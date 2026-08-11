@@ -16,6 +16,285 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 10.08.2026 SPAETABENDS -- KORREKTUR AN KON4-10: ES GIBT KEINEN STEMPEL-RISS
+
+**Dieser Nachtrag widerruft eine Aussage, die ich WENIGE STUNDEN VORHER selbst in denselben
+Ledger geschrieben habe.** KON4-10 bleibt woertlich stehen; er ist ab hier ueberholt.
+
+### KON5-01 -- WAS KON4-10 BEHAUPTETE UND WARUM ES FALSCH IST
+
+KON4-10 sagte: "measurement_line ist leer, weil der Perm-Pfad den 2-arg-Zweig von
+COMDARE_ANATOMY_VERSION_STAMP trifft. Fix: den 3-arg-Zweig treffen."
+
+**Am Objekt widerlegt.** Die Kette ist korrekt verdrahtet, vollstaendig verfolgt:
+
+    profile_run_entry.hpp:482    ruft make_lazy_adhoc_source_gen_from_env()   RICHTIG
+    lazy_adhoc_source_gen:312    liest COMDARE_MEASUREMENT_COMBO aus der Umgebung
+    lazy_adhoc_source_gen:221    make_lazy_adhoc_source_gen(measurement_stamp = {})
+    adhoc_emitter.hpp:122        if (measurement_stamp.empty()) -> 2-arg, sonst 3-arg
+
+Und der Kommentar an der Aufrufstelle (profile_run_entry.hpp:480-482) sagt es woertlich:
+
+    "S6-P1b Env-Bruecke (e): die vom Planer gewaehlte Mess-Combo reist via
+     COMDARE_MEASUREMENT_COMBO in den lazy Source-Gen -> die je-Combo-Bauten stempeln
+     ihre DLLs REAL. UNGESETZT/[all] => "" => byte-identische Quellen"
+
+**Der leere Mess-Stempel bei ungesetzter Combo ist dokumentiertes SOLLVERHALTEN.** Er schuetzt
+den golden-320-Pfad vor Byte-Drift. Die Verzweigung ist korrekt. Das Prueff-Dock-Gate hat
+KORREKT angeschlagen -- es meldete eine leere Mess-Deklaration, was bei einer ECHTEN Messung ein
+Fehler waere. Der Durchstich-Agent hatte die Variable nicht gesetzt.
+
+**Es gibt keinen Code-Riss zu heilen. Ich haette einen funktionierenden Mechanismus
+"repariert".**
+
+### KON5-02 -- DIE FEHLERKLASSE, und sie ist dieselbe wie in KON4-09
+
+KON4-09 haelt fest: "Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber
+ihn." Genau dasselbe gilt fuer MEINEN EIGENEN Postenschnitt. Ich hatte den Agentenbericht
+("der Perm-Pfad trifft den 2-arg-Zweig") uebernommen, ohne die Kette zu Ende zu verfolgen --
+also die Klasse V1: ein Bericht ist Beweismaterial, kein Beweis.
+
+Was den Fehler gefangen hat: der Kern-Explore, angewandt auf den EIGENEN Posten. Die Regel
+gilt nicht nur fuer geerbte Aufgaben, sondern auch fuer selbst geschriebene.
+
+### KON5-03 -- DIE RICHTIGE AUFGABE, neu geschnitten
+
+    (A) DURCHSTICH: der Mini-Lauf muss COMDARE_MEASUREMENT_COMBO setzen -- die vom Planer
+        gewaehlte Combo. ZU PRUEFEN: emittiert der CEB sie in die Mess-Jobs? Im
+        cache_engine_builder_iterator.hpp erscheint sie in ZWEI Kommentaren (:152, :347),
+        nicht als sichtbare Emission. DAS ist die Luecke, nicht der Emitter.
+    (B) GATE-SCHAERFE (Haertung, kein Riss): unterscheidet das Prueff-Dock zwischen
+        "Provisionierungs-Lauf ohne Combo" (legitim) und "Mess-Lauf ohne Combo" (Fehler)?
+
+### KON5-04 -- DIE REIHENFOLGE BLEIBT OFFEN, ALS OWNER-VORLAGE (nicht als Bau)
+
+Die Owner-Anweisung "system vorn, organ hinten" ist von diesem Befund UNBERUEHRT und weiterhin
+gueltig. Sie trifft aber DREI Ebenen mit sehr verschiedenen Kosten:
+
+    (1) Makro-Argumente        anatomy_module_abi_v1.hpp:213 / :162
+        KOSTEN: der emittierte Quelltext aendert sich -> die 320er-Byte-Identitaets-Wachen
+        (adhoc_emitter.hpp:119 benennt sie selbst). 88 Test-Dateien tragen
+        golden/CRC/Roundtrip, 16 fassen Stempel oder Fingerprint an. Neuer golden-Stand noetig.
+
+    (2) POD-Feldreihenfolge    anatomy_module_abi_v1_decl.hpp:200
+        KOSTEN: ABI-BRUCH. stamp_layout_version 6 -> 7, jeder Loader, jede vendorierte DLL,
+        alle Tier-Binaries neu.
+
+    (3) Preimage-Glied-Folge   anatomy_fingerprint.hpp:601, Glied-Count FEST = 9
+        KOSTEN: JEDER SHA-512-FINGERPRINT AENDERT SICH -- alle Lager-Anker, alle
+        .fingerprint-Sidecars, jeder binary_id-Bezug. Der teuerste Bruch des Systems.
+
+EMPFEHLUNG: Option (1). Der Owner-Satz fiel im Kontext des EMITTIERTEN Makro-Calls, und die
+Stufen-Ordnung ist eine Aussage ueber die lesbare Form des Stempels, nicht ueber die
+Byte-Reihenfolge einer Hash-Eingabe. Guenstigster Moment: zusammen mit einer ohnehin faelligen
+Aenderung am emittierten Quelltext -- EIN golden-Bruch statt zwei.
+
+OFFEN UND NICHT ZU RATEN: wo die MESS-Stufe steht. Der Satz ordnet nur system und organ.
+
+### KON5-05 -- ZEHN-WOCHEN-EXPLORE GEFAHREN: es gab NIE eine Festlegung
+
+Der gesamte Bestand hat organ zuerst -- Makro, POD, Preimage, und das Enum
+AxisKind{organ, system_measurement, system_config} (axis.hpp:17-21).
+
+Ledger flach durchsucht (2.734.392 Byte, tr '\n' ' ' gegen die Zeilenumbruch-Falle):
+
+    "Preimage-Ordnung"      0
+    "feste Preimage"        0
+    "system vor organ"      0
+    "Stempel-Reihenfolge"   1   -- und dieser Treffer meint die Reihenfolge der 18
+                                   ORGAN-ACHSEN INNERHALB der Organ-Zeile, nicht organ-vs-system
+
+**Die Owner-Anweisung ist eine NEUORDNUNG, keine Wiederherstellung.** Das ist fuer die
+Kostenabwaegung wesentlich: es gibt keinen frueheren Zustand, zu dem man zurueckkehrt.
+
+### KON5-06 -- NEBENFUND: die Diff-Hygiene-Wache existiert in ZWEI Fassungen
+
+Beim Fahren aufgefallen (sie brach mit "Unbekannte Option '--bereich'" ab):
+
+    ce     scripts/ci_diff_ascii_width_guard.sh   779 Zeilen  sha1 6d98605a62ee  --bereich
+    super  scripts/ci_diff_ascii_width_guard.sh   558 Zeilen  sha1 0014fe29648c  --seit-basis --bestand
+
+Dieselbe Datei, derselbe Zweck, zwei Fassungen -- der Abschrift-Fall, gegen den B-3 gebaut ist,
+im Wachen-Werkzeug selbst. Heute knallt es nicht, weil die Optionsnamen sich unterscheiden und
+ein falscher Aufruf sauber abbricht. Das ist Glueck, keine Konstruktion. Gefaehrlich bleibt:
+`--stdin` gibt es in BEIDEN -- der einzige gemeinsame Pfad, mit moeglicherweise
+unterschiedlichem Verhalten und ohne Abbruch. Und ce hat 221 Zeilen MEHR: beim super-main-FF
+misst also eine schwaechere Wache, und beide drucken "GRUEN".
+## NACHTRAG 10.08.2026 ABENDS -- DIE SIEBEN KERN-EXPLORES: KEIN EINZIGES "STIMMT"
+
+**Anlass, Owner verbatim 10.08.:** "Jede Verarbeitung braucht vorne einen Explore, ob ueberhaupt
+der KERN ihrer Aufgabe stimmt, sonst muessen wir die DEFINITION der Aufgabe korrigieren."
+
+Daraufhin bekam jedes Paket der F1-Kette eine Pflicht-Stufe 0 mit vier zulaessigen Urteilen,
+als Pflichtfeld im Schema. Gefahren als Workflow wf_e22d25ef-71c, 11 Agenten, 0 Fehler.
+
+    SCHON_ERLEDIGT     5    D1b - D2-G1 - D3-7 - D3-3 - ##23
+    STIMMT_TEILWEISE   2    ##08 - ##20+D3-6
+    STIMMT             0
+
+Fuenf von sieben Paketen waeren neu gebaut worden, obwohl sie fertig sind. Jeder Neubau haette
+eine ZWEITE WAHRHEIT neben der bestehenden erzeugt und deren gefahrene Koeder entwertet.
+
+Vollstaendige Fassung mit allen Belegen: Fussnote **F1-KERN** in
+docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md.
+
+### KON4-01 -- LEDGER-KORREKTUR: die D2-G1-Zeile war falsch UND gefaehrlich
+
+Ledger-Zeile 2626 sagt: "zwei gegenstandslos -- D2-G1 durch den W-1-Wurzelfix geheilt, D1b
+durch eine Bauweg-Aenderung ueberholt."
+
+**Der D2-G1-Teil dieses Satzes ist am Objekt falsch.** Er verharmlost die Fehlerklasse. Richtig:
+
+    Es waren ZWEI unabhaengige Defekte, nicht einer.
+      (a) enable_testing()-Reihenfolge  -> keine CTestTestfile.cmake  (W-1-Wurzelfix)
+      (b) gtest_discover_tests-Defekt   -> vom Wurzelfix ERST SICHTBAR GEMACHT
+
+Der Wurzelfix hat (a) geheilt und dabei (b) als NOT_BUILT-Daueralarm freigelegt. Geschlossen
+wurde (b) zwei Tage spaeter mit **ce ca6d8af1** ("D2-G1: die zwei gtest-Binaries unter libs/
+nach dem Repo-Muster registrieren"). SELBST GEPRUEFT: der Commit existiert und ist Vorfahr von
+origin/development.
+
+**Geltende Fassung:** "D2-G1 war NICHT gegenstandslos -- der Wurzelfix legte einen zweiten,
+unabhaengigen Defekt frei (gtest_discover_tests), der am 10.08. mit ca6d8af1 geschlossen wurde."
+
+**Warum das zaehlt:** ein Satz, der einen zweiten Defekt als "gegenstandslos" fuehrt, loescht
+genau die Information, die beim naechsten Mal noetig waere. Ein Wurzelfix, der etwas sichtbar
+macht, ist keine Heilung des Sichtbargewordenen.
+
+### KON4-02 -- die 27 ist heute 30
+
+test_commands.cpp = 23, test_engine_adapters.cpp = 7. SELBST NACHGEZAEHLT aus dem Git-Index
+(git show HEAD:<pfad>, ^TEST(_F|_P)?\(). Die "20+7=27" war der Stand von 759b695a (06.07.);
+am 09.08. kamen mit cc9c233e/905bd1aa drei Welch-Faelle dazu.
+
+### KON4-03 -- D1b IST ZU STREICHEN, nicht zu bauen
+
+Die Messung des Plans stimmt, die Schlussfolgerung nicht.
+
+    grep -c -F "adhoc_emitter" .gitlab-ci.yml        = 0    (Gegenprobe comdare_tests = 10)
+
+ABER: es gibt keine Prebuild-Liste mehr, in die man ihn eintragen koennte. SELBST GEMESSEN:
+
+    aktive Zeile  ^\s*COMDARE_TEST_PREBUILD_TARGET   = 0
+    GEGENPROBE    ^\s*COMDARE_TEST_CMAKE_BUILD_DIR   = 1    (die Null traegt)
+    Vorkommen gesamt                                  = 2, BEIDE in Kommentaren
+
+Die verlangte Massnahme wuerde die am 08.08. bewusst zurueckgebaute Fehlerklasse -- eine
+Handliste neben dem Bauweg -- wieder einfuehren.
+
+**Was stattdessen offen ist**, vom CI-File selbst benannt (ce/.gitlab-ci.yml:934-938,
+Kommentar "OFFEN (eigenes Paket)"): test:unit veroeffentlicht seit D1c seine Inventur als
+build/Testing/ctest_unit_inventar.txt -- DER VERBRAUCHER FEHLT. test:coverage-guard liegt in
+Stage 'contract', test:unit in Stage 'test'; needs darf nicht vorwaerts zeigen (17 needs-Kanten,
+0 vorwaerts). Das ist ein STAGE-TOPOLOGIE-Posten, kein Prebuild-Posten.
+
+### KON4-04 -- der Selektor ist NICHT MEHR DISJUNKT (Wellenplan Z.67 ueberholt)
+
+Der Plan behauptet: "der anhang:forward-Selektor (*.result.csv) trifft die Produktions-Ablage
+(result.csv) NIE -- die Muster sind disjunkt, nachgemessen."
+
+SELBST GEMESSEN, ci/anhang_forward_core.sh:202:
+
+    AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"
+
+BEIDE Formen, EINE Definition, drei Verwendungen. Gelandet mit 6d2e3dce (09.08.), in
+origin/development; der Kopf der Datei fuehrt den alten Zustand als geheilte Falle F1 (:41-45)
+namentlich. Selbstbiss am unveraenderten Stand gefahren: "11 Faelle, 11 gehalten, 0 gerissen"
+und "6 von 6 Mutanten haben die Probe rot gemacht".
+
+**D3-6 ist damit erledigt.**
+
+### KON4-05 -- ##08: der Auftrag hat einen NAMEN missverstanden
+
+"lazy_csv_header" -- das Wort "lazy" ist das Praefix der lazy-LAUF-Familie
+(run_lazy_static_then_dynamic, LazyRunConfig, LazyMeasuredRow, lazy_try_resume_binary), es ist
+KEIN Emissionsverhalten. Und "EINMAL" im Postentitel heisst "EINE Definition" (B-3 =
+Abschrift-Beseitigung), nicht "einmal geschrieben". Nenner: 3531 durchsuchte C/C++-Dateien,
+1 Definition (cache_engine_builder_iterator.hpp:504).
+
+Eine gebaute lazy-Header-Emission wuerde ci/mess_ausbeute_wache.sh:186-190 modus-blind rot
+machen und das N_LEER-Signal loeschen. **NIE BAUEN.**
+
+Schema-Freeze Stufe 1 + B-3 sind erledigt (schema_freeze.hpp Kopf "2026-08-09",
+kWideSchemaFreezeStufe1 = 189 Spalten, zwei gtests, Ledger:4079 03f897dd).
+
+### KON4-06 -- ##20: die VORSCHRIFT ist falsch, nicht der Code
+
+##20 sagt "`|| true` beim git add faellt". Am Objekt: rc=128 bei JEDEM DE-only-Lauf -- genau
+deshalb stand die Zeile jahrelang so. Ein blindes Entfernen macht den Kanal rot.
+
+### KON4-07 -- ##23: der Auftrag vermischte ZWEI Nahtstellen
+
+    (A) ergebnis_mappe_naht.hpp   die Mappe IM LAUF, Richtung xlsx -> csv
+    (B) tools/mess_report/        ein CLI, das eine BESTEHENDE Mess-CSV liest
+
+Der Postentitel "Mess-CSV -> xlsx" beschreibt (A) falsch herum -- die Owner-Doktrin ist
+xlsx -> csv, die Mappe entsteht zuerst. Alle vier Teile sind gebaut, die Abnahme wurde gegen
+das ECHTE 320er-Archiv gefahren.
+
+**Restposten R1, Blocker fuer jede echte Kampagne:** die acht vendorierten thesis_profiles sind
+xlsx-blind (mit_xlsx=1 ohne_xlsx=8 ueber Nenner 9). Der Gitlink wurde am 10.08. auf e114cabd
+gehoben (super 0e11e1f8); ob das den geforderten Stand >= 4a26b6a3 einschliesst, ist beim Bau
+NEU AUSZUZAEHLEN, nicht anzunehmen.
+
+### KON4-08 -- FUENF NEU GESCHNITTENE RESTPOSTEN, keiner davon vermessen
+
+    Stage-Topologie   der Verbraucher der test:unit-Inventur fehlt (aus D1b)
+    D3-7b             der dritte Modus (pruef_only) fehlt in der Treiber-Bilanzzeile
+    D3-3b             eine LEERZEILE ist kein Messwert -- drei Dateien in EINEM Commit
+    ##20-B            die Vorschrift korrigieren, nicht den Code
+    ##23-R1           die acht vendorierten Profile sind xlsx-blind
+
+Die alten Aufwaende (D1b 1,5 h, D2-G1 2 h) fallen. Die Restposten duerfen NICHT stillschweigend
+als gleich teuer gefuehrt werden.
+
+### KON4-09 -- DIE ALLGEMEINE LEHRE, und sie ist teuer bezahlt
+
+Derselbe Kern-Explore lief im Hauptstrang-Workflow NICHT vorgeschaltet, sondern erst beim
+Bauen. Dort war in FUENF VON FUENF Faellen der Bauauftrag am Objekt falsch, weil er aus Plaenen
+und Ledger-Zitaten gebaut war, die selbst veraltet sind. Vier der fuenf Bauenden haben ihren
+eigenen Auftrag widerlegt und damit einen Fehlbau verhindert.
+
+**Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber ihn.**
+
+Schaerfster Einzelbeleg (P5): der Ledger korrigierte in KON2-15 eine tote Zeilennummer -- auf
+eine ZWEITE tote Zeilennummer. Drei Zahlen fuer einen unveraenderten Satz, die mittlere
+geschrieben von jemandem, der gerade eine tote Zahl reparierte.
+
+### KON4-10 -- STEMPEL: SYSTEM VORN, ORGAN HINTEN (Owner 10.08.)
+
+> "system sollte immer vorn stehen und organ hinten. Das entspricht der Anordnung der Stufen."
+
+Die Argument-Reihenfolge bildet die Stufen-Ordnung ab: System gibt frei, Organ setzt durch --
+die Freigabe steht vorn. Verwandt und begruendend: System-Achsen = Freigabe, Organ-Achsen =
+Durchsetzung.
+
+**Der IST-Stand ist falsch herum**, gemessen im F1-Durchstich am erzeugten perm.cpp:
+
+    COMDARE_ANATOMY_VERSION_STAMP("<organ>", "<system>")     <- ORGAN zuerst
+
+Und die 2-arg-Form ist in anatomy_module_abi_v1.hpp:213 definiert als _M(organ, system, "") --
+mit LEEREM Mess-Stempel. Die 3-arg-Vollform steht daneben (:162); adhoc_emitter.hpp hat beide
+Zweige (:124 / :131), Verzweigung an if (measurement_stamp.empty()).
+
+Gemessen im Tier-Binary (eigenes dlopen, FREMDE Quelle -- nicht die Gate-Meldung):
+
+    organ_line        len=666, 18 Eintraege   belegt
+    system_line       len=101                 belegt
+    measurement_line  len=0                   LEER
+
+Deshalb bricht die Kette an Stufe 1: fehlerklasse=mess_konsistenz status=deklaration_leer,
+haupt_ist=0 haupt_soll=3.
+
+**ZWEI Aenderungen, nicht eine.** Wer nur den leeren Mess-Stempel heilt, zementiert die
+Stufen-Ordnung falsch. OFFEN und vor dem Bau zu klaeren, nicht zu raten: wo die MESS-Stufe in
+der Reihenfolge steht -- der Owner hat in diesem Satz nur System und Organ geordnet.
+
+### KON4-11 -- die Kette bis ##25 ist LEER
+
+Nach diesen Urteilen sind alle Vorglieder des Durchstichs erledigt oder gestrichen. Der
+Durchstich haengt nicht mehr an ihnen, sondern allein an KON4-10. **Das ist der einzige
+verbleibende Blocker vor F1 (Fr 14.08.).**
 ## LEDGER-KONSOLIDIERUNG III -- 10.08.2026, Session-Log-Durchgang
 
 Auftrag Owner 10.08.2026: "Bitte pruefe auch den gesamten Kontext auf alle anderen Probleme, die

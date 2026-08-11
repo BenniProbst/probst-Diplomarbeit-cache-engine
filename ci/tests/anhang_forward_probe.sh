@@ -797,7 +797,11 @@ fi
 #   FOLGE, ausdruecklich benannt: die awk-Zaehlung ist an DIESER Stelle heute
 #   REDUNDANTE Deckung, nicht die tragende. Tragend fuer den Ein-Zeilen-Fall ist
 #   das 'awk 1' der Konkatenation. Die awk-Zaehlung bleibt trotzdem: sie ist die
-#   Zusage "wortgleich zu Wache und Sammler", und sie faengt den Fall ab, falls
+#   Zusage "dasselbe Zaehl-WERKZEUG wie Wache und Sammler" -- seit D3-3b
+#   (10.08.2026) ausdruecklich nicht mehr dieselbe Zaehl-REGEL, denn das Aggregat
+#   muss abbilden, was TATSAECHLICH angehaengt wurde (Begruendung in
+#   ci/wide_aggregat.sh, Abschnitt "ABGRENZUNG ZU D3-3b").
+#   Sie faengt den Fall ab, falls
 #   jemand das 'awk 1' spaeter wieder entfernt. Zwei Deckungen desselben Falls
 #   sind kein Fehler -- sie unbenannt zu lassen waere einer.
 # =============================================================================

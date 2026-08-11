@@ -1381,7 +1381,27 @@ thesis:pdf:
             export COMDARE_MINIO_ENDPOINT="prodcache"   # ArtifactCache liest dies als mc-ALIAS-Namen
             echo "  Ebene B aktiv: mc-Alias=prodcache Bucket=${COMDARE_MINIO_BUCKET} (Creds via MC_HOST env, nie argv)"
           else
-            echo "  [Infra-Fehler: minio-CI-Vars unvollstaendig -> Ebene B inert, Messung laeuft weiter]"
+            # LAUTER GUARD (Infra-Bitte 10.08.2026, wichtiger als der Cache selbst):
+            # Ein gesetzter ENDPOINT ist eine ABSICHTSERKLAERUNG -- "diese Messung soll
+            # cachen". Fehlt dann ein Schluessel, lief der Job bisher GRUEN OHNE CACHE.
+            # Das ist keine Fehlermeldung, das ist eine verfaelschte Messung: die
+            # Falsch-Gruen-Klasse, die in diesem Projekt am teuersten war.
+            # UNTERSCHEIDUNG, auf die es ankommt:
+            #   ENDPOINT gesetzt + Schluessel fehlt  -> KONFIGURATIONSFEHLER, hart rot
+            #   ENDPOINT ungesetzt                   -> Ebene B gar nicht gewollt, inert ok
+            if [ -n "${COMDARE_MINIO_ENDPOINT:-}" ]; then
+              echo "  [Infra-Fehler] COMDARE_MINIO_ENDPOINT ist GESETZT, aber die Zugaenge sind unvollstaendig."
+              echo "    NENNER (welche der vier fehlt, namentlich):"
+              for _v in MINIO_ACCESS_KEY MINIO_SECRET_KEY COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET; do
+                eval "_w=\${$_v:-}"
+                if [ -n "$_w" ]; then echo "      $_v = gesetzt"; else echo "      $_v = FEHLT"; fi
+              done
+              echo "    Ein gesetzter Endpunkt heisst: diese Messung SOLL cachen. Ohne Zugang"
+              echo "    liefe sie ohne Cache weiter und saehe gruen aus -- das ist eine"
+              echo "    verfaelschte Messung, kein Infra-Hinweis. Deshalb hart rot."
+              exit 1
+            fi
+            echo "  [Ebene B nicht angefordert: COMDARE_MINIO_ENDPOINT ungesetzt -> inert, Messung laeuft weiter]"
             unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
           fi
         else

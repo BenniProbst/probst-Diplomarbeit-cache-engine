@@ -82,13 +82,28 @@
 #   ein provision_only-Lauf, der per Bauart nicht misst. Was diese Wache
 #   hinzufuegt, ist ausschliesslich das MASKIEREN durch fremde Zeilen.
 #
-# ZAEHLWEISE, ausdruecklich benannt -- IDENTISCH zu ci/mess_ausbeute_wache.sh
-# und ci/persist_sammler.sh:
-#   Datenzeilen = (Zeilen der Datei) - 1, gezaehlt mit awk 'END{print NR+0}',
-#   NICHT mit `wc -l` (das zaehlt Umbrueche und meldet eine Datei ohne
-#   abschliessenden Newline um eine Zeile zu niedrig). Eine leere Datei hat 0
-#   Zeilen und damit 0 Datenzeilen, nicht -1. Drei Gates derselben Kette duerfen
-#   sich in der Zaehlweise nicht widersprechen.
+# ZAEHLWEISE, ausdruecklich benannt -- WORTGLEICH zu ci/mess_ausbeute_wache.sh
+# und ci/persist_sammler.sh (dasselbe awk-Programm, Byte fuer Byte):
+#   Datenzeilen = alle Zeilen AB DER ZWEITEN, die mindestens ein Zeichen tragen,
+#   das kein Leerraum ist. Die erste Zeile ist der CSV-Kopf und zaehlt nie mit.
+#   Gezaehlt wird mit awk, NICHT mit `wc -l` (das zaehlt Umbrueche und meldet
+#   eine Datei ohne abschliessenden Newline um eine Zeile zu niedrig). Eine
+#   leere Datei hat 0 Zeilen und damit 0 Datenzeilen, nicht -1. Drei Gates
+#   derselben Kette duerfen sich in der Zaehlweise nicht widersprechen.
+#
+#   EINE LEERZEILE IST KEIN MESSWERT (D3-3b, 10.08.2026). Vorher galt
+#   `Datenzeilen = Zeilen - 1`; damit zaehlte jede leere und jede nur aus
+#   Blanks/Tabs bestehende Zeile mit. Fuer DIESE Wache ist das der schwerere
+#   Fall: ihr zweiter Ausgang haengt an `datenzeilen_dieser_lauf == 0`. Eine
+#   frische Zelle, die nur Kopf und Leerzeilen schrieb, hatte Z_DIESER > 0 --
+#   und genau das Maskierungs-Gate, das dafuer gebaut wurde, blieb still. Die
+#   Heilung geht nur in die scharfe Richtung: Z_DIESER kann seither nur kleiner
+#   werden, das Gate also nur oefter beissen, nie seltener.
+#
+#   EIN DURCHLAUF, ZWEI ZAHLEN: das awk-Programm gibt "<rohzeilen> <datenzeilen>"
+#   aus; die verworfene Menge faellt daraus als eigener NENNER ab
+#   (datenzeilen_verworfen), damit "0 Datenzeilen" von "0 Zeilen" unterscheidbar
+#   bleibt.
 #
 # AUFRUF:
 #   sh ci/frische_wache.sh pruefen <wurzel> [<lauf-kennung>]
@@ -162,13 +177,18 @@ wache_pruefen() {
     Z_ALT=0
     Z_OHNE=0
     N_DIESER_VOLL=0
+    Z_VERWORFEN=0
     ALT_LISTE=''
     OHNE_LISTE=''
     while IFS= read -r F; do
         [ -n "$F" ] || continue
-        # Datenzeilen dieser Datei -- Zaehlweise wortgleich zur Ausbeute-Wache.
-        _zeilen=$(awk 'END{print NR+0}' "$F")
-        if [ "$_zeilen" -le 1 ]; then _daten=0; else _daten=$((_zeilen - 1)); fi
+        # Ein Lesevorgang, zwei Zahlen: "<rohzeilen> <datenzeilen>". Das
+        # awk-Programm steht Byte-gleich in ci/mess_ausbeute_wache.sh und
+        # ci/persist_sammler.sh.
+        _paar=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$F")
+        _zeilen=${_paar%% *}
+        _daten=${_paar##* }
+        if [ "$_zeilen" -gt 1 ]; then Z_VERWORFEN=$((Z_VERWORFEN + _zeilen - 1 - _daten)); fi
         _m="$(dirname "$F")/$MARKER_NAME"
         if [ ! -f "$_m" ]; then
             N_OHNE=$((N_OHNE + 1)); Z_OHNE=$((Z_OHNE + _daten))
@@ -205,6 +225,7 @@ wache_pruefen() {
     echo "  csv_altbestand=$N_ALT           datenzeilen_altbestand=$Z_ALT"
     echo "  csv_ohne_marker=$N_OHNE          datenzeilen_ohne_marker=$Z_OHNE"
     echo "  davon $N_DIESER_VOLL Datei(en) dieses Laufs mit modus=voll (nur die SOLLTEN messen)."
+    echo "  datenzeilen_verworfen=$Z_VERWORFEN  (leer oder nur Leerraum -- kein Messwert)"
     echo "  (die drei Teilmengen ergeben zusammen csv_gesamt -- keine Datei faellt"
     echo "   zwischen zwei Wachen hindurch.)"
     echo "$TRENN"

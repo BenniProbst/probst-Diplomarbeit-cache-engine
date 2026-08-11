@@ -29,6 +29,7 @@
 - **##36-Köder** kann den Zielfall nicht sehen: eine Null-Fenster-Zelle liefert im ungeheillten Gate `reruns=0` — exakt die Zahl, die laut Köder „nicht verdrahtet" bedeutet. Korrigiert auf **zwei degenerierte Zellarten** (Null-Fenster → „unbestimmbar", echte Streuung → Reruns), beide Zahlen getrennt.
 - **##04/##05** waren Abnahmezeilen **ohne Bau-Paket** — die Vorlage verifizierte den `make check`-Defekt und heilte ihn nirgends. **V-6 gilt jetzt beidseitig** (Paket ohne Abnahmezeile UND Abnahmezeile ohne Paket = nicht abgenommen); D1/D1a schließen die Lücke.
 - **##57**-Köder („Datensatz mit nur einer Binary") beißt aus dem falschen Grund und wäre auch nach einer Heilung grün — der Rückgabetyp kann „nicht bestimmbar" von „bestimmt: keiner" heute gar nicht unterscheiden (D4f); Abnahme auf den Statusraum umgestellt.
+- **##20-Vorschrift** ~~„`AF_GENERATOR` belegen, `|| true` beim `git add` fällt"~~ → **„`AF_GENERATOR` belegen (erledigt); das `git add` nennt statt Verzeichnissen die Buchführungsliste `$COPIED_LIST` dieses Laufes, `2>/dev/null` UND `|| true` fallen dabei beide, Ausgabe `im Index: N von M kopierten Datei(en)`, `N != M` = Abbruch"** — **RICHTIGSTELLUNG 10.08.2026 am Objekt, s. Fußnote ##20-B**. Wörtlich gebaut hätte v1 hier den Kanal rot gemacht (DE-only gegen ein Ziel ohne `anhang/en`: rc **128**); die Begründung des Kern-Explores („rc=128 bei *jedem* DE-only-Lauf", „stand *jahrelang* so") ist ihrerseits zu stark bzw. falsch — 289 trägt **18 von 18** je Sprache, und die Zeile ist vom **06.08.2026**. Der echte Defekt liegt daneben und ist reproduziert: bei jedem `git add`-Fehlschlag aus anderem Grund (gemessen: stale `index.lock`) meldet der Kanal `IDEMPOTENT: 0 Aenderungen`, **Exit 0**, und **0 von 2** Messwert-Dateien landen.
 - **Einwand-36-Erklärung** („610 Tests = Folge von EXCLUDE_FROM_ALL") wird **nicht festgeschrieben**: super `Code/CMakeLists.txt:278 enable_testing()` steht ebenfalls NACH den `add_subdirectory`-Aufrufen (:211/:243) — dieselbe D2-G1-Konstellation; welche Ursache trägt, entscheidet die Messung in D1g, nicht der Plan.
 
 **(3) HYBRID kehrt ins Fenster zurück.** v1 führte Hybrid-Bau als Streichkaskade Position 2 / W7. Der Owner-KERN 08.08. („Volles GO. Alles Pflicht.", Gattung `HEURISTIK-ADAPTER`, Genus `Function-Interface-Reroute`, 4. Mess-Ebene DAZWISCHEN) verbietet das. Der Widerspruch wird **zerlegt statt glattgerechnet**, entlang des älteren, als bindend markierten Owner-E1-Designs (`hybrid/README.md`: „kein eigener ABI-Schritt", „Erster Meilenstein = F8-Minimal-DoD, genau 1 Standard-Dock", Router = Break-Even-Router, der Messkurven **konsumiert**): **HY-A** (Struktur+Dock+Achse+Parser) in die Freeze-Woche, **HY-B** (Overhead-Messung mit Stub-Heuristik, eigene kleine Teilmatrix) in die Mess-Welle, **HY-C** (Router aus echten Kurven) in die Auswertung. **Preis, offen ausgewiesen:** der W2-S-E-Restbau (##40: T-06…T-14, W-03, W-08, A14, A10) fällt nach W7 (Abschnitt 7).
@@ -66,6 +67,16 @@ Alle Zahlen heute (08.08.) erhoben, Messaufbau: ce-Worktree `/home/comdare/wt-ce
 
 **Der lebende Mess-Weg kann nicht rot werden:** der CEB-emittierte STUFE-3-Mess-Job liest `measure_out` an keiner Zeile zwischen `FAIL=0` (:1447) und `exit $FAIL` (:1528) und trägt das **einzige** `allow_failure: true` der Datei (:1394, Begründung ist Agent-Behauptung ohne Owner-Wort). Das statische Existenz-Gate akzeptiert reproduzierte Kopfzeilen- und 0-Byte-CSVs (rc=0, heute gefahren); `persist:measurements` zählt Dateien statt Zeilen und macht das Phantom unter „Messdaten nie löschen" **permanent**; der `anhang:forward`-Selektor (`*.result.csv`) trifft die Produktions-Ablage (`result.csv`) **nie** — die Muster sind disjunkt, nachgemessen.
 
+> ⚠️ **KORREKTUR-EINSCHUB 10.08.2026 — der letzte Halbsatz ist ÜBERHOLT; er bleibt stehen, weil
+> der Bestand an Irrtümern selbst ein Datum ist.**
+> Die Muster sind **nicht mehr disjunkt**. Am Objekt heute, eine Definition und drei Verwendungen:
+> `ci/anhang_forward_core.sh:202` → `AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"`
+> — **beide** Formen. Gelandet mit `6d2e3dce` (09.08., „zwei Transportfallen im Anhang-Kanal, plus
+> eine dritte"), in `origin/development`; der Kopf der Datei führt den alten Zustand als geheilte
+> Falle F1 (`:41-45`) namentlich. Der Rest des Absatzes (`allow_failure`, Existenz-Gate,
+> `persist:measurements`) ist an anderer Stelle bereits korrigiert. **Damit ist D3-6 erledigt** —
+> Belege und Restposten in der Fußnote **F1-KERN** unten.
+
 **Die Statistik erklärt tote Reihen für gültig:** `welch_t_test.hpp:130-136` (se≤0 → t=0, p=1.0, `valid=true`), `mann_whitney_u_test.hpp:90/:92` (`valid=true` VOR dem Guard), `multi_compare.hpp:75/:83` (p=1.0 in die Bonferroni-Familie; `win_rate`-Nenner enthält Ungetestetes), `result_aggregator.hpp:86` (`success = !empty` — 32 Nullen = success), `drift_detector.hpp:69-72/:122/:128` (median≤0 → drift=0.0 = Minimum → der Rerun-Loop endet **bevorzugt auf der kaputten Gruppe** mit `stable=true`). Perzentile: **2** Definitionen, beide fälschlich „Nearest-Rank" benannt, in 4700/9998 Probefällen verschieden; A's p99 == max für n≤100 trifft 2 von 3 write-Checkpoints der Default-Konfiguration. Median: **5** Implementierungen, **3** Antworten (20/25/30 auf {10,20,30,40}); die Zahl der Sieger-Kürung ist bei geradem n eine andere als die in der LaTeX-Tabelle (`best_binary_selector.cpp:183-188` sagt es selbst: „REV-DATA-12 (offen)").
 
 **Menge und Maschine:** `--check-size` und `<measure_selection>` = 0 Treffer (beide Repos); die einzige Rechnung für die Voll-Matrix: **~143 Tage einthreadig als Untergrenze** (0,1094 s ist doppelt als Untergrenze markiert, Spanne Faktor 69). Bau des Bestands: **128 × 19,4 min ≈ 41,4 h** auf prod1 allein. `getent hosts prod2` → rc 2, während `05_evaluation.tex:78-79` den Zwei-Maschinen-Betrieb im Präsens zusagt. prod1: `/` zu 83 % voll, 43 G frei, Runner id=16 auf derselben Platte, concurrent=2; jede Permutations-TU 523 MB MaxRSS.
@@ -90,7 +101,7 @@ Sie stehen zwischen uns und einer belastbaren Messung und gehören deshalb hierh
 |---|---|---|---|---|
 | D1 | Reconfigure in `check`; Zahlen 427/429/431 gemessen, beide Gate-Familien benannt | 3 | W-1 | mit D1a in EINEM Commit |
 | D1a | `make` (all) baut **0/53** Permutations-DLLs — Produkt-Problem, `make install` unvollständig; 2-Pass-Bau ist hausübliche Praxis (`base-pipeline.yml:470-477`) | 2,5 | W-1 | nach D1, gleiche Datei |
-| D1b | CI-Prebuild kennt `comdare_adhoc_emitter_cli` nicht → 2 von 431 Tests laufen in **keinem** Job (`.gitlab-ci.yml:637`) | 1,5 | W0a | **D1e ZWINGEND vorher** |
+| D1b | ~~CI-Prebuild kennt `comdare_adhoc_emitter_cli` nicht → 2 von 431 Tests laufen in **keinem** Job (`.gitlab-ci.yml:637`)~~ → **STREICHEN, nicht bauen** (F1-Kern-Explore 10.08., s. Fußnote F1-KERN) | ~~1,5~~ **0** | — | **entfällt** |
 | D1c | Abdeckungs-Wache bleibt grün gegen die korrekte Inventur (`guard431.log`) → zweite Achse: Job-Baum-Inventur aus **fremdem** Artefakt, N≠M = rot; fail-closed | 5 | W0a | nach D1b, D1f |
 | D1d | Doku-Widerspruch „404 statt 406" (Guard-Kopf) vs. „427 gegen 431" (super-Makefile) — der falsche Kommentar hat den unvollständigen CI-Job **erzeugt**; Zahlen künftig mit Datum+Kommando | 0,5 | W-1 | nach D1-Messung (K13) |
 | D1e | `f15_compare_cli_smoke`: Binary nicht in der `comdare_tests`-Baukante (424 Inputs), `PASS_REGULAR_EXPRESSION` hängt den Exit-Code ab (11 Fehlerausgänge unsichtbar), Kommentar beschreibt einen anderen Test, kein TIMEOUT | 2 | W0a | vor D1b |
@@ -107,7 +118,7 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 |---|---|---|---|---|
 | D2-G4 | **Textkorrektur der Abnahme ##06 VOR dem Bau**: ~~15 bedingte Registrierungen in 8 Klassen~~ → **18 bedingte Registrierungen unter 14 Bedingungs-Ausdrücken** (am Objekt 09.08. nachgezählt, s. Fußnote D2-G4); 2 der 5 STATUS_OUT-Blöcke in jeder CI unerreichbar **und ohne jede Test-Registrierung**; Formel „erfüllt ODER Allowlist mit Begründung"; Zähl-Skript als unabhängige Quelle | 1 | W0a | **ERLEDIGT 09.08.** (super `scripts/ci_abnahme06_bedingungs_tabelle.sh` + `ci/abnahme06_bedingungs_allowlist.txt` + korrigierte Formel in §6) |
 | D2 | Nenner-Untergrenze (`ci_test_inventory_floor.txt`, eigener Commit), Emitter in die covguard-Prebuild-Zeile, Skip-Allowlist, Configure-Log als Artefakt (heute `paths: []`) | 3,5 | W0a | nach D2-G4 |
-| D2-G1 | 27 unsichtbare gtest-Fälle → zwei `add_test` nach dem dokumentierten Muster, in `COMDARE_TEST_TARGETS`; Erstlauf ehrlich buchen (`AllFourteenAxesPopulated` bei heute 22/18 Achsen = erwarteter Fund, kein `allow_failure`) | 2 | W0a | parallel möglich |
+| D2-G1 | ~~27~~ **30** unsichtbare gtest-Fälle → zwei `add_test` nach dem dokumentierten Muster, in `COMDARE_TEST_TARGETS`; Erstlauf ehrlich buchen (`AllFourteenAxesPopulated` bei heute 22/18 Achsen = erwarteter Fund, kein `allow_failure`) | ~~2~~ **0** | — | **ERLEDIGT 10.08. mit `ce ca6d8af1`** (s. Fußnote F1-KERN) |
 | D2-G2 | ohne dieses Paket macht D2 die Hauptpipeline rot (Registrierung ohne Bau); TIMEOUT nach gemessener Zeit ×4; Exit-Code via `cmake -P`-Wrapper (Vorbild `registry_roundtrip.cmake`) | 1,5 | W0a | im D2-Bogen |
 | D2-G3 | drei Grün-ohne-Vergleich-Wege: Untergrenze, `==`-Druck → echter Vergleich mit Exit, `2>/dev/null` fällt (K11: ctest-Ausgabe in Datei, dann rc), `declared:VAR` → gezählte „ungeprüfte Gates" | 1,5 | W0a | mit D2 |
 | D2-G5 | ~~6 von 428 Tests registrieren sich nur auf AVX-512-Hosts~~ → Host-Klassen-Bericht (3 Zahlen, Host-Kennung), zweistufige Untergrenze — **RICHTIGSTELLUNG 08.08. am Objekt, s. Fußnote D2-G5** | 1 | W0b | **GEBAUT** (super `scripts/ci_host_klassen_bericht.sh` + Selbsttest + Job `test:host-klassen-bericht`) |
@@ -240,7 +251,30 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > Selbsttest (Fixture mit von Hand abgezähltem Inventar, T-3): **11 von 11 Fällen grün**, davor
 > **8 von 11 rot** — der Rot-Lauf ging dem Bau voraus (T-1).
 >
-> <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=18 bedingungs_klassen=14 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-09 host=prod1/avx512f -->
+> **NACHZUG 10.08.2026 — DIE VIER PRT-ART-REGISTRIERUNGEN SIND ENTFALLEN, DIE ZAHLEN ZIEHEN NACH.**
+> Der Gitlink-Bump auf `ce e114cabd` (super `0e11e1f8`) hat es ausgelöst, und **beide Wachen haben
+> gefangen**, was sonst still falsch geworden wäre — super-Pipeline **15615**, Jobs **373214** und
+> **373217**.
+>
+> | Zahl | alt (09.08., Stand `1880f296`) | neu (10.08., Stand `e114cabd`) |
+> |---|---|---|
+> | `bedingte_registrierungen` | 18 | **14** |
+> | `bedingungs_klassen` | 14 | **13** |
+> | Allowlist `stellen_soll` | 6 | **2** |
+>
+> **Die Differenz ist exakt die Allowlist-Position `COMDARE_PRT_ART_LEGACY_AVAILABLE`** (18 − 4 = 14).
+> Am Objekt gemessen: die Bedingung kommt in `ce tests/unit/CMakeLists.txt` nur noch **zweimal** vor
+> — `:87` auskommentiert, `:148` im Erklärungstext. **Beide sind Kommentare.** Der Code begründet den
+> Wegfall selbst (`:148`): *„ein Gatter, das per Konstruktion nie TRUE werden konnte"*; die drei
+> Quelldateien liegen weiter im Baum, ihre Disposition ist **Ledger PA-3 (Owner)**.
+>
+> Der Allowlist-Eintrag ist damit **aufgehoben** — nicht gelöscht, sondern in
+> `ci/abnahme06_bedingungs_allowlist.txt` auskommentiert mit voller Begründung. Es war die
+> `ist < soll`-Richtung (`soll=4 ist=0`), also *„eine tote Ausnahme, deren Begründungstext ab dann
+> falsch ist"* — genau der Fall, für den der Nachtrag D2-G4/Z die Zusicherung gebaut hat.
+> **Zum ersten Mal hat die `ist<soll`-Hälfte gebissen**; bisher war nur die Schleichweg-Richtung belegt.
+
+> <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=14 bedingungs_klassen=13 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-10 host=prod1/avx512f -->
 
 > **FUSSNOTE D2-G5 — RICHTIGSTELLUNG 08.08.2026, am Objekt gemessen, nicht abgeschrieben.**
 > Die Planzeile „6 von 428 Tests registrieren sich nur auf AVX-512-Hosts" ist als Satz **falsch**,
@@ -293,6 +327,263 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > unabhängig davon hat die ce-Sichtbarkeits-Wache (ce `404ff6cf`, 09.08.) die avx512f-Sprosse auch
 > **zweimaschinig** belegt: 461 Einträge lokal/prod1 gegen 457 im CI-Baum eines Runners ohne
 > AVX-512, Differenz exakt die vier Gatter-Einträge.
+
+> **FUSSNOTE F1-KERN — DIE SIEBEN KERN-EXPLORES VOM 10.08.2026. Kein einziges „STIMMT".
+> Jede Zahl unten am Objekt gemessen; wo ich sie selbst nachgeprüft habe, steht es dabei.**
+>
+> **Anlass, Owner verbatim 10.08.:** *„Jede Verarbeitung braucht vorne einen Explore, ob überhaupt
+> der **Kern** ihrer Aufgabe stimmt, sonst müssen wir die **Definition der Aufgabe** korrigieren."*
+> Daraufhin bekam jedes Paket der F1-Kette eine Pflicht-Stufe 0 mit vier zulässigen Urteilen
+> (`STIMMT` · `STIMMT_TEILWEISE` · `STIMMT_NICHT` · `SCHON_ERLEDIGT`), als Pflichtfeld im Schema.
+> Gefahren als Workflow `wf_e22d25ef-71c`, 11 Agenten, 0 Fehler.
+>
+> **DAS ERGEBNIS, das die Regel rechtfertigt:**
+>
+> | Urteil | Anzahl | Pakete |
+> |---|---|---|
+> | **SCHON_ERLEDIGT** | 5 | D1b · D2-G1 · D3-7 · D3-3 · ##23 |
+> | **STIMMT_TEILWEISE** | 2 | ##08 · ##20+D3-6 |
+> | **STIMMT** | **0** | — |
+>
+> **Fünf von sieben Paketen wären neu gebaut worden, obwohl sie fertig sind.** Ein Neubau hätte
+> jeweils eine **zweite Wahrheit** neben der bestehenden erzeugt und deren gefahrene Köder entwertet.
+>
+> ---
+>
+> **D1b — STREICHEN, nicht bauen. Der Gegenstand existiert nicht mehr.**
+> Die Messung des Plans stimmt, die Schlussfolgerung nicht. `grep -c -F "adhoc_emitter" .gitlab-ci.yml`
+> = **0** — bestätigt, Gegenprobe im selben Lauf `comdare_tests` = **10**, die Null trägt.
+> Aber: **es gibt keine Prebuild-Liste mehr, in die man ihn eintragen könnte.**
+> *Von mir selbst nachgemessen:* aktive Zeile `^\s*COMDARE_TEST_PREBUILD_TARGET` = **0**;
+> Gegenprobe mit einer aktiven Variablen derselben Familie `^\s*COMDARE_TEST_CMAKE_BUILD_DIR` = **1**.
+> Beide Vorkommen der Prebuild-Variablen stehen in **Kommentaren**. Die verlangte Maßnahme würde die
+> am 08.08. bewusst zurückgebaute Fehlerklasse (Handliste neben dem Bauweg) wieder einführen.
+> **Restposten, vom CI-File selbst benannt** (`ce/.gitlab-ci.yml:934-938`, Kommentar „OFFEN (eigenes
+> Paket)"): `test:unit` veröffentlicht seit D1c seine Inventur als `build/Testing/ctest_unit_inventar.txt`
+> — **der Verbraucher fehlt**. `test:coverage-guard` liegt in Stage `contract`, `test:unit` in Stage
+> `test`; `needs` darf nicht vorwärts zeigen (17 needs-Kanten, 0 vorwärts). Das ist ein
+> **Stage-Topologie-Posten**, kein Prebuild-Posten.
+>
+> **D2-G1 — ERLEDIGT mit `ce ca6d8af1`, und die Ledger-Fassung war gefährlich falsch.**
+> Beide Zeilennummern des Plans sind überholt: `enable_testing()` liegt heute bei `CMakeLists.txt:695`
+> **vor** dem ersten `add_subdirectory` (`:701`); `:674` ist heute eine Kommentarzeile, die den alten
+> Zustand beschreibt. Die **27** ist heute **30** — *von mir aus dem Git-Index nachgezählt:*
+> `test_commands.cpp` = **23**, `test_engine_adapters.cpp` = **7**. Die drei Zusätze kamen am 09.08.
+> mit `cc9c233e`/`905bd1aa` und sind Welch-Fälle; die Signifikanz-Wachen sind vollständig da.
+> **Es waren ZWEI unabhängige Defekte**, nicht einer: (a) die `enable_testing()`-Reihenfolge, (b) ein
+> davon unabhängiger `gtest_discover_tests`-Defekt, den der Wurzelfix **erst sichtbar gemacht** hat.
+> Geschlossen wurde (b) am 10.08. mit `ca6d8af1` („die zwei gtest-Binaries unter `libs/` nach dem
+> Repo-Muster registrieren") — *von mir geprüft: existiert und ist Vorfahr von `origin/development`.*
+> **Die Ledger-Zeile 2626** sagt *„zwei gegenstandslos — D2-G1 durch den W-1-Wurzelfix geheilt"*.
+> Das verharmlost die Klasse und ist als Satz falsch; korrigiert im Ledger-Nachtrag vom 10.08.
+>
+> **##08 — STIMMT_TEILWEISE. Zerfällt in drei Teile, einer davon darf NIE gebaut werden.**
+> (A) **erledigt:** Schema-Freeze Stufe 1 + B-3 sind gebaut, datiert und bewacht
+> (`schema_freeze.hpp`, Kopf „2026-08-09", `kWideSchemaFreezeStufe1` = 189 Spalten;
+> `test_b3_schema_freeze_stufe1.cpp`, `test_mt_l3_wide_schema_orakel.cpp`; Ledger:4079 `03f897dd`).
+> (B) **NIE bauen:** die „lazy Header-Emission" auf `a.out_csv`. **Der Auftrag hat den Namen
+> missverstanden** — `lazy` ist das Präfix der lazy-*Lauf*-Familie (`run_lazy_static_then_dynamic`,
+> `LazyRunConfig`, `LazyMeasuredRow`, `lazy_try_resume_binary`), **kein Emissionsverhalten**. Und im
+> Plan heißt der Posten „`lazy_csv_header` **EINMAL** (B-3)" = *eine Definition* (Abschrift-Beseitigung),
+> nicht „einmal geschrieben". Gebaut würde sie `ci/mess_ausbeute_wache.sh:186-190` modus-blind rot
+> machen und das `N_LEER`-Signal löschen. Nenner: 3531 durchsuchte C/C++-Dateien, **1** Definition
+> (`cache_engine_builder_iterator.hpp:504`).
+>
+> **D3-7 — ERLEDIGT, `028684ac` (09.08.), in development.** `ci/lauf_marker.sh` (371 Z.),
+> `ci/tests/lauf_marker_probe.sh`, `ci/frische_wache.sh`; verdrahtet in `.gitlab-ci.yml:1665-1667`
+> und `:1840-1842`. Der Modus kommt aus der **Treiber-Bilanzzeile**, nicht vom Aufrufer.
+> **Restposten „D3-7b: der dritte Modus fehlt"**, dreiseitig — `pruef_only` erscheint nicht in der
+> Bilanzzeile (`ce profile_run_entry.hpp:1268`), also kann der Marker ihn nicht führen.
+>
+> **D3-3 — ERLEDIGT, `4e0b7e0d` (08.08.).** Die Logik liegt nicht mehr im YAML, sondern in
+> `ci/persist_sammler.sh` (332 Z.): `:305` `if [ "$DATENZEILEN_GESAMT" -eq 0 ]; then gate_verweigern; fi`,
+> Zählung in `bilanz_zaehlen :131-155` per `awk` (statt `wc`, ausdrücklich begründet `:26-33`).
+> **Restposten „D3-3b: eine LEERZEILE ist kein Messwert"** — `NR-1` zählt Leerzeilen mit; die Heilung
+> muss **drei Dateien in EINEM Commit** treffen, weil sie sich gegenseitig Wortgleichheit zusichern.
+>
+> **##20+D3-6 — STIMMT_TEILWEISE. Der Selektor ist geheilt, die Vorschrift ist falsch.**
+> (A) **erledigt:** D3-6 und ##20s erste Hälfte (`AF_GENERATOR` belegt) — s. Korrektur-Einschub in §1.
+> Selbstbiss gefahren am unveränderten Stand: *„NENNER: 11 Fälle gefahren, 11 gehalten, 0 gerissen"*,
+> *„SELBSTBISS-NENNER: 6 von 6 Mutanten haben die Probe rot gemacht."*
+> (B) **die Vorschrift selbst ist zu korrigieren:** ##20 sagt „`|| true` beim `git add` fällt". Das ist
+> am Objekt **falsch** — es gibt `rc=128` bei **jedem DE-only-Lauf**, und genau deshalb stand die Zeile
+> jahrelang so. Ein blindes Entfernen macht den Kanal rot.
+> *(Nachtrag 10.08. abends, Paket ##20-B: diese drei Zeilen bleiben wörtlich stehen — sie sind die
+> Fassung, gegen die gemessen wurde. **Die Richtung hält, zwei ihrer drei Begründungen nicht**, und der
+> Code ist nicht unschuldig: er ist anders defekt, als ##20 behauptet. Vollständig am Objekt
+> nachgemessen, s. **FUSSNOTE ##20-B** unmittelbar nach dieser Fußnote.)*
+>
+> **##23 — ERLEDIGT, und der Auftrag vermischte zwei Nahtstellen.**
+> Es gibt **zwei**: (A) `ergebnis_mappe_naht.hpp` — die Mappe **im Lauf**, Richtung **xlsx → csv**
+> (das ist die Owner-Doktrin, und der Posten-Titel „CSV → xlsx" beschreibt sie falsch herum);
+> (B) `tools/mess_report/` — ein CLI, das eine **bestehende** Mess-CSV liest. Alle vier Teile des
+> Postens sind gebaut; die Abnahme wurde gegen das **echte 320er-Archiv** gefahren.
+> **Restposten R1, Blocker für jede echte Kampagne:** die acht vendorierten `thesis_profiles` sind
+> **xlsx-blind** (`mit_xlsx=1 ohne_xlsx=8` über Nenner 9). *Teilweise erledigt:* der Gitlink wurde am
+> 10.08. auf `e114cabd` gehoben (`super 0e11e1f8`); ob das den geforderten Stand `>= 4a26b6a3`
+> einschließt, ist beim Bau von R1 **neu auszuzählen**, nicht anzunehmen.
+>
+> ---
+>
+> **WAS DARAUS FÜR DEN PLAN FOLGT.** Von den sieben geprüften Posten bleiben **null** als
+> ursprünglich beschriebenes Bau-Paket. Was bleibt, sind **fünf neu geschnittene Restposten**
+> (Stage-Topologie · D3-7b · D3-3b · ##20-B · ##23-R1) und **eine Ledger-Korrektur**. Die
+> ursprünglichen Aufwände (D1b 1,5 h · D2-G1 2 h) fallen; die Restposten sind **nicht** vermessen und
+> dürfen nicht stillschweigend als gleich teuer geführt werden.
+> *(Nachtrag 10.08. abends: **einer von den fünfen ist es jetzt** — ##20-B ist am Objekt durchgemessen
+> und als Doku-Paket geschlossen; was von ihm als BAU übrig bleibt, ist die eine ersetzte Zeile aus der
+> Fußnote ##20-B, offen nur noch an der git-Version des Runners. Die anderen vier bleiben unvermessen.)*
+>
+> **Und die allgemeine Lehre, die über F1 hinausgeht:** derselbe Kern-Explore lief im
+> Hauptstrang-Workflow **nicht** vorgeschaltet, sondern erst beim Bauen — dort war in **fünf von fünf**
+> Fällen der Bauauftrag am Objekt falsch, weil er aus Plänen und Ledger-Zitaten gebaut war, die selbst
+> veraltet sind. **Der Plan ist keine Quelle über den Code. Er ist eine Behauptung über ihn.**
+
+> **FUSSNOTE ##20-B — DIE VORSCHRIFT, AM OBJEKT NACHGEMESSEN. 10.08.2026 abends.
+> Die alte Fassung oben bleibt stehen; die korrigierte steht hier daneben (Muster D2-G4/D2-G5).**
+>
+> **MESSORT, selbst gemessen statt abgeschrieben.** super `probst-diplomarbeit-cache-engine`,
+> Worktree `.claude/worktrees/wf_bc389245-884-4`, **HEAD `7144f4f6`** (`git rev-parse HEAD`);
+> `6d2e3dce` ist Vorfahr (`git merge-base --is-ancestor` → rc **0**). Gegenstand ist **eine Zeile**:
+> `ci/anhang_forward_core.sh:417` `git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true`.
+> `git version 2.43.0`. **Jedes rc unten ohne Pipe gemessen** (K11). Alle Fixtures unter `mktemp -d`,
+> kein Projekt-Repo berührt, **kein CI-YAML angefasst** — dies ist ein Doku-Paket plus eine Messung.
+>
+> **(A) bestätigt, nichts zu tun:** `:202` `AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"`
+> trägt beide Namensformen.
+>
+> **DIE DREI BEHAUPTUNGEN VON (B), EINZELN GEMESSEN — eine hält, zwei nicht:**
+>
+> | Behauptung | Urteil | Beleg, literal |
+> |---|---|---|
+> | „Ein blindes Entfernen macht den Kanal rot" | **HÄLT** | DE-only gegen ein Ziel **ohne** `anhang/en/tabellen`: unverändert rc=**0** (Commit landet), mit gestrichenem `\|\| true` rc=**128**, `fatal: pathspec 'anhang/en/tabellen' did not match any files` |
+> | „`rc=128` bei **jedem** DE-only-Lauf" | **ZU STARK** | rc=128 **nur**, wenn das ZIEL den Pfad weder im Baum noch im Index trägt. Gegen ein Ziel **mit** `anhang/en`-Bestand: rc=**0**, auch mit gestrichenem `\|\| true` |
+> | „genau deshalb stand die Zeile **jahrelang** so" | **FALSCH** | die Zeile kam mit dem **ersten** Commit der Datei überhaupt: `347684cb`, **2026-08-06** — vier Tage. `git log -S` auf `.gitlab-ci.yml` findet **keinen** Vorläufer |
+>
+> **WARUM DIE ZWEITE BEHAUPTUNG DEN POSTEN VERSCHIEBT.** `git add -- <pfad>` ist nur dann `rc=128`,
+> wenn die Pathspec **nichts** trifft. **3 von 3 Zuständen gemessen:** Pfad fehlt ganz → **128**;
+> Verzeichnis existiert und ist leer → **0**; Verzeichnis mit Datei → **0**. Und das reale Ziel trägt
+> den Pfad: im 289-Baum am gepinnten Gitlink `798e9460` liegen `anhang/de/tabellen` = **18** und
+> `anhang/en/tabellen` = **18** getrackte Dateien (Gegenprobe `kapitel/de` = **14**, also keine
+> Werkzeug-Null). **Der `|| true` ist heute im CI-Pfad also gar nicht tragend** — er ist ein latenter
+> Schutz für einen Fall, den die Pipeline in ihrer heutigen Konfiguration nicht erreicht. Er wird
+> tragend in dem Moment, in dem `AF_LANGS` eine Sprache bekommt, die 289 noch nicht führt.
+>
+> **UND JETZT DER TEIL, DEN ##20 RICHTIG GEROCHEN UND FALSCH BENANNT HAT.** Die v1-Fassung führte den
+> Defekt als *„`git add … 2>/dev/null || true` + ‚IDEMPOTENT: 0 Aenderungen' + Exit 0"*
+> (`…-369-soll-211-ist.md:509` und `:641`). **Das ist am Objekt WAHR und reproduziert** — nur hat es
+> mit der Sprachauswahl nichts zu tun. Gemessen an einem Ziel, das **beide** Sprachen getrackt trägt
+> (wie 289), mit einer **stale `.git/index.lock`** — dem klassischen Runner-Rest eines abgebrochenen
+> Vorlaufs:
+>
+> ```
+>    [de] kopiert: 1 .tex -> anhang/de/tabellen/
+>    [en] kopiert: 1 .tex -> anhang/en/tabellen/
+>    kopiert gesamt: 2 .tex
+> -- (3) Idempotenz-Pruefung im Ziel-Repo --
+>    gestagte Aenderungen: 0 Datei(en)
+> === anhang:forward IDEMPOTENT: 0 Aenderungen -> kein Commit ===
+> ```
+>
+> **rc=0. Commits vorher 2, nachher 2. Im Zielbaum gelandet: 0 von 2 kopierten Messwert-Dateien.
+> stderr LEER** — das `2>/dev/null` hat den `fatal: Unable to create … index.lock` verschluckt, das
+> `|| true` das rc. Der Lauf ist von einem ehrlichen „nichts zu tun" **nicht zu unterscheiden**; das
+> ist exakt die Fehlerklasse, gegen die derselbe Kanal in seinem eigenen Kopf vier Fallen dokumentiert
+> („Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches ‚nichts zu tun' aussah").
+> **Gegenprobe im selben Lauf:** ohne `index.lock` rc=0, Commits 2→3, **2 von 2** Dateien gelandet —
+> die Null oben ist also keine Werkzeug-Null.
+>
+> **ZWEITER, UNABHÄNGIGER BEFUND derselben Zeile (nicht von ##20 genannt).** `git add -- <verzeichnis>`
+> nimmt **fremde** unversionierte Dateien im selben Verzeichnis mit. Gemessen: eine `fremd_entwurf.tex`,
+> die dieser Lauf nie geschrieben hat, liegt in `anhang/de/tabellen/` → `gestagte Aenderungen: 3` statt
+> 2, und die Datei steht danach **im committeten Baum** (1 Treffer, Nenner 5 Dateien unter `anhang/`).
+> **Präzise eingeordnet, damit daraus keine neue Falschaussage wird:** die Kopfzusage der Datei
+> (`:26-33`) betrifft den **Rollback**-Pfad — „löscht niemals fremde unversionierte Dateien" — und die
+> hält. Was **nirgends** zugesichert ist und **nicht** gilt: dass der *Commit* nur die Dateien dieses
+> Laufes enthält.
+>
+> **DIE KORRIGIERTE VORSCHRIFT — die alte bleibt oben stehen, diese tritt daneben:**
+>
+> ~~„`AF_GENERATOR` belegen, `|| true` beim `git add` fällt."~~ →
+> **„`AF_GENERATOR` belegen (erledigt). Das `git add` nennt keine Verzeichnisse mehr, sondern die
+> Buchführungsliste `$COPIED_LIST` dieses Laufes. `2>/dev/null` und `|| true` fallen dabei BEIDE —
+> nicht als Streichung, sondern weil der Fall, den sie abfingen, dann nicht mehr entstehen kann.
+> Dazu ein Nenner in der Ausgabe: `im Index: N von M kopierten Datei(en)`, und `N != M` ist Abbruch."**
+>
+> **DER VORSCHLAG IM WORTLAUT — GEMESSEN, ABER AUSDRÜCKLICH NICHT GEBAUT** (Auftrag ##20-B: „falls es
+> eine saubere Lösung gibt, die das `|| true` ersetzt statt streicht — vorschlagen, nicht bauen"):
+>
+> ```sh
+> git -C "$AF_DEST_REPO" add --pathspec-from-file="$COPIED_LIST" --
+> im_index=0
+> while IFS= read -r _p; do
+>   [ -n "$_p" ] || continue
+>   if git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$_p" >/dev/null 2>&1; then
+>     im_index=$((im_index + 1))
+>   fi
+> done < "$COPIED_LIST"
+> echo "   im Index: $im_index von $copied kopierten Datei(en)"
+> if [ "$im_index" -ne "$copied" ]; then
+>   echo "FEHLER: $((copied - im_index)) von $copied kopierten Dateien stehen NICHT im Index." >&2
+>   exit 1
+> fi
+> ```
+>
+> **Warum das die Ursache trifft und nicht die Wache abschwächt:** `$COPIED_LIST` existiert bereits
+> (`:388`, gebaut für den Rollback) und enthält **genau** die Pfade, die dieser Lauf geschrieben hat.
+> Wer nur diese Pfade nennt, kann die Pathspec-Null gar nicht mehr erzeugen — die Sprache ohne Quelle
+> steht schlicht nicht in der Liste. Damit braucht es kein `|| true`, und jeder verbleibende
+> Fehlschlag ist ein echter, den `set -euo pipefail` trägt. Der Leerlauf-Fall ist vorher schon
+> abgefangen (`:409-412`, `copied -eq 0` → NO-OP, Exit 0), die Liste ist hier also nie leer.
+>
+> **DER VORSCHLAG, GEFAHREN — 5 von 5 Fällen, rc je ohne Pipe:**
+>
+> | Fall | Lage | rc | gelandet |
+> |---|---|---|---|
+> | V1 | DE-only gegen Ziel **ohne** `anhang/en` (der Fall, der ##20 rot macht) | **0** | 1 von 1 |
+> | V2 | DE-only gegen Ziel **mit** `en`-Bestand (wie 289) | **0** | 1 von 1 |
+> | V3 | beide Sprachen, Normalfall | **0** | 2 von 2 |
+> | V4 | derselbe Lauf ein zweites Mal → `IDEMPOTENT: 0 Aenderungen`, kein Leer-Commit | **0** | 2 (unverändert) |
+> | V5 | **KÖDER** stale `index.lock` — heute still grün | **128** | 0, mit dem echten `fatal` auf stderr |
+>
+> **Beide Richtungen (K13):** der Köder beißt (V5 rot), die unmanipulierten Läufe bleiben grün (V1–V4).
+> Zusätzlich fällt der Fremd-Datei-Befund weg: `gestagte Aenderungen: 2` statt 3, `fremd_entwurf.tex`
+> **0** Treffer im committeten Baum.
+>
+> **WAS AM VORSCHLAG NOCH NICHT GEMESSEN IST — und vor dem Bau zu messen wäre:**
+> `--pathspec-from-file` verlangt **git ≥ 2.25**. Hier lokal `2.43.0`; **die git-Version auf dem
+> baremetal-Runner ist NICHT geprüft** und darf nicht angenommen werden. Fällt sie zu alt aus, ist die
+> Rückfallform `git add -- $(cat …)` **nicht** zulässig (Wortaufspaltung); dann `xargs -0` mit
+> NUL-getrennter Liste — und `$COPIED_LIST` müsste `printf '%s\0'` schreiben.
+>
+> **SO IST JEDE ZAHL OBEN REPRODUZIERBAR** (kein Repo nötig, alles unter `mktemp -d`; die Läufe oben
+> sind mit genau dieser Lage gefahren):
+>
+> ```sh
+> # Ziel-Repo:  git init --bare fern.git; git clone file://…/fern.git ziel; ein Ausgangs-Commit.
+> #   Variante "ohne en"  : nichts weiter anlegen.
+> #   Variante "wie 289"  : anhang/{de,en}/tabellen/bestand.tex anlegen, add, commit.
+> # Quelle:     arbeit/artefakte/de/tabellen/A_messwerte.tex   (DE-only)
+> #             + …/en/tabellen/A_messwerte.tex                (beide Sprachen)
+> # Koeder:     : > ziel/.git/index.lock                       (der stille Fall)
+> AF_DEST_REPO=…/ziel AF_WORK_ROOT=…/arbeit AF_LANGS="de,en" AF_ARTIFACT_ROOTS="artefakte" \
+> AF_CORPUS_ROOT="korpus_gibt_es_nicht" AF_NO_PUSH=true AF_PDF_GATE=off \
+>   bash ci/anhang_forward_core.sh > out 2> err        # rc DANACH ohne Pipe lesen (K11)
+> ```
+>
+> Die „Vorschrift angewandt"-Läufe liefen gegen eine **Wegwerf-Kopie** des Kerns, in der genau eine
+> Zeile ersetzt war (Diff-Nenner: **2** geänderte Zeilen, 1 raus / 1 rein). **`ci/anhang_forward_core.sh`
+> selbst wurde in diesem Paket nicht angefasst** — `git diff` über `ci/` ist leer.
+>
+> **WAS DIESES PAKET NICHT GEPRÜFT HAT** (V-8: beide Mengen nennen): den `anhang:forward`-Job im
+> Lauf (er ist inert-by-default hinter `COMDARE_ANHANG_FORWARD`), den Push-/Merge-Retry-Zweig, das
+> PDF-Gate (in allen Läufen `AF_PDF_GATE=off`), und den Korpus-Zweig (alle Läufe über den
+> Artefakt-Zweig). Geprüft wurde **ausschließlich** Block (3), die Idempotenz-Prüfung, `:416-418`.
+>
+> **NACHZUZIEHEN, NICHT VON MIR** (Ledger ist Single-Writer): der Ledger führt unter **KON4-06**
+> (`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:221-223`) dieselbe zu starke Fassung
+> („rc=128 bei JEDEM DE-only-Lauf"). Sie ist nach dieser Messung um die Ziel-Bedingung zu ergänzen
+> und die „jahrelang"-Begründung zu streichen.
 
 ### D3 — Ein leeres Messfenster ist heute grün (8 Posten, 20 h)
 
@@ -491,6 +782,15 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
             (Triple-Configure ce 25fe4fbf, Eintraege 429/425/423, s. Fussnoten-Nachtrag).
  20+D3-6 [CI, EIN Paket] anhang:forward: AF_GENERATOR belegt UND Selektor findet
             BEIDE Layouts; NO-OP nur mit Nenner. P1/P2/P3 gefahren.
+            NACHSATZ 10.08. (##20-B, s. Fussnote): die Zeile "|| true beim git add
+            faellt" NICHT so bauen -- DE-only gegen ein Ziel ohne anhang/en ist
+            damit rc=128 (gemessen, ohne Pipe). Ersetzen statt streichen:
+            git add --pathspec-from-file="$COPIED_LIST" -- , dazu die Zeile
+            "im Index: N von M kopierten Datei(en)" und Abbruch bei N != M.
+            Der echte Defekt ist ein anderer: faellt git add aus anderem Grund
+            (gemessen: stale index.lock), meldet der Kanal "IDEMPOTENT: 0
+            Aenderungen", Exit 0, und 0 von 2 Messwerten landen. Offen vor Bau:
+            git-Version auf dem baremetal-Runner (--pathspec-from-file ab 2.25).
  21   [CI]  Realm-Wurzeln /mnt + G-E3 + COMDARE_BESTANDSLOG in beiden CI.
             ACHTUNG V-3/V-8: "steht in beiden CI" ist Praesenz in der YAML, also
             reine Ankuendigung. Abnahme sind die aktiv-Zeile (Feldgleichheit, via
@@ -572,7 +872,16 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
 
 ## 5. DER KRITISCHE PFAD
 
-`##01 → ##02 → D1+D1a (W-1) → D2-G4 → D1e → D1b → D1f → D1c → D2+D2-G2 → D2-G1 → D5-1 (W0a) → ##08 → D3-7 → D3-1 → D3-3 → D3-4+D3-5 → ##20+D3-6 → ##23 → ##25 DURCHSTICH (F1) → D4a→D4b→D4c → D4d → ##10+##10b → ##11 → ##13 → ##14 → ##15 → HY-A1→A2→A3 (F2/FREEZE) → ##32/##33/##34 Bump-Bündel → ##35 → ##36 (T-15+D4) → ##46 → ##47 → ##48 → ##49 Bau 41,4 h → ##50 → ##51 (F3) → GO×2 → ##53+HY-B → ##56 (F4) → ##57/HY-C → ##58/##58b → ##59 → ##60+P-1 (F5) → ##62.`
+`##01 → ##02 → D1+D1a (W-1) → D2-G4 → D1e → ~~D1b~~ → D1f → D1c → D2+D2-G2 → ~~D2-G1~~ → D5-1 (W0a) → ~~##08~~ → ~~D3-7~~ → D3-1 → ~~D3-3~~ → D3-4+D3-5 → ~~##20~~+~~D3-6~~ → ~~##23~~ → ##25 DURCHSTICH (F1) → D4a→D4b→D4c → D4d → ##10+##10b → ##11 → ##13 → ##14 → ##15 → HY-A1→A2→A3 (F2/FREEZE) → ##32/##33/##34 Bump-Bündel → ##35 → ##36 (T-15+D4) → ##46 → ##47 → ##48 → ##49 Bau 41,4 h → ##50 → ##51 (F3) → GO×2 → ##53+HY-B → ##56 (F4) → ##57/HY-C → ##58/##58b → ##59 → ##60+P-1 (F5) → ##62.`
+
+> ⚠️ **KORREKTUR-EINSCHUB 10.08.2026 zur Kette oben.** Die durchgestrichenen Glieder sind durch die
+> F1-Kern-Explores erledigt oder gestrichen (Fußnote **F1-KERN**). **Die Kette bis `##25 DURCHSTICH`
+> ist damit leer** — der Durchstich hängt nicht mehr an ihnen. Er hängt an einem Riss, den erst der
+> gefahrene Mini-Lauf zeigte: `measurement_line` ist **len=0**, weil der Perm-Pfad den
+> 2-arg-Zweig von `COMDARE_ANATOMY_VERSION_STAMP` trifft. **Und die Reihenfolge ist verkehrt** —
+> Owner 10.08.: *„system sollte immer vorn stehen und organ hinten. Das entspricht der Anordnung der
+> Stufen."* Zwei Änderungen, nicht eine; wer nur den leeren Stempel heilt, zementiert die
+> Stufen-Ordnung falsch. Das ist der **einzige** verbleibende Blocker vor F1.
 
 **Die Rechnung.** Verfügbar: 27 Werktage + 11 WE-Tage. Der Pfad belegt: 2 WE-Tage (W-1) + 2,5 AT (W0a) + 2,5 AT (W0b) + 5 AT (W1) + 5 AT (W2, davon ~1,7 AT reine Bau-Wartezeit, in der nur Text/lokale Pakete laufen) + 5,75 Maschinentage Kampagne (davon 4 im WE/regulären Lauf ohne Personal-Bindung, Batch-Abnahmen abends) + 1 AT Rückschrieb + 3 AT Auswertung + 2 Fangnetz-Tage + 2 AT Sicherung ≈ **26 von 27 Werktagen**. Rest-Reserve: **1 Werktag + ~7 WE-Tage** (2 entnommen W-1, 2 Option HY-A, 2 Option Resume-Puffer).
 

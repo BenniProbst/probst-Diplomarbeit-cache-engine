@@ -23,14 +23,28 @@
 # Mess-Ausbeute-Wache: erst string-identisch heben und beweisen, dass sich
 # nichts geaendert hat, dann heilen.
 #
-# ZAEHLWEISE, ausdruecklich benannt -- IDENTISCH zu ci/mess_ausbeute_wache.sh:
-#   Datenzeilen = (Zeilen der Datei) - 1, weil die erste Zeile der CSV-Kopf ist.
-#   Gezaehlt wird mit awk 'END{print NR+0}', NICHT mit `wc -l`: wc zaehlt
-#   Zeilenumbrueche, eine Datei ohne abschliessenden Newline wuerde eine Zeile
-#   zu wenig melden. Eine voellig leere Datei hat 0 Zeilen und damit 0
-#   Datenzeilen (NICHT -1) -- der Sonderfall ist unten ausdruecklich behandelt.
-#   Zwei Gates derselben Kette duerfen sich nicht in der Zaehlweise
+# ZAEHLWEISE, ausdruecklich benannt -- WORTGLEICH zu ci/mess_ausbeute_wache.sh
+# und ci/frische_wache.sh (dasselbe awk-Programm, Byte fuer Byte):
+#   Datenzeilen = alle Zeilen AB DER ZWEITEN, die mindestens ein Zeichen tragen,
+#   das kein Leerraum ist. Die erste Zeile ist der CSV-Kopf und zaehlt nie mit.
+#   Gezaehlt wird mit awk, NICHT mit `wc -l`: wc zaehlt Zeilenumbrueche, eine
+#   Datei ohne abschliessenden Newline wuerde eine Zeile zu wenig melden. Eine
+#   voellig leere Datei hat 0 Zeilen und damit 0 Datenzeilen (NICHT -1).
+#   Drei Gates derselben Kette duerfen sich nicht in der Zaehlweise
 #   widersprechen; deshalb wortgleich uebernommen.
+#
+#   EINE LEERZEILE IST KEIN MESSWERT (D3-3b, 10.08.2026). Vorher galt
+#   `Datenzeilen = Zeilen - 1`; damit zaehlte jede leere und jede nur aus
+#   Blanks/Tabs bestehende Zeile als Messwert mit, und das COMMIT-GATE unten
+#   ("datenzeilen_gesamt == 0 -> kein Rueckschrieb") liess sich von einem
+#   Laufordner aus Kopfzeilen und Leerzeilen oeffnen. Die Heilung geht nur in
+#   die scharfe Richtung: die Zahl kann seither nur kleiner werden, nie
+#   groesser -- das Gate wird dadurch nie weicher.
+#
+#   EIN DURCHLAUF, ZWEI ZAHLEN: das awk-Programm gibt "<rohzeilen> <datenzeilen>"
+#   aus. Aus beiden faellt die verworfene Menge als eigener NENNER ab
+#   (leerzeilen_gesamt); ohne ihn waere nach der Heilung nicht mehr sichtbar, ob
+#   eine Datei leer war oder ob ihre Zeilen verworfen wurden.
 #
 # XLSX IST DIE AUSGABE (P5, 09.08.2026) -- was sich geaendert hat und was nicht:
 #   Owner-KERN, mehrfach bestaetigt: "xlsx ist die Ausgabe. CSV wird NIE
@@ -113,6 +127,7 @@ git rev-parse --git-dir > /dev/null 2>&1 || {
 BK=measurement; DEST="$BK/$RUN_TS"
 
 CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
+LEERZEILEN_GESAMT=0
 
 # SELBSTCHECK bilanz_zaehlen (P5, 2026-08-09):
 #   ZUGESICHERT: die Datenzeilen-Bilanz zaehlt weiterhin AUSSCHLIESSLICH *.csv;
@@ -129,8 +144,9 @@ CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
 # anderes, wenn daneben eine Auswertungs-xlsx liegt (dann gibt es Material,
 # aber keinen zaehlbaren Messwert).
 bilanz_zaehlen() {
-    local wurzel liste xliste zf zeilen daten
+    local wurzel liste xliste zf paar zeilen daten
     CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
+    LEERZEILEN_GESAMT=0
     liste=$(mktemp) || exit 2
     xliste=$(mktemp) || exit 2
     for wurzel in $ZAEHL_WURZELN; do
@@ -142,11 +158,16 @@ bilanz_zaehlen() {
     XLSX_GESAMT=$(awk 'END{print NR+0}' "$xliste")
     while IFS= read -r zf; do
         [ -n "$zf" ] || continue
-        zeilen=$(awk 'END{print NR+0}' "$zf")
-        if [ "$zeilen" -le 1 ]; then
-            daten=0
-        else
-            daten=$((zeilen - 1))
+        # Ein Lesevorgang, zwei Zahlen: "<rohzeilen> <datenzeilen>". Das
+        # awk-Programm steht Byte-gleich in ci/mess_ausbeute_wache.sh und
+        # ci/frische_wache.sh.
+        paar=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$zf")
+        zeilen=${paar%% *}
+        daten=${paar##* }
+        if [ "$zeilen" -gt 1 ]; then
+            LEERZEILEN_GESAMT=$((LEERZEILEN_GESAMT + zeilen - 1 - daten))
+        fi
+        if [ "$daten" -gt 0 ]; then
             CSV_MIT_DATENZEILE=$((CSV_MIT_DATENZEILE + 1))
         fi
         DATENZEILEN_GESAMT=$((DATENZEILEN_GESAMT + daten))
@@ -159,6 +180,7 @@ bilanz_drucken() {
     echo "  csv_gesamt=$CSV_GESAMT"
     echo "  csv_mit_datenzeile=$CSV_MIT_DATENZEILE"
     echo "  datenzeilen_gesamt=$DATENZEILEN_GESAMT"
+    echo "  leerzeilen_gesamt=$LEERZEILEN_GESAMT"
     echo "  xlsx_gesamt=$XLSX_GESAMT"
 }
 
@@ -243,6 +265,7 @@ fi
       echo "csv_gesamt=$CSV_GESAMT"
       echo "csv_mit_datenzeile=$CSV_MIT_DATENZEILE"
       echo "datenzeilen_gesamt=$DATENZEILEN_GESAMT"
+      echo "leerzeilen_gesamt=$LEERZEILEN_GESAMT"
       echo "xlsx_gesamt=$XLSX_GESAMT"
     } > "$DEST/PROVENANCE.txt"
     echo "-- Laufordner --"; find "$DEST" -type f | sort
@@ -292,6 +315,12 @@ fi
 gate_verweigern() {
     echo "KEIN COMMIT: das Messfenster traegt 0 Datenzeile(n)."
     echo "  csv_gesamt=$CSV_GESAMT  csv_mit_datenzeile=$CSV_MIT_DATENZEILE  datenzeilen_gesamt=$DATENZEILEN_GESAMT  xlsx_gesamt=$XLSX_GESAMT"
+    echo "  leerzeilen_gesamt=$LEERZEILEN_GESAMT"
+    if [ "$LEERZEILEN_GESAMT" -gt 0 ]; then
+        echo "  HINWEIS: $LEERZEILEN_GESAMT Zeile(n) im Fenster sind leer oder tragen nur"
+        echo "  Leerraum. Sie zaehlen seit D3-3b nicht mehr als Messwert -- vor der"
+        echo "  Heilung haetten genau sie dieses Gate geoeffnet."
+    fi
     if [ "$XLSX_GESAMT" -gt 0 ]; then
         echo "  HINWEIS: $XLSX_GESAMT xlsx im Fenster, aber kein zaehlbarer Messwert. Die xlsx"
         echo "  entsteht AUS der CSV; ohne CSV-Datenzeile belegt sie nichts. Das Gate bleibt"
