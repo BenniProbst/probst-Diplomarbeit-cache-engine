@@ -16,6 +16,118 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON36: WF7 — SCHNITT 2 NACHGELIEFERT, KON34 GEHEILT · DIE KONSOLIDIERUNG IV WIRD UM 56 FAKTEN ERGÄNZT
+
+*(Zur Nummer: **KON35 wurde nie vergeben** — der Konsolidierungs-Entwurf trug die 35 im
+Arbeitstitel und ist als „LEDGER-KONSOLIDIERUNG IV" ohne KON-Nummer gelandet. Die Zählung
+springt bewusst, wie bei GOAL v7.)*
+
+**WF7 (`wf_61df1b40`, 8/8 Agenten, 0 Tode — die Kompaktheits-Auflage hat den StructuredOutput-Tod
+diesmal verhindert) hatte zwei Aufträge:** (1) die Heilung der KON34-Deckungslücke (c) — der am
+Limit gestorbene Schnitt 2 (SOLL-Zuordnung der Messeinrichtungen aus den PLÄNEN) wurde
+nachgeliefert und adversarial gegen KON34 verifiziert; (2) fünf Lücken-Berichte über alle
+KON-Quellbereiche (KON1…KON34 + die zehn jüngsten Sessions) gegen die LEDGER-KONSOLIDIERUNG IV,
+dedupliziert und am Ledger gegengeprüft. **Eigene Lead-Stichprobe vor diesem Eintrag: 6 von 6
+Fakten-Ankern halten exakt** (KON8-04 :4111 · KON7-01 :4356 · KON7-04 :4404 · KON9-06 :3754 ·
+KON12-03 :3216 · KON12-02 :3199).
+
+---
+
+### KON36-01 — DIE HEILUNG: DECKUNGSLÜCKE (c) IST GESCHLOSSEN — VERIFY-URTEIL „TEILS", DER KERNBEFUND HÄLT
+
+**Schnitt 2 liegt vor** (01.08. F2-Gesetz · 03.08. A8-Dossier · 06.08. messachse-DOSSIER ·
+GO-3 · 09.08. Owner-Kommentare am Objekt · 10.08. KON25-03). **KON34-06(c) ist GESCHLOSSEN**;
+(a), (b), (d) bleiben offen.
+
+    BESTAETIGT:   KON34-01 (A/B-Split, 0 Produktionsaufrufer -- Objekt komplett gelesen:
+                  steuer_dock.hpp:1-241 + konfiguration.hpp:1-272, keine Plan-Quelle
+                  widerspricht) · KON34-04/B1 auch PLAN-seitig
+                  (measurement_tooling_registry.hpp:1-13 traegt KEINE Stufen-Dimension;
+                  canonical_combo dedupliziert+sortiert, max 2^3 Teilmengen -- deckt weder
+                  die 6 noch die 32) · KON34s Recht, die 6 zu verwerfen (D-3, Ledger:10910,
+                  war nie Owner-entschieden -- die Schachtelungs-Lesart war Arbeitshypothese,
+                  im Code selbst so benannt: "Trag-Interpretation dieses Baus").
+    PRAEZISIERT:  die Ein-Ort-Praemisse war das OWNER-Modell vom 09.08. (steuer_dock.hpp:4-9,
+                  "3 Fakultaet CEB-Versionen") -- durch KON25-03 UEBERHOLT, nicht "von Anfang
+                  an falsch". Der Teilmengen-Ausweg, den KON34-03/04 zieht, war am 09.08. im
+                  Code-Kommentar selbst als Eventualitaet vorgesehen (konfiguration.hpp:40-44:
+                  Maschinerie "GEGEN DIE ANTWORT INVARIANT"; eine Alias-Zeile CebVersionen,
+                  steuer_dock.hpp:230-231). GO-3 (Ledger:12040-12046, 07/08.08.) ist ein
+                  FRUEHERER, von KON34 nicht zitierter Beleg "Instrumente nicht an einem Ort"
+                  (der Hybrid bekommt eine EIGENE Macro-Schicht, "zwischengequetscht").
+    ANFECHTBAR:   die SOLL-Spalte "Wallclock -> CEB, an/aus" (KON34-02): das F2-Gesetz 06.08.
+                  legt Wallclock "DREIPHASIG in die TIER-BINARIES" (DOSSIER-messachse:44-50).
+                  Der SOLL-Eintrag gilt allein ueber den Vorrang von KON25-03 (10.08.,
+                  neuer) -- der Konflikt wurde nie EXPLIZIT aufgeloest. -> praezise
+                  Owner-Frage, in Sektion M der Konsolidierung nachgetragen.
+    ZWEIDEUTIG:   der Spaltenkopf "Wallclock/G1": die "Vier Dreien"-Warnung
+                  (DOSSIER-messachse:107-117) trennt Tooling-Werte von Erhebungs-Ebenen
+                  E1-E3 ("kein Dokument darf sie unbenannt mischen"); das
+                  16_E1_E4-Dossier:95-119 belegt eine DRITTE Bedeutung derselben E-Labels
+                  (XML-Baum..RC-Laufzeit). -> Sektion M.
+    VERSCHAERFT:  KON34-06(a)/R-1: KON34/B4 beantwortet nur die ORDNUNGS-Seite (System B
+                  umstellen); zum AUSWAHL-Subsystem (measurement_tooling_registry /
+                  canonical_combo / XSD <combo>, 18 Dateien) trifft KON34 KEINE Aussage --
+                  R-1 (KON29-06) bleibt insoweit offen: welches der zwei Subsysteme
+                  wird fortgefuehrt?
+
+**Verify-Korrekturen am nachgelieferten Schnitt 2 selbst:** zwei Zitatanker falsch
+(DOSSIER-messachse „:38-40" → echte Fundstelle **:44-50**; „:19" → **:93-99**). Und die
+Schnitt-These *„ob die 32 auch die 12 ersetzt, ist nirgends explizit"* ist am Ledger
+**widerlegt**: KON25-03 ersetzt die 12-These **ausdrücklich** (Ledger:1331-1333); die
+Zwischen-Chronologie (10.08. 07:27 „12" / 12:40 „6") ist in KON29-05 (Ledger:901-904) verbucht.
+
+---
+
+### KON36-02 — DIE ERGÄNZUNG DER KONSOLIDIERUNG IV: 56 FAKTEN, EINE KORREKTUR
+
+Fünf Lücken-Berichte (Quellbereiche KON34…KON25 · KON24…KON15 · KON14…KON8 · KON7…KON1 · die
+zehn Sessions), von der Synthese dedupliziert und am Ledger gegengeprüft. **Nachgetragen werden
+56 Fakten** — je Kapitel als datierter **ERGÄNZT (KON36/WF7)**-Block, der bestehende Text bleibt
+unangetastet:
+
+    B  8   Q6-MaxN-8-Korrektur (32 gilt) · gerade CEB-Anzahl (Herkunft F11) ·
+           PlanTextBuilder bleibt (owner-bestaetigt) · CEB orchestriert direkt/delegiert
+           (KORREKTUR, s.u.) · CEB-Bau RAM-sequentiell · System-Achse sitzt IN der CEB ·
+           0-von-4-Traeger-Jobs · Selbstkompilations-Blaupause (Filterkette = Mechanismus)
+    C  15  S-6-Schnitt a-d + Verbotszonen · SOLL-Versionierung + 3 IST-Luecken ·
+           Stempel-Basis-Pflicht · ABI-Optionalitaet (Stempel = 5. Symbol, darf nullptr) ·
+           7 Flaeche-2-Interfaces · Hybrid-Bereichs-Karte + 3 Anteile + Einmal-Pruefung ·
+           CEB 2 System-Anzeigen · Stempel FAELLT AN / kein Freigabe-Feld · dreiwertige
+           Composite-Matrix · POD-Asymmetrie · 3 Vertrags-Gatter · W12-B halb ·
+           Flaeche-3-Deckungsluecke
+    D  6   C-4-Wache 6-von->=152 + Modular/Detail-Split · 130/152-Aufschluesselung ·
+           io_dispatch T12 + persistence_target T17 · Syntax/Semantik-Pflicht + MIN-2-Filter ·
+           Flag-Katalog 59 Knoten + f-Kollision · S-14 = 7 von 130 (Ausroll-Auftrag)
+    E  2   PMC ohne Vendor (WARNING-Uebergangszustand) · Wallclock-SOLL-Konflikt (KON36-01)
+    F  1   MergeStrategy-Werte SIND die Prueflings-Verbund-Varianten
+    G  3   COMDARE_STORAGE_CACHE setzen · LagerBaumWriter 0 Aufrufer (S-17 setzt O-9 voraus) ·
+           Bestandslog-Leereintrag je binary_id (SKIP-Risiko)
+    H  1   8 von 9 thesis_profiles xlsx-blind (Kampagnen-Blocker)
+    I  4   S-14/S-18 = BUILD-BLOCKER · S-13-Kern-Reihenfolge nach dem Stempel ·
+           P-0-Rest-Verdrahtung · V-1 ##25 ohne Besitzer
+    J  9   coverage-guard stempelfremd + F1-vor-F2 · test:secrets raus aus prod2 · main-FF
+           kumulativ · Wachen-Divergenz ce/super · Kapazitaet 20,7/34,4 h · Shell-Regression
+           13 Dateien · XML-Wache unbeobachtbar · Stage-Topologie · MinIO-Keys ungeprueft
+    K  3   Backup-Ref gestuft · Betreuer-PDFs in die Release-Checkliste ·
+           NOTICE/GPL-Schalter-Widerspruch
+    M  4   KON34-06(d) 17-vs-18 · K2/K4/K5-Registerluecken · W-6 vier Klone ·
+           E-Label-Doppelbedeutung + Wallclock-SOLL-Konflikt (neu aus WF7)
+
+**Genau EINE Fehldarstellung in der Konsolidierung (aus fünf Berichten):** Kapitel B nannte den
+Hybrid *„eigenständig … + Sync-Kanal"* **ohne Zeitbezug** — KON21-01 stuft das als
+**AUTONOMIE-STUFE (SPÄTER)**; **JETZT** orchestriert die CEB alle Prüfdocks **direkt oder
+delegiert**. Korrigiert im Kapitel B (datierter Vermerk); der Sync-Kanal (S-20) ist dabei
+**Neubau**, die Loader-Fähigkeit liegt als `AnatomyModuleLoader` im Bestand.
+
+**Von der Gegenprüfung VERWORFENE Berichts-Behauptungen** (nicht nachgetragen): „S-6 bleibt
+gesperrt" (KON21-03 hat entsperrt) · „P/E-Core ohne Wellen-Posten" (KON27-04: W7/#21) ·
+„MinIO-Keys 0 Ledger-Treffer" (KON22-01/5 + KON27-04/#10 führen sie — nur die Konsolidierung
+ließ sie aus).
+
+**Schwerpunkt der Auslassungen:** KON2 (36 Positionen) und KON3 (18) waren in der Konsolidierung
+fast unintegriert (KON2 nur als „RANG C"-Verweis, KON3 nur über KON3-02); dazu die
+KON7–KON12-Substanz (Stempel-Interfaces, Bereichs-Karte, P-0/S-14/S-17-Messungen).
 ## LEDGER-KONSOLIDIERUNG IV — ALLE KON-EINTRÄGE (KON1 … KON34), THEMATISCH
 
 > **Auftrag Owner 12.08.2026:** *„Konsolidiere dann das Ledger mit ALLEN Kon Einträgen."*
@@ -71,7 +183,8 @@
 | **KON31** | 12.08. | Prüfling = **Mess-Unter-Achse des Planers** zur Laufzeit | gilt |
 | **KON32** | 12.08. | Übergangs-GO (a) · **neuer PAT im Vault** · Infra rotiert | gilt |
 | **KON33** | 12.08. | **Die Sicht ist wiederhergestellt** — super grün, ce ein roter Job | gilt |
-| **KON34** | 12.08. | WF6: **die Messeinrichtungs-Kartierung** — zwei Mess-Architekturen, **die 6 verliert ihren Gegenstand** | gilt |
+| **KON34** | 12.08. | WF6: **die Messeinrichtungs-Kartierung** — zwei Mess-Architekturen, **die 6 verliert ihren Gegenstand** | gilt; **Deckungslücke (c) geschlossen durch KON36** |
+| **KON36** | 12.08. | WF7: **Schnitt 2 nachgeliefert** (Heilung, Urteil TEILS — Kernbefund hält) · Konsolidierung IV um **56 Fakten** ergänzt (ERGÄNZT-Blöcke je Kapitel), 1 Korrektur (Hybrid-Autonomie-Zeitbezug) · *KON35 nie vergeben* | gilt |
 
 ---
 
@@ -113,9 +226,35 @@ freigegeben`. Vier-Parteien-Kette = **zweimal dreistellig parallel**, nicht einm
 
 **Der Hybrid** (KON9-02/03, KON19-02, KON21-01): eigene Gattung (Heuristik-Adapter) mit
 Reroute-Genus · **kein Aggregator, sondern Transmitter/Multiplexer** — je Thread läuft genau
-eine Tier-Binary, die Werte gehen über Fläche 3 **durch** ihn zur CEB · **eigenständig** über
-**wiederverwendete CEB-Module** + **Sync-Kanal** zur CEB · **bis zu 32 Prüfdocks, beliebige
-Anzahl** (KON28-03, KON30-04).
+eine Tier-Binary, die Werte gehen über Fläche 3 **durch** ihn zur CEB · **bis zu 32 Prüfdocks,
+beliebige Anzahl** (KON28-03, KON30-04).
+
+**KORRIGIERT 12.08. (KON36/WF7) — der Zeitbezug fehlte:** *„eigenständig + Sync-Kanal"* ist die
+**AUTONOMIE-STUFE (SPÄTER)**. **JETZT** gilt KON21-01 zweistufig: die CEB orchestriert alle
+Prüfdocks **direkt ODER delegiert** an den Hybrid (über **wiederverwendete CEB-Module**, Bestand:
+`AnatomyModuleLoader`); erst **später** trifft der Hybrid eigenständige dynamische
+Lade-Entscheidungen — dann über den **Sync-Kanal** (S-20, **Neubau**) von der CEB zur Laufzeit
+steuerbar.
+
+**ERGÄNZT 12.08. (KON36/WF7):**
+* Dock-Obergrenze entschieden: **32** (XML) schlägt Q6-MaxN=8 (`synthese_matrix.hpp:33-51`) —
+  die 8 ist zu korrigieren, kleiner Bau-Posten (KON28-03).
+* Herkunft der gestrichenen F11-Invariante bleibt als Aussage gültig: es kann nur eine
+  **GERADE Anzahl an CEBs** geben; Hybrid-Docks ausgenommen (KON30-04).
+* **PlanTextBuilder + `plan dump`** + hart gegateter CI-Job `visibility:tier-binaries` +
+  `parse_plan_dump()` sind owner-bestätigt **produktionskritisch und bleiben**; nur das
+  Flag-Wort `--dump-plan` ist vollzogen überholt — O-13 zu (KON26-03, KON27-05).
+* Jeder CEB-Bau läuft wegen RAM **sequentiell**, ebenso die von der CEB verlangten und
+  **registrierten** Folge-Builds (KON17-01).
+* Die System-Achse **sitzt IN der CEB** und gibt von dort Organ frei — keine Querkante
+  System→Organ neben der Trägerkette; der Freigeber ist eine **Achse**, kein Träger (KON8-04).
+* IST-Lücke der Emission: **0 von 4 Trägern** haben einen eigenen Bau-/Test-Job (super 45 Jobs ·
+  ce 25 · „hybrid" 0 Treffer beidseitig) (KON23-05/E).
+* Die Selbstkompilation hat eine **gebaute Blaupause**: `catalog_codegen.cmake` läuft heute
+  (add_custom_command + TARGET_FILE + DEPENDS xml); Director = `ExperimentPlanDirector`,
+  Interpreter = XML→Plan, Template-Method = `resolve_selection`; **die Filterkette
+  (C++23-concept + mp11) IST der Mechanismus** — *„nur bestimmte concept-builds zur Laufzeit
+  eines niederen Trägers dürfen den compile eines höheren Trägers bilden"* (KON9-06, KON10-05).
 
 ---
 
@@ -167,6 +306,56 @@ eingebaut.
 **dokumentiertes Sollverhalten**, es gibt keinen Riss. KON14-02 („S-6 pauschal falsch herum") →
 **KON15-02/KON20**: die Reihenfolge ist **kontextabhängig**.
 
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **Der S-6-Schnitt vollständig** (KON21-03): S-6a Umstellung `MESS,SYSTEM,ORGAN` (Makro ·
+  POD · Preimage; #87 = Argumentfolge, #78 = POD-Folge — beide gemeint) · S-6b
+  Transpositions-Sperre (mit S-6) · S-6c Kategorien-Ordnungs-Wache (Owner-GO *„Ja bitte"*) ·
+  S-6d #67 explore+schärfen, **behalten**. Kosten dreistufig: Makro billig · POD = ABI-Bruch
+  (Layout-Bump nötig, `decl.hpp:293`-Konflikt vorab lösen) · Preimage-Glieder = jeder SHA
+  ändert sich (KON5-04).
+* **S-6-VERBOTSZONEN** (KON20-02): Lager-Kaskaden + `kOrganGruppen*` + `kSystemAxisOrder` +
+  `kCompositionAxisNames` + Hash-Mechanik + Messwert-2-Tupel; der Lager-Schlüssel wandert
+  automatisch mit.
+* **SOLL-Versionierung je Stufe** (KON2-06/17): CEB-Zeile nur Mess+System · Genus compile-time
+  **ZUSAMMENGESETZT** aus allen M/S/O-Achsen · alle **VIER** Binaries mit Fingerprint-SHA.
+  **Drei IST-Lücken:** Planer ohne SHA · CEB-System-Anteil leer (Versionen vs. Zellwerte
+  ungeklärt) · Genus handgeschrieben (5 Literale, 1 Test-Aufrufer).
+* **Stempel-Basis-Pflicht** unerfüllt (KON7-08, KON6-03): fünf lose Stempel-Strukturen ohne
+  gemeinsame Basisklasse (*„Erbin darf nur verschärfen, nie aufweichen"*).
+* **Die Identitäts-Fläche ist am ABI heute OPTIONAL** (KON7-01): der Loader verlangt nur die
+  4 Pflicht-Symbole, das 5. (Stempel) darf `nullptr` sein — **SOLL: Pflicht**, konkreter
+  Bauauftrag.
+* **Fläche 2 hat sieben Interfaces** (KON7-04): version_xyz (nur Planer) · mess/system/
+  organ_zeile · fingerprint_sha · gesamt_stempel (je `constexpr`) · **angeschlossene() NUR
+  Hybrid** — braucht einen **Laufzeit-Sammler** über die Dock-Registrierung (zwei Mechanismen
+  hinter einer ABI-Fläche, beim Bau zu trennen).
+* **Hybrid-Stempel = BEREICHS-KARTE** (KON7-05, KON8-10): je Funktions-Parameterbereich
+  (Grenzen = Break-Even) gilt der Stempel der dort geladenen Tier-Binary; 4 eigene Zeilen
+  sofort baubar, die Karte erst nach HY-B/C — leer/einbereichig davor ist **Sollverhalten**
+  (drei Fläche-2-Schichten nach Entstehungszeit).
+* **Hybrid-Fläche-2 hat drei Anteile** (KON9-02/03): eigene M/S/O-Achsen = Stempel;
+  Parameterfunktions-Eigenschaften + durchgereichte Tier-Stempel = **nur Laufzeitanfrage**;
+  die Hybrid↔Tier-Kopplung ist reine Fläche-1-Passung → die Teilmengenprüfung läuft im
+  Hybrid-Zweig nur **einmal**.
+* **Die CEB hat ZWEI System-Anzeigen** (KON8-03): (1) compile-time → in den Stempel;
+  (2) Laufzeit/RAM-Erkennung → **nicht** in den Stempel — erklärt „CEB-System leer";
+  Bauauftrag: (1) füllen, (2) draußen halten.
+* **Der Stempel wird nicht separat geschrieben — er FÄLLT AN** als Resultat der
+  B+-Baum-Materialisierung; Fläche 2 trägt bewusst **kein Freigabe-Feld** (Freigabe =
+  Laufzeit-Abfrage am Baum) (KON8-05/06).
+* **Die Composite-Zulassungsmatrix ist DREIWERTIG** (PFLICHT-in-MIN / ERLAUBT / VERBOTEN) —
+  operationalisiert `MIN ⊆ implementiert ⊆ freigegeben` als prüfbares Gate (KON8-07).
+* **POD `AnatomyVersionLines` ist asymmetrisch** (KON7-09): Organ komplett · System ohne
+  Kompositionsfunktion · Mess nur Zeile (kein measurement_entries); Feldfolge *„gewachsen,
+  nicht entworfen"*.
+* **Der Vertrag CEB↔Tier ist produktiv verdrahtet** (KON2-15): drei Geschwister-Gatter
+  `conformance_gate` · `mess_interface_testate` · `mess_konsistenz_gate` — Letzteres fährt
+  **vor jeder Messung**, fail-closed.
+* **W12-B nur halb erfüllt** (KON2-09): Organ-Änderung invalidiert chirurgisch,
+  System-Änderung löst weiterhin **Vollbau** aus.
+* **Fläche-3-Deckungslücke** (KON25-02): der Zweig CEB=AUS/Tier=AN wird von keinem Testziel
+  übersetzt (Task #20).
+
 ---
 
 ## D. DIE ACHSEN — Kategorien, Homes, Grammatik, Versionierung
@@ -214,6 +403,32 @@ Aktivierungs-, keine Neubau-Aufträge.**
 **ÜBERHOLT:** KON7-06 („Komplexitäts-Leiter dreistufig") → **KON8-08**: *alle* Kategorien nutzen
 **dieselbe** Grammatik; die System-Achsen sind nicht „komplexer", sie sind die **Quelle**, weil
 sie freigeben.
+
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **Die C-4-Wache** (= `contract:axis-version-lock`) sichert heute nur **6 Heuristik-Header**
+  per SHA-256, Schnittmenge mit `axes/` = **0** (≥152 ungedeckt; 1 von 18 Achsen per A1-Pin);
+  die hartkodierte Pfad-Liste war **Mitursache des Drei-Wochen-Ausfalls**. Owner: **EINE**
+  Wache **modular erweitern + Detail-Klassen-Split** (eine Klasse je Kategorie-Home);
+  Autodiscovery über die Registry-Typlisten ist im Bestand vorgezeichnet (KON2-19,
+  KON23-05/F, KON17-03).
+* **130/152 aufgeschlüsselt** (KON25-06): 130 = `axes/`-Organ-Header; 152 = +22
+  `topics/queuing/`-Träger (tragen `algo_version`, sind aber **keine** Organ-Achsen —
+  fehlplatziert, gehören ins Organ-Home).
+* **Die IO-Substanz = ZWEI reguläre Organ-Hauptachsen** (KON26-01): `io_dispatch` T12
+  (RAM-Simulationen, 4 Bausteine ON) und `persistence_target` T17 (DiskWriteback **gebaut**,
+  per Owner Q-1/Fall B **OFF**) — eine Festplatten-IO-Meta-Meta wäre ein **additiver neuer
+  Typ**, T12/T17 bleiben.
+* **Rang-1-Owner-Pflicht** (KON9-09): je Achsen-Kategorie die definiert freigegebene Syntax
+  **und** Semantik — *„Pflicht und Basis für die Abgabe"*; **MIN ist ein Querschnittskonzept
+  mit ZWEI Filtern**: System+Organ additiv monoton · **Mess zweischneidig** (mehr Messfühler
+  = mehr Latenz).
+* **Flag-Katalog-Lücke** (KON7-06, KON8-09): Vollausbau 59 Knoten, **alle im c-Zweig**;
+  g/f/n ohne Sub-Token (S2-KATALOG-Andockstelle vorbereitet, Katalog unrecherchiert);
+  Namenskollision `f`=FPGA (Tiefe 0) vs. AVX-512-Foundation (unter x512) wird Risiko, sobald
+  `f` einen Sub-Katalog bekommt.
+* **S-14 präzise** (KON12-02): **7 von 130** axes-Headern tragen den Marker; die Wache
+  existiert CI-verdrahtet (`ce/.gitlab-ci.yml:768-786`) — reiner **Ausroll-Auftrag**, kein
+  Neubau (Lock-Datei trägt 9 Einträge, Differenz zu 7 beim Ausrollen mitzumessen).
 
 ---
 
@@ -278,6 +493,14 @@ sie freigeben.
 **Die Kampagne fährt das State-Pattern** — die **vier CacheEngine-Modi als PHASEN** über die
 Träger-Stufen (Dossier 19 TEIL G: Mess- → Auswertungs- → Arbeits- → Hybrid-Modus, KON29-03).
 
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **PMC läuft in der CI heute OHNE Vendor** = Übergangszustand mit WARNING — Messqualität
+  eingeschränkt, der Vendor kommt vom Planer laufzeitgemessen (KON34-02).
+* **Wallclock-SOLL-Konflikt** (KON36-01, neu aus der Schnitt-2-Gegenlese): das F2-Gesetz
+  06.08. legt Wallclock *„DREIPHASIG in die TIER-BINARIES"* (DOSSIER-messachse:44-50) — die
+  KON25-03-Zuordnung „Wallclock → CEB, an/aus" gilt allein über den Vorrang des Neueren, der
+  Konflikt wurde nie explizit aufgelöst → **Owner-Frage** (Sektion M).
+
 ---
 
 ## F. DIE DREI KONZEPTE, DIE NIE ZU VERMENGEN SIND
@@ -297,6 +520,11 @@ Konzepte**, die Umbenennung ist eine **Trennung**, keine Vereinheitlichung. *(Ow
 nicht sauber getrennt.")* Umbenennungs-Landkarte in KON29-03: Klasse A umbenennen · die Modi
 sind ein **Bau**-Posten (0 Code-Treffer) · Klasse C (XSD-Merge) ist das **dritte** Konzept ·
 Homonyme bleiben unangetastet.
+
+**ERGÄNZT 12.08. (KON36/WF7):** die drei `MergeStrategy`-Werte (`CeOnly` / `PrueflingReplace` /
+`FullJoin`) **SIND die Prüflings-Verbund-Varianten** — sie verbinden das dritte Konzept
+(Klasse C/XSD-Merge) mit dem Prüfling; der künftige Bezeichner gehört zur Prüflings-Familie
+und wird beim S-6-Fenster-Bau vorgeschlagen (Golden-Byte-wirksam) (KON30-02).
 
 ---
 
@@ -319,6 +547,17 @@ Homonyme bleiben unangetastet.
       "der Kanal bleibt falsch und muss behoben werden wie definiert".         KON32-01
       Zweifach zu heilen: Ziel-Filter UND per-Binary-Format XLSX (nicht CSV).
 
+**ERGÄNZT 12.08. (KON36/WF7):**
+* `COMDARE_STORAGE_CACHE` ist heute **AUS** und muss für S-13/Tests explizit **gesetzt**
+  werden (KON33-03).
+* **S-17:** der `LagerBaumWriter` hat **0 Produktionsaufrufer** (Gegenprobe
+  BuildOrchestrator = 11) — reiner **Verdrahtungsposten**, setzt **O-9** voraus (NAS-Ordner
+  oder MinIO-Bucket als Cache-Wurzel); die **Messdaten-Kaskade hat damit heute keinen
+  Einsortier-Pfad** (KON12-03).
+* **Bestandslog-SKIP-Risiko** (KON3-06): je binary_id wird EIN Eintrag mit leerer Zelle
+  geschrieben, obwohl die ID über die ganze opt-x-simd-Matrix gebaut wird (320 IDs
+  bit-identisch) — ein SKIP kann falsch begründet sein.
+
 ---
 
 ## H. DIE XML — Einstieg, Sprache, Export
@@ -337,6 +576,10 @@ Homonyme bleiben unangetastet.
       MIT den uebrigen Kapiteln und Beschreibungen NEBEN dem generierten Anhang.
     VIER Rueckschrieb-Methoden: Csv · LatexTable · ComparisonMetrics · XLSX (scharf).
     PDF entsteht Thesis-seitig. json/html/svg/png = belegte Nullen.            KON23-03
+
+**ERGÄNZT 12.08. (KON36/WF7):** **8 von 9 vendorierten `thesis_profiles` sind xlsx-blind**
+(`mit_xlsx=1` gegen `ohne=8`) — benannter **Blocker für jede echte Kampagne** (##23-R1;
+beim Bau neu auszuzählen, ob der Gitlink-Stand ≥ `4a26b6a3` das schon deckt) (KON4-07/R1).
 
 ---
 
@@ -361,6 +604,19 @@ Homonyme bleiben unangetastet.
 IDENTITÄTS-FREEZE** · Bau-Trigger **Mi 26.08. 06:00** · Kampagne ab Sa 29.08. · **Abgabe Di
 15.09.** = **Ausfertigungsdatum** (KON22).
 
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **S-14/S-18 sind BUILD-BLOCKER** (*„sonst ist der Build … unmöglich"*, WF3 Z. 34976),
+  keine CI-Kosmetik (KON24-01/Q-f).
+* **S-13/Ablage ist der KERN der Bau-Reihenfolge nach dem Stempel** (Rüge KON17-04):
+  1. Stempel · 2. Planungs-Simulation · 3. von der XML die **gesamte Kette bis zur PDF**,
+  von vorn nach hinten mit allen Abzweigungen — ausdrücklich **nicht** Post-Abgabe.
+* **P-0-Rest = Verdrahtungsposten** (KON12-01): das super-Skelett `v32_messreihe_antrieb.hpp`
+  (nur Test-Aufrufer) auf das ce-Skelett ziehen, **wenn** S-8 gebaut wird; der
+  `ExperimentPlanDirector` ist 4-fach eingebunden — der „dritte Enumerations-Walk" ist
+  widerlegt.
+* 🔴 **V-1:** der F1-Liefergegenstand `##25` DURCHSTICH (Fr 14.08.) ist seit der Stempel-Nacht
+  **ohne Besitzer** — dringendster Posten, Wellen-Platz W0b/#11 (KON24-02/V-1, KON27-04).
+
 ---
 
 ## J. BETRIEB UND CI
@@ -380,6 +636,31 @@ IDENTITÄTS-FREEZE** · Bau-Trigger **Mi 26.08. 06:00** · Kampagne ab Sa 29.08.
       (test:coverage-guard) · 24 Runner/15 online · prod1+prod2 online ·
       COMDARE_STORAGE_CACHE NICHT gesetzt · DROP_URL zeigt auf den Filterpod. KON33
 
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **`test:coverage-guard` ist aus nachweislich STEMPELFREIEM ISA/Host-Grund rot** („alle
+  Blocker klemmen am Stempel" gilt nur als Policy); Fix-Reihenfolge bindend: **erst F1**
+  (Operanden vergleichbar), **dann F2** (when:always) (KON8-11, KON33-02).
+* **D-1-Entscheid:** `test:secrets` verlässt den prod2-CI-Job-Pool — Umsetzung **ungeprüft**
+  (KON22-01/7).
+* **main-FF beider Repos offen** (super main ~25 Commits zurück); vor jedem FF die
+  Diff-Hygiene-Wache über den **KUMULATIVEN** Bereich (KON24-02/V-3).
+* **Zwei divergente Fassungen der Diff-Hygiene-Wache** (ce 779 Z. `--bereich` · super 558 Z.
+  `--seit-basis`/`--bestand`), gemeinsamer `--stdin`-Pfad ohne Abbruch — vor dem main-FF
+  misst die **schwächere** super-Fassung (KON5-06).
+* **Kampagnen-Kapazität zweilanig** (4-Perm-Profil): prod1 20,7 h / prod2 34,4 h (Engpass;
+  prod2 = i9-12900K seit RMA); 12-Perm nie durchgerechnet — blockiert durch B-4 (KON29-04).
+* **Stehende Regression gegen C++/CMake-only:** 13 Shell-Testdateien (7.967 Z.) in `ci/tests`
+  gegen 517 Google Tests; ein tr-Shim (exit 127) ließ 5/5 Mutanten fälschlich als „gefangen"
+  durchgehen (KON6-05, S-16).
+* **XML-Wache:** zwei Zweighälften nachweislich unbeobachtbar (grep-Zweig braucht root;
+  Nenner-Mismatch-Mutant überlebt); Owner-Frage „zulässig?" unbeantwortet (KON3-03).
+* **Stage-Topologie-Lücke:** `test:unit` publiziert `ctest_unit_inventar.txt` ohne
+  Verbraucher; `test:coverage-guard` liegt in **früherer** Stage als `test:unit` (needs darf
+  nicht vorwärts zeigen) (KON4-03).
+* 🔴 **MinIO-Keys** wurden vom Scrub mitgenommen, aus dem Cluster-Cred-Vault neu zu
+  beschaffen (sonst kein Systemtest); Neu-Einsetzen **ungeprüft**, 776-Runner-Token-Rotation
+  **ungeprüft** (KON22-01/5+6, Task #10).
+
 ---
 
 ## K. LIZENZ, EIGENTUM, FORMALES
@@ -393,6 +674,18 @@ IDENTITÄTS-FREEZE** · Bau-Trigger **Mi 26.08. 06:00** · Kampagne ab Sa 29.08.
     PRUEFUNGSUNTERLAGEN (8 Exposes, 3 PDFs mit Betreuer-Mailverkehr, Anmeldeformular)
       werden beim Public-Release MITVEROEFFENTLICHT.                             KON22
     ABGABE = AUSFERTIGUNGSDATUM (15.09.2026).                                    KON22
+
+**ERGÄNZT 12.08. (KON36/WF7):**
+* **Backup-Ref-Löschung gestuft** (KON22-02): stehen lassen → nach der Lieferphase
+  rechtebeschränktes Bundle → **erst dann** Remote-Löschung mit ausdrücklichem,
+  gegenstands-genauem GO; **keine Löschung vor der Lieferphase**.
+* Die drei Prüfungsunterlagen-PDFs tragen **Betreuer-Namen/@tu-dresden-Adressen** — der
+  Mitveröffentlichungs-Entscheid gehört **vor dem Public-Release in die Release-Checkliste**
+  (KON22-01/4).
+* **Lizenz-Widerspruch am Objekt** (KON2-24/25): `ce/NOTICE` sagt „Apache 2.0", `ce/LICENSE`
+  trägt die Dual-Lizenz (36/28 SPDX-Header ce/prt-art); der fünfte Schalter
+  `COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION=ON` kopiert bei jedem Configure GPL-3-Code
+  (wh.c) — das Vier-Schalter-Gate deckt ihn **nicht**.
 
 ---
 
@@ -441,8 +734,30 @@ IDENTITÄTS-FREEZE** · Bau-Trigger **Mi 26.08. 06:00** · Kampagne ab Sa 29.08.
 * **Der Owner-Haken zur 6-vs-32-Herleitung** — KON34 liefert die Herleitung aus der Karte;
   der Ledger führt „32 Docks = 32 Mess-Permutationen" bislang als **Beobachtung**, nicht als
   Festlegung. Ebenso offen: ob **Reihenfolge INNERHALB einer Stufe** je Mess-Gegenstand zählt.
-* **Schnitt 2 von WF6 fehlte** — die SOLL-Zuordnung aus den **Plänen** ist nicht gegengelesen;
-  die Herleitung stammt aus dem **Code**.
+* ~~**Schnitt 2 von WF6 fehlte** — die SOLL-Zuordnung aus den **Plänen** ist nicht gegengelesen;
+  die Herleitung stammt aus dem **Code**.~~ **GESCHLOSSEN 12.08. (KON36-01):** Schnitt 2
+  nachgeliefert und adversarial verifiziert — der Kernbefund hält, Urteil TEILS.
+
+**ERGÄNZT 12.08. (KON36/WF7) — neue und nachgetragene Offen-Punkte:**
+* **KON34-06(d):** die 17-vs-18-Dateizählung des System-B-Doppelbaus blieb unaufgeklärt.
+* **Register-Lücken** (KON20-04): **K2** P/E-Core-Cluster (`ICpuCore`/`ICoreLayout`/
+  `CoreClass`, CPUID 0x1A) ohne einen Implementierer, deep-research-Pflicht §16.3-E17 offen
+  (Wellen-Platz W7/#21) · **K4** das `mess/`-Subsystem hat keine S-Position (Klärung in der
+  W1-Planung; durch KON34/B4 jetzt teilweise beantwortet: System B wird umgestellt und über
+  den Builder angeschlossen) · **K5** drei Skelett-Testverzeichnisse seit 06.07. ohne
+  Eigentümer.
+* **W-6 ungelöst:** vier lokale Repo-Klone — Owner-benannte „Struktur-Regression" (07.07.,
+  Notier-Auftrag nie vollzogen) oder akzeptierter Zielzustand mit Sync-Pflicht?
+* **Der Wallclock-SOLL-Konflikt** (KON36-01): F2-Gesetz 06.08. (*„DREIPHASIG in die
+  TIER-BINARIES"*, DOSSIER-messachse:44-50) gegen KON25-03 (*„Wallclock → CEB, an/aus"*) —
+  gilt nur per Vorrang des Neueren, nie explizit aufgelöst → **Owner-Frage**.
+* **Die E-Label-Doppelbedeutung** (KON36-01): messachse-Dossier E1–E3 (Erhebungs-Ebenen:
+  Achsenaufruf/Gattungsaufruf/Lastsequenz) vs. 16_E1_E4-Dossier (XML-Baum…RC-Laufzeit) —
+  nie aufgelöst; KON34-02s Spaltenkopf „Wallclock/G1" bleibt dadurch zweideutig →
+  **Owner-Frage-Kandidat**.
+* **R-1-Rest** (KON29-06, durch KON36-01 verschärft): KON34/B4 beantwortet nur die
+  ORDNUNGS-Seite — zum **AUSWAHL-Subsystem** (`measurement_tooling_registry` /
+  `canonical_combo` / XSD `<combo>`, 18 Dateien) fehlt die Fortführungs-Entscheidung.
 ## NACHTRAG 12.08.2026 — KON34: DIE R-1-KARTIERUNG — ZWEI MESS-ARCHITEKTUREN, UND DIE 6 VERLIERT IHREN GEGENSTAND
 
 **Der Owner-Verständnis-Auftrag aus KON30-01 ist erfüllt:** *„verstehe die Messeinrichtungen in

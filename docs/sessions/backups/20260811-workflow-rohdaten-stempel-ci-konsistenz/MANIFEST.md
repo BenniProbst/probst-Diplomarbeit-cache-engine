@@ -263,3 +263,14 @@ gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
 
 **Dazu die LEDGER-KONSOLIDIERUNG IV** (`kon-quellen/ledger-konsolidierung-IV.md`) — alle
 34 KON-Nachtraege thematisch zusammengezogen, mit KON-Index und UEBERHOLT-Ketten.
+
+## Nachtrag 12.08.2026 — WF7 (Heilung + Konsolidierungs-Lücken)
+
+- `lauf-wf_61df1b40-wf7-heilung.tar.gz` (2,1 M): ALLE 8 Agenten-Transkripte + journal.jsonl
+  des Heilungs-Workflows (Schnitt-2-Nachlieferung + 5 Lücken-Agenten + Fable-max-Synthese;
+  8/8 fertig, 0 Tode — die Kompaktheits-Auflage wirkte).
+- `kon-quellen/ledger-nachtrag-kon36.md`: die KON36-Quelldatei.
+- `kon-quellen/wf7-synthese-vollergebnis.json`: das vollständige Synthese-Ergebnis
+  (heilungs_urteil + ergaenzungs_liste mit allen 56 Fakten + kon36_entwurf).
+- gitleaks-Null gedeckt: Köder glpat-+20 Zeichen (Länge geprüft) → leaks found: 1;
+  Scan über die 4 Landungs-Dateien (3,10 MB) → no leaks found.
