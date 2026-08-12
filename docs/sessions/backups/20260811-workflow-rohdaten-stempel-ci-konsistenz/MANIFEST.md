@@ -179,3 +179,23 @@ head -c 15 | base64 | tr -dc liefert nicht-deterministisch 19 ODER 20).
 ZWEITE Probe mit 40 Input-Bytes und gepruefter Laenge 20 -> leaks found: 1.
 Die Null ist erst mit der ZWEITEN Probe gedeckt. Fallen-Register ergaenzt.
 ```
+
+---
+
+## NACHTRAG 4 — WF1 (neun Owner-Straenge) + WF3 (5-Kontexte-Einlesen), 12.08.
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_91263b69-d40.tar.gz` | 11 M — WF1: 46 Agenten (45 fertig, 1 StructuredOutput-Tod), 9 Straenge A-I |
+| `lauf-wf_c665d379-7b8.tar.gz` | 1,6 M — WF3: 9 Agenten, 7 Leser + Abgleich + Synthese |
+
+Synthesen gelandet als `20260812-WF1-SYNTHESE-*` und `20260812-WF3-SYNTHESE-*`; beide Koepfe
+beim Agenten-Return verloren (Return beginnt mitten im Satz) -- die Straenge A-D von WF1 aus dem
+Journal geborgen (`20260812-WF1-BERGUNG-verify-ABCD.md`), das WF3-Unverbuchte vollstaendig in
+KON22. Auswertung: KON22 (WF3) + KON23 (WF1).
+
+```
+gitleaks   WF1 + WF3 je "no leaks found"
+Gegenprobe MIT LAENGENPRUEFUNG (Lehre aus Nachtrag 3): Koeder-Laenge ${#K}=20
+           verifiziert VOR dem Zaehlen -> leaks found: 1. Beide Nullen gedeckt.
+```
