@@ -305,3 +305,12 @@ gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
   gitleaks koeder-gedeckt, Diff-Hygiene gruen.
 - 289-Token rotiert (comdare-thesis-writeback-r20260812, id=97); Fehleintraege vorher per
   API-Verifikation erkannt und geloescht; Kopie 0600 in /home/comdare/keys/.
+
+## Nachtrag 12.08.2026 — WF11 (Bau-Start, 3 Agenten am 529-Overload tot)
+
+- `lauf-wf_d826aca8-wf11-bau-start.tar.gz` (1,9 M): 9 ueberlebende Agenten + journal
+  (3 Explores, 3 Designs, 3 Verifies; die 3 Bau-Agenten starben serverseitig).
+- `kon-quellen/wf11-design-{1,2,3}.json`: die GEBORGENEN Schnitte (1=D gebaut, 2=A S-1,
+  3=C F1-Durchstich) -- Grundlage des Neubaus WF12 ohne Wiederholung der Explore-Arbeit.
+- `kon-quellen/wf11-vollergebnis.json` + `ledger-nachtrag-kon49.md`.
+- Strang D gelandet: ce a99c4a18 (beide Remotes), Diff Lead-nachgeprueft.
