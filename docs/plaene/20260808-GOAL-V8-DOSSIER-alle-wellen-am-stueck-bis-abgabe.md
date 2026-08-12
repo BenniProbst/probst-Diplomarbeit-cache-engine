@@ -7,6 +7,17 @@
 
 ---
 
+<!-- REFERENZ-KOPF-NACHTRAG 12.08.2026 (KON19-00/KON39) — Volltext-Traeger:
+     docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md Teil A.1 -->
+
+## REFERENZ-STAND 12.08.2026 — KOPF-NACHTRAG (KON19-00)
+
+> **Owner-Auftrag KON19-00 (12.08.):** dieses Dossier ist — mit Wellenplan v2, DESIGNPLAN-tdd und ARBEITSWEISE-GESAMT-DOKTRIN — **Haupt-Referenzdokument**; spätere Planungsdokumente werden **gegen diese vier gemessen**, nicht umgekehrt. Nichts wird gelöscht: Originaltext bleibt, Überholtes trägt datierte Marker an der Stelle selbst.
+> **Fakten-Quelle für den lebenden Stand:** Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`, Abschnitt **„LEDGER-KONSOLIDIERUNG IV"** (A–M inkl. ERGÄNZT) + **KON24–KON38**. Bei Widerspruch: **Owner-Wort schlägt alles · Neueres schlägt Älteres.** Dieses Dossier bleibt Stand 08.08. + datierte Nachträge; es **verweist** auf den Ledger, es dupliziert ihn nicht.
+> **Die Korrektur-Tabelle A (Stelle→ALT→GILT), die Neu-Liste B und die Bestätigungs-Liste C stehen im Volltext-Träger** `docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md` **Teil A.1** — die betroffenen Stellen dieses Dossiers tragen datierte Einzel-Marker. Kurzfassung der tragenden Korrekturen: VI.1(a) Kette → Bau-Modul/Träger-Rakete/Emission-endet-im-Lager (ORT-Reihenfolge gilt weiter) · VI.2 „0 % gebaut" → „0 % ANGESCHLOSSEN"; Nenner = **32** aus 5 Schaltern, Hybrid-Mess-Schicht hält · VI.5 → T-15a ≠ T-15b (je 5 für Build UND Messung, 3 Erfolgs-Werte einzeln) · OD-7 = 16, `--debug` bis **T−3 (~12.09.) = echte Messung** · **KON38: Stempel-Strecke = Fable 5 max in allen Workflow-Teilen** · B1–B5 (System A/B) in jeder Durchführungs-Planung.
+
+---
+
 ## VERSIONSHISTORIE UND ABLÖSUNG
 
 | Version | Zeitraum | Gegenstand | Status |
@@ -93,6 +104,8 @@ GitLab-Tags. Ein fehlender Tag-Pin ist deshalb **kein Befund**.
    `measure:smoke` und `measure:golden-320` — **Symbol-Anker: die Zeilennummern :923/:1015 sind
    binnen Stunden auf :1097/:1194 gedriftet**) — Messdaten können nicht zwischen CPUs floaten. Das ist die Stelle, an der der
    Schaden unheilbar gewesen wäre.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** ANKER GEDRIFTET 12.08.: heute :1810/:2038; ‚47 von 53' heute super allein 38/41 — bei Zitat neu zählen, Anker über Symbol/Commit/KON (Ledger-IV/L-6).
 
 Volltext und Fehlerklasse: Ledger, „RICHTIGSTELLUNG 09.08.2026 — der Befund hält, meine Deutung
 nicht".
@@ -347,6 +360,8 @@ verwechselt, beurteilt die richtige Sache auf der falschen Schicht.
 [PLANER] fragt (Laufzeit) → [CEB] trägt (Compile-Zeit) → [HYBRID] adaptiert → [TIER] läuft
 ```
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** ÜBERHOLT 12.08. nur in der Emissions-/Linear-Lesart (Bau-Modul/Builder, Tiefe 3, Rakete rückwärts, Emission endet im Lager; KON16…KON25-08) — die ORT-Reihenfolge der vier Träger gilt weiter. → Wellenkonsolidierung Teil A.1.
+
 **(b) Die Verarbeitungskette — der Weg des Prüflings.** Owner-Wortlaut vom 09.08., bindend:
 
 ```
@@ -384,7 +399,11 @@ gedeutet habe, ohne vorher nach dem vorhandenen Entwurf zu suchen.
 
 ## VI.2 HYBRID — Pflicht, eigene Gattung, 0 % gebaut
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** ÜBERHOLT 12.08.: ‚0 % gebaut' → ‚0 % ANGESCHLOSSEN' — hybrid/ trägt 4 Header/943 Z. + 1802 Z. Vorarbeit, 0 Produktions-Konsumenten (KON9-02).
+
 Owner-KERN 08.08.: Gattung **`HEURISTIK-ADAPTER`**, Genus **`Function-Interface-Reroute`**.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** PRÄZISIERT 12.08.: ZWEI Ebenen GEMEINSAM — AnatomyGattung::HeuristikAdapter=3 (4. Gattung, keine Dock-Gattung) + AnatomyGenus::FunctionInterfaceReroute=5 (sechswertig); genus() liefert NIE den Reroute-Wert (Pass-through, Weg C) — anatomy_base.hpp:53-92 + :131-169; 14 Entscheide E-1…E-10/K1/K2/K5.
 
 Sie erbt **compile-time** die Interfaces einer Gattung+Genus und stellt sie nach heuristischer
 Entscheidung an die eigentlichen Tier-Binary-Interfaces durch — *„wie ein heuristik-gesteuertes
@@ -393,6 +412,8 @@ Mutex"*. Sie rechnet nicht selbst; sie entscheidet, wer durchdarf.
 **Eigene Macro-Benchmarking-Schicht:** die drei Mess-Ebenen werden im Hybrid-Fall auf **vier**
 erweitert — die neue wird **dazwischengeschoben**, nicht angehängt. Gemessen wird der **Overhead des
 Reroutes zu multiplen Tier-Zielen am Hybrid-Prüfdock**.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** PRÄZISIERT 12.08. (nicht überholt): Nenner = 32 aus 5 Schaltern (KON25-03/KON34-03); die eigene Hybrid-Mess-Schicht HÄLT und trägt B3; je Stufe ein Subset der 3 (KON37-03).
 
 **Verschränkung:** wie `SearchAlgorithm` die Container-Gattung nutzt, kann die
 Heuristik-Tier-Binary-Strategie **direkt im SearchAlgorithm-Hauptalgorithmus** als
@@ -475,6 +496,8 @@ leer — und der Lauf misst weiter:
 
 > *„In der Wissenschaft geht nicht immer alles glatt, aber das muss SICHTBAR sein."*
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** GETRENNT 12.08.: T-15a (Drift→Kampagnen-Neustart) ≠ T-15b (Build UND Messung dürfen JE 5-mal scheitern, nicht 1+5; Erfolg = 3 Werte je Parameter+Binary EINZELN persistiert, KON37-06). 🔴 die 5 sitzt heute falsch auf der Drift-Achse (ce 4cd1ab91).
+
 **Wir arbeiten NIE mit Zufall** — außer für Köder. Die Gap-Statistik der k-Wahl braucht eine
 Zufalls-Referenz und fällt damit aus; die k-Wahl stützt sich auf Silhouette + Elbow + Domänen-Anker
 **k ≈ 6…14**.
@@ -505,6 +528,8 @@ Zufalls-Referenz und fällt damit aus; die k-Wahl stützt sich auf Silhouette + 
 | **W4** | Mo 07.–Fr 11.09. | Auswertung + Text + **HY-C** | 2 |
 | **W5** | Sa 12.–Di 15.09. | Sicherung, PDF, Abgabe | — |
 | **W7** | nach der Abgabe | §75, Restbau, HY-Vollausbau, `checkpoint_measure` | — |
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** *ÜBERHOLT 12.08. (W7-Zeile ‚checkpoint_measure'): checkpoint_measure ist Teil von System B → B4, Owner-KERN 09.08. ‚muss gebaut werden' — gehört in die Durchführungs-Planung, nicht nach W7 (KON34, Wellenplan §17.3).*
 
 ## VII.2 Betriebsregeln über allen Wellen
 
@@ -596,6 +621,8 @@ Codex (GPT-5, read-only) bleibt eingebunden — **als Kritiker, nicht als Zusamm
 | **D2** | Abdeckungs-Wache über zu kleinem Nenner | **offen** — **18** bedingte Registrierungen unter **14** Bedingungen (09.08. am Objekt bestätigt, drei ce-Stände, `scripts/ci_abnahme06_bedingungs_tabelle.sh`); `STATUS_OUT` deckt davon ~~2~~ → **4 von 18** (22 %). Die „2" traf die *Blöcke ohne Registrierung* (`_pa_status`, `_fj_status` — in jeder CI unerreichbar), nicht die gedeckten Registrierungen. **Teilstück D2-G4 ERLEDIGT 09.08.**: Formel ##06 auf „erfüllt ODER Allowlist mit Begründung" korrigiert, Zähl-Skript + `ci/abnahme06_bedingungs_allowlist.txt` gelandet. |
 | **D5** | fünf Median-Implementierungen, drei Antworten | **offen** |
 | **D3-4** | Ausgabe-Gate in `allow_failure`-Job wirkungslos | **offen** — gehört in einen Folge-Job |
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** *ERGÄNZT 12.08. zu D2: ce hat GENAU EINEN roten Job test:coverage-guard (stempelfremder ISA/Host-Grund); Fix-Reihenfolge bindend erst F1 (Operanden vergleichbar), dann F2 (when:always) — Guard-interne Schritte, NICHT die Fristen F1/F2 (KON8-11 · KON33-02). Zu D5: 3/5 erledigt (ce c98b4b95), offen D5-2-Rest + D5-4.*
 
 > **KORRIGIERT 09.08.2026 — die folgende Aussage war FALSCH und ist zurückgenommen.**
 > Sie stand seit der Ersterstellung (`25040237`, 08.08. 19:29 UTC) unverändert über acht

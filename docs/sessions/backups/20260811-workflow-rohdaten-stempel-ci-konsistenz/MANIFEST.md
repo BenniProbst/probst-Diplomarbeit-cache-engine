@@ -274,3 +274,11 @@ gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
   (heilungs_urteil + ergaenzungs_liste mit allen 56 Fakten + kon36_entwurf).
 - gitleaks-Null gedeckt: Köder glpat-+20 Zeichen (Länge geprüft) → leaks found: 1;
   Scan über die 4 Landungs-Dateien (3,10 MB) → no leaks found.
+
+## Nachtrag 12.08.2026 — WF8 (Wellenkonsolidierung + strategische Reihenfolge)
+
+- `lauf-wf_4ec570cc-wf8-wellenkonsolidierung.tar.gz`: ALLE 10 Agenten (5 Drift/Inventar sonnet-max,
+  2 Design fable-max, 2 Verify fable-xhigh, 1 Synthese fable-max) + journal.jsonl; 10/10, 0 Tode.
+- `kon-quellen/ledger-nachtrag-kon39.md` + `kon-quellen/wf8-synthese-vollergebnis.json`.
+- Ergebnis-Träger im Repo: docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md
+  (Teil A Referenz-Nachträge · Teil B Strecke · Teil C OF-1…OF-4 · Teil D W7-Liste).

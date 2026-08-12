@@ -1,5 +1,5 @@
 # DESIGNPLAN ERWEITERTE TESTABDECKUNG — TDD ÜBER ALLE WELLEN
-**Stand 08.08.2026 abends · fügt sich in den Wellenplan v2 (`docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md`) ein, Abschnitte 3 und 6 sind bindend; dieses Dokument ergänzt dessen Verifikationsvertrag um die Testseite, es ersetzt nichts.**
+**Stand 08.08.2026 abends · fügt sich in den Wellenplan v2 (`docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md`) ein, Abschnitte 3 und 6 sind bindend; dieses Dokument ergänzt dessen Verifikationsvertrag um die Testseite, es ersetzt nichts.** **[STAND-HINWEIS 12.08.: Drift gegen KON15–KON38 in §10; betroffene Stellen tragen [D-n → §10]-Marker.]**
 
 Posten-IDs unten: MT=Messkette-Treiber, ST=Statistik-Glied, PK=Perzentil-Kanon, PE=Planer-Emission, LG=Lagerhaltung, AS=Achsen-Stempel, PM=PMC-Messfühler, AG=Anatomie-Gattung, XL=xlsx-Ausgabe, HY=Hybrid. Notation je Posten: `[Band Welle h]`; Band A = landet im Fenster, B = nur bei freiem Slot, C = W7. `*` = Welle gegenüber dem Kritik-Material verschoben (Regeln in §4).
 
@@ -83,6 +83,8 @@ Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Materials (`*` im Regis
 
 **W1 (Mo–Fr 17.–21.08., F2 = Freeze) — A: 23 Posten, 99 h; B: 22, 62 h. Engpass des gesamten Plans (§8).** Reihenfolge hart: **MT-L3-Schema-Orakel VOR D4d** (der einen Spaltenänderung der Woche — sonst entsteht die neue Spalte am Orakel vorbei). PK-KanonWert/PK-Kreuztest/PK-KlemmJson auf dem D5-1-Kanon (liegt seit W0a-Lokalspur), PK-DeleteP99 mit D5-4. Statistik-Trio landet mit D4a–D4c; ST-CLITestat ersetzt die `PASS_REGULAR_EXPRESSION`-Wache (Wachen-Register ##31 kennt die Klasse). **HY-Reroute-Vertrag zuerst** (Concept, `gattung_of`-Pin, `kGenusCount` — definiert HY-A), dann HY-ModulGrenze atomar mit HY-A2 (F8-DoD), HY-Ebene4a nach dem 4.-Ebenen-Entscheid Mi 19.08. Lager-Kette: LG-HostBinder → LG-SkipCallback → LG-E2Exlsx + LG-WritebackXlsx (= Definition-of-done des Task-63-Strangs), LG-XlsxAlt, LG-LoadWache, LG-Idempotenz. PM-Naht, XL-L2, XL-L4. **Abnahme F2:** Invarianz-Beweis der Statistik grün NACH Heilung, HY-Verträge compile-hart, SKIP-Zweitlauf ruft den Mess-Callback 0-mal.
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** [D-1 → §10]: Bestand nicht null — 4 Header/943 Z., Genus sechswertig; der Vertrag PINNT, definiert nicht grundauf.
+
 **W2 (Mo–Fr 24.–28.08., F3) — A: 8 Posten, 21 h; B: 23, 67 h.** Nur Mo/Di/Fr tragen Slots (Bau-Fenster Mi–Do ist exklusiv). Band A = Kampagnen-Wahrheit, Landung bis F3 als Teil der GO-Vorlage: MT-L1 (measured zählt Messung, Marker-Erhalt), MT-L2 (Token statt 0.000, Snapshot-Teil 3), MT-L6/L7, PM-m3v2Zero, PM-RAPL, PM-Scaled, PM-NichtGelesen-Seam. Band B (xlsx-Härtung, Perzentil-Folgeposten, AG-Pakete) nur bei freiem Slot Mo/Di.
 
 **W3-MESS (Sa 29.08.–F4 04.09.) — 0 h neue Testarbeit.** Die W0b/W2-Gates SIND die Batch-Abend-Instrumente (Bilanz, Inhalts-Gate, Frische, HY-B „eine tote Reihe kann nicht gewinnen"). Band-B-Arbeit höchstens in Batch-Pausen als [lok] ohne Landung.
@@ -113,9 +115,13 @@ Befund aus diesem Lauf, mit Nenner: Codex lieferte die Rohbreite über 10 Teilge
 
 **Bedarf:** 117 Posten, 385.5 h ≈ 386 h. Bänder: **A = 53 Posten, 206 h** · **B = 59 Posten, 166.5 h** · **C = 5 Posten, 13 h**.
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** [D-4 → §10]: die S-Strecke (S-6, S-13, S-14, S-17…S-21) hat KEINE Testposten im 117er-Katalog — gezählte Warteliste in §10; Summen NICHT anfassen, bis durchgezählt.
+
 **Deckung von Band A:** ~131.5 h davon sind die **Testseite bereits geplanter Bauten** und wandern in deren Paketbudgets (HY-Verträge 58 h → HY-A/C; Lager/xlsx-Facade 39 h → Task-63-Strang; Statistik 12 h → D4; Perzentil 17 h → D5; Planer 6.5 h → D3; MT-L5 4 h eigenes CI-Paket). Davon sind ~30 h in den D-Posten-Abnahmen (76 h, Wellenplan §2) schon eingepreist (Überschneidungen: ST-Trio↔D4a–c, ST-CLITestat↔D1e, PK-DeleteP99↔D5-4, PK-KanonWert-Seed↔D5-1, ST-CTestWache↔D2-G1/D1c, PE-Testate↔D3-4/D3-5). **Eigenständige neue Wachen in Band A: ~75 h.**
 
 **Kapazität (Annahme, keine Messung — zweiter [lok]-Slot der Ein-Blech-Regel):** W-1 ~6 h · W0a ~8 h · W0b+Nachlauf ~18 h · W1 ~24 h · W2 ~10 h · W3 ~4 h (Batch-Pausen) · W4 ~24 h · zwei benannte Reserve-WE ~24 h = **~118 h**. Die ~75 h eigenständiges Band A passen hinein; die verbleibenden ~100 h Paket-Testseite erhöhen aber die erste Spur, die der Wellenplan bereits mit 26 von 27 Werktagen füllt.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** [D-2 → §10]: die Stempel-Strecke (P-Posten) kommt ZUSÄTZLICH und fällt NIE; Band B/W1 (62 h) geschlossen gestrichen — §8-Bedingung (2) entschieden.
 
 **Die wichtigste Aussage: es passt NICHT alles — und der Engpass hat einen Namen: W1.** W1 trägt 99 h Band-A-Testarbeit in einer Woche, die schon D4/D5-Rest, Menge, HY-A und die Entwicklung der W2-Pakete enthält. W1 hält nur unter vier Bedingungen: (1) Vorziehen alles Lokalen in den W0b-Nachlauf (bis Di 18.08.), (2) die Reserve-WE 15./16.08. für die Testspur und 22./23.08. für HY-A **samt seiner Verträge** — der Wellenplan benennt letzteres nur für HY-A; dass die HY-Testverträge mitgemeint sein müssen, ist ein offener Konflikt und wird dem Owner so vorgelegt, nicht glattgerechnet; (3) Band B landet im Fenster planmäßig **gar nicht** (0 von 166.5 h eingeplant; jede gelandete B-Stunde ist Beifang eines frei gewordenen Slots); (4) TDD wird als Ersatz, nicht als Zusatz gebucht — der Test ist die Abnahme des Pakets, keine zweite Abnahme daneben. Reißt eine der vier Bedingungen, fällt zuerst Band A/W2-Randwerk (MT-L6/L7), dann XL-L1-Stufe-B auf W2 — **nie** fallen: ST-CTestWache, MT-L4, die Statistik-Begleittests, PK-KanonWert, LG-XlsxAlt/LG-CsvAlt (Messdaten nie löschen), die HY-Verträge (Owner: ALLES PFLICHT). Von 386 h Bedarf landen im Fenster somit planmäßig 206 h in 53 Posten; 179.5 h in 64 Posten gehen begründet und gezählt nach W7 — diese Zahl steht ab F1 als Zähler in jeder Wellen-Abnahme.
 ---
@@ -173,6 +179,8 @@ Das Kritik-Material meldete D3-1 und D3-2 als **NICHT GEFUNDEN**. Das war zum Me
 **Der Unterschied, der hier zählt:** „gefallen" heißt, die Behauptung des Kritik-Materials trägt nicht mehr. Es heißt **nicht** „erledigt". D3-1 ist zur Hälfte offen, und diese Hälfte bleibt in W0b stehen. Ein Posten, der als erledigt abgehakt wird, weil sein Kern landete, ist genau die Klasse `anwesenheit-statt-bedingung` aus §2 — eine Ebene höher.
 
 **Und die Wache ist selbst gedeckt:** `ci/tests/mess_ausbeute_bissprobe.sh`, im CI als `test:mess-ausbeute-bissprobe` **ohne** `allow_failure`, mit `--selbstbiss` (Wegwerf-Mutanten, an denen die Probe rot werden MUSS). Das ist T-1 und T-7 am selben Gegenstand.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** [D-3 → §10]: Shell-Bissproben sind Alt-Last — S-16-Migration zu Google Tests, Zielstruktur liefert die TEST-KONSOLIDIERUNG (KON37-08).
 
 ### 9.4 · B-4 — das Abnahmekriterium von D3-2 konnte nicht fehlschlagen
 
@@ -337,9 +345,25 @@ nicht auf dem **lebenden** Weg erfüllt.
 
 Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-wache` in `.gitlab-ci.yml`, **ohne** `allow_failure`, und ihre Bissprobe `ci/tests/plan_zahlen_probe.sh` fährt beide Richtungen — den Positiv-Fall als Nenner und gewürfelte Köder, an denen die Wache rot werden **muss**.
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** [D-3 → §10]: dito — Shell-Form zu migrieren, Mechanik vorbildlich.
+
 ### 9.6 · Was hier ausdrücklich NICHT gedeckt ist
 
 - **Die vier ctest-Zustände aus B-2 (429/431/456/460)** sind *nicht* maschinell bewacht. Sie brauchen einen Configure bzw. einen gebauten Baum und sind nicht in Sekunden ableitbar; ein Anker dafür wäre entweder ein Daueralarm oder eine Lüge. Ihre Deckung ist die ce-seitige Sichtbarkeits-Wache (ce `1f88cfec`), nicht dieses Dokument.
 - **Sätze ohne Zahl.** Die Wache prüft Zahlen. Eine falsche Behauptung, die keine Zahl trägt, fängt sie nicht — dagegen hilft nur §6 (Codex-Pass) und T-9.
 - **Die Aufwände (386 h, 206/166,5/13).** Sie sind Schätzungen, keine Messungen, und werden hier nicht als Objektzahlen behandelt. Ihre einzige geprüfte Eigenschaft ist die innere Konsistenz: 53+59+5 = 117 Posten, 206+166,5+13 = 385,5 h — beides stimmt, und die sieben Klassenlisten in §2 tragen tatsächlich 29/25/23/16/10/9/3 Einträge + 2 Einzelfälle = 117.
 - **Die 157/117/40 aus §0** sind nicht nachgezählt worden; sie stammen aus der Meta-Stufe und stehen hier als deren Aussage, nicht als eigene Messung.
+
+---
+
+## 10. NACHTRAG — DRIFT GEGEN KON15–KON38 (12.08.2026) + REFERENZ-STATUS
+
+**Status (KON19-00):** Haupt-Referenzdokument der Testseite. Stand bleibt 08.08. + §9; nicht eingearbeitet war der Architektur-Freeze KON15–KON38 — Differenzen nach §9-Muster, nichts gelöscht. Fakten-Quelle: Ledger-Konsolidierung IV.
+
+**D-1 — Hybrid-Bestand nicht null** (§4/Regel 3, W1-Absatz „definiert HY-A"): KON9-02: `hybrid/` trägt **4 Header/943 Z.**, 0 Konsumenten; `AnatomyGattung::HeuristikAdapter=3` existiert, `AnatomyGenus` **sechswertig** — der HY-Reroute-Vertrag **PINNT** `kGenusCount`, definiert nicht grundauf. TDD-Charakter bleibt: Tests vor dem ANSCHLUSS.
+**D-2 — Kapazität** (§8, „~118 h"): #87/#78/#86/KON9-05/HY-A sind **(P), MÜSSEN vor F2, fallen NIE** (§13.3); Reserve-WE 22./23.08. dafür gezogen; **Band B/W1 (62 h) „geschlossen gestrichen"**. §8-Bedingung (2) damit entschieden.
+**D-3 — Shell-Bissproben sind Alt-Last** (§9.3 `mess_ausbeute_bissprobe.sh`, **§9.5 (Z.338)** `plan_zahlen_probe.sh`): KON6-05: `ci/tests/*.sh` müssen Google Tests werden, KEINE Ausnahme; Teil der stehenden Regression **S-16** (14 Dateien/8.528 Z., 0 retired; Skip-Verbot KON22). MECHANIK vorbildlich, FORM zu migrieren; **KON37-08s TEST-KONSOLIDIERUNG dockt hier an** (Ziel-Testmodule = Zielstruktur auch für S-16).
+**D-4 — S-Strecke hat KEINE Testposten** (Lücke, als GEZÄHLTE Warteliste): S-6, S-13, S-14, S-17…S-21 fehlen im 117er-Katalog; T-9 läuft für den größten Baublock leer. Neu: **S-21 Kategorien-Ordnungs-Wache** (=S-6c, Owner-GO, Vorbild `organ_gruppen_decken_die_komposition`, KON21-03). S-6-Umfang erst nach Layout-Bump-Lösung (`decl.hpp:293`) schätzbar.
+**D-5 — xlsx-Nenner** (§2/K7 „null Aufrufer"): KON4-07/R1+KON36-02/H: **8 von 9** `thesis_profiles` xlsx-blind — Kampagnen-Blocker; fehlender T-3-Klasse-Posten mit Profil-Nenner. Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum.
+**D-6 — PMC-Vertragsfolge ungetestet**: PMC = Meta-Meta-Achse, AMD/Intel = zwei Komponenten (KON8-12); CI fährt PMC ohne Vendor (WARNING, KON34-02). MT-L11 misst nur Injektion — CEB→Tier-CT-Vertragsanpassung ohne Posten.
+**Summen-Regel:** 117/386 h werden NICHT angefasst, bis die S-Strecke durchgezählt ist — sonst derselbe T-3-Fehler, den §9 korrigiert.

@@ -952,6 +952,8 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 | measure:smoke-Wiederbelebung | fällt (bleibt deprecated; nur der 3-Zeilen-Helfer-Umbau D3-2) | keine — der lebende Weg ist der CEB-emittierte, und genau der wird gehärtet |
 | **Streichkaskade bei globalem Zeitriss** (Reihenfolge jetzt festgelegt, nicht im Riss): 1. ##40-Reste/W7-Vorgriffe, 2. F-07b, 3. HY-C-Umfang (Router auf EINEN belegten Fall), 4. Break-Even-Neubau (dann Hermite ratifizieren MIT Methodik-Begründung), 5. ##41-Stufe-2. **NICHT streichbar:** die drei Präsens-Zusagen, HY-A/HY-B (Owner „Alles Pflicht"), D5-1+D4-Trio (sonst sind die Kennzahlen falsch gerechnet), die W0a/W0b-Wachen | | |
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** *ÜBERHOLT 12.08. (checkpoint_measure-Zeile): Teil von System B → B4, ‚muss gebaut werden' (Owner-KERN 09.08.) — vor F2/Trigger, nicht W7 (§17.3).*
+
 ---
 
 ## 8. WAS BEIM OWNER LIEGT
@@ -975,6 +977,8 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 | **OV-2 checkpoint_measure** | Bleibt es bei „spezifiziert, nicht gebaut" (W7)? | **ja** — ein Fingerprint-Bump ohne Konsument wäre die Klasse „gebaut, kein Konsument" im Identitätsfenster | vor Mo 24.08. |
 | **OV-15 GO-TERMIN** | Können beide Mess-GOs (320er + gedeckelte Teilmatrix) bis **Sa 29.08. 06:00** fallen, wenn die GO-VORLAGE Fr 28.08. mit Deckel-Zahl vorliegt — ja? | **ja erbeten** — jeder Verzugstag frisst 1:1 Messfenster; ab Ende-W2-Verzug kippt die Rückwärtsrechnung und W4 entfällt als Auswertungsfenster | Vorab-Zusage an F3 |
 | **OV-18 STREICHKASKADE** | Bestätigst du die neue Streich-Reihenfolge (Abschnitt 7, letzter Block) mit einem Satz? | ja erbeten — sie weicht von v1 ab, weil deren Position 2 (Hybrid) durch deinen KERN gefallen ist | Mo 17.08. |
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** *PRÄZISIERT 12.08. zu OV-10: gegenstandslos NUR als Nenner-/6er-Frage; der Anordnungs-Gegenstand ist neu gefasst per KON37-03 (statische Anordnungs-Freigabe) → §17.2. Zu OV-13: Zeitbezug korrigiert — ‚eigenständig + Sync-Kanal' = SPÄTER, jetzt direkt/delegiert (KON36/KON21-01) → §17.5.*
 
 *(OV-9/OV-11 der v1 sind in OV-5/OV-8 aufgegangen; OV-14-alt (RF-5, A5-Value-Filter) bleibt unverändert offen und wird an F2 mitvorgelegt.)*
 
@@ -1592,6 +1596,8 @@ Zahlen vorgelegt.**
 
 ## 14.3 DIE ZWINGENDE REIHENFOLGE
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** ERGÄNZT 12.08.: die Pfeilkette liest sich mit S-19 als Knoten zwischen S-7/F2 und Trigger — S-19 PRODUZIERT die B-4-Zahl (KON37-03, KON30-03: Träger-Stufen-Reihenfolge, Planer zuerst) → §17.5. Regel 2 (P-0) gilt in der §15.5-Fassung: begleitend, nicht blockierend.
+
 ```
         O-1 ─┐
         O-2 ─┼──────────────────────────────► S-2 ──┐
@@ -1914,6 +1920,8 @@ Owner: *„C-4 ist eine **üble Bilanz**, weil wir das **trennen und verdrahten*
 ⇒ **S-18 — die Achsen-Versionierung trennen und verdrahten.** Umfang und Ort sind Gegenstand eines
 laufenden Explores; der Posten wird nach dessen Rücklauf geschnitten und eingeordnet.
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** BEANTWORTET 12.08.: das Home-Prinzip (KON27-01) definiert S-18 vollständig — je Kategorie ein Home + EIN Wächter, zweistufige Versionierung, golden zuerst → §17.5.
+
 ## 15.10 WAS NACH WIE VOR UNGEPRÜFT IST
 
 **14 von 17 Bau-Teilen** sind nie gegen den Code gemessen worden (nur P-0, S-14, S-17). Der
@@ -1928,6 +1936,7 @@ ist aus dem Dokument allein **nicht** entscheidbar. Beides läuft im Explore vom
 > Workflows (WF1 neun Stränge · WF2 zwei Welten/leere Klassen · WF3 5-Kontexte-Ernte, alle
 > gelandet als KON20/KON22/KON23). **§13–§15 bleiben unverändert stehen; was hier steht, gilt
 > vor.** Gesamturteil: `docs/sessions/20260812-GESAMTURTEIL-manuelle-synthese-*`.
+> **FORTSCHREIBUNG 12.08. abends: §16 gilt bis KON23 — Fortsetzung und Vorrang: §17 (KON24–KON38).**
 > WF4 läuft; die Referenz-Konsolidierung (KON19-00, vier /goal-Dokumente als Haupt-Referenz)
 > folgt nach dessen Rücklauf als eigener Schritt.
 
@@ -1973,7 +1982,74 @@ ist aus dem Dokument allein **nicht** entscheidbar. Beides läuft im Explore vom
 * **Nenner-Vorbehalt:** KEINE Kapazitätsrechnung mit einer Hybrid-Zahl, bis F3 beantwortet ist;
   CEB-Reihe ist 5→6→**12** (W-3), der PMC-Multiplikator unbeziffert.
 
+> ⚠️ **MARKER 12.08.2026 (KON39):** ÜBERHOLT 12.08.: der Nenner ist 32 (KON25-03); ‚CEB-Reihe 5→6→12' ist abgelöst; die Anordnung kehrt als statische Freigabe zurück (KON37-03) → §17.2.
+
 ## 16.4 OFFENE OWNER-PUNKTE (Stand 12.08. mittags)
 
 **F1–F10** (KON23-07) + **F11** Prüfdock-Zählung (gerade Anzahl vs. EIN Dock vs. alle — Z. 35020
 gegen KON9-03 gegen KON21-01) + **F3**-Nenner + A-1-Vorlagetext vor jeder Backup-Ref-Löschung.
+
+> ⚠️ **MARKER 12.08.2026 (KON39):** ÜBERHOLT 12.08.: F1–F11 sind ALLE geschlossen, R-4 GESTRICHEN (KON30-04); die WF7-Fragen F-A…F-H per KON37 beantwortet; die lebende Offen-Liste steht in §17.1.
+
+---
+
+# 17. KONSOLIDIERUNG AUF KON24–KON38 + REFERENZ-STATUS (nachgetragen 12.08.2026 abends)
+
+> **Anlass:** KON19-00. §13–§16 bleiben stehen; **§16 gilt bis KON23, was hier steht, gilt vor.** Fakten-Quelle: Ledger „LEDGER-KONSOLIDIERUNG IV" + KON24–KON38 — dieses Kapitel verweist, es dupliziert nicht. Gesamturteil: `docs/sessions/20260812-GESAMTURTEIL-*`. **Betriebsregel KON38:** jeder Stempel-Posten (S-1…S-7, S-14, S-18, B5, Flächen, Preimage, Versionierung, S-17-Schlüsselanteile) fährt in allen Workflow-Teilen `{model:'fable', effort:'max'}`.
+
+## 17.1 OWNER-FRAGEN: F1–F11 UND F-A…F-H ALLE GESCHLOSSEN — Restliste neu geschnitten
+
+§16.4 ist abgelöst: F1–F11 zu (KON25-11 · KON25 · KON27-01/-02 · KON28-03+KON30-04; **R-4 ist GESTRICHEN** — Owner: „streiche diesen missverständlichen Punkt überall", KON30-04; „gerade Anzahl" gilt nur noch für CEBs, KON36/B). Die WF7-Fragen F-A…F-H sind per **KON37 alle acht** beantwortet.
+
+| ZU (12.08. abends) | Quelle |
+|---|---|
+| Wallclock-SOLL-Konflikt: **MERGE** — Freigabe Planer · Entscheidung/Schalter-Hoheit CEB · Durchführung im Vertrag CEB↔Tier/Hybrid; Vererbungsregel: CEB baut/ruft nur eigene Messeigenschaften | **KON37-01** |
+| R-1-Rest: Auswahl-Subsystem wird **NEU gebaut** nach geänderter Architektur, `<measurement_tooling>` **erweitert** (Stufen-Dimension), Altes **ARCHIVIERT**; Korrelations-Pflicht Freigabe↔Ausführung per Compile-Time-Permutation der höheren Stufe | **KON37-02** |
+| KON34-06(b): Reihenfolge zählt DOCH — als **statische Anordnungs-Freigabe in der Mess-Achse** (Adressierung, keine Nenner-Dimension) | **KON37-03** |
+| E-Label-Doppeldeutung: Umbenennung genehmigt; **Lastsequenz = Framework-Mess-Achse**, keine dritte „Ebene" | **KON37-05** |
+| T-15b-Details P.13/14: **je 5** für Build UND Messung; 3 Erfolgs-Werte einzeln (KF-10) | **KON37-06** |
+| OD-7-Rest: W3-Kampagne fährt `--debug`; **T−3 (~12.09.) = echte Messung** | **KON37-04** |
+| W-6: vier Klone = **Zielzustand** unter Konsolidierungspflicht (#88) | **KON37-07** |
+
+| OFFEN (12.08. abends) | Quelle |
+|---|---|
+| **R-2** nur noch Bezeichner-VORSCHLAG (durch uns, im S-6-Fenster) | KON30-02 · KON36-02/F |
+| **R-3/B-4-Menge**: KEINE Owner-Zahl — „Wie viel ist ohne Planer-Simulation nicht festlegbar" ⇒ **S-19 rechnet sie** | KON37-03 · KON30-03 |
+| **KON34-06(d)** 17-vs-18 Dateien System-B-Doppelbau → Owner-Frage OF-1 | KON34-06 |
+| **KON34-06(a)** „32 Docks = 32 Mess-Permutationen" — Bestätigung gegen das Subset-Modell → OF-2 | KON28-03 · KON37-03 |
+| **O-5/K1** Lager-Identität Hybrid-.so → OF-3 · **O-4-Rest** Festplatten-IO → OF-4 | §16.1 · WF4/E-A |
+| **A-1**-Vorlagetext vor jeder Backup-Ref-Aktion (aus §16.4 unverändert) | Ledger-IV/M |
+| **NEU:** E-WARMUP-Explore (cache warmup, 10 Wochen) · Posten TEST-KONSOLIDIERUNG (Eigentümer setzen) · **T−3-Ripple** (XML→PDF-Vollautomatik + Lager-Skip + W5-Fenster) | KON37-06/-08/-04 |
+
+## 17.2 DER MESS-NENNER IST 32 — die 6 verliert ihren Gegenstand, die ORDNUNG kehrt als Freigabe zurück
+
+**Owner-Selbstkorrektur** (KON25-03): Tier Micro/Macro 2×2 · Hybrid 2×2 · CEB-Wallclock 2 ⇒ **32 Belegungen aus 5 Schaltern**. Die 6 zählte REIHENFOLGEN einer ortsfesten Vollmenge (KON34-03). **KON37-03 ergänzt:** die KON25-03-Zuordnung ist **SOLL-BELEGUNG, kein Typ-Verbot** — jede Stufe trägt ein **SUBSET der 3** compile-time-Einrichtungen; die Reihenfolge kehrt zurück als **STATISCHE ANORDNUNGS-FREIGABE in der Mess-Achse** (Zeiger/Zustände für an/aus je Stufe = Adressierung, **KEINE Nenner-Dimension; Nenner bleibt 32**). Folgen: §16.3 „CEB-Reihe 5→6→12" ÜBERHOLT (Marker, Zeile bleibt) · §8/OV-10 **gegenstandslos NUR als Nenner-/6er-Frage — Anordnungs-Gegenstand neu per KON37-03** · Kapazität hängt an der **S-19-Ausgabe** (B-4-Zahl), nicht an einer Owner-Antwort.
+
+## 17.3 ZWEI MESS-ARCHITEKTUREN — B1–B5 in die W1-Zeile (Owner-Merkauftrag 12.08.)
+
+**System A (LIVE):** #ifdef-Gates in `anatomy/abi_adapter.hpp` über `mess_achsen_naht.hpp`. **System B (DORMANT):** `mess::Konfiguration`+`CheckpointMeasure`+`SteuerDock`, 17 Dateien, 0 Produktionsaufrufer (KON34-01). **Fristen:** **B3 explizit VOR F2 (Owner-Datum, KON34-04)**; B1/B2/B4/B5 vor F2 als **ABLEITUNG** aus KON6-02/2+KON34-05 eingeplant (kein Owner-Datum; Merkauftrag sagt „in jede Durchführungs-Planung"). Die Posten:
+* **B1** XML-Konsum je Stufe — **KON37-02:** `<measurement_tooling>` um Stufen-Dimension erweitern; `measurement_tooling_registry`/`canonical_combo` **NEUBAU** nach geänderter Architektur, Altes **ARCHIVIEREN**; 🔴 Korrelations-Pflicht Freigabe↔Ausführung via Filterketten-Mechanik (KON9-06).
+* **B2** Gate-Trennung G2/G3 — ohne sie ist „Tier je an/aus" UNERFÜLLBAR.
+* **B3** Hybrid-Gates (erst damit 5 statt 3 Schalter) — **KON37-01:** der „Wallclock-Umzug" ist Umzug der **SCHALTER-HOHEIT**, kein Instrument-Umzug (Tier-Pflicht-Wurf `abi_adapter.hpp:476-491` fällt); **Vererbungsregel** trägt B3+B5: CEB baut höhere Stufen nur nach eigenen Messeigenschaften, ruft nur selbstgebaute Messfühler.
+* **B4** System B umstellen+anschließen — **KON37-03-Zielrolle:** die geordnete Typliste wird die **statische Anordnungs-Freigabe** (statt `anzahl==6`-Vollmengen-Permutation).
+* **B5** Stempel-Pflicht je Schalter (⭐ Fable max, KON38).
+`--debug` und Mess-Schalter **streng disjunkt** (KON34-05). ÜBERHOLT damit: §7-Zeile + §8/OV-2 „checkpoint_measure bleibt spezifiziert, nicht gebaut (W7)" — checkpoint_measure ist Teil von System B; **Owner-KERN 09.08. (paraphrasiert im Ledger, KON34-02/-03): checkpoint_measure muss gebaut werden**; B4 gehört in jede Durchführungs-Planung, nicht nach W7.
+
+## 17.4 T-15 ENTKOPPELT · OD-7/DEBUG · T−3-ANKER · ZWEILANIG GEN-2
+
+* **T-15b** = ZWEITE Retry-Klammer um `measure_one_binary`, von Drift-`max_reruns` (T-15a/D4) verschieden. **KON37-06:** Build und Messung dürfen **JE 5-mal** scheitern (nicht 1+5); Erfolg = 3 Wiederholungen je Parameter+Binary, **alle 3 einzeln persistiert**; Soft-Ausnahme nur fehlende Messeinrichtung (PMC) → xlsx-Warnung. 🔴 die 5 sitzt FALSCH auf der Drift-Achse (`ce 4cd1ab91`), Umzug + 8-Punkte-Ripple (KON26-04/KON28-02). §2-D4-Zeile und §7 bleiben stehen, Fußnote dort.
+* **OD-7:** HEAVY-Deckel **24→16**; Kompensation `--debug` (KON26-05/KON28-01). **Umschaltpunkt = T−3 (~Sa 12.09.2026, KON37-04)** — nicht mehr „System steht planmäßig": davor fährt ALLES inkl. W3-Kampagne `--debug` (nproc-parallel, ungenau); ab T−3 echt (1 Thread), **Debug-Ergebnisse löschen** (KON29-01, einzige Ausnahme von „Messdaten nie löschen"). **Ripple (ausweisen, nicht glattrechnen):** echte Messung liegt im bisherigen W5-Fenster ⇒ W3 = **Debug-Generalprobe**, W4 entwickelt an Debug-Zahlen; trägt nur mit **vollautomatischer XML→PDF-Regeneration + Lager-Skip** (Posten in W2/W3).
+* **Zweilaniger Kampagnenbetrieb Gen-2** (KON29-04): Bestandslog auf minio · Claims à 4096 · Takeover ETA+50 % · Kapazität prod1 20,7 h / prod2 34,4 h (4-Perm; 12-Perm hängt an der S-19-B-4-Zahl). Lücken: `window_belongs_to` unverdrahtet · Messung selbst nicht zweilanig.
+
+## 17.5 NEUE KONZEPTE UND PRÄZISIERUNGEN
+
+* **PRÜFLING** (Ledger-IV/F): Mess-Unter-Achse des Planers zur Laufzeit; je Organ-Achse zusätzliche Algorithmen, eigener Stempel je Prüflings-Algorithmus, XML-beschränkbar 1–3; `MergeStrategy`-Werte SIND die Verbund-Varianten (KON30-02 · KON31 · KON36/F).
+* **HOME-PRINZIP** (KON27-01): je Achsen-Kategorie ein Home + genau EIN Wächter; zweistufige Versionierung; „zuerst gültige golden Version, dann Gliederung"; inkl. queuing-Umzug. Beantwortet §15.9/S-18-Explore vollständig (Marker dort).
+* **EXPORT/S-13, Option b** (KON27-02): je FORMAT ein FORMAT→ZIEL-Eintrag; LaTeX mit Inhalts-Auswahl; PDF lazy.
+* **BAU-REIHENFOLGE-DOKTRIN**: Owner verbatim (KON30-03): *„Wir beginnen beim Bau genau in der Träger-Stufen-Reihenfolge […]"* — die Pfeilkette **PLANER→CEB→TIER→HYBRID ist die Ledger-Doktrin-Box, kein Owner-Zitat**. §14.3-Graph liest sich mit **S-19** als Knoten zwischen S-7/F2 und Trigger; S-19-Weg: gruppieren → kategorisieren → Permutation über den Experiment-B+-Baum rechnen — **S-19 PRODUZIERT die B-4-Zahl** (KON37-03).
+* **E-LABELS** (KON37-05): Erhebungs-Ebenen werden umbenannt (E1–E4 gehört der Experiment-Maschinerie); Achsen-/Gattungs-(Genus-)Aufruf = Aufruf-Ebenen, **Lastsequenz = Framework-Mess-Achse** (liegt selbst auf einem Achsen-Interface) → in die Umbenennungs-Landkarte.
+* **Hybrid-Zeitbezug** (KON36/WF7): „eigenständig + Sync-Kanal" = Autonomie-Stufe SPÄTER; JETZT orchestriert die CEB direkt ODER delegiert (Bestand `AnatomyModuleLoader`); S-20 = Neubau für später — betrifft §16.1/O-5 und §8/OV-13; HY-A/B/C-Zerlegung hält.
+
+## 17.6 WELLEN-WIRKUNG — Task-Nummern, keine zweite Zählung
+
+KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#11/#13 + neu #14–#22, zwei Zeilen OHNE Nummer** — als Cross-Reference-Spalte an die bestehenden ##/S-/D-Tabellen (Ledger-IV/L-8: Nummern sind kein Autoritätsbeleg; KON27-04s „#21/#22" kollidieren mit der Lead-Liste). 🔴 **V-1: der `##25`-DURCHSTICH (DIE F1-Lieferung, Fr 14.08.) war bis 12.08. mittags OHNE Besitzer** — Sofortposten. Layout-Bump-Konflikt (`decl.hpp:293`) bleibt benannter Vorab-Posten des S-6-Fensters. **KON37-08:** die 3 Skelett-Testverzeichnisse sind NICHT mehr W7-Behälter → aktiver Posten TEST-KONSOLIDIERUNG (s. Teil D).
