@@ -16,6 +16,91 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON56: DIE F1-LANDUNG IST DURCH — C+A CI-GRÜN (ce 671d7f6a), GITLINK GEBUMPT, DER ##25-CI-BEWEIS LÄUFT
+
+**Der Bau-Tag endet mit der vollzogenen Landesequenz. Dieser Nachtrag ist die Kurzbilanz;
+Volltext und Pflicht-Kipp-Liste: `docs/sessions/20260812-KONTEXTUEBERGABE-nacht-9-*.md`.**
+
+### KON56-01 — WAS GELANDET IST (jede Stufe belegt)
+
+    ce  671d7f6a  (beide Remotes) = a99c4a18 + 17 Commits:
+        STRANG C  5f4024af  Katalog-Emitter reicht Mess-Zeile durch (##25/F1,
+                  KON47-01/a; P9: measured=1, n_ops=10000, ns_per_op=644.020,
+                  deklaration_leer 0x; Wache (g); F27/F28) -- Merge 7cb253c5
+        STRANG A  868ed3a1  S-1 Stempel-Basisklasse (10 Commits, 13 Dateien,
+                  28er-Matrix dreiwertig, StempelVertrag deferred-consteval,
+                  10 Trait-Anbindungen, Pins byte-unberuehrt) -- Merge 99de5b30
+        + Verify-Fixup (Kommentar) + Format-Serie (cf22-Vollformat 10 Dateien,
+        cppcheck-2.21-FP-Suppression) -- KOMPILAT-NEUTRAL BEWIESEN je Datei
+        (g++ -fpreprocessed-Hash HEAD==Arbeitskopie)
+    LOKAL      Kombibau J-1..J-4: ctest Debug 485/485 + Release 485/485 (GCC;
+               clang-Deckung via CI -- KON55-02-Selbstbefund deklariert)
+    CI ce      Pipeline 15759 SUCCESS (beide Compiler; einziger Rot war
+               pmc:intel = transienter prod2-perf-Zustand, dreifach belegt
+               [15751 gruen selber Runner · Schwester-Smoke 0,4s spaeter Passed
+               · Fehlerklasse available=0/perf_event_paranoid], Retry gruen)
+    super      Wachen-Merge a1ee9780 (Bissprobe 30/30 + selbstbiss 4/4 vom Lead
+               selbst gefahren) + ATOMAR Gitlink 670483c0->671d7f6a + §9.5-
+               Fussnote (fuenfter Zug; PZW-Wache lokal "5 von 5") = bfb12cee
+               + Hygiene-Nachzug 6bc1e679 (s. KON56-02).
+    CI super   Pipeline 15763 @ 6bc1e679 SUCCESS -- 22 Jobs, 0 nicht-gruen
+               (PZW-Wache, Bissproben, Durchstich-Bissprobe, Hygiene).
+               🔴 ABER: measure:smoke war dort NICHT instanziiert -- der Job
+               ist rules-gated auf COMDARE_DURCHSTICH=="true" und faehrt dann
+               f1_durchstich.profile.xml mit COMDARE_MINDEST_GEMESSEN=1 /
+               COMDARE_MAX_RESUMIERT=0 (resume="false": jede resumierte Zelle
+               ist ein Befund). Die Variable ist DISJUNKT zu
+               COMDARE_RUN_MEASURE -- das erzeugte zusaetzlich
+               measure:golden-320 (timeout 10 days) und belegte den
+               resource_group-Slot tagelang. V3-Falle "Gesamtstatus gruen
+               ohne den entscheidenden Job" per Jobliste GEFANGEN, bevor #11
+               geschlossen wurde.
+    ✅ BEWEIS   DER ##25-CI-BEWEIS IST ERBRACHT: super-Pipeline 15764 @
+               6bc1e679 (per API gezuendet, COMDARE_DURCHSTICH=true),
+               measure:smoke Job 376333 SUCCESS. Woertlich aus dem Trace:
+                 RUN_PROFILE (CEB-Eintritt): id=f1_durchstich
+                   mode=f1_durchstich_base basis_count=1 (N=1)
+                 RUN_PROFILE fertig: basis_rows=1 sota_rows=0 measured=1
+                   resumed=0 provisioned=1 csv_ok=1
+                 MESS-AUSBEUTE-WACHE: OK (1 echte, 0 n/a-/provisionierte
+                   Datenzeile(n) aus 1 von 1 Datei(en)).
+                 DURCHSTICH-WACHE / frische: OK (1 real gemessen,
+                   0 resumiert).
+               (HONEST-EMPTY der Ratio-Heatmap = designte 1x1-Flaechen-
+               Semantik ohne SOTA-Serie, kein Befund.) Pipeline-Terminal
+               15764: siehe Uebergabe §7 / Monitor bh12ue8gm.
+    OFFEN      Codex-Zweitlens (Dual-Review-Heilung) laeuft als Hintergrund-
+               Task kn8waqov0 ueber den 17-Commit-Diff; Befunde => Fixup-Paket.
+
+### KON56-02 — 🔴 ZWEI DEKLARIERTE EIGENFEHLER DIESER LANDUNG
+
+    (1) Der super-Push bfb12cee lief TROTZ rotem lokalen Hygiene-Lauf: ich habe
+        beim ersten ROT die AUFRUFFORM verdaechtigt statt den BEFUND zu lesen
+        (V4 verletzt: "verdaechtige das Verfahren" heisst pruefen, nicht
+        annehmen). Die 3 echten Verstoesse stammten aus dem Agenten-Patch
+        (2x >120, 1x Mojibake 'Pruefling'); mein cmp hatte nur Klon==Patch
+        bewiesen, nicht Hygiene. FIX unmittelbar nachgeschoben (6bc1e679):
+        Quell-Umbrueche mit BYTE-IDENTISCHER Ausgabe (echo-Probe literal),
+        Bissprobe 30/30, Hygiene ueber den GANZEN Bereich de83472e..HEAD GRUEN.
+    (2) R4-ABWEICHUNGEN, bewusst + begruendet: Nachschub-Push waehrend 15761
+        lief (wissentlich roten Stand nicht stehen lassen) und der folgende
+        Docs-Push der Uebergabe waehrend 15764 laeuft (Owner-Order: Kontext
+        endet jetzt; Uebergabe muss persistiert sein). Massgeblicher
+        Beweis-Lauf ist 15764 @ 6bc1e679 (COMDARE_DURCHSTICH=true).
+
+### KON56-03 — KANAL-TAG IM RUECKBLICK (KON50…KON55) + ARBEITSWEISE-VOLLZUG
+
+    KON50 Flaeche-1-Control (stream in/out) · KON51 XML-gefilterte Nachrichten,
+    Flaeche 3 = Signal+sparse-binary, Arenen+Hol-Punkte, 6-GB-Warnung, Stumm-
+    schaltung · KON52 OOB=NUR Fertig-Signal, RAM-OOB=XML-Opt-in · KON53 Sync-
+    Barriere + --auto/Bestaetigen · KON54 Verneinen + kill-OOB, Lager heilt ·
+    KON55 clang+gcc ueberall Basis (Compiler = kuenftige System-Achse; Lande-
+    Skript jetzt 2x2-Matrix). MEMORY-DETAIL-Pflichtlektuere nachgeholt: das
+    Steuerkanal-Memory (09.08.) ist der Vorlaeufer der Kanal-Doktrin (sein
+    3!=6-Anteil ist per KON41-03 ueberholt, sein OV-10-Konflikt per KON37-03/
+    KON42 geloest -- Memory-Pflege faellig); MeasureStorage-Arenen decken
+    KON51-02; das Compiler-Achsen-Ruling 17.07. (5. System-Achse gcc|clang,
+    Unterachsen opt/flags/commands, Default Ofast) traegt KON55.
 ## NACHTRAG 12.08.2026 — KON55: CLANG UND GCC SIND ÜBERALL BASIS-PFLICHT (CI UND LOKAL) — WEIL DER COMPILER EINE SYSTEM-ACHSE BELEGEN WIRD
 
 **Owner verbatim 12.08.2026:**
