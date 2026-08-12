@@ -211,3 +211,26 @@ Gegenprobe MIT LAENGENPRUEFUNG (Lehre aus Nachtrag 3): Koeder-Laenge ${#K}=20
 Synthese gelandet als `20260812-WF4-SYNTHESE-die-fuenf-kon19-explores.md` (mit Kopf — die
 Kompaktheits-/Titel-Auflage wirkt), Auswertung **KON26**. gitleaks: no leaks found; Gegenprobe
 mit laengengeprueftem 20-Zeichen-Koeder -> leaks found: 1. Die Null ist gedeckt.
+
+---
+
+## NACHTRAG 6 — VOLLSICHERUNG 12.08.2026 (Owner-Auftrag: alles loeschsicher)
+
+| Datei/Ordner | Inhalt |
+|---|---|
+| `alle-journale-20260812.tar.gz` | 9,5 M — **ALLE 235** `journal.jsonl` der Session (= jedes Agenten-Ergebnis jedes Laufs; das Journal ist die Wahrheit). 🔴 ZWEI Journale REDIGIERT (wf_2444c5ec: 1× glpat-, wf_aa90e8b0: 1× ghp_ → `[REDIGIERT-20260812]`); erst danach `no leaks found` |
+| `kon-quellen/` | 21 KON-Nachtrags-Quelldateien (kon14…kon27) — die tmp-Originale, deren Inhalt im Ledger steht |
+| `owner-extrakte/` | die Token-redigierten Owner-Nachrichten der 6 Kontexte (owner-kontext-0…-5 + Gesamt + Extraktor-Skript), je `no leaks found` |
+| `wf5_f_explores.js` u.a. | die Workflow-Skripte WF2–WF5 in gefahrener Fassung |
+
+**Durabel AUSSERHALB des Repos (nie committen — Transkripte/Agent-Volltranskripte tragen
+Live-Token-Risiko):** `/home/comdare/ernte-20260812-nacht7c/` — `workflows/` (797 M, alle 235
+Laeufe VOLLSTAENDIG inkl. agent-*.jsonl) · `session-log-5a19728e-stand-20260812.jsonl` (217 M,
+der komplette Session-Log mit allen Owner-Antworten) · `task-outputs/` (1200 Task-Ergebnisdateien
+aus /tmp, die beim Reboot verloren gegangen waeren).
+
+**Gegenprobe dieser Sicherung:** Koeder-Laenge VOR dem Zaehlen geprueft (20) → `leaks found: 1`.
+Alle drei Repo-Nullen (kon-quellen · owner-extrakte · journale nach Redaktion) sind gedeckt.
+
+**🔴 ROTATIONS-MELDUNG an den Owner:** der `ghp_`-Fund (GitHub-PAT, 40 Zeichen, in einem
+alten Workflow-Journal) war NICHT unter den sieben rotierten CI/CD-Variablen — Rotation pruefen.
