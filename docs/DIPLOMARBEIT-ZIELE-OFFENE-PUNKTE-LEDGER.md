@@ -16,6 +16,103 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON57: „ALLE LÜCKEN WERDEN SOFORT PFLICHT" — DIE ZWEITLENS-HÄRTUNG IST GEBAUT (11+1 FIXES, DUAL-REVIEW GESCHLOSSEN), 15764 TERMINAL SUCCESS
+
+**Owner verbatim 12.08.2026 (abends):** *„Gut, alle Lücken werden sofort Pflicht, wir machen das
+gleich richtig. Dann weiter mit offener Arbeit und stets weiter mit dem hauptstrang und
+konsolidierten Wellenplan."* — Damit fiel die Runde-1/Runde-2-Teilung: ALLE 11 Codex-Funde
+wurden in EINEM Paket gebaut.
+
+---
+
+### KON57-01 — DER ##25-BEWEIS IST KOMPLETT TERMINAL
+
+    super-Pipeline 15764 (COMDARE_DURCHSTICH=true) = TERMINAL SUCCESS, 35/35 Jobs.
+    measure:smoke Job 376333: measured=1 resumed=0 provisioned=1 csv_ok=1,
+    MESS-AUSBEUTE-WACHE OK (1 echte, 0 n/a), DURCHSTICH-WACHE frische OK.
+    => die F1-Lieferung (##25) ist VOLL CI-bewiesen; Tasks #11 + #30 completed.
+
+### KON57-02 — DIE ZWEITLENS-BILANZ: 11 FUNDE, ALLE UMGESETZT (+1 BONUS-HEILUNG #84)
+
+    LENS 1 (Codex-Erstpass ueber den 17-Commit-Diff @671d7f6a): 5 ERNST + 6 HINWEISE.
+    Meta-Objektpruefung: 5/5 ERNST am Objekt BESTAETIGT.
+    GEBAUT auf Branch bau/s1-codex-haertung (Worktree fixup-s1-haertung, ab 671d7f6a):
+      f837420b  Runde 1: F2 Hex-Probe (ist_sha512_hex_128 consteval statt Laengen-
+                Vergleich) · F3 Fehlgrammatik-Koeder mit EIGENEM Kompositum (fiel
+                vorher an der Teilstring-Regel statt am Scanner, ##57-Klasse) ·
+                F4 K13-Wurf = nur Reihenfolge, wertbezogen BEIDE Toolings.
+      84e6099a  Runde 2 (Owner-Order "sofort Pflicht"): F1 Trait-Split in leichten
+                stempel_baustein_trait.hpp + AbiPod-Spezialisierungen beim POD-
+                Eigentuemer decl.hpp (Include-Order-Falle strukturell zu; Beweis
+                beidseitig: Mini-TU neu rc=0 / Altstand 3 static_asserts reissen) ·
+                F5 test_lazy-Wache (h): 18 Sweeps + 17er-Union + kary_perk je MIT
+                Stempel (_M+Zeile in JEDEM Eintrag) und mit {} (2-arg) · H6 shaped-
+                Sibling reicht den Stempel durch (Renderer + build_pilot_source_
+                map_shaped; vorher deklaration_leer bei Aktivierung, KON44-01-
+                Klasse) · H7 CEB-Voll-Orakel + Planer-os=-Pin · H8 Negativ-Probe
+                mit DEKLARIERTER Grenze (Eigentuemer-Header nicht TU-ziehbar;
+                geschlossene Liste = S-5-Registry-Posten) · H9 Span-Vertrag ·
+                H10 Erlaubt-Zweig dreifach bewiesen (Matrix traegt 0 Erlaubt-
+                Zellen — der Zweig ist VOR seiner ersten Belegung gedeckt) ·
+                H11 g1-EOF-Pflicht · DAZU Anker-Nachzug decl:108/113->:109/:114
+                in 4 Doku-Traegern (hy_label_gate hatte ihn gefangen — V14-Klasse,
+                zweiter Wachen-Fang des Abends).
+      6f537245  Zweitpass-Fixes (LENS 2): H-A ist_stempelzeilen_span laesst
+                Fixed-Extent-Spans zu (same_as verwarf std::span{kArray}) ·
+                H-B 3 stale Orts-Kommentare nachgezogen · H-C F12-Nenner per
+                Structured Binding mit EXAKT 13 Namen compile-hart gepinnt.
+
+    🟢 BONUS-HEILUNG F12 — #84-VORBESTAND ERKLAERT UND GEHEILT: die KON55-2x2-
+    Matrix reproduzierte das clang/Debug-Rot von test_warn1_d2_fingerprint_koeder
+    SOFORT (Vorbestand @671d7f6a bewiesen). Ursache: der Test scannte record-BYTES
+    inkl. der 4 Padding-Bytes nach version (uint32 vor uint64) — deren Nullung
+    sichert record{} NIE zu (V7-Klasse "Zusicherung, die das Design nicht gibt");
+    gcc nullte zufaellig, clang/Debug liess das Muster legal stehen. Fix: die 13
+    MITGLIEDER werden geprueft, nicht die Bytes.
+
+### KON57-03 — DUAL-REVIEW GESCHLOSSEN + T-1-KOEDER-PROTOKOLL
+
+    LENS 2 (Codex ueber das Fix-Diff 671d7f6a..84e6099a, inline nach bwrap-
+    Sandbox-Ausfall): TRAEGT_MIT_FIXES — 3 HINWEISE, 0 ERNST; alle 3 in 6f537245.
+    (Der erste Lens-2-Anlauf via cwd scheiterte am bwrap-Launcher; Codex meldete
+     vorbildlich "keine Fundliste ohne gelesenen Gegenstand" — Diff-inline ist
+     das Rezept, erneut bestaetigt.)
+    T-1-MUTATIONS-PROTOKOLL (Wegwerf-Mutationen, je ROT gesehen + Gegenprobe gruen):
+      M-F1   Altstand-Dateien unter Mini-TU  -> 3x static assertion failed
+      M-F2b  kProbeSha128 -> exakt 64x'g' (Laenge 128 HAELT :150) -> Vertrags-
+             Asserts :175/:188 reissen == die Hex-Probe beisst
+             (Erstversuch M-F2 ersetzte 63 Zeichen -> riss am Laengen-Assert =
+              Koeder biss aus dem FALSCHEN Grund; protokolliert + wiederholt)
+      M-F3   Fehl-Zeile -> gueltig  -> :246 "geklebte Gruppe MUSS ablehnen" reisst
+      M-H10  Ungueltig-Probe -> gueltig -> :507 "ERLAUBT heisst NICHT beliebig" reisst
+    KOMBIBAU (KON55-Matrix): Anlauf 2 = 4x 485/485 GRUEN ueber 84e6099a
+    (gcc+clang x Debug+Release, je J-1..J-4 + ctest, Baeume belegt-geprueft
+    geraeumt); finaler Anlauf ueber 6f537245 LAEUFT bei Abfassung.
+
+### KON57-04 — PROZESS-LEHREN DIESER RUNDE (deklariert)
+
+    (1) STASH-VOR-GEGENPROBE: die F1-Altstand-Gegenprobe (checkout HEAD -- ueber
+        Ordner) haette die uncommitteten Runde-2-Edits gefressen — der
+        vorgeschaltete Stash hielt alles. LEHRE: erst committen, DANN
+        Alt-Stand-Gegenproben fahren.
+    (2) Der Koeder-Laengen-Fehler M-F2 (63 statt 64) ist dieselbe Klasse wie die
+        gitleaks-19/20-Falle: LAENGE PRUEFEN, bevor die Mutation zaehlt.
+    (3) hy_label_gate + PZW zusammen = zwei Zeilen-Anker-Wachen, die diese
+        Session beide gefangen haben — V14 haelt nur als Werkzeug.
+
+### KON57-05 — WAS NACH DIESEM NACHTRAG OFFEN IST (Landesequenz dokumentiert)
+
+    1. Finaler 2x2-Kombibau ueber 6f537245 gruen abwarten (laeuft).
+    2. SERIELL LANDEN: bau/s1-codex-haertung -> ce development (MERGE, nie
+       rebase) · Diff-Hygiene ueber den Bereich · cf22 (9/9 vorgeprueft) ·
+       gitleaks -m + frischer 20er-Koeder (Laengen-Assert!) · Push BEIDE Remotes
+       · ce-Pipeline-Monitor (KON55: beide Compiler fahren dort).
+    3. super: Gitlink-Bump 671d7f6a -> <Merge-SHA> als SECHSTER Zug MIT
+       §9.5-PZW-Fussnoten-Nachzug im SELBEN Commit (die Wache erzwingt es sonst
+       per exit 2 — gewollt); Nenner: +1 Test-Datei-frei, Anker neu zaehlen.
+    4. DANACH Hauptstrang nach Plan-Teil B: golden festschreiben (#16-
+       Voraussetzung) · S-14a Bump-Wache Teil 1 · #10 MinIO · #22-Rest ·
+       S-3-Aktivierung (Fr) — Strecke unveraendert.
 ## NACHTRAG 12.08.2026 — KON56: DIE F1-LANDUNG IST DURCH — C+A CI-GRÜN (ce 671d7f6a), GITLINK GEBUMPT, DER ##25-CI-BEWEIS LÄUFT
 
 **Der Bau-Tag endet mit der vollzogenen Landesequenz. Dieser Nachtrag ist die Kurzbilanz;

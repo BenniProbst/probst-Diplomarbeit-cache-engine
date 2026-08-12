@@ -108,18 +108,26 @@ Wellen-Pipeline 15763 ohne die Variable war grün, enthielt den Job aber NICHT �
 
 ## §6 WAS LÄUFT / WAS DIE NACHFOLGE ZUERST TUT
 
-    ERLEDIGT super-Pipeline 15763 @ 6bc1e679 SUCCESS (22 Jobs, 0 nicht-gruen)
-             — ABER ohne measure:smoke (rules-gated). Beweis-Pipeline 15764
-             (COMDARE_DURCHSTICH=true) gezuendet: measure:smoke Job 376333
-             SUCCESS (measured=1 resumed=0 csv_ok=1, beide Wachen OK).
-    LAEUFT   Pipeline-15764-Restjobs (Monitor bh12ue8gm meldet Terminal).
-             Codex-Zweitlens ueber den 17-Commit-Diff: Hintergrund-Task
-             kn8waqov0 (Dual-Review-Heilung; Diff: jobs/tmp/landung-c-a.diff).
+    ERLEDIGT super 15763 SUCCESS (Welle, ohne smoke — rules-gated) · 15764
+             (COMDARE_DURCHSTICH=true) TERMINAL SUCCESS 35/35 inkl.
+             measure:smoke Job 376333 (measured=1 resumed=0 csv_ok=1) —
+             ##25/#11/#30 GESCHLOSSEN. KON56+KON57 im Ledger.
+    ERLEDIGT Codex-Zweitlens (Dual-Review-Heilung): 11 Funde (5 ERNST, alle
+             am Objekt bestaetigt) => Owner-Order "alle Luecken sofort
+             Pflicht" => ALLE 11+1 GEBAUT auf ce-Branch bau/s1-codex-haertung
+             (f837420b + 84e6099a + 6f537245; Worktree fixup-s1-haertung).
+             Lens 2 ueber das Fix-Diff: TRAEGT_MIT_FIXES (3 Hinweise, alle
+             drin). T-1-Mutations-Protokoll 4/4 + Kombibau 4x485/485 ueber
+             84e6099a. BONUS: #84-clang/Debug-Vorbestand (record-Padding-
+             Scan, V7-Klasse) als F12 GEHEILT. Details/Belege: KON57.
+    LAEUFT   finaler 2x2-Kombibau ueber 6f537245 (Task bc8esqe84).
     1.       PFLICHT-KIPP-LISTE §1 vollstaendig einlesen. DANN erst handeln.
-    2.       15764-Terminal: GRUEN => ##25/#11 GESCHLOSSEN (F1-Lieferung
-             steht), Task #11+#30 completed, KON57-Abschluss-Nachtrag;
-             ROT in einem Restjob => Job-Log lesen, Befund vor Fix
-             (der Beweis-Job selbst ist bereits SUCCESS).
+    2.       🔴 FIXUP LANDEN (KON57-05, Schritt fuer Schritt dokumentiert):
+             Kombibau gruen => Merge auf ce development (NIE rebase) =>
+             Hygiene+cf22+gitleaks(-m, 20er-Koeder mit Laengen-Assert) =>
+             beide Remotes => Pipeline-Monitor => super-Gitlink-Bump
+             671d7f6a -> <Merge-SHA> als SECHSTER Zug MIT §9.5-PZW-Nachzug
+             im SELBEN Commit => Task #32 completed.
     3.       Codex-Ergebnis bewerten: Funde => Fixup-Paket (eigene Mini-Runde,
              Wachen+Koeder wie heute); KEINE Funde => in KON57 als Zweitlens-
              Deckung verbuchen.
@@ -136,11 +144,13 @@ Wellen-Pipeline 15763 ohne die Variable war grün, enthielt den Job aber NICHT �
 ## §7 BETRIEBSSTAND
 
     ce     development = 671d7f6a   CI 15759 SUCCESS        beide Remotes
-    super  development = 6bc1e679   CI 15763 SUCCESS (Welle ohne smoke) ·
-                                    CI 15764 (COMDARE_DURCHSTICH=true):
-                                    measure:smoke Job 376333 SUCCESS (##25!),
-                                    Jobliste 35/35 success beim Docs-Push
-                                    (Gesamtstatus finalisierte noch) · beide Remotes
+           + UNGELANDET: Branch bau/s1-codex-haertung @ 6f537245 (3 Commits,
+             Zweitlens-Haertung, LANDEFAEHIG nach finalem Kombibau — KON57-05)
+             im Store des wt-super-landung-ce; Worktree fixup-s1-haertung
+    super  development = cfdbfb79   (KON56 + diese Uebergabe; 15763 SUCCESS
+                                    Welle ohne smoke · 15764 TERMINAL SUCCESS
+                                    35/35 inkl. measure:smoke 376333 = ##25!)
+                                    beide Remotes
     Gitlink super->ce  = 671d7f6a   (atomar mit §9.5; PZW lokal 5/5)
     Ledger ~26.4xx Z. (KON56 oben) · Platte ~31G frei · Runner prod1+prod2 online
     Branch-Sicherungen: C+A doppelt (Hauptstore + wt-super-landung-Store;
