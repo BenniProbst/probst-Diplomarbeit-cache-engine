@@ -16,6 +16,54 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON54: SHELL-VERNEINUNG UND NUTZER-„kill"-OOB — DER PLANER KANN DAS LAUFENDE EXPERIMENT HALB SAUBER STOPPEN; DAS LAGER HEILT
+
+**Owner verbatim 12.08.2026 („Alles korrekt" zu KON53 + Erweiterung):**
+
+> *„Man kann auch **über die shell das nächste Teilexperiment verneinen** oder einen **"kill" OOB
+> auf der CLI senden, der vom Planer an die CEB gesendet wird und das aktuelle Experiment
+> ebenfalls halb sauber stoppt**. **Ja das Lager heilt das.**"*
+
+---
+
+### KON54-01 — DIE FESTLEGUNG
+
+    BESTAETIGUNGS-PROMPT (ohne --auto, KON53): der Nutzer kann das naechste
+      Teil-Experiment auch VERNEINEN -- die Sequenz endet kontrolliert an der
+      Barriere (kein Start des naechsten Teils).
+    NUTZER-„kill"-OOB (CLI, jederzeit): der Planer sendet ihn an die CEB; das
+      AKTUELLE Experiment wird HALB SAUBER gestoppt.
+    LAGER-HEILUNG: owner-bestaetigt („Ja das Lager heilt das") -- die
+      KON53-Ableitung 2 ist damit FESTLEGUNG: Wiederanlauf skippt Fertiges
+      ueber das Lager, das halb gestoppte Experiment faehrt neu.
+
+### KON54-02 — DIE KANAL-GESAMTSEMANTIK (KON50…KON54 konsolidiert)
+
+    RICHTUNG CEB -> PLANER (Stummphase):
+      GENAU EINE OOB-Nachricht: das FERTIG-SIGNAL (KON52; Latenz-Reinheit).
+      Alles andere (Status, Log, Trace, 6-GB-Warnung) queued bis zum Break --
+      Ausnahme NUR bei XML-RAM-OOB-Opt-in: die Warnung geht direkt durch.
+    RICHTUNG PLANER -> CEB (Stummphase):
+      ZWEI legitime Ausnahme-Kommandos, beide nutzer-/konfigurations-initiiert:
+        (a) STOPP-Befehl als Folge des XML-RAM-OOB (KON52)
+        (b) NUTZER-„kill"-OOB von der CLI (KON54) -- halb sauberer Stopp
+      Sonst stumm; regulaere Steuerung nur an der Barriere (KON53).
+    AN DER BARRIERE (zwischen Teil-Experimenten):
+      voller beidseitiger Flush+Sync als Startbedingung; Fortgang --auto ODER
+      manuelle Bestaetigung -- jetzt inkl. VERNEINEN (kontrolliertes Ende).
+
+### KON54-03 — DEKLARIERTE ABLEITUNG („halb sauber"; beim Bau zu verifizieren)
+
+    Ein halb sauberer Stopp schreibt NICHTS Unvollstaendiges ins Lager zurueck
+    (die Skip-Doktrin kennt nur GUELTIGEN Bestand; Teilstaende im Lager waeren
+    ein falscher Skip beim Wiederanlauf). Die Partner-Arenen werden verworfen,
+    der Abbruch wird im Status/Trace SICHTBAR (failed/abgebrochen, nie still);
+    Prozess-Teardown geordnet (kein SIGKILL-Aequivalent auf die Docks noetig --
+    das ist der Unterschied zum "Programm kill" aus KON53).
+
+**Bau-Wirkung:** S-8 (CLI: Bestätigungs-Prompt mit ja/NEIN + „kill"-Kommando) · S-10 (das
+Planer→CEB-Kommando-Vokabular der Stummphase = {stop_ram_oob, stop_user_kill}, sonst leer) ·
+Lager/Skip unverändert (heilt per Design). **Offene Owner-Fragen: NULL.**
 ## NACHTRAG 12.08.2026 — KON53: DAS INTER-EXPERIMENT-FENSTER IST EINE VOLLE SYNC-BARRIERE — UND DER FORTGANG IST WÄHLBAR (--auto ODER MANUELLE BESTÄTIGUNG)
 
 **Owner verbatim 12.08.2026 (Erweiterung zu KON51-03/KON52):**
