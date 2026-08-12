@@ -120,14 +120,22 @@ Wellen-Pipeline 15763 ohne die Variable war grün, enthielt den Job aber NICHT �
              drin). T-1-Mutations-Protokoll 4/4 + Kombibau 4x485/485 ueber
              84e6099a. BONUS: #84-clang/Debug-Vorbestand (record-Padding-
              Scan, V7-Klasse) als F12 GEHEILT. Details/Belege: KON57.
-    LAEUFT   finaler 2x2-Kombibau ueber 6f537245 (Task bc8esqe84).
+    ERLEDIGT Finaler Kombibau 4x 485/485 GRUEN ueber 6f537245 => GELANDET:
+             ce-Merge 7d65eb6c (no-ff; Baum == merge-tree-Vorhersage 0df88cee,
+             Hygiene GRUEN 4 Commits, gitleaks -m koeder-gedeckt, beide
+             Remotes) + super-Gitlink-Bump 09937abe (SECHSTER Zug, §9.5-
+             Fussnote im selben Commit, PZW lokal "5 von 5", beide Remotes).
+    LAEUFT   CI-Beweis: ce-Pipeline 15770 @7d65eb6c (Monitor bto27s8jk) +
+             super-Pipeline @09937abe (Monitor b1u7063y9).
     1.       PFLICHT-KIPP-LISTE §1 vollstaendig einlesen. DANN erst handeln.
-    2.       🔴 FIXUP LANDEN (KON57-05, Schritt fuer Schritt dokumentiert):
-             Kombibau gruen => Merge auf ce development (NIE rebase) =>
-             Hygiene+cf22+gitleaks(-m, 20er-Koeder mit Laengen-Assert) =>
-             beide Remotes => Pipeline-Monitor => super-Gitlink-Bump
-             671d7f6a -> <Merge-SHA> als SECHSTER Zug MIT §9.5-PZW-Nachzug
-             im SELBEN Commit => Task #32 completed.
+    2.       Pipeline-Ausgaenge pruefen: BEIDE gruen => Task #32 completed,
+             Fixup-Worktree fixup-s1-haertung nach KON49-02-Loeschregel
+             entfernen (alle Store-Branch-Tips einzeln gegen echten Remote im
+             HAUPT-Klon; bau/s1-codex-haertung ist gemergt) => weiter
+             Hauptstrang: golden festschreiben (#16-Voraussetzung) => S-14a =>
+             #10 MinIO => S-3-Aktivierung (Strecke Teil B unveraendert).
+             EIN roter Job => Log lesen, Befund vor Fix (KON55: die ce-CI
+             faehrt beide Compiler — lokal ist 4x485/485 bewiesen).
     3.       Codex-Ergebnis bewerten: Funde => Fixup-Paket (eigene Mini-Runde,
              Wachen+Koeder wie heute); KEINE Funde => in KON57 als Zweitlens-
              Deckung verbuchen.
@@ -143,14 +151,14 @@ Wellen-Pipeline 15763 ohne die Variable war grün, enthielt den Job aber NICHT �
 
 ## §7 BETRIEBSSTAND
 
-    ce     development = 671d7f6a   CI 15759 SUCCESS        beide Remotes
-           + UNGELANDET: Branch bau/s1-codex-haertung @ 6f537245 (3 Commits,
-             Zweitlens-Haertung, LANDEFAEHIG nach finalem Kombibau — KON57-05)
-             im Store des wt-super-landung-ce; Worktree fixup-s1-haertung
-    super  development = cfdbfb79   (KON56 + diese Uebergabe; 15763 SUCCESS
-                                    Welle ohne smoke · 15764 TERMINAL SUCCESS
-                                    35/35 inkl. measure:smoke 376333 = ##25!)
-                                    beide Remotes
+    ce     development = 7d65eb6c   (= 671d7f6a + Zweitlens-Haertungs-Merge,
+                                    KON57) · CI 15770 LAEUFT · beide Remotes
+    super  development = 09937abe   (= KON56/57 + Uebergabe + Gitlink-Bump
+                                    6. Zug) · CI @09937abe LAEUFT ·
+                                    15764 TERMINAL SUCCESS 35/35 inkl.
+                                    measure:smoke 376333 = ##25! · beide Remotes
+    Gitlink super->ce  = 7d65eb6c   atomar mit §9.5 (PZW lokal 5/5)
+    Worktree fixup-s1-haertung: bleibt bis Pipeline-gruen (KON49-02)
     Gitlink super->ce  = 671d7f6a   (atomar mit §9.5; PZW lokal 5/5)
     Ledger ~26.4xx Z. (KON56 oben) · Platte ~31G frei · Runner prod1+prod2 online
     Branch-Sicherungen: C+A doppelt (Hauptstore + wt-super-landung-Store;
