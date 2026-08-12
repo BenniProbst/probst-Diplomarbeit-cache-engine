@@ -16,6 +16,66 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON42: OF-2-NEU BEANTWORTET — DIE DOCK-32 IST EIN PROGRAMM-DECKEL, DIE DEFAULT-DOKTRIN IST GESETZT, UND DER HYBRID IST ZWEIWEGIG XML-STEUERBAR
+
+**Owner verbatim 12.08.2026:**
+
+> *„Wir bestätigen die **32 als statische Maximal-Variable der Hybrid-Prüfdocks um die
+> Programmgröße einer multi-release Lösung zu deckeln**. Der **Wert ist willkürlich und wird
+> später in W7 angepasst**. Ich bestätige, dass **all diese Variablen standardmäßig hart in den
+> Planer als default einkompiliert werden und durch jede vorhandene Eingabe in die XML
+> überschrieben werden**. Ich bestätige **sonst exakt alles was du dazu gesagt hast**. Die
+> **Belegung des Hybrid ist zudem durch die XML als Durchstich für den Hybrid manuell statisch
+> wählbar** oder Die **Synthese-Funktionen und Wirkbereiche einzelner Tier-Binaries in der
+> Hybrid manuell per XML setzbar**."*
+
+---
+
+### KON42-01 — DIE VIER FESTLEGUNGEN
+
+    (1) DOCK-32 = PROGRAMM-DECKEL, kein Fach-Nenner:
+        die 32 der Hybrid-Pruefdocks ist eine STATISCHE MAXIMAL-VARIABLE, deren Zweck
+        die DECKELUNG DER PROGRAMMGROESSE einer MULTI-RELEASE-Loesung ist. Der Wert
+        ist WILLKUERLICH und wird in W7 angepasst. (Sie ist damit endgueltig von den
+        Mess-Belegungen entkoppelt -- KON41-03 bestaetigt.)
+
+    (2) 🔴 DIE DEFAULT-DOKTRIN (neu, traegt S-8/Planer-Design):
+        ALLE diese Variablen (Maximal-/Konfigurations-Variablen) werden STANDARDMAESSIG
+        HART IN DEN PLANER ALS DEFAULT EINKOMPILIERT und durch JEDE VORHANDENE
+        XML-EINGABE UEBERSCHRIEBEN.
+        => Kein Pflicht-Attribut in der XML fuer Deckel-Werte; der Planer traegt die
+        Defaults compile-time, die XML ist der Override-Kanal. (Konsistent mit der
+        geschichteten Wahrheit KON21-02: Code=Freigabe, XML=Realisierung.)
+
+    (3) OF-2-NEU VOLLSTAENDIG BESTAETIGT ("sonst exakt alles"):
+        32 = strukturelles MAXIMUM allein der MESS-BELEGUNGEN (2^5-Schalter, KON25-03)
+        · real gefordert je XML/Planer · die GROESSEN der Permutations-Schichten
+        kommen AUSSCHLIESSLICH aus der S-19-Simulation · die Hybrid-Dock-Zahl ist
+        davon unabhaengig. => S-19 hat seinen Mess-Faktor sauber definiert.
+
+    (4) 🔴 DER HYBRID IST ZWEIWEGIG XML-STEUERBAR (neu, traegt HY-A3/B1):
+        Weg (i):  die BELEGUNG des Hybrid ist per XML als DURCHSTICH manuell
+                  STATISCH waehlbar (welche Tier-Binaries an den Docks)
+        Weg (ii): die SYNTHESE-FUNKTIONEN und WIRKBEREICHE einzelner Tier-Binaries
+                  im Hybrid sind manuell per XML setzbar
+        => der <hybrid_tier>-Parser (HY-A3) traegt BEIDE Wege; die Wirkbereiche
+        korrespondieren mit der Komposit-Map des Hybrid-Stempels (KON41-04:
+        Synthese-Funktions-Keys -> Pruefdock-Stempel) und den Break-Even-Grenzen
+        der Bereichs-Karte (KON7-05).
+
+---
+
+### KON42-02 — KONSEQUENZEN FÜR DIE STRECKE
+
+* **S-19 (#7):** rechnet die Mess-Dimension als „geforderte Belegungen ≤ 32"; die
+  Dock-Variable geht als **Programm-Deckel-Konstante** ein, nicht als Kombinatorik-Faktor.
+* **S-8/Planer:** die **Default-Doktrin** wird Bau-Auflage — Deckel-/Config-Variablen als
+  `constexpr`-Defaults im Planer, XML-Override je Attribut; Q6-MaxN-Korrektur (8→32,
+  Strecken-Posten 9) baut direkt die Default-Form.
+* **HY-A3 (Strecken-Posten 26):** der `<hybrid_tier>`-Parser bekommt die zwei Steuerwege
+  (statische Dock-Belegung ODER Synthese-Funktionen+Wirkbereiche je Tier-Binary).
+* **W7-Posten (gezählt):** Dock-Deckel-Anpassung (der willkürliche 32er-Wert).
+* **Offene Owner-Fragen: NULL.** (v3.5-GO wartet als Vorlage, blockiert nichts.)
 ## NACHTRAG 12.08.2026 — KON41: VIER ANTWORTEN — DIE GENERALPROBEN-DOKTRIN, DIE DOCK-PERMUTATIONS-ENTWIRRUNG („VÖLLIG FALSCH"), UND DER HYBRID-STEMPEL IST SPEZIFIZIERT
 
 **Der Owner hat OF-5, OF-1, OF-2 und OF-3 beantwortet — OF-2 mit einer scharfen Korrektur an
@@ -716,6 +776,7 @@ KON7–KON12-Substanz (Stempel-Interfaces, Bereichs-Karte, P-0/S-14/S-17-Messung
 | **KON39** | 12.08. | WF8: **Wellenkonsolidierung gelandet** (KON19-00 vollzogen) — vier /goal-Dokumente = Haupt-Referenz (GOAL-Kopf-Nachtrag · Wellenplan §17 · Designplan §10 · v3.5-Vorlage) · **die Strecke bis zur Abgabe steht** (Plan-Dokument Teil B, kritischer Pfad, T−3-Anker) · Owner-Fragen auf **VIER** reduziert (OF-1…OF-4) · Reviews 2× TRAEGT_MIT_FIXES, 22 Fixes drin | gilt |
 | **KON40** | 12.08. | Zwischenstand: **WF9/##25-Durchstich läuft** (Strecken-Posten 1) · **OF-1 am Objekt geklärt** (17 Code + README = 18) · 🔴 **OF-5 neu: F-D-Spannung** („T−3" vs. „wie empfohlen" — W3-Gestalt) · Hotspot-Serialisierung S-1/#83 hinter WF9 | gilt; OF-5/OF-1 durch KON41 beantwortet |
 | **KON41** | 12.08. | Vier Antworten: **GENERALPROBEN-DOKTRIN** (Dauerzustand bis T−3, manueller Reset Builds+Messdaten, finaler Lauf; OV-4-Deckel = f(T−3)) · OF-1 bestätigt · 🔴 **„VÖLLIG FALSCH": Prüfdocks ≠ Permutationen** (KON28-03-Beobachtung + KON34-03-Dock-Klammer widerlegt; Schichten-Größen NUR aus S-19) · **Hybrid-Stempel spezifiziert** (Komposit-Map-Zeile, SHA deckt Dock-Belegung) · Betriebsregel: nur noch nicht-explore-auflösbare Fragen | gilt |
+| **KON42** | 12.08. | OF-2-neu beantwortet: **Dock-32 = willkürlicher PROGRAMM-DECKEL** (multi-release, W7-anpassbar) · 🔴 **DEFAULT-DOKTRIN** (Variablen hart als Planer-Defaults einkompiliert, XML überschreibt) · Mess-Belegungs-Maximum 32 + S-19-Hoheit **vollständig bestätigt** · 🔴 **Hybrid zweiwegig XML-steuerbar** (statische Dock-Belegung ODER Synthese-Funktionen+Wirkbereiche) · **offene Owner-Fragen: NULL** | gilt |
 
 ---
 
