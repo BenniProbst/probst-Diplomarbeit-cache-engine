@@ -16,6 +16,63 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON52: V-F1/V-F2 BEANTWORTET — NUR DAS FERTIG-SIGNAL IST OOB, DIE RAM-WARNUNG IST DELAYED-INFORMATIV, UND EIN HARTER RAM-OOB IST XML-OPT-IN
+
+**Owner verbatim 12.08.2026:**
+
+> *„V-F1 - **Nur das Fertig-Signal darf die Prioritäten überspringen, weil Zwischen-Signale
+> Latenzen erzeugen, welche Messwerte verfälschen**. Wenn der **RAM endet, dann geht das Programm
+> sowieso in den OOM, das wird der erfahrene ITler schon merken**. Es ist nur interessant - falls
+> das Programm mit RAM Warnung überlebt - dass **möglicherweise zu große Anforderungen an das
+> Experiment gestellt wurden, das kann man aber auch noch nach dem Experiment begutachten**. In
+> der **XML soll es zusätzlich möglich sein einen RAM OOB zu konfigurieren, der hart ist (kein
+> default)**, sodass in diesem Fall die **Warnung direkt durchgeht an den Planer, der dann der
+> CEB den Befehl zum Stoppen des Experimentes sendet**. Der **Planer gibt den Fehler auf der
+> Kommandozeile aus**. V-F2: **Default wie gesagt rein informativ, Grenze der Warnung und des
+> OOB separat in der XML einstellbar, standard ist nur delayed Warnung und keine Begrenzung**."*
+
+---
+
+### KON52-01 — DIE FESTLEGUNG (schliesst KON51-04 vollständig)
+
+    OOB-KLASSE DES KANALS = GENAU EINE NACHRICHT: das FERTIG-SIGNAL.
+      Begruendung (tragend fuer jeden Kanal-Bau): ZWISCHEN-Signale erzeugen
+      Latenzen, die MESSWERTE VERFAELSCHEN. Die Latenz-Reinheit der Messung
+      schlaegt die Betriebs-Sichtbarkeit.
+    OOM-PHILOSOPHIE: reisst der RAM, faellt das Programm in den OOM -- akzeptiert
+      ("das wird der erfahrene ITler schon merken"). Die RAM-WARNUNG ist ein
+      NACHBETRACHTUNGS-Indikator (Experiment moeglicherweise zu gross angelegt),
+      delayed am Experiment-Break voellig ausreichend.
+    🔴 HARTER RAM-OOB = XML-OPT-IN (KEIN Default):
+      nur wenn in der XML konfiguriert, geht die Warnung DIREKT durch an den
+      Planer -> der Planer sendet der CEB den BEFEHL ZUM STOPPEN des Experiments
+      -> der Planer gibt den FEHLER auf der KOMMANDOZEILE aus.
+      (Der Stopp-Befehl ist damit die einzige legitime Planer-Sendung in die
+       Stummphase -- als FOLGE des Nutzer-Opt-ins, nicht als Kanal-Default.)
+    V-F2 DEFAULTS: rein informativ · WARN-Grenze und OOB-Grenze SEPARAT in der
+      XML einstellbar · Standard = NUR delayed Warnung (Schwelle 6 GB, KON51-02)
+      und KEINE Begrenzung (OOB aus).
+
+### KON52-02 — EINORDNUNG UND BAU-WIRKUNG
+
+    DEFAULT-DOKTRIN (KON42) exakt getroffen: die 6-GB-Warnschwelle ist ein hart
+      einkompilierter Planer-Default, per XML ueberschreibbar; die OOB-Grenze hat
+      BEWUSST KEINEN Default (nicht gesetzt = deaktiviert -- ein Opt-in-Attribut,
+      kein Deckel-Wert).
+    S-10/KANAL: Prioritaetsklassen + exakt EINE unbedingte OOB-Nachricht (Fertig);
+      die RAM-OOB-Durchleitung ist ein BEDINGTER Pfad hinter dem XML-Flag.
+      Planer-seitig NEU: das Stopp-Kommando als Control-Nachricht (stream in).
+    S-13/B1-FAMILIE (XSD): zwei separate Attribute im Mess-/Experiment-Kontext
+      (ram_warn_grenze, Default 6 GB · ram_oob_grenze, optional/aus).
+    KOMMANDOZEILEN-FEHLER laeuft ueber den KON50-Trace-/Status-Weg des Planers.
+    DEKLARIERTE ABLEITUNG (beim Bau am Objekt zu verifizieren, KEINE Owner-Frage):
+      ein RAM-OOB-Stopp ist ein deterministischer Overrun des KONFIGURIERTEN
+      Deckels -- die T-15b-Retry-Klammer (je 5) wuerde fuenfmal identisch
+      reissen; Arbeitsannahme: OOB-Stopp schreibt failed OHNE Retry, der Lauf
+      faehrt mit dem naechsten Experiment der main.xml-Sequenz fort
+      (failed-Doktrin "sichtbar, nie still; der Lauf misst weiter").
+
+**Offene Owner-Fragen nach diesem Nachtrag: NULL.**
 ## NACHTRAG 12.08.2026 — KON51: NAHT-SPRACHEN UND MESS-DATENFLUSS — GEFILTERTE XML-NACHRICHTEN (PLANER→CEB), FLÄCHE 3 = SIGNAL+SPARSE-BINARY-STREAM, ARENEN MIT HOL-PUNKTEN, STUMMSCHALTUNG WÄHREND DER MESSUNG
 
 **Owner verbatim 12.08.2026 (bestätigt KON50: „Ja korrekt, du hast es verstanden"):**
