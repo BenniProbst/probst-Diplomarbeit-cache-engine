@@ -74,7 +74,7 @@ Wache vermessen wurde. Beides zusammen macht S-14/S-18 (Ausrollen + Trennen/Verd
 Priorität „hoch" per KON16-08) zur **Voraussetzung des Bau-Triggers**, nicht zur CI-Kosmetik.
 
 **(c) WF3 enthält eine Invariante, die WF1/WF2 nicht kannten — und sie kollidiert:**
-*„Es kann nur eine **gerade Anzahl an Prüfdocks** geben, das ist eine Regression mit 5"*
+*„Es kann nur eine **gerade Anzahl an Prüfdocks** geben, das ist eine Regression mit 5"* **[ÜBERHOLT 12.08., KON30-04: gestrichen — die Invariante meinte die gerade Anzahl an CEBs; Hybrid-Docks tragen jede beliebige Anzahl bis 32]**
 (Z. 35020) steht gegen *„die CEB hat **genau EIN** Prüfdock"* (KON9-03) und gegen die heutige
 K2-Antwort (*„die CEB orchestriert **alle Prüfdocks**"* — Plural). Drei Aussagen, drei
 mögliche Zählgegenstände (Docks je CEB? Docks gesamt? Hybrid-Prüfdocks?). **Das ist der eine
@@ -129,7 +129,7 @@ Contract-Test) · XML = Wahrheit der **Realisierung** · jede Binary = XML-Teilm
 | **V-6** | **MinIO-Keys nach Scrub** + 776 Runner-Token + prod2-`test:secrets` | WF3 unverbucht (KON22) | Task #10, Status ungeprüft — **operativer Blocker für jeden System-Test** |
 | **V-7** | **A-1-Vorlagetext** vor jeder Backup-Ref-Löschung nachlesen (Roh ~Z. 35872) | WF3 §5 | offen; bis dahin gilt die gestufte Ledger-Fassung |
 | **V-8** | **E-1…E-4** (OV-4 Mess-Deckel · Ledger-Selbstwiderspruch :9468/:8941 · W-6 vier Klone) | WF3 §5: „Neuvorlage mit viel Kontext" verlangt, Vollzug unbelegt | Status je Punkt ungeprüft |
-| **V-9** | **Prüfdock-Zählung** (gerade Anzahl vs. EIN Dock vs. alle Docks) | WF3 §5 + KON21-01 | **F11**, vor jedem Bau an Prüfdocks |
+| **V-9** | **Prüfdock-Zählung** (gerade Anzahl vs. EIN Dock vs. alle Docks) | WF3 §5 + KON21-01 | **F11**, vor jedem Bau an Prüfdocks | **[ÜBERHOLT 12.08., KON30-04: gestrichen — die Invariante meinte die gerade Anzahl an CEBs; Hybrid-Docks tragen jede beliebige Anzahl bis 32]**
 | **V-10** | **W12-B** (zweite Hälfte §43, seit 19.07. „nach W11") + #68-Forensik | Task-Altbestand | unverändert offen, nach KON13 nur #68 gefallen |
 | **V-11** | **MEMORY.md-Kopf** sagt „lebender Stand: Ledger KON16" | dieser Kontext | stale — korrigiert auf KON23 in dieser Runde |
 
@@ -144,7 +144,7 @@ gelandet ✅ · Rohdaten-Backups mit gedeckten gitleaks-Nullen ✅ · K2-Erklär
 
 **F1–F10** (KON23-07, WF1-Synthese §6 im Volltext) — dazu neu aus diesem Urteil:
 
-**F11 — Prüfdock-Zählung:** *Was zählt die Invariante „nur eine gerade Anzahl an Prüfdocks"
+**F11 — Prüfdock-Zählung [GESCHLOSSEN 12.08., KON28-03 + KON30-04]:** *Was zählt die Invariante „nur eine gerade Anzahl an Prüfdocks"
 (Z. 35020) — die Docks **je CEB** (gegen „genau EIN Prüfdock", KON9-03), die Docks **im
 Gesamtsystem**, oder die **Hybrid-Prüfdocks**?* (Vor jedem Bau an Prüfdocks; K2-Antwort spricht
 von „allen Prüfdocks" im Plural.)
