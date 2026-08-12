@@ -16,6 +16,48 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON55: CLANG UND GCC SIND ÜBERALL BASIS-PFLICHT (CI UND LOKAL) — WEIL DER COMPILER EINE SYSTEM-ACHSE BELEGEN WIRD
+
+**Owner verbatim 12.08.2026:**
+
+> *„Bitte bedenke, dass der **build auf allen Diplomarbeit Projekten auf der CI und lokal
+> generell zuerst mit clang und auch mit gcc Pflicht ist, die Versionen dafür sind jeweils
+> geplant**. Dies hängt schon allein damit zusammen, dass **Compiler Performance Unterschiede
+> bringen, weshalb sie eine System-Achse belegen werden**. Wir **beginnen also damit clang und
+> gcc zu unterstützen als Basis**. **Nur clang reicht nicht, weil wir sonst spätestens im CEB
+> Problemen bek[o]mmen**."*
+
+---
+
+### KON55-01 — DIE FESTLEGUNG UND IHRE NEUE BEGRÜNDUNGSKETTE
+
+    PFLICHT (alle Diplomarbeit-Projekte, CI UND LOKAL, generell):
+      der Build laeuft mit CLANG UND mit GCC — beide, als BASIS-Belegung;
+      die VERSIONEN sind jeweils GEPLANT (heute: clang 22.1.8 / gcc 15.3 als
+      gefahrene Staende; die geplante Version ist Teil der Belegung).
+    🔴 DIE ARCHITEKTUR-BEGRUENDUNG (neu, tragend): Compiler bringen
+      PERFORMANCE-UNTERSCHIEDE — deshalb werden sie eine SYSTEM-ACHSE BELEGEN.
+      {clang, gcc} ist die BASIS-Belegung dieser kuenftigen Achse; "nur clang"
+      brueche SPAETESTENS IM CEB (die CEB baut hoehere Stufen — ihr Bau-Vokabular
+      muss den geplanten Compiler-Satz von Anfang an tragen).
+    EINORDNUNG: verschaerft KON22-01/8 ("beide Compiler Pflicht, Skip VERBOTEN")
+      von der CI-Doktrin zur GENERELLEN (auch lokal); fuegt sich exakt in
+      KON16-06 (Tools/Compiler erreichen die Binary als Stempel ueber Flaeche 2,
+      ALS TEIL DER SYSTEMACHSE) und KON8-03 (CEB-Anzeige ① "womit ich gebaut
+      wurde") — die kuenftige Compiler-System-Achse ist deren Permutations-Form.
+    BAU-WIRKUNG: S-9/S-11 (CEB-Kompilation je Messsystem) permutiert kuenftig
+      auch ueber die Compiler-Belegung; die Versionen wandern als Achsen-Werte
+      in Stempel/Preimage (System-Realm) — Detailschnitt beim S-9-Bau.
+
+### KON55-02 — SELBSTBEFUND ZUR HEUTIGEN LANDUNG (deklariert, nicht versteckt)
+
+    Der lokale Kombi-Vollbau der C+A-Landung (671d7f6a) lief NUR mit GCC
+    (Debug 485/485 + Release 485/485). Die CLANG-Deckung dieses Stands liefert
+    die CI (Pipeline 15759: build:clang + Test-Jobs) — Nenner deklariert:
+    LOKAL geprueft = gcc beide Konfigs; CI prueft beide Compiler.
+    KONSEQUENZ (Regel ins Werkzeug, nicht in den Kopf): das Lande-Vollbau-
+    Skript faehrt ab sofort BEIDE Compiler je Konfiguration
+    (gcc UND clang x Debug UND Release) — Skript erweitert in dieser Runde.
 ## NACHTRAG 12.08.2026 — KON54: SHELL-VERNEINUNG UND NUTZER-„kill"-OOB — DER PLANER KANN DAS LAUFENDE EXPERIMENT HALB SAUBER STOPPEN; DAS LAGER HEILT
 
 **Owner verbatim 12.08.2026 („Alles korrekt" zu KON53 + Erweiterung):**
