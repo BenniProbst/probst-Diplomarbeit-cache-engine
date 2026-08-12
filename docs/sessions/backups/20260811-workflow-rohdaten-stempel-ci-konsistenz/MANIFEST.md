@@ -199,3 +199,15 @@ gitleaks   WF1 + WF3 je "no leaks found"
 Gegenprobe MIT LAENGENPRUEFUNG (Lehre aus Nachtrag 3): Koeder-Laenge ${#K}=20
            verifiziert VOR dem Zaehlen -> leaks found: 1. Beide Nullen gedeckt.
 ```
+
+---
+
+## NACHTRAG 5 — WF4: die fuenf KON19-Explores (12.08.)
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_23fc24f2-08a.tar.gz` | 5,3 M — 21 Agenten (19 fertig, 2 Transkript-Schnitte an StructuredOutput gestorben, von den Gegenproben kompensiert; 3 TEST-Stubs verworfen) |
+
+Synthese gelandet als `20260812-WF4-SYNTHESE-die-fuenf-kon19-explores.md` (mit Kopf — die
+Kompaktheits-/Titel-Auflage wirkt), Auswertung **KON26**. gitleaks: no leaks found; Gegenprobe
+mit laengengeprueftem 20-Zeichen-Koeder -> leaks found: 1. Die Null ist gedeckt.
