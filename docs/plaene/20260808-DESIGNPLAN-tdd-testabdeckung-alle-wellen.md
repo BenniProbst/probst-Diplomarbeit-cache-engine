@@ -203,13 +203,34 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 670483c084293c2fa7f6fb7c72dcc3a8192e0b48
+PZW-CE-SHA         = 671d7f6a0d678db15adf2bf22aaa36c30556ab85
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 12.08.2026, abends — fünfter Gitlink-Zug (Strang-C+A-Landung, ##25/F1 + S-1), und
+wieder bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
+
+Der Gitlink zieht von `670483c0` auf **`671d7f6a`** (überspringt den Zwischenstand `a99c4a18`
+— der Bump-Bereich trägt damit Strang D + C + A: die Guard-Wachen, den Katalog-Emitter-Fix und
+die S-1-Stempel-Basisklasse, 17 Commits).
+
+| Anker | alt (Stand `670483c0`) | neu (Stand `671d7f6a`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `670483c084293…` | **`671d7f6a0d678…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | 498 Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 498 Test-`.cpp` im Baum `671d7f6a` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 498 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2768 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2768 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich trotz Nenner-Wachstum (497 → 498 Test-`.cpp`, +`test_s1_stempel_basis_vertrag.cpp`)
+keine Zahl bewegt:** weder der Katalog-Emitter-Fix (C: `measurement_stamp`-Durchreichung) noch
+die Stempel-Basisklasse (A) rufen `lazy_csv_header()` — dasselbe Muster wie beim dritten und
+vierten Zug: der Nenner zählt **Dateien**, die Anker zählen **Stellen**.
 
 **Nachzug 11.08.2026, nachts — vierter Gitlink-Zug, und KEINE der vier Zahlen bewegt sich.
 Die vorherige Fassung bleibt darunter stehen (Doku wird deprecatet, nicht gelöscht).**
