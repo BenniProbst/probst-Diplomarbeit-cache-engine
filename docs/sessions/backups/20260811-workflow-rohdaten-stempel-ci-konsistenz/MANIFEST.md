@@ -282,3 +282,15 @@ gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
 - `kon-quellen/ledger-nachtrag-kon39.md` + `kon-quellen/wf8-synthese-vollergebnis.json`.
 - Ergebnis-Träger im Repo: docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md
   (Teil A Referenz-Nachträge · Teil B Strecke · Teil C OF-1…OF-4 · Teil D W7-Liste).
+
+## Nachtrag 12.08.2026 — WF9 (##25-Durchstich) + WF10-Heilung
+
+- `lauf-wf_1fb6bc6f-wf9-durchstich.tar.gz` (1,0 M): ALLE 5 Agenten + journal (Kern 2x sonnet ·
+  Design fable max · Bau opus max/Worktree · Verify fable xhigh).
+- `wf9-durchstich-belege-messlauf.tar.gz` (128 K): measure_out_mini + messlauf-stdout.log +
+  .p4_*-Protokolle aus dem Worktree (der rote Beweis-Lauf: deklaration_leer, measured=0 —
+  additiv gesichert VOR jeder Worktree-Aktion).
+- `kon-quellen/wf9-durchstich-vollergebnis.json` + `kon-quellen/ledger-nachtrag-kon44.md`.
+- WF10-Heilung: erster E-WARMUP-Agent starb am Kontext-Ueberlauf (572 K Transkript, kein
+  result); Resume wjh71oern mit zweigeteiltem Warmup (fable max, Kontext-Disziplin) —
+  Rohdaten kommen mit dem WF10-Abschluss-Tar.
