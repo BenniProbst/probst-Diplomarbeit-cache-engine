@@ -813,7 +813,7 @@ selbstbiss_fall() {   # $1 = Kurzname, $2 = Zweig, $3 = erwartete Zeilen-Differe
     fi
 }
 
-# Zweig-Reihenfolge im Prüfling (Datei-Ordnung der 'exit 1'):
+# Zweig-Reihenfolge im Pruefling (Datei-Ordnung der 'exit 1'):
 #   1 = Keine-CSV        -- toetbar NUR durch F4 (Mindest=0; bei Mindest>=1 faengt Zweig 2 mit)
 #   2 = Datenzeilen-Summe -- toetbar durch F1/F6/F13
 #   3 = D4d echte Zeilen  -- KON44-02, toetbar NUR durch F27 (Summe reicht, echte nicht)

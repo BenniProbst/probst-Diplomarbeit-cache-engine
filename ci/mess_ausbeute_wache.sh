@@ -258,7 +258,8 @@ while IFS= read -r F; do
     # n/a-Zeile := Datenzeile, deren Felder 4/5/6 (n_ops/total_ns/ns_per_op laut Kopfzeile,
     # ce cache_engine_builder_iterator.hpp:550) alle drei woertlich "n/a" sind -- eine provisionierte
     # Zeile, keine Daten-Aussage.
-    NA=$(awk -F';' 'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$F")
+    NA=$(awk -F';' \
+        'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$F")
     if [ "$ZEILEN" -gt 1 ]; then
         LEERZEILEN=$((LEERZEILEN + ZEILEN - 1 - DATEN))
     fi
@@ -357,5 +358,6 @@ if [ "$N_LEER" -gt 0 ]; then
     echo "         Das ist ein Befund, kein Rauschen -- er gehoert in die Auswertung."
 fi
 
-echo "MESS-AUSBEUTE-WACHE: OK ($ECHT echte, $NA_SUMME n/a-/provisionierte Datenzeile(n) aus $N_MIT von $N_CSV Datei(en))."
+echo "MESS-AUSBEUTE-WACHE: OK ($ECHT echte, $NA_SUMME n/a-/provisionierte" \
+    "Datenzeile(n) aus $N_MIT von $N_CSV Datei(en))."
 exit 0
