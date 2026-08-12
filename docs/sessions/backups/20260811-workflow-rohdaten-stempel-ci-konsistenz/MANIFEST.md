@@ -246,3 +246,20 @@ alten Workflow-Journal) war NICHT unter den sieben rotierten CI/CD-Variablen —
 Synthese (MIT Kopf — die Kompaktheits-Auflage wirkt) als `20260812-WF5-SYNTHESE-*`, Auswertung
 **KON29**. gitleaks no leaks found, Koeder laengengeprueft (20) -> leaks found: 1. Ernte-Ordner
 nachgezogen.
+
+---
+
+## NACHTRAG 8 — WF6: die R-1-Messeinrichtungs-Kartierung (12.08.)
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_37d98690-317.tar.gz` | 587 K — WF6: 3 Agenten (2 fertig, 1 Schnitt am StructuredOutput-Limit gestorben) |
+| `wf6_messeinrichtungen.js` | das Skript |
+
+Synthese `20260812-WF6-SYNTHESE-r1-messeinrichtungs-kartierung.md`, Auswertung **KON34**.
+⚠️ Schnitt 2 (SOLL-Zuordnung aus den Plaenen) fehlte der Synthese — die Herleitung stammt
+aus dem CODE, nicht aus einer Plan-Quelle. In KON34 als Deckungsgrenze ausgewiesen.
+gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
+
+**Dazu die LEDGER-KONSOLIDIERUNG IV** (`kon-quellen/ledger-konsolidierung-IV.md`) — alle
+34 KON-Nachtraege thematisch zusammengezogen, mit KON-Index und UEBERHOLT-Ketten.
