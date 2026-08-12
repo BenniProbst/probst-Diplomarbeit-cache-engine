@@ -16,6 +16,62 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON53: DAS INTER-EXPERIMENT-FENSTER IST EINE VOLLE SYNC-BARRIERE — UND DER FORTGANG IST WÄHLBAR (--auto ODER MANUELLE BESTÄTIGUNG)
+
+**Owner verbatim 12.08.2026 (Erweiterung zu KON51-03/KON52):**
+
+> *„Zwischen 2 Experimenten wird ja **immer geflusht** (daher auch bei Komplex-Experimenten) und
+> dort ergibt sich die Chance **immer alle sonstigen Trace Nachrichten an den Planer zu flushen
+> und gegen die CEB Nachrichten zu synchronisieren**, das **nächste Ex[p]eriment startet erst,
+> wenn alle Nachrichten auf beiden Seiten vollständig ausgetauscht wurden**, dann beginnt erst
+> das nächste Teil-Experiment. Der **Nutzer kann wählen, ob das nächste Teilexperiment
+> automatisch startet mit dem --auto flag oder ob er das nächste Teil-Ex[p]eriment manuell
+> bestätigen muss, nachdem er auf dem Planer alle Berichte und Traces eingesehen hat**, wei[l]
+> ja **während eines Teilexperimentes Funkstille herrscht und nicht eingegriffen werden kann,
+> außer Programm kill**. Das gibt **Zeit darüber nachzudenken, ob man fortfahren möchte**."*
+
+---
+
+### KON53-01 — DIE FESTLEGUNG
+
+    INTER-EXPERIMENT-FENSTER = VOLLE, BIDIREKTIONALE SYNC-BARRIERE:
+      zwischen zwei (Teil-)Experimenten wird IMMER geflusht -- auch in
+      Komplex-Experimenten; dort werden ALLE sonstigen Trace-Nachrichten an den
+      Planer geflusht und GEGEN die CEB-Nachrichten SYNCHRONISIERT.
+      STARTBEDINGUNG des naechsten Teil-Experiments: alle Nachrichten BEIDER
+      Seiten VOLLSTAENDIG ausgetauscht (Queue-Drain beidseitig quittiert) --
+      erst dann beginnt das naechste Teil-Experiment.
+    FORTGANGS-WAHL (Planer-CLI):
+      --auto             das naechste Teil-Experiment startet AUTOMATISCH
+      ohne --auto        MANUELLE BESTAETIGUNG noetig, nachdem der Nutzer am
+                         Planer alle Berichte/Traces eingesehen hat
+      BEGRUENDUNG: waehrend eines Teil-Experiments herrscht FUNKSTILLE, kein
+      Eingriff moeglich AUSSER Programm-kill (die konfigurierte Ausnahme bleibt
+      der XML-RAM-OOB, KON52) -- die Pause gibt Zeit zu entscheiden, ob man
+      fortfaehrt.
+
+### KON53-02 — EINORDNUNG UND DEKLARIERTE ABLEITUNGEN (keine Owner-Fragen)
+
+    PRAEZISIERT KON51-03: das Fenster ist nicht nur Kommunikations-GELEGENHEIT,
+      sondern PFLICHT-Austausch mit Vollstaendigkeits-Bedingung vor dem Start.
+      Drain-Quittungs-Mechanik (woran "vollstaendig" erkannt wird) = S-10-Design.
+    --auto reiht sich neben --debug in die Planer-CLI (KON29-01/S-8-Familie;
+      quer, beschleunigt/gates nur den FORTGANG, leitet nie um).
+    DEKLARIERTE ABLEITUNG 1: die CI-KETTE faehrt --auto -- ein CI-Job kann nicht
+      manuell bestaetigen, und die Generalproben-Doktrin (KON41-01) verlangt die
+      XML->PDF-VOLLAUTOMATIK; interaktiv-lokal ist manuell der Default
+      (--auto = Opt-in laut Owner-Wortstellung). Beim S-8-Bau zu verifizieren.
+    DEKLARIERTE ABLEITUNG 2: "Programm kill" mitten im Teil-Experiment heilt
+      ueber das LAGER (Skip beim Wiederanlauf, KON19-06/KON41-01) -- kein
+      eigener Resume-Mechanismus im Kanal noetig.
+    KON19-06-Anschluss: die main.xml-Sequenz ("alle sequentiell, wenn
+      gewuenscht") bekommt mit der Barriere ihre UEBERGABE-PUNKTE; die
+      KON52-Semantik (OOB nur Fertig-Signal) bleibt unberuehrt -- die Barriere
+      liegt NACH dem Fertig-Signal, ausserhalb der Stummphase.
+
+**Bau-Wirkung:** S-8 (Planer-CLI: `--auto` neben `--debug`) · S-10 (Barriere-Protokoll:
+Fertig-Signal → beidseitiger Flush/Sync → Drain-Quittung → Start-Kommando bzw.
+Bestätigungs-Prompt) · S-12/CI-Emission setzt `--auto`. **Offene Owner-Fragen: NULL.**
 ## NACHTRAG 12.08.2026 — KON52: V-F1/V-F2 BEANTWORTET — NUR DAS FERTIG-SIGNAL IST OOB, DIE RAM-WARNUNG IST DELAYED-INFORMATIV, UND EIN HARTER RAM-OOB IST XML-OPT-IN
 
 **Owner verbatim 12.08.2026:**
