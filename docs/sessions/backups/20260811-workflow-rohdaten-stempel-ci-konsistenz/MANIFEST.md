@@ -159,3 +159,23 @@ Gegenprobe VORHER gefahren:   Koeder 'glpat-' + 20 Zeichen aus /dev/urandom -> l
 **Warum das Skript gesichert wird, obwohl nichts zurueckkam:** die neun Straenge tragen die
 ausformulierten Owner-Zitate und Suchauftraege. Das ist der eigentliche Wert — nicht die
 Agenten-Ausgabe, die es nie gab.
+
+---
+
+## NACHTRAG 3 — WF2: Zwei Welten + Register leerer Klassen (12.08.)
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_8f39354c-394-zwei-welten.tar.gz` | 2,4 M — 9 Agenten, 0 Fehler: Strang J (Glieder-Reihenfolge Lager vs. außerhalb, blockierte S-6) + Strang K (Register der leeren Klassen) |
+
+Synthese (Fable 5 max) gelandet als
+`docs/sessions/20260812-WF2-SYNTHESE-zwei-welten-der-glieder-reihenfolge-und-register-leerer-klassen.md`,
+Auswertung Ledger **KON20**.
+
+```
+gitleaks   6,02 MB gescannt   no leaks found
+Gegenprobe: ERSTE Probe biss NICHT (Koeder hatte 19 Zeichen -- das Rezept
+head -c 15 | base64 | tr -dc liefert nicht-deterministisch 19 ODER 20).
+ZWEITE Probe mit 40 Input-Bytes und gepruefter Laenge 20 -> leaks found: 1.
+Die Null ist erst mit der ZWEITEN Probe gedeckt. Fallen-Register ergaenzt.
+```
