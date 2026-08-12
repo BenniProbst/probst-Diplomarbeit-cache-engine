@@ -203,13 +203,35 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 671d7f6a0d678db15adf2bf22aaa36c30556ab85
+PZW-CE-SHA         = 7d65eb6c2ffd36a981f062648f4273d305863b6c
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 12.08.2026, spätabends — sechster Gitlink-Zug (Zweitlens-Härtungs-Merge, KON57), und
+wieder bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
+
+Der Gitlink zieht von `671d7f6a` auf **`7d65eb6c`** (Merge des Fixup-Branchs
+`bau/s1-codex-haertung`: 11+1 Zweitlens-Fixes über 13 Dateien, +344/−116; Dual-Review
+geschlossen, Kombibau 4×485/485 — Details KON57).
+
+| Anker | alt (Stand `671d7f6a`) | neu (Stand `7d65eb6c`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `671d7f6a0d678…` | **`7d65eb6c2ffd3…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | 498 Test-`.cpp` im Baum, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 498 Test-`.cpp` im Baum `7d65eb6c` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 498 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2768 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2768 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich trotz 13 geänderter Dateien keine Zahl bewegt:** die Härtung legt **keine neue
+Test-`.cpp`** an (der neue Header `stempel_baustein_trait.hpp` ist kein Test — der Nenner
+bleibt 498) und ruft `lazy_csv_header()` an keiner neuen Stelle; die super-CI-Datei ist
+unberührt. Dasselbe Muster wie beim vierten und fünften Zug: der Nenner zählt **Dateien**,
+die Anker zählen **Stellen**.
 
 **Nachzug 12.08.2026, abends — fünfter Gitlink-Zug (Strang-C+A-Landung, ##25/F1 + S-1), und
 wieder bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
