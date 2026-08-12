@@ -16,6 +16,98 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON51: NAHT-SPRACHEN UND MESS-DATENFLUSS — GEFILTERTE XML-NACHRICHTEN (PLANER→CEB), FLÄCHE 3 = SIGNAL+SPARSE-BINARY-STREAM, ARENEN MIT HOL-PUNKTEN, STUMMSCHALTUNG WÄHREND DER MESSUNG
+
+**Owner verbatim 12.08.2026 (bestätigt KON50: „Ja korrekt, du hast es verstanden"):**
+
+> *„Die **Nachrichten zwischen Planer und CEB sprechen auch XML**, aber der **Planer gibt zum Init
+> der CEB und als director über deren state, nur Nachrichten Heraus, welche die CEB wirklich
+> braucht (also gefilterte Programmteile aus der Planer Syntax-geprüften Eingangs-XML)**. Jede
+> **freigebende Träger-Stufe kümmert sich weiterhin aus seiner binary heraus, um die erst im
+> nächsten schritt zu ladenden und anzuschließenden Module**. Im Falle des Prüfdocks zwischen CEB
+> und dem Tier-Binary bzw. dem Hybrid ist **Fläche 3 für measurement eine Signalfunktion von der
+> CEB Ausgehend und ein stream der Messwerte-Nachrichten nach dem flush eingehend vom Partner am
+> Prüfdock**. Die **Serialisierung der Werte von measurement ist kein XML sondern sparse binary**.
+> Die anderen Flächen waren hier schon definiert. Die **CEB aggregiert die Messdaten im RAM nach
+> einem Flush**, aber die **Tier-Binary/Hybrid haben jeweils ihre eigenen bei Anforderung
+> eingebauten Mess-Arenen für checkpoint-measure, die nur zu definierten Hol-Punkten in die CEB
+> in die RAM Arena von dieser geflusht werden, um dann gesammelt zurückgeschrieben zu werden,
+> wenn die Messung eines Experimentes fertig ist (warnung an den Planer wenn die CEB mehr als
+> 6GB RAM Messdaten hält)**. Während der **Experiment Messung ist die Kommunikation zwischen
+> Planer und CEB stumm, um keine Latenzen zu erzeugen**, Nachrichten werden auf **beiden Seiten
+> von Planer und CEB bis zum break eines EINZELNEN Experimentes aggregiert und dann erst
+> nachgesendet, wenn die CEB das Ende eines EINZEL-Experimentes verkündet** - **zusammengesetzte
+> Experimente kommunizieren also immer zwischen zwei Experimenten mithilfe von Nachrichten
+> queues (fertig Signal separat durch den Kanal gesendet und überspringt alle Prioritäten um
+> das Senden freizugeben)**."*
+
+---
+
+### KON51-01 — DIE NAHT-SPRACHEN (Steuer-Naht XML-gefiltert · Mess-Naht sparse binary)
+
+    PLANER->CEB (Flaeche 1, Control):  AUCH XML -- aber GEFILTERT:
+      der Planer gibt zum INIT der CEB und als DIRECTOR ueber deren STATE nur
+      Nachrichten heraus, die die CEB WIRKLICH BRAUCHT = gefilterte Programmteile
+      aus der Planer-SYNTAX-GEPRUEFTEN Eingangs-XML.
+      => Validierung sitzt am Planer (Eingangs-XML), die CEB bekommt den
+         relevanten, geprueften AUSSCHNITT (deckt KON21-02 Binary=XML-Teilmenge,
+         KON19-03 XML=Programmiersprache; §38-Ranges = die Nutzlast-Gestalt).
+    LADE-VERANTWORTUNG: jede FREIGEBENDE Stufe kuemmert sich AUS IHRER BINARY
+      heraus um die im NAECHSTEN Schritt zu ladenden/anzuschliessenden Module
+      (Planer laedt/startet CEB · CEB laedt Tier/Hybrid ans Pruefdock --
+       deckt KON25-08 Raketen-Mechanik + KON21-01 Loader/AnatomyModuleLoader).
+
+    FLAECHE 3 AM PRUEFDOCK (CEB<->Tier/Hybrid, measurement) -- RICHTUNGSSEMANTIK:
+      AUSGEHEND (CEB -> Partner):  eine SIGNALFUNKTION
+      EINGEHEND (Partner -> CEB):  ein STREAM der Messwerte-Nachrichten NACH dem FLUSH
+      FORMAT: KEIN XML -- SPARSE BINARY (die Steuer-Naht spricht XML, die
+      Mess-Naht binaer). Die uebrigen Flaechen waren definiert (KON16-06/KON50).
+
+### KON51-02 — DIE ARENEN-ARCHITEKTUR (checkpoint-measure bekommt seine Zielrolle)
+
+    TIER/HYBRID:  je EIGENE, BEI ANFORDERUNG EINGEBAUTE Mess-Arena fuer
+                  checkpoint-measure ("bei Anforderung eingebaut" = die
+                  Mess-Schalter-Belegung B1-B5/32; System-B-Bausteine
+                  checkpoint_measure/stapel_arena erhalten hiermit ihre Zielrolle)
+    FLUSH:        NUR zu DEFINIERTEN HOL-PUNKTEN in die CEB-RAM-ARENA
+                  (Hol-Punkt-Definition: Bestand checkpoint_speicher/soll_design
+                   per Explore beim Bau -- KEINE Owner-Frage)
+    CEB:          AGGREGIERT im RAM nach einem Flush; RUECKSCHRIEB GESAMMELT,
+                  wenn die Messung EINES Experimentes fertig ist
+    🔴 SCHWELLE:  WARNUNG an den Planer, wenn die CEB > 6 GB RAM Messdaten haelt
+
+### KON51-03 — DIE STUMMSCHALTUNG (Latenz-Hygiene der Mess-Phase)
+
+    WAEHREND der Experiment-Messung: Planer<->CEB STUMM (keine Latenzen).
+    BEIDSEITIG werden Nachrichten bis zum BREAK des EINZELNEN Experiments
+    AGGREGIERT und erst nachgesendet, wenn die CEB das ENDE des
+    EINZEL-Experiments VERKUENDET.
+    ZUSAMMENGESETZTE Experimente (main.xml-Rekursion, KON19-03) kommunizieren
+    IMMER ZWISCHEN zwei Experimenten -- ueber NACHRICHTEN-QUEUES beidseitig.
+    FERTIG-SIGNAL: separat durch den Kanal, UEBERSPRINGT ALLE PRIORITAETEN
+    (out-of-band-Klasse; es gibt also PRIORITAETSKLASSEN im Kanal), um das
+    Senden/den Queue-Drain freizugeben.
+    => deckt die Latenz-Doktrin (Mess-Exklusivitaet; fremde Last kontaminiert)
+       und praezisiert KON50: Status/Log/Trace QUEUEN experiment-lang.
+
+### KON51-04 — ZWEI VORGELEGTE FRAGEN (nicht explore-auflösbar; Empfehlungen dabei)
+
+    V-F1  DURCHBRUCHS-KLASSE der Stummschaltung: darf NUR das Fertig-Signal die
+          Prioritaeten ueberspringen -- oder auch die 6-GB-WARNUNG (und harte
+          Experiment-Fehlschlaege) als out-of-band-Betriebssignale? (Die Schwelle
+          wird ja WAEHREND der Messung gerissen; aggregiert kaeme die Warnung
+          erst am Break an.)  EMPFEHLUNG: kleine OOB-Klasse {Fertig-Signal ·
+          6-GB-Warnung · harter Abbruch-Fehlschlag}; alles andere queued.
+    V-F2  VERHALTEN bei >6 GB: rein INFORMATIV (nur Warnung, Messung laeuft
+          unveraendert) -- oder zieht die CEB selbst den NAECHSTEN HOL-PUNKT vor
+          (frueher Flush der Partner-Arenen; der Rueckschrieb bleibt am
+          Experiment-Ende)?  EMPFEHLUNG: Warnung + vorgezogener Hol-Punkt,
+          KEIN Abbruch ("sichtbar, nicht still").
+
+**Bau-Wirkung:** S-10 (Nutzlast = gefilterte XML-Fragmente hinab, Queue+Prioritäten+OOB im
+Kanal) · B4/B5 (Arenen „bei Anforderung eingebaut" folgt der Schalter-Belegung; SteuerDock-
+Explore aus KON50-03 unverändert) · Fläche-3-Vereinigung #20 (Signal+Stream-Richtungen,
+sparse-binary-Format statt XML) · T-15b/failed konsumiert die Break-Verkündung.
 ## NACHTRAG 12.08.2026 — KON50: DIE PLANER↔CEB-NAHT — FLÄCHE 1 = CONTROL-INTERFACE (STREAM IN/OUT), FLÄCHE 2 = STEMPEL, RÜCKWEG NUR STATUS+TRACE
 
 **Owner verbatim 12.08.2026:**
