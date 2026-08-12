@@ -226,6 +226,81 @@ dort — die emittierten `ceb:build`-Jobs bauen ihn selbst). Historisch standen 
 Alt-Flags am Treiber — funktional identisch, aber seit W1 beantwortet der Treiber sie mit einer
 Verweis-Zeile.
 
+## 8b. F1-Durchstich (`measure:smoke` direkt, ##25)
+
+Der Job hinter `COMDARE_DURCHSTICH` fährt **nicht** über `planer:delegate` → `ceb` → `tier`, sondern ruft
+den Treiber **direkt** (`.gitlab-ci.yml:1936`) gegen
+`Code/experiment_config/thesis_profiles/f1_durchstich.profile.xml` (1 Binary, 1 Perm, `cap=1`,
+`resume="false"`). Ziel ist die **ganze Kette in EINEM Lauf**: frischer Mini-Messwert → Lauf-Marker →
+Inhalts-Gate → `persist`-Commit → xlsx im Realm-Baum → `anhang:forward` → Thesis-Submodul-Commit.
+
+**DIE EINE STARTZEILE** — *Run pipeline* auf **`development`**, genau diese drei Opt-ins setzen:
+
+```
+COMDARE_DURCHSTICH=true  COMDARE_PERSIST_MEASUREMENTS=true  COMDARE_ANHANG_FORWARD=true
+```
+
+Jede Variable schaltet **genau einen** Job scharf; die drei Regeln sind **paarweise disjunkt**:
+
+| Opt-in | schaltet scharf | Gate-Stelle |
+|---|---|---|
+| `COMDARE_DURCHSTICH` | `measure:smoke` (`:1810`) | `.gitlab-ci.yml:1838` |
+| `COMDARE_PERSIST_MEASUREMENTS` | `persist:measurements` (`:2241`) | `.gitlab-ci.yml:2270` |
+| `COMDARE_ANHANG_FORWARD` | `anhang:forward` (`:2416`) | `.gitlab-ci.yml:2438` |
+
+`persist:measurements` und `anhang:forward` laufen zusätzlich **nur auf `development`**
+(Branch-Bedingung in derselben Regel). Fehlt ein Opt-in, **entsteht der Job gar nicht** — die Regel
+greift nicht; die `INERT`-Zeile im Skript ist nur der zweite Gurt („defense-in-depth; die rules gaten
+bereits", `.gitlab-ci.yml:2274`).
+
+> **Der Lauf muss von einem Menschen gestartet werden.** Beide Schreib-Jobs tragen als **erste** Regel
+> `$GITLAB_USER_LOGIN =~ /_bot_/ → when: never` (`:2268`, `:2436`) — ein von einem Bot/Token ausgelöster
+> Lauf misst zwar, schreibt aber **weder** nach 288 **noch** nach 289 zurück, und zwar **ohne** roten Job.
+
+> ⚠️ **`COMDARE_RUN_MEASURE` NICHT setzen.** Es erzeugt zugleich `measure:golden-320` (Timeout **10 Tage**),
+> der per `needs` auf demselben Job wartet und danach den **`resource_group`-Slot tagelang belegt**
+> (Begründung im YAML selbst, `.gitlab-ci.yml:1832-1834`). Die F1-Welle will **genau einen messenden Job**.
+
+**Voraussetzung (Projektvariablen, `protected` + `masked`):** ohne sie brechen die beiden Schreib-Jobs
+hart ab (kein stiller Skip).
+
+| Variablenpaar | Projekt | Gate-Stelle |
+|---|---|---|
+| `COMDARE_WRITEBACK_USER` / `COMDARE_WRITEBACK_TOKEN` | 288 (super) | `.gitlab-ci.yml:2278-2280` |
+| `COMDARE_THESIS_WRITEBACK_USER` / `COMDARE_THESIS_WRITEBACK_TOKEN` | 289 (Thesis) | `.gitlab-ci.yml:2446-2453` |
+
+`anhang:forward` prüft **beide** Paare: das 289er für den Anhang-Push, das 288er für den Gitlink-Bump
+(`.gitlab-ci.yml:2451-2452`).
+
+**Beweisjobs, in dieser Reihenfolge:** `measure:smoke` (`:1810`) → `persist:measurements` (`:2241`) →
+`anhang:forward` (`:2416`).
+
+**Lese-Hinweis (nicht verwechseln):** der PDF-Beweis **dieses** Laufs kommt aus dem **PDF-Gate des
+anhang-Kerns** (`ci/anhang_forward_core.sh:1297ff`, ALLES-ODER-NICHTS gegen den 289-Klon). Der Job
+`thesis:pdf` (`:1585`) baut auf dem Submodul-Stand, mit dem die Pipeline **gestartet** ist — er sieht den
+frischen Gitlink erst im **Folgelauf**. Das ist kein Defekt, sondern die Reihenfolge.
+
+### STAND 12.08.2026 — die Kette trägt, die MESSUNG nicht
+
+Lokal gefahren auf ce-Stand `670483c0` mit **exakt** der Env, die `measure:smoke` setzt
+(`COMDARE_GN_OPT=O3`, `COMDARE_GN_SIMD=no_extension`, `COMDARE_PLATFORM=amd@<host>`,
+`COMDARE_MEASUREMENT_COMBO` bewusst ungesetzt):
+
+- **grün:** `validate` · `lastprofile` (1/1) · Lauf-Marker (schreiben+prüfen) · `mess_ausbeute_wache`
+  (1 Datenzeile) · `frische_wache` (`csv_dieser_lauf=1`) · **csv UND xlsx** entstehen beide
+- **rot:** `durchstich_wache frische` — `measured=0`, gefordert 1. Der Treiber endet mit **Exit 1**:
+  `fehlerklasse=mess_konsistenz status=deklaration_leer` (`haupt_ist=0`, `haupt_soll=3`).
+
+Ursache am Objekt: die emittierte `perm.cpp` der Basis-320-Zelle trägt die **2-arg**-Form von
+`COMDARE_ANATOMY_VERSION_STAMP` (ohne Mess-Zeile), während die Prüfseite die Vollmengen-Zeile
+verlangt. Herleitung im ce-Kommentar an `profile_run_entry.hpp` (lazy_gen).
+
+⚠️ **Die eine Datenzeile ist KEIN Messwert:** `n_ops=n/a`, `total_ns=n/a`, `ns_per_op=n/a`,
+`quality_flag=n/a` — eine *provisionierte* Zeile (`provisioned=1`). Nur `durchstich_wache frische`
+fängt das ab; `mess_ausbeute_wache` und `frische_wache` melden **OK**. Ohne dieses eine Gate liefe eine
+Zeile voller `n/a` bis in die Thesis-PDF. Bis der Stempel-Befund behoben ist (S-6-Fenster), liefert der
+Durchstich **keinen** frischen Messwert.
+
 ## 9. Exit-Codes + Troubleshooting
 
 | Code | Bedeutung |
