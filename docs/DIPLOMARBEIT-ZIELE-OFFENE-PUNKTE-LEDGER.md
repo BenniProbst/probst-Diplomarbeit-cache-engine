@@ -12500,7 +12500,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[Bau]** Resolver-Forks R1–R8 enumeriert ins USER-GO-Register (R1 Single-Source, R5 Range-Syntax=Traeger §30-Mess-Modi, R6 Schema-v2-Fenster, R2/R3/R4/R8; STUFE:458-467; R1/R5 hoch).
 - **[Bau]** Planer-Bauplan-Forks B/C/D/E (PlanTextBuilder, Deadline-Schnitt, ceb_contract_version-Bump, XML-Kanal-Konvergenz; BAUPLAN:185-188; hoch).
 - **[Bau]** PL-18 physische Aufteilung der 3 Art-Registries in 3 Dateien/3 Module (System-Reg→measurement, Mess-Reg→Mess-Modul; mittel).
-- **[Bau]** §32-F4/GN-8-Rest — COMDARE_GOLDEN_320_IDS-Makro-Rename + axis_version.lock-Scope auf Organ-Strategie-Header + contract:axis-version-lock-CI vervollstaendigen (niedrig).
+- **[Bau]** §32-F4/GN-8-Rest — COMDARE_GOLDEN_320_IDS-Makro-Rename + axis_version.lock-Scope auf Organ-Strategie-Header + contract:axis-version-lock-CI vervollstaendigen (~~niedrig~~ **UEBERHOLT 11.08., KON16-08: Owner-Entscheid „hoch"** — die zweite Fundstelle sagte schon immer „hoch"; der Widerspruch ist damit aufgeloest, HOCH gilt).
 - **[Bau]** GN-10 Fixture-Single-Source experiment_golden.xml (E7-Kanon, F27 kanonische-Kopie; niedrig).
 - **[Konformitaet]** K-5 best_binary_selector ABI-Spiegel stale (kAbiMajor=5/'.A5.' vs Host 6) — schreibt falsche Provenienz, Paritaets-static_assert nachziehen (ROADMAP:108/176; hoch, Daten-Korrektheit).
 - **[Konformitaet]** K-13 cache_engine_axis_registry.xml-Drift (18/86 mit isa-composition vs HEAD 17+system_axis) per axis_registry_gen regenerieren+committen (mittel). **→ ERLEDIGT-STALE 2026-07-20 (A11-Audit): Drift existiert nicht mehr — live 17 Achsen/82 Bausteine ohne isa (Fix a9c433d0, §29).**
