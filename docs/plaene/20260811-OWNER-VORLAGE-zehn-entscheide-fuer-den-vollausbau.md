@@ -1,3 +1,10 @@
+> **🔴 ÜBERHOLT (12.08.2026):** Alle Punkte dieser Vorlage sind beantwortet oder gegenstandslos —
+> O-1→KON16-01+F1 · O-2→KON13-01 (nie eine Frage) · O-3→KON16-02 · O-4→KON19-01 · O-5→KON21-01/
+> KON19-02 · O-6/O-7/O-8→gegenstandslos (KON16-03, keine YAML) · O-9→KON13-04/KON15-05 ·
+> O-10→KON17-01 · O-11→KON17-02 · O-12→KON19-03 · O-13→KON19-04 (WF4 klärt Herkunft) ·
+> O-14→KON21-02. **Die lebenden offenen Fragen sind F1–F11** (Ledger KON23-07 + Wellenplan §16.4).
+> Dieses Dokument bleibt als Historie stehen (Doku wird deprecatet, nie gelöscht).
+
 # OWNER-VORLAGE — ZEHN ENTSCHEIDE FÜR DEN VOLLAUSBAU DER TRÄGER-BAUKETTE
 
 > **Stand:** Di 11.08.2026 nachts · **Frist: Do 14.08.** (Kipp-Punkt K-1 aus Wellenplan §14.5)

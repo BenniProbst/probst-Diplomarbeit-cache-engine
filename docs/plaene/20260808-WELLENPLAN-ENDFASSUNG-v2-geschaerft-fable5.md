@@ -1919,3 +1919,61 @@ laufenden Explores; der Posten wird nach dessen Rücklauf geschnitten und eingeo
 **14 von 17 Bau-Teilen** sind nie gegen den Code gemessen worden (nur P-0, S-14, S-17). Der
 **Stunden-/Tage-Aufwand** von S-1…S-18 steht an keiner Stelle dieses Plans — *„Termine unverändert"*
 ist aus dem Dokument allein **nicht** entscheidbar. Beides läuft im Explore vom 11.08. nachts.
+
+---
+
+# 16. KONSOLIDIERUNG AUF KON16–KON23 (nachgetragen 12.08.2026)
+
+> **Anlass:** die Owner-Antwortrunden vom 11./12.08. (KON16–KON21) und drei zurückgelaufene
+> Workflows (WF1 neun Stränge · WF2 zwei Welten/leere Klassen · WF3 5-Kontexte-Ernte, alle
+> gelandet als KON20/KON22/KON23). **§13–§15 bleiben unverändert stehen; was hier steht, gilt
+> vor.** Gesamturteil: `docs/sessions/20260812-GESAMTURTEIL-manuelle-synthese-*`.
+> WF4 läuft; die Referenz-Konsolidierung (KON19-00, vier /goal-Dokumente als Haupt-Referenz)
+> folgt nach dessen Rücklauf als eigener Schritt.
+
+## 16.1 DIE TEILELISTE §14.2 — was durch die Antwortrunden gefallen, ersetzt oder präzisiert ist
+
+| Alt (§14.2/§14.7) | NEU |
+|---|---|
+| O-1 „Syntax+Semantik je Kategorie" blockiert S-2/S-3 | **Grammatik EXISTIERT** (Flag-Grammatik v2, gebaut+gelandet 07.08.). Rest-Fork: **F1** (`cp`/`ce` = Klammerformen `c{p}`/`c{e}`?). S-2 = G-2-**Semantik-Nachzug** in Achsen-Nummerierungs-Reihenfolge (KON13-03), kein Neuentwurf |
+| O-3 „fordert oder impliziert" | **BEANTWORTET je Seite** (KON16-02): Freigabe **impliziert** · Compile-Seite **fordert**. Beide Seiten **gebaut und heute leer/inert** (KON23-02) ⇒ **S-3/S-7 sind AKTIVIERUNGS-Aufträge** |
+| O-4 Meta-Meta leer | **NICHT leer** (KON19-01): SIMD = System-Meta-Meta · **Festplatten-IO = Organ-Meta-Meta**, verknüpft je Tier-Binary = je Gattung+Genus. WF4-E-A erhebt den Bestand |
+| O-5 K1/K2/K5 | **K2+K5 BEANTWORTET** (KON21-01/KON19-02): CEB direkt ODER delegiert; Hybrid eigenständig über **wiederverwendete CEB-Module** + **Sync-Kanal**; keine Aggregation (je Thread eine Tier-Binary, Durchreichung über Fläche 3) |
+| O-6/O-7/O-8 (YAML-Fragen) | **GEGENSTANDSLOS** (KON16-03: keine YAML). Rest-Fork: **F4** (CiYamlBuilder stilllegen oder Dual-Weg?) |
+| O-9 Cache-Wurzel | beantwortet (KON13-04/KON15-05); Runner lesen NUR ccache auf minio.comdare.de + Buildsystem-NAS |
+| O-10 Typ/Instanz | **BEANTWORTET** (KON17-01): anforderungsgetrieben; Zahlen aus der **Planungs-Simulation** (neues Teil, s. 16.2) |
+| O-11 „eigene Bedürfnisse" | **BEANTWORTET** (KON17-02): Emission endet **im Lager**; J-1…J-4 mitemittieren. Rest-Fork: **F8** (Lint/Release?) |
+| O-12 XML-Kanal | **BEANTWORTET** (KON19-03): EINE Einstiegs-XML, rekursiv; XML-Syntax = Programmiersprache ⇒ **S-8 entblockt** |
+| O-13 dump-plan | Director-Methode, vermutlich überholt; WF4-E-C klärt die Herkunft |
+| O-14 Registry | **BEANTWORTET** (KON21-02): Option 1 geschichtet — Code=Wahrheit der Freigabe (Registry generiert + Contract-Test), XML=Wahrheit der Realisierung, Binary=XML-Teilmenge ⇒ Registry-Arbeit S-2/S-9 entblockt |
+| S-6 „Preimage-Ordnung" (gesperrt) | **ENTSPERRT und geschnitten** (KON20/KON21-03): S-6a Umstellung `MESS,SYSTEM,ORGAN` an allen drei Außen-Ebenen (Makro/POD/Preimage; POD braucht **Layout-Bump — Konflikt mit decl.hpp:293-Verbot vorab lösen**) · S-6b Transpositions-Sperre (mit S-6) · S-6c **Kategorien-Ordnungs-Wache** (neu, Owner-GO) · S-6d #67 explore+schärfen, behalten. Verbotszonen: Lager-Kaskaden, Unterachsen-Quellen, Hash-Mechanik. Preimage-Ordnung folgt der **Träger-Kette** (dynamisch), das Lager ist die Ausnahme |
+| S-12 „CI-Gerüst, CiYamlBuilder emittiert Mini-Pipelines" | **NEU GEFASST**: das Bau-Modul (C++23-Planer-Bibliothek, KON18-01) emittiert die **Beschreibung**; reale Prozesse im BuildOrchestrator. Umfang: anforderungsgetriebene Übergabe + J-1…J-4-Emission + CEB-Sequenz Tier→Hybrid + F4-Entscheid |
+| S-13 „post-Abgabe-Kandidat" | **DER KERN DER ABLAGE** (KON17-04, Rüge). Reihenfolge: Stempel → Planungs-Simulation → **von der XML die gesamte Kette bis zur PDF, von vorn nach hinten, mit allen Abzweigungen** |
+| S-16 Shell→GTest | verschärft durch KON22: **„Gebaut wird immer, skip ist VERBOTEN"** — beide Compiler Pflicht-Parallel-Baustufen |
+
+## 16.2 NEUE TEILE
+
+| ID | Teil | Quelle | Bestand |
+|---|---|---|---|
+| **S-19** | **PLANUNGS-SIMULATION** — berechnet die Träger-Zahlen je XML-Anforderung; **Pflicht nach der Stempel-Aufgabe, „schon geplant"** | KON17-01 | Zähl-Keim `PlanSizeBuilder` (`experiment_plan_director.hpp:489`); der Plan selbst ist zu FINDEN (Bestands-Pflicht) |
+| **S-20** | **SYNC-KANAL CEB↔Hybrid** — Runtime-Beeinflussung der Lade-/Lauf-Entscheidungen; Loader als **wiederverwendetes CEB-Modul** in den Hybrid | KON21-01 | `AnatomyModuleLoader` als Modul-Kandidat; Hybrid-Bau-Anschluss = 0 |
+| **S-21** | **Kategorien-Ordnungs-Wache** (= S-6c, eigenes Werkzeug-Teil) — Vorbild `organ_gruppen_decken_die_komposition` | KON21-03 | Vorbild existiert CT-bewiesen |
+
+## 16.3 WELLEN-WIRKUNG — Termine unverändert, Inhalte nachgezogen
+
+* **W0b (bis F1 Fr 14.08.):** 🔴 der **`##25` DURCHSTICH ist weiter ohne Besitzer** — er IST die
+  F1-Lieferung (Gesamturteil V-1). Dazu: ce-Pipeline rot (V-2) vor jeder weiteren ce-Landung.
+* **WE-Reserve + W1 (F2 Fr 21.08. = Freeze):** das **S-6-Fenster** (S-6a–d) und die **harten
+  Umbenennungs-Stellen** (WF1-G: XSD-Enum/Golden) als EIN Änderungsfenster — beide brechen
+  dieselben Vertragsflächen. Davor der **Layout-Bump-Konflikt** (decl.hpp:293). S-14/S-18
+  (Priorität hoch, KON16-08) im selben Zeitraum — WF3 Z. 34976 macht sie zum Build-Blocker.
+* **W2 (Bau-Trigger Mi 26.08.):** S-17 + S-13 steigen auf den kritischen Pfad (Emissions-Abschluss
+  = Lager, 16.1). S-19 Planungs-Simulation liefert **vor** dem Trigger die Bau-Zahlen — ohne sie
+  hat der Trigger keinen belegten Umfang (die „41,4 h für 128" sind als Rechenlücke benannt).
+* **Nenner-Vorbehalt:** KEINE Kapazitätsrechnung mit einer Hybrid-Zahl, bis F3 beantwortet ist;
+  CEB-Reihe ist 5→6→**12** (W-3), der PMC-Multiplikator unbeziffert.
+
+## 16.4 OFFENE OWNER-PUNKTE (Stand 12.08. mittags)
+
+**F1–F10** (KON23-07) + **F11** Prüfdock-Zählung (gerade Anzahl vs. EIN Dock vs. alle — Z. 35020
+gegen KON9-03 gegen KON21-01) + **F3**-Nenner + A-1-Vorlagetext vor jeder Backup-Ref-Löschung.
