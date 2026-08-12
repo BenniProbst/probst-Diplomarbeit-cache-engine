@@ -234,3 +234,15 @@ Alle drei Repo-Nullen (kon-quellen · owner-extrakte · journale nach Redaktion)
 
 **🔴 ROTATIONS-MELDUNG an den Owner:** der `ghp_`-Fund (GitHub-PAT, 40 Zeichen, in einem
 alten Workflow-Journal) war NICHT unter den sieben rotierten CI/CD-Variablen — Rotation pruefen.
+
+---
+
+## NACHTRAG 7 — WF5: die vier KON25-Explores (12.08.)
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_82a43408-b34.tar.gz` | WF5: 13 Agenten, 0 Fehler — E-F5 (Ziel 3 + Ist verletzt Entscheid) · E-F7 (Dossier-19-Phasen) · E-F9 (Gen-2-Plan, 2 Lücken) · E-F3b (6=Anordnung vs. 32=Belegung + Doppelbau) |
+
+Synthese (MIT Kopf — die Kompaktheits-Auflage wirkt) als `20260812-WF5-SYNTHESE-*`, Auswertung
+**KON29**. gitleaks no leaks found, Koeder laengengeprueft (20) -> leaks found: 1. Ernte-Ordner
+nachgezogen.

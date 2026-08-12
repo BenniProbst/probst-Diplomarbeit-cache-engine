@@ -1,0 +1,67 @@
+# WF5-SYNTHESE
+
+**Vier KON25-Explores (je 2 Schnitte + unabhängige Prüfung am Objekt), Stand 12.08.2026.** Alle Owner-Zitate sind roh im Transkript `5a19728e-f6e1-4736-a246-e3fda9ac35a1.jsonl` verifiziert (type=user, promptSource=typed), nicht nur aus dem Ledger übernommen. Ledger-Zeilennummern = heutiger Stand (Datei ist durch KON26/KON27 gewachsen; Anschluss-Suchen über Anker, nicht Zeilen).
+
+## 1. JE STRANG DIE ANTWORT
+
+### E-F5 — measure-drop-Ziel: ENTSCHIEDEN — Ziel (3); der ungefilterte Ist-Zustand ist NICHT gedeckt (belegt)
+**Der Entscheid selbst** (Transkript Z.43026, 2026-08-11T21:24:47.577Z, im letzten Kontext 41971–43298; abgeschnittene Vorstufe Z.43019, 21:15:54Z):
+> „Das cache-engine-experiment soll der Ausgabe Ort für die fertig kompilierte Diplomarbeit und explizit in der XML angeforderte Einzelnachweise sein. [...] Also geben wir nur die finale Zusammenfassung, Latex und PDF in den einstellbaren dritten Zielort cache-engine-experiment im Cluster_NFS an."
+
+Gelandet 5,5 Min. später als **KON13-04** (Commit 270ceff8, 21:30:16Z, Ancestor von development; Ledger aktuell Z.1957–1997): Ziel (2) Buildsystem-Cache = Binaries UND Messungen; Ziel (3) = NUR Zusammenfassung+LaTeX+PDF plus angeforderte Einzelnachweise, „NICHT: alle Messwerte".
+
+- **Ziel 2 oder 3?** Der Kanal (Ebene C, HTTPS-PUT über V80-Filterpod) bedient **Ziel (3)** — Route seit Verortungs-Brief 18.07. („Export auf Subpfad jailen cache-engine-experiment/", Z.87).
+- **Ungefiltert bis S-13 erlaubt?** **NEIN.** Gegenprobe über alle 31 getippten Owner-Nachrichten + queue-operations des letzten Kontexts: null Treffer für „bis S-13"/„übergangsweise"/„vorläufig". Der Code verletzt den Entscheid real: `cache_engine_builder_iterator.hpp:3089-3093` ruft `cfg.measurement_sink(rcsv, …)` UNBEDINGT je vorhandener result.csv; kein Filtermechanismus existiert (grep „Einzelnachweis|individuell angefordert" = 1 irrelevanter Kommentar). Die weite 18.07.-Planung wird per Owner-Konfliktregel „Neu schlägt grundsätzlich alte Aussage" (KON13-03) gestochen.
+- Der alte Kontext endete 18 s nach „Punkt 6: Bitte stelle jetzt alle noch offenen Rückfragen" (Z.43254/43255, 22:23Z) — die ZIEL-Frage war da schon beantwortet, nur die Routing-MECHANIK offen. Diese ist seit heute ebenfalls entschieden: **KON27-02** (F10, Ledger Z.71–93): „Option b. Das Element beschreibt konkret je ausgegebenes Format wohin das soll [...]". Rest = reine Bau-Arbeit S-13.
+
+### E-F7 — Stufe/Phase: Plan gefunden (Dossier 19 TEIL G); Trennung im Code 0 % begonnen (belegt)
+**Owner 12.08.** (Transkript Z.44275, 07:42:07.663Z = KON25-07, Ledger Z.365–385): „die Träger-Stufe ist die Binary und damit ein physisches Objekt und die Phase ist ein ganz anderes Konzept der CacheEngine Modi, welche über diese Träger-Stufen ausgeführt werden [...] Du hast das nicht sauber getrennt."
+
+**Fundort des Plans:** `docs/architektur/19_SCHICHTEN_FERTIGSTELLUNG_E4_E1_INTERFACE_VERTRAEGE.md:119-132` (TEIL G, User 09./10.07., bindend), Z.130: „Alle 4 Phasen der cache-engine (Mess- → Auswertungs- → Arbeits- → Hybrid-Modus) müssen erzeugt und in E4 [...] AUTOMATISCH dokumentiert werden" — die einzige Stelle im Bestand, die „Phase" wörtlich an die vier Betriebsmodi bindet. Revidiert KON16-09 (11.08., „Ja genau ein Synonym"). Nuance: das 06.08.-Klärungsdokument (Z.417–423) nannte „PHASE" die Kettenposition/den Träger-Typ — das ist die 12.08.-Bedeutung von STUFE, nicht von PHASE.
+
+**Kartierung (alle Stellen am Objekt bestätigt):**
+- FALSCH benannt → „Träger-Stufe": `batch_planner.hpp:92-101` (`type_phase_rank`, „Phasen-Ränge" über planer_block/ceb/tier), `bestandslog_document.hpp:117-121` (BatchTyp).
+- Bleibt „Phase" (Dossier-19-Modi): als Code-Bezeichner **0 Treffer** im ce-Baum (Gegenprobe: RunMethodology = 7 Dateien) — reiner Bau-Posten, kein Umbenennungs-Posten.
+- DRITTES Konzept, von der Owner-Zweiteilung NICHT erfasst: XSD `<phase merge="Stufe1_CeOnly|Stufe2_PrueflingReplace|Stufe3_FullJoin">` (experiment_schema.xsd:241-256), `MergeStrategy` (pruefling_merge.hpp:131-135); golden zeigt phase2→Stufe1, phase1→Stufe2 — nicht 1:1 (experiment_golden.xml:44-46).
+- Homonyme, unverändert lassen: §61-Modi-Leiter (RunMethodology, mess_achsen_naht.hpp:156-168), „PHASE 1/2"-ABI-Stempel, `phase=bau|pruef|mess`-CI-Marker, two_phase_valid, COMDARE_PHASE_B/E.
+
+mtime-Gegenprobe: keine Kandidaten-Datei am 12.08. angefasst — Umsetzung noch nicht begonnen.
+
+### E-F9 — Multi-Runner gegen das Lager: Plan real, Kern verdrahtet; die MESSUNG ist die echte Lücke (belegt)
+**Owner 12.08.** (Transkript Z.44275): „Ja klar bleibt er, das ist auch geplant wie das gegen das Lager gefahren wird mit multiplen gleichgestellten CI runnern und unterschiedlichen nodes im System - explore." → prod2 bleibt; KON3-02 (seit 17.07.) geschlossen; Kapazitätsrechnung zweilanig.
+
+**Zwei Plan-Generationen:** Gen 1 (§35/§36, 19.07.: statische CI-Matrix + Capability-Tags) ist DEPRECATED (RF-4, 27.07.; archiviert `ci/archive/perm-matrix-fallback.yml`, nicht eingebunden). Gen 2 gilt (§62/§62-B, 21.–23.07.): Bestandslog auf minio — „prod1 baut ALLES, was es kann, und prod2 baut ALLES, was es kann" (Ledger:14214); Claims à 4096, 30-min-Pro-forma → ETA=Σt_i/N_threads, Takeover bei ETA+50 %, Jobs O(Maschinen).
+
+**Code-Ist:** `bestandslog/` = 23 Header; reservation_lifecycle (kProFormaMinutes=30, kTakeoverFactor=1.5), ETA, Registration, planer_driven_build real per `#include` in BEIDEN Treibern (experiment_plan_director.hpp:55/60, cache_engine_builder_iterator.hpp:47-52); Takeover-Sweep produktiv (iterator:2123-2176, Test „jetzt PRODUKTIV"). ABER: **scharf erst seit 09.08.** (LAG-P1 — davor COMDARE_BESTANDSLOG in 0 von 2 aktiven YAMLs, Ledger:1685-1703; heute eingebunden in measure:smoke/:1864, measure:golden-320/:2075, planer:delegate/:2640). **Gleichverteilung** (`window_belongs_to`, n_machines/rank, batch_planner.hpp:78-81) ist gebaut+getestet, aber NICHT verdrahtet (0 Treffer in planer_driven_build.hpp) — Koordination läuft heute rein über Claim/Lock/Takeover. **Messung nicht zweilanig:** einziger Voll-Messjob measure:golden-320 global-exklusiv (`resource_group: ceb-measurement-exclusive`), hart tags:[prod,baremetal,amd], COMDARE_LANE="amd" (super/.gitlab-ci.yml:1813, 2038-2096) — widerspricht der §61-Revision (`ceb-measure-<host>`, 21.07.), bis heute nicht umgesetzt. PMC-Vendor-Lanes dagegen live (pmu-prod1/pmu-prod2, ce/.gitlab-ci.yml:229-244).
+
+**Korrekturen aus der Prüfung:** prod2 ist seit RMA (~10.07.) ein i9-12900K, nicht i9-14900KS (Ledger:10534-10568, lscpu Job 368969) — funktional folgenlos (beide ohne AVX512), Korrektur bewusst zurückgestellt. Der Concurrency-Widerspruch ist durch KON26-05 (12.08., Ledger:241-259) aufgelöst: nie eine 16-Kerne-Entscheidung, OD-7 sagt „24 WORKER"; Rest-Frage („Deckel 24 oder 16?") liegt als Rück-Vorlage beim Owner (:267). Kapazität: 524.288 Binaries = 128 Slices à 4096, zweilanig 64/Maschine → prod1 20,7 h, prod2 34,4 h (Engpass); einlanig ≈ 41,4 h (Ledger:16099-16101).
+
+### E-F3b — 32 vs. 6: verschiedene Dimensionen (Anordnung vs. Belegung); Ersetzen-oder-Koexistenz nur vom Owner entscheidbar (wahrscheinlich)
+**Die 6** = ANORDNUNG: `steuer_dock.hpp:229-241` (`Permutationen<Liste<Wallclock,Makro,Mikro>>`, static_assert anzahl==6); `konfiguration.hpp:32-38`: „3! = 6 ist eine Zahl über PERMUTATIONEN, nicht über Teilmengen (2^3 = 8, davon nicht-leer 7 — beides ist nicht 6)"; Ordnung=Identität (tag()-static_assert :263-270). Gebaut 09.08. (0d73d783), an keine Build-Kombinatorik angeschlossen (CebPermutationen: 0 Treffer außerhalb mess/ + Test).
+**Die 32** (KON25-03 heute, Ledger:302-334, Live-Selbstkorrektur „Stop, das war falsch von mir"): Tier(Micro×Macro an/aus=4) × Hybrid(4) × CEB(Wallclock an/aus=2) = **32** = reine BELEGUNG. 32/6 nicht ganzzahlig — anders als 12=6×2 (10.08.) kann die 6 in der 32 nicht als Faktor überleben.
+**Doppelbau-Fund:** seit 19./20.07. (Commits b5e64a51/571e1291) existiert ein zweites Subsystem derselben drei Namen mit AUSWAHL-Semantik: measurement_tooling_registry.hpp, plan_legend.hpp:71-92 (canonical_combo: reihenfolge-UNabhängig, „[all]"-Sentinel), mess_achsen_naht.hpp:216-219 (array<bool,3>), XSD `<combo tools=…>` (:275-287) — in 18 Dateien referenziert (gegen 3 für die 6), aber Fan-out „dormant bis S5/S6" (SCHEMA.md:46). BEIDE Subsysteme sind heute inert.
+**Chronologie-Korrektur (roh verifiziert):** 10.08. 07:27:43Z (Z.33224): „eigentlich sind es 12 [...] gegen die 6 CEBs getestet [...] Mein Fehler." — und am SELBEN Tag 12:40:23Z (Z.35912): „Es gibt 6 builds an CEBs wegen der 3 fakultät Mess-Layer Regelung von Wallclock/Macro/Micro für checkpoint_measure. [...]" Das letzte Vor-32-Owner-Wort war also wieder „6"; Ledger-W-3 (:5571-5583, „Seite B/12 ist neuer") kennt diese spätere Äußerung nicht. (Ein Schnitt-Nichtfund war Encoding-Falsch-Null: „fakultaet" statt „fakultät".)
+**Strukturargument** (Ableitung, KEINE Owner-Aussage): im 32er-Modell trägt die CEB nur Wallclock → `Permutationen<Liste<Wallclock>>::anzahl==1` (Gegenprobe schon im Code, steuer_dock.hpp:240) — die 6er-Maschinerie verlöre ihre Drei-Instrumente-Voraussetzung; spräche für Ersetzen, wäre aber laut OV-10 „ein Gate-Modell-Umbau im Identitätsfenster mit Bump-Folge" (Ledger:8352-8365).
+
+## 2. WAS ZU BAUEN / ZU KORRIGIEREN IST
+
+1. **S-13: Ziel-Filter in Ebene C** — den unbedingten per-Binary-Sink (`cache_engine_builder_iterator.hpp:3089-3093`) durch die Regel „nur Zusammenfassung/LaTeX/PDF + explizit angeforderte Einzelnachweise" ersetzen; Export-Element nach KON27-02 „Option b" ins XSD. Abhängigkeit: Entscheid komplett (KON13-04 + KON27-02); Welle W2, kritischer Pfad (KON27-04 Posten #18).
+2. **S-13-Unterbau: Drei-Ziele-Struktur in der XML** — den inerten `<storage>`-Slot (experiment_schema.xsd:662-680) erweitern, auf Bestand aufsetzen (Bestandslog-Genera binary|measurement, lager_ziel_strategie.hpp, Ebenen A/B/C) statt Parallelbau.
+3. **S-17: LagerBaumWriter verdrahten** — 0 Produktions-Aufrufer (skip_manifest.hpp:14-19); LB-0/LB-1 gebaut, braucht artifact_cache; letzter Schritt, kein Neubau. Abhängig von 2.
+4. **Messung zweilanig (§61)** — `resource_group` je Maschine + Intel-Gegenstück zu measure:golden-320 (super/.gitlab-ci.yml:1813, 2038-2096); §61-Entscheid liegt seit 21.07. vor; Wallclock-Abgabe-Lane bleibt plattformrein prod1 (§61-KONSOLIDIERUNG d). Vor der Kampagne.
+5. **window_belongs_to verdrahten ODER ausbuchen** — die §62-B-Gleichverteilungspflicht ist heute wirkungslos (batch_planner.hpp:78-81 → planer_driven_build.hpp: 0 Treffer). Design-Wahl vor der Kampagne klären.
+6. **Umbenennung Klasse A** „Phase"→„Träger-Stufe" (batch_planner.hpp:92-101, Bauplan-A2-Prosa) nach KON25-07 — heute kostenlos, ab 26.08. teuer (Memory: nie eine Flotte gebaut); Homonyme (Klasse D) und XSD-Merge (Punkt 3 unten) NICHT mit anfassen; erst laute Compile-Fehler, dann verschieben.
+7. **Ledger-Nachträge (nur Doku):** (a) W-3-Chronologie korrigieren (Z.35912 = 10.08. 12:40Z, NACH der 12); (b) E-F5/E-F7/E-F9/E-F3b von „EXPLORE offen" (KON25-11, KON26-06) auf erledigt; (c) Zeilendrift-Hinweis (KON13-04 jetzt ~Z.1957).
+8. **Kapazitätsrechnung 12-Perm** — 20,7/34,4 h gelten nur fürs 4-Perm-Profil (524.288); 12-Perm wäre asymmetrisch 1.572.864 prod1 / 1.048.576 prod2 (Ledger A2 ~21760-21769); Neuberechnung existiert nirgends. Blockiert durch B-4 (Owner).
+
+## 3. WAS OFFEN BLEIBT
+
+**Echte Owner-Fragen (durch Explore nicht auflösbar):**
+1. **F3b-Kern:** Ersetzt die 32 die 3!=6-Steuerdock-Maschinerie vollständig (Rückbau auf 1-Instrument = Gate-Modell-Umbau mit Stempel-Bump, OV-10 Ledger:8352-8365), oder gilt die 6 als eigene Ordnungs-Dimension daneben? Zusatz: bekommen Tier/Hybrid für ihre je 2 Instrumente eine Ordnungsfrage (2!) oder nur an/aus — und welches der zwei unverbundenen Mess-Subsysteme (Ordnung in mess/ vs. verdrahtete Auswahl in measurement_tooling_registry) wird fortgeführt? D-3 („6 vs. 8 vs. 4/5", Frist HEUTE, Ledger:9899-9905) ist von KON25-03 nicht wörtlich adressiert.
+2. **F7-Klasse C:** künftiger Name der XSD-Merge-„Phasen" (`Stufe1_CeOnly…`) — drittes Konzept; Umbenennung bricht Golden-/Schema-Byte-Identität. Dazu: „Stufe" bleibt doppelt belegt (§61-Modi-Leiter), und Dossier-19s „Messmodus" kollidiert beim künftigen Bau mit dem etablierten Build-Profil-Begriff COMDARE_MEASUREMENT_ON (Audit 20260716-e11:30).
+3. **F9-Deckel:** 24 (thread-orientiert) oder 16 (kern-orientiert) — präzisierte Rück-Vorlage liegt beim Owner (KON26-05/06).
+4. **B-4:** Bau-Menge (4 Kandidaten 131072/524288/1572864/2097152, heute reconfirmed offen, Ledger:622-623) — blockiert Posten 8.
+
+**Infra-Tatsachen (kein Design; aus den Repos nicht einsehbar):** Zeigt COMDARE_MEASUREMENT_DROP_URL live auf cache-engine-experiment/ (kein hartkodierter Produktionswert im Repo)? Ist COMDARE_STORAGE_CACHE=true als Pipeline-/Projektvariable gesetzt (im YAML nirgends zugewiesen)? Sind pve1/pve2/node3/node4/Odroid inzwischen online/getaggt (letzte Quelle 19.07.: offline)? Lief das Bestandslog je real unter Last zweier Maschinen (nur In-Memory-Tests belegt)?
+
+**Geschlossen:** E-F5 vollständig (Entscheid + Routing-Mechanik: KON13-04 + KON27-02), E-F7-Plan-Fundort, E-F9-prod2-Frage. Die vier Explore-Aufträge aus KON25-11 sind damit inhaltlich abgeschlossen; was bleibt, ist Bau (S-13/S-17/§61/Umbenennung) und die vier oben präzisierten Owner-Fragen.
