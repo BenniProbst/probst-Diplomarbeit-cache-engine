@@ -146,6 +146,38 @@ mit_daten() {         # $1 = Zieldatei, $2 = Anzahl Datenzeilen ; gibt 1. Token 
     echo "$_erster"
 }
 
+# ;-Schema-Fixtures (KON44-02 / D4d, F27/F28): der ECHTE measurements.csv-Kopf traegt ';' als
+# Trenner, n_ops/total_ns/ns_per_op sind die Felder 4/5/6 (ce cache_engine_builder_iterator.hpp:550).
+KOPF_SEMI='binary_id;setting;repetition;n_ops;total_ns;ns_per_op;quality_flag'
+
+mit_na_zeilen() {     # $1 = Zieldatei, $2 = Anzahl REINER n/a-Zeilen ; gibt 1. Token aus
+    mkdir -p "$(dirname "$1")"
+    printf '%s\n' "$KOPF_SEMI" > "$1"
+    _erster=''
+    _i=1
+    while [ "$_i" -le "$2" ]; do
+        _t=$(token)
+        [ -n "$_erster" ] || _erster="$_t"
+        printf 'perm-%s;lauf;%s;n/a;n/a;n/a;n/a\n' "$_t" "$_i" >> "$1"
+        _i=$((_i + 1))
+    done
+    echo "$_erster"
+}
+
+mit_echten_semi() {   # $1 = Zieldatei, $2 = Anzahl ECHTER ;-Zeilen ; gibt 1. Token aus
+    mkdir -p "$(dirname "$1")"
+    printf '%s\n' "$KOPF_SEMI" > "$1"
+    _erster=''
+    _i=1
+    while [ "$_i" -le "$2" ]; do
+        _t=$(token)
+        [ -n "$_erster" ] || _erster="$_t"
+        printf 'perm-%s;lauf;%s;%s;%s;12\n' "$_t" "$_i" "$((100 + _i))" "$((9000 + _i))" >> "$1"
+        _i=$((_i + 1))
+    done
+    echo "$_erster"
+}
+
 # --- Lauf ohne Pipe: rc=$? nach einer Pipe misst das LETZTE Glied -------------
 lauf() {              # $1 = Wurzel (oder __KEIN_ARG__), $2 = Mindest, $3 = Modus
     : > "$OUT"; : > "$ERR"
@@ -568,6 +600,38 @@ fordere_literal "$ERR" "0 CSV-Dateien"
 fall_ende
 
 # =============================================================================
+# F27/F28  KON44-02 / D4d (12.08.2026): EINE n/a-ZEILE IST KEIN MESSWERT.
+#     (Nummern F27/F28, NICHT F20/F21: F20/F21 sind seit D3-3b/D3-7b vergeben --
+#     Umbenennung statt UNION, exakt die Fall-Namen-Kollision, die der
+#     EINDEUTIGKEITS-RIEGEL unten dokumentiert.)
+#     Anlassfall am Objekt: der F1-Durchstich-Lauf (WF9-Beleg, MANUAL_RUN.md
+#     Abschnitt 8b) bestand diese Wache mit GENAU EINER Datenzeile aus
+#     n_ops=n/a;total_ns=n/a;ns_per_op=n/a (provisioniert, kein Messwert).
+# =============================================================================
+N_NA=$(wuerfel 1 4)
+fall "F27 ;-Kopf + $N_NA reine n/a-Zeile(n), modus=voll -> rc=1, Ausgabe nennt exakt $N_NA"
+D="$WERK/f27"; T27=$(mit_na_zeilen "$D/perm-0001/measurements.csv" "$N_NA")
+fordere_literal "$D/perm-0001/measurements.csv" "$T27"          # Koeder liegt wirklich in der Fixture
+fordere_literal "$D/perm-0001/measurements.csv" ";n/a;n/a;n/a"  # und ist wirklich eine n/a-Zeile
+lauf "$D" 1 voll
+fordere_rc 1
+fordere_literal "$OUT" "$N_NA n/a-/provisionierte Zeile(n)"
+fordere_literal "$OUT" "0 echte,"
+fordere_literal "$ERR" "n/a ist keine Daten-Aussage"
+fall_ende
+
+N_ECHT=$(wuerfel 1 4)
+fall "F28 Gegenprobe: $N_ECHT echte ;-Zeile(n), modus=voll -> rc=0 UND '0 n/a'"
+D="$WERK/f28"; T28=$(mit_echten_semi "$D/perm-0001/measurements.csv" "$N_ECHT")
+fordere_literal "$D/perm-0001/measurements.csv" "$T28"          # Koeder liegt wirklich in der Fixture
+lauf "$D" 1 voll
+fordere_rc 0
+fordere_literal "$OUT" "$N_ECHT echte, 0 n/a"
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+fordere_kein_literal "$ERR" "FEHLER"
+fall_ende
+
+# =============================================================================
 # F10 ABNAHME D3: das alte Praesenz-Muster ist aus .gitlab-ci.yml verschwunden.
 #     ZUERST der Koeder -- eine Null ohne beissenden Koeder ist keine Aussage,
 #     sondern ein moegliches Werkzeug-Versagen (ugrep + `$(` ohne -F).
@@ -704,8 +768,11 @@ echo "==========================================================================
 ORIG_ZEILEN=$(awk 'END{print NR}' "$WACHE")
 ORIG_EXITS=$(awk '/^[[:space:]]*exit 1$/{n++} END{print n+0}' "$WACHE")
 echo "  Wache: $ORIG_ZEILEN Zeilen, davon $ORIG_EXITS mit 'exit 1' (Nenner der Mutation)."
-if [ "$ORIG_EXITS" -ne 2 ]; then
-    echo "  ABBRUCH: erwartet wurden 2 'exit 1'-Zweige, gefunden $ORIG_EXITS." >&2
+# KON44-02 (12.08.2026): DREI rote Zweige -- (1) keine CSV, (2) Datenzeilen-Summe verfehlt,
+# (3) NEU: echte Zeilen verfehlt (n/a-/provisionierte zaehlen nicht, D4d). Der Nenner ist
+# mitgezogen; Zweig (3) wird von F27 getoetet (Mutant M3 unten).
+if [ "$ORIG_EXITS" -ne 3 ]; then
+    echo "  ABBRUCH: erwartet wurden 3 'exit 1'-Zweige, gefunden $ORIG_EXITS." >&2
     echo "           Die Wache hat sich strukturell geaendert -- die Mutation waere geraten." >&2
     exit 2
 fi
@@ -746,10 +813,14 @@ selbstbiss_fall() {   # $1 = Kurzname, $2 = Zweig, $3 = erwartete Zeilen-Differe
     fi
 }
 
-# M1 toetbar durch F1/F6 (Ausbeute-Zweig), M2 NUR durch F4 (Keine-CSV-Zweig).
-selbstbiss_fall "M1  ohne 'exit 1' im Keine-CSV-Zweig  (Zeile 87)"    1     1
-selbstbiss_fall "M2  ohne 'exit 1' im Ausbeute-Zweig   (Zeile 118)"   2     1
-selbstbiss_fall "M3  ohne beide 'exit 1'"                             beide 2
+# Zweig-Reihenfolge im Prüfling (Datei-Ordnung der 'exit 1'):
+#   1 = Keine-CSV        -- toetbar NUR durch F4 (Mindest=0; bei Mindest>=1 faengt Zweig 2 mit)
+#   2 = Datenzeilen-Summe -- toetbar durch F1/F6/F13
+#   3 = D4d echte Zeilen  -- KON44-02, toetbar NUR durch F27 (Summe reicht, echte nicht)
+selbstbiss_fall "M1  ohne 'exit 1' im Keine-CSV-Zweig"                1     1
+selbstbiss_fall "M2  ohne 'exit 1' im Summen-Zweig"                   2     1
+selbstbiss_fall "M3  ohne 'exit 1' im D4d-Echte-Zweig (KON44-02)"     3     1
+selbstbiss_fall "M4  ohne alle drei 'exit 1'"                         beide 3
 
 echo ""
 echo "============================================================================="

@@ -127,6 +127,23 @@
 #   Zeilen verworfen wurden. Ein zweiter Lesevorgang je Datei waere der falsche
 #   Preis dafuer.
 #
+#   EINE n/a-ZEILE IST KEIN MESSWERT (KON44-02 / D4d, 12.08.2026). Der Anlassfall
+#   am Objekt (WF9-Beleg, MANUAL_RUN.md Abschnitt 8b): der F1-Durchstich-Lauf
+#   hinterliess GENAU EINE Datenzeile -- mit n_ops=n/a, total_ns=n/a,
+#   ns_per_op=n/a (eine PROVISIONIERTE Zeile, provisioned=1, kein Messwert).
+#   Diese Wache meldete OK (1 Datenzeile); nur durchstich_wache frische fing den
+#   Lauf. Eine n/a-Zeile ist aber keine Daten-AUSSAGE -- sie sagt "hier fehlt der
+#   Wert", nicht "hier ist einer". Deshalb je CSV eine ZWEITE awk-Zaehlung
+#   (FS=';'): eine n/a-Zeile ist eine Datenzeile, deren Felder 4/5/6
+#   (n_ops/total_ns/ns_per_op laut Kopf, ce cache_engine_builder_iterator.hpp:550)
+#   alle drei woertlich "n/a" sind. Das geteilte PAAR-awk bleibt dabei BYTE-GLEICH
+#   zu ci/persist_sammler.sh und ci/frische_wache.sh -- die n/a-Zaehlung ist ein
+#   EIGENES, zweites Programm, kein Umbau des geteilten.
+#   URTEIL: modus=voll wird NEU rot, wenn die ECHTEN Zeilen (Datenzeilen minus
+#   n/a) die Mindestzahl verfehlen; die weichen Modi bleiben WARNUNG. Die alten
+#   Zweige (keine CSV / Datenzeilen-Summe) sind unveraendert -- die Heilung geht
+#   nur in die scharfe Richtung.
+#
 # POSIX-sh, ASCII-only, kein Python (Hausdoktrin: kein Python in der Buildchain).
 # =============================================================================
 
@@ -229,6 +246,7 @@ SUMME=0
 N_LEER=0
 N_MIT=0
 LEERZEILEN=0
+NA_SUMME=0
 while IFS= read -r F; do
     [ -n "$F" ] || continue
     # Ein Lesevorgang, zwei Zahlen: "<rohzeilen> <datenzeilen>". Das awk-Programm
@@ -236,6 +254,11 @@ while IFS= read -r F; do
     PAAR=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$F")
     ZEILEN=${PAAR%% *}
     DATEN=${PAAR##* }
+    # KON44-02 / D4d: ZWEITE Zaehlung, EIGENES Programm (das geteilte PAAR-awk oben bleibt byte-gleich).
+    # n/a-Zeile := Datenzeile, deren Felder 4/5/6 (n_ops/total_ns/ns_per_op laut Kopfzeile,
+    # ce cache_engine_builder_iterator.hpp:550) alle drei woertlich "n/a" sind -- eine provisionierte
+    # Zeile, keine Daten-Aussage.
+    NA=$(awk -F';' 'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$F")
     if [ "$ZEILEN" -gt 1 ]; then
         LEERZEILEN=$((LEERZEILEN + ZEILEN - 1 - DATEN))
     fi
@@ -244,16 +267,20 @@ while IFS= read -r F; do
         echo "  LEER   $F  ($ZEILEN Rohzeile(n), 0 Datenzeile(n) = Kopf, nichts oder nur Leerzeilen)"
     else
         N_MIT=$((N_MIT + 1))
-        echo "  DATEN  $F  ($DATEN Datenzeile(n) aus $ZEILEN Rohzeile(n))"
+        echo "  DATEN  $F  ($DATEN Datenzeile(n) aus $ZEILEN Rohzeile(n), davon $NA n/a)"
     fi
     SUMME=$((SUMME + DATEN))
+    NA_SUMME=$((NA_SUMME + NA))
 done < "$TMP"
+# KON44-02: ECHT = Datenzeilen ohne die n/a-/provisionierten -- nur sie sind eine Daten-Aussage.
+ECHT=$((SUMME - NA_SUMME))
 
 echo "-----------------------------------------------------------------------------"
 echo "NENNER (nie eine nackte Null):"
 echo "  $N_CSV measurements.csv gefunden."
 echo "  davon $N_MIT mit Datenzeilen, $N_LEER ohne (nur Kopfzeile oder leer)."
 echo "  $SUMME Datenzeile(n) insgesamt, gefordert waren mindestens $MINDEST."
+echo "  $ECHT echte, $NA_SUMME n/a-/provisionierte Zeile(n) (n_ops/total_ns/ns_per_op == n/a; KON44-02/D4d)."
 echo "  $LEERZEILEN Leerzeile(n) verworfen (leer oder nur Leerraum -- kein Messwert)."
 echo "-----------------------------------------------------------------------------"
 
@@ -302,6 +329,24 @@ if [ "$SUMME" -lt "$MINDEST" ]; then
     exit 0
 fi
 
+# KON44-02 / D4d (12.08.2026): die Datenzeilen-Summe reicht, aber die ECHTEN Zeilen nicht --
+# der n/a-Phantom-Fall. Eine n/a-Zeile ist keine Daten-Aussage; ein Lauf, der die Mindestzahl
+# nur mit provisionierten Zeilen erreicht, hat nicht gemessen. EIGENE Meldung (nicht die des
+# Summen-Zweigs): wer hier landet, hat Dateien UND Zeilen -- nur keine Werte. modus=voll ist
+# rot; die weichen Modi bleiben WARNUNG (sie messen per Bauart nicht, s. oben).
+if [ "$ECHT" -lt "$MINDEST" ]; then
+    echo "BEFUND: von $SUMME Datenzeile(n) sind nur $ECHT echte Messzeile(n); $NA_SUMME n/a-/provisionierte Zeile(n)."
+    if [ "$MODUS" = voll ]; then
+        echo "FEHLER: nur $ECHT echte Messzeile(n), gefordert waren mindestens $MINDEST --" >&2
+        echo "        $NA_SUMME n/a-/provisionierte Zeile(n) zaehlen NICHT (D4d: n/a ist keine Daten-Aussage)." >&2
+        echo "        Eine provisionierte Zeile ist KEIN Messwert. Der Lauf gilt als gescheitert." >&2
+        echo "        (modus=voll -- dieser Lauf SOLLTE messen.)" >&2
+        exit 1
+    fi
+    echo "WARNUNG: modus=$MODUS -- $ECHT echte Messzeile(n), $NA_SUMME n/a-/provisionierte."
+    echo "         In diesem Modus ist die echte Messzeile nicht das Erfolgsmass; der Befund bleibt sichtbar."
+fi
+
 # Teil-Ausbeute ist kein Abbruch, aber sie muss SICHTBAR sein: eine leere CSV
 # neben vollen ist ein echter Befund (ein Pruefling hat nichts geliefert) und
 # darf nicht in einer Erfolgsmeldung verschwinden. Der Owner-KERN dazu lautet:
@@ -312,5 +357,5 @@ if [ "$N_LEER" -gt 0 ]; then
     echo "         Das ist ein Befund, kein Rauschen -- er gehoert in die Auswertung."
 fi
 
-echo "MESS-AUSBEUTE-WACHE: OK ($SUMME Datenzeile(n) aus $N_MIT von $N_CSV Datei(en))."
+echo "MESS-AUSBEUTE-WACHE: OK ($ECHT echte, $NA_SUMME n/a-/provisionierte Datenzeile(n) aus $N_MIT von $N_CSV Datei(en))."
 exit 0

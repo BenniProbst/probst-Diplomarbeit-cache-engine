@@ -301,6 +301,39 @@ fängt das ab; `mess_ausbeute_wache` und `frische_wache` melden **OK**. Ohne die
 Zeile voller `n/a` bis in die Thesis-PDF. Bis der Stempel-Befund behoben ist (S-6-Fenster), liefert der
 Durchstich **keinen** frischen Messwert.
 
+### STAND 12.08.2026 (abends) — BEHOBEN: die Messung trägt (KON47-01/Option a)
+
+*Der Block darüber bleibt als Historie stehen; sein Schluss-Satz ist überholt: der Owner hat den
+Stempel-Fix per KON47-01/Option a **vor** das S-6-Fenster gezogen (OWNER>PLAN — geändert wird nur der
+**Wert** des Mess-Glieds, nie die Glieder-Ordnung; die S-6-Sperre bleibt unberührt).*
+
+Fix in ce (Branch `bau/strang-c-f1-katalog-emitter`): der Katalog-Emitter reicht die Mess-Zeile des
+Laufs durch — `build_pilot_source_map`/`make_catalog_source_gen`/`generated_make_catalog_source_gen`
+(+ alle 18 Sweep-Zweige und per-K) tragen `measurement_stamp` (Default `{}` = 2-arg, Alt-Aufrufer
+byte-identisch); `profile_run_entry` löst `live_mess_zeile` **vor** der ersten gestempelten Quelle auf
+und speist Katalog + Sweeps + SOTA + Prüfdock-SOLL aus **einem** benannten Objekt. Neue ce-Wache (g)
+in `test_lazy_adhoc_source_gen` (Katalog==lazy modulo Index-Zeile, `_M`-Vollform, gewürfelter Köder
+beidseitig). Neue super-Wachenschärfe (KON44-02/D4d): `mess_ausbeute_wache` zählt je CSV zweitens die
+n/a-/provisionierten Zeilen (Felder 4/5/6 == `n/a`) und ist bei `modus=voll` **rot**, wenn die
+**echten** Zeilen die Mindestzahl verfehlen (Bissproben F27/F28; F20/F21 waren vergeben).
+
+Lokal gefahren (Sequenz `.gitlab-ci.yml:1936-1965`, Env exakt wie `measure:smoke`, COMBO ungesetzt):
+
+- **Treiber Exit 0:** `RUN_PROFILE fertig: basis_rows=1 sota_rows=0 (basis_ids=1 sota_ids=0)
+  measured=1 resumed=0 provisioned=1 csv_ok=1`
+- **`durchstich_wache frische`:** `OK (1 real gemessen, 0 resumiert).`
+- **gehärtete `mess_ausbeute_wache`:** `OK (1 echte, 0 n/a-/provisionierte Datenzeile(n) aus 1 von 1
+  Datei(en)).`
+- **Echte Werte** in der einen Datenzeile: `n_ops=10000`, `total_ns=6440197`, `ns_per_op=644.020`;
+  `deklaration_leer` kommt in beiden Lauf-Logs **0**-mal vor. Die emittierte `perm.cpp` derselben
+  basis-320-Zelle trägt jetzt die **3-arg `_M`-Vollform** (vorher 2-arg, s. Block darüber) — die
+  Preimage-Wirkung (sha512_line/Sidecars der Basis-320-/Sweep-/per-K-Zellen) ist **gewollt**
+  (KON47-01 „heute kostenlos“), **kein** `fingerprint_format`-Bump.
+- **Lese-Hinweis:** ein grep nach `;n/a;n/a;n/a;` über die ganze Zeile trifft **eine** Stelle — das
+  sind die by-design-n/a-Endspalten (`alloc_bytes_in_use_peak`/`alloc_*_frag_milli`,
+  Klasse C, plus nicht erhobene PMC-Spalten wie `pmc_cache_misses_l2/l3`), **nicht** die Messfelder
+  4–6. Die feldgenaue Prüfung (Felder 4/5/6) ist genau die neue Wachen-Zählung.
+
 ## 9. Exit-Codes + Troubleshooting
 
 | Code | Bedeutung |
