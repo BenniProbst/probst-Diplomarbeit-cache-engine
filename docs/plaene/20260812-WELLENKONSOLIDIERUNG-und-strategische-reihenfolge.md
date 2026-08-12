@@ -240,7 +240,7 @@ LEGENDE: [P]=vor F2 · [M]=vor Trigger · [W]=vor Gegenstand (Wellenplan:1335-13
 | # | Frage (1 Satz) | Empfehlung | Frist | blockiert |
 |---|---|---|---|---|
 | OF-1 | KON34-06(d): trägt der System-B-Doppelbau 17 oder 18 Dateien? | 17 als Arbeitshypothese; Zählung am Objekt liegt bei | Mi 19.08. | #24/B4-Umfang (W2) |
-| OF-2 | KON34-06(a): bestätigst du „32 Docks = 32 Mess-Permutationen" als Festlegung — im KON37-03-Modell: 32 = Belegungs-Maximum aus 5 Schaltern, je Stufe ein Subset der 3, Dock-ORDNUNG = statische Anordnungs-Freigabe (Adressierung), KEINE Nenner-Dimension? | bestätigen | Fr 21.08. | #7/S-19-Nenner + E-F3b (32-vs-6) |
+| OF-2 | ~~KON34-06(a): bestätigst du „32 Docks = 32 Mess-Permutationen" als Festlegung …~~ **KORRIGIERT 12.08. (KON41-03, Owner: „VÖLLIG FALSCH"):** Prüfdocks ≠ Permutationen — zwei verschiedene Größen, beide zufällig mit 32 geschätzt; Permutations-Schichten-Größen bestimmt NUR die Simulation. **OF-2-neu** (entwirrt): *Bestätigst du die 32 als strukturelles MAXIMUM allein der MESS-BELEGUNGEN (2^5 Schalter, KON25-03) — reale Forderung je XML/Planer, Größen der Permutations-Schichten ausschließlich aus S-19, Hybrid-Dock-Zahl (≤32) davon unabhängig?* | bestätigen | Fr 21.08. | #7/S-19-Nenner |
 | OF-3 | O-5/K1: welche Lager-Identität trägt die Hybrid-`.so` (Stempel-/Pfad-Schema im Binaries-Baum)? | wie Tier-Binary, mit Genus-Anteil `FunctionInterfaceReroute` + Karten-Verweis | Fr 21.08. | S-15-Einsortierung + Binaries-Kaskade (W3) |
 | OF-4 | O-4-Rest: wird Festplatten-IO ein NEUER additiver OrganMetaMetaAxis-Typ oder trägt der Bestand (T12/T17) die Verwandtschaft schon? | Bestand prüfen lassen, nur bei Lücke neuer Typ | F3 Fr 28.08. | W3-Bauumfang |
 
