@@ -294,3 +294,14 @@ gitleaks no leaks found; Koeder laengengeprueft (20) -> leaks found: 1.
 - WF10-Heilung: erster E-WARMUP-Agent starb am Kontext-Ueberlauf (572 K Transkript, kein
   result); Resume wjh71oern mit zweigeteiltem Warmup (fable max, Kontext-Disziplin) —
   Rohdaten kommen mit dem WF10-Abschluss-Tar.
+
+## Nachtrag 12.08.2026 — WF10 geheilt + Landungen + 289-Rotation
+
+- `lauf-wf_46baecd5-wf10-drei-explores-geheilt.tar.gz` (1,0 M): alle Agenten inkl. des am
+  Kontext-Ueberlauf gestorbenen ersten Warmup-Agenten + die zwei Heilungs-Schnitte (fable max).
+- `kon-quellen/ledger-nachtrag-kon45.md` + `kon45 via wf10-synthese-vollergebnis.json` +
+  `ledger-nachtrag-kon46.md`.
+- Landungen: ce 9bb664d6 (516c05a0-Merge) · super e22f1300 (ac2afddd-Merge) — beide Remotes,
+  gitleaks koeder-gedeckt, Diff-Hygiene gruen.
+- 289-Token rotiert (comdare-thesis-writeback-r20260812, id=97); Fehleintraege vorher per
+  API-Verifikation erkannt und geloescht; Kopie 0600 in /home/comdare/keys/.
