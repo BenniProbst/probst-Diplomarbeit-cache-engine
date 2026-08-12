@@ -16,6 +16,72 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 12.08.2026 — KON50: DIE PLANER↔CEB-NAHT — FLÄCHE 1 = CONTROL-INTERFACE (STREAM IN/OUT), FLÄCHE 2 = STEMPEL, RÜCKWEG NUR STATUS+TRACE
+
+**Owner verbatim 12.08.2026:**
+
+> *„wir hatten ja am Beispiel der CEB gesagt, dass diese zum Tier-Binary über mehrere Flächen
+> kommuniziert und dass Fläche 2 das Stempel Interface ist. Das ist zwischen Planer und CEB
+> ähnlich: die **CEB hat auf Fläche 1 ein control interface**, auf dem über einen **stream in und
+> einen st[r]eam out interne Prozess-Nachrichten** übermittelt werden, also der **Planer schickt
+> seine erkannten Anforderungen an die CEB, diese führt sie aus und schickt
+> Statusmeldungen/Nachrichten an den Planer zurück, wie diese durchgeführt wurden
+> erfolgreich/nicht erfolgreich zusammen mit einem log-Message warum etwas gescheitert ist**.
+> **Fläche 2 der CEB ist auch hier das Stempel interface.** Weil die **CEB misst und die Daten
+> Verarbeitet, schickt sie dem Planer nur die Ergebnisse ihrer arbeit als Trace für die
+> Kommandozeile für den Nutzer zurück, damit er sieht was geschieht**."*
+
+---
+
+### KON50-01 — DIE FESTLEGUNG
+
+    DIE PLANER<->CEB-NAHT (dieselbe Flaechen-Schablone wie CEB<->Tier):
+      FLAECHE 1  CONTROL-INTERFACE der CEB -- stream in / stream out,
+                 interne Prozess-Nachrichten:
+                   HINAB   Planer -> CEB: die ERKANNTEN ANFORDERUNGEN (CEB fuehrt aus)
+                   HINAUF  CEB -> Planer: STATUS je Anforderung
+                           (erfolgreich / nicht erfolgreich) + LOG-MESSAGE, WARUM
+                           etwas gescheitert ist
+      FLAECHE 2  DER STEMPEL (Identitaet) -- wie auf jeder Naht
+      RUECKWEG-GRENZE: die CEB MISST und VERARBEITET selbst; an den Planer geht
+                 NUR der ERGEBNIS-TRACE fuer die KOMMANDOZEILE (Nutzer-Sicht,
+                 "damit er sieht was geschieht") -- KEINE Mess-Rohdaten.
+
+### KON50-02 — EINORDNUNG GEGEN DEN BESTAND (bestätigt · präzisiert · Grenzen)
+
+    BESTAETIGT:  KON7-01 (Flaeche 1 = "Vertrag zum Planer", Flaeche 2 = Stempel auf
+                 JEDEM Traeger -- die Schablone gilt JE NAHT) · KON16-03 ("Pipe oder
+                 Prozess" = das Stream-Paar; Emission und Steuerung sind EINE Naht) ·
+                 KON10-04/§38 (Nutzlast hinab = serialisierter Teilbaum als Ranges;
+                 Rueckkanal sparse, "KEIN Mess-Daten-Rueckfluss" -- heute von der
+                 anderen Seite bestaetigt) · KON17-01 (anforderungsgetrieben: die
+                 "erkannten Anforderungen" reisen ueber stream in) · KON16-05
+                 (super/Planer = Anwender-Sicht; der Trace bedient sie).
+    PRAEZISIERT: der §38-Rueckkanal traegt DREI Nachrichtenklassen, nicht eine:
+                 (i) Fortschritts-Deltas (Cursor, Mixed-Radix) · (ii) STATUS je
+                 Anforderung erfolgreich/nicht + Fehler-LOG (neu, owner-gesetzt;
+                 Konsumenten: T-15b-Retry-Klammer, failed-Doktrin OV-16-Klasse;
+                 Form: benannte Fehlerklassen nach mess_konsistenz_gate-Muster) ·
+                 (iii) ERGEBNIS-TRACE fuer den Nutzer (IST-Keim: die
+                 [TESTAT]-Fortschrittszeilen). KON47-02-Analogie: der Planer fragt
+                 die CEB-Identitaet ueber Flaeche 2 ab wie die CEB die Tier-Stempel
+                 am Hybrid-Init-Cache.
+    GRENZEN (nichts hineinlesen): KEINE Aussage zu einer Flaeche 3 dieser Naht ·
+                 KEINE IPC-Technik-Festlegung (anonyme Pipes an posix_spawnp im
+                 BuildOrchestrator sind der Bestands-Kandidat -- Explore beim Bau) ·
+                 ob der Trace als dritte Klasse IM stream out oder als eigener
+                 Kanal faehrt = Design-Entscheid bei S-9/S-10, KEINE Owner-Frage.
+
+### KON50-03 — BAU-WIRKUNG (Strecke; keine neue Owner-Frage)
+
+    S-10  bekommt seinen RAHMEN: das Control-Interface traegt Ranges hinab und
+          Deltas+Status+Log hinauf -- S-10 baut die Nutzlast IN diese Naht.
+    S-9 / S-12  emittieren gegen diese Naht (Prozess + Streams statt YAML).
+    B4    beim System-B-Umstellen per Explore klaeren: ist der SteuerDock-Bestand
+          ein KEIM dieses Control-Interfaces oder ein ANDERER "Steuer"-Gegenstand
+          (Zell-Steuerung)? Gegenstand vor Name -- nicht am Wort "Steuer" kleben.
+    T-15b konsumiert den Status-Kanal (failed + Log) -- Baubezug notiert.
+    S-13  bleibt GETRENNT: Export/Lager ist der Daten-Weg, der Trace ist NUR Sicht.
 ## NACHTRAG 12.08.2026 — KON49: WF11 — DREI AGENTEN-TODE AM API-OVERLOAD, EINE VOREILIGE WORKTREE-LÖSCHUNG, UND WAS DIE BESTANDSAUFNAHME ERGAB
 
 **WF11 (`wf_d826aca8`) kam mit 9 von 12 Agenten zurück: die DREI BAU-Agenten starben an einem
