@@ -16,6 +16,52 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 13.08.2026 -- KON59: KORREKTUR admit_organ_on_machine ("NUR AUS TESTS" WAR FALSCH) + A2.5-VORMERKUNGEN
+
+**Bau-Stufe 1 der Ultracode-Nachimplementierung (Task #40). Bilanz der Vollstaendigkeits-
+pruefung als Kopf: 538 Erledigt-Behauptungen (11.-13.08.) am Objekt geprueft -- 311 halten
+voll (58 Prozent), 190 teilweise, 19 hart gefallen, 18 gegenstandslos. Rohdaten:
+docs/sessions/backups/20260813-luecken-und-vollstaendigkeit/ (8 Task-Outputs).**
+
+---
+
+### KON59-01 -- KORREKTUR (NE-18): admit_organ_on_machine PRODUKTIV GERUFEN -- "VORHANDEN, ABER INERT", NICHT TESTONLY
+
+    FALSCH (Buchungs-Grundlage von KON45-02): "admit_organ_on_machine wird NUR aus
+      Tests gerufen -- kein Produktionspfad."
+    AM OBJEKT (13.08. selbst nachgemessen, ce nur lesend):
+      build_orchestrator.hpp:761 ruft admit_organ_on_machine PRODUKTIV in der
+      CEB-Bau-Delegation (Section 40.a-E4, flag-genaues Bau-Gate am Pruef-Dock),
+      seit 19.07. (ce 6d65b0e6 "volle Live-Naht ... 3 Inertness-Beweise im Test").
+      INERT nur, weil heute ALLE Organe leere required-Mengen deklarieren:
+      aggregate_required_for_axes(spec.axes) liefert leer -> Zulassung trivial ->
+      keine Wirkung (byte-/golden-neutral). Wer ein required-Flag deklariert,
+      aktiviert das Gate OHNE weiteren Bau.
+    KORREKTUR: "vorhanden, aber inert" ersetzt "kein Produktionspfad". Fehlerklasse
+      A2.2 (nach dem KONSUMENTEN gesucht statt nach dem GEGENSTAND). Die OF-4-Antwort
+      (Comp-Gate-Schicht) stuetzte sich auf die falsche Messung; ob ihre Folgerung
+      haelt, prueft die C-3a-Owner-Vorlage (136a1798, Frist Mi 19.08.) -- hier ist
+      nur die MESSUNG korrigiert, nicht der Entscheid vorweggenommen.
+
+### KON59-02 -- VORMERKUNGEN: NE-20-TRIAGE (STUFE 2) + ZWEI ce-POSTEN NACH DER WELLEN-LANDUNG
+
+    NE-20 allow_failure-TRIAGE (PLATZHALTER, Ergebnis liefert Stufe 2 dieses Laufs):
+      3 aktive allow_failure:true am Baum (ce .gitlab-ci.yml :257 arm64-smoke und
+      :898 relock-manual; super .gitlab-ci.yml :2751 ergebnis:holen) stehen gegen
+      die Doktrin "allow_failure VERBOTEN" (06.07.; ZELLE=Warnung, JOB=rot) --
+      je Stelle deklarieren oder entfernen; der Stufe-2-Nachtrag traegt das Urteil.
+    ce-POSTEN, FAELLIG NACH DER LAUFENDEN WELLEN-LANDUNG (ce ist bis dahin
+    schreibgesperrt; beide aus der Vollstaendigkeitspruefung):
+      NE-16  test_t6_wachen_inventar.cpp kennt den S-14a-CI-Job nicht (der Kombibau
+             blieb trotzdem gruen) -- Inventar-Nenner bestimmen, VOR der naechsten
+             neuen Wache, sonst ist sie wieder unbewacht.
+      NE-10  S-3/S-7-Aktivierung: "beide Seiten gebaut UND inert" je Seite mit zwei
+             Zahlen belegen (existiert + Nenner); bvset_ist_teilmenge hat 2
+             PRODUKTIONS-Treffer im build_orchestrator -- "inert" ist teilwiderlegt,
+             vor der Aktivierung nachmessen (dieselbe Klasse wie KON59-01).
+
+---
+
 ## NACHTRAG 13.08.2026 — KON58: DER RIEGEL STEHT UND BEWACHT DIE RICHTIGE MENGE — S-14a MIT ZWEI PFLICHT-FIXUPS (158 → 718 RECORDS), S-3 GEBAUT, VIER ARBEITSWEISE-FASSUNGEN, UND DER LEDGER KANNTE DEN TAG NICHT
 
 **Der Hauptstrang-Tag nach der KON57-Landung: vier Explores (Fable 5 max) und zwei Bau-Stränge
