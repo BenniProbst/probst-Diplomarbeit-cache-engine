@@ -139,7 +139,16 @@ riss() { RC=1; echo "  [RISS] $1"; }
 
 # --- R3: Nenner zuerst --------------------------------------------------------
 BESTAND="$WERK/bestand"
-find "$TESTS_DIR" -maxdepth 1 -type f -name '*.sh' | sort > "$BESTAND"
+# NE-19a (13.08.2026): vorher 'find | sort > BESTAND'. Ein find-TEILTOD (N Zeilen geliefert,
+# dann rc!=0) liess sort mit rc=0 enden und einen TEIL-Bestand stehen: R1 prueft dann nur die
+# gelieferte Teilmenge, der Rest ist still unbewacht (der Nenner-0-Abbruch unten greift nur
+# beim Totalverlust). dash als /bin/sh kennt weder pipefail noch PIPESTATUS (gemessen 13.08.:
+# rc=2, dash 0.5.12-6ubuntu5); Hausform: jede Stufe in eine Datei, jede Stufe ihr eigener $?.
+find "$TESTS_DIR" -maxdepth 1 -type f -name '*.sh' > "$WERK/bestand_roh" \
+    || { echo "ABBRUCH: find ueber '$TESTS_DIR' fehlgeschlagen (rc=$?) -- der Bestand waere" >&2
+         echo "         unvollstaendig, und R1 pruefte eine Teilmenge als Ganzes." >&2; exit 2; }
+sort "$WERK/bestand_roh" > "$BESTAND" \
+    || { echo "ABBRUCH: sort des Proben-Bestands fehlgeschlagen (rc=$?)." >&2; exit 2; }
 N_BESTAND=$(awk 'END{print NR+0}' "$BESTAND")
 echo "  R3 Bestand: $N_BESTAND Datei(en) unter $TESTS_DIR (Muster '*.sh', maxdepth 1)."
 if [ "$N_BESTAND" -lt 1 ]; then

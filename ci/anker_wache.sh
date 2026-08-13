@@ -70,9 +70,18 @@ for _dok in $DOKUMENTE; do
     [ -f "$_dok" ] || { echo "ABBRUCH: Dokument '$_dok' fehlt." >&2; exit 2; }
     echo "  Dokument: $_dok"
     # '>' am Zeilenanfang abstreifen, damit der Anker auch in einem Markdown-Zitat steht.
-    sed 's/^[[:space:]]*>[[:space:]]*//' "$_dok" \
-        | awk -v d="$_dok" '$1 == "ANKER-SYMBOL" && NF >= 4 { print d "\t" $2 "\t" $3 "\t" $4 }' \
-        >> "$TMP/anker.txt" || true
+    # NE-19a (13.08.2026): vorher stand hier 'sed | awk >> ... || true'. Starb sed fuer EIN
+    # Dokument, waehrend ein anderes Anker lieferte, fehlten dessen Anker STILL im Bestand --
+    # Teilverlust ohne rote Zeile (der Nenner-0-Abbruch unten greift nur beim Totalverlust).
+    # dash als /bin/sh kennt weder pipefail noch PIPESTATUS (gemessen 13.08.: rc=2, dash
+    # 0.5.12-6ubuntu5); die Hausform (Kopf ci_diff_ascii_width_guard.sh) ist je Stufe eine
+    # Datei und ein EIGENER, LAUTER Abbruch.
+    sed 's/^[[:space:]]*>[[:space:]]*//' "$_dok" > "$TMP/dok_flach.txt" \
+        || { echo "ABBRUCH: sed konnte '$_dok' nicht verarbeiten (rc=$?) -- Anker-Bestand waere" >&2
+             echo "         unvollstaendig, KEIN stilles Weiterlaufen." >&2; exit 2; }
+    awk -v d="$_dok" '$1 == "ANKER-SYMBOL" && NF >= 4 { print d "\t" $2 "\t" $3 "\t" $4 }' \
+        "$TMP/dok_flach.txt" >> "$TMP/anker.txt" \
+        || { echo "ABBRUCH: awk-Anker-Extraktion fuer '$_dok' fehlgeschlagen (rc=$?)." >&2; exit 2; }
 done
 
 N_ANKER=$(awk 'END{print NR+0}' "$TMP/anker.txt")
