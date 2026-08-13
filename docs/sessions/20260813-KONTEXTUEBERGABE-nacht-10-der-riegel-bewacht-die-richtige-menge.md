@@ -115,3 +115,43 @@ pre-secret-scrub-20260802 (nach A-1 verbucht, nichts gelöscht).
     Länge assertieren, rc OHNE Pipe · AskUserQuestion nie · kein git add -A ·
     CI-Pipelines nie canceln · Owner-Regeln 13.08.: Lücken sind IMMER Pflicht, auch aus
     Workflow-Feldern · A2.5-FIX-Stufe nach jedem Verify · Fable 5 max überall bis Widerruf.
+
+---
+
+## §8 NACHTRAG (gleicher Kontext, nach Abfassung — ÜBERSCHREIBT §3/§6, wo sie kollidieren)
+
+1. **super-Pushes GELANDET**: die drei „warten auf Sammel-Push"-Commits + diese Übergabe
+   (6c4cc130) sind auf BEIDEN Remotes; Pipelines **15783 + 15784 SUCCESS**. Der zweite Push
+   war eine deklarierte R4-Abweichung (Owner-Order „Kontext endet"; im Commit begründet).
+2. **`wgrkst273` FERTIG — die Welle IST gelandet**: P1-Merge 4c37116a → P11-Merge b91b22fc
+   (Auto-Union, 0 Löschungen beidseitig) → Floor-Neumessung **5f3f26a5 = 489/485/483**
+   (+1 je Sprosse = Tripwire-Test, belegt) → J-Kette 8/8 → ctest **488/488** → Tripwire
+   einzeln GRÜN → Gates → EIN Push, beide Remotes == 5f3f26a5. **CI 15785 lief bei
+   Abfassung** (Monitor bg3eh7v9i mit Lebendprobe scharf). Lock-Regen **ENTLASTET**:
+   S-3-Dateien liegen NICHT im Overlay-Schnitt (Lock byte-identisch, sha256 == Fixup-3-
+   Referenz). 🔴 **Folge-Auflage an P2/S-7: der Echtfall-Beweis des Riegels (ROT am
+   Echtbaum → Regen → GRÜN) steht weiter aus** — der erste Overlay-berührende Bau erbringt
+   ihn und protokolliert ihn. clang-22/Debug für den GESAMTstand erbringt erst die CI
+   (lokal lief gcc-15 Release; je Paket liegen 4×485/4×486 vor).
+3. **`wuwemnde5` FERTIG — F1_NICHT_BELEGT, zweischichtig**: (a) anhang:forward lief nie
+   (COMDARE_ANHANG_FORWARD fehlte in 15764 — nichts kaputt, nie gefahren). (b) 🔴 NEU:
+   die Kette ist derzeit NICHT landbar — **diagram_generator REV 7.6 (M08) emittiert für
+   1×1-Flächen `matrix plot*` mit EINER Koordinate → pgfplots FATAL** (4/64 Dateien:
+   de+en × lc_surface_ns_per_op, lc_surface_op_lookup_p50_ns); PDF-Gate verweigerte
+   korrekt, Testlauf AF_NO_PUSH rollte exakt zurück (64/64), Baseline 863170f baut rc=0.
+   → **Fix-Workflow `w3dbgrmvq` läuft** (Explore→Bau T-1-rot-zuerst→A2.5; Worktree
+   wt-ce-f1-diagram ab 5f3f26a5, KEIN Push bis 15785 terminal). Weitere Pflichten daraus:
+   **CI-Gate-Lücke** — AF_PDF_GATE=auto prüft ohne TeX NICHTS auf dem baremetal-Runner ⇒
+   COMDARE_TEXLIVE_AVAILABLE=true für den Kanal-Job setzen (super-Commit, fährt mit dem
+   Bump-Push) · **Zahlen-Korrektur**: der echte 376333-Wert ist **ns_per_op=1199.047**
+   (n_ops=10000); die in NE-01 zitierte 644.020 gehört NICHT zu diesem Job (4 Treffer in
+   den Ultracode-Rohdaten — bei KON59-Prüfung korrigieren, bevor sie weiterzitiert wird) ·
+   danach Kanal-ECHTLAUF (neue Messung, COMDARE_DURCHSTICH+COMDARE_ANHANG_FORWARD=true,
+   Writeback-Token Projekt 289 rotiert 12.08., lokal verifiziert HTTP 403 = auth ohne
+   API-Scope) + 288-Gitlink-Bump BEIDER Zeiger + E-18-SNAP.
+4. **API-Host-Falle**: GitLab-API = `https://gitlab.comdare.local/api/v4` (aus dem Remote
+   gelesen — `.de` war geraten und gab 404; Host NIE raten, immer `git remote get-url`).
+5. **Nächste Schritte dieses Kontexts**: 15785 terminal grün → **Gitlink-Bump 8. Zug auf
+   5f3f26a5 + PZW-Fußnote (Floor 489/485/483, Merge-SHAs 4c37116a/b91b22fc) ATOMAR** +
+   TEXLIVE-Gate-Commit im selben Push → Tasks #4/#33 completed → w3dbgrmvq-Landung seriell
+   → F1-Echtlauf. Worktrees wt-ce-mess-ordnung/wt-ce-golden-s14a stehen (P2 nutzt ersteren).
