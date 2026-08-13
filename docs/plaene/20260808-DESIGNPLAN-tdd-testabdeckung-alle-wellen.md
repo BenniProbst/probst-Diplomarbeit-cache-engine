@@ -445,3 +445,20 @@ Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-w
 **D-5 — xlsx-Nenner** (§2/K7 „null Aufrufer"): KON4-07/R1+KON36-02/H: **8 von 9** `thesis_profiles` xlsx-blind — Kampagnen-Blocker; fehlender T-3-Klasse-Posten mit Profil-Nenner. Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum.
 **D-6 — PMC-Vertragsfolge ungetestet**: PMC = Meta-Meta-Achse, AMD/Intel = zwei Komponenten (KON8-12); CI fährt PMC ohne Vendor (WARNING, KON34-02). MT-L11 misst nur Injektion — CEB→Tier-CT-Vertragsanpassung ohne Posten.
 **Summen-Regel:** 117/386 h werden NICHT angefasst, bis die S-Strecke durchgezählt ist — sonst derselbe T-3-Fehler, den §9 korrigiert.
+
+---
+
+## 11. NACHTRAG — TESTRELEVANTE NEUERUNGEN KON39–KON57 (13.08.2026)
+
+**Status (KON19-00, A2.5-Fix NE-21):** Fortschreibung von §10 nach §9/§10-Muster; der TDD-Vertrag §3 (T-1…T-9) kannte die folgenden drei Klassen noch nicht. Nichts gelöscht, nichts an den Summen. Fakten-Quelle: Ledger KON47-04, KON55, KON57. **Als GEZÄHLTE Posten-Liste (3 neue Testklassen), noch NICHT in den 117er-Katalog eingerechnet** — dieselbe Summen-Regel wie §10/D-4 (erst nach dem Durchzählen der S-Strecke).
+
+**T-11a — WARMUP-PAAR-PFLICHTTEST** (KON47-04, Owner: „Pflicht für die Forschung, muss getestet sein"): der Warmup ist ein **PAAR** (Lauf 1 messen+VERWERFEN, Lauf 2 messen+SPEICHERN), **×3 Wiederholungen = 6 Läufe, 3 persistierte Werte**. GEZÄHLTE Test-Pflichten (T-1…T-9 anwendbar):
+- (1) **Paar-Zählung 2×3:** der Test weist genau 6 Messaufrufe und **3** persistierte Werte nach (T-3 Nenner: die 3 einzeln, nie gemittelt — KF-10); Köder: eine Fassung mit nur 3 Läufen ODER 1 persistiertem Wert wird ROT.
+- (2) **--debug-Zweig 1×:** unter `--debug` läuft es **genau einmal, kalter Cache** (Verzweigung am RunMethodology-Flag, quer, KON34-05 — beschleunigt, leitet nie um); Köder: `--debug` mit 2 Läufen wird ROT.
+- (3) **Verwerf-Beweis:** der Wert aus Lauf 1 (Warmup) erscheint **nicht** im persistierten Satz; Köder: eine Fassung, die Lauf 1 speichert, wird ROT (T-4 Gegeneingang). Vorbild `two_phase_measure`; Legacy `run_observable_perm` misst kalt → anpassen oder ausbuchen.
+
+**T-11b — KOMBIBAU-2×2-MATRIX ALS PRÜFNORM** (KON55): jede Landung ist erst grün, wenn **{clang, gcc} × {Debug, Release} = 4 Zellen** je J-1…J-4 + ctest durchlaufen (Compiler ist künftige System-Achse; „nur clang" bräche spätestens im CEB). GEZÄHLTE Pflicht: **4 Zellen**, je mit literaler ctest-Bilanz; der KON55-Kombibau zählt als EIN Bau-Slot (A2.1(a2), Zellen sequentiell). Abnahme-Regel, kein Einzeltest-Posten: sie gehört in die Wellen-Abnahme (§4) jedes Stempel-/Mess-Pakets.
+
+**T-11c — MUTATIONS-PROTOKOLL ALS ABNAHMEKLASSE** (KON57, verschärft T-1): der Biss jedes neuen Tests wird per **protokollierter Wegwerf-Mutation** belegt (Rot gesehen, dann zurückgenommen) — und die **Köder-LÄNGE/-Form wird geprüft, BEVOR die Mutation zählt** (M-F2-Lehre: 63-statt-64-Zeichen biss aus dem falschen Grund; dieselbe Klasse wie die gitleaks-19/20-Falle). GEZÄHLTE Pflicht je Paket: **je neuem Test ≥1 Wegwerf-Mutation mit literalem Rot + Gegenprobe-Grün**; Vorbild KON57-03 (M-F1/M-F2b/M-F3/M-H10).
+
+**Summen-Regel (unverändert):** 117/386 h bleiben unangetastet; T-11a–c sind erst zu addieren, wenn die S-Strecke (§10/D-4) mit-durchgezählt wird — sonst der T-3-Fehler aus §9.
