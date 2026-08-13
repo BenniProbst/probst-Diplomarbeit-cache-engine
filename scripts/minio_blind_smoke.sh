@@ -31,6 +31,11 @@
 #
 # AUFRUF
 #   bash scripts/minio_blind_smoke.sh
+#   bash-ONLY (Array-Syntax bei ENDPOINTS/VAULTS/cands): das Syntax-Gate ist
+#   'bash -n' (rc=0). 'sh -n' (dash) reisst an der ersten Array-Klammer mit rc=2
+#   -- gemessen 13.08.2026 (A2.5-V2). Die NE-11b-Sammelangabe "bash+sh -n ok"
+#   gilt von den zwei NE-11b-Skripten nur fuer scripts/worktree_remove_safe.sh
+#   (dort beide rc=0); fuer dieses Skript gilt sie NICHT.
 # EXIT
 #   0 = ein Paar oeffnet (TREFFER-Zeile nennt Vault/Zeile/Position/Endpunkt)
 #   1 = kein Paar oeffnet (echte Null NUR gueltig, wenn der Koeder oben biss)
