@@ -42,6 +42,11 @@
 #   hier versioniert, damit das Werkzeug nicht mit dem Job stirbt (NE-11b).
 # =============================================================================
 set -u
+# NE-19a (13.08.2026): pipefail als Mindest-Haertung. Das URTEIL dieses Skripts kommt aus
+# KEINER Pipe (probe() liefert den rc direkt); die einzige Pipe ist die kosmetische
+# Bucket-Zaehlung nach dem TREFFER (mc ls | wc -l). pipefail macht deren Status ehrlich,
+# ohne einen Urteilspfad zu aendern -- PIPESTATUS je Stufe ist hier deshalb NICHT noetig.
+set -o pipefail
 MC=/usr/local/bin/mc
 ENDPOINTS=("minio.comdare.de:9000" "minio.comdare.local:9000")
 VAULTS=(/home/comdare/Projekte/Cluster/keys/CREDENTIALS-VAULT-DEV.md

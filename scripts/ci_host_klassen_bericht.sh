@@ -164,14 +164,33 @@ echo "BAUM-KENNUNG   wurzel=$SUPER_SHA"
 # vendorierter Fremdcode (googletest, snmalloc, mimalloc ...), dessen add_test
 # nicht Teil dieses Bauwegs ist. Der Ausschluss steht HIER und nicht in einer
 # Allowlist, weil er eine Eigenschaft des Verzeichnisses ist.
-git -C "$WURZEL" ls-files -z '*CMakeLists.txt' '*.cmake' 2>/dev/null \
-    | tr '\0' '\n' | grep -v '^ext/' \
-    | awk -v w="$WURZEL" 'NF{print w "/" $0}' >> "$TMP/dateien.txt" || true
+# NE-19a (13.08.2026): vorher 'git | tr | grep | awk >> ... || true'. Ein git-TEILTOD (N Pfade
+# geliefert, dann rc!=0) hinterliess eine TEIL-Liste, die '|| true' still segnete -- der
+# 0-Dateien-Abbruch unten greift nur beim Totalverlust, der Bericht zaehlte eine Teilmenge
+# als Ganzes. dash als /bin/sh kennt weder pipefail noch PIPESTATUS; Hausform (Kopf
+# ci_diff_ascii_width_guard.sh): je Stufe eine Datei und ein eigener, lauter Abbruch.
+# grep -v darf rc=1 liefern (alles gefiltert, leere Menge ist hier ehrlich), rc>1 nicht.
+git -C "$WURZEL" ls-files -z '*CMakeLists.txt' '*.cmake' > "$TMP/ls_wurzel.roh" 2>/dev/null \
+    || { echo "ABBRUCH: git ls-files in '$WURZEL' fehlgeschlagen (rc=$?) -- die Dateiliste waere" >&2
+         echo "         unvollstaendig, und der Bericht zaehlte eine Teilmenge als Ganzes." >&2; exit 2; }
+tr '\0' '\n' < "$TMP/ls_wurzel.roh" > "$TMP/ls_wurzel.txt" \
+    || { echo "ABBRUCH: tr auf der Wurzel-Dateiliste fehlgeschlagen (rc=$?)." >&2; exit 2; }
+_rc=0; grep -v '^ext/' "$TMP/ls_wurzel.txt" > "$TMP/ls_wurzel.gefiltert" || _rc=$?
+[ "$_rc" -le 1 ] || { echo "ABBRUCH: ext/-Filter der Wurzel-Dateiliste fehlgeschlagen (rc=$_rc)." >&2; exit 2; }
+awk -v w="$WURZEL" 'NF{print w "/" $0}' "$TMP/ls_wurzel.gefiltert" >> "$TMP/dateien.txt" \
+    || { echo "ABBRUCH: awk-Pfadbau der Wurzel-Dateiliste fehlgeschlagen (rc=$?)." >&2; exit 2; }
 
 # Submodule aus .gitmodules -- KEINE handgepflegte Liste, sonst driftet sie.
 if [ -f "$WURZEL/.gitmodules" ]; then
-    git -C "$WURZEL" config --file "$WURZEL/.gitmodules" --get-regexp '^submodule\..*\.path$' 2>/dev/null \
-        | awk '{print $2}' | awk 1 >> "$TMP/submodule.txt" || true
+    # NE-19a: Stufen-Form statt 'git | awk | awk || true' (Begruendung s. Wurzel-Dateiliste oben).
+    # git config --get-regexp endet mit rc=1, wenn KEIN Eintrag matcht -- das ist hier ehrlich
+    # (ein Repo ohne Submodule); rc>1 ist ein Werkzeugfehler und bricht laut ab.
+    _rc=0
+    git -C "$WURZEL" config --file "$WURZEL/.gitmodules" --get-regexp '^submodule\..*\.path$' \
+        > "$TMP/gitmodules.roh" 2>/dev/null || _rc=$?
+    [ "$_rc" -le 1 ] || { echo "ABBRUCH: .gitmodules-Auswertung fehlgeschlagen (rc=$_rc)." >&2; exit 2; }
+    awk '{print $2}' "$TMP/gitmodules.roh" >> "$TMP/submodule.txt" \
+        || { echo "ABBRUCH: awk auf den .gitmodules-Pfaden fehlgeschlagen (rc=$?)." >&2; exit 2; }
 fi
 
 while IFS= read -r _sp; do
@@ -199,9 +218,15 @@ while IFS= read -r _sp; do
     # Dessen add_test-Aufrufe sind nicht Teil unseres Bauwegs. Der Ausschluss ist
     # ein SCHNITT mit Begruendung, kein Zudecken -- gleiche Linie wie die
     # Schwester-Wache im ce-Repo.
-    git -C "$_sd" ls-files -z '*CMakeLists.txt' '*.cmake' 2>/dev/null \
-        | tr '\0' '\n' | grep -v '^ext/' \
-        | awk -v w="$_sd" 'NF{print w "/" $0}' >> "$TMP/dateien.txt" || true
+    # NE-19a: Stufen-Form statt 'git | tr | grep | awk >> ... || true' (Begruendung s. oben).
+    git -C "$_sd" ls-files -z '*CMakeLists.txt' '*.cmake' > "$TMP/ls_sub.roh" 2>/dev/null \
+        || { echo "ABBRUCH: git ls-files im Submodul '$_sp' fehlgeschlagen (rc=$?)." >&2; exit 2; }
+    tr '\0' '\n' < "$TMP/ls_sub.roh" > "$TMP/ls_sub.txt" \
+        || { echo "ABBRUCH: tr auf der Submodul-Dateiliste '$_sp' fehlgeschlagen (rc=$?)." >&2; exit 2; }
+    _rc=0; grep -v '^ext/' "$TMP/ls_sub.txt" > "$TMP/ls_sub.gefiltert" || _rc=$?
+    [ "$_rc" -le 1 ] || { echo "ABBRUCH: ext/-Filter im Submodul '$_sp' fehlgeschlagen (rc=$_rc)." >&2; exit 2; }
+    awk -v w="$_sd" 'NF{print w "/" $0}' "$TMP/ls_sub.gefiltert" >> "$TMP/dateien.txt" \
+        || { echo "ABBRUCH: awk-Pfadbau im Submodul '$_sp' fehlgeschlagen (rc=$?)." >&2; exit 2; }
 done < "$TMP/submodule.txt"
 
 N_DATEIEN=$(awk 'END{print NR+0}' "$TMP/dateien.txt")
