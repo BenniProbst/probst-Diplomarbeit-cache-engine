@@ -203,13 +203,46 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 7d65eb6c2ffd36a981f062648f4273d305863b6c
+PZW-CE-SHA         = f23c18e2db974ed7f93a0659f6196c75e0afe0a4
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 13.08.2026 — siebter Gitlink-Zug (Q6-Kommentar-Nachzug, KON58-02), und zum vierten Mal
+in Folge bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
+
+Der Gitlink zieht von `7d65eb6c` auf **`f23c18e2`** (Merge des Q6-Branchs `bau/q6-dock32-nachzug`:
+der 32er-Dock-Entscheid an vier Stellen nachgetragen — KON28-03/KON41-03/KON42-01; ce-Pipeline
+15774 TERMINAL SUCCESS, Merge-Baum `92a107ef` == `merge-tree`-Vorhersage).
+
+| Anker | alt (Stand `7d65eb6c`) | neu (Stand `f23c18e2`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `7d65eb6c2ffd3…` | **`f23c18e2db974…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | 498 Test-`.cpp` im Baum, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 498 Test-`.cpp` im Baum `f23c18e2` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 498 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2768 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2768 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich nichts bewegt — diesmal ist der Beleg der Diff selbst:** der Zug ändert **genau drei
+Dateien** (`20260802-hybrid_tier_stufe_soll_design.md`, `hybrid/README.md`,
+`heuristik_adapter_synthese_matrix.hpp`; +30/−1). Davon sind **0** Test-`.cpp`, **0** tragen
+`lazy_csv_header`, **0** ist die CI-YAML — gemessen am Diff, nicht am Ergebnis. Der Nenner bleibt
+bei 498, weil keine neue Test-Datei entsteht. *(Gegenprobe, dass das Zählwerkzeug sucht: der Diff
+führt insgesamt 3 Dateien — die Nullen stehen also neben einer Nicht-Null.)*
+
+🔴 **EINE EIGENE FEHLMESSUNG BEIM NACHZIEHEN, protokolliert, weil sie die §9.5-Regel bestätigt:**
+ich hatte die Anker zuerst von Hand nachgezählt und **40/23/1** erhalten statt der Wachen-Werte
+**40/21/2**. Zwei verschiedene Fehler in einer Messung: die Datei-Zählung lief über `awk -F:` auf
+die Rohzeilen und nahm damit die Kommentar-Treffer mit (dieselbe `-l`-Falle wie am 09.08., nur mit
+anderem Werkzeug), und für `SCHEMA-LITERAL` hatte ich schlicht das **falsche Muster** gegriffen.
+**Die CI-Formel ist die CI-Formel** — die Wache wurde gefahren, ihre Zahlen stehen oben, meine
+Handmessung ist verworfen.
+
+---
 
 **Nachzug 12.08.2026, spätabends — sechster Gitlink-Zug (Zweitlens-Härtungs-Merge, KON57), und
 wieder bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
