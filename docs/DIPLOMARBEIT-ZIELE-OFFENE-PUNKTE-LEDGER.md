@@ -45,6 +45,14 @@ frühere Angabe gefallen ist, steht die Korrektur dabei.**
       + 22 topics/queuing-Traeger
       = 158 Lock-Records. Davon 122 ECHTE Traeger (algo_version-Zuweisung) und
       30 Forwarder/Prosa (digest-only, ohne Versions-Semantik).
+      🔴 BINNENAUFTEILUNG KORRIGIERT (Verify-Fund, 13.08.): der Bau-Bericht schluesselte die
+      30 als "13 Observable-Forwarder + 16 Base-Prosa + alloc-Base" auf -- am Objekt sind es
+      12 *_observable.hpp + 18 Base-Dateien (inkl. axis_06_allocator_strategy_base.hpp).
+      Die Summe 30 und das Lock selbst waren korrekt; falsch war nur die Aufschluesselung im
+      Berichtstext. Der Verify hat es unabhaengig nachgezaehlt, ich hatte die Berichts-Zahl
+      ungeprueft uebernommen -- V1-Klasse, hier ohne Objekt-Folge, aber verbucht statt still
+      korrigiert. (Mit dem Fixup-3-Regen ist die Aufteilung ohnehin abgeloest: v3 fuehrt
+      518 digest-only gegen 122 Traeger ueber den Overlay-Schnitt, s. KON58-13.)
 
     🔴 EIGENE PLANUNGSZAHL GEFALLEN, nicht geglaettet: der Explore plante "103+20 = 123
     Traeger", am Objekt sind es 102+20 = 122. axis_06_allocator_strategy_base.hpp zaehlte im

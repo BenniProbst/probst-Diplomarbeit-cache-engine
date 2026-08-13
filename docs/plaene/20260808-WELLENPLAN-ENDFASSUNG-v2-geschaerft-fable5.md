@@ -2053,3 +2053,96 @@ gegen KON9-03 gegen KON21-01) + **F3**-Nenner + A-1-Vorlagetext vor jeder Backup
 ## 17.6 WELLEN-WIRKUNG — Task-Nummern, keine zweite Zählung
 
 KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#11/#13 + neu #14–#22, zwei Zeilen OHNE Nummer** — als Cross-Reference-Spalte an die bestehenden ##/S-/D-Tabellen (Ledger-IV/L-8: Nummern sind kein Autoritätsbeleg; KON27-04s „#21/#22" kollidieren mit der Lead-Liste). 🔴 **V-1: der `##25`-DURCHSTICH (DIE F1-Lieferung, Fr 14.08.) war bis 12.08. mittags OHNE Besitzer** — Sofortposten. Layout-Bump-Konflikt (`decl.hpp:293`) bleibt benannter Vorab-Posten des S-6-Fensters. **KON37-08:** die 3 Skelett-Testverzeichnisse sind NICHT mehr W7-Behälter → aktiver Posten TEST-KONSOLIDIERUNG (s. Teil D).
+
+---
+
+# 18. TASK-ZUORDNUNG 13.08.2026 — ALLE OFFENEN TASKS IN DIE WELLEN (Owner-Auftrag 13.08.)
+
+> **Anlass:** Owner 13.08.2026: *"Arbeite alle offenen tasks in die Wellen des Wellenplans mit ein an eine strategisch gueltige Stelle."* Dieser Abschnitt ERGAENZT §13.3/§17.6 und die Strecke (20260812-WELLENKONSOLIDIERUNG Teil B); wo er etwas ueberholt, steht es an der Zeile. Kriterium bleibt §13.2 (P/M/W — Wirkung auf den Freeze, nicht Thema); Kostenlage KON6-02/2: nie eine Flotte gebaut, Identitaets-Umbauten HEUTE kostenlos, ab Mi 26.08. 06:00 entwerten sie ~41,4 h Bau (Nenner: 128 Binaries x 19,4 min einlanig, KON41-01 — REALE Zahl erst aus S-19).
+> **Objekt-Pruefstand dieses Abschnitts (13.08.):** KON25-04/-08 am Ledger bestaetigt (#3 entblockt) · Layout-Gleichheits-Wache ==6 mit K-4-Probe am Symbol `stamp_pod_has_entries` bestaetigt (#15-Vorabposten lebt; Loesung = EIN gebuendelter Bruch, KON45-01/3) · `cfg.measurement_sink` feuert im Builder-Iterator unbedingt je result.csv sofern gesetzt (#18-Verstoss lebt; KON32-01a toleriert bis c) · `active_organ_required()` liefert `{}` global + C-3a-Tripwire verlangt Owner-Paket-Entscheid (#38a) · Legacy-Pfad `run_observable_perm` misst kalt, Fallback bei unbekanntem Profil (#38b) · KON44-02-n/a-Zaehler in `mess_ausbeute_wache.sh` BEREITS GEBAUT, CI-Beweis "1 echte, 0 n/a" (Pipeline 15764) — #38c ist NUR NOCH Rest (frische_wache/persist_sammler) · 13 lokale ce-Branches + wt-ce-golden-s14a@8cc564d5 (Fixup 3 committet) + wt-ce-mess-ordnung@4a89aed5 ("Paket P1" im Commit-Text) bestaetigt · Thesis ZWEIMAL Submodul @798e9460, beide uninitialisiert.
+
+## 18.1 DIE KLASSEN-REGEL, FORTGESCHRIEBEN
+
+    (P) vor F2 Fr 21.08.  ·  (M) vor Trigger Mi 26.08. 06:00  ·  (W) vor seinem Gegenstand
+    (-) Betrieb/Hygiene ohne Freeze-Bezug — Frist aus dem Betriebsgrund, nicht aus dem Freeze
+    NEU AUSGEWIESEN: binary-beruehrender MESS-Code (Arena-Formel, Warmup-Pfad, Harness) ist
+    nicht preimage-FORM-wirksam, aber trigger-gebunden — nach Mi 26.08. entwertet er den Bau.
+    Er faehrt als (M) im WE-/W2-Fenster VOR dem Trigger (Praezedenz: Strecken-Posten 42/#13).
+
+## 18.2 W0b — bis F1 Fr 14.08. (+ Betriebs-/Lande-Nachlauf)
+
+| Task | Gegenstand | Klasse | Anker | haengt an |
+|---|---|---|---|---|
+| **#36** | Fixup 3 landen: Riegel bewacht die GRUNDGESAMTHEIT (387er-Overlay) statt 152 Literal-Zitierer; Traeger-Austritt zweiseitig; KON55-Kombibau | **(W)** | LUECKE=PFLICHT (Owner 13.08.) · KON55 · Objekt: 8cc564d5 committet | — (blockiert #33) |
+| **#33** | S-14a-Riegel Teil 1 landen (b12afd32=Fixup 2, dann 8cc564d5) — VOLLAUSROLLUNG erst NACH S-18-Homes (W2, Strecke P.41) | **(W)** | §13.3-Bump-Wachen-Begruendung · KON9-11 · Fessel P11-vor-P4 | #36 |
+| **#4** | S-3 Abnahme (Kombibau 4 Zellen + Inventory-Floor) + Landung; DANACH S-7 im selben Worktree | **(P)** | §15.4 (transitiv preimage-wirksam) · KON43-01/1 · Objekt: 4a89aed5 "Paket P1" | S-1 gelandet · Fessel P1-vor-P2 |
+| **#10** | MinIO-Key-Haelfte SOFORT (Vault-blind + 200-Probe, Muster KON46-03); Backup-Ref pre-secret-scrub-20260802 NUR Owner-Vorlage | **(-)** | KON27-04 P.3 · KON22-02 · Loeschung=GO | A-1-Text aus #21 (nur Ref-Haelfte) |
+| **#21** | E-1…E-4-Vollzug + A-1-Vorlagetext (KOMPLETT abschliessbar, W-6-Gate gefallen) — P/E-Core-Anteil -> W7 gezaehlt | **(-)** | KON37-07 · KON27-04 P.15/P.12 | — (A-1 gate-t #10-Ref) |
+| **#22(i)** | OD-7-Infra-Haelfte: Handout liegt (HEAVY_J 24->16, runner-mode.sh); Livecheck 16-vs-24 = Infra | **(-)** | KON26-05/KON28-01 · Handout dc8c0dc5 | Infra-Agent |
+| **#37** | Disjunktheits-Plan ALS DOKUMENT LANDEN — er ist die LANDE-Ordnung (Worktree-Ebene, v3.8-Form) und geht NICHT in die Wellen-Zeitordnung auf; im Repo heute NICHT auffindbar (nur der Commit-Marker "Paket P1") | **(W)** | v3.8/A2.1a · Ort≠Zeit-Doktrin | — (traegt jeden Lande-Slot) |
+| **#31** | 13 ungelandete ce-Branches (am Objekt bestaetigt) + 4 Workflow-Worktrees + Haupt-Auscheck Store 2 + wt-super-d3naht-Rueckwaerts-Gitlink: Triage sofort, seriell landen in der P-Lande-Ordnung, ABGESCHLOSSEN vor #19 | **(-)** | KON49 · Owner 13.08. · EIN-SCHREIBER-Regel | #37 (Ordnung) · Lande-Slots bis W1-Ende |
+| **NEU** | OWNER-VORLAGE #38a: C-3a-Paket-Entscheid (erste required-Deklaration) — Frist der Antwort Mi 19.08., sonst Fallregel 18.6(3) | **(W)** | Tripwire-Text am Objekt · KON47-03 | — |
+
+## 18.3 WE 15./16.08. (Reserve GEZOGEN) + W1 bis F2 Fr 21.08. = IDENTITAETS-FREEZE
+
+| Task | Gegenstand | Klasse | Anker | haengt an |
+|---|---|---|---|---|
+| **#16** | golden festschreiben -> Homes MESS/SYSTEM + je Home EIN Waechter (S-18) + queuing-Umzug | **(P)** | KON27-01 ("ZUERST eine gueltige golden Version, dann die Gliederung") · KON27-04 P.5 | #33/#36 (P11-vor-P4) · #24/B2 (P6-vor-P4) |
+| **#24/B2** | Gate-Trennung G2/G3 (golden-brechend) — VOR #16 landen | **(P)** | KON34-04-B2 · Fessel P6-vor-P4 | E-Strang-Worktree · Explore 21b |
+| **#24/B3** | Hybrid-Gates — erst damit 5 Schalter; Schalter-Hoheits-Umzug, kein Instrument-Umzug | **(P)** | 🔴 OWNER-DATUM: KON34-04 "VOR F2 (heute kostenlos, ab 26.08. teuer)" · KON37-01 | B2 |
+| **#24/B5** | Stempel-Pflicht je Schalter (⭐ Fable max) | **(P)** | KON34-04-B5 · KON38 | S-5 · Lande-Slot ggf. A (21b) |
+| **#24/B1** | XML-Konsum je Stufe: <measurement_tooling>+Stufen-Dimension, Registry-NEUBAU, Altes ARCHIVIEREN | **(P)**-Ableitung | KON37-02 · §17.3 (kein Owner-Datum) | Strecke P.34; Fallkandidat 18.6(4) |
+| **#15** | S-6-FENSTER (a MESS,SYSTEM,ORGAN · b Sperre · c S-21-Wache · d #67) — landet als LETZTER Preimage-Schritt. VORAB: der Layout-Bump-Konflikt ist am Objekt bestaetigt (Gleichheits-Wache ==6, K-4-Probe) und per KON45-01/3 GELOEST-DESIGNT: Layout 6->7 + Format 4->5 + Budget in EINEN Bruch falten, Wache zieht mit. S-6b ist unabhaengig sofort baubar (KON7-10/4, aendert kein Byte) — Vorzieher ins WE erlaubt | **(P)** | KON27-04 P.4 · §17.6 · KON5-04 | S-5 · Bump-Buendel · EIN Schreiber auf decl.hpp (P3-vor-P5) |
+| **#38d** | Preimage-Budget: kAnatomyFingerprintPreimageMax 4096 sprengt bei 32 belegten Docks — Konstanten heben MIT Budget-Beleg, Map-VALUE = Tier-SHA-Zeile | **(P)** | KON45-01/5 ("Pflicht-Edit MIT Budget-Beleg"; Buendel-Zeile "GEBUENDELT VOR F2/26.08.") | im Bump-Buendel mit #15/#38a2 |
+| **#38a2** | Comp-Gate-STEMPEL-ANTEIL: organ_stamp_line waehlt den Meta-Meta-Suffix JE COMP (heute stempelt ein Disk-Typ JEDE Binary, auch MemoryOnly — am Objekt: active_organ_required()=={}) | **(P)** | KON45-02/2 · KON47-03 (Timing "nicht vor F1/F2 ERZWUNGEN" — die Wirkungsklasse zieht ihn trotzdem vor F2, solange kostenlos; Abweichung vom Owner-Timing hiermit DEKLARIERT, kein Widerspruch: erzwungen≠verboten) | 🔴 Owner-Paket-Entscheid (Tripwire) · Bump-Buendel; Fallregel 18.6(3) |
+| **#17** | G-2-Semantik-Nachzug in Achsen-Nummerierungs-Reihenfolge, NACH den Homes — schliesst die Strecke, gibt #7 frei | **(P)** | KON13-03 · KON27-04 P.8 · KON17-01 | #16 |
+| **#20** | Flaeche-3-Vereinigung: IMessVisitor == measurement-Durchstich; Deckungsluecken-Test CEB=AUS/Tier=AN erst NACH B2 | **(P)** | KON25-02 · Strecke P.30 | B2 (nur Test-Teil) |
+
+**FREEZE-CHECK Fr 21.08., alle (P):** S-6a–d · S-7 · S-5 · S-3/#17 · ABI-Pflicht · CEB-Stempel · SOLL-Versionierung · HY-A · B1 · B2/B3/B5 · Umbenennung · **NEU: #38d + #38a2 (oder deklarierter Fall nach 18.6(3))**.
+
+## 18.4 WE 22./23.08. (Reserve GEZOGEN, W2-Vorstaffel) + W2 bis Trigger Mi 26.08. 06:00 / F3 Fr 28.08.
+
+| Task | Gegenstand | Klasse | Anker | haengt an |
+|---|---|---|---|---|
+| **#29** | Zielstruktur-SCHNITT der vier Traeger-Unterprojekte VOR dem S-8-Bau (WE-Design-Posten); voller Monolith-Split -> W7/#88 ("beim Aufraeumen") | **(W)** | KON43-01/2+02 · Owner verbatim "4 unter-Projekte […] beim Aufraeumen" | Abstimmung S-6d/#67 (Include-Kanten) |
+| **#7** | S-19 Planungs-Simulation Sa–Mo: gruppieren -> kategorisieren -> B+-Baum-Permutation; PRODUZIERT die B-4-Zahl = Bau-Nenner des Triggers ("41,4 h fuer 128" ist benannte Rechenluecke) | **(M)** | KON37-03 · KON30-03 · KON42-01/3 | Stempel-Strecke komplett (#4+#15+#16+#17, KON17-01) · OF-2 |
+| **#13** | T-15b-Umzug Sa/So: Retry-Klammer um measure_one_binary, je 5 fuer BUILD UND MESSUNG, 3 Werte einzeln; Arena-Formel deckt x5 ZUSAETZLICH (checkpoint_speicher, Symbol-Anker) — binary-beruehrend, darum VOR Trigger | **(M)** | KON37-06 · KON26-04/KON28-02 · W2-Zuordnung = Fortschreibung Strecke P.42 (Abweichung von KON27-04-W1 DORT deklariert) | KON37-06-Spez (liegt) |
+| **#38b** | Warmup-PAAR durchsetzen: ALLE Messpfade fahren (verwerfen+speichern)x3; Legacy run_observable_perm misst am Objekt KALT (Fallback bei unbekanntem Profil) -> anpassen oder ausbuchen; Tests T-1…T-9 (Paar-Zaehlung 2x3, --debug 1x, Verwerf-Beweis) | **(M)** | 🔴 KON47-04 Owner verbatim "SONST IMMER ZWEI MAL. PFLICHT FUER DIE FORSCHUNG. MUSS GETESTET SEIN." · KON45-03 | mit #13 im Mess-Fenster Sa/So |
+| **#38c** | n/a-Zaehler-REST: mess_ausbeute_wache traegt die KON44-02-Heilung BEREITS (Objekt+CI-Beweis "1 echte, 0 n/a") — offen NUR frische_wache/persist_sammler: nachziehen ODER Arbeitsteilung deklarieren | **(W)** | KON44-02 (Befund hiermit am Objekt PRAEZISIERT: teilgebaut) | vor W3-Kampagne |
+| **#3** | S-12 CI-Geruest: vier Mini-Pipelines je Traeger, Emission = VOLLE Pipeline (Bau+Test+LINT+RELEASE+Lager+J-1…J-4), Raketen-Mechanik; CiYamlBuilder bleibt fuer den LOKALEN Build. **ENTBLOCKT: die Task-Blocker 'F4+F8' sind die Owner-FRAGEN, beide beantwortet** | **(M)** | KON25-04 · KON25-08 · KON43-02 (Zielform) | S-8->S-9->S-10/S-11 (Traeger-Reihenfolge) |
+| **#18** | S-13 Export-Element + Ziel-FILTER + per-Binary-XLSX — heilt den am Objekt bestaetigten Unbedingt-Kanal (cfg.measurement_sink je result.csv); Toleranz (a) endet mit (c) | **(M)** | 🔴 KON32-01 Owner: "nur per Binary xlsx" + "(a) uebergangsweise" · KON27-02 Option b | Emissionskette · Landung Di 25. (engster Slot) |
+| **#22(ii)** | --debug in die Planer-CLI (Generalproben-Schalter) — BAU-Haelfte, faehrt MIT S-8 | **(-)** | KON34-05 ("beschleunigt, leitet nie um") · KON41-01 | S-8 |
+| **#24/B4** | System B umstellen+anschliessen: Typliste = statische Anordnungs-Freigabe, anzahl==6 faellt; Gate nur noch OF-1 (17-vs-18) | **(M)** | KON37-03 · KON34-04-B4 · Strecke P.40 | OF-1 (Mi 19.08.) |
+| **#19** | main-FF BEIDER Repos — davor Diff-Hygiene-Wache ueber den KUMULATIVEN FF-Bereich push-lokal | **(-)** | KON27-04 P.10 · Diff-Hygiene-Memory | 🔴 #31 abgeschlossen |
+| **#28** | TEST-KONSOLIDIERUNG (integration · generic_module_tests · module_specific_tests): W2 nur Eigentuemer+Inventur-Beginn; Verteilung in Ziel-Testmodule als Dauerposten mit S-16 bis W4 | **(W)** | 🔴 KON37-08 Owner: "wieder aufnehmen, deren Kern konsolidieren und Pflegen. Jeden Test pruefen […]" | #29-Zielstruktur · S-16/#88 |
+
+## 18.5 W3/W4/W5/W7
+
+* **W3-MESS** (Sa 29.08.–Do 03.09., F4): unveraendert Debug-GENERALPROBE (KON37-04/KON41-01); Voraussetzungs-Posten XML->PDF-Vollautomatik + Lager-Skip liegen in W2/W3 — der T-3-Ripple bleibt AUSGEWIESEN.
+* **W4** (F5 Fr 11.09.): ##58-NENNER-NEUMESSUNG vor Bau (Diskrepanz 28 vs. 13 InputIfFileExists-Ziele; in diesem Worktree nicht messbar — Thesis-Submodul leer). #28-Verteilungs-Rest mit S-16.
+* **W5/T-3** (~Sa 12.09.): MANUELLER RESET (Builds+Messdaten, GO zum Zeitpunkt) + ECHTE MESSUNG Sa 12.–Mo 14.09. (KON41-01) — harter Anker.
+* **W7, gezaehlt (Zugaenge dieser Zuordnung):** #38a3 voller Festplatten-IO-/Genus-Ausbau (KON47-03 "voll bauen wenn an der Reihe") · #29-Rest voller Monolith-Split (#88-Familie) · #21-P/E-Core-Cluster (KON27-04 P.12) · Thesis-Doppel-Submodul-Konsolidierung (#88/KON37-07). Bestand aus §13.3/Teil D unveraendert.
+
+## 18.6 KAPAZITAET W1 — OFFEN AUSGEWIESEN (kein Glattrechnen)
+
+    BESTAND §12.5: 99 h Band A auf voller Woche · Zweitslot ~24 h (ANNAHME, keine Messung)
+    + Stempel-Strecke (§13.3, Entlastungen 1-3 GEZOGEN)
+    + NEU HIER:  #38d (klein, im Pflicht-Buendel) · #38a2 (~1-2 Tage, SCHAETZUNG —
+                 KON45-02 nennt das Comp-Gate "EIGENER Bauauftrag") · B1-Landung (Bestand)
+    FALL-REIHENFOLGE (wenn W1 reisst, in dieser Ordnung, je mit Zahl im Protokoll):
+      (1) #68 -> W2 [deklarierter erster Verzicht, V-10]
+      (2) Ordnungs-Relations-M-Anteil -> W2 [§13.3]
+      (3) #38a2 -> W2-Bump-Buendel, Freeze-Nachbuchung DEKLARIERT [KON45-01/3: ein Bruch]
+      (4) B1 -> W2-Anfang vor Trigger [Ableitung ohne Owner-Datum]
+    NIE FALLEN: #87 #78 #86 · KON9-05-Stempelzeile · HY-A · #15 · #16/#17 · B3 (Owner-
+    Datum KON34-04) · #38d (Pflicht-Buendel).
+
+## 18.7 DIE VIER FESSELN DER LANDE-ORDNUNG (aus dem Disjunktheits-Plan 13.08.; Plan-Dokument per #37 zu landen — die P-Namen sind am Objekt nur als Commit-Marker "Paket P1" belegt)
+
+    P11 vor P4   S-18 verschiebt die Homes, die S-14a bewacht  => Riegel Teil 1 (#33) JETZT,
+                 S-14-VOLLAUSROLLUNG erst NACH dem Home-Umzug (W2, Strecke P.41)
+    P6  vor P4   B2-Gate-Trennung ist golden-brechend          => B2 landet VOR #16
+    P1  vor P2   simd_build_gate-Kopplung                      => S-3-Landung VOR S-7-Bau
+                 (beide im selben Worktree wt-ce-mess-ordnung — ein Schreiber)
+    P3  vor P5   anatomy_module_abi_v1_decl.hpp                => EIN Schreiber; alle decl-
+                 Aenderungen (Layout 7, #38d, S-6a-POD) fahren im EINEN Bump-Buendel-Slot
