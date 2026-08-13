@@ -285,6 +285,19 @@
 #
 # EXIT: 0 = Commit gelandet ODER bewusst nichts zu tun. 1 = fail-loud (nie stilles Gruen).
 # =====================================================================================
+
+# ---- BASH-WACHE (POSIX-Teilmenge; MUSS vor dem ersten Bashismus stehen) -------------
+# Dieses Script ist bash (Shebang Zeile 1). Ein Aufruf ueber 'sh' (dash/POSIX-sh)
+# starb bisher VOR jeder Arbeit wortkarg an "set: Illegal option -o pipefail" (rc=2,
+# F1-Fix-Stufe 13.08.2026). Diese Wache macht den Fehl-Aufruf LAUT, nennt den
+# richtigen Aufruf und bleibt im dokumentierten Exit-Vertrag (1 = fail-loud).
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "FEHLER: ci/anhang_forward_core.sh ist ein bash-Script (Shebang Zeile 1)." >&2
+  echo "        'sh ci/anhang_forward_core.sh' (dash/POSIX-sh) kann es nicht fahren." >&2
+  echo "        Richtig: bash ci/anhang_forward_core.sh (die CI ruft es direkt, Shebang greift)." >&2
+  exit 1
+fi
+
 set -euo pipefail
 
 AF_DEST_REPO="${AF_DEST_REPO:-}"
