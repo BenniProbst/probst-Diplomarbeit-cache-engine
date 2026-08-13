@@ -1062,15 +1062,30 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
     // ns_per_op=1199.047). Wortlaut nennt Metrik + Groesse + Vorhandensein.
     {
         std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // F1-FIX (2026-08-13, Lens-Fund e-ii): Numerus nach der ZAHL DER MESSWERTE, nicht pauschal
+        // Singular -- eine gemessene 1x3-Matrix traegt drei Messwerte, "Der Messwert selbst ist" war
+        // dort sachlich falsch. Gezaehlt wird mit exakt der Zellen-Logik des Writers (Masken-Wache +
+        // cell_displayable), nicht ueber ny*nx: nicht ausgefuehrte Zellen sind keine Messwerte. Der
+        // ratio-Pfad unten bleibt zu Recht IMMER Plural (jede Verhaeltnis-Zelle = Zaehler UND Nenner).
+        bool const  note_mask = heatmap_mask_matches(data);
+        std::size_t n_meas    = 0;
+        for (std::size_t y = 0; y < data.matrix.size(); ++y)
+            for (std::size_t x = 0; x < data.matrix[y].size(); ++x)
+                if (cell_displayable(data, note_mask, y, x)) ++n_meas;
+        bool const one = (n_meas == 1);
         data.degenerate_size_note =
             de ? ("(Gemessen, aber nicht als Flaeche darstellbar: " + metric +
                   " liegt im vorliegenden Korpus nur als " + size_txt +
                   "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
-                  "2x2. Der Messwert selbst ist im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
+                  "2x2. " +
+                  (one ? "Der Messwert selbst ist" : "Die Messwerte selbst sind") +
+                  " im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
                   "statt den Bau zu brechen.)")
                : ("(Measured, but not drawable as a surface: " + metric + " spans only a " + size_txt +
                   " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
-                  "requires at least 2x2. The measured value itself is present in the corpus; the surface is "
+                  "requires at least 2x2. " +
+                  (one ? "The measured value itself is" : "The measured values themselves are") +
+                  " present in the corpus; the surface is "
                   "omitted honestly instead of failing the build.)");
     }
     // write_heatmap WIEDERVERWENDEN (view={0}{90} matrix plot + colormap/viridis).

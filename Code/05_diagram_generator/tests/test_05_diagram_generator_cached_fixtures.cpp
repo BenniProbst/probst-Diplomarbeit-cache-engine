@@ -955,6 +955,9 @@ TEST(Stufe05Pipeline, Surface1x1IsHonestSizePlaceholder) {
     // ... sondern nennt die Groesse und das Minimum.
     EXPECT_TRUE(file_contains(out_de, "1x1"));
     EXPECT_TRUE(file_contains(out_de, "2x2"));
+    // F1-FIX (2026-08-13, Lens-Fund e-ii): 1x1 traegt GENAU EINEN Messwert -> Singular ist hier richtig.
+    EXPECT_TRUE(file_contains(out_de, "Der Messwert selbst ist"));
+    EXPECT_FALSE(file_contains(out_de, "Die Messwerte selbst sind"));
 
     // -- en, op_lookup_p50_ns (zweite fatale Flaeche des 64er-Sets) --
     auto out_en = comdare_user_tmp() / "f1_surface_1x1_en.tex";
@@ -969,6 +972,9 @@ TEST(Stufe05Pipeline, Surface1x1IsHonestSizePlaceholder) {
     EXPECT_FALSE(file_contains(out_en, "nie ausgefuehrt"));
     EXPECT_TRUE(file_contains(out_en, "1x1"));
     EXPECT_TRUE(file_contains(out_en, "2x2"));
+    // F1-FIX (Lens-Fund e-ii): Singular auch in der en-Fassung -- genau ein Messwert im 1x1-Korpus.
+    EXPECT_TRUE(file_contains(out_en, "The measured value itself is"));
+    EXPECT_FALSE(file_contains(out_en, "The measured values themselves are"));
 
     fs::remove(out_de, ec);
     fs::remove(out_en, ec);
@@ -994,6 +1000,11 @@ TEST(Stufe05Pipeline, Surface1xNAndNx1ArePlaceholders) {
     EXPECT_TRUE(file_contains(out_row, "HONEST-EMPTY"));
     EXPECT_FALSE(file_contains(out_row, "never executed"));
     EXPECT_TRUE(file_contains(out_row, "1x2"));
+    // F1-FIX (2026-08-13, Lens-Fund e-ii): ZWEI gemessene Zellen -> der Vermerk muss den Plural tragen.
+    // Der fruehere Pauschal-Singular ("The measured value itself is") behauptete EINEN Messwert, wo zwei
+    // im Korpus stehen -- dieselbe Ehrlichkeitsklasse wie die nie-ausgefuehrt-Wache, nur im Numerus.
+    EXPECT_TRUE(file_contains(out_row, "The measured values themselves are"));
+    EXPECT_FALSE(file_contains(out_row, "The measured value itself is"));
 
     // ny=2, nx=1 (2 Algos x 1 Workload)
     auto p_col = comdare_user_tmp() / "f1_smoke_2x1.csv";
@@ -1009,6 +1020,9 @@ TEST(Stufe05Pipeline, Surface1xNAndNx1ArePlaceholders) {
     EXPECT_TRUE(file_contains(out_col, "HONEST-EMPTY"));
     EXPECT_FALSE(file_contains(out_col, "nie ausgefuehrt"));
     EXPECT_TRUE(file_contains(out_col, "2x1"));
+    // F1-FIX (Lens-Fund e-ii): auch die de-Fassung zaehlt -- zwei Messwerte, also Plural.
+    EXPECT_TRUE(file_contains(out_col, "Die Messwerte selbst sind"));
+    EXPECT_FALSE(file_contains(out_col, "Der Messwert selbst ist"));
 
     fs::remove(out_row, ec);
     fs::remove(out_col, ec);
@@ -1630,6 +1644,80 @@ TEST(Stufe05Pipeline, RatioMatrixDegenerateAllOnesWidensOnlyTheAxis) {
     EXPECT_TRUE(file_contains(out, "point meta min=-1.0000"));
     EXPECT_TRUE(file_contains(out, "point meta max=1.0000"));
     EXPECT_TRUE(file_contains(out, "zmin=1.0000, zmax=2.0000"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P2-t5b) INTERAKTION Entartungs-Wache x 0-Klasse (F1-FIX 2026-08-13, Lens-Fund a/HINWEIS): vor
+// REV 7.7 deckte P2-t2 die Kombination "alle positiven Verhaeltnisse exakt 1.0 UND eine echte 0" in
+// EINEM 2x1-Korpus; der 2x2-Umbau hat sie in zwei Tests getrennt. Hier steht sie wieder in EINEM
+// Test, jetzt ueber der Groessen-Wache (2x2): ERST weitet die Entartungs-Wache die halbe Breite
+// (0 -> 1 Dekade), DANN setzt die 0-Klasse eine Dekade DARUNTER an (-2) und die Domaene waechst
+// symmetrisch mit -- exakt die Zahlen des alten 2x1-Korpus. Ein Tausch dieser Reihenfolge (0-Klasse
+// aus der UNGEWEITETEN Breite) faellt NUR hier auf: beide Nachbar-Tests sind gegen ihn blind
+// (P2-t2 hat half>0, P2-t5 hat keine 0).
+TEST(Stufe05Pipeline, RatioMatrixTrueZeroOnAllOnesWidensAxisThenPlacesZeroClassBelow) {
+    auto p = comdare_user_tmp() / "p2_zero_on_all_ones.csv";
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_a", 0.0},
+                                 {"linear_scan", "ycsb_c", 100.0},
+                                 {"k_ary", "ycsb_c", 100.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p2_ratio_zero_all_ones.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_ratio_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"),
+              dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "matrix plot*")); // echte Figur, kein Groessen-Platzhalter
+    // Alle positiven Verhaeltnisse exakt 1.0 -> halbe Breite 0 -> Entartungs-Wache weitet auf 1 Dekade;
+    // die 0-Klasse sitzt eine weitere Dekade darunter (-2), die Domaene waechst symmetrisch (+-2).
+    EXPECT_TRUE(file_contains(out, "(0,0,0.0000) [-2.0000]")); // k_ary/ycsb_a: echte 0 (n=1000, p50=0)
+    EXPECT_TRUE(file_contains(out, "(1,0,1.0000) [0.0000]"));  // k_ary/ycsb_c: exakt wie die Referenz
+    EXPECT_TRUE(file_contains(out, "(0,1,1.0000) [0.0000]"));  // Referenz gegen sich selbst
+    EXPECT_TRUE(file_contains(out, "point meta min=-2.0000"));
+    EXPECT_TRUE(file_contains(out, "point meta max=2.0000"));
+    // VERMERKT (Bestandsverhalten seit P2; schon der alte 2x1-Korpus emittierte exakt diese Liste):
+    // der 0-Klassen-Tick -2.0000 faellt hier mit dem Dekaden-Tick -2 zusammen ("$0$" neben "$10^{-2}$").
+    // Ausser der 0 liegt dort kein Datum; bewusst festgeschrieben, nicht Gegenstand des F1-Fixes.
+    EXPECT_TRUE(file_contains(out, "ytick={-2.0000,-2,-1,0,1,2}"));
+    EXPECT_TRUE(file_contains(out, "yticklabels={$0$,$10^{-2}$,$10^{-1}$,$1$,$10^{1}$,$10^{2}$}"));
+    // Der z-Traeger {0.0, 1.0} ist NICHT entartet -> KEIN explizites zmin/zmax (anders als P2-t5).
+    EXPECT_FALSE(file_contains(out, "zmin="));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (f1-e) GEGENKOEDER Spaltenbreite > 2 im NICHT-ratio-Pfad (F1-FIX 2026-08-13, Lens-Nebenfund a):
+// committet waren nur 2x2 (f1-d) und indirekt 3x2 ueber den ratio-Pfad (P2-t4) -- eine kuenftige
+// Fehl-Wache der Form "genau 2 Spalten" (nx != 2 statt nx < 2) traefe 2x3 unbemerkt: alle
+// 1xN/Nx1-Tests blieben Platzhalter (korrekt), alle 2x2-Tests echte Figuren (korrekt). Dieser Test
+// nagelt die Klasse "echte Figur auch BREITER als 2 Spalten" im Roh-Pfad dauerhaft fest.
+TEST(Stufe05Pipeline, Surface2x3StaysRealFigure) {
+    auto p = comdare_user_tmp() / "f1_surface_2x3.csv";
+    // 2 Algos x 3 Workloads, alle sechs Zellen gemessen (ns_per_op > 0).
+    write_wide_csv_for_ratio(p, {{"k_ary", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_b", 200.0},
+                                 {"k_ary", "ycsb_c", 300.0},
+                                 {"eytzinger", "ycsb_a", 400.0},
+                                 {"eytzinger", "ycsb_b", 500.0},
+                                 {"eytzinger", "ycsb_c", 600.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f1_surface_2x3.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "matrix plot*"));
+    EXPECT_TRUE(file_contains(out, "mesh/cols=3,")); // PFLICHT-Traeger der dritten Spalte
+    EXPECT_FALSE(file_contains(out, "HONEST-EMPTY (Groesse)"));
+    // Achsen: y = {eytzinger=0, k_ary=1}, x = {ycsb_a=0, ycsb_b=1, ycsb_c=2}. Eckzellen verbatim:
+    EXPECT_TRUE(file_contains(out, "(0,1,100.0000) [2.0000]")); // k_ary/ycsb_a, log10(100) = 2
+    EXPECT_TRUE(file_contains(out, "(2,0,600.0000) [2.7782]")); // eytzinger/ycsb_c, log10(600)
 
     fs::remove(out, ec);
     fs::remove(p, ec);
