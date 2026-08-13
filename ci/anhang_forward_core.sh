@@ -122,9 +122,11 @@
 #       (`grep -lE '^[^%]*\\documentclass' -- *.tex | head -1`) und baut NUR dieses. Heute
 #       deckungsgleich mit dem Vollbestand, weil Projekt 289 genau EIN Top-Level-Haupt-
 #       dokument traegt (diplomarbeit.tex; am Gitlink-Checkout 05.08.2026 verifiziert).
-#       Kaeme ein zweites hinzu (z.B. ein eigenes EN-Hauptdokument), pruefte das Gate NUR
-#       das erste -- dann ist diese Auswahl auf eine LISTE zu erweitern. Bis dahin gilt die
-#       Zusage ausdruecklich nur fuer das erste Hauptdokument.
+#       SEIT 2026-08-13 WACHT DAS GATE SELBST (Verify-Fall E): bei MEHR als einem Haupt-
+#       dokument ist on ein FEHLER (Teil-Pruefung als Gruen waere eine Luege) und auto sagt
+#       LAUT, was ungeprueft bleibt. Wer ein zweites einfuehrt (z.B. ein EN-Hauptdokument),
+#       erweitert diese Auswahl auf eine LISTE; bis dahin gilt die Zusage ausdruecklich nur
+#       fuer das erste Hauptdokument.
 #   (b) KEINE TeX-Toolchain => KEINE Pruefung. AF_PDF_GATE=auto ueberspringt das Gate auf
 #       Runnern ohne latexmk/pdflatex und LOGGT das literal ("hier wurde NICHT geprueft").
 #       Die Zusage "landet nie einen kaputten Stand" gilt also nur auf TeX-faehigen
@@ -253,9 +255,11 @@
 #   AF_TMP            Arbeitsverzeichnis                            (Default: mktemp -d)
 #   AF_DRY_RUN        true => kopieren+stagen, aber KEIN Commit, KEIN Push
 #   AF_NO_PUSH        true => Commit ja, Push nein (Fixture ohne Remote)
-#   AF_PDF_GATE       auto (Default) | on | off -- PDF-Bau-Wache vor dem Commit.
+#   AF_PDF_GATE       auto (Default) | on | off -- PDF-Bau-Wache vor dem Commit. Jeder ANDERE
+#                     Wert ist seit 2026-08-13 ein sofortiger FEHLER (wirkte vorher still wie auto).
 #                     auto: laeuft, wenn TeX-Toolchain UND Haupt-.tex vorhanden sind;
-#                     on:   fehlende Toolchain ist ein FEHLER; off: bewusst abgeschaltet.
+#                     on:   fehlende Toolchain ODER mehr als EIN Haupt-.tex ist ein FEHLER;
+#                     off:  bewusst abgeschaltet.
 #                     Geltungsbereich s.o. (a)-(c): NUR das ERSTE Top-Level-Haupt-.tex.
 #   AF_PUSH_RETRIES   Push-/Merge-Versuche                          (Default: 5)
 #   AF_PROV_*         Provenance fuer die Commit-Botschaft (PIPELINE_ID/URL/SUPER_SHA/REF)
@@ -297,6 +301,13 @@ AF_GENERATOR="${AF_GENERATOR:-}"
 AF_DRY_RUN="${AF_DRY_RUN:-false}"
 AF_NO_PUSH="${AF_NO_PUSH:-false}"
 AF_PDF_GATE="${AF_PDF_GATE:-auto}"
+# HAERTUNG 2026-08-13 (Verify-Fund 16, F1-Kette): AF_PDF_GATE war ein UNGEPRUEFTES Enum --
+# jeder Wert ausser exakt on/off wirkte still wie auto und haette ohne TeX-Toolchain still
+# uebersprungen. Fail-closed (II.7): unbekannter Modus stirbt hier LAUT, vor jeder Wirkung.
+case "$AF_PDF_GATE" in
+  on|off|auto) : ;;
+  *) echo "FEHLER: AF_PDF_GATE='$AF_PDF_GATE' ist kein gueltiger Modus (erlaubt: on|off|auto)" >&2; exit 1 ;;
+esac
 AF_PUSH_RETRIES="${AF_PUSH_RETRIES:-5}"
 AF_PROV_PIPELINE_ID="${AF_PROV_PIPELINE_ID:-NA}"
 AF_PROV_PIPELINE_URL="${AF_PROV_PIPELINE_URL:-NA}"
@@ -1300,8 +1311,26 @@ fi
 echo "-- (3b) PDF-Gate (AF_PDF_GATE=$AF_PDF_GATE) --"
 run_pdf_gate() {
   local erzwingen="${1:-nein}"
-  local main tex_tool marke ext
-  main="$(cd "$AF_DEST_REPO" && grep -lE '^[^%]*\\documentclass' -- *.tex 2>/dev/null | head -1)"
+  local main tex_tool marke ext mains anz
+  # EINE Quelle der Auswahl: erst die LISTE aller Top-Level-Hauptdokumente, daraus das erste.
+  mains="$(cd "$AF_DEST_REPO" && grep -lE '^[^%]*\\documentclass' -- *.tex 2>/dev/null)"
+  anz=0
+  if [ -n "$mains" ]; then anz="$(printf '%s\n' "$mains" | wc -l)"; fi
+  main="$(printf '%s\n' "$mains" | head -1)"
+  # FALL E (Verify 2026-08-13, F1-Kette): bei MEHR als einem Hauptdokument kann DIESES Gate
+  # nicht vollstaendig pruefen (es baut nur eines). on => ROT statt Teil-Pruefung als Gruen
+  # (II.7); auto => es baut das erste und sagt LAUT, was ungeprueft bleibt. Wer das ausloest,
+  # erweitert die Auswahl auf eine LISTE (s. Datei-Kopf, Geltungsbereich (a)).
+  if [ "$anz" -gt 1 ]; then
+    if [ "$AF_PDF_GATE" = "on" ]; then
+      echo "FEHLER: AF_PDF_GATE=on, aber $anz Top-Level-Hauptdokumente ($(printf '%s' "$mains" | tr '\n' ' ')) --" >&2
+      echo "       dieses Gate baut nur das ERSTE und liesse die uebrigen UNGEPRUEFT. Erst die" >&2
+      echo "       Auswahl auf eine Liste erweitern, dann wieder on fahren (kein Teil-Gruen)." >&2
+      return 1
+    fi
+    echo "   WARNUNG: $anz Hauptdokumente gefunden -- gebaut und geprueft wird NUR '$main',"
+    echo "   die uebrigen bleiben UNGEPRUEFT (Geltungsbereich (a), Datei-Kopf)."
+  fi
   if command -v latexmk >/dev/null 2>&1; then tex_tool=latexmk
   elif command -v pdflatex >/dev/null 2>&1; then tex_tool=pdflatex
   else tex_tool=""; fi

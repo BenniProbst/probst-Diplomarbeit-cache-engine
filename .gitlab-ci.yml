@@ -2361,9 +2361,10 @@ persist:measurements:
 #    DEKLARIERTER GELTUNGSBEREICH DES PDF-GATES (bewusste Grenze, kein Versehen): das Gate baut GENAU EIN
 #    Hauptdokument -- das ERSTE Top-Level-*.tex mit \documentclass (Auswahl per grep -l ... | head -1).
 #    Heute deckungsgleich mit dem Vollbestand, weil 289 genau EIN Top-Level-Hauptdokument traegt
-#    (diplomarbeit.tex; am Gitlink-Checkout 05.08.2026 verifiziert). Kommt ein zweites hinzu (z.B. ein
-#    eigenes EN-Hauptdokument), prueft das Gate NUR das erste -- dann ist der Kern auf eine Liste zu
-#    erweitern. Zweite Grenze -- im KERN weiter vorhanden, in DIESEM Job seit 2026-08-13 GESCHLOSSEN:
+#    (diplomarbeit.tex; am Gitlink-Checkout 05.08.2026 verifiziert). SEIT 2026-08-13 WACHT DER KERN SELBST:
+#    mehr als EIN Hauptdokument macht on ROT, statt still nur das erste zu pruefen (Teil-Pruefung als
+#    Gruen waere ein Haken ohne Ausgabe); wer ein zweites einfuehrt (z.B. EN), erweitert den Kern auf
+#    eine Liste. Zweite Grenze -- im KERN weiter vorhanden, in DIESEM Job seit 2026-08-13 GESCHLOSSEN:
 #    AF_PDF_GATE=auto prueft auf einem Runner OHNE TeX-Toolchain GAR NICHTS (der Kern loggt das ehrlich
 #    statt still gruen zu melden). Dieser Job faehrt darum HART AF_PDF_GATE=on (fail-closed, II.7):
 #    ohne TeX im Job-Env wird der Lauf ROT, BEVOR irgendetwas committet oder gepusht ist -- die Zusage
