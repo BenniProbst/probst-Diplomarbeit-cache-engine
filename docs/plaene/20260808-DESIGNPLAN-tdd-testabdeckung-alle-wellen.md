@@ -55,6 +55,8 @@ PE-AllowFailure [A W0b 1] · PE-Startgate-Vertrag [B W1 2.5] · PM-PAPI [C W7* 3
 **K7 produktionsweg-ungetestet (3).** Gebaut, aber unverdrahtet oder asymmetrisch — Tests fahren Nebenwege, der Owner-Weg (xlsx) hat null Aufrufer.
 XL-L1 Facade zweistufig [A W0b(A-Stufe)/W1(B-Stufe) 10] · LG-E2Exlsx Facade [A W1 6] · XL-CsvDtor-Leck [B W2 2]
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** [D-5 → §10]: die xlsx-„null Aufrufer"-Aussage von K7 ist präzisiert — **8 von 9** `thesis_profiles` sind xlsx-blind (KON4-07/R1 + KON36-02/H), nicht alle 9; es fehlt der T-3-Klasse-Posten mit Profil-Nenner (Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum). Die Zeile bleibt stehen.
+
 **Einzelfälle (2):** PK-WinsorWert (absturzfreiheit-statt-aussage: `isfinite` ersetzt den Wert) [B W2 2] · XL-L4 n/a-Konkurrenz (kennzahl-ohne-nicht-bestimmbar) [A W1 3].
 
 ## 3. Der TDD-Vertrag

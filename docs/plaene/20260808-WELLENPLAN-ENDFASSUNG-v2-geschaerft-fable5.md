@@ -621,6 +621,8 @@ Die Klasse in einem Satz, fünffach belegt: die Null wird überall als **Divisio
 
 **Tragende Abnahme:** Invarianz-Beweis — derselbe Datensatz mit und ohne degenerierte Kandidaten liefert **identische** `adjusted_p` für die echten (heute Faktor 9/7 daneben; ein gewürfelter Kandidat mit p_roh zwischen 0,05/9 und 0,05/7 kippt heute die Signifikanz); Welch-Köder {634×4} vs. {634×6} und der schärfere {746×4} vs. {634×6} (beide konstant, 15 % verschieden, heute „kein Unterschied"); f15-Köder: präparierte Null-DLL **gewinnt heute das Ranking mit p50=0** — nach Heilung ausgewiesen und Exit≠0.
 
+> ⚠️ **FUSSNOTE T-15b (MARKER 13.08.2026, KON59):** die D4-Zeile koppelt an **T-15a** (Drift-`max_reruns`, `ce 4cd1ab91`). Davon VERSCHIEDEN ist **T-15b** = zweite Retry-Klammer um `measure_one_binary`: **je 5** für **Build UND Messung** (nicht 1+5), Erfolg = 3 Wiederholungen je Parameter+Binary, **alle 3 einzeln persistiert** (KON37-06, §17.4). Die „5" sitzt heute FALSCH auf der Drift-Achse; Umzug + 8-Punkte-Ripple = Task #13 (W2, KON26-04/KON28-02). Diese Zeile bleibt stehen.
+
 ### D5 — Sechs Perzentil-Verfahren, fünf Mediane, ein fehlendes Feld (5 Posten, 13 h)
 
 | id | Kern | h | Welle | Zwang |
@@ -980,6 +982,8 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 | **Streichkaskade bei globalem Zeitriss** (Reihenfolge jetzt festgelegt, nicht im Riss): 1. ##40-Reste/W7-Vorgriffe, 2. F-07b, 3. HY-C-Umfang (Router auf EINEN belegten Fall), 4. Break-Even-Neubau (dann Hermite ratifizieren MIT Methodik-Begründung), 5. ##41-Stufe-2. **NICHT streichbar:** die drei Präsens-Zusagen, HY-A/HY-B (Owner „Alles Pflicht"), D5-1+D4-Trio (sonst sind die Kennzahlen falsch gerechnet), die W0a/W0b-Wachen | | |
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** *ÜBERHOLT 12.08. (checkpoint_measure-Zeile): Teil von System B → B4, ‚muss gebaut werden' (Owner-KERN 09.08.) — vor F2/Trigger, nicht W7 (§17.3).*
+
+> ⚠️ **FUSSNOTE T-15b (MARKER 13.08.2026, KON59):** *(T-15/D4-Streichung-Zeile)* die abgelehnte Streichung betrifft **T-15a** (Drift/D4). **T-15b** ist die davon verschiedene zweite Retry-Klammer: **je 5** für **Build UND Messung**, 3 Erfolgs-Werte einzeln persistiert (KON37-06, §17.4); ihr Umzug von der Drift-Achse ist **Task #13** (W2, KON26-04/KON28-02). Die Zeile bleibt stehen.
 
 ---
 
@@ -1595,6 +1599,8 @@ Zahlen vorgelegt.**
 | **O-4** | **Meta-Meta-Achsen von System und Organ** — vom Owner als *„zu recherchieren"* markiert; am Objekt: Organ-Liste leer, System genau eine Familie (SIMD) | S-3 |
 | **O-5** | **K1** Lager-Identität der Hybrid-`.so` · **K2** Loader-Schichten-Zuordnung · **K5** Snapshot-Aggregations-Semantik | S-10 |
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT — **O-2 ist GESTRICHEN** (§15.1; KON8-12/KON13: der Hybrid ist Glied der MESS-Kette, nicht der BAU-/FREIGABE-Kette). Die **O-2-Blocker-Zeile bleibt stehen**, blockiert aber **nichts** mehr; **S-2 hängt nur noch an O-1**.
+
 **Bau-Teile, in Abhängigkeitsordnung:**
 
 | ID | Teil | Quelle | Vorbild im Repo |
@@ -1651,12 +1657,16 @@ Zahlen vorgelegt.**
                                               O-5 ──────────────┘
 ```
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT — die **Graph-Kante `O-2 ─┼─► S-2`** ist GESTRICHEN (§15.1, KON8-12/KON13). Der Zufluss auf S-2 ist nur noch **O-1, O-3, O-4**; die gezeichnete Kante bleibt stehen, gilt aber nicht mehr.
+
 **Die vier harten Regeln der Ordnung:**
 
 1. **Kein Grammatik-Bau ohne O-1 und O-2.** Die Zahl der Grammatiken hängt an O-2; die Semantik an O-1.
 2. **Kein Planer-Kopf ohne P-0.** Sonst entsteht die dritte Enumerations-Engine (BAUPLAN-Kritik §1).
 3. **Alles Preimage-Wirksame vor F2.** S-1, S-2, S-5, S-6, S-7 — danach ist die Identität eingefroren.
 4. **Der Hybrid entsteht nach der Einzelmessung** (ZEIT), steht aber in der Kette vor dem Tier (ORT).
+
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT — in **Regel 1** ist der Teil *„und O-2"* GESTRICHEN (§15.1, KON8-12/KON13): die Grammatik-Zahl hängt **nicht** an O-2. Regel 1 gilt als *„Kein Grammatik-Bau ohne O-1"*; **Regel 2 (P-0)** ist begleitend, nicht blockierend (§15.5). Die Zeilen bleiben stehen.
 
 ---
 
@@ -1671,9 +1681,13 @@ Zahlen vorgelegt.**
 | **F1-Pflicht** | `##25` **DURCHSTICH** · D3-4+D3-5 · D3-1-Marker · D3-8 · ##26 · W0a-Rest (D1e/D1f/D1c/D2-G2/##06/##07) |
 | **Betrieb** | #83 `lint:format` · #80 coverage-guard (F1 **vor** F2, bindend) |
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT (zwei Korrekturen an der `sofort`-Zeile) — (1) die Owner-Vorlage umfasst **O-1, O-3, O-4, O-5**; **O-2 ist GESTRICHEN** (§15.1, KON8-12/KON13). (2) **„Frist Do 14.08." → „Fr 14.08."** (§15.7): der 14.08.2026 ist ein **Freitag**. Zeile bleibt stehen.
+
 ### WE Sa 15./So 16.08. — **Reserve gezogen**
 
 **S-2** drei Grammatiken je Phasigkeit (setzt O-1/O-2 voraus).
+
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT — S-2 setzt nur **O-1** voraus; der Zusatz *„/O-2"* ist GESTRICHEN (§15.1, KON8-12/KON13). Zeile bleibt stehen.
 
 ### W1 · Mo 17.08. – Fr 21.08. = **F2 = IDENTITÄTS-FREEZE**
 
@@ -1723,6 +1737,8 @@ Bedingung; wird sie gerissen, ist die Folge bekannt und muss nicht neu erwogen w
 | **K-3** | **Di 25.08. abends** | `##47` Kalibrierlauf läuft **durch die neue Kette** grün | der Bau-Trigger fährt auf ungeprüftem Weg |
 | **K-4** | **Mi 26.08. 06:00** | Bau-Trigger startet | spätester tolerierbarer Start ist **Fr 28.08. 06:00**; danach fällt das W4-Fangnetz ersatzlos |
 | **K-5** | **Do 27.08. abends** | Bau ist durch | ohne Bau keine Kampagne, ohne Kampagne kein F4 und kein Ergebniskapitel |
+
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT an **K-1** (zwei Korrekturen) — (1) **„Do 14.08." → „Fr 14.08."** (§15.7, Freitag). (2) Die Bedingung ist *„O-1 ist entschieden"*; **O-2 ist GESTRICHEN** (§15.1, KON8-12/KON13). Zeile bleibt stehen.
 
 **Die Rückfallstufe, falls K-3 oder K-4 reißt** — sie wird hier benannt, damit sie im Riss nicht
 erfunden werden muss: **der heutige Bauweg ist bis zum Bau-Trigger nicht zu entfernen.** `S-11`
@@ -2047,6 +2063,8 @@ gegen KON9-03 gegen KON21-01) + **F3**-Nenner + A-1-Vorlagetext vor jeder Backup
 | **O-5/K1** Lager-Identität Hybrid-.so → OF-3 · **O-4-Rest** Festplatten-IO → OF-4 | §16.1 · WF4/E-A |
 | **A-1**-Vorlagetext vor jeder Backup-Ref-Aktion (aus §16.4 unverändert) | Ledger-IV/M |
 | **NEU:** E-WARMUP-Explore (cache warmup, 10 Wochen) · Posten TEST-KONSOLIDIERUNG (Eigentümer setzen) · **T−3-Ripple** (XML→PDF-Vollautomatik + Lager-Skip + W5-Fenster) | KON37-06/-08/-04 |
+
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT (Teil der OFFEN-Tabelle, binnen Stunden beantwortet) — **OF-1** (KON34-06(d) 17-vs-18) zu per KON40-02/KON41-02 (17 Code + 1 README = 18); **OF-2** (KON34-06(a)) zu per KON41-03/KON42; **OF-3** (O-5/K1) und **OF-4** (Festplatten-IO) zu per KON45-02/KON47-03; **E-WARMUP** zu per KON45-03/KON47-04. **Weiter offen** bleiben: **R-2** (S-6-Fenster), **R-3/B-4** (S-19 rechnet), **A-1**-Vorlagetext, **TEST-KONSOLIDIERUNG**-Eigentümer, **T−3-Ripple**. Zeilen bleiben stehen.
 
 ## 17.2 DER MESS-NENNER IST 32 — die 6 verliert ihren Gegenstand, die ORDNUNG kehrt als Freigabe zurück
 

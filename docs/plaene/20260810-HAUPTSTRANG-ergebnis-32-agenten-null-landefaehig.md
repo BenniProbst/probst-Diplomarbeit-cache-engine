@@ -66,6 +66,8 @@ Dazu `docs/architecture/24_messmodell_korrektur_zwei_dimensionen.md:528`: „Ein
 
 **NICHT AUFFINDBAR:** die Regel hinter der Paarigkeits-Aussage („nur eine gerade Anzahl an Prüfdocks"). Drei belegbare Zählungen — 5 gebaut, 3 nach der 03.06.-Korrektur, n je Genus — keine ist gerade. **Gegenprobe:** derselbe flache Ledger findet „Pruefdock" 44×, „Prueff-Dock" 50×; das Thema ist massiv belegt, nur diese Regel nicht.
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT — die „gerade Anzahl an Prüfdocks"-Invariante (F11) ist seit 12.08. GESTRICHEN (KON30-04, Owner: „streiche diesen missverständlichen Punkt überall"); sie gilt nur noch für CEBs (KON36/B), NICHT für Prüfdocks. Der Absatz bleibt als Herleitungs-Beleg stehen.
+
 ### B-2 — „Der Planer hat einen Fingerprint, über seine Version": **GEFUNDEN**
 
 Fundstelle: `/home/comdare/wt-super-landung/docs/plaene/20260806-PLAN-versionierungs-interface-stempel.md`, §3.1 (Z.303-360) und §3.4 (Z.418-435). Wortlaut aus §3.1:
@@ -176,6 +178,8 @@ Sieben Entscheide, die niemand außer dem Owner treffen kann. Sortiert nach Term
 **Grundlage.** Drei belegbare Zählungen, keine gerade (siehe B-1). Die Regel, aus der die Paarigkeit folgt, existiert im durchsuchten Korpus nicht — mit Gegenprobe. **Welche Menge soll gerade sein?** Ohne diese Regel ist nicht sagbar, ob ein Dock fehlt oder eines zu viel ist; jede Korrektur wäre geraten.
 
 **Empfehlung:** keine. Ein Satz vom Owner genügt und entsperrt einen laufenden Strang.
+
+> ⚠️ **MARKER 13.08.2026 (KON59):** BEANTWORTET — der erbetene Owner-Satz kam: die „gerade Anzahl"-Paarigkeit ist GESTRICHEN (KON30-04, 12.08.), gilt nur noch für CEBs (KON36/B). V-5 ist damit ZU; der Strang ist entsperrt. Der Eintrag bleibt stehen.
 
 ### V-6 — Das eine Invalidierungs-Fenster: Glied [6] raus, Format 4→5
 

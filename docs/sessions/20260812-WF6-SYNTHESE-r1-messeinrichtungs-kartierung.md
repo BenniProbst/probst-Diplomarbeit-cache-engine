@@ -31,6 +31,8 @@ KON30-01 · Owner-Auftrag: *"verstehe die Messeinrichtungen in jeder Traeger-Stu
 
 **Was NICHT klar wird (ehrliche Grenze):** (a) Der Ledger markiert *"32 Docks maximal = 32 Mess-System-Permutationen (KON25-03)"* ausdrücklich als *"Beobachtung (keine Festlegung)"* — *"ob das dieselbe Größe ist, klärt E-F3b (läuft)"* (KON28-03). Diese Synthese liefert die Herleitung, der Owner-Haken fehlt. (b) Ob Reihenfolge **innerhalb** einer Stufe je Mess-Gegenstand ist, ist unentschieden — dieselbe offene Frage wie "4! = 24 oder 48" beim Hybrid (Memory, nicht entschieden). (c) Die "gerade Anzahl"-Invariante ist laut KON28-03 der letzte offene F11-Teil. (d) Die 17-vs-18-Dateizählung des Doppelbaus blieb unaufgeklärt.
 
+> ⚠️ **MARKER 13.08.2026 (KON59):** ÜBERHOLT zu (a) und (c): der Owner-Haken kam — der Mess-Nenner ist **32** (KON25-03 bestätigt), die Anordnung kehrt als **statische Freigabe** zurück (KON37-03), und die „gerade Anzahl"-Invariante (c) ist **GESTRICHEN** (KON30-04), gilt nur noch für CEBs (KON36/B). (b) und (d) bleiben offen (OF-1/17-vs-18 → KON40-02). Die Zeilen bleiben stehen.
+
 ## 3. WAS ZU BAUEN IST
 
 **B1 — XML-Konsum (der eigentliche Schalter):** Der Plan-Director konsumiert `<measurement_tooling>` end-zu-end: Combos aus dem Profil statt hart `[all]`; das Element um die **Stufen-Dimension** erweitern (heute nennt es nur `tools`, nicht tier/hybrid/ceb — KON25-03 verlangt Schalter JE STUFE). Dock-Anzahl folgt daraus dynamisch, Obergrenze 32 (KON28-03); die Planungs-Simulation (S-19) liefert das Verständnis je Kategorie/Achse. KEINE YAML — der Planer emittiert den Prozess über das zentrale Baumodul.
