@@ -711,9 +711,36 @@ Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind),
 
 ### W4-AUSWERTUNG — ZAHLEN + TEXT + HY-C · Mo 07.09.–Mi 09.09. Kern; Do 10./Fr 11.09. Fangnetz; Fr 11.09. = **F5**
 
-##57 (Break-Even auf dem D4f-Typ: „kein Break-Even bestimmbar" ≠ „bestimmt: keiner", zwei verschiedene Ausgaben — heute byte-gleich; Umfang gemäß OV-1/OV-6), **HY-C** (`hybrid_router` als Break-Even-CoR aus den HY-B/W3-Kurven + `hybrid_eviction`-Minimalstrategie + EIN belegter Routing-Fall im Text; Köder: nirgends kreuzende Kurven → `kein_schnittpunkt` + Rückfall auf direkten Tier-Aufbau, ungültige Kurve → `kurve_ungueltig`), ##58+##58b (Anhang-Wache: 28 `\InputIfFileExists`-Ziele gegen wirklich gefundene Dateien, beide Zahlen; `\thesisfinal` macht Ersatztext zum LaTeX-Fehler; `|| echo honest-empty` fällt ersatzlos), ##59 (FF0–FF4, Nenner 5, leere Frage = rot), ##60 (Ergebniskapitel C5: Zahlen ins ##44-Gerüst, jede Tabelle mit Lauf-Provenance; DE führt, EN zieht für berührte Kapitel nach), ##61 (Backups sofort), **P-1** (Präsens-Zusagen-Wache: `geprueft 3 / erfuellt-oder-korrigiert 3` — Zwei-Maschinen KORRIGIERT per OV-5, Resume ERFÜLLT per ##35, Konformität ERFÜLLT per perm_runner/OV-8).
+##57 (Break-Even auf dem D4f-Typ: „kein Break-Even bestimmbar" ≠ „bestimmt: keiner", zwei verschiedene Ausgaben — heute byte-gleich; Umfang gemäß OV-1/OV-6), **HY-C** (`hybrid_router` als Break-Even-CoR aus den HY-B/W3-Kurven + `hybrid_eviction`-Minimalstrategie + EIN belegter Routing-Fall im Text; Köder: nirgends kreuzende Kurven → `kein_schnittpunkt` + Rückfall auf direkten Tier-Aufbau, ungültige Kurve → `kurve_ungueltig`), ##58+##58b (Anhang-Wache: 28 **[NEUMESSUNG 13.08.2026, Korrektur daneben, kein stilles Ersetzen: real 10 unkommentierte Aufrufe = 10 eindeutige Ziele (roh 12); die 28 ist mit keiner Zaehlweise reproduzierbar, UNBELEGT -- s. Fussnote ##58-NENNER unten]** `\InputIfFileExists`-Ziele gegen wirklich gefundene Dateien, beide Zahlen; `\thesisfinal` macht Ersatztext zum LaTeX-Fehler; `|| echo honest-empty` fällt ersatzlos), ##59 (FF0–FF4, Nenner 5, leere Frage = rot), ##60 (Ergebniskapitel C5: Zahlen ins ##44-Gerüst, jede Tabelle mit Lauf-Provenance; DE führt, EN zieht für berührte Kapitel nach), ##61 (Backups sofort), **P-1** (Präsens-Zusagen-Wache: `geprueft 3 / erfuellt-oder-korrigiert 3` — Zwei-Maschinen KORRIGIERT per OV-5, Resume ERFÜLLT per ##35, Konformität ERFÜLLT per perm_runner/OV-8).
 **Parallelität 2** (Auswertung und Text dateidisjunkt; keine Bau-Abnahmen mehr auf dem Blech). Fangnetz Do/Fr: Auswertungs-Verzug ODER Teil-Nachmessung via Resume (max. 2 Tage + WE 12./13. als letzte Entnahme).
 **Blockiert durch:** W3-MESS (mindestens die 320er-Abgabemessung; HY-C konsumiert die HY-B-Kurven — deshalb stand der Router nie in W1).
+
+> **FUSSNOTE ##58-NENNER -- NEUMESSUNG 13.08.2026 (A2.5-Fix-Stufe), am echten Klon gemessen, nicht abgeschrieben.**
+> Gemessener Baum: `/home/comdare/Projekte/Research/20260931-overleaf-diplomarbeit`, HEAD `29a1700`, Arbeitsbaum
+> sauber. Einschraenkung ausdruecklich: in super sind BEIDE Thesis-Submodule
+> (`Code/external/20260931-overleaf-diplomarbeit` und `thesis/diplomarbeit`, gitlink `798e9460`) UNINITIALISIERT --
+> in super-Worktrees ist die Zahl nicht messbar, gemessen wurde deshalb der echte Klon. Werkzeug: `/usr/bin/grep`
+> absolut (das blanke `grep` ist eine ugrep-Funktion). Zaehlweisen, jede benannt:
+>
+> * (a) Aufrufe gesamt, alle `.tex` DE+EN, Muster `-r --include='*.tex' -o -F '\InputIfFileExists'`, Scope ganzer
+>   Klon: **12** (12 Zeilen, kein Mehrfachtreffer je Zeile; alle 12 in `anhang/*/A_measurements.tex`, 6 je Sprache).
+> * (b) davon ohne auskommentierte, Muster `-E '^[^%]*\\InputIfFileExists'`: **10** (je Sprache ist genau 1 Treffer
+>   eine auskommentierte Erlaeuterungszeile, DE `anhang/de/A_measurements.tex:71`).
+> * (c) nur `anhang/`-Baeume (DE+EN): roh **12** / unkommentiert **10** -- identisch mit (a)/(b), ausserhalb von
+>   `anhang/` existiert kein Aufruf.
+> * (d) nur DE (`anhang/de/`): roh **6** / unkommentiert **5**. Eindeutige Ziel-Dateien (dedupliziertes
+>   `{...}`-Argument, DE+EN): **10** = 5 je Sprache (seg_attribution, observer_detail, latency_range, latency_ecdf,
+>   exchange_forest).
+>
+> **Die 28 ist mit KEINER gefahrenen Zaehlweise reproduzierbar**: roh 12, unkommentiert 10, eindeutige Ziele 10,
+> nur DE 6/5, bare `IfFileExists` 12, alle Dateien ausser `.git` 12, `\input{` gesamt 55 / unkommentiert 39 / nur
+> tabellen-Ziele 40, `\input`+`\InputIfFileExists` unkommentiert in `anhang/` 46, vorhandene Dateien in den
+> `tabellen/`-Verzeichnissen 18+18=36. Nach B-1/Designplan Abschnitt 9.1 ist die 28 damit keine veraltete, sondern
+> eine UNBELEGTE Zahl. Auch die **13** (KON6-07/3, KON8-11) reproduziert am heutigen Stand nicht: die Klon-Historie
+> kennt fuer `.tex` nur 10 (`73947aa`) dann 12 (`8d156a5`, observer_detail DE+EN) bis heute 12. Konsequenz fuer den
+> ##58-Bau: die Wache MISST ihr Soll zur Laufzeit selbst (Nenner = Zaehlweise (b), Ziel-Liste = dedupliziertes
+> Argument wie in (d)) und vergleicht gegen wirklich gefundene Dateien; eine eingefrorene Konstante (28, 13 oder 10)
+> wiederholte denselben Fehler.
 
 ### W5-SICHERUNG · Sa 12.09.–Di 15.09. (Abgabe Di)
 
@@ -926,7 +953,7 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 
 **W3-MESS** (Nenner 7): ##53 `zellen_mit_echtem_messwert/zellen_gesamt` + Häufigkeit JEDES Ersatz-Tokens (Single-Source `measurement_curve_loader.hpp:72`), alle Zahlen im Log UND im Exit-Code; `nicht_gebaut > 0` = Abbruch vor der Auswertung („Zeilenzahl > 0" ist wertlos — der Bau-Fehler-Zweig schreibt formal vollständige CSVs); „echt" = D4d-Definition · Batch-Abende: Bilanz, Gate, Frische — je Batch protokolliert · HY-B: Overhead-Kurve je Zielanzahl mit n je Zelle; eine tote Reihe kann nicht mehr gewinnen (D4e-Nachweis) · **##56 Commit nur bei Substanz, PROVENANCE trägt die Zahl — gehärtet (V-8):** dazu **`object_stat` gegen den minio-Store** nach dem Lauf (Schlüssel trägt das gewürfelte Lauf-Token, `size > 0`), und dasselbe für den NAS-Pfad. Der Git-Stand allein ist die **Ankündigung**, nicht der Gegenstand: genau hier saß LAG-P1 — die aktiv-Zeile fiel, der Schreibweg scheiterte **danach**, die Emission lief ohne Abbruch weiter. Die Bestandslog-Wache sagt das über sich selbst ausdrücklich (`ci/bestandslog_wache.sh:15-18`: *„ZUSICHERT NICHT: dass das Bestandslog-Dokument im Objekt-Store wirklich entstanden ist … sie gehoert an ein object_stat"*) — die fehlende Hälfte ist damit **benannt, aber unerledigt**, und sie gehört in diese Abnahme.
 
-**W4/W5** (Nenner 8 + 1): ##57 zwei Läufe, zwei verschiedene Antworten (Status benannt — heute byte-gleich; der v1-Köder „eine Binary" ist als unzureichend vermerkt) · ##58 28 Soll gegen X gefunden, beide Zahlen · ##58b `\thesisfinal` macht Ersatztext zum Fehler, `|| echo honest-empty` gefallen · ##59 5/5 · P-1 `geprueft 3 / erfuellt-oder-korrigiert 3` · HY-C Köder beidseitig (kein Schnittpunkt vs. ungültige Kurve) · ##62 wie v1.
+**W4/W5** (Nenner 8 + 1): ##57 zwei Läufe, zwei verschiedene Antworten (Status benannt — heute byte-gleich; der v1-Köder „eine Binary" ist als unzureichend vermerkt) · ##58 28 Soll **[NEUMESSUNG 13.08.2026: Soll am echten Klon = 10 unkommentierte Aufrufe = 10 eindeutige Ziele (roh 12); 28 UNBELEGT -- s. Fussnote ##58-NENNER, W4-Abschnitt]** gegen X gefunden, beide Zahlen · ##58b `\thesisfinal` macht Ersatztext zum Fehler, `|| echo honest-empty` gefallen · ##59 5/5 · P-1 `geprueft 3 / erfuellt-oder-korrigiert 3` · HY-C Köder beidseitig (kein Schnittpunkt vs. ungültige Kurve) · ##62 wie v1.
 
 ---
 
@@ -2119,7 +2146,7 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
 ## 18.5 W3/W4/W5/W7
 
 * **W3-MESS** (Sa 29.08.–Do 03.09., F4): unveraendert Debug-GENERALPROBE (KON37-04/KON41-01); Voraussetzungs-Posten XML->PDF-Vollautomatik + Lager-Skip liegen in W2/W3 — der T-3-Ripple bleibt AUSGEWIESEN.
-* **W4** (F5 Fr 11.09.): ##58-NENNER-NEUMESSUNG vor Bau (Diskrepanz 28 vs. 13 InputIfFileExists-Ziele; in diesem Worktree nicht messbar — Thesis-Submodul leer). #28-Verteilungs-Rest mit S-16.
+* **W4** (F5 Fr 11.09.): ##58-NENNER-NEUMESSUNG vor Bau (Diskrepanz 28 vs. 13 InputIfFileExists-Ziele; in diesem Worktree nicht messbar — Thesis-Submodul leer). #28-Verteilungs-Rest mit S-16. **[NACHGEMESSEN 13.08.2026 (A2.5-Fix), am echten Klon /home/comdare/Projekte/Research/20260931-overleaf-diplomarbeit HEAD 29a1700 (die super-Submodule bleiben uninitialisiert, dort weiter nicht messbar): roh 12 / unkommentiert 10 / eindeutige Ziele 10 -- weder 28 noch 13 reproduzierbar (Klon-Historie: 10 bei 73947aa, 12 seit 8d156a5), die 28 damit UNBELEGT nach B-1/Designplan Abschnitt 9.1; Zaehlweisen in Fussnote ##58-NENNER im W4-Abschnitt. Der Vor-Bau-Posten bleibt: zum W4-Bau das Soll zur Laufzeit erheben, keine eingefrorene Konstante.]**
 * **W5/T-3** (~Sa 12.09.): MANUELLER RESET (Builds+Messdaten, GO zum Zeitpunkt) + ECHTE MESSUNG Sa 12.–Mo 14.09. (KON41-01) — harter Anker.
 * **W7, gezaehlt (Zugaenge dieser Zuordnung):** #38a3 voller Festplatten-IO-/Genus-Ausbau (KON47-03 "voll bauen wenn an der Reihe") · #29-Rest voller Monolith-Split (#88-Familie) · #21-P/E-Core-Cluster (KON27-04 P.12) · Thesis-Doppel-Submodul-Konsolidierung (#88/KON37-07). Bestand aus §13.3/Teil D unveraendert.
 
