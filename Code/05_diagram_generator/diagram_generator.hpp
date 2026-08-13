@@ -6,6 +6,11 @@
 // A4-Awareness durch direkten LaTeX-Output, Diagramme kommen automatisch
 // im LaTeX-Layout mit korrekter Seitenpositionierung.
 //
+// REV 7.7 (2026-08-13): Groessen-Wache 1x1/1xN/Nx1 -> HONEST-EMPTY (pgfplots matrix input=image
+// verlangt >=2x2; Fehlerklasse der E-2a-Landung 05./06.08., Kern-Commits ba5e48eb/838612f3, deckte
+// nur Datenlosigkeit, nicht die Matrix-GROESSE). Beleg F1-Smoke Job 376333: 1 Algo x 1 Workload,
+// ns_per_op=1199.047 GEMESSEN -> matrix plot* mit genau einer Koordinate war kompilier-fatal.
+//
 // 3 Plot-Typen:
 //   Bar      — Vergleich diskreter Permutationen
 //   Scatter  — XY-Korrelation (z. B. allocation_size vs. latency)
@@ -123,6 +128,13 @@ struct HeatmapData {
     // emittiert (reiner Text, wird escape_latex-durchgereicht). Leer -> neutraler ASCII-Default. Der
     // Aufrufer (write_surface_search_algo_x_workload) fuellt ihn sprach-lokalisiert.
     std::string empty_note;
+    // REV 7.7/F1 (2026-08-13): Vermerk-Text fuer eine GEMESSENE Matrix unter dem pgfplots-Minimum --
+    // matrix input=image verlangt >= 2 Zeilen UND >= 2 Spalten, 1x1/1xN/Nx1 ist kompilier-fatal
+    // (Proben 13.08.2026, texlive 2026, compat=1.18: 1x1 rc=1, 1x2 rc=1, 2x2 rc=0). Der Text darf
+    // NICHT "nie ausgefuehrt" behaupten: die Zelle(n) SIND gemessen, nur die Flaeche ist nicht
+    // darstellbar. Leer -> neutraler ASCII-Default (default_degenerate_size_note). Reiner Text,
+    // wird escape_latex-durchgereicht; die Aufrufer fuellen ihn sprach-lokalisiert.
+    std::string degenerate_size_note;
     // P2/DIVERGENTE FARBSKALA (2026-08-06) -- additiv, Default false = exakt das Bestandsverhalten
     // (log10-viridis). Die Matrix traegt dann keine Latenzen in ns, sondern VERHAELTNISSE zu einer
     // Referenz; deren aussagekraeftiger Punkt ist nicht das Minimum, sondern die Gleichheit
@@ -160,6 +172,8 @@ struct HeatmapData {
 // eine ausgefuehrte 0 wird DARGESTELLT (eigene 0-Farbklasse eine Dekade unter der kleinsten gemessenen
 // Dekade; besteht die Flaeche NUR aus echten Nullen, traegt die Colorbar genau diese eine 0-Klasse).
 // Strukturell leere Matrix (0 Zeilen/Spalten) bleibt status_empty_input OHNE Datei (Bestandsverhalten).
+// REV 7.7: eine GEMESSENE Matrix unter dem 2x2-Minimum von matrix input=image (1x1/1xN/Nx1) bekommt
+// den GROESSEN-Platzhalter (degenerate_size_note), ebenfalls status_ok -- die Datei muss existieren.
 [[nodiscard]] int write_heatmap(std::filesystem::path const& out, HeatmapData const& data,
                                 PageConstraints const& cnst = {});
 

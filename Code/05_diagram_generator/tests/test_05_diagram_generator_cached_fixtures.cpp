@@ -732,6 +732,35 @@ void write_wide_csv_with_op_counts(fs::path const& p) {
 // Zaehlt die Koordinaten-Zeilen einer Heatmap, die ehrlich ausgelassen sind: Mesh-Traeger ",0)" + [nan].
 std::size_t count_omitted_cells(fs::path const& p) { return count_occurrences(p, ",0) [nan]"); }
 
+// REV 7.7/F1 (2026-08-13): 1x1-Smoke-Fixture, spiegelt Job 376333 (measure_out_smoke/e4_xml/
+// measurements.csv): n_ops=10000, total_ns=11990468 -> ns_per_op=1199.047; op_lookup_n=10000,
+// op_lookup_p50_ns=1310. Header schema-treu MIT allen 5 op_<art>_p50_ns-Pflichtspalten (parse_wide_csv
+// required[]) und allen 5 op_<art>_n-Zaehlern (Zaehler = Primaerquelle der Ausgefuehrt-Klassifikation).
+void write_wide_csv_smoke_1x1(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_n;op_insert_p50_ns;op_lookup_n;op_lookup_p50_ns;"
+      << "op_erase_n;op_erase_p50_ns;op_scan_n;op_scan_p50_ns;op_rmw_n;op_rmw_p50_ns;"
+      << "workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;1199.047;0;0;10000;1310;0;0;0;0;0;0;ycsb_c;1\n";
+}
+
+// REV 7.7/F1: 1xN/Nx1-Korpora -- two_workloads=true: 1 Algo x 2 Workloads (ny=1, nx=2);
+// two_workloads=false: 2 Algos x 1 Workload (ny=2, nx=1). Beide GEMESSEN, beide unter dem 2x2-Minimum.
+void write_wide_csv_smoke_degenerate(fs::path const& p, bool two_workloads) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_n;op_insert_p50_ns;op_lookup_n;op_lookup_p50_ns;"
+      << "op_erase_n;op_erase_p50_ns;op_scan_n;op_scan_p50_ns;op_rmw_n;op_rmw_p50_ns;"
+      << "workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;1199.047;0;0;10000;1310;0;0;0;0;0;0;ycsb_c;1\n";
+    if (two_workloads) {
+        f << "search_algo=k_ary/mapping=direct;1250.500;0;0;10000;1400;0;0;0;0;0;0;ycsb_a;1\n";
+    } else {
+        f << "search_algo=eytzinger/mapping=direct;1250.500;0;0;10000;1400;0;0;0;0;0;0;ycsb_c;1\n";
+    }
+}
+
 } // namespace
 
 // (a) Parser: die 5 op_<art>_n werden HEADER-GETRIEBEN mitgelesen; fehlt die Spaltengruppe (p50-only-
@@ -887,6 +916,151 @@ TEST(Stufe05Pipeline, SurfaceExecutionCounterOverridesP50Heuristic) {
     fs::remove(out_old, ec);
     fs::remove(p, ec);
     fs::remove(p_old, ec);
+}
+
+// -----------------------------------------------------------------------------
+// REV 7.7/F1 (2026-08-13) -- GROESSEN-WACHE: eine GEMESSENE Matrix unter dem 2x2-Minimum von
+// pgfplots' matrix input=image (1x1/1xN/Nx1) ist kompilier-fatal ("'matrix input=image' is
+// unsupported for line plots (or matrix plots with just 1 row or 1 column)"; Proben 13.08.2026,
+// texlive 2026, compat=1.18: 1x1 rc=1, 1x2 rc=1, 2x2 rc=0). Der F1-Smoke-Korpus (Job 376333) ist
+// GENAU dieser Fall: 1 Suchalgorithmus x 1 Workload, ns_per_op=1199.047. Die Datenlos-Wache (E-2a)
+// greift dort NICHT, denn die Zelle IST gemessen -> eigener GROESSEN-Platzhalter, der ausdruecklich
+// NICHT "nie ausgefuehrt" behauptet.
+// -----------------------------------------------------------------------------
+
+// (f1-a) 1x1 GEMESSEN -> ehrlicher GROESSEN-Platzhalter: status_ok, Datei existiert (blankes \input in
+//        A_measurements.tex), KEIN matrix plot, KEIN addplot3 -- und der Vermerk nennt Groesse (1x1)
+//        und Minimum (2x2) statt der falschen Datenlos-Behauptung.
+TEST(Stufe05Pipeline, Surface1x1IsHonestSizePlaceholder) {
+    auto p = comdare_user_tmp() / "f1_smoke_1x1.csv";
+    write_wide_csv_smoke_1x1(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 1u);
+
+    std::error_code ec;
+
+    // -- de, ns_per_op (die F1-PDF-Tabellenzeile haengt an genau dieser Flaeche) --
+    auto out_de = comdare_user_tmp() / "f1_surface_1x1_de.tex";
+    fs::remove(out_de, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_de, rows, "ns_per_op", "de"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out_de));
+    EXPECT_FALSE(file_contains(out_de, "matrix plot"));
+    EXPECT_FALSE(file_contains(out_de, "addplot3"));
+    EXPECT_TRUE(file_contains(out_de, "HONEST-EMPTY"));
+    EXPECT_TRUE(file_contains(out_de, "\\begin{figure}"));
+    // EHRLICHKEIT: die Zelle IST gemessen -- der Vermerk darf die Datenlos-Behauptung NICHT tragen ...
+    EXPECT_FALSE(file_contains(out_de, "nie ausgefuehrt"));
+    EXPECT_FALSE(file_contains(out_de, "never executed"));
+    // ... sondern nennt die Groesse und das Minimum.
+    EXPECT_TRUE(file_contains(out_de, "1x1"));
+    EXPECT_TRUE(file_contains(out_de, "2x2"));
+
+    // -- en, op_lookup_p50_ns (zweite fatale Flaeche des 64er-Sets) --
+    auto out_en = comdare_user_tmp() / "f1_surface_1x1_en.tex";
+    fs::remove(out_en, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_en, rows, "op_lookup_p50_ns", "en"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out_en));
+    EXPECT_FALSE(file_contains(out_en, "matrix plot"));
+    EXPECT_FALSE(file_contains(out_en, "addplot3"));
+    EXPECT_TRUE(file_contains(out_en, "HONEST-EMPTY"));
+    EXPECT_TRUE(file_contains(out_en, "\\begin{figure}"));
+    EXPECT_FALSE(file_contains(out_en, "never executed"));
+    EXPECT_FALSE(file_contains(out_en, "nie ausgefuehrt"));
+    EXPECT_TRUE(file_contains(out_en, "1x1"));
+    EXPECT_TRUE(file_contains(out_en, "2x2"));
+
+    fs::remove(out_de, ec);
+    fs::remove(out_en, ec);
+    fs::remove(p, ec);
+}
+
+// (f1-b) 1xN und Nx1: auch mit ZWEI gemessenen Zellen bleibt die Matrix unter dem 2x2-Minimum
+//        (Probe 13.08.: 1 Zeile x 2 Spalten rc=1) -> Platzhalter, status_ok, Groesse im Vermerk.
+TEST(Stufe05Pipeline, Surface1xNAndNx1ArePlaceholders) {
+    std::error_code ec;
+
+    // ny=1, nx=2 (1 Algo x 2 Workloads)
+    auto p_row = comdare_user_tmp() / "f1_smoke_1x2.csv";
+    write_wide_csv_smoke_degenerate(p_row, /*two_workloads=*/true);
+    std::vector<dg::WideMeasurementRow> rows_row;
+    ASSERT_EQ(dg::parse_wide_csv(p_row, rows_row), dg::status_ok);
+    auto out_row = comdare_user_tmp() / "f1_surface_1x2.tex";
+    fs::remove(out_row, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_row, rows_row, "ns_per_op", "en"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out_row));
+    EXPECT_FALSE(file_contains(out_row, "matrix plot"));
+    EXPECT_FALSE(file_contains(out_row, "addplot3"));
+    EXPECT_TRUE(file_contains(out_row, "HONEST-EMPTY"));
+    EXPECT_FALSE(file_contains(out_row, "never executed"));
+    EXPECT_TRUE(file_contains(out_row, "1x2"));
+
+    // ny=2, nx=1 (2 Algos x 1 Workload)
+    auto p_col = comdare_user_tmp() / "f1_smoke_2x1.csv";
+    write_wide_csv_smoke_degenerate(p_col, /*two_workloads=*/false);
+    std::vector<dg::WideMeasurementRow> rows_col;
+    ASSERT_EQ(dg::parse_wide_csv(p_col, rows_col), dg::status_ok);
+    auto out_col = comdare_user_tmp() / "f1_surface_2x1.tex";
+    fs::remove(out_col, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_col, rows_col, "ns_per_op", "de"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out_col));
+    EXPECT_FALSE(file_contains(out_col, "matrix plot"));
+    EXPECT_FALSE(file_contains(out_col, "addplot3"));
+    EXPECT_TRUE(file_contains(out_col, "HONEST-EMPTY"));
+    EXPECT_FALSE(file_contains(out_col, "nie ausgefuehrt"));
+    EXPECT_TRUE(file_contains(out_col, "2x1"));
+
+    fs::remove(out_row, ec);
+    fs::remove(out_col, ec);
+    fs::remove(p_row, ec);
+    fs::remove(p_col, ec);
+}
+
+// (f1-c) ratio-Pfad mit Referenz IM Korpus: die 1x1-Verhaeltnis-Matrix (k_ary/k_ary = 1.0) traegt ein
+//        Datum, faellt also NICHT unter die Datenlos-Wache -> auch hier GROESSEN-Platzhalter.
+//        (Der reale Smoke-Lauf nahm Referenz linear_scan -> have_ref=false -> Datenlos-Platzhalter;
+//        Referenz k_ary trifft gezielt den 1x1-MIT-DATEN-Pfad.)
+TEST(Stufe05Pipeline, Ratio1x1IsHonestSizePlaceholder) {
+    auto p = comdare_user_tmp() / "f1_smoke_ratio_1x1.csv";
+    write_wide_csv_smoke_1x1(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f1_surface_ratio_1x1.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_ratio_vs_reference(out, rows, "ns_per_op", "k_ary", "de"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out));
+    EXPECT_FALSE(file_contains(out, "matrix plot"));
+    EXPECT_FALSE(file_contains(out, "addplot3"));
+    EXPECT_TRUE(file_contains(out, "HONEST-EMPTY"));
+    EXPECT_TRUE(file_contains(out, "\\begin{figure}"));
+    EXPECT_FALSE(file_contains(out, "nie ausgefuehrt"));
+    EXPECT_FALSE(file_contains(out, "never executed"));
+    EXPECT_TRUE(file_contains(out, "1x1"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (f1-d) GEGENKOEDER gegen Ueberblocken: ein 2x2-Korpus bleibt eine ECHTE Figur (matrix plot*),
+//        kein Groessen-Platzhalter. (Bestandstest WriteSurfaceHeatmapFromWide deckt 2x2 zusaetzlich.)
+TEST(Stufe05Pipeline, Surface2x2StaysRealFigure) {
+    auto p = comdare_user_tmp() / "f1_smoke_2x2.csv";
+    write_wide_csv_with_op_counts(p); // Bestands-Fixture: 2 Algos x 2 Workloads
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f1_surface_2x2.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "matrix plot*"));
+    EXPECT_TRUE(file_contains(out, "addplot3"));
+    EXPECT_FALSE(file_contains(out, "HONEST-EMPTY (Groesse)"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
 }
 
 // -----------------------------------------------------------------------------
@@ -1312,8 +1486,16 @@ TEST(Stufe05Pipeline, RatioMatrixTrueZeroNumeratorIsDisplayableButZeroDenominato
     // (a) Zaehler 0, Nenner 100 -> Ratio 0, darstellbar. z_field = op_insert_p50_ns, weil nur dort der
     //     Ausfuehrungs-Zaehler op_insert_n die 0 als GEMESSEN ausweisen kann (bei ns_per_op ist eine 0
     //     dokumentiert "nicht ausgefuehrt").
+    // REV 7.7 (2026-08-13): Korpus auf ZWEI Workload-Spalten erweitert. Der alte 2x1-Korpus (1 Spalte)
+    // liess den Writer genau die Flaechen-Klasse emittieren, die pgfplots kompilier-fatal ablehnt
+    // (Proben 13.08.: 1x2 rc=1, 2x1 rc=1 (Nachprobe), 2x2 rc=0) -- seit der Groessen-Wache entsteht
+    // dafuer ehrlich ein Platzhalter. Die hier gepruefte SEMANTIK (Verhaeltnis 0 ist darstellbar,
+    // eigene Farbklasse unter der Mitte) braucht eine echte Figur, also ein 2x2-Korpus.
     auto p_num = comdare_user_tmp() / "p2_zero_numerator.csv";
-    write_wide_csv_for_ratio(p_num, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 0.0}});
+    write_wide_csv_for_ratio(p_num, {{"linear_scan", "ycsb_a", 100.0},
+                                     {"k_ary", "ycsb_a", 0.0},
+                                     {"linear_scan", "ycsb_c", 100.0},
+                                     {"k_ary", "ycsb_c", 50.0}});
     std::vector<dg::WideMeasurementRow> rows_num;
     ASSERT_EQ(dg::parse_wide_csv(p_num, rows_num), dg::status_ok);
     ASSERT_TRUE(rows_num[0].has_op_n); // die Ausfuehrungs-Wahrheit steht wirklich in der CSV
@@ -1323,11 +1505,14 @@ TEST(Stufe05Pipeline, RatioMatrixTrueZeroNumeratorIsDisplayableButZeroDenominato
               dg::status_ok);
     EXPECT_TRUE(file_contains(out_num, "matrix plot*"));           // echte Figur
     EXPECT_FALSE(file_contains(out_num, "Metrik ohne Messwerte")); // KEIN Platzhalter
-    // Verhaeltnis 0 ist DARGESTELLT -- Wert 0.0000 mit eigener Farbklasse eine Dekade unter der Mitte
-    // (log10(0) existiert nicht). Halbe Breite ist hier 1 Dekade (nur ein positives Verhaeltnis 1.0),
-    // die 0-Klasse sitzt also bei -2.
-    EXPECT_TRUE(file_contains(out_num, "(0,0,0.0000) [-2.0000]"));
-    EXPECT_TRUE(file_contains(out_num, "(0,1,1.0000) [0.0000]")); // Referenz gegen sich selbst: log(1)=0
+    // Verhaeltnis 0 ist DARGESTELLT -- Wert 0.0000 mit eigener Farbklasse eine Dekade unter der halben
+    // Breite (log10(0) existiert nicht). Halbe Breite ist hier |log10(0.5)| = 0.3010 (Zellen 0.5 und
+    // 1.0), die 0-Klasse sitzt also bei -(0.3010+1) = -1.3010; die Domaene waechst SYMMETRISCH mit.
+    EXPECT_TRUE(file_contains(out_num, "(0,0,0.0000) [-1.3010]"));
+    EXPECT_TRUE(file_contains(out_num, "(0,1,1.0000) [0.0000]"));  // Referenz gegen sich selbst: log(1)=0
+    EXPECT_TRUE(file_contains(out_num, "(1,0,0.5000) [-0.3010]")); // zweite Spalte rechnet normal weiter
+    EXPECT_TRUE(file_contains(out_num, "point meta min=-1.3010"));
+    EXPECT_TRUE(file_contains(out_num, "point meta max=1.3010"));
     // Die 0-Klasse ist ehrlich als "0" beschriftet, die Mitte als "1" (= wie die Referenz).
     EXPECT_TRUE(file_contains(out_num, "yticklabels={$0$,"));
     EXPECT_TRUE(file_contains(out_num, "$1$"));
@@ -1384,8 +1569,15 @@ TEST(Stufe05Pipeline, RatioMatrixDivergentScaleIsLogSymmetricAroundEquality) {
     auto p = comdare_user_tmp() / "p2_divergent.csv";
     // Referenz 100; k_ary 200 -> Verhaeltnis 2.0; eytzinger 50 -> Verhaeltnis 0.5.
     // Genau der Prueffall: beide sind "Faktor 2" von der Referenz entfernt, nur in andere Richtung.
-    write_wide_csv_for_ratio(
-        p, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 200.0}, {"eytzinger", "ycsb_a", 50.0}});
+    // REV 7.7 (2026-08-13): zweite Workload-Spalte ergaenzt (der alte 3x1-Korpus ist seit der
+    // Groessen-Wache ehrlich ein Platzhalter; Nx1 ist pgfplots-fatal, Nachprobe 2x1 rc=1). Die Werte
+    // je Spalte sind identisch -> die geprueften Log-Symmetrie-Zahlen bleiben exakt dieselben.
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_a", 200.0},
+                                 {"eytzinger", "ycsb_a", 50.0},
+                                 {"linear_scan", "ycsb_c", 100.0},
+                                 {"k_ary", "ycsb_c", 200.0},
+                                 {"eytzinger", "ycsb_c", 50.0}});
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
@@ -1417,7 +1609,14 @@ TEST(Stufe05Pipeline, RatioMatrixDivergentScaleIsLogSymmetricAroundEquality) {
 // Geweitet wird ausschliesslich die ACHSE, kein Datum wird veraendert.
 TEST(Stufe05Pipeline, RatioMatrixDegenerateAllOnesWidensOnlyTheAxis) {
     auto p = comdare_user_tmp() / "p2_degenerate.csv";
-    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0}});
+    // REV 7.7 (2026-08-13): 1x1 -> 2x2-Korpus. Die 1x1-Flaeche ist seit der Groessen-Wache ehrlich ein
+    // Platzhalter (matrix input=image verlangt >= 2x2, Proben 13.08.); dieser Test prueft aber die
+    // ENTARTUNG DER DOMAENEN bei lauter exakt gleichen Verhaeltnissen, und die braucht eine echte
+    // Figur. Alle vier Zellen tragen dasselbe Verhaeltnis 1.0 -> Farb- und z-Domaene kollabieren.
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_a", 100.0},
+                                 {"linear_scan", "ycsb_c", 100.0},
+                                 {"k_ary", "ycsb_c", 100.0}});
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
@@ -1440,7 +1639,13 @@ TEST(Stufe05Pipeline, RatioMatrixDegenerateAllOnesWidensOnlyTheAxis) {
 // log-Dekaden-Colorbar, KEINE divergente Colormap. P2 ist additiv, kein Ersatz.
 TEST(Stufe05Pipeline, RatioModeDoesNotLeakIntoThePlainLatencyHeatmap) {
     auto p = comdare_user_tmp() / "p2_bestandsschutz.csv";
-    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 300.0}});
+    // REV 7.7 (2026-08-13): zweite Workload-Spalte ergaenzt (der alte 2x1-Korpus ist seit der
+    // Groessen-Wache ehrlich ein Platzhalter; Nachprobe 2x1 rc=1) -- der Bestandsschutz "keine
+    // divergente Colormap im Roh-Pfad" braucht eine echte Figur.
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_a", 300.0},
+                                 {"linear_scan", "ycsb_c", 100.0},
+                                 {"k_ary", "ycsb_c", 300.0}});
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
