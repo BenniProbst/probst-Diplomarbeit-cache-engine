@@ -114,9 +114,13 @@ trap 'rm -rf "$WERK"' EXIT INT TERM
 token() { od -An -tx1 -N8 /dev/urandom | tr -d ' \n'; }
 
 # --- KOEDER VOR JEDER NULL ----------------------------------------------------
-# /usr/bin/grep ist hier ugrep; eine Null kann Abwesenheit ODER Werkzeug-Versagen
-# sein. Deshalb wird die Zaehlweise erst an einer Datei geeicht, deren Inhalt
-# diese Wache selbst gewuerfelt hat.
+# Eine Null kann Abwesenheit ODER Werkzeug-Versagen sein. Deshalb wird die
+# Zaehlweise erst an einer Datei geeicht, deren Inhalt diese Wache selbst
+# gewuerfelt hat (K13). BERICHTIGT 13.08.2026 (A2.5-V3): die fruehere Begruendung
+# "/usr/bin/grep ist hier ugrep" war am Objekt falsch -- /usr/bin/grep ist
+# GNU grep 3.11 (prod1, gemessen 13.08.); ugrep ist die interaktive grep-FUNKTION
+# (Fallen-Register-Lehre). Die Eichung bleibt richtig, egal welches grep
+# antwortet.
 KOEDER_DATEI="$WERK/koeder"
 KT=$(token)
 N_KOEDER=3

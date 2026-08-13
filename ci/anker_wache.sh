@@ -100,7 +100,12 @@ while IFS='	' read -r _dok _pfad _sym _soll; do
         continue
     fi
     # IST: alle Zeilen, die das Symbol tragen. -F, weil das Symbol keine
-    # Regex-Absicht hat und /usr/bin/grep hier ugrep ist (-P liefert stille 0).
+    # Regex-Absicht hat -- literal bleibt literal, egal welches grep antwortet.
+    # BERICHTIGT 13.08.2026 (A2.5-V3): die fruehere Begruendung "/usr/bin/grep ist
+    # hier ugrep (-P liefert stille 0)" war am Objekt falsch -- /usr/bin/grep ist
+    # GNU grep 3.11 (prod1, gemessen 13.08.); die Fallen-Register-Lehre zur
+    # stillen 0 betrifft die interaktive grep-FUNKTION (ugrep), nicht das Binary.
+    # Der Runner ist von hier nicht messbar; -F traegt auf GNU grep UND ugrep.
     # K11: die Ausgabe erst in eine DATEI, dann auswerten -- ein rc hinter dieser
     # Pipe wuerde 'tr' messen, nicht 'grep'.
     grep -nF "$_sym" "$_datei" > "$TMP/treffer.txt" 2>/dev/null || :
