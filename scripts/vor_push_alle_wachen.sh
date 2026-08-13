@@ -195,7 +195,10 @@ EOF
 
 wache_args() {
     case "$1" in
-        scripts/ci_diff_ascii_width_guard.sh)       printf '%s' "$BEREICH" ;;
+        # --bereich <basis> <spitze>: der PUSH-Bereich dieser Wache (Memory-Lehre
+        # 'DIFF-HYGIENE misst PUSH-lokal': --seit-basis fiele lokal auf origin/main
+        # zurueck und maesse den kumulativen Rueckstand statt dieses Pushes).
+        scripts/ci_diff_ascii_width_guard.sh)       printf '%s' "--bereich $BASIS HEAD" ;;
         scripts/ci_abnahme06_bedingungs_tabelle.sh)
             printf '%s' "--nur-zusicherung --gegen-vorlage"
             printf '%s' " docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md" ;;
