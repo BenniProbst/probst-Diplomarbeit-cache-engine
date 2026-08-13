@@ -1970,7 +1970,12 @@ measure:smoke:
       sh ../ci/frische_wache.sh pruefen measure_out_smoke
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
       echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
-      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      # KETTEN-RISS-Heilung (13.08.2026): Spiegel von measure:golden-320 (T-6-Schwesterpflicht,
+      # volle Begruendung dort). ANHANG_GRUND leer = Anhang real regeneriert (>=1 .tex gezaehlt).
+      ANHANG_GRUND="kein appendix-generator Binary unter build/"
+      cmake --build build --target appendix_generator_cli \
+        || { echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+             ANHANG_GRUND="appendix_generator_cli-Build fehlgeschlagen"; }
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
         # WIDE-Aggregat (P4c, 2026-08-09): die Logik steht NICHT mehr hier, sondern EINMAL in
@@ -1999,15 +2004,33 @@ measure:smoke:
         echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
-          echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          # Zaehlung als eigene Stufe MIT Verzeichnis-Wache (Spiegel measure:golden-320).
+          if [ -d measure_out_smoke/appendix ]; then
+            N_ANHANG_TEX=$(find measure_out_smoke/appendix -name '*.tex' | wc -l)
+          else
+            N_ANHANG_TEX=0
+          fi
+          echo "== regenerierte Anhang-.tex =="; echo "  Anhang-.tex je Lauf: $N_ANHANG_TEX"
+          if [ "$N_ANHANG_TEX" -ge 1 ]; then
+            ANHANG_GRUND=""
+          else
+            ANHANG_GRUND="appendix-generator lief, erzeugte aber 0 .tex unter measure_out_smoke/appendix"
+          fi
           rm -f "$WIDE" measure_out_smoke/_rc_list.txt   # Intermediates NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
         else
           # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
           # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
           echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER) -> Anhang-Regenerierung honest uebersprungen"
+          ANHANG_GRUND="WIDE-Aggregat ohne Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER)"
         fi
       fi
-      echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
+      # KETTEN-RISS geheilt: OK-Zeile bedingt (Spiegel measure:golden-320, Begruendung dort).
+      if [ -z "$ANHANG_GRUND" ]; then
+        echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
+      else
+        echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs unter measure_out_smoke/) ==="
+        echo "=== Anhang-Regenerierung SKIP: $ANHANG_GRUND ==="
+      fi
     # LAG-P1: Bestandslog-Wache als eigener Schritt, OHNE allow_failure (Begruendung s. measure:golden-320).
     - !reference [.bestandslog_wache, script]
     # LAG-P1 Rest: die Wache oben belegt, dass das Gate zuendete; DIESE belegt, dass der Store
@@ -2163,7 +2186,14 @@ measure:golden-320:
       # vorher stale "16"; Ist laut 08_appendix_generator/appendix_generator.hpp) aus der WIDE-Matrix ALLER Permutationen.
       # WIDE-Aggregat = Konkatenation der per-Perm-result.csv (Header einmal + alle Datenzeilen). honest-empty-tolerant.
       echo "== Anhang-Regenerierung aus Live-Messdaten (#24) =="
-      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      # KETTEN-RISS-Heilung (13.08.2026): die OK-Schlusszeile des Jobs behauptete den regenerierten
+      # Anhang UNBEDINGT -- auch wenn der Build scheiterte, das Binary fehlte, das Aggregat leer blieb
+      # oder der Generator 0 .tex schrieb. ANHANG_GRUND sammelt den SKIP-Grund; leer heisst: der
+      # Anhang-Schritt lief real und hat mindestens eine .tex erzeugt (am Objekt gezaehlt, unten).
+      ANHANG_GRUND="kein appendix-generator Binary unter build/"
+      cmake --build build --target appendix_generator_cli \
+        || { echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+             ANHANG_GRUND="appendix_generator_cli-Build fehlgeschlagen"; }
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
         # WIDE-Aggregat (P4c, 2026-08-09): EIN Aufruf statt einer dritten Kopie. Die Logik steht in
@@ -2187,15 +2217,38 @@ measure:golden-320:
         echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
-          echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          # Zaehlung als eigene Stufe MIT Verzeichnis-Wache (Ketten-Riss-Paket): das alte
+          # 'find fehlendes-dir | wc -l' waere unter pipefail ein harter, unerklaerter Jobtod
+          # gewesen (find rc=1), wenn der tolerierte Generator-Fehler oben kein appendix/ anlegte.
+          if [ -d measure_out/appendix ]; then
+            N_ANHANG_TEX=$(find measure_out/appendix -name '*.tex' | wc -l)
+          else
+            N_ANHANG_TEX=0
+          fi
+          echo "== regenerierte Anhang-.tex =="; echo "  Anhang-.tex je Lauf: $N_ANHANG_TEX"
+          if [ "$N_ANHANG_TEX" -ge 1 ]; then
+            ANHANG_GRUND=""
+          else
+            ANHANG_GRUND="appendix-generator lief, erzeugte aber 0 .tex unter measure_out/appendix"
+          fi
           rm -f "$WIDE" measure_out/_rc_list.txt   # Intermediates (39k-Zeilen-Konkatenation) NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
         else
           # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
           # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
           echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER) -> Anhang-Regenerierung honest uebersprungen"
+          ANHANG_GRUND="WIDE-Aggregat ohne Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER)"
         fi
       fi
-      echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
+      # KETTEN-RISS geheilt (13.08.2026): die OK-Zeile nennt den Anhang NUR, wenn er real
+      # regeneriert wurde (ANHANG_GRUND leer, s. Anhang-Block); sonst eigene SKIP-Zeile MIT Grund.
+      # Der Mess-Teil ist hier bereits durch die harten Wachen oben (Lauf-Marker, Ausbeute,
+      # Frische) bewiesen -- der bleibt unveraendert besiegelt.
+      if [ -z "$ANHANG_GRUND" ]; then
+        echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
+      else
+        echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs unter measure_out/) ==="
+        echo "=== Anhang-Regenerierung SKIP: $ANHANG_GRUND ==="
+      fi
     # LAG-P1: die Bestandslog-Wache als EIGENER Schritt, NACH dem Lauf, OHNE allow_failure. Sie steht
     # bewusst hinter der Mess-Ausbeute-Wache: erst "hat der Lauf Messwerte erzeugt", dann "war er dabei
     # ueberhaupt am Lager angemeldet". Beide Fragen sind getrennt beantwortbar und beide muessen ja sein.
@@ -2748,6 +2801,11 @@ ergebnis:holen:
       when: never
     - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
       when: manual                                 # GN-11/320er-Gate: das scharfe Ergebnis-Holen ist opt-in
+      # DEKLARIERTE AUSNAHME (NE-20-Triage 13.08.2026) von der Owner-Doktrin 06.07. ("kein allow_failure"):
+      # unter rules: gilt fuer when:manual der Default allow_failure:false -- jede GN-11-Pipeline stuende
+      # BLOCKED, bis jemand dieses SKELETT (Job seit 19.07., 18a99200, §42 W10-B) von Hand spielt. Das Flag
+      # heisst hier "darf ungespielt bleiben", nicht "Fehler egal". Beim Scharfschalten des Sammel-Aufrufs
+      # (GN-11/320er) diese Ausnahme NEU triagieren -- ein scharfer Sammler ist ZELLE=Warnung/JOB=rot.
       allow_failure: true
   script:
     - |
