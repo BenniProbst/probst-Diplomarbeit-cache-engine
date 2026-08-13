@@ -205,13 +205,41 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = f23c18e2db974ed7f93a0659f6196c75e0afe0a4
+PZW-CE-SHA         = 5f3f26a5294f75572a7d2907ec8ebbb1de482f2a
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 13.08.2026, mittags — achter Gitlink-Zug (WELLEN-LANDUNG P1+P11, KON58/§18), und zum
+fünften Mal in Folge bewegt sich KEINE der fünf Zahlen. Die vorherige Fassung bleibt darunter
+stehen.**
+
+Der Gitlink zieht von `f23c18e2` auf **`5f3f26a5`** (die A2.1a-Wellen-Landung: Merge P1
+`4c37116a` = S-3-Ordnungsrelation + Merge P11 `b91b22fc` = S-14a-Riegel über den Overlay-Schnitt
++ Floor-Neumessung `5f3f26a5` — **ce-Pipeline 15785 TERMINAL SUCCESS**, ctest 488/488 lokal,
+Floor-Sprossen **489/485/483** je Host-Klasse).
+
+| Anker | alt (Stand `f23c18e2`) | neu (Stand `5f3f26a5`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `f23c18e2db974…` | **`5f3f26a5294f7…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | **501** Test-`.cpp` im Baum, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 501 Test-`.cpp` im Baum `5f3f26a5` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 501 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2768 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2768 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich trotz Nenner-Wachstum (498 → 501 Test-`.cpp`) keine Zahl bewegt:** die drei neuen
+Dateien sind exakt die Zugänge des Zugs (`test_s3_ordnung_freigabe.cpp`,
+`test_s3_ordnung_relation.cpp`, `test_s14_axis_version_lock_tripwire.cpp` — per
+`diff --name-only --diff-filter=A` am Zug gemessen), und der Zug berührt `lazy_csv_header`
+an **0** Stellen (`git diff f23c18e2..5f3f26a5 -- 'tests/*.cpp' | grep -c` = 0); die
+super-CI-YAML ist unberührt (2768 Zeilen). Dasselbe Muster wie beim vierten bis siebten Zug:
+der Nenner zählt **Dateien**, die Anker zählen **Stellen**. *(Die Erwartung wurde vor dem
+Commit aus der Zug-Differenz abgeleitet und von der Wache nach dem Commit bestätigt — die
+CI-Formel ist die CI-Formel, der Wachen-Lauf ist der Beleg, nicht diese Ableitung.)*
 
 **Nachzug 13.08.2026 — siebter Gitlink-Zug (Q6-Kommentar-Nachzug, KON58-02), und zum vierten Mal
 in Folge bewegt sich KEINE der vier Zahlen. Die vorherige Fassung bleibt darunter stehen.**
