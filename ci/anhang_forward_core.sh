@@ -293,7 +293,7 @@
 # richtigen Aufruf und bleibt im dokumentierten Exit-Vertrag (1 = fail-loud).
 if [ -z "${BASH_VERSION:-}" ]; then
   echo "FEHLER: ci/anhang_forward_core.sh ist ein bash-Script (Shebang Zeile 1)." >&2
-  echo "        'sh ci/anhang_forward_core.sh' (dash/POSIX-sh) kann es nicht fahren." >&2
+  echo "        Der Aufruf lief NICHT unter bash (BASH_VERSION leer -- z.B. sh/dash/zsh/ksh)." >&2
   echo "        Richtig: bash ci/anhang_forward_core.sh (die CI ruft es direkt, Shebang greift)." >&2
   exit 1
 fi
