@@ -16,6 +16,600 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 13.08.2026 — KON58: DER RIEGEL STEHT UND BEWACHT DIE RICHTIGE MENGE — S-14a MIT ZWEI PFLICHT-FIXUPS (158 → 718 RECORDS), S-3 GEBAUT, VIER ARBEITSWEISE-FASSUNGEN, UND DER LEDGER KANNTE DEN TAG NICHT
+
+**Der Hauptstrang-Tag nach der KON57-Landung: vier Explores (Fable 5 max) und zwei Bau-Stränge
+sind zurück. Die Bump-Pflicht-Wache deckt ab heute 158 statt 6 Träger — die Fehlerklasse
+„Änderung ohne Bump ⇒ kein Neubau ⇒ schneller UND falsch" hat damit erstmals ein Werkzeug, das
+sie über den ganzen Organ-Bestand fängt. Jede Zahl unten am Objekt gemessen; wo eine eigene
+frühere Angabe gefallen ist, steht die Korrektur dabei.**
+
+---
+
+### KON58-01 — 🔴 GOLDEN-BASELINE UND S-14a-RIEGEL (Task #16-Voraussetzung + Task #33)
+
+    OWNER-DECKUNG   KON27-01 "Wir beginnen aber zuerst mit einer gueltigen golden Version"
+                    (die Baseline, an der sich jede spaetere Umgliederung misst) ·
+                    KON17-03 "Wache Modular erweitern und in Detail-Klassen splitten"
+                    (EINE Wache, kein zweites Werkzeug daneben) · KON16-08 Prioritaet "hoch".
+    GEBAUT          ce-Branch bau/golden-s14a-riegel, vier Commits:
+                      a8465ef3  golden-Baseline auf 158 Traeger festgeschrieben
+                      8424a331  Tripwire-ctest ROT ZUERST (Koeder D belegt die v1-Luecke)
+                      f2f9fc05  Riegel v2 (Detail-Klassen, bidirektionaler Check, Lock v2,
+                                CI-Job ohne Pfad-Liste)
+                      bb5d3f3c  Lock v2 als Zweizeilen-Record (Diff-Hygiene voll gedeckt)
+
+    DIE GRUNDGESAMTHEIT, dreifach gemessen (Bauer, Verify, Lead-Gegenprobe):
+      6 heuristik-Header (Kommentar-Marker AXIS_ALGO_VERSION, Integer)
+      + 130 axes-Header mit algo_version-Substring
+      + 22 topics/queuing-Traeger
+      = 158 Lock-Records. Davon 122 ECHTE Traeger (algo_version-Zuweisung) und
+      30 Forwarder/Prosa (digest-only, ohne Versions-Semantik).
+
+    🔴 EIGENE PLANUNGSZAHL GEFALLEN, nicht geglaettet: der Explore plante "103+20 = 123
+    Traeger", am Objekt sind es 102+20 = 122. axis_06_allocator_strategy_base.hpp zaehlte im
+    naiven Zeilen-grep nur wegen einer PROSA-Kommentarzeile mit; der kommentar-/string-bewusste
+    Scan ordnet sie korrekt als Nicht-Traeger ein. Der Verify hat die Menge mit einem
+    UNABHAENGIGEN Muster nachgezaehlt: dieselben 122 Dateien, diff leer.
+
+    WAS DER RIEGEL JETZT KANN (v1 -> v2):
+      v1  pruefte NUR die 6 Pfade, die im CI-Job-Script standen, und iterierte allein ueber
+          diese argv-Liste. Ein verwaister Lock-Eintrag (Datei geloescht/umbenannt) blieb
+          dadurch STILL -- die Wache konnte ihre eigene Grundgesamtheit nicht verlieren sehen.
+      v2  erhebt die Grundgesamtheit SELBST ueber Kategorie-Homes (HeuristikDetail
+          unveraendert + OrganDetail neu: axes/ und topics/queuing/), prueft BIDIREKTIONAL
+          (jede entdeckte Datei im Lock UND jeder Lock-Eintrag mit Datei), nutzt den
+          BESTANDS-Parser algo_semver.hpp statt eines zweiten Version-Parsers, macht ein
+          unparsbares Literal (Sentinel) ROT und druckt je Kategorie einen BESTAND-Zaehler
+          MIT NENNER. Die hartkodierte Sechs-Pfad-Liste faellt aus der CI-YAML -- sie war
+          Mitursache des Drei-Wochen-Ausfalls (KON14-05) und alterte mit jedem neuen Traeger.
+      SYSTEM/MESS-Detail-Klassen sind BEWUSST NICHT angelegt (die Homes existieren nicht,
+      KON27-01) -- als benannte Leerstelle im Tool-Kopf dokumentiert, kein stiller Default.
+
+    DER BISS, GEFAHREN (K13 beidseitig, jede Ausgabe literal protokolliert):
+      ROT ZUERST (T-1)  Koeder D am HEUTIGEN v1-Werkzeug: Phantom-Eintrag im Lock ->
+                        v1 antwortet "GRUEN alle 2 Strategie-Header konsistent", EXIT=0.
+                        Das ist das Rot, das FEHLTE. Der Verify hat es unabhaengig
+                        reproduziert (v1 selbst kompiliert, eigener Phantom-Pfad).
+      A  Drift ohne Bump an einer ECHTEN Kopie -> "ROT Digest geaendert OHNE gueltigen
+         Version-Bump (1.0.2.c -> 1.0.2.c)", EXIT=1; Ruecknahme -> EXIT=0
+      B  dieselbe Aenderung MIT Bump -> "OK ... MIT Version-Bump 1.0.0.c -> 1.1.0.c"
+      C  Datei nicht im Lock -> "unlocked" ROT   ·   D  verwaister Eintrag -> ROT (v2)
+      E  unparsbares Literal (Sentinel) -> ROT
+      v1-LOCK-ABWEISUNG: das v2-Werkzeug weist ein v1-Lock hart ab (kein stiller Fallback,
+         kein Vakuum-Gruen).
+      MUTATIONSBEWEIS T-i-2 (seit KON23-05/F offen) ist damit ERBRACHT: eine Aenderung an
+      einem axes-Header wird gefangen -- vorher lief sie an der Wache vorbei.
+
+    DIE MESSLATTE DER GOLDEN VERSION: nach dem gesamten v2-Umbau sind alle 158
+    <Pfad,Digest>-Paare IDENTISCH zur Baseline (sort/diff leer) -- vom Verify unabhaengig
+    nachgerechnet. Der Umbau hat die Identitaet also nicht angefasst; genau das war der
+    Zweck von "golden zuerst".
+
+    ABNAHME: ctest -N 485 -> 486 (T-7: der neue Test ist registriert und haengt ueber
+    add_dependencies + COMDARE_TEST_TARGETS im Bauweg) · KOMBIBAU KON55 VOLLSTAENDIG LOKAL:
+    gcc UND clang x Debug UND Release, je 486/486, jede Zelle nach J-1..J-4 -- dem CI bleibt
+    nichts nachzudecken · Diff-Hygiene-Wache ueber den Bereich GRUEN · YAML-Schluessel-Wache
+    und Stufen-Topologie-Wache GRUEN.
+
+    🔴 BETRIEBSFOLGE AB DER LANDUNG (gewollt, hier ausdruecklich angesagt): jede Aenderung an
+    einem der 122 Organ-Traeger erzwingt einen X.Y.Z-Bump ODER einen bewussten
+    Lock-Regen-Commit (--write); die 30 Forwarder/Prosa-Dateien verlangen IMMER den
+    Regen-Commit. Das trifft die W1-Straenge S-6/S-7 unmittelbar -- sie fassen axes-Header
+    massenhaft an. Der Friktions-Aufwand je Strang ist ungeplant und wird beim ersten
+    S-6-Paket gemessen, nicht geschaetzt.
+
+---
+
+### KON58-02 — Q6: DIE 32 STAND SCHON IM CODE — DER POSTEN WAR EIN KOMMENTAR-NACHZUG
+
+Der Wellenplan fuehrte „Q6-MaxN 8→32" als Bau-Posten. **Am Objekt war die Zahl bereits
+korrekt** (`heuristik_adapter_synthese_matrix.hpp`, `kHybridNodeObergrenzeDefault = 32` seit dem
+HY-A1-Nachzug 09.08.); offen war nur, dass der Datei-Kopf den Owner-Entscheid noch als
+**„OFFEN FÜR DEN OWNER"** führte. Vollzogen als Doku-Nachzug an vier Stellen (Matrix-Kopf ·
+`hybrid/README.md` · zwei Stellen im 02.08.-Soll-Design), je mit ÜBERHOLT-/NACHZUG-Vermerk,
+**nichts gelöscht**: 32 löst die 8 ab (KON28-03), 32 ist ein **Programm-Deckel**, kein
+Fach-Nenner (KON41-03: Prüfdocks ≠ Mess-Permutationen), Default-Doktrin gilt (KON42-01).
+Der XML-Override-Mechanismus bleibt ausdrücklich HY-A3.
+
+**Beweis, dass kein Code-Verhalten wanderte:** `g++ -fpreprocessed`-Hash des Headers vor und
+nach dem Nachzug **identisch** (`bd874f3f…`) — kommentarbereinigt ist die Datei byte-gleich.
+Köder gefahren: `static_assert(nodes == 8)` macht den Bau rot („the comparison reduces to
+(32 == 8)"), Rücknahme grün. Commit `58579575`, Branch `bau/q6-dock32-nachzug`; Kombibau
+4×485/485. **GELANDET als Merge `f23c18e2`** (no-ff; Merge-Baum `92a107ef` byte-identisch mit
+der `merge-tree`-Vorhersage, Diff-Hygiene über den Bereich GRÜN, beide Remotes) — ce-Pipeline
+**15774**.
+
+🔴 **UND EINE WERKZEUG-FALLE, DIE BEI DIESER LANDUNG ZUGESCHLAGEN HÄTTE:** der
+Standard-gitleaks-Köder (`aws_secret_access_key = "<20 Zufallszeichen>"`) **biss NICHT** — der
+Scan meldete „no leaks found" auf einer präparierten Datei. Die Null der Gegenprobe wäre damit
+wertlos gewesen (die dokumentierte Entropie-Schwellen-Falle, hier erstmals literal gefahren).
+Gültiger Köder ist die **projekt-eigene Klasse**: `glpat-` + 20 Zeichen ⇒ `leaks found: 1`,
+rc=1. **Erst danach** zählt die Null des echten Push-Inhalt-Scans (2 Commits, 198 Diff-Zeilen,
+`--pipe` mit `--config`, `-m` für den Merge). *Lehre für das Rezept: nicht „ein Köder mit 20
+Zeichen", sondern „ein Köder AUS EINER REGEL, DIE DIESE CONFIG FÜHRT" — die Länge allein
+entscheidet nicht, ob er beißt.*
+
+---
+
+### KON58-03 — OD-7: DAS HANDOUT LIEGT, DIE ZWEI ALT-ZITATE UND §69.6 SIND MARKIERT, N-3 IST NEU GERECHNET
+
+    INFRA-HANDOUT (Cluster docs/sessions/20260813-HANDOUT-od7-heavy-worker-24-auf-16.md):
+      Gegenstand ist GENAU EINE Zeile -- scripts/runner-mode.sh:43 (prod1) HEAVY_J 24 -> 16.
+      Die prod2-Zeile :44 (HEAVY_J=$(nproc)) und alle NORMAL-Werte bleiben unberuehrt.
+      Deploy-Weg und SIGHUP-only-Doktrin sind aus dem Infra-eigenen Beleg zitiert
+      (2026-07-26-INFRA-runner-matrix-DONE.md:50), nicht behauptet.
+      EINORDNUNG, die das Handout ausdruecklich macht: die HEAVY-Schaltung ist SIGNAL-GATED
+      (Infra-Zusage 02.08.) -- dieses Handout ist KEIN heavy-Signal, sondern nur die
+      Aenderung des Deckel-Werts fuer das naechste angeforderte Fenster (Bau-Trigger 26.08.).
+
+    DIE ZWEI UNKORRIGIERTEN ALT-ZITATE (Momentaufnahme 13.08., vor dem Edit neu angekert):
+      Z. 17446  §61 DEBUG-PARALLELITAET  "prod1: 32 Threads/24 Kerne"
+      Z. 17511  Thread-Budget            "prod1 = 32 Threads / 24 Kerne; prod2 = 24/16"
+      Beide bekommen einen datierten Marker DANEBEN (Praezedenz: Original + Marker, nie
+      loeschen): real prod1 = 16 Kerne/32 Threads (9950X3D), prod2 = 16 Kerne/24 Threads
+      (i9-12900K); die Werte waren am 22.07. zwischen den Maschinen vertauscht (KON26-05).
+      §69.6 (Z. 17745) bekommt den UEBERHOLT-Vermerk fuer den HEAVY-prod1-Teil (24 -> 16,
+      KON28-01); prod2 und NORMAL bleiben gueltig.
+
+    N-3/N-4 NEU GERECHNET (jede Eingangsgroesse als GEMESSEN oder ANNAHME gekennzeichnet):
+      ZWEILANIG (Voll-Bau): prod1 @16W ~22,8 h (ANNAHME: intel-Skalierungsfaktor 16W/24W =
+        35,5/32,25 = 1,1008 auf amd uebertragen; die naiv-lineare Obergrenze 24/16 ist durch
+        die GEMESSENE Saettigung 24W->32W = 19,4->19,95 min widerlegt) gegen prod2 @24W
+        GEMESSEN 34,4 h  =>  DER ENGPASS BLEIBT INTEL. Die Umstufung 24->16 aendert die
+        zweilanige Voll-Bau-Wanduhr NICHT (auch die Obergrenze 31,0 h bleibt unter 34,4 h).
+      EINLANIG (T-3-Kennzahl): 41,4 h @24W -> ~45,6 h @16W (ANNAHME, gleicher Faktor;
+        die in der nacht-9-Uebergabe genannte "~45,5 h" ist genau diese Rechnung).
+      KOMPENSATION liegt auf der MESS-Seite (--debug, nproc-parallel, KON37-04) -- ihre
+        GROESSE ist unbeziffert, weil kein debug-Mess-Slice gemessen ist. Ausgewiesen,
+        nicht glattgerechnet.
+      PFLICHT-NACHKALIBRIERUNG beim ersten realen 4096er-Batch @16W: es existiert KEIN
+        amd-16W-Lauf in den Traces (nur @24W und @32W).
+
+---
+
+### KON58-04 — 🔴 #10 MinIO: DIE VARIABLEN EXISTIEREN, DER VAULT TRÄGT NUR ENTWERTETES — UND EINE BACKUP-REF IST OHNE BUCHUNG VERSCHWUNDEN
+
+    BEFUND 1 (CI-Variablen): die vier Ebene-B-Variablen EXISTIEREN in Projekt 288
+      (MINIO_ACCESS_KEY, MINIO_SECRET_KEY, COMDARE_MINIO_ENDPOINT, COMDARE_MINIO_BUCKET).
+      Ob ihre WERTE tragen, ist von aussen nicht pruefbar, ohne sie zu lesen -- der gueltige
+      Test ist ein CI-SMOKE (288-Pipeline measure:smoke mit COMDARE_STORAGE_CACHE=true;
+      Beweiszeile "Ebene B aktiv: mc-Alias=prodcache", Gegenkoeder = der HART-ROT-Ast bei
+      geleertem Secret). Er gehoert in ein RUHIGES Fenster (Ein-Blech, er schreibt in MinIO).
+    BEFUND 2 (Vault, blind gemessen): die als minio-access/-secret markierten Vault-Zeilen
+      sind Markdown-Prosa; mehrere tragen ausdruecklich das Wort "entwertet" (Rotationslog).
+      Zwei Smoke-Anlaeufe (Einzelkandidaten und Paare-aus-einer-Zeile, beide Endpunkte,
+      rueckwaerts) blieben rot -- MIT gefahrenem Koeder und validierter Werkzeug-Mechanik
+      (die anonymous-Probe erreicht minio.comdare.de:9000, health 200, Antwort "Access Key
+      does not exist"), die Null ist also keine Werkzeug-Null. Das deckt das Owner-Wort
+      "die keys minio wurden vom scrub mitgenommen" (KON22-01/5).
+      FOLGE: traegt der Smoke aus Befund 1 nicht, muessen MinIO-seitig NEUE Keys erzeugt
+      werden (mc admin = Infra-Territorium, Handout-Muster KON48) -- ein Wiedereinsetzen
+      alter kompromittierter Werte waere schneller UND falsch.
+    🔴 BEFUND 3, UNGEBUCHT UND OWNER-VORZULEGEN: refs/backup/pre-secret-scrub-20260802 ist
+      auf BEIDEN origins nicht mehr vorhanden (ls-remote leer bei rc=0, Gegenprobe
+      refs/heads/development liefert die Tips), lokal 0 Refs, kein Bundle gefunden. Die
+      geltende gestufte Fassung (KON22-02/KON2-02/O-5) lautet: stehen lassen -> nach der
+      Lieferphase rechtebeschraenktes Bundle -> ERST DANN Remote-Loeschung mit
+      gegenstands-genauem GO. Weder Bundle-Ueberfuehrung noch Loeschungs-GO sind im Ledger
+      verbucht. KEINE Eigenmassnahme -- Frage an den Owner: war das die geplante Vollziehung,
+      und wo liegt das Bundle?
+    NEBENBEFUNDE derselben Scrub-Klasse (je eigener Posten): COMDARE_NFS_DROP_TOKEN fehlt in
+      288 (Ebene C bleibt inert) · CE_SUBMODULE_TOKEN fehlt bei existierendem USER (die
+      Planer-Emission braeche, sobald dieser Pfad faehrt) · COMDARE_THESIS_WRITEBACK_TOKEN
+      fehlt in 288, existiert in 289. Und die "776" ist keine Runner-/Projekt-ID, sondern die
+      Zahl der gitleaks-Treffer (RuleID gitlab-rrt) im Backup-Suchlauf -- die Instanz
+      akzeptiert Registration-Tokens weiterhin (allow_runner_registration_token=true), der
+      Reset-Weg ist ein Owner-Entscheid (je Projekt zuruecksetzen vs. instanzweit abschalten).
+
+---
+
+### KON58-05 — DER FR/SA-SCHNITT LIEGT: S-3 UND S-7 SIND AKTIVIERUNGEN OHNE OWNER-GATE
+
+Der Explore zu Task #4 hat beide Tage ohne Rückfrage ausführbar geschnitten und dabei **eine
+Paraphrase des Leads korrigiert**: „jeder Algorithmus bekommt eine neue Versionszeile" hat null
+Ledger-Treffer. KON9-05 verlangt, dass jeder Algorithmus den Stempel **unterstützt** (Syntax
+*und* Semantik) — **keine** Literal-Bumps am Aktivierungstag; die 123 Literale bleiben.
+
+    EISERNE REGEL BEIDER TAGE: keine Datei unter axes/, topics/ oder heuristik/ anfassen --
+    Overlay-Glied [7] hasht deren Quelltext, jeder Touch verschiebt Fingerprints (und seit
+    heute zusaetzlich: er erzwingt einen Bump oder Lock-Regen). Die gesamte Arbeit liegt in
+    measurement/, profile_facade/ und tests/ => SHA-/golden-neutral by construction.
+    S-3 (Fr): Ordnungs-Relation ueber Flag-MENGEN (SUBSET, constexpr, ueber die bestehende
+      Traversal-Primitive -- kein zweiter Parser) + Voraussetzungs-Wache (Compile-Seite
+      FORDERT, Ketten als DATEN mit Beleg-Zitat, FORDERN statt Auffuellen) + die freigebende
+      Seite scharf ueber GENAU EINEN Aufruf in der Fassaden-Naht.
+    S-7 (Sa): Vollbestands-Beweis ueber die Registry-Typlisten (Nenner gemessen, nicht
+      gepinnt) + Semantik an SYNTHETISCHEN Probe-Klassen im Test + Zulassungs-Bruecke an der
+      BESTEHENDEN per-Binary-Naht. Der globale Fassaden-Hook bleibt gesperrt (C-3a-Tripwire):
+      die erste echte required-Deklaration ist ein eigener kuenftiger Owner-Paket-Entscheid.
+    O-3 und O-4 sind beantwortet (KON16-02 bzw. KON26-01), die Strecke ist owner-gedeckt
+    (KON57-05) -- fuer #4 ist KEIN Owner-Entscheid noetig.
+
+---
+
+### KON58-06 — PROZESS-LEHREN DIESES TAGES (deklariert, auch die eigene)
+
+    (1) 🔴 EIGENER FEHLER, korrigiert: ich habe eine Explore-Angabe ("Deploy laut
+        20260801-fahrplan-workflow.json:55") UNGEPRUEFT in den Infra-Handout geschrieben.
+        Die Datei existiert an dem Ort nicht. Beim Nachpruefen fand sich der ECHTE Beleg
+        (2026-07-26-INFRA-runner-matrix-DONE.md:50) -- der Handout ist korrigiert, bevor er
+        Infra erreicht hat. V1 gilt auch fuer Explore-Berichte des eigenen Workflows: ein
+        Bericht ist Beweismaterial, kein Beweis. Und ein Handout an ein fremdes Team ist
+        genau der Ort, an dem eine ungeprueft uebernommene Referenz teuer wird.
+    (2) 🔴 CODEX IST HEUTE ZWEIMAL AUSGEFALLEN -- die Lens-2-Besetzung braucht einen Plan B.
+        (a) SANDBOX: "bwrap: loopback Failed RTM_NEWADDR" (zweiter belegter Fall nach
+            KON57-03). Codex meldete erneut VORBILDLICH statt zu raten ("keine Fundliste ohne
+            gelesenen Gegenstand"). NEUES REZEPT statt Diff-inline (das kostet Lead-Kontext
+            doppelt: einmal lesen, einmal schreiben): die Review-Gegenstaende in ein
+            WEGWERF-VERZEICHNIS kopieren und Codex dort mit vollem Zugriff laufen lassen --
+            kein Repo in Reichweite, also kein Risiko, und der Diff muss nicht durch den
+            Lead-Kontext.
+        (b) IDLE-TIMEOUT: der zweite Anlauf (Wegwerf-Verzeichnis, danger-full-access, cwd
+            dort) lief 1800 s ohne ein einziges Lebenszeichen und wurde vom Harness
+            abgebrochen. Der Auftrag war gross (7 Pruefachsen, 60-KB-Diff, ultra-Effort).
+        LEHRE, in die Arbeitsweise: ein Codex-Lens wird ab sofort KLEIN geschnitten (ein
+        Gegenstand, drei Fragen) und bekommt einen PARALLEL laufenden zweiten Lens anderer
+        Herkunft (Fable, adversarisch) -- nicht als Ersatz nach Ausfall, sondern von Anfang
+        an nebeneinander. Die Dual-Review-Pflicht darf nicht an der Verfuegbarkeit EINES
+        Werkzeugs haengen; zwei Ausfaelle an einem Tag sind die frische Defekt-Probe, die
+        die Ersatz-Lens-Klausel ausdruecklich verlangt.
+    (3) DIE ZAHL "9 EINTRAEGE" IM LOCK WAR EIN wc-l-ARTEFAKT (3 Kommentarzeilen), die "7
+        Marker-Traeger" zaehlten einen Prosa-Erwaehner mit -- real 6 = 6 = 6 (Marker, Lock,
+        CI-Argumente). Der seit KON12-02 mitgefuehrte Restposten "Differenz beim Ausrollen
+        mitmessen" ist damit erledigt. Drei Zahlen, ein Gegenstand: wer Zeilen zaehlt, wo
+        Records gemeint sind, erzeugt eine Differenz, die es nie gab.
+    (4) 🔴 DER gitleaks-STANDARDKOEDER BISS NICHT -- und die Null waere wertlos gewesen.
+        Gefahren am 13.08.: `aws_secret_access_key = "<20 Zufallszeichen>"` in einer
+        Wegwerf-Datei => "no leaks found", rc=0. Der Laengen-Assert aus v3.5 (A3) haelt die
+        19/20-Falle, aber NICHT diese: die Regel-Auswahl entscheidet mit. Gueltig ist
+        `glpat-` + 20 Zeichen => "leaks found: 1", rc=1 -- ein Praefix, das eine Regel der
+        REPO-EIGENEN Config traegt. Zweite Falle im selben Lauf: ein Koeder unter /tmp faellt
+        in die Allowlist-Pfade und beisst auch dann nicht, wenn das Muster stimmt.
+        LEHRE: der Koeder muss aus einer REGEL DER VERWENDETEN CONFIG stammen und im
+        gemessenen Bereich liegen -- Laenge allein entscheidet nicht.
+
+---
+
+### KON58-07 — 🔴 DAS PFLICHT-FIXUP AM RIEGEL: 22 LENS-FUNDE IN SIEBEN GRUPPEN GESCHLOSSEN (ce b12afd32)
+
+    ANLASS   Owner-Dauerregel 13.08.: "Falls es Luecken gab ist die Behebung IMMER Pflicht" --
+             es gibt keine Klasse NOTIZ/Randfall/HINWEIS-statt-ERNST. Zwei unabhaengige Lenses
+             (Codex, klein geschnitten nach der Lehre oben + ein dreiachsiger Fable-Lens)
+             lieferten 22 Funde, mehrere LIVE am gebauten Werkzeug gefahren, nicht vermutet.
+
+    DER SCHWERSTE FUND UND SEINE HEILUNG -- G2, das Bump-Dauerloch:
+      Ein akzeptierter Bump OHNE Lock-Regen machte die Datei DAUERHAFT ungeschuetzt. Live
+      gefahren: Edit1+Bump => "OK Digest geaendert MIT Version-Bump 1.0.0.c -> 1.1.0.c",
+      Exit 0; Edit2 mit ANDEREM Inhalt, Version unveraendert, Lock ungeregen => WIEDER
+      "OK ... MIT Version-Bump" + GRUEN. Das Werkzeug kann Edit1 und Edit2 unter derselben
+      gebumpten Version strukturell nicht unterscheiden -- ein reiner Bump-Ok-Zweig reicht
+      deshalb NIE.
+      GEHEILT ZWEISTUFIG: (a) --check endet bei akzeptiertem Bump mit EXIT 3
+      "REGEN ERFORDERLICH" -- das Tool ist fail-closed unabhaengig von der CI-Verdrahtung;
+      erst der Regen-Commit segnet den KONKRETEN Inhalt. (b) der CI-Job faehrt zusaetzlich
+      --write + git diff --exit-code auf die Lock-Datei (Tiefenstaffelung: faengt auch
+      Register-Drift-Formen, die --check strukturell nicht sieht).
+
+    DIE UEBRIGEN SECHS GRUPPEN, je mit gefahrenem Rot-zuerst und Gegenprobe:
+      G1  Ruhelage: bei gleichem Digest wurde die Version NIE geprueft (ein verfaelschter
+          Lock-Eintrag blieb still gruen und wurde zur falschen Basis des naechsten
+          Vergleichs) · --write schrieb trotz rc=1 ein Lock (Truncate-Fall)
+      G3  Nur-erstes-Literal: k_ary traegt ZWEI algo_version-Literale; ein Bump am falschen
+          reichte. Registerform jetzt KANONISCH KOMPRIMIERT (N gleiche Literale => Einzelwert,
+          haelt die golden 158 byte-stabil), ungleiche komma-gefuegt
+      G4  Marker-Strenge: ein Prosa-Zitat "AXIS_ALGO_VERSION: 99" mitten in einer Zeile stellte
+          die heuristik-Version · Ueberlauf-Marker (2^64) wurde zu 0 · fehlender Marker =>
+          version=0 wurde von --write akzeptiert. Jetzt zaehlt NUR die dedizierte,
+          zeilenverankerte Kommentarzeile; 0/mehrdeutig/unparsbar/Ueberlauf => ROT
+      G5  Nenner und Umgebung: leere Homes lieferten "GRUEN -- 0 Dateien" (V-1-Bruch woertlich)
+          => Mindest-Nenner als Werkzeug-Konstanten, Verletzung Exit 2 · ein unlesbares
+          Unterverzeichnis riss den Prozess mit SIGABRT (filesystem_error) => Exit-2-Pfad ·
+          Traeger mit fremder Endung und Verzeichnis-Symlinks waren unsichtbar => beide ROT
+      G6  Scanner-Robustheit: ein Digit-Separator verschluckte das Literal · ein Literal unter
+          "#if 0" stellte die Version. Zusatzbefund EHRLICH protokolliert: der balancierte
+          Separator-Fall (wie im Bestand adaptive_lsm:105) biss NICHT -- der Biss braucht die
+          ungerade Quote-Lage
+      G7  Beweis-Haerte: der Koeder-F-Beweis pruefte einen Substring statt Byte-Identitaet der
+          Lock-Datei => auf Byte-Vergleich umgestellt; v1-Lock-Abweisung als Dauer-Koeder
+
+    NENNER UND BESTANDS-MESSUNGEN (alle mit Grundgesamtheit, nicht nackt):
+      multi=1 von 152 (k_ary ist die einzige Multi-Literal-Datei) · 0 Nicht-hpp-Traeger unter
+      den Homes (Nenner 40 geprueft) · 0 Symlinks · 0 Literale unter Praeprozessor-Bedingung.
+      Koeder A-S, jede Rot-Ausgabe literal, jede mit Gegenprobe gruen. golden 158 nach dem
+      Fixup byte-identisch REGENERIERBAR (zweimal --write => diff leer).
+
+    🔴 EIN FUND WURDE NICHT LIVE GESTELLT, sondern am Code verifiziert und so gemeldet:
+    read_file_bytes las ueber "ss << f.rdbuf()" ohne jede Zustandspruefung -- die
+    rdbuf-Extraktion setzt am ifstream KEINE Fehlerflags, ein I/O-Fehler nach dem Oeffnen ist
+    von EOF nicht unterscheidbar. Ein Live-Koeder braeuchte Fehler-Injektion am Blockgeraet;
+    der Bauer hat das benannt statt einen Phantom-Koeder zu bauen. Fix: badbit-Pruefung UND
+    Laengenvergleich gegen fs::file_size.
+
+---
+
+### KON58-08 — S-3 IST GEBAUT: DIE ORDNUNGS-RELATION, DIE VORAUSSETZUNGS-WACHE UND DER EINE AUFRUF (ce 4a89aed5)
+
+    OWNER-DECKUNG   KON16-02 "Im Falle der Freigabe impliziert es das Vorhandensein und im
+                    Falle der compile Seite Fordert das Flag das Vorhandensein von Hardware
+                    ein" · KON23-02 "beide Seiten gebaut und heute leer/inert" => S-3 ist ein
+                    AKTIVIERUNGS-Auftrag · KON13-06/A-2 "S-3 faellt nicht, es ist ueber S-5
+                    transitiv preimage-wirksam".
+
+    GEBAUT (8 Dateien, 1101+/12-):
+      S-3a  flag_menge_ordnung.hpp (neu): flag_menge_ist_teilmenge als constexpr ueber die
+            BESTANDS-Primitive for_each_flag_node -- kein zweiter Parser. Element =
+            (token, eltern)-Paar: ein vnni unter x256 ist NICHT dasselbe wie unter x512.
+            Asymmetrisch und fail-closed nach dem Vorbild bvset_teilmenge.hpp. Dazu die
+            Signatur-Bruecke ueber die TABELLENFELDER von kFlagGrammarCatalog (nie ueber
+            String-Heuristik -- es gibt drei Namensraeume) und die Geschlossenheits-Wache.
+      S-3b  kFlagVoraussetzungsKetten (15 Zeilen, jede mit Beleg-Zitat) +
+            voraussetzungen_erfuellt, eingehaengt als UNGATED Konjunktions-Term (d) in
+            ce_owned_version_is_wellformed. Damit hoeren ALLE Bestands-Verbraucher mit --
+            null neue Aufrufstellen. FORDERN, nicht auffuellen: ein stilles Ergaenzen waere
+            ein Identitaets-Ereignis (parse->render-Treue).
+      S-3c  maschinen_deklarations_naht.hpp (neu) + DER EINE Aufruf in
+            run_experiment_profile_facade, nach validate und vor der Perm-Schleife.
+            Kein Treffer im hostname_hint => nichts wird belegt (natuerlicher Kill-Switch).
+
+    DER MUTATIONSBEWEIS, beidseitig und literal:
+      M1  Teilmenge -> Gleichheit  => die Erweiterungs-Faelle reissen (4 static_asserts
+          namentlich); Revert gruen
+      M2  Eltern ignorieren        => der vnni-Doppelgaenger reisst. Die Bissprobe wurde dafuer
+          EIGENS nachgeschaerft ("1.0.0.c.x256{vnni}" gegen "1.0.0.c.x256.x512{f.vnni}") --
+          der erste Entwurf haette aus dem falschen Grund gebissen
+      M3  Term (d) entfernt        => genau die drei neuen Negativfaelle reissen
+          (x512{vl} ohne f · vaes ohne x128{aes} · vpclmulqdq); Revert gruen
+
+    DIE 24 BESTANDSTRAEGER: ALLE GRUEN, dreifach belegt statt angenommen. (1) die 123
+    Organ-Literale sind nackte c-Formen (97x 1.0.0.c + 24x 1.0.2.c + 2x 1.0.1.c) => Term (d)
+    ist dort vakuum-wahr; (2) die flag-tragenden Positiv-Literale tragen ihr Fundament bzw.
+    beide x128-Wurzeln; (3) die Negativ-Traeger bleiben negativ, weil ein Konjunktions-Term
+    false nie zu true macht. GEFAEHRDET war keiner.
+
+    FINGERPRINT-NEUTRAL, BEWIESEN: die 9 datei_praefix-Formen des Overlay-Glieds treffen exakt
+    17 Dateien, keine davon algo_semver/flag_grammar_catalog/flag_menge_ordnung;
+    golden_fullpilot_320* byte-unberuehrt (git diff --stat leer). ctest 485 -> 487.
+
+    🔴 OFFEN, ausdruecklich: der KON55-Kombibau ist NICHT gefahren. Der Bau-Agent gab ab,
+    waehrend Zelle 1 lief; das Log endet mit "[1535/1538] Linking" und "make: Terminated",
+    die Zahl der ctest-Starts ist NULL. Das ist kein Rot, sondern ein NICHTS -- und die beiden
+    sehen im Protokoll verschieden aus (ein Rot haette eine Bilanz). LEHRE: ein Bau, den
+    niemand zu Ende sieht, hat nicht stattgefunden; Bauten laufen im Vordergrund oder
+    abgekoppelt (setsid/nohup), nie an der Lebensdauer des Agenten haengend.
+    Die Abnahme laeuft als eigenes Paket (4 Zellen + Inventory-Floor-Neuzaehlung als eigener
+    Commit + golden-Endkontrolle).
+
+---
+
+### KON58-09 — DIE ARBEITSWEISE WAECHST AN EINEM TAG UM VIER FASSUNGEN (v3.6 -> v3.9)
+
+    Alle vier auf Owner-Anweisung, alle im Umbrella comdare/projekte gelandet (nur GitLab --
+    dort steht der Gesamtplan, er geht nie ins Internet).
+
+    v3.6  A1-Zeile CODE-REVIEW-ANALYSE + A1.1 (Owner: "du bist gerade nur Opus 5 und
+          ERKENNST KEINE FABLE 5 PROBLEME"). Die Review-Analyse faehrt ab sofort ZWEISTUFIG:
+          Opus 5 max ERHEBT (alle Pfade, die ausgefuellte Wahrheitstafel -- urteilt NICHT),
+          Fable 5 max BEWERTET adversarisch darauf. Beide Pflicht, ZUSAETZLICH zum Codex-Lens.
+          A1.1: liegt der Orchestrator unter Fable 5 max, DELEGIERT er Code-Review und Analyse
+          nach dieser Hauptarbeitsweise, statt selbst zu pruefen -- ihm bleiben
+          Objekt-Stichproben (V1), Einordnung, GO/NO-GO.
+          BEGRUENDUNG, die ueber den Fall hinausgeht: die Modelle haben VERSCHIEDENE blinde
+          Flecken. Wer unterhalb der Klasse liegt, findet deren Fehlerbild auch mit maximaler
+          Muehe nicht -- ihm faellt nicht auf, dass dort etwas zu finden waere. Ein Lead, der
+          seine eigene Review-Analyse fuehrt, ist sein eigener Zweit-Lens; das ist keiner.
+    v3.7  A2.1(a2): HARTE OBERGRENZE prod1 -- MAXIMAL DREI GLEICHZEITIGE VOLLBAUTEN
+          (Owner: "prod1 vertraegt nur 3 builds wegen Plattenspeicherplatz parallel").
+          Gilt UNABHAENGIG vom df-Wert im Startmoment -- ein Vollbau waechst, waehrend er
+          laeuft. Gedeckelt ist die Zahl der LAUFENDEN Bauten, nicht der offenen Straenge;
+          der KON55-Kombibau zaehlt als EIN Slot, solange seine vier Zellen nacheinander laufen.
+    v3.8  A2.1a DIE WELLEN-FORM (Owner: "mit parallelen worktrees und lokalen builds und CI
+          erst nach dem landen aller worktrees"): N Worktrees parallel, ein Schreiber je Baum
+          -> lokale Vollbauten, hoechstens drei gleichzeitig -> MERGES seriell und lokal, OHNE
+          Push und OHNE Pipeline dazwischen -> EIN Push, wenn ALLE Worktrees der Welle gelandet
+          sind -> EINE CI ueber den Gesamtstand.
+          🔴 DAS ERFUELLT R4 BESSER ALS DIE ALTE FORM: ein Push statt N erzeugt GENAU EINE
+          Pipeline; die Ein-Blech-Regel wird entlastet statt gedehnt, und der Bau blockiert nie
+          auf eine fremde Pipeline. BEDINGUNG: jedes Paket ist VOR seinem Merge lokal
+          vollstaendig gruen (Kombibau + ctest + Koeder beidseitig) -- die CI wird damit
+          Integrations-, keine Erstpruefung. Jedes Paket landet als eigener --no-ff-Merge,
+          damit ein roter Job seinem Paket zuzuordnen bleibt. AUSNAHMEN, die weiter je Paket
+          pushen: Pakete, deren Abnahme nur die CI erbringen kann, und solche, die eine fremde
+          Pipeline scharf machen -- in der Wellen-Planung ausdruecklich zu benennen.
+    v3.9  A3: WORKTREE-BESTAND WIRD UEBER `git worktree list` JE STORE ERHOBEN, NIE UEBER DAS
+          DATEISYSTEM (Owner: "dass du worktrees auch immer auf ungelandete nested work trees
+          durchsuchst"). Drei Fallen, alle am 13.08. gemessen: VERSCHACHTELTE Baeume liegen im
+          Store-Verzeichnis selbst (<repo>/.git/modules/<submodul>/.claude/worktrees/wf_*) --
+          acht Stueck mit 1,6 GB, vier auf UNGELANDETEN Branches, keiner unter einem wt-*-Namen ·
+          MEHRERE STORES (ein Submodul hat je super-Worktree einen eigenen Objektspeicher):
+          17 Branches im einen, 147 im anderen, und die 13 ungelandeten lagen VOLLSTAENDIG im
+          zuerst ungemessenen · VERWAISTE Registrierungen (prunable).
+          Der Store wird pro Baum mit `git rev-parse --git-common-dir` bestimmt -- der
+          VERZEICHNISNAME sagt nichts darueber.
+
+---
+
+### KON58-10 — DIE WELLE IST DISJUNKT GESCHNITTEN: SIEBEN GRUPPEN, VIER HARTE FESSELN
+
+    Owner-Auftrag 13.08.: "untersuche alle Aufgaben der aktuellen Welle, ob sie disjunkt sind,
+    um sie parallel zu fahren". Erhebung Opus 5 max, Plan Fable 5 max (A1 nach v3.6).
+
+    SIEBEN GRUPPEN, je ein Worktree, innerhalb seriell:
+      G-A mess-ordnung (P1 S-3 -> P2 S-7) · G-B abi-stempel (P3 S-5 -> P5 Layout-7) ·
+      G-C gate-trennung (P6 B2, golden-brechend) · G-D homes (P4 S-18) ·
+      G-E filter-concepts (P7 S-4) · G-F lead-betrieb (P8/P9/P10, ohne Bau-Slot) ·
+      G-G s14a-riegel (P11 Bestand)
+
+    DIE VIER FESSELN, keine verhandelbar:
+      P11 VOR P4   S-18 verschiebt die Homes, die S-14a bewacht -- umgekehrt zeigt die
+                   Lock-Domaene auf Pfade, die es nicht mehr gibt
+      P6  VOR P4   golden-Identitaetskette, strikt seriell
+      P1  VOR P2   verdeckte Kopplung ueber simd_build_gate.hpp
+      P3  VOR P5   ein Schreiber auf anatomy_module_abi_v1_decl.hpp
+
+    DER EINE HOTSPOT: tests/unit/CMakeLists.txt wird von SIEBEN der elf Posten angefasst.
+    Aufloesung mechanisch: jeder Strang haengt seinen Block ans DATEIENDE mit Strang-Marker.
+
+    🔴 EIN FUND, der stille Brueche verhindert hat: die Namen test_s5_* und test_s7_* sind im
+    Bestand bereits mit ANDEREM Gegenstand belegt (18 bzw. 10 Dateien, am Objekt gezaehlt).
+    Neue Tests bekommen deshalb THEMATISCHE Namen statt Posten-Nummern (test_s3_ordnung_*).
+    Das ist die V12-Klasse eine Ebene tiefer: Nummern kollidieren, auch in Dateinamen.
+
+    KORREKTUR am Lagebild: set_active_machine_declaration liegt in
+    measurement/simd_build_gate.hpp:234, NICHT in profile_facade -- eine frueher kursierende
+    Ortsangabe war falsch und haette den S-3c-Auftrag ins Leere geschickt.
+
+    LANDE-ORDNUNG 1-9: P1 -> P11 -> P2 -> P10 -> P6 -> P3 -> P5 -> P7 -> P4, alle
+    [P]-Posten mit >=2 Tagen Luft vor F2. Das im Plan benannte "Blech-Stau"-Risiko entfaellt
+    mit der v3.8-Wellenform (lokale Merges, EIN Push, EINE CI); Ausnahme bleibt P10 (MinIO),
+    dessen Abnahme nur die CI erbringen kann.
+
+---
+
+### KON58-11 — 🔴 DAS PFLICHT-KIPPEN FAND VIER BAU-POSTEN OHNE TASK — UND EINEN ZWEITEN ARBEITSWEISE-BEFUND
+
+    Owner-Auftrag 13.08.: die Pflichtlektuere vollstaendig in den Kontext kippen, danach alle
+    Ledger-Eintraege und Korrekturen der letzten drei Tage. Vollzogen mit Nenner:
+    GOAL v8 686/686 · Wellenplan 2055/2055 · Designplan 413/413 · ARBEITSWEISE 988/988 ·
+    MEMORY-DETAIL 61/61 · Ledger Z. 19-6824 (6806 Zeilen, 53 Nachtraege = der komplette
+    11.-13.08.-Bereich; ab 6825 beginnt der 10.08.).
+
+    🔴 BEFUND 1 -- DIE ARBEITSWEISE LIEGT AN ZWEI ORTEN MIT VERSCHIEDENEM INHALT:
+    super docs/ traegt 53 Zeilen (seit 10.08. ein ZEIGER), der Umbrella 988 (die geltende
+    Fassung). Wer der Memory-Pfadangabe "super docs/" folgt und dort aufhoert, liest einen
+    Umzugshinweis und haelt ihn fuer die Doktrin. Der Zeiger ist korrekt gesetzt -- die
+    Pfadangabe im Memory ist zu praezisieren.
+
+    🔴 BEFUND 2 -- VIER BAU-POSTEN AUS KON44/KON45/KON47 TRAGEN KEINE TASK-NUMMER:
+      (a) AM OBJEKT BESTAETIGT: die COMP-GATE-SCHICHT fehlt weiterhin --
+          active_organ_required() in simd_build_gate.hpp:263 liefert `return {}`, global und
+          leer. Folge (KON45-02): organ_stamp_line<Comp>() ruft den Meta-Meta-Suffix OHNE
+          Comp, ein Disk-Typ stempelte JEDE Binary, auch MemoryOnly. Owner-Wort dazu liegt
+          vor (KON47-03: "voll bauen wenn an der Reihe") -- die Schicht ist Pflicht-Umfang.
+      (b) WARMUP-PAAR-DURCHSETZUNG (KON47-04): "SONST IMMER ZWEI MAL. PFLICHT FUER DIE
+          FORSCHUNG. MUSS GETESTET SEIN." Der Legacy-Pfad run_observable_perm misst laut
+          KON45-03 heute KALT -- anpassen oder ausbuchen, plus Tests nach T-1..T-9.
+      (c) n/a-ZAEHLER IM INHALTS-GATE (KON44-02): eine Zeile voller n/a galt zwei von drei
+          Wachen als GRUEN. Das Gate prueft kuenftig ECHTE Werte statt Zeilen-Existenz.
+      (d) PREIMAGE-BUDGET-BRUCH (KON45-01/5): 32 belegte Docks sprengen
+          kAnatomyFingerprintPreimageMax=4096 -- Konstanten heben, MIT Budget-Beleg.
+      (b) und (c) tragen ausdruecklich den Status "aus dem Ledger, NICHT am Objekt geprueft".
+
+    🔴 EIGENER MESSFEHLER dabei, protokolliert (V4): meine erste Gegenprobe suchte
+    perm_runner.hpp unter profile_facade/ und lieferte eine STILLE NULL. Die Datei liegt in
+    harness/; die Gegenprobe ueber den ganzen Baum findet 18 Treffer. Genau die Klasse, gegen
+    die V4 gebaut ist -- deshalb steht bei (b) und (c) "ungeprueft" statt einer Behauptung.
+
+    ZWEI WEITERE UNVERBUCHTE DISKREPANZEN aus dem Kippen: der Wellenplan (##58) nennt 28
+    \InputIfFileExists-Ziele, gemessen sind 13 (zweifach belegt, KON6-07/3 und KON8-11) --
+    vor dem F5-Anhang-Gate zu klaeren. Und die Thesis ist ZWEIMAL als Submodul eingebunden
+    (thesis/diplomarbeit und Code/external/20260931-overleaf-diplomarbeit), beide Pfade in
+    super leer -- exakt die Falle, wegen der Arbeitsweise V3 existiert.
+
+---
+
+### KON58-12 — WAS DIESER NACHTRAG SELBST BELEGT: DER LEDGER KANNTE DEN TAG NICHT
+
+    Beim Kippen am 13.08. gemessen: Eintraege von HEUTE im Ledger = **NULL**. Der oberste
+    Nachtrag war KON57 vom 12.08. Die gesamte Arbeit dieses Tages -- Q6-Landung, S-14a-Riegel,
+    Fixup 2, S-3, die Worktree-Pruefung, die gitleaks-Falle, vier ARBEITSWEISE-Fassungen, der
+    Wellen-Schnitt -- existierte in der Stand-Quelle nicht.
+
+    Das GOAL sagt (Teil X): der Ledger ist "die einzige Wahrheitsquelle fuer den Stand".
+    Eine Wahrheitsquelle, die einen ganzen Arbeitstag nicht kennt, ist fuer diesen Tag keine.
+    LEHRE, in derselben Klasse wie die Nachtrags-Mechanik von B.3 (scripts/ledger_nachtrag.sh
+    statt cat >>): eine Regel, die nur im Kopf steht ("nachtragen, wenn etwas fertig ist"),
+    faellt unter Takt zuerst. Der Nachtrag gehoert an die LANDUNG gebunden, nicht an den
+    Vorsatz -- wie die Lande-Stufe selbst in den Workflow gehoert (A2.1).
+
+---
+
+### KON58-13 — 🔴 DAS DRITTE PFLICHT-FIXUP: DER RIEGEL BEWACHT JETZT DIE RICHTIGE MENGE (ce 8cc564d5)
+
+    DER KERN-DEFEKT, am Objekt gemessen (V1, dreifach: Bauer, meine Gegenprobe, Codegen):
+      387 *.hpp liegen unter den organ-Homes, 152 stehen im Lock
+      => 235 Dateien (60 %) UNBEWACHT -- und die Wache meldete dazu woertlich
+         "GRUEN bestand konsistent -- 158 Dateien (heuristik=6, organ=152)", Exit 0.
+      DIE FILTER-STELLE: OrganDetail::discover verwarf jede Datei ohne den Substring
+      "algo_version" IM TEXT -- ein INHALTS-Filter, der die Grundgesamtheit auf die
+      Literal-ZITIERER verengte. Wer den Stempel nicht selbst nennt, war unsichtbar.
+
+    🔴 WARUM DAS DIE SCHWERSTE KLASSE IST: der Stempel ist Cache- UND Lager-Schluessel
+    (KON9-11). Das Overlay-Glied [7] hasht den QUELLTEXT der Organ-Verzeichnisse -- jede
+    unbewachte Datei dort kann den Fingerprint verschieben, ohne dass die Bump-Wache es
+    merkt. Genau die Kombination "Aenderung ohne Bump => kein Neubau => schneller UND
+    falsch", gegen die das Werkzeug gebaut wurde. Die Wache mass etwas anderes als das,
+    was den Cache-Schluessel stellt.
+
+    DIE HEILUNG -- die Grundgesamtheit ist jetzt der OVERLAY-SCHNITT, nicht eine Plan-Zahl:
+      massgeblich ist kOverlaySourceSet (builder/overlay_source_set.hpp) mit seinen
+      Endungs-Listen -- also exakt die Menge, die der Fingerprint SIEHT.
+      158 -> 718 Records (organ 640 · system 16 · mess 1 · tier_substanz 55 · heuristik 6;
+      am Objekt gegengezaehlt: awk je Kategorie liefert dieselben Zahlen).
+      Die GRUEN-Meldung BELEGT die Vollstaendigkeit jetzt, statt sie zu suggerieren:
+      "deckt 712 von 712 Overlay-Quellen (Schnitt: builder/overlay_source_set.hpp)".
+      Eine Deckungsluecke ist ROT, nicht Prosa.
+
+    DIE DIFFERENZ IST BEIDSEITIG BENANNT (V6.5, Mengendifferenz immer in beide Richtungen):
+      560 Dateien kamen NEU unter Bewachung (209 aus den alten Homes + 351 Neuzugaenge:
+      anatomy 55, topics ausserhalb queuing 263, include/measurement 17, .in-Dateien 16).
+      26 Alt-Home-Dateien fielen AUS dem Schnitt (telemetry_axis 10 -- inzwischen
+      CEB-System-Achse · simd/isa 10 -- Build-only Glied [6] · cacheline 3 ·
+      axis_centric_namespaces.hpp · queuing-Topic-Huelle 2). Fuer JEDE geprueft: 0 waren
+      gelockt, 0 enthalten "algo_version". Als bewusster Schnitt-Entscheid dokumentiert,
+      nicht still vollzogen -- kehrt telemetry/isa in die Komposition zurueck, nimmt der
+      Schnitt sie automatisch wieder auf und die Wache folgt ihm.
+      Traeger unveraendert 122 (der einzige Substring-Neuzugang traegt nur
+      Concept-Requirements, kein Literal => digest-only).
+
+    DIE ZWEI WEITEREN BEFUNDE, geschlossen:
+      TRAEGER-AUSTRITT war ein vom Werkzeug SELBST angewiesener Einweg -- verlor eine Datei
+        ihr Literal, schrieb --write sie klaglos als digest-only fort (bei ganz entfernter
+        Erwaehnung verschwand der Record sogar). Jetzt ROT beidseitig, mit Nennung der
+        alten Register-Version, und --write verweigert (Lock byte-identisch belegt).
+      AUFWERTUNG digest-only -> traeger ist die legitime Gegenrichtung => Exit 3
+        "REGEN ERFORDERLICH", nicht Exit 1 (die Klasse aus Fixup 2, hier korrekt getrennt).
+      KATEGORIE-SPALTE: am Objekt geprueft -- sie IST kein totes Datum, do_check haelt
+        lock.category gegen die Discovery-Kategorie, auch bei Digest-Gleichheit (Koeder T5).
+
+    DIE MUTATIONSPROBE BEWEIST DIE HEILUNG AM GEHEILTEN CODE (K13, beidseitig):
+      MUTANT A  der alte Substring-Filter reinstalliert => die Suite REISST am
+                Mindest-Nenner: "ROT Mindest-Nenner unterschritten: organ=153 (min 600)"
+      MUTANT B  Deckungs-Netz abgeschaltet => die Suite reisst an Koeder C, UND das
+                T1-Szenario meldet unter Mutant B literal "GRUEN ... deckt 712 von 713
+                Overlay-Quellen" bei EXIT=0 -- die geheilte Krankheit, reproduziert.
+      Original wiederhergestellt (diff leer), Suite EXIT=0.
+
+    🔴 EIN ERZWUNGENER FORMATWECHSEL v2 -> v3, und er ist ein Beleg fuer die Hygiene-Wache:
+      die neue Menge traegt Record-Koepfe bis 146 Byte (laengster Pfad 138). Das
+      v2-Zweizeilenformat konnte sein eigenes Versprechen "jede Zeile <= 120" strukturell
+      nicht mehr halten, und eine Ausnahme-Klasse in der Diff-Hygiene-Wache war per
+      Fixup-2-Entscheid ausgeschlossen. Also v3 = Dreizeilen-Record mit Pfad-Split:
+      die WACHE wurde nicht aufgeweicht, das FORMAT wurde angepasst. Am Objekt nachgemessen:
+      laengste Lock-Zeile jetzt 92 Zeichen (Grenze 120).
+      🔴 LANDE-AUFLAGE, zweig-uebergreifend: v3 + 718er-Register treffen JEDEN parallelen
+      Zweig, der das Lock liest oder regeneriert. Nach dem Merge auf dem Zielzweig einmal
+      --check + --write + git diff fahren. Alte v2-Erwartungen werden LAUT abgewiesen
+      (Koeder S3), nicht still fehlinterpretiert -- die richtige Richtung, aber sie macht
+      die Lande-Reihenfolge scharf: P11 VOR P4 hat damit einen ZWEITEN Grund neben den
+      verschobenen Homes.
+
+    KON55-KOMBIBAU vollstaendig auf dem ENDSTAND (nicht auf dem Fixup-2-Stand), vier Zellen
+    nacheinander, je J-1..J-4 + volle Suite, Bilanzen literal:
+      gcc Debug 486/486 · gcc Release 486/486 · clang Debug 486/486 · clang Release 486/486
+      (je "100% tests passed, 0 tests failed out of 486"). df vor jeder Zelle 29-33 G,
+      Bauverzeichnis je Zelle nach der Bilanz geraeumt mit Belegpruefung (git ls-files == 0
+      UND csv/xlsx == 0, alle vier 0/0). Warnungs-Review zweimal: im eigenen Quelltext
+      0 clang-Warnungen; die eine gcc-Release-Warnzeile ist VORBESTAND.
+
+    🔴 NEBENBEFUND, den erst dieser Kombibau sichtbar gemacht hat: -Wstringop-overflow in
+    libstdc++ stl_algobase.h, ausgeloest ueber die Inlining-Kette
+    axes/alloc/axis_06_allocator_exgen.hpp (ExgenAllocator::allocate) in der TU
+    test_v41_topic_traversal. NICHT aus diesem Diff -- gcc-Release wurde in Fixup 2 nie
+    vollstaendig gebaut, die Zelle hat den Bestand ERSTMALS belichtet. Der naheliegende
+    Schnellfix ist ausdruecklich VERWORFEN: ein Pragma am gelockten Traeger waere ein
+    literal-loser Byte-Drift -- genau das, was der Riegel jetzt faengt. Eigener Posten mit
+    Ursachen-Analyse.
 ## NACHTRAG 12.08.2026 — KON57: „ALLE LÜCKEN WERDEN SOFORT PFLICHT" — DIE ZWEITLENS-HÄRTUNG IST GEBAUT (11+1 FIXES, DUAL-REVIEW GESCHLOSSEN), 15764 TERMINAL SUCCESS
 
 **Owner verbatim 12.08.2026 (abends):** *„Gut, alle Lücken werden sofort Pflicht, wir machen das
