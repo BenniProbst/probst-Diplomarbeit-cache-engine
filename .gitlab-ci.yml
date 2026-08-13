@@ -76,7 +76,7 @@ cache:
 # genannten Namen, nie die Nachbarn.
 #
 # ALLE ZEHN SIND GEPRUEFT UND ABSICHTLICH EXTERN. Die Belegzeilen unten sind die rules-
-# Zeilen, an denen die Variable wirklich gatet -- gemessen 11.08.2026, nicht abgeschrieben.
+# Zeilen, an denen die Variable wirklich gatet -- nachgemessen 13.08.2026, nicht abgeschrieben.
 # Sie sind KEIN Befund: sie sind die Opt-in-Schalter der mehrtaegigen Mess- und
 # Rueckschrieb-Laeufe, die eine normale Welle gerade NICHT ausloesen soll.
 #
@@ -90,26 +90,26 @@ cache:
 # naechsten Schalter gleichen Namens zu werden.
 #
 # extern: COMDARE_RUN_MEASURE -- Opt-in des mehrtaegigen golden-320-Voll-Messlaufs, per
-#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1807, :2020)
+#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1848, :2061)
 # extern: COMDARE_STATIC_SMOKE_FALLBACK -- Zusatzschalter des statischen Smoke-Zweigs,
-#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1807, :1808)
+#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1848, :1849)
 # extern: COMDARE_BUILD_GOLDEN_N -- Gate des NEUEN golden-N-Standardpfads; dreifach inert
-#         (Variable + when:manual + _bot_-never) (gatet :2509, :2513, :2600, :2603, :2634)
+#         (Variable + when:manual + _bot_-never) (gatet :2633, :2637, :2724, :2727, :2758)
 # extern: COMDARE_DYNAMIC_PLANER_CI -- isoliertes Opt-in NUR der Planer-Delegation
-#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2514, :2604)
+#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2638, :2728)
 # extern: COMDARE_DURCHSTICH -- Opt-in der F1-Durchstich-Welle; ausdruecklich DISJUNKT zu
-#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1797)
+#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1838)
 # extern: COMDARE_PERSIST_MEASUREMENTS -- Opt-in des Mess-Rueckschriebs nach development;
-#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2228)
+#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2270)
 # extern: COMDARE_ANHANG_FORWARD -- Opt-in des Anlagen-Vorwaertsschreibens in die Thesis;
-#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2370)
+#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2443)
 # extern: COMDARE_TEXLIVE_AVAILABLE -- FAEHIGKEITS-Merkmal des Runners (TeX Live
-#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1553)
+#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1594)
 # extern: COMDARE_SWEEP_ZOMBIES -- Not-Werkzeug: raeumt Waisen-Prozesse, nur per
 #         API-Trigger zusammen mit SWEEP_TAG=amd|intel (gatet :228)
 # extern: COMDARE_MEASURE_PROFILE -- smoke|full-Marke der Mess-Welle, per Trigger oder
-#         manuellem Start gesetzt; gatet drei echte Regeln (:1808, :2509, :2600).
-#         Die Weiterreichung :2589 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
+#         manuellem Start gesetzt; gatet drei echte Regeln (:1849, :2633, :2724).
+#         Die Weiterreichung :2713 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
 #         SETZT sie nicht -- sie gibt den Eltern-Wert an die Child (CI-INV 11.08.2026)
 #
 # NICHT GEDECKT UND BEWUSST SO: Variablen, die nur in `script:`-Rumpf oder in
