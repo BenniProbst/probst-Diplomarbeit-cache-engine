@@ -86,8 +86,10 @@ Feld 1 -- GEGENSTAND: refs/backup/pre-secret-scrub-20260802 im super-Repo
   5ba3d03fdd5d612d747e18f9b5b4f2d0fdb89f80 (ls-remote-Beleg unmittelbar vor der Loeschung,
   Transkript Z. ~35922); fruehere Erhebung nannte als Anlage-Commit 44820451 (02.08.,
   "backup(e23): Suchlauf-...", Z. ~4845). Der Commit hing an KEINEM Branch. Remotes:
-  origin (GitLab) trug die Ref; GitHub war vorher schon leer (Z. ~35934: "github ist
-  sauber" / Z. ~36039: "GitHub war nie betroffen").
+  origin (GitLab) trug die Ref; GitHub war vorher schon leer (VERIFY-KORREKTUR 13.08.:
+  das Zitat "github ist sauber" stammt aus der ANLAGE-Aera 02.08., Z. ~4845 -- derselben
+  Zeile wie der Anlage-Commit-Beleg; im Loeschfenster Z. 35913-35994 faellt das Wort
+  "github" nicht; Bestaetigung Z. ~36039: "GitHub war nie betroffen").
 Feld 2 -- INHALT: 776 Runner-Token-Vorkommen (Kopien), alle in EINEM Commit. Sensitivitaet
   hoch. Gueltigkeit: durch Loeschung NICHT beruehrt -- Rotation ist der eigene Posten A-3
   (Owner 10.08.: "A-3: volles go"), Token-Hygiene laeuft dort.
