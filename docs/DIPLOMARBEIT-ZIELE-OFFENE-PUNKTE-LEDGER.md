@@ -16,6 +16,140 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON64: OWNER-GROSSRUNDE 14.08. ABENDS/NACHTS (B/C/D-BLOECKE + VORLAGE-RUNDE + F-G1-KOMPLETT) + INFRA-VOLLZUEGE + MESS-ACHSEN-FAMILIEN-KARTE
+
+**Anlass: Owner-Antworten in vier Nachrichten (14.08. abends bis nachts) auf die offene
+Rueckfragen-Runde; dazu die Vollzuege derselben Nacht. Quelle der Wortlaute:
+tmp/kon64_sammlung.md (Sammlung dieser Session, verbatim-Kerne) + Transkript 5a19728e
+(F-G1-Kette 55059->55066->55073->55103: die SPAETESTE Nachricht gewinnt je Punkt --
+W5-Warnung: 'alles angenommen' wurde fuer F-G1-8/-9 in derselben Nacht praezisiert/
+korrigiert; NIE nur die erste Nachricht verbuchen). KON64 vor diesem Nachtrag 0 Treffer.**
+
+### KON64-01 -- AUSNAHME-FREIGABEN A1-A4 (Session macht Infra) + VOLLZUEGE
+
+    A1 Token-Einrichtung SELBST: VOLLZOGEN -- PAT id=98 auf 289 (write_repository,
+       Developer, Ablauf 2026-10-15), Vault Cluster 3a5d45d, 288-Variable masked+
+       protected (Newline-Falle: masked lehnt \n ab -> tr -d). F1-Vollbeleg KON63.
+    A2 Transkript-History-Rewrite (16,3-MB-jsonl im Base-Baum, #46): AUSNAHMSWEISE
+       durch die Session -- einzeln+haendisch gegen ALLE Vault-Passwoerter (blind),
+       redigierte Fassung TECHNISCH GESICHERT erhalten; 'in ruhiger Minute', eigener
+       serieller Slot. OFFEN (geplant).
+    A3 MinIO SELBST: VOLLZOGEN (Verify TRAEGT) -- neues Paar comdare-ci-r20260814
+       (Vault b20492af), 288-Variablen ersetzt (2x PUT 200), Blind-Smoke GRUEN
+       ('Buckets sichtbar: 16, SMOKE_EXIT=0'; 13.08. rot), Toolbox-Backup-Kanal
+       geheilt (403->rc=0; stale emptyDir-s3cfg -> Secret-Key s3cmd-config +
+       Deployment-Repoint, nur Toolbox gerollt; 1-Byte put/ls/rm bewiesen).
+       HELM-PFLICHT beim Chart-10-Upgrade: backups.objectStorage.config in die
+       Values, sonst Revert (Task #52).
+    A4 Rotation: AUFGESCHOBEN bis Arbeits-Pause ('Fortschritt geht vor') --
+       Vormerkliste: 776er, 06.08.-Aera, 4 MinIO-Alt-Svcaccts, Root-Identitaets-
+       Umzug (Rails/Registry), id=98-Turnus.
+
+### KON64-02 -- VORLAGE-RUNDE OF-1..OF-4 + B/C/D-BLOECKE
+
+    OF-1 id=97 Widerruf: VOLLZOGEN (HTTP 204, revoked=True; beide 289-Fehl-
+       Variablen der 12.08.-Rotation geloescht -- die Rotation hatte die Variablen
+       entgegen beiden Infra-Handouts auf 289 statt 288 gesetzt; Token nie in
+       einem gruenen Lauf verwendet, 5300-Jobs-Scan).
+    OF-2 id=98-Politik: Owner akzeptiert Empfehlung -- Server-Variable+privater
+       Vault BLEIBT (kein ci-template/gitignore-Ansatz; public GitHub-Repos
+       fuehren keine Pipelines und nie Klartext); FESTER TURNUS 30d via
+       rotate-API als Scheduled-Job im PRIVATEN Cluster-Repo = Task #54.
+    OF-3 GitLab >=19.1 'jetzt sofort': Inspektion ergab NO-GO -- 3 Blocker
+       ((a) Backup-Kanal [GEHEILT via A3], (b) CNPG gitlab-pg DEGRADIERT 1/2
+       ready 'closed pool', (c) PG 16.11 < Pflicht 17.x; dazu Chart-10-Breaking:
+       bundled Redis entfaellt [Instanz NUTZT es], NGINX-Ingress default aus).
+       Vorstrecke Task #52; DB-Schritte warten auf Owner-Kenntnisnahme.
+    OF-4/G1 (CI_JOB_TOKEN-Umstellung): 'muss erst detailliert von mir beantwortet
+       werden' -- NICHTS umgesetzt.
+    B5 (F-G1) im Chat vorgelegt; B6 Umbrella-Ausnahme a/b/c (Task #51); B7
+       'Freigabe nach Plan' -- B7a Disk-IO-Typ+Comp-Gate (KON45-02, W1-Bump-
+       Buendel) FREIGEGEBEN; B7b Map-VALUE=Tier-SHA FREIGEGEBEN MIT NEUEM
+       ARCHITEKTUR-ELEMENT (verbatim in kon64_sammlung): CEB-LAGER-REGISTRY-
+       HASH-MAP -- key=Tier-Fingerprint (128-hex), value=Rest-Stempel der
+       Tier-Binary; CEB-Init rekonstruiert die Hybrid-Belegungs-Identitaet
+       rueckwirkend aus dem Lager (Textlimit umgangen). Bau: S-17/HY-A/B5.
+    B8 (#83 Thesis-Doppel-Submodul): AUSGEBUCHT mit Sync-Beleg (ein Repo
+       ../20260931-overleaf-diplomarbeit.git, zwei Pfade, beide Gitlinks
+       identisch 2eabaec3).
+    C9 Auswertungs-Staffelungs-Explore: GO (Task #49; gefahren, s. KON64-04).
+    C10 Wallclock-Startgrenze: BESTAETIGT (Laden/Anschliessen VOR der Klammer).
+    C11 Deep-Research-Parameter-Workflow: Freigabe -- GEFUNDEN: docs/sessions/
+       20260804-DOSSIER-achsen-qualitaets-parameter-katalog.md (855 Z., 27
+       Parameter-je-Achse-Eintraege) -> A1-Durchzug-Quelle.
+    D12 5 origin-Branches: GO MIT ARCHIV-AUFLAGE (erneute Wert-Pruefung ->
+       Bundle ins Archiv -> dann Loeschung; Task #50).
+    D13 Zombie-Pipeline 14190: CANCELED (API-belegt).
+
+### KON64-03 -- F-G1-RUNDE KOMPLETT (Kette 55059->55103, spaeteste Nachricht gewinnt)
+
+    ANGENOMMEN: F-G1-5 (Exaktheit fuer MESSDATEN-Gueltigkeit) · F-G1-6 (leere
+      Slots NUR dreiphasig/Mess; Hardware traegt immer mindestens ein Tag --
+      'Bei CPU muss es mindestens einen e core oder p core geben') · F-G1-7
+      (.c bleibt; Zukunft GPU/FPGA/NPU-CEBs = weitere Basis-Flags) · F-G1-10
+      (String traegt Anordnung, Mess-Home-Tabelle pinnt) · F-G1-11 (w-fuehrend,
+      aus B1, KON60-08).
+    F-G1-3 PRAEZISIERT: m-Flag bleibt b/h/t OHNE Planer-Slot; NEU: der
+      CEB-Stempel traegt einen PLANER-VERTRAGS-SLOT (Versions-Pin des
+      Planer<->CEB-Steuer-Vertrags -- 'Befehle entgegennehmen und beantworten');
+      Form/Ort = Familien-Design-Punkt (F6 der neuen Fragen).
+    F-G1-4 GESCHAERFT (IDEMPOTENZ-DOKTRIN): Option (a) + 'technisch gleich
+      idempotent zu beiden Vertragspartnern' -- je Kind-Belegung ein PERFEKT
+      ANGEPASSTES CEB-Kompilat (Overhead-Vermeidung: Macro/Micro wird aus der
+      CEB wahlweise AUSKOMPILIERT, um die Differenz zu erkennen); schwaechere
+      Kinder zeigen es im Stempel an, die Stufe davor misst was das Kind kann;
+      Teilmenge 'technisch ja, real durch angepasste Kompilate unterbunden'.
+      w-Faktorisierung 'korrekt, aber nur halb' -> BENCHMARK-EXPLORE-ORDER
+      (10 Wochen wallclock/micro/macro, Sonnet vt) GEFAHREN (wf_2e3d0e0d,
+      Ergebnis folgt); M-8/M-9-Finalfassung + Owner-Bestaetigung danach (F7).
+    F-G1-8 KORRIGIERT (dritte Option statt Empfehlung): PMC = EIGENSTAENDIGE
+      DREIPHASIGE Meta-Meta-Achse, 'nicht in der existierenden Achse';
+      Plan-Explore war PFLICHT und ist gefahren (KON64-04).
+    F-G1-9 KORRIGIERT ('Nein' zur Empfehlung): Lastsequenz = EIGENE MESS-ACHSE;
+      ihre Flags beschreiben die geplante ZUGRIFFS-SEQUENZ auf ein Tier/Hybrid-
+      Interface + das Framework-Set (unterstuetzt/verwendet/geplant);
+      10-Wochen-Explore PFLICHT vor dem Design.
+    F-G1-12 NEU GEFASST: 'multiple Mess-Achsen ... jeweils ihre eigene
+      Basis-Grammatik ... mit Syntax und Semantik designen' = DESIGN-AUFTRAG
+      MESS-ACHSEN-FAMILIE (Task #53, G-1-Schwester-Dokumente); die alte
+      Tooling-id-Frage loest sich voraussichtlich je-Achse-eigene-Zeile.
+    MARKER-PFLICHTEN (aus W1-W3 des Familien-Tieflesens): (1) 20260806-PLAN-
+      hybrid-architektur-pmc-achsen-zuordnung.md:363 ('PMC als Unter-Achse von
+      micro') ist durch 10.08.+14.08. UEBERHOLT -- datierter Marker faellig.
+      (2) G-1-Design §3.3/§7.4 (PMC/Lastsequenz 'bleibt Meta-Meta') ist in
+      BEIDEN Punkten anders entschieden -- Status-Nachtrag faellig (gebuendelt
+      mit der F-G1-4-Finalfassung nach dem Benchmark-Explore). (3) Ledger:3518
+      'Tier-Fingerprint pmc-frei' steht gegen die PMC-Dreiphasigkeit (W2 --
+      Alias-Klasse analog w-Blindheit): Aufloesung im PMC-Schwester-Design,
+      Frage F1 der naechsten Vorlage.
+
+### KON64-04 -- MESS-ACHSEN-FAMILIEN-KARTE (Explore-Zug wf_6b1d9de5, 5 Agenten)
+
+    GEBAUT (9): measurement_tooling (G-1 fertig; Registry-Neubau KON37-02 offen)
+      · measurement_category (16 Bausteine) · collector (3: WallClock/Observer/
+      Pmc) · load_framework (ycsb) · measurement_framework · run_methodology
+      (4 Modi) · writeback_method (4 Werte) · dynamic_dims (workload + 5 RC) ·
+      pmc_vendor_registry (amd/intel).
+    GEPLANT/OFFEN: PMC-Meta-Meta-Achse (eigenstaendig dreiphasig, F-G1-8) ·
+      Lastsequenz-Achse (F-G1-9) · hybrid-Meta-Meta (RF-7 -- oder durch h-Slot
+      gegenstandslos? Frage F4) · repetition + 3-Mess-Modi-XML-Emission (TODOs).
+    C9-BEFUND (Auswertungs-Staffelung): Mess-/System-Achsen haben KEINE eigene
+      Statistik-Form (Nichtfund mit Gegenprobe ueber 04/05/08-Stufen) -- sie
+      bestimmen CSV-Spalten (Mess) bzw. multiplizieren die Organ-Matrix
+      (System, 4 deklarierte System-Permutationen x 2^17); Statistik lebt an
+      den ORGAN-Diagrammen (4 variable Achsen search_algo/node_type/
+      memory_layout/prefetch); Perzentile NUR via HDR, nie gemittelt.
+    DESIGN-REIHENFOLGE (angenommener Vorschlag): KON64 landen -> G-1-Nachtrag
+      (mit F-G1-4-Final nach Benchmark-Explore) -> PMC-Schwester-Design zuerst
+      (reifster Bestand, kleinste Grammatik) -> Lastsequenz-Explore dann Design
+      -> Familien-Klaerungen per Owner-Vorlage -> Unter-Achsen mit KON37-02.
+    NAECHSTE OWNER-VORLAGE (8 Fragen F1-F8 aus dem Tieflesen): F1 PMC-Kind-
+      Projektion (pmc-fuehrend analog w?) · F2 PmcSystemAxis-Verbleib in
+      collector · F3 Lastsequenz vs load_framework (Ersatz/Erweiterung/
+      Koexistenz -- Single-Source!) · F4 hybrid-Meta-Meta vs h-Slot · F5
+      Familien-Umfang (Unter-Achsen eigene Grammatik-Dokumente?) · F6 Form/Ort
+      Planer-Vertrags-Slot · F7 F-G1-4-Modell (nach Benchmark-Explore) · F8
+      P/E-Core in der PMC-Achse (Sub-Flags vs Vendor-Auffaecherung).
 ## NACHTRAG 14.08.2026 -- KON63: F1-ENDBELEG VOLL -- DER DURCHSTICH IST KOMPLETT DURCH DEN KANAL (MESSUNG -> CSV -> ANHANG -> THESIS-PUSH -> PDF-GATE -> E-18-SNAP -> 288-WRITEBACK MIT BEIDEN GITLINKS)
 
 **Anlass: F1-Tag (Fr 14.08.). Nummern-Vergabe gemessen: KON63 hatte 0 Treffer vor diesem
