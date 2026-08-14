@@ -263,7 +263,14 @@ build:clang:
   # existiert => das needs haengt nie. Die Gegenrichtung gilt bewusst NICHT: mit
   # COMDARE_CLANG_MATRIX != "1" existiert verify:submodules OHNE build:clang -- fuer die
   # needs-Validitaet harmlos (nur die tragende Richtung zaehlt).
-  extends: [.build-clang-latest, .ccache-pull]
+  # CI-DUAL 14.08.: Cache-Wechsel -- weg vom gcc-Release-Key (.ccache-pull), pull auf den clang-Key.
+  # Der WRITER des clang-Keys ist test:unit:clang (Voll-Suite = maximale Objekt-Abdeckung, ce-Muster);
+  # dieser Werkzeug-Bau-Gate-Job ist Konsument. Ein Key, GENAU EIN Writer (#53-ccache-Hygiene).
+  extends: [.build-clang-latest]
+  cache:
+    key: "ccache-$CI_PROJECT_NAME-clang"
+    paths: [".ccache"]
+    policy: pull
   needs: ["verify:submodules"]
   rules:
     - if: '$COMDARE_CLANG_MATRIX != "1"'
@@ -1215,9 +1222,18 @@ test:unit:
 # Generator-Wechsel risse configure.sh, Makefile und ccache um. Zwei Baeume sind hier der
 # schwerere, aber offizielle Weg.
 # KEIN allow_failure (Doktrin seit 06.07.: ZELLE = Warnung, JOB = hart rot).
+# CI-DUAL 14.08. (Owner verbatim; KON22-01/8, T-11b): Kette GCC -- test:unit -> test:unit:debug
+# seriell via needs (bisher liefen BEIDE Vollbauten parallel hinter verify:submodules; die Kette
+# SENKT die gleichzeitige Vollbau-Spitze). EXISTENZ-SICHER: beide ziehen ihre rules identisch aus
+# .code-rules => existieren in denselben Wellen. Eigener ccache-Key gcc-dbg mit DIESEM Job als
+# einzigem Writer -- bisher pull-only auf dem gcc-RELEASE-Key (Fehlpassung: Debug-Objekte treffen
+# dort nie einen Cache-Eintrag).
 test:unit:debug:
-  extends: [.test, .code-rules, .ccache-pull]
-  needs: ["verify:submodules"]
+  extends: [.test, .code-rules]
+  cache:
+    key: "ccache-$CI_PROJECT_NAME-gcc-dbg"
+    paths: [".ccache"]
+  needs: ["test:unit"]
   tags: [baremetal]
   script:
     - |
@@ -1238,6 +1254,79 @@ test:unit:debug:
       make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
   variables:
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test-debug"
+
+# -- CI-DUAL 14.08. (Owner verbatim: "in ALLEN pipelines ... mit gcc und clang dual in compile
+# Release und Debug"; KON22-01/8, KON55/KON55-01, Paragraf 61, T-11b, KON60-09): die Unit-VOLLSUITE
+# ist der 2-Compiler-Beweis DURCH AUSFUEHRUNG -- dieselbe Suite unter clang, Release UND Debug.
+# Kette CLANG: build:clang (Werkzeug-Bau-Gate) -> test:unit:clang -> test:unit:clang:debug, strikt
+# seriell via needs (OOM-Doktrin: nie 4 parallele Vollbauten; Spitze bleibt 3 == prod1-Deckel).
+# docs-only-Symmetrie: .code-rules wie die gcc-Zwillinge -- eine Zelle skippt nur, wenn alle vier
+# skippen. KEIN allow_failure, KEIN COMDARE_*-Abschalt-Gate an den Zellen selbst; wird build:clang
+# per COMDARE_CLANG_MATRIX abgeschaltet, bricht die Pipeline-ERZEUGUNG laut (needs auf einen nicht
+# existierenden Job) statt still eine Zelle zu verlieren.
+# ccache: eigener Key je Compiler x BuildType, GENAU EIN Writer (#53-Hygiene); test:unit:clang ist
+# der Writer des clang-Keys (Voll-Suite = maximale Objekt-Abdeckung), build:clang zieht pull-only.
+test:unit:clang:
+  extends: [.test, .code-rules]
+  stage: test
+  needs: ["build:clang"]
+  tags: [baremetal]
+  cache:
+    key: "ccache-$CI_PROJECT_NAME-clang"
+    paths: [".ccache"]
+  script:
+    - |
+      set -euo pipefail
+      _CXX=""; _CC=""
+      for v in 22 21 20 19 18 17 16; do
+        if command -v "clang++-$v" >/dev/null 2>&1; then _CXX="clang++-$v"; _CC="clang-$v"; break; fi
+      done
+      [ -n "$_CXX" ] || { echo "FEHLER: kein clang auf Runner (Infra-HO, #273-Muster)"; exit 5; }
+      echo "GNU-Bauweg (clang): CC=$_CC CXX=$_CXX ($($_CXX --version | head -n1))"
+      CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Release \
+        --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test-clang
+      _built=0
+      for _a in 1 2 3 4; do
+        if make BUILD_JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"; then _built=1; break; fi
+        echo "Bau-Versuch $_a fehlgeschlagen -> ninja-Resume-Retry"
+      done
+      [ "$_built" = 1 ] || { echo "FEHLER: 'make' (clang) nach 4 Versuchen nicht erfolgreich"; exit 4; }
+      make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
+  variables:
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test-clang"
+
+# CI-DUAL 14.08.: Zelle clang x Debug -- identischer Body, drei Abweichungen (needs-Kette,
+# Debug-BuildType, eigenes Bauverzeichnis) plus eigener ccache-Key (Writer dieser Job).
+test:unit:clang:debug:
+  extends: [.test, .code-rules]
+  stage: test
+  needs: ["test:unit:clang"]
+  tags: [baremetal]
+  cache:
+    key: "ccache-$CI_PROJECT_NAME-clang-dbg"
+    paths: [".ccache"]
+  script:
+    - |
+      set -euo pipefail
+      _CXX=""; _CC=""
+      for v in 22 21 20 19 18 17 16; do
+        if command -v "clang++-$v" >/dev/null 2>&1; then _CXX="clang++-$v"; _CC="clang-$v"; break; fi
+      done
+      [ -n "$_CXX" ] || { echo "FEHLER: kein clang auf Runner (Infra-HO, #273-Muster)"; exit 5; }
+      echo "GNU-Bauweg (clang, Debug): CC=$_CC CXX=$_CXX ($($_CXX --version | head -n1))"
+      CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Debug \
+        --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test-clang-debug
+      _built=0
+      for _a in 1 2 3 4; do
+        if make BUILD_JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"; then _built=1; break; fi
+        echo "Bau-Versuch $_a fehlgeschlagen -> ninja-Resume-Retry"
+      done
+      [ "$_built" = 1 ] || { echo "FEHLER: 'make' (clang-Debug) nach 4 Versuchen nicht erfolgreich"; exit 4; }
+      make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
+  variables:
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test-clang-debug"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
