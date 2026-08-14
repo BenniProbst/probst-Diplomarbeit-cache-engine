@@ -55,3 +55,31 @@ bereits, Verursacher unbekannt.
 (additiv), dann deine Entscheidung ueber die Remote-Seite. Ich pruefe die lokalen Klone
 auf die Ref, sobald du es freigibst — die Pruefung selbst ist lesend und gefahrlos, aber
 sie gehoert nach A-1 erst NACH dieser Vorlage.
+
+---
+
+## NACHTRAG 13.08. (#21/BAU) -- FRAGE 2 IST DURCH ROH-TRANSKRIPT-BEFUND UEBERHOLT
+
+Der Verursacher ist NICHT unbekannt, und es braucht KEINE nachtraegliche Bestaetigung --
+die Kette liegt vollstaendig im Rohtranskript der 10.08.-Session
+(5a19728e-f6e1-4736-a246-e3fda9ac35a1.jsonl; Owner-Zitate als ASCII-Transliteration):
+
+1. **Z. 35872 (12:20:53Z), A-1-Vorlage:** "A-1 - GO fuer die Loeschung von
+   refs/backup/pre-secret-scrub-20260802. 776 Runner-Token, alle in einem Commit, der an
+   keinem Branch haengt. [...] Empfehlung: loeschen, danach Vollscan als Beleg 776 -> 0."
+2. **Z. 35912 (12:40:23Z), Owner:** "A-1: volles GO." -- das GO deckte die LOESCHUNG
+   direkt und gegenstands-genau.
+3. **Z. ~35913-35944 (bis 12:43Z):** Loeschung ausgefuehrt (git push origin --delete +
+   git update-ref -d; Nachweis "Backup-Refs auf origin: 0"; GitHub war vorher schon leer).
+4. **Z. ~36022-36039 (12:50-12:52Z):** korrigierter Vollscan MIT --log-opts=--all
+   (der erste Beleg deckte nur HEAD): super 6634 Refs/6538 commits "no leaks found";
+   ce beide Remotes 3374 commits "no leaks found".
+
+**FRAGE 2 wird damit zur KENNTNISNAHME-Mitteilung:** Loeschung war owner-autorisiert und
+ist belegt; es fehlte allein die Ledger-Buchung (liegt dem Lead jetzt als KON-Nachtrag
+vor; KON22-02 ist als Fehl-Rekonstruktion markiert, KON58-04 Befund 3 aufgeloest). Ein
+Bundle existiert nicht und war nicht Teil der genehmigten Empfehlung. Der oben erbetene
+Klon-Sweep entfaellt als Ref-Frage und wandert als Token-Hygiene-Punkt zur A-3-Rotation.
+**FRAGE 1 (MinIO-Keys) bleibt unveraendert offen und dringend.**
+Referenz: docs/plaene/20260813-OWNER-VORLAGE-a1-backup-ref-aktionen.md (Vorlage-Form +
+ausgefuellte Fassung + E-1..E-4-Bilanz).
