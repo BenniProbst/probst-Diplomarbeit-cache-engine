@@ -315,22 +315,58 @@ fordere_literal "$ERR" "0 CSV-Dateien"
 fall_ende
 
 # =============================================================================
-# F5  Teil-Ausbeute: eine leere neben einer vollen CSV -> rc=0, aber die leere
-#     MUSS als Befund sichtbar sein (Owner-KERN: nicht alles geht glatt, aber
-#     es muss sichtbar sein).
+# F5  ##26 M==N (KON60-05, 2026-08-14): eine leere neben einer vollen CSV ist
+#     bei modus=voll (hier: Default-Aufruf ohne drittes Argument) ein FEHLER --
+#     ein Pruefling, der keine einzige Datenzeile geliefert hat, darf einen
+#     Voll-Messlauf nicht bestehen, nur weil die ANDEREN geliefert haben.
+#     BIS ##26 galt hier rc=0 mit blosser WARNUNG; die Sichtbarkeits-Zusage
+#     (Owner-KERN: nicht alles geht glatt, aber es muss sichtbar sein) lebt
+#     unveraendert weiter -- im BEFUND (jeder Modus) und in den weichen Modi
+#     als WARNUNG (F5b). Gegenprobe ohne leere CSV: F5c.
 # =============================================================================
 N5=$(wuerfel 2 9)
-fall "F5  1 leere + 1 CSV mit $N5 Zeile(n) -> rc=0 MIT sichtbarer WARNUNG"
+fall "F5  1 leere + 1 CSV mit $N5 Zeile(n), modus=voll -> rc=1 (##26 M==N)"
 D="$WERK/f5"
 nur_kopf "$D/perm-0001/measurements.csv"
 T5=$(mit_daten "$D/perm-0002/measurements.csv" "$N5")
 fordere_literal "$D/perm-0002/measurements.csv" "$T5"
 lauf "$D" 1
-fordere_rc 0
+fordere_rc 1
 fordere_literal "$OUT" "2 measurements.csv gefunden."
 fordere_literal "$OUT" "$N5 Datenzeile(n) insgesamt"
 fordere_literal "$OUT" "davon 1 mit Datenzeilen, 1 ohne"
+fordere_literal "$OUT" "BEFUND: 1 von 2 CSV-Dateien tragen KEINE Datenzeile."
+fordere_literal "$ERR" "FEHLER: 1 von 2 CSV-Dateien tragen KEINE Datenzeile."
+fordere_literal "$ERR" "(modus=voll -- dieser Lauf SOLLTE messen.)"
+fall_ende
+
+fall "F5b dieselbe Lage, modus=pruef_only -> rc=0 MIT sichtbarer WARNUNG (##26 weich)"
+N5B=$(wuerfel 2 9)
+D="$WERK/f5b"
+nur_kopf "$D/perm-0001/measurements.csv"
+T5B=$(mit_daten "$D/perm-0002/measurements.csv" "$N5B")
+fordere_literal "$D/perm-0002/measurements.csv" "$T5B"
+lauf "$D" 1 pruef_only
+fordere_rc 0
+fordere_literal "$OUT" "davon 1 mit Datenzeilen, 1 ohne"
+fordere_literal "$OUT" "BEFUND: 1 von 2 CSV-Dateien tragen KEINE Datenzeile."
 fordere_literal "$OUT" "WARNUNG: 1 von 2 CSV-Dateien tragen KEINE Datenzeile."
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+fordere_kein_literal "$ERR" "FEHLER"
+fall_ende
+
+fall "F5c Gegenprobe ##26: 2 volle CSVs, modus=voll -> rc=0, KEIN M-von-N-Befund"
+N5C=$(wuerfel 2 9)
+D="$WERK/f5c"
+T5C=$(mit_daten "$D/perm-0001/measurements.csv" "$N5C")
+T5D=$(mit_daten "$D/perm-0002/measurements.csv" "$N5C")
+fordere_literal "$D/perm-0001/measurements.csv" "$T5C"
+fordere_literal "$D/perm-0002/measurements.csv" "$T5D"
+lauf "$D" 1 voll
+fordere_rc 0
+fordere_literal "$OUT" "davon 2 mit Datenzeilen, 0 ohne"
+fordere_kein_literal "$BEIDE" "tragen KEINE Datenzeile"
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
 fall_ende
 
 # =============================================================================
@@ -771,8 +807,11 @@ echo "  Wache: $ORIG_ZEILEN Zeilen, davon $ORIG_EXITS mit 'exit 1' (Nenner der M
 # KON44-02 (12.08.2026): DREI rote Zweige -- (1) keine CSV, (2) Datenzeilen-Summe verfehlt,
 # (3) NEU: echte Zeilen verfehlt (n/a-/provisionierte zaehlen nicht, D4d). Der Nenner ist
 # mitgezogen; Zweig (3) wird von F27 getoetet (Mutant M3 unten).
-if [ "$ORIG_EXITS" -ne 3 ]; then
-    echo "  ABBRUCH: erwartet wurden 3 'exit 1'-Zweige, gefunden $ORIG_EXITS." >&2
+# ##26 M==N (KON60-05, 2026-08-14): VIER rote Zweige -- (4) NEU: leere CSV neben
+# vollen bei modus=voll. Der Nenner ist mitgezogen; Zweig (4) wird von F5 getoetet
+# (Mutant M4 unten -- der fruehere Alle-Zweige-Mutant heisst seither M5).
+if [ "$ORIG_EXITS" -ne 4 ]; then
+    echo "  ABBRUCH: erwartet wurden 4 'exit 1'-Zweige, gefunden $ORIG_EXITS." >&2
     echo "           Die Wache hat sich strukturell geaendert -- die Mutation waere geraten." >&2
     exit 2
 fi
@@ -817,10 +856,12 @@ selbstbiss_fall() {   # $1 = Kurzname, $2 = Zweig, $3 = erwartete Zeilen-Differe
 #   1 = Keine-CSV        -- toetbar NUR durch F4 (Mindest=0; bei Mindest>=1 faengt Zweig 2 mit)
 #   2 = Datenzeilen-Summe -- toetbar durch F1/F6/F13
 #   3 = D4d echte Zeilen  -- KON44-02, toetbar NUR durch F27 (Summe reicht, echte nicht)
+#   4 = ##26 M==N         -- KON60-05, toetbar NUR durch F5 (Summe und ECHT reichen, N_LEER>0)
 selbstbiss_fall "M1  ohne 'exit 1' im Keine-CSV-Zweig"                1     1
 selbstbiss_fall "M2  ohne 'exit 1' im Summen-Zweig"                   2     1
 selbstbiss_fall "M3  ohne 'exit 1' im D4d-Echte-Zweig (KON44-02)"     3     1
-selbstbiss_fall "M4  ohne alle drei 'exit 1'"                         beide 3
+selbstbiss_fall "M4  ohne 'exit 1' im M==N-Zweig (##26/KON60-05)"     4     1
+selbstbiss_fall "M5  ohne alle vier 'exit 1'"                         beide 4
 
 echo ""
 echo "============================================================================="

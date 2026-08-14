@@ -98,7 +98,8 @@
 # EXIT: 0 = es wurden Messwerte erzeugt (mit Nenner belegt), oder der Modus misst
 #           per Bauart nicht und die Lage ist als WARNUNG sichtbar
 #       1 = keine CSV, oder (bei modus=voll) keine einzige Datenzeile bzw.
-#           Mindestzahl verfehlt
+#           Mindestzahl verfehlt, oder (bei modus=voll, ##26 M==N) mindestens
+#           eine gefundene CSV ganz ohne Datenzeile neben vollen
 #       2 = die Wache konnte nicht pruefen (Verzeichnis fehlt, Argument fehlt,
 #           unbekannter Modus, modus=auto ohne Lauf-Marker) --
 #           ausdruecklich KEIN Gruen: ein stiller Rueckfall waere derselbe Defekt.
@@ -143,6 +144,19 @@
 #   n/a) die Mindestzahl verfehlen; die weichen Modi bleiben WARNUNG. Die alten
 #   Zweige (keine CSV / Datenzeilen-Summe) sind unveraendert -- die Heilung geht
 #   nur in die scharfe Richtung.
+#
+# DER VIERTE ROTE ZWEIG (##26 M==N, KON60-05, 2026-08-14) -- Teil-Ausbeute:
+#   Bis heute war "eine leere CSV neben vollen" in JEDEM Modus nur eine WARNUNG
+#   am gruenen Ende. Im Voll-Messlauf ist das dieselbe Fehlerklasse wie die vom
+#   08.08.: ein Pruefling ohne einen einzigen Messwert bestand den Lauf, weil
+#   die ANDEREN geliefert haben. Owner-Zuweisung KON60-05 (Fix-Form Komplex-Fix):
+#   modus=voll fordert M==N -- jede der N gefundenen measurements.csv traegt
+#   mindestens eine Datenzeile (M = Dateien mit Datenzeilen); sonst exit 1.
+#   Die weichen Modi bleiben WARNUNG: dort ist die Datenzeile per Bauart nicht
+#   das Erfolgsmass, M==N also unerfuellbar und kein Urteilsgrund. Die AUSGABE
+#   ist in allen Modi dieselbe (BEFUND-Zeile, wortgleich); herabgestuft wird
+#   nur das URTEIL -- nie die AUSGABE (Owner-KERN, s.o.). Die Heilung geht
+#   auch hier nur in die scharfe Richtung.
 #
 # POSIX-sh, ASCII-only, kein Python (Hausdoktrin: kein Python in der Buildchain).
 # =============================================================================
@@ -348,11 +362,25 @@ if [ "$ECHT" -lt "$MINDEST" ]; then
     echo "         In diesem Modus ist die echte Messzeile nicht das Erfolgsmass; der Befund bleibt sichtbar."
 fi
 
-# Teil-Ausbeute ist kein Abbruch, aber sie muss SICHTBAR sein: eine leere CSV
-# neben vollen ist ein echter Befund (ein Pruefling hat nichts geliefert) und
-# darf nicht in einer Erfolgsmeldung verschwinden. Der Owner-KERN dazu lautet:
-# "In der Wissenschaft geht nicht immer alles glatt, aber das muss SICHTBAR sein."
+# ##26 M==N (KON60-05, 2026-08-14): Teil-Ausbeute ist bei modus=voll ein ABBRUCH.
+# Eine leere CSV neben vollen heisst: ein Pruefling hat nichts geliefert -- im
+# Voll-Messlauf ist das kein Randbefund, sondern ein gescheiterter Teil des
+# Laufs (M von N Dateien tragen Daten, gefordert ist M==N). Die weichen Modi
+# bleiben WARNUNG: dort ist die Datenzeile per Bauart nicht das Erfolgsmass
+# (s. Modus-Zweige oben), M==N also unerfuellbar. Der Owner-KERN gilt in beiden
+# Richtungen: "In der Wissenschaft geht nicht immer alles glatt, aber das muss
+# SICHTBAR sein." Herabgestuft wird das URTEIL, nie die AUSGABE: die
+# BEFUND-Zeile steht in jedem Modus wortgleich da.
 if [ "$N_LEER" -gt 0 ]; then
+    echo "BEFUND: $N_LEER von $N_CSV CSV-Dateien tragen KEINE Datenzeile."
+    if [ "$MODUS" = voll ]; then
+        echo "FEHLER: $N_LEER von $N_CSV CSV-Dateien tragen KEINE Datenzeile." >&2
+        echo "        Gefordert ist M==N: jede der $N_CSV gefundenen Dateien traegt mindestens" >&2
+        echo "        eine Datenzeile; hier liefern nur $N_MIT von $N_CSV." >&2
+        echo "        Ein Pruefling ohne Datenzeile ist im Voll-Messlauf gescheitert, keine Fussnote." >&2
+        echo "        (modus=voll -- dieser Lauf SOLLTE messen.)" >&2
+        exit 1
+    fi
     echo "WARNUNG: $N_LEER von $N_CSV CSV-Dateien tragen KEINE Datenzeile."
     echo "         Der Lauf gilt als gelungen, aber diese Pruefling(e) haben nichts geliefert."
     echo "         Das ist ein Befund, kein Rauschen -- er gehoert in die Auswertung."
