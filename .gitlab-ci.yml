@@ -1233,7 +1233,12 @@ test:unit:debug:
   cache:
     key: "ccache-$CI_PROJECT_NAME-gcc-dbg"
     paths: [".ccache"]
-  needs: ["test:unit"]
+  # Lens-Fund 14.08.: Ketten-Kante ist NUR Ordnung -- artifacts:false, sonst laedt der Job den
+  # Release-Report (ctest-junit.xml) des Vorgaengers und wuerde ihn bei eigenem Fruehscheitern
+  # (artifacts when:always im .test-Template) als EIGENEN Test-Report wieder hochladen.
+  needs:
+    - job: "test:unit"
+      artifacts: false
   tags: [baremetal]
   script:
     - |
@@ -1269,7 +1274,9 @@ test:unit:debug:
 test:unit:clang:
   extends: [.test, .code-rules]
   stage: test
-  needs: ["build:clang"]
+  needs:   # Lens-Fund 14.08.: Ordnungs-Kante, artifacts:false (s. test:unit:debug)
+    - job: "build:clang"
+      artifacts: false
   tags: [baremetal]
   cache:
     key: "ccache-$CI_PROJECT_NAME-clang"
@@ -1301,7 +1308,9 @@ test:unit:clang:
 test:unit:clang:debug:
   extends: [.test, .code-rules]
   stage: test
-  needs: ["test:unit:clang"]
+  needs:   # Lens-Fund 14.08.: Ordnungs-Kante, artifacts:false (s. test:unit:debug)
+    - job: "test:unit:clang"
+      artifacts: false
   tags: [baremetal]
   cache:
     key: "ccache-$CI_PROJECT_NAME-clang-dbg"
