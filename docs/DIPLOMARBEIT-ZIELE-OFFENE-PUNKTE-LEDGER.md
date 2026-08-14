@@ -16,6 +16,70 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 14.08.2026 -- KON62: STUFE 3 KOMPLETT (BEIDE CIs TERMINAL SUCCESS) + #81-WIEDERHOL-VERIFY PIPELINE-MESSUNG VOLLZOGEN
+
+**Anlass: Abschluss der Drei-Stufen-Landung (v4.3/A2.1b) -- Stufe 3 = EIN Push je Repo,
+EINE CI, streng seriell. Nummern-Vergabe gemessen: KON62 hatte vor diesem Nachtrag
+0 Treffer im Ledger (KON35 nie vergeben; Vergabe-Doktrin V12).**
+
+### KON62-01 -- DIE PUSH-KETTE (seriell, mit zwei CI-ROT-ZYKLEN, beide T-1-geheilt)
+
+    ce-PUSH 1   2a3b1eb0 -> ce-CI 15792 TERMINAL failed (lint:format 377292: 80
+                clang-format-Violations in 2 P6-Lizenz-Testdateien; lint:static
+                377293: cppcheck uninitMemberVarNoCtor 2 Stellen; Rest 20 Jobs gruen).
+    T-1-FIX     4f18f478 (clang-format 22.1.8 CI-versionsgleich + NSDMI nach
+                Bestands-Praezedenz) -> EIN neuer Push (origin+github) -> ce-CI 15793
+                TERMINAL SUCCESS (lint:format+lint:static gruen).
+    GITLINK     65c364b8 ATOMAR: Gitlink 5f3f26a5 -> 4f18f478 PLUS PZW-Anker
+                DESIGNPLAN :208 im SELBEN Commit (Atomar-Pflicht als T-1-ROT
+                reproduziert: ohne sie exit 2 der docs:plan-zahlen-wache);
+                R1/KON4-07-Neuauszaehlung 11 von 11 thesis_profiles mit xlsx>=1.
+    WACHEN      Vollauf auf sauberem Baum: C1-Format-Paritaets-Rot am
+                05_diagram_generator gefunden und geheilt (7617f037, T-1).
+    super-PUSH  7617f037 (origin+github) -> super-CI 15794 TERMINAL failed:
+                test:unit/:debug (377370/377371), LizenzAmObjekt.EchtesRepoIst-
+                Konsistent -- NOTICE Z.91 trug den ALTEN ce-Marker "Comdare Cache
+                Engine -- Dual License", der Gitlink-Bump brachte die owner-
+                entschiedene P6-LICENSE (Comdare Research License 1.0). Die Wache
+                tat ihren Job; Repo-uebergreifende Vertragsflaechen-Klasse.
+                MONITOR-LEHRE: der Pipeline-Monitor des Workflow-Agenten starb
+                stumm mit dessen Return -- der Owner fand das Rot vor dem System.
+                Poller laufen seither als EIGENSTAENDIGE Background-Tasks.
+    T-1-FIX     ef1a062d: NOTICE zieht der LICENSE nach (nie umgekehrt) -- Marker
+                -> "Comdare Research License, Version 1.0" (LICENSE Z.1 woertlich)
+                + Objekt-Marker-Liste test :608; Header-Historie Z.16 unangetastet.
+                Lokal LizenzAmObjekt 6/6 + volle Suite 27/27 PASSED; gitleaks
+                Koeder rc=1 / Echt rc=0. EIN Push (origin+github).
+    super-CI    15798 @ ef1a062d TERMINAL SUCCESS -- 34 von 34 Jobs gruen
+                (0 nicht-success/manual), inkl. test:unit 377438 + test:unit:debug
+                377439 + docs:plan-zahlen-wache 377434.
+
+### KON62-02 -- #81 WIEDERHOL-VERIFY: PIPELINE-MESSUNG (Owner-Auftrag 11.08., Task #43)
+
+    Gegenstand: die 5 W0b-Bauposten am gelandeten Gesamtstand ef1a062d, MIT
+    Pipeline-Messung (Referenz 15764 vom 13.08., alle Referenz-Jobs success).
+    MESSUNG 15798 (14.08., alle success, Job-IDs frisch):
+      test:mess-ausbeute-bissprobe   377423 (Referenz 376312) -- deckt ##26-Haertung
+                                     96ff69d5 + Schwester-Fix 853cea9a (32/32+14/14)
+      test:durchstich-bissprobe      377424 (Referenz 376313)
+      test:lauf-marker-probe         377425 (Referenz 376314)
+      test:frische-wache-probe       377426 (Referenz 376315) -- nach 853cea9a
+      test:persist-sammler-probe     377427 (Referenz 376316)
+      test:anhang-forward-probe      377431 (Referenz 376320)
+      test:anhang-snapshot-probe     377432 (Referenz 376321)
+      docs:plan-zahlen-wache         377434 (Referenz 376323) -- PZW nach 65c364b8
+    Der erste Verify-Durchgang (vor #81) kannte P-GLIED und die Folge-Commits
+    nicht; DIESE Messung laeuft am Gesamtstand NACH Komplex-Fix und Landung.
+    #81/#43 damit VOLLZOGEN; Objekt-Haelfte war im Komplex-Fix-Verify (V3) belegt.
+
+### KON62-03 -- ENDZUSTAENDE (gemessen nach 15798-TERMINAL)
+
+    ce    development origin+github = 4f18f478 ; CI 15793 SUCCESS.
+    super development origin+github = ef1a062d ; CI 15798 SUCCESS (34/34);
+          Gitlink Code/external/comdare-cache-engine -> 4f18f478 (ancestor-
+          bewiesen); PZW dual gruen.
+    main-FF beider Repos NICHT faellig (blockiert durch #31/#19, plangemaess).
+    Naechste Glieder: A1-DURCHZUG (KON60-03, alle 18 Achsen) -> F1-ECHTLAUF.
 ## NACHTRAG 14.08.2026 -- KON61-NACHTRAG A (A2.5-FIX-STUFE): VERIFY-FUNDE F1-F4 BEHOBEN/VERBUCHT
 
 **Anlass: adversarischer Verify des KF-Pakets (Urteil TRAEGT_MIT_FIXES; 4 Funde + 3 Deckungs-Kennzeichnungen).
