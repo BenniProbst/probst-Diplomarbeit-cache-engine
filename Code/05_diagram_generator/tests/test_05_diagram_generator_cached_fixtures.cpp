@@ -1669,8 +1669,7 @@ TEST(Stufe05Pipeline, RatioMatrixTrueZeroOnAllOnesWidensAxisThenPlacesZeroClassB
     auto            out = comdare_user_tmp() / "p2_ratio_zero_all_ones.tex";
     std::error_code ec;
     fs::remove(out, ec);
-    ASSERT_EQ(dg::write_surface_ratio_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"),
-              dg::status_ok);
+    ASSERT_EQ(dg::write_surface_ratio_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "matrix plot*")); // echte Figur, kein Groessen-Platzhalter
     // Alle positiven Verhaeltnisse exakt 1.0 -> halbe Breite 0 -> Entartungs-Wache weitet auf 1 Dekade;
     // die 0-Klasse sitzt eine weitere Dekade darunter (-2), die Domaene waechst symmetrisch (+-2).
