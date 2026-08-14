@@ -605,7 +605,7 @@ TEST(LizenzKern, MarkerOhneAussagekraftIstRot) {
     // muessen ALLE durchkommen. Eine Untergrenze, die den Bestand schneidet,
     // waere keine Haertung, sondern ein Dauer-Rotstand.
     for (const char* echt :
-         {"Comdare Cache Engine -- Dual License", "Apache License", "ISC License", "an MIT license, plus a clause",
+         {"Comdare Research License, Version 1.0", "Apache License", "ISC License", "an MIT license, plus a clause",
           "GNU GENERAL PUBLIC LICENSE", "MIT License", "LGPL-2.1-or-later"}) {
         EXPECT_TRUE(marker_ist_aussagekraeftig(echt)) << "Marker am Objekt in Gebrauch: \"" << echt << "\"";
     }
