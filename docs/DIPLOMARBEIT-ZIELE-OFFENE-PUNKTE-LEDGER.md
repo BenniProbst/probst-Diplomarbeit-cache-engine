@@ -16,6 +16,346 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 14.08.2026 -- KON60: WELLE-2-LANDUNG STUFE 1 (BEIDE REPOS, KEIN PUSH) + VERBUCHUNG OWNER-SAMMELRUNDE 13.08. (A1/B1/B2/Vorlage-B4/B5/D3/D4) + E-21-VOLLZUG
+
+**Anlass: Drei-Stufen-Landung Stufe 1 (v4.3/A2.1b: serielle --no-ff-Merges MIT Harmonisierung
+an Vertrags-/Interface-Flaechen; Stufe 2 = Komplex-Fix; Stufe 3 = EIN Push je Repo, EINE CI).
+Quelle der Entscheide: Owner-Nachricht 13.08. 14:19:56Z (Transkript 5a19728e:52798,
+promptSource=typed; wortgleich :53214) = Punkt-fuer-Punkt-Antwort auf
+docs/plaene/20260813-OWNER-VORLAGE-sammelrunde-welle2-vor-komplexfix.md (fa75d47c).
+Nummern-Vergabe gemessen, nicht geraten: KON60 hatte vor diesem Nachtrag 0 Treffer in 27043
+Ledger-Zeilen; KON35 bleibt nie vergeben; der e21-Strang lieferte seinen Text ausdruecklich
+mit "Nummern-Vergabe beim Lead" (s. KON60-11). Der Nachtrag ist AN DIE LANDUNG gebunden
+(KON58-12-Lehre), nicht an den Vorsatz.**
+
+---
+
+### KON60-01 -- LANDUNG SUPER: DREI SERIELLE --no-ff-MERGES + HARMONISIERUNG + ZWEI DESIGNS (KEIN PUSH)
+
+    BASIS      super development @ fa75d47c (Lande-Baum wt-super-landung, Ein-Schreiber).
+    MERGE 1    865ff21d = bau/f1-1x1-honest-empty @ 8e9a31d2 (05-Groessen-Wache HONEST-EMPTY
+               1x1/1xN/Nx1 statt pgfplots-Fatal, BASH-WACHE in ci/anhang_forward_core.sh,
+               Numerus-Ehrlichkeit + Gegenkoeder; F1/T-1). Proben: merge-tree-Vorhersage
+               6e6caaf4 == Merge-Tree EXAKT; Loeschungen beidseitig 0/0 (--diff-filter=D
+               gegen beide Eltern); Schnittmenge Zweig (5 Dateien) gegen dev-seit-Basis
+               (12 Dateien) = 0; bash -n rc=0.
+    MERGE 2    dbef5b0f = bau/texlive-gate-haertung @ 5363eebb (PDF-Gate fail-closed:
+               AF_PDF_GATE hart on in anhang:forward, Enum-Wache gegen stille Fehlmodi,
+               Mehr-Hauptdokument-Wache Fall E). Schnittmenge 2 von 2 Zweig-Dateien
+               (.gitlab-ci.yml + ci/anhang_forward_core.sh) mit dev-seit-Basis (14 Dateien)
+               -- Auto-Union textuell konfliktfrei, aber HARMONISIERT statt nur gemergt
+               (A2.1b, Auto-Merge an Vertragsflaechen = Anfangsverdacht): die vom Zweig am
+               eigenen Endstand nachgemessenen Kopfblock-Anker der .gitlab-ci.yml zeigten
+               nach dem Merge mit den dev-seitigen Einfuegungen (Ketten-Riss-Heilung
+               measure:smoke/golden-320 + NE-20-Kommentar ergebnis:holen, +58 Nettozeilen)
+               auf verschobene Stellen: 11 von 16 Anker-Werten (13 von 20 Nennungen) stale,
+               Verschiebung +23 bzw. +53. Alle 16 am Merge-Endstand NEU gemessen (nicht
+               geschoben), Gegenprobe 16 von 16 OK (je Zeile "OK :NNNN traegt VARIABLE"
+               literal); finaler Merge-Tree == Auto-Union-Vorhersage 7d3342aa PLUS GENAU
+               8+/8- Anker-Zeilen in .gitlab-ci.yml (git diff Vorhersage..Merge, literal
+               "1 file changed, 8 insertions(+), 8 deletions(-)"). Weitere Proben:
+               YAML-PARSE-OK (57 Top-Level-Schluessel, toleranter Loader wegen !reference),
+               bash -n rc=0, Loeschungen beidseitig 0/0. Beide Absichten erhalten
+               (texgate-Haertung unveraendert, dev-Einfuegungen unveraendert, Anker wahr
+               am vereinigten Stand).
+    MERGE 3    ad742bdc = bau/e21-vollzug-a1 @ fe7bb459 (A-1-Vorlage-Form + Nachtraege,
+               Verbuchung s. KON60-11). Proben: Vorhersage ad39da42 == Merge-Tree EXAKT;
+               Loeschungen beidseitig 0/0; Schnittmenge 0 von 2 Zweig-Dateien.
+    DESIGNS    85c1174d = docs/plaene/20260813-DESIGN-zielstruktur-vier-traeger-
+               unterprojekte.md -- publiziert MIT Owner-B3-Umsetzung (13.08.: Namen
+               ENGLISCH): alle Zielstruktur-Namen fuehren `planner` (traeger/planner,
+               comdare_planner, libs/traeger/{planner,ceb,tier,hybrid}); die Kollision
+               `planner`(EN-Bestand profile_facade/planner) vs `planer`(DE) ist damit
+               GELOEST, Entscheid-Saetze im Dokument nachgezogen (Kopf/Uebergabe/R5/P.6.1).
+               6e796ae5 = docs/plaene/20260813-DESIGN-g1-grammatik-dreiphasige-messachse.md
+               -- publiziert MIT STATUS-NACHTRAG (ANGENOMMEN 2 von 12, s. KON60-07).
+    KEIN PUSH  super development lokal 5 Commits vor origin/fa75d47c-Basis (3 Merges +
+               2 Design-Commits) + dieser Ledger-Commit; Push erst nach Komplex-Fix
+               (Stufe 3). Der ce-Gitlink im super-Baum blieb in Stufe 1 UNANGETASTET
+               (Bump folgt mit/nach dem Komplex-Fix, R1/KON4-07-Neuauszaehlung dann).
+
+### KON60-02 -- LANDUNG ce (STAND BEI BUCHUNG): DREI MERGES AUF ce development, KEIN PUSH
+
+    ce development @ a6804dfa, origin/development unveraendert 5f3f26a5 (kein Push,
+    plangemaess). Merge-SHAs (Branch-Namen aus den Merge-Subjects):
+      d215b127 = Merge bau/s7-algo-hardware-stempel   (P2/S-7)
+      0304ebf1 = Merge bau/wachen-floor-inventar
+      a6804dfa = Merge bau/p6-lizenz-umsetzung        (P6-Slot, Task #42)
+    Die P2/S-7-Pflichtproben (Lock byte-identisch gegen die Fixup-3-Referenz, KON58-13-
+    Lande-Auflage --check/--write/git diff, Auto-Union 0 Loeschungen beidseitig) und die
+    Proben der uebrigen ce-Merges: siehe ce-Landungs-Protokoll des ce-Landers; der Verify
+    prueft nach und ergaenzt. KEIN Echtfall-Anspruch an P2 -- S-7 ist SHA-/golden-neutral
+    by construction (KON58-05), der Riegel-Echtfall liegt im S-6-Fenster (KON60-04).
+
+### KON60-03 -- A1 = C-3a-PAKET-ENTSCHEID: AKTIVIERUNG JA, ALLE 18 ACHSEN, EIN DURCHZUG
+
+    OWNER (52798, verbatim): "Alle gemeinsam in einem Workflow Durchzug. Alle werden
+    benoetigt mit voller Verlinkung und Implementierung. Das ist denke ich anhand bereits
+    existierender fast vollstaendiger Beispiele als Abgleich realisierbar."
+    Das IST der C-3a-Paket-Entscheid in der Sache, VOR der Frist Mi 19.08., und WEITER als
+    die Vorlage 136a1798: nicht EINE Achse zuerst, sondern ALLE 18 in einem Durchzug.
+    Vorab-GO seit 26.07. 19:07Z (46375cdc:82959: "C-3a erhaelt direktes volles Folge GO
+    sobald das gate dafuer faellt").
+    Das "fast vollstaendige Beispiel" = die durchgaengig verdrahtete, heute inhaltlich
+    leere Kette: kSimdOrganRequirement (alle kRequiredNone) + kSimdOrganSensibility ->
+    aggregate_required_for_axes -> admit_organ_on_machine (KON59-01: "vorhanden, aber
+    inert") -> Stempel -> Lock/Fingerprint-Sidecar -> golden (320er). Der Tripwire
+    (simd_build_gate.hpp:272-278) benennt den Ersatzweg selbst: per-Binary-Orchestrator-Weg
+    ueber aggregate_required_for_axes, NICHT die globale Vereinigung active_organ_required().
+    "Volle Verlinkung" = Sechs-Stationen-Abnahme JE ACHSE (Achse -> required -> Gate ->
+    Stempel inkl. Meta-Meta-Suffix -> Lock -> golden); den K-3-Rest (SOTA emittiert leere
+    Organ-Zeile) dabei schliessen ODER als Grenze deklarieren.
+    BUCHUNG: der Fallregel-18.6(3)-Trigger ist der Sache nach bedient; #38a2 bleibt im
+    W1-Bump-Buendel -- die W1-PAKETIERUNG ist INTERPRETATION (Owner nennt weder "W1" noch
+    "Buendel"; Stuetze: Vorlage-Empfehlung + Owner-Schweigen), als solche kenntlich.
+    KON59-01 fuehrte die C-3a-Frist noch als offen -- hiermit NACHGEZOGEN: in der Sache
+    entschieden per 52798. required-Semantik bleibt KON16-02 (freigebende Seite IMPLIZIERT,
+    compile-Seite FORDERT EIN; DREIPHASIG zusaetzlich Messfuehler-Vertrag der CEB-Mess-
+    achse); required = hartes Funktions-MINIMUM, kein Beschleunigungs-Wunsch; Hardware-
+    Erweiterung bleibt dauerhaft ADDITIV. OFFEN (Bau-Ermessen bzw. am Objekt, KEINE neue
+    Owner-Runde): konkrete required-FLAG-WERTE je Achse sind nirgends deklariert (prefetch
+    = einziges gebautes Muster "bewusst LEER"); Disk-Typ-Suffix-Spannung beim #38a2-Bau am
+    Objekt ausmessen; NE-10-Vorsicht vor Aktivierung (jede "inert"-Behauptung je Seite mit
+    ZWEI Zahlen nachmessen -- bvset_ist_teilmenge hat 2 Produktions-Treffer).
+
+### KON60-04 -- D4: RIEGEL-ECHTFALL-ORT = S-6-FENSTER IM W1-BUMP-BUENDEL; UEBERHOLT-MARKER AN KON58-01 (S-7-HAELFTE)
+
+    BEGRIFFE ERSTMALS EINGEFUEHRT (je 0 Treffer vor diesem Nachtrag, beide Schreibweisen
+    geprueft, Nenner 27043 Zeilen): "Riegel-Echtfall" = die erste ECHTE landende Aenderung
+    an einem Riegel-Traeger, protokolliert als ROT -> Bump/Regen -> GRUEN. "Bump-Buendel" =
+    das primaere W1-Buendel (Layout 6->7 + Format 4->5 + Budget/#38d + #38a2 + S-6a-POD in
+    EINEM Bruch; KON45-01/3, Wellenplan Par. 18.6/18.7).
+    D4 (52798): "Freigabe und bitte explore zum Gegenpruefen" -- die Gegenpruefung ist an
+    allen 20+ Ankern BESTANDEN. ORT des Echtfalls: das S-6-FENSTER, NICHT S-7.
+    UEBERHOLT-MARKER (datiert 14.08., Original stehen lassen; Anker ueber Wortlaut, nie
+    Zeilennummer): der KON58-01-Betriebsfolge-Satz "Das trifft die W1-Straenge S-6/S-7
+    unmittelbar -- sie fassen axes-Header massenhaft an." ist fuer die S-7-HAELFTE
+    UEBERHOLT -- S-7 war SHA-/golden-neutral by construction (KON58-05 eiserne Regel:
+    nichts unter axes/, topics/, heuristik/; empirischer Praezedenzfall P1/S-3: Lock
+    byte-identisch). Fuer S-6 gilt der Satz FORT.
+    CHRONOLOGIE festgehalten: nacht-10 Par. 8 liess den Echtfall-Traeger OFFEN; die
+    juengere Assistenten-Fassung 51962 schlug noch S-7 vor; definitiv aufgeloest erst mit
+    D4 (14:01Z). FORM des Echtfalls (X.Y.Z-Bump vs. bewusster Lock-Regen-Commit): faellt im
+    S-6-Paket, Friktion wird GEMESSEN, nicht geschaetzt; der erste landende Echtfall ist
+    protokollierter PFLICHTSCHRITT des S-6-Paket-Auftrags. S-6-Explore-Pflicht (Glieder-
+    Reihenfolge, zwei Welten) bleibt UNERFUELLT -- bis dahin wird an S-6 NICHTS gebaut.
+
+### KON60-05 -- VORLAGE-B4 (xlsx/csv-DOKTRIN + WACHE ##26) -- ##26 ERSTMALS IM LEDGER
+
+    LABEL-WARNUNG: "B4" bezeichnet ZWEI Gegenstaende -- DIESE Vorlage-Frage B4 (xlsx/##26)
+    UND den Wellen-Posten B4/System-B (Konsolidierung IV E). In jedem Auftrag qualifizieren
+    ("Vorlage-B4" vs. "Posten B4/System-B").
+    ##26 hatte vor diesem Nachtrag 0 Ledger-Treffer (lebte nur in Wellenplan + Vorlage) --
+    ohne diese Buchung wiederholte sich die B4-Rueckfrage.
+    ENTSCHEIDUNGSLAGE: Doktrin-Kette geschlossen -- xlsx = STAMM (entsteht bedingungslos im
+    Speicher), csv = KIND; Persistenz dreiwertig (a) xlsx (b) csv (c) beide; XOR ueberlebt
+    nur als Verbot zweier UNABHAENGIGER Schreibwege. "Es gibt keine CSV ohne xlsx" (13.08.)
+    ist ERZEUGUNGS-Doktrin, KEINE Platten-Existenz-Regel: die ##26-Wache bekommt KEINE
+    xlsx-Existenz-Pruefung (csv-only-Laeufe sind plankonform; xlsx = NENNER der Erzeugung,
+    nicht Entscheider der Wache). Einziger echter Plan-vs-Code-Riss: die M==N-Klausel.
+    FIX-FORM (Komplex-Fix): harter M==N-Zweig NUR bei modus=voll; leere CSV im Vollmodus =
+    exit 1 MIT unveraenderter Befund-AUSGABE ("Herabgestuft wird das URTEIL, nie die
+    AUSGABE"; "Heilung nur in die scharfe Richtung"); Warnung bleibt fuer provision/pruef
+    (M==N dort per Bauart unerfuellbar, Kopfzeilen-CSVs). Explore-Beleg an den Fix haengen.
+    FORMAL fehlt das woertliche Bau-GO: dieselbe Owner-Nachricht vergibt "Freigabe" nur an
+    C3/D1/D2/D3/D4, nicht an B4/B5. Der Bau stuetzt sich auf Plan-Formel (Wellenplan
+    "N>=1 UND M==N UND datenzeilen_gesamt>=1") + Dauerregel LUECKE=BEHEBUNG-PFLICHT; die
+    formale Luecke wird nachrichtlich gefuehrt, nicht verschwiegen.
+
+### KON60-06 -- B5: kVOLLAUSBAU = STATUS-QUO-BESTAETIGUNG, KEINE SIGNATUR-ZULASSUNG
+
+    Owner: "Keine Einschraenkung der Implementierung gegen den Plan bitte, genauso wie
+    geplant." kVollausbau (algo_semver.hpp:1232, 59 Knoten) hat im gesamten Korpus exakt
+    DREI Rollen: kMaxFlagNodes-Bemessung, schaerfstes Positiv-Kriterium (m5) + Roundtrip,
+    O-1-Vokabular der System-Kategorie; 7 Fundstellen repo-weit, alle in algo_semver.hpp;
+    strukturell nicht signaturfaehig (fail-closed Tokens ohne cpuinfo-Id, vendor-
+    uebergreifende Vereinigung ohne reale CPU). Eine SIGNATUR-Zulassung war NIE geplant --
+    KEIN Zulassungs-Bau, KEIN Katalog-Ausbau-Posten. Die Signatur-Welt ist fertig
+    (23er-Katalog static_assert, DREI Maschinen-Signaturen Prod1Zen5 22 / Prod2RaptorLake 9
+    / OdroidGracemont 9 Flags, S-3a-Bruecke flag_menge_in_signatur, Werkzeug-Grenze
+    static_assert==2 mit eingebauter Ausbau-Vorschrift "Ausnahme entfernen, nicht Zahl
+    anpassen"). B5 aendert an A1 NICHTS: kVollausbau ist KEIN Eingang der Signatur-Welt.
+    Formales Ja zur Empfehlungs-Frage fehlt woertlich (Substanz gedeckt) -- kein
+    Handlungsbedarf.
+
+### KON60-07 -- B2: G-1-KURZ-VOKABULAR AUTONOM UEBERNOMMEN (NUR F-G1-1 + F-G1-2)
+
+    UEBERNAHME-KETTE, gebucht: Owner-Bedingung 13.08. ("wenn kein widerspruch ... autonom
+    uebernehmen (passt)", 52798) -> 0/8-Kollisions-Erhebung eigenstaendig reproduziert
+    (8 Token gegen Hardware-Katalog kFlagGrammarCatalog[62] + Reserve[14], Positiv-
+    Kontrolle "bw" beisst; System-Achsen; 18 Organ-Achsen; cpu_sub p/e; PMC; load_framework;
+    Tooling-Ids wallclock/macro/micro; Testat-Grammatik; Pruefling-XSD) -> autonome
+    Uebernahme AUSSCHLIESSLICH fuer F-G1-1 (EIN Parser -- G-1 als Profil der v2) und
+    F-G1-2 (Kurz-Vokabular m / b h t / w ma mi). Der Owner billigt kurze String-Kuerzel
+    ausdruecklich (07.08. 09:20Z, 11321: "cpe ist ein Kuerzel wie 'g','e','f','n'").
+    design_g1.md-STATUSWECHSEL GELANDET: 6e796ae5, Zielpfad docs/plaene/20260813-DESIGN-
+    g1-grammatik-dreiphasige-messachse.md (STATUS-NACHTRAG im Kopf).
+    F-G1-3 bis -10 und -12 bleiben nummerierte OFFENE Owner-Fragen (konservative Lesart,
+    nicht als mit-entschieden verbucht). F-G1-11 ist KEIN offener Owner-Entscheid mehr:
+    Aufloesung aus Bestand per B1 (s. KON60-08), Abbildung auf die Slot-Projektion =
+    Konstruktionsarbeit im Komplex-Fix. BAU-AUFLAGE Stufe B: die 0/8-Momentaufnahme in
+    eine CT-Invariante verwandeln (static_assert-Kreuz-Wache der 8 Token gegen
+    Katalog+Reserve) -- heute reserviert NICHTS die G-1-Buchstaben gegen kuenftiges
+    Hardware-Wachstum. ls = benannte kuenftige Andockstelle Lastsequenz, Erweiterung NUR
+    per Owner-Entscheid; neue E-Label-Strings existieren im Korpus nicht -- 8-Token-Probe
+    beim Praegen einmalig nachfahren.
+
+### KON60-08 -- B1: KIND-STEMPEL AUS BESTAND AUFGELOEST; (iii)-WALLCLOCK-DEFINITION ERSTMALS GEBUCHT
+
+    "Alle (i), (ii) sind definiert" = KEIN neuer Entscheid; die Substanz steht im Bestand:
+    nur tatsaechlich verwendete Konfiguration kommt in den Stempel (roh 41905, 11.08.
+    16:03:59Z), Mess-Bestueckung der Kinder folgt der erzeugenden CEB (KON37-01-Vererbungs-
+    regel). Tier-Stempel = das KOMPILAT: 4 Zeilen, ZWEI SEPARATE Arrays (System + Organ)
+    in zwei string_view-Zeilen, nur HAUPT-Achsen, nur Eingebautes; die G-1-Slot-Projektion
+    muss w-fuehrend sein, wenn die erzeugende CEB w traegt. Referent-Klaerung: (i)/(ii)/
+    (iii) sind die Optionen der B1-VORLAGE selbst; die aeltere Par.-43-Paar-Zuordnung ist
+    verworfen.
+    (iii)-DEFINITION (52798, Volltext-Sinn): Wallclock = separater check-point measure
+    wrapper auf CEB-SEITE um das Gesamt-Experiment "vom Aufruf bis zur Fertigstellung";
+    Zweck = Bestimmung des Messfehlers der eingebauten Macro-/Micro-Fuehler ueber die
+    Gesamtausfuehrungszeit MIT und OHNE eingebaute Tier-Fuehler. w erscheint im Tier-
+    Stempel genau dann, wenn die CEB w traegt und einbaut; der Wrapper bleibt CEB-seitig
+    (im Code: Wallclock = MessEbene::Compare, konfiguration.hpp:106-109). Die gesamte
+    Wallclock-Kette ist BESTAETIGT, nicht geaendert (Ebene 2 = CEB-Pruefdock-Gesamtzeit;
+    checkpoint_measure = Baupflicht; Nenner 32 aus KON25-03 -- Owner-Live-Selbstkorrektur;
+    in Nachtraegen NIE KON34-03 als Quelle zitieren, dessen Dock-32 ist verworfen).
+    Der Tier-Pflicht-Wurf (abi_adapter.hpp:476-491) FAELLT per Vererbungsregel; die
+    Tier-Gates BLEIBEN. two_phase_measure ist ein SEPARATES Muster auf Einzel-Operations-
+    Ebene (Warmup/Rollback) -- nicht mit der Experiment-Klammer vermengen.
+    FORMULIERUNGS-DISZIPLIN: "keine Gesamt-Versionierung ausser Planer-X.Y.Z" statt "kein
+    Gesamt-Stempel" -- das Interface (6) gesamt_stempel() (CT-Konkatenation der EIGENEN
+    Zeilen, planner_version.hpp:60-87) existiert ausdruecklich und ist KEINE Regression.
+    KONSTRUKTION im Komplex-Fix (aus Bestand, keine weitere Rueckfrage-Runde); Messfehler-
+    Bestimmung als Belegungs-PAARE planen (genau EIN Schalter Unterschied); WIE VIELE der
+    32 Belegungen gefahren werden, entscheidet allein die Planer-Simulation S-19.
+    CebVersionen-Alias (konfiguration.hpp:40-44) = der benannte Umbaupunkt der w-Sicht --
+    ob ersetzt oder erweitert, entscheidet das G-1-Design am Objekt.
+    EINZIGE echte Definitionsluecke: die START-Grenze der Klammer ("vom Aufruf" -- liegt
+    Pruefdock-Laden/Anschliessen in der Gesamtzeit?); erste Spannen-Angabe ueberhaupt,
+    KON51-02 definiert nur das ENDE. Erst Bestands-Explore (KON51-01 Lade-Verantwortung,
+    KON25-08 Raketen-Mechanik), dann ggf. praezise Frage -- nicht raten. Hol-Punkte des
+    Flush: per KON51-02 Explore-Auftrag beim Bau, KEINE Owner-Frage.
+
+### KON60-09 -- D3: "WIE EMPFOHLEN, FREIGABE." + NOVUM TEILPROJEKT-COMMIT-KRITERIUM; KON-57/E-26 BEANTWORTET
+
+    D3 lautet vollstaendig "Wie empfohlen, Freigabe." (V13-Heilung: eine Ellipse hatte
+    genau diesen Entscheid-Satz verschluckt) + Erweiterung: das Lager verwaltet ALLE VIER
+    Traeger-Stufen (Teilprojekte per KON43) mit und ueberspringt Builds bei "nichts
+    geaendert bzw. gleicher commit des Teilprojektes wie letztes Mal". Das ist das EINZIGE
+    echte NOVUM der Owner-Nachricht 13.08.; der Begriff "Teilprojekt" hatte vor diesem
+    Nachtrag 0 Ledger-Treffer.
+    Damit ist der KON-57/E-26-Widerspruch ENTSCHIEDEN: VOLL-ctest bleibt in JEDER Pipeline
+    Pflicht, KEIN Fingerprint-Test-Skip; Skip nur fuer gruen-getestet inventarisierten
+    Bestand mit Test-Log neben der Binary (Par. 68b), nie als Pipeline-Abkuerzung. DREI
+    Ebenen getrennt gebucht (nur so bleibt der Nicht-Widerspruch sichtbar):
+      (1) Compiler-Doktrin "Gebaut wird immer" (gcc+clang BEIDE Pflicht)
+      (2) Test-Pflicht (VOLL-ctest in jeder Pipeline)
+      (3) Lager-Build-Skip (Stempel/Fingerprint + Teilprojekt-Commit-Gleichheit,
+          ZWEIGLEISIG -- Commit-Gleichheit deckt nur den Build-Skip, nicht die
+          Identitaets-/Einordnungs-Korrektheit; die X.Y.Z-Bump-Wache bleibt noetig).
+    UEBERHOLT-MARKER (datiert 14.08., Original stehen lassen; Anker ueber Wortlaut): die
+    09.08.-Assistant-Folgerung "Die Lagerhaltung lagert MESSDATEN, nicht Binaries"
+    (damals :11494) ist UEBERHOLT (D-12-Kaskaden + KON9-11 + D3); Persistenz auf NAS/
+    MinIO, kein Konflikt mit "Tier nur RAM-hot".
+
+### KON60-10 -- node_type/scoring-DRIFT DER required-TABELLEN (A1-BEIFANG) GEBUCHT
+
+    18 Achsen dreifach gesichert (Registry-XML T00-T17, kOrganAxisCount=18,
+    kCompositionAxisNames); die Code-Tabellen (simd_organ_requirement.hpp) tragen nur
+    9 Zeilen -- es FEHLEN 10 Achsen (path_compression, node_type, allocator, concurrency,
+    serialization, io_dispatch, migration_policy, queuing_q1, queuing_q2,
+    persistence_target), und "scoring" steht drin, ist aber KEINE registrierte Achse.
+    Die Drift war im Ledger UNGEBUCHT ("scoring": 0 Treffer vor diesem Nachtrag).
+    Referenzdoc 20260719 Abschnitt 5: node_type [solide], "Scoring/Ranking, falls
+    vorhanden" [spekulativ]/"kuenstlich".
+    FIX (gehoert zum A1-Durchzug): beide Tabellen 9 -> 18 Zeilen, deckungsgleich zu
+    kCompositionAxisNames, MIT static_assert-Drift-Wache gegen die Registry (die fehlende
+    Kopplung war die Drift-Ursache); node_type per Referenzdoc aufnehmen; scoring raus
+    ODER als dokumentierter Nicht-Achsen-Platzhalter benannt. Byte-Klasse ehrlich
+    deklarieren: mit der ersten nicht-leeren Menge endet die golden-Neutralitaet --
+    320er-Wachen PRUEFEN, nicht umgehen. Im SELBEN Zug (Komplex-Fix, Luecke=Pflicht):
+    drei stale-17-Kommentare (build_orchestrator.hpp:745, axis_variant_version_table.hpp:
+    203, lazy_adhoc_source_gen.hpp:81+136 -- Code operiert ueberall auf 18).
+
+### KON60-11 -- E-21-VOLLZUG (STRANG bau/e21-vollzug-a1, GELANDET IN MERGE 3): A-1-VERBUCHUNG NACHGEHOLT
+
+    Quelle: e21-Strang-Ausgabe (w1pm0nio7, "Nummern-Vergabe beim Lead"); Objekt-Erhebung
+    13.08. im wt-super-e21 @ a103e518; Anker primaer ueber KON-Kennung/Wortlaut (L-6).
+    Strang-Commits, alle in Merge 3 (ad742bdc) gelandet: f1b05256 = A-1-Vorlage-Form
+    (docs/plaene/20260813-OWNER-VORLAGE-a1-backup-ref-aktionen.md: 10 Pflichtfelder, neu
+    PFLICHT Feld 5 Unwiederbringlichkeit, Feld 6 Scan-Nenner + --log-opts=--all, Feld 9
+    Verbuchung im selben Zug; ausgefuellte Referenz-Fassung pre-secret-scrub-20260802;
+    Bestand aller heutigen Backup-Refs) ; bd02e7ab = NACHTRAG an 20260813-OWNER-VORLAGE-
+    minio-keys-und-backup-ref.md (Frage 2 auf KENNTNISNAHME umgestellt; Klon-Sweep
+    entfaellt als Ref-Frage, wandert als Token-Hygiene zu A-3; Frage 1 MinIO-Keys
+    unveraendert OFFEN) ; fe7bb459 = VERIFY-Korrektur Feld 1 (Zitat "github ist sauber"
+    gehoert zur Anlage-Aera ~Z.4845, nicht ins Loeschfenster ~35934).
+    (1) A-1-KETTE NACHGEBUCHT (Rohtranskript 5a19728e, Z. 35872 / 35912 / ~35913-35944 /
+        ~36022-36039 / 35995 / 35999): Vorlage 10.08. 12:20:53Z (Empfehlung: Loeschung
+        refs/backup/pre-secret-scrub-20260802 -- 776 Runner-Token in einem Commit an
+        keinem Branch, Zweck erfuellt, "Nach Ihrer Regel fasse ich Remote-Refs nicht ohne
+        ausdrueckliches GO an") -> OWNER-GO 12:40:23Z: "A-1: volles GO." -> AUSFUEHRUNG
+        in derselben Session bis 12:43:05Z (git push origin --delete + git update-ref -d;
+        Nachweis "Backup-Refs auf origin: 0"; GitHub war vorher schon leer; Ref-SHA
+        zuletzt 5ba3d03f, Anlage-Commit 44820451 vom 02.08.) -> BELEG MIT SELBSTKORREKTUR
+        12:50-12:52Z: der erste "776 -> 0"-Scan deckte nur HEAD; korrigierter Vollscan MIT
+        --log-opts=--all: super 6634 Refs (77 Merges/6557 Nicht-Merges), 6538 commits
+        scanned, "no leaks found"; ce beide Remotes 3374 commits scanned, "no leaks
+        found". Owner-Rahmen 12:49Z: beide Remotes zaehlen ("hast du auch beide
+        gescrubt?"), GitHub public = kritischerer Fall.
+    (2) KORREKTUR-MARKER an KON22-02 (datiert 13.08., Original stehen lassen): die
+        Rekonstruktion "das A-1-GO deckte den Vollscan-Beleg, nicht den Zeitpunkt; keine
+        Loeschung vor der Lieferphase" entstand OHNE den Vorlagetext und ist am
+        Rohtranskript WIDERLEGT -- das GO deckte die LOESCHUNG direkt und gegenstands-
+        genau; die Loeschung erfolgte in derselben Session; der gestufte Bundle-Plan war
+        nie die genehmigte Fassung dieses Falls.
+    (3) KON58-04 BEFUND 3 AUFGELOEST ("ohne Buchung verschwunden, Verursacher unbekannt"):
+        Verursacher = die 10.08.-Session selbst, owner-autorisiert per Z. 35912; ein
+        Bundle existiert nicht und war nicht Teil der genehmigten Empfehlung; es fehlte
+        ALLEIN die Ledger-Buchung -- hiermit nachgeholt (Feld-9-Lektion: Verbuchung
+        kuenftig IM SELBEN ZUG).
+    (4) UEBERHOLT-/KENNZEICHNUNGS-MARKER (datiert 13.08.; Original + Marker, NIE loeschen
+        -- Praezedenz KON58-03):
+        (a) KON2-36 "OV-4 MESS-DECKEL BLEIBT UNBEANTWORTET" -> UEBERHOLT durch KON41-01
+            (12.08., Generalproben-Doktrin "Beides" + Delegation); Folge-Posten: OV-4-
+            Deckel = f(T-3-Fenster), RECHNUNG in W2 mit S-19-Zahlen VOR der GO-Vorlage
+            ##51 (W2, nicht #21).
+        (b) Zeile "[Par.59-MERGE-STEMPEL] K7a Merge-Stempel-POD ..." (Anker: Wortlaut
+            "K7a Merge-Stempel-POD") -> UEBERHOLT: Owner-E2 02.08. ("Merge Zeile kann
+            daher nicht existieren") hat gewonnen; DV-1 entfernte den merge-Stempel-CODE
+            in A13-M3 ERSATZLOS; die Merge-DURCHFUEHRUNG (merge_plan.hpp) blieb. Objekt-
+            Belege 13.08.: adhoc_emitter.hpp:110, anatomy_version_stamp.hpp:392,
+            merge_plan.hpp Kopf.
+        (c) Zeile "TIER = ... DRITTER Merge-Stempel (K7a GELANDET: POD 72/layout 3)"
+            (Anker: Wortlaut "DRITTER Merge-Stempel") -> UEBERHOLT wie (b); Hinweis
+            Zeilenanker-Drift: die 10.08.-Vorlage zitierte ":9468/:8941" im DAMALIGEN
+            Stand -- heutige Zeilen tragen andere Gegenstaende (L-6 bestaetigt).
+        (d) NEUE KENNZEICHNUNGS-ZEILE (E-4a/KON-12): Messdaten-Altbestand n=1 = ohne
+            Drift-Aussage (Generalprobe). SOLL kuenftig: je 5 Fehlversuche fuer Build UND
+            Messung, bei Erfolg 3 Wiederholungen je Parameter und Binary, alle 3 Werte
+            EINZELN persistiert (KON37-06/F-H); der T-3-Reset (KON41-01) macht den
+            Altbestand zur Generalprobe ohne Endgueltigkeits-Anspruch.
+    (5) E-BLOCK-BILANZ der 10.08.-Vorlage (WARNZEILE uebernommen: mindestens 5
+        kollidierende E-Serien im Korpus -- IMMER Gegenstand pruefen, nie Nummer):
+        E-1 SCHON_ERLEDIGT (KON40-03/KON41-01; Rest = Marker 4a) ; E-2 SCHON_ERLEDIGT am
+        Objekt (DV-1/A13-M3; Marker 4b/4c; woertliche "mit mehr Kontext"-Neuvorlage
+        GEGENSTANDSLOS) ; E-3 SCHON_ERLEDIGT (KON37-07/F-F; Rest in #88) ; E-4a
+        SCHON_ERLEDIGT (Marker 4d) ; E-4b SCHON_ERLEDIGT (Livecheck 16-vs-24 -> #22(i)/
+        Infra) ; E-4c: im e21-Text noch OFFEN mit Vorlage-Empfehlung -- durch die
+        JUENGERE Owner-Antwort D3 (52798, 14:19Z) BEANTWORTET, s. KON60-09; die
+        vorbereitete Frage (a1-backup-ref-aktionen.md Teil III) geht NICHT mehr in eine
+        Owner-Vorlage.
+    (6) GATE + ABSCHLUSS: #10-Ref-Haelfte FREI (A-1-Text liegt vor; Objekt-Gegenprobe
+        13.08.: pre-secret-scrub-20260802 existiert nirgends -- lokal rev-parse leer,
+        origin refs/backup/* leer, GitHub ohne backup-Refs; uebriger Backup-Bestand
+        unveraendert: 3x refs/heads/backup/* lokal, Tag backup/pre-p0-sync-20260722,
+        origin refs/heads/backup/gitlab-artifact-development-2026-07-25 @ 14fd135f);
+        MinIO-Haelfte von #10 bleibt OFFEN (Owner-Vorlage Frage 1). #21 ABGESCHLOSSEN
+        (P/E-Core-Anteil -> W7 unberuehrt, KON27-04 P.12; Nummern-Kollision #21/#22
+        KON27-04-vs-Lead-Liste dokumentiert -- der Gegenstand zaehlt).
+
+---
+
 ## NACHTRAG 13.08.2026 -- KON59: KORREKTUR admit_organ_on_machine ("NUR AUS TESTS" WAR FALSCH) + A2.5-VORMERKUNGEN
 
 **Bau-Stufe 1 der Ultracode-Nachimplementierung (Task #40). Bilanz der Vollstaendigkeits-
