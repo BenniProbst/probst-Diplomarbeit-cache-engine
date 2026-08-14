@@ -1,0 +1,10 @@
+=== K13-BISS der neuen F6-Literal-Checks (beidseitig) ===
+ausbeute_rc=1 (erwartet 1, M==N-Zweig)
+--- SEITE A: echte Ausgabe, alle 3 Checks muessen HALTEN ---
+check1_summenliteral_gefunden rc=0
+check2_summengate_verbot: grep rc=1 (SOLL 1 = nicht drin = Check haelt)
+check3_befundliteral_gefunden rc=0
+--- SEITE B: Koeder-Ausgaben, jeder Check muss REISSEN koennen ---
+koeder1_falsche_summe: grep rc=1 (SOLL 1 -> fordere_literal risse)
+koeder2_summengate_riss: grep rc=0 (SOLL 0 -> fordere_kein_literal risse)
+koeder3_falscher_befund: grep rc=1 (SOLL 1 -> fordere_literal risse)
