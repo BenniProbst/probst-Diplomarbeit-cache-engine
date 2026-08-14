@@ -16,6 +16,73 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 14.08.2026 -- KON63: F1-ENDBELEG VOLL -- DER DURCHSTICH IST KOMPLETT DURCH DEN KANAL (MESSUNG -> CSV -> ANHANG -> THESIS-PUSH -> PDF-GATE -> E-18-SNAP -> 288-WRITEBACK MIT BEIDEN GITLINKS)
+
+**Anlass: F1-Tag (Fr 14.08.). Nummern-Vergabe gemessen: KON63 hatte 0 Treffer vor diesem
+Nachtrag. Der Beleg fiel in ZWEI Schritten: Pipeline 15800 (Teilbeleg, Guard-Rot wie in
+Task #47 deklariert) + Retry-Job 377539 nach Owner-A1-Token-Freigabe (Vollbeleg).**
+
+### KON63-01 -- DIE KETTE, jede Stufe mit Literal
+
+    TRIGGER    Pipeline 15800 @ 904d22b2 (source=api, 19:03:58Z; NUR die 2 Rule-Variablen
+               COMDARE_DURCHSTICH=true + COMDARE_ANHANG_FORWARD=true; Rules frisch gelesen
+               :1838/:2496). Endstand 36 Jobs = 35 success + 1 failed (einziges Rot =
+               anhang:forward 377504 am Credentials-Guard, deklarierter #47-Ausgang;
+               fruehere Zaehlung '34' war Berichts-Fehlzaehlung) + 3 Bridges success
+               (thesis 15801, prt-art 15802, ce 15803).
+    MESSUNG    Job 377503 SUCCESS (111.4s, prod1): 'RUN_PROFILE fertig: ... measured=1
+               resumed=0 provisioned=1 csv_ok=1'; Zelle 'opt=O3 simd=no_extension
+               platform=amd@prod1 lane=amd'; 4 Wachen OK literal (Durchstich-lastprofile
+               1/1, Durchstich-frische 1 real/0 resumiert, Mess-Ausbeute 1 echte aus 1/1,
+               Frische 1/1 CSV + Marker 1/1); CSV 189 Spalten, alle 9 required[] da,
+               1 Datenzeile: n_ops=10000 ns_per_op=671.532 op_lookup_p50_ns=750
+               op_lookup_p99_ns=1170 workload=ycsb_c two_phase_valid=1 drift_reps=3
+               drift_relative=0.030181 drift_status=stabil.
+    ANHANG     64 Anhang-.tex regeneriert; HONEST-EMPTY-NENNER ERFUELLT am Trace:
+               matrixplot=0, HONEST-EMPTY=32 (davon 24x 'Platzhalter-Vermerk statt
+               Heatmap'), 'nie ausgefuehrt'=0; Zusatzmessung an den 64 .tex: 36 Dateien
+               mit HONEST-EMPTY, 0 mit matrixplot.
+    PDF (CI)   thesis:pdf 377502 SUCCESS prod1: 'Output written on diplomarbeit.pdf
+               (204 pages, 937524 bytes).'
+    TOKEN      Owner-A1-Ausnahme-Freigabe -> PAT id=98 auf 289 (write_repository,
+               Developer, Ablauf 2026-10-15), Vault Cluster/keys/thesis-writeback-
+               pat-289-r20260814 (0600; Cluster-Commit 3a5d45d, Dedup-Guard clean),
+               CI-Variable 288 masked+protected (HTTP 201; Falle: masked lehnt das
+               Datei-Newline ab -> tr -d '\n', Fallen-Register-Klasse).
+    THESIS     Retry-Job 377539 SUCCESS (19:48Z, prod1): 'kopiert gesamt: 64 .tex' +
+               'Uebernahme-Nenner: kopiert=64 im_index=64 nicht_uebernommen=0
+               git_add_fehler=0' + 'PDF-Gate GRUEN: diplomarbeit.tex gebaut'
+               (AF_PDF_GATE=on) -> Thesis-Commit 2eabaec3 'anhang(E-18): Mess-Anhang
+               ... (64 Datei(en))' AUF 289-REMOTE development (ls-remote-belegt).
+    E-18-SNAP  'geerntet diplomarbeit.pdf (918803 Bytes, sha256=e4e06b2e8f8b1178...)'
+               + compile-export.txt (8002 Zeilen); SNAP-VERTRAG 'erfuellt'; Recovery-
+               Identitaet PENDING-r16-j377539.txt (pending_thesis_commit_sha=2eabaec3).
+    WRITEBACK  Runner-Commit 04c8f215 'thesis(E-18): BEIDE Gitlinks auf 2eabaec3... +
+               Compile-Schnappschuss (4 Datei(en)) [skip ci]' AUF 288-REMOTE gepusht
+               ('288-Writeback gepusht (Versuch 1)') -- BEIDE Thesis-Zeiger
+               (thesis/diplomarbeit + Code/external/20260931-overleaf-diplomarbeit)
+               vom Kanal SELBST nachgezogen; Pipeline 15805 bewusst skipped.
+    TeX-FRAGE  empirisch beantwortet: TeX laeuft auf prod1 im Job-Kontext (thesis:pdf
+               + PDF-Gate GRUEN); prod2-TeX weiter ungetestet (377504 lief auf prod2
+               und starb VOR dem Gate; 377539 lief prod1).
+
+### KON63-02 -- ROHBEFUND + OFFENE RESTE (benannt, nicht bewertet)
+
+    MESSWERTE  op_lookup_p50_ns=750 / ns_per_op=671.532 (prod1) vs Referenz 376333
+               (1310 / 1199.047) -- Rohbefund OHNE Bewertung; Maschine der Referenz
+               klaeren (AMD/Intel-Differenz waere der Fingerprint-Gegenstand);
+               Pruefposten Task #41-Nachlauf. Die 644.020 wird NIE zitiert (KON61).
+    RESTE      persist:measurements nicht erzeugt (Rule verlangt COMDARE_PERSIST_
+               MEASUREMENTS=true -- nicht Teil des F1-Rezepts); prod2-TeX offen;
+               Zombie-Pipeline 14190 pending seit 01.08. (blockiert nichts);
+               Langfrist-Token-Mechanismus ohne PAT = Untersuchung wf_5ba07e0d
+               (Owner-Vorlage folgt); Rotations-Vormerkung Uebergangs-Token nach
+               Abgabe (Owner-A4: Rotation erst bei Pause).
+
+    F1-BILANZ: Der GOAL-v8-Durchstich ('ein am Mittwoch frisch gemessener Mini-
+    Messwert liegt am Freitag als Tabellenzeile im Thesis-Submodul') ist am F1-Tag
+    VOLLZOGEN -- frische Messung 19:08Z, Thesis-Ankunft 19:48Z, jede Stufe mit
+    Nenner und Literal. F1 GELIEFERT.
 ## NACHTRAG 14.08.2026 -- KON62: STUFE 3 KOMPLETT (BEIDE CIs TERMINAL SUCCESS) + #81-WIEDERHOL-VERIFY PIPELINE-MESSUNG VOLLZOGEN
 
 **Anlass: Abschluss der Drei-Stufen-Landung (v4.3/A2.1b) -- Stufe 3 = EIN Push je Repo,
