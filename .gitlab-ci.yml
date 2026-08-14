@@ -76,7 +76,7 @@ cache:
 # genannten Namen, nie die Nachbarn.
 #
 # ALLE ZEHN SIND GEPRUEFT UND ABSICHTLICH EXTERN. Die Belegzeilen unten sind die rules-
-# Zeilen, an denen die Variable wirklich gatet -- gemessen 11.08.2026, nicht abgeschrieben.
+# Zeilen, an denen die Variable wirklich gatet -- nachgemessen 14.08.2026, nicht abgeschrieben.
 # Sie sind KEIN Befund: sie sind die Opt-in-Schalter der mehrtaegigen Mess- und
 # Rueckschrieb-Laeufe, die eine normale Welle gerade NICHT ausloesen soll.
 #
@@ -90,26 +90,26 @@ cache:
 # naechsten Schalter gleichen Namens zu werden.
 #
 # extern: COMDARE_RUN_MEASURE -- Opt-in des mehrtaegigen golden-320-Voll-Messlaufs, per
-#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1807, :2020)
+#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1848, :2084)
 # extern: COMDARE_STATIC_SMOKE_FALLBACK -- Zusatzschalter des statischen Smoke-Zweigs,
-#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1807, :1808)
+#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1848, :1849)
 # extern: COMDARE_BUILD_GOLDEN_N -- Gate des NEUEN golden-N-Standardpfads; dreifach inert
-#         (Variable + when:manual + _bot_-never) (gatet :2509, :2513, :2600, :2603, :2634)
+#         (Variable + when:manual + _bot_-never) (gatet :2686, :2690, :2777, :2780, :2811)
 # extern: COMDARE_DYNAMIC_PLANER_CI -- isoliertes Opt-in NUR der Planer-Delegation
-#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2514, :2604)
+#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2691, :2781)
 # extern: COMDARE_DURCHSTICH -- Opt-in der F1-Durchstich-Welle; ausdruecklich DISJUNKT zu
-#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1797)
+#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1838)
 # extern: COMDARE_PERSIST_MEASUREMENTS -- Opt-in des Mess-Rueckschriebs nach development;
-#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2228)
+#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2323)
 # extern: COMDARE_ANHANG_FORWARD -- Opt-in des Anlagen-Vorwaertsschreibens in die Thesis;
-#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2370)
+#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2496)
 # extern: COMDARE_TEXLIVE_AVAILABLE -- FAEHIGKEITS-Merkmal des Runners (TeX Live
-#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1553)
+#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1594)
 # extern: COMDARE_SWEEP_ZOMBIES -- Not-Werkzeug: raeumt Waisen-Prozesse, nur per
 #         API-Trigger zusammen mit SWEEP_TAG=amd|intel (gatet :228)
 # extern: COMDARE_MEASURE_PROFILE -- smoke|full-Marke der Mess-Welle, per Trigger oder
-#         manuellem Start gesetzt; gatet drei echte Regeln (:1808, :2509, :2600).
-#         Die Weiterreichung :2589 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
+#         manuellem Start gesetzt; gatet drei echte Regeln (:1849, :2686, :2777).
+#         Die Weiterreichung :2766 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
 #         SETZT sie nicht -- sie gibt den Eltern-Wert an die Child (CI-INV 11.08.2026)
 #
 # NICHT GEDECKT UND BEWUSST SO: Variablen, die nur in `script:`-Rumpf oder in
@@ -2406,18 +2406,22 @@ persist:measurements:
 #    Heatmap mit komplett 0.0000-z-Matrix; pgfplots bricht daran FATAL ab und es entsteht GAR KEINE PDF.
 #    Da die 12 Kern-Tabellen in A_measurements.tex an blankem \input haengen (nur die 5 Darstellungs-.tex
 #    an \InputIfFileExists), rettet Weglassen einzelner Dateien nichts. OHNE diese Wache wuerde E-18 die
-#    PDF-Strecke reissen statt sie zu schliessen. Gesteuert ueber AF_PDF_GATE (on|auto|off), hier an die
-#    bestehende Runner-Voraussetzung COMDARE_TEXLIVE_AVAILABLE gekoppelt.
+#    PDF-Strecke reissen statt sie zu schliessen. Gesteuert ueber AF_PDF_GATE (on|auto|off); in DIESEM
+#    Job seit 2026-08-13 HART on (wuwemnde5-Haertung, Begruendung am Kern-Aufruf unten). Die fruehere
+#    Kopplung an COMDARE_TEXLIVE_AVAILABLE (unset -> auto) haette den Kanal ueberall dort UNGEPRUEFT
+#    pushen lassen, wo der Job-PATH kein TeX sieht.
 #
 #    DEKLARIERTER GELTUNGSBEREICH DES PDF-GATES (bewusste Grenze, kein Versehen): das Gate baut GENAU EIN
 #    Hauptdokument -- das ERSTE Top-Level-*.tex mit \documentclass (Auswahl per grep -l ... | head -1).
 #    Heute deckungsgleich mit dem Vollbestand, weil 289 genau EIN Top-Level-Hauptdokument traegt
-#    (diplomarbeit.tex; am Gitlink-Checkout 05.08.2026 verifiziert). Kommt ein zweites hinzu (z.B. ein
-#    eigenes EN-Hauptdokument), prueft das Gate NUR das erste -- dann ist der Kern auf eine Liste zu
-#    erweitern. Zweite deklarierte Grenze: AF_PDF_GATE=auto prueft auf einem Runner OHNE TeX-Toolchain
-#    GAR NICHTS (der Kern loggt das ehrlich statt still gruen zu melden). Die Zusage "landet nie einen
-#    Stand, mit dem die Thesis-PDF nicht mehr baut" gilt daher nur auf TeX-faehigen Runnern; das
-#    Restnetz ausserhalb davon ist die 289-Pipeline NACH dem Push.
+#    (diplomarbeit.tex; am Gitlink-Checkout 05.08.2026 verifiziert). SEIT 2026-08-13 WACHT DER KERN SELBST:
+#    mehr als EIN Hauptdokument macht on ROT, statt still nur das erste zu pruefen (Teil-Pruefung als
+#    Gruen waere ein Haken ohne Ausgabe); wer ein zweites einfuehrt (z.B. EN), erweitert den Kern auf
+#    eine Liste. Zweite Grenze -- im KERN weiter vorhanden, in DIESEM Job seit 2026-08-13 GESCHLOSSEN:
+#    AF_PDF_GATE=auto prueft auf einem Runner OHNE TeX-Toolchain GAR NICHTS (der Kern loggt das ehrlich
+#    statt still gruen zu melden). Dieser Job faehrt darum HART AF_PDF_GATE=on (fail-closed, II.7):
+#    ohne TeX im Job-Env wird der Lauf ROT, BEVOR irgendetwas committet oder gepusht ist -- die Zusage
+#    "landet nie einen Stand, mit dem die Thesis-PDF nicht mehr baut" gilt damit auf JEDEM Runner.
 #
 #    WARUM DER 289-PUSH BEWUSST OHNE ci.skip LAEUFT: die 289-Pipeline (lint + thesis-pdf de/en) IST der
 #    Post-measure-Rebuild -- sie SOLL feuern. 289 triggert 288 nicht zurueck => kein Loop. Der GITLINK-Bump
@@ -2452,8 +2456,9 @@ persist:measurements:
 #    das Protokoll, mit gewuerfeltem Koeder in beide Richtungen. Dieselbe Begruendung wie bei
 #    ci/persist_sammler.sh: Logik in einem YAML-Block ist nicht testbar.
 #    GRENZE (bewusst): OHNE Compile KEIN Schnappschuss. Ueberspringt AF_PDF_GATE (auto ohne
-#    TeX-Toolchain) oder ist es off, entsteht kein Bau-Produkt; der Kern sagt das literal, statt
-#    einen leeren Ordner anzulegen. Die AF_PDF_GATE-Semantik ist dadurch UNVERAENDERT.
+#    TeX-Toolchain -- seit der on-Haertung 2026-08-13 in DIESEM Job unerreichbar) oder ist es off,
+#    entsteht kein Bau-Produkt; der Kern sagt das literal, statt einen leeren Ordner anzulegen. Die
+#    AF_PDF_GATE-Semantik des KERNS ist dadurch UNVERAENDERT.
 #    ADDITIV: der Ordnername traegt die Lauf-Kennung r<RUNNER>-j<JOB>, ist also runneruebergreifend
 #    eindeutig; ein bestehender Ordner wird NIE ueberschrieben und NIE geloescht (Messdaten-Doktrin).
 #    NACHHOLUNG: der Beleg haengt NICHT am Anhang-Byte-Delta. Ein Lauf, der 289 pusht und vor dem
@@ -2537,6 +2542,10 @@ anhang:forward:
       #    KONTRAKT: repo-relativ unter $CI_PROJECT_DIR, sonst kann git ihn nicht stagen. Der Kern
       #    setzt denselben Vertrag ueber AF_SNAP_ROOT_STRICT durch und sagt es literal.
       SNAP_DIR="measurement/thesis_compiles"
+      # HAERTUNG AF_PDF_GATE (2026-08-13, Befund wuwemnde5, F1-Kette): bisher an COMDARE_TEXLIVE_AVAILABLE
+      # gekoppelt (unset -> auto); auto haengt an der TeX-Sichtbarkeit im Job-PATH (im YAML nicht pruefbar)
+      # und prueft ohne TeX NICHTS -- der Kanal wuerde UNGEPRUEFT pushen; 12.08.-Risiko: defekter 1x1-Stand
+      # rot erst in der 289-Pipeline. Fail-closed (II.7): Gate HART on -- kein TeX => ROT VOR Commit/Push.
       AF_DEST_REPO="$THESIS_CLONE" \
       AF_BRANCH="development" \
       AF_LANGS="de,en" \
@@ -2544,7 +2553,7 @@ anhang:forward:
       AF_ARTIFACT_ROOTS="Code/measure_out/appendix Code/measure_out_smoke/appendix" \
       AF_CORPUS_ROOT="measurement" \
       AF_GENERATOR="${GEN:-}" \
-      AF_PDF_GATE="$([ "${COMDARE_TEXLIVE_AVAILABLE:-}" = "true" ] && echo on || echo auto)" \
+      AF_PDF_GATE=on \
       AF_PROV_PIPELINE_ID="${CI_PIPELINE_ID:-NA}" \
       AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
       AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
