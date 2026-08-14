@@ -354,6 +354,68 @@ mit "Nummern-Vergabe beim Lead" (s. KON60-11). Der Nachtrag ist AN DIE LANDUNG g
         (P/E-Core-Anteil -> W7 unberuehrt, KON27-04 P.12; Nummern-Kollision #21/#22
         KON27-04-vs-Lead-Liste dokumentiert -- der Gegenstand zaehlt).
 
+### KON60-NACHTRAG A (14.08.2026, A2.5-FIX-STUFE) -- ZU KON60-01/-02: ANKER-REGRESSION
+    BEHOBEN, N1-NO-OP-BEWEIS, METRIK-/BASIS-PRAEZISIERUNG, STUFE-3-AUFLAGE
+
+    Drei-Stufen-Landung Stufe 2 (Komplex-Fix, v4.3/A2.1b), Ein-Schreiber beider Lande-
+    Baeume. Originale oben bleiben wortgleich stehen; dieser Nachtrag kommt DANEBEN.
+
+    (1) MERGE-REGRESSION BEHOBEN (zu KON60-01 MERGE 1): ci/anker_wache.sh war am
+        gelandeten Stand 09cd97a3 ROT -- literal "ROT Code/05_diagram_generator/
+        diagram_generator.cpp:662 traegt 'nearest_rank_median' NICHT -- es steht auf
+        710.", rc=1 (1 von 2 Ankern gedriftet). Ursache merge-attributiert: die
+        f1-Commits 915038ca+ff9a517b fuegten +48 Zeilen vor dem Anker ein; der
+        Doku-Anker (docs/audits/20260716-wp5-rev-mining-DISPOSITION.md, seit df21ab01
+        unveraendert) wurde in Stufe 1 nicht nachgezogen; die texgate-Harmonisierung
+        (MERGE 2) deckte nur die 16 CI-YAML-Kopfblock-Anker, nicht dieses Dokument.
+        FIX 16f777be nach Wache-Doktrin: ANKER-SYMBOL 662 -> 710, Historie datiert
+        DANEBEN (nichts geloescht), Gegenstands-Praezisierung: verankert ist seit
+        D5-2 (08cab824) die using-Zeile, Definition zentral in
+        Code/common/percentile_canon.hpp:81; REV-DATA-12 bleibt OFFEN (ce-Selector
+        lower_median, heute best_binary_selector.cpp:196, Aufrufer :219/:221).
+        Nachlauf literal "ANKER-WACHE: OK (2 von 2 Ankern zeigen auf ihr Symbol).",
+        rc=0. Ohne den Fix waere die EINE Stufe-3-CI rot (.gitlab-ci.yml:1040 +
+        scripts/vor_push_alle_wachen.sh:159).
+
+    (2) N1-DECKUNGSLUECKE ENTLASTET (zu KON60-02; Sammelliste Punkt 61 "Registry-XML-
+        Regen [F1-Lens N1]"): Stufe 1 enthielt KEINEN XML-Regen (0 XML-Dateien im
+        54-Dateien-ce-Diff 5f3f26a5..643102fb) -- der geforderte "Fix ODER No-op-
+        Beweis" stand aus. A2.5 hat den 2-Pass am ce-Lande-Stand 643102fb gefahren:
+        comdare_axis_registry_gen in build-axislock (Referenz-Konfig /usr/bin/c++ =
+        g++ 15.3, Ninja; Ninja ohne Neubau-Bedarf), Generator rc=0 (T00..T17 = 18
+        Achsen), cmp regeneriert vs. committet rc=0 BYTE-IDENTISCH (23285 == 23285
+        Bytes), offizielles Gate test_axis_registry_roundtrip literal "Passed" (1/1;
+        lokal Test #413, in den 4 Kombibau-Zellen #417), memory_layout_packed_bitmap
+        1 Treffer in der committeten XML. ERGEBNIS: NO-OP -- der Lens-Befund N1
+        reproduziert am Gesamtstand nicht (XML-Stand seit 774a5d5f korrekt); KEIN
+        XML-Commit noetig, Punkt 61 BEDIENT.
+
+    (3) METRIK-PRAEZISIERUNG (zu den drei "Loeschungen beidseitig 0/0"-Zeilen in
+        KON60-01 und der Auto-Union-Zeile in KON60-02): das super-Feld misst mit
+        --diff-filter=D geloeschte DATEIEN (Datei-Loeschungen 0/0 stimmt), NICHT
+        geloeschte Zeilen; die ce-Buchung nutzt denselben Feldnamen als ZEILEN-
+        Metrik -- zwei Instrumente, ein Name. Zeilen-Loeschungen real (numstat-
+        Summen): f1 16 (branch-eigen base..tip) / 24 (dev-eigen); texgate 29
+        (branch-eigen) / 46 (= 38 dev-eigen + exakt 8 deklarierte Harmonisierungs-
+        Zeilen, s. MERGE 2); e21 0 / 67 (dev-eigen). Merge-attributierbare
+        Loeschungen ueberall 0 -- die Substanz haelt. KUENFTIG benennen:
+        "Datei-Loeschungen (--diff-filter=D)" bzw. "Zeilen-Loeschungen (numstat)",
+        nie derselbe Name fuer verschiedene Instrumente.
+
+    (4) BASIS-PRAEZISIERUNG (zu KON60-01 KEIN PUSH): "origin/fa75d47c-Basis" war
+        unscharf -- origin/development steht (und stand bei Buchung) auf a103e518;
+        fa75d47c liegt 5 nie gepushte Vor-Landungs-Commits VOR origin (gemessen
+        14.08.: a103e518 ist Ancestor, kein Fork; die 5 Commits: 83e06159, e96b67e8,
+        f3017a77, 2cbcc6b5, fa75d47c). Der Stufe-3-Push-Bereich ist damit
+        origin/development(a103e518)..HEAD, nicht erst ab fa75d47c.
+
+    (5) STUFE-3-AUFLAGE: scripts/vor_push_alle_wachen.sh KOMPLETT am Push-Stand
+        fahren. Der A2.5-Lauf brach plangemaess ab (rc=2, literal "ABBRUCH -- der
+        Arbeitsstand ist schmutzig", Ursache: absichtlicher Gitlink-Zwischenzustand
+        " M Code/external/comdare-cache-engine", s. KON60-01 KEIN PUSH) -- der
+        Voll-Lauf gehoert an den Push-Zeitpunkt NACH dem Gitlink-Bump; die von (1)
+        betroffene Anker-Wache ist einzeln gruen gemessen.
+
 ---
 
 ## NACHTRAG 13.08.2026 -- KON59: KORREKTUR admit_organ_on_machine ("NUR AUS TESTS" WAR FALSCH) + A2.5-VORMERKUNGEN
