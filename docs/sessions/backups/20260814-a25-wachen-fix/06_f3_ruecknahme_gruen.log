@@ -1,0 +1,13 @@
+Running main() from /home/comdare/wt-ce-wachen/build-covguard/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = *GenauErreicht*
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from D2AbdeckungsWacheNenner
+[ RUN      ] D2AbdeckungsWacheNenner.UntergrenzeGenauErreichtIstKeinBefund
+  [D2] Fall 'Untergrenze genau erreicht' | Koeder 21846c1046d8 | Prueflig /home/comdare/wt-ce-wachen/scripts/ci_test_coverage_guard.sh | Exit 1
+[       OK ] D2AbdeckungsWacheNenner.UntergrenzeGenauErreichtIstKeinBefund (236 ms)
+[----------] 1 test from D2AbdeckungsWacheNenner (236 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (236 ms total)
+[  PASSED  ] 1 test.

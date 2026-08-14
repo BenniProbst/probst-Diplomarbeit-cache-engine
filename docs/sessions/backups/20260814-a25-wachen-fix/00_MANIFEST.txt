@@ -1,0 +1,24 @@
+A2.5-FIX-STUFE Wachen-Paket, Resume nach PAUSE-2 (wf_b6b05f65-923) -- Rohdaten-Belege
+Worktree: /home/comdare/wt-ce-wachen, Branch bau/wachen-floor-inventar
+Endstand: 5f3f26a5 -> 092ab7e9 (#39) -> 6eb72ace (NE-16) -> 0fbcb049 (F3) -> 07a60cc7 (F4, ersetzt WIP c0ff9986 inhaltsgleich)
+Bau: build-covguard (Release/Ninja, configure.sh-Rezept in config.status), df vor Bau 37G frei.
+
+01_t6_gruen_baseline.log            t6 direkt, 4 von 4 PASSED, Nenner 25 Jobs von 33 (5 res., 3 Tmpl.), Scanner-Rest 0
+02_d2_nenner_ctest.log              ctest d2, 1 von 1 Passed
+03_guard_live.log                   Guard live Exit 0, ANKER 489, genau erreicht 489 == Anker 489, Ausweis 1529
+04_guard_selbsttest.log             Selbsttest RC=0, 10 Faelle, 11 Laeufe, 0 abweichend
+05_f3_mutation_rot.log              Zeile 709 auf 'von mindestens' zurueck -> GenauErreicht ROT (Actual: true, rc=1)
+06_f3_ruecknahme_gruen.log          Ruecknahme -> 1 von 1 PASSED (rc=0)
+07_f4_t1_alter_scanner_rot.log      alte Scanner-Semantik -> neuer TEST ROT (rc=1), 3 von 4 Objekt-Faelle still gruen
+08_f4_koeder_alter_scanner_still_gruen.log  2 Koeder-Jobs in YAML, alter Scanner -> STILL GRUEN, Nenner unveraendert 25 von 33
+09_f4_koeder_neuer_scanner_rot.log  gleiche Koeder, gehaerteter Scanner -> ROT MIT NAMEN, Nenner 27 von 35 (rc=1)
+10_f4_final_gruen.log               Koeder entfernt -> 4 von 4 PASSED (rc=0), Baum sauber
+11_find_csv_xlsx.txt / 11_tracked_csv_xlsx.txt  Raeum-Beleg: 8 von 8 committed, 0 untracked, 0 im Bau-Baum
+12_f1_tote_zeile_rot.log            Block contract:mess_report_smoke (YAML 864) raus -> ROT 'TOTE TABELLEN-ZEILE' (rc=1)
+13_f1_ruecknahme_gruen.log          Ruecknahme -> 4 von 4 PASSED (rc=0)
+koeder.txt                          Koeder-Zeilen (T-11c-Formpruefung: Spalte 0, Flow + quotiert, 0 Kollisionen)
+commitmsg_f4.txt                    Commit-Text 07a60cc7
+yaml_ohne_block.tmp                 Zwischenstand der TOTE-ZEILE-Probe
+
+KEIN PUSH erfolgt. BU-SOFORT: dieses Verzeichnis ist die Rohdaten-Quelle fuer den
+Backup-Commit nach super docs/sessions/backups/ (Parent-Schritt).

@@ -1,0 +1,13 @@
+Test project /home/comdare/wt-ce-wachen/build-covguard
+    Start 460: test_d2_abdeckungs_wache_nenner
+1/1 Test #460: test_d2_abdeckungs_wache_nenner ...   Passed    3.94 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+d2            =   3.94 sec*proc (1 test)
+nenner        =   3.94 sec*proc (1 test)
+selbsttest    =   3.94 sec*proc (1 test)
+wachen        =   3.94 sec*proc (1 test)
+
+Total Test time (real) =   3.95 sec

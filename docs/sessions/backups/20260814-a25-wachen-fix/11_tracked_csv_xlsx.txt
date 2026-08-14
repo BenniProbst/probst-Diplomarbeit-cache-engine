@@ -1,0 +1,8 @@
+./docs/archiv/messdaten/20260606-fullpilot-320/tier150_measurements.csv
+./tests/unit/fixtures/best_binary_cells.csv
+./tests/unit/fixtures/best_binary_pareto.csv
+./tests/unit/fixtures/best_binary_strict_values.csv
+./tests/unit/fixtures/best_binary_wide.csv
+./tests/unit/fixtures/load_profile_writer_pilot.csv
+./tests/unit/thesis_tiere/adapter_measurements.csv
+./tests/unit/thesis_tiere/tier150_measurements.csv

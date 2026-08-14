@@ -1,0 +1,31 @@
+=============================================================================
+ SELBSTTEST der DRITTEN ACHSE (Fremd-Inventur)  (scripts/ci_test_coverage_guard.selbsttest.sh)
+ Bau-Baum : build-covguard
+=============================================================================
+
+INVENTUR des Baums: 489 Tests (zugleich die 'fremde' Quelle fuer den Gleichstand-Fall)
+GRUNDLAUF (Achse ungefahren): RC=0
+SOLL-DELTA-Block (gewuerfelt): 'r5d_f15_compare_cli_smoke' mit 1 Test(s)
+
+FAELLE:
+  [ok  ]  (5) ungesetzt_meldet_laut                  RC=0 (erwartet 0)
+  [ok  ]  (1) gleichstand_gruen                      RC=0 (erwartet 0)
+  (Koeder Fall 2: 3 Tests frisch gezogen und aus der fremden Inventur entfernt)
+  [ok  ]  (2) abweichung_rot_mit_namen               RC=4 (erwartet 4)
+  [ok  ]  (3) fehlende_datei_rot                     RC=4 (erwartet 4)
+  [ok  ]  (4) leere_datei_rot                        RC=4 (erwartet 4)
+  [ok  ]  (6) soll_delta_gruen                       RC=0 (erwartet 0)
+  (Koeder Fall 7: 3 Extra-Namen frisch gezogen und ZUSAETZLICH entfernt)
+  [ok  ]  (7) soll_delta_plus_extra_rot              RC=4 (erwartet 4)
+  [ok  ]  (8) soll_delta_stale_rot                   RC=4 (erwartet 4)
+  (Koeder Fall 9: eigen=avx512f, fremd synthetisch=avx2, K=4 gewuerfelte Namen, Richtung reicher)
+  [ok  ]  (9) klassen_differenz_k_gruen              RC=0 (erwartet 0)
+  (Koeder Fall 9 Gegenprobe: K-1 = 3 Namen -- MUSS rot beissen)
+  [ok  ]  (9) klassen_differenz_koeder_rot           RC=4 (erwartet 4)
+  [ok  ]  (10) probe_fehlt_rot                        RC=4 (erwartet 4)
+
+-----------------------------------------------------------------------------
+NENNER: 10 Faelle gefahren (11 Wache-Laeufe; Fall 9 traegt den
+Gegenkoeder als zweiten Lauf), davon 0 Lauf/Laeufe abweichend.
+-----------------------------------------------------------------------------
+SELBSTTEST ABDECKUNGS-WACHE (dritte Achse): GRUEN.

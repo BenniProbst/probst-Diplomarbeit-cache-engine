@@ -1,0 +1,69 @@
+=============================================================================
+ ABDECKUNGS-WACHE der CI-Test-Auswahl  (scripts/ci_test_coverage_guard.sh)
+ Bau-Baum : build-covguard
+ Manifest : scripts/ci_test_coverage_manifest.sh
+ Modus    : WEICH  (COMDARE_WACHE_STRIKT ungesetzt)
+=============================================================================
+
+LIVE-INVENTUR (ctest -N): 489 registrierte Tests
+
+HOST-KLASSE (gemessen, build-covguard/CMakeCache.txt): avx512f
+  COMDARE_HOST_RUNS_AVX2=ja, COMDARE_HOST_RUNS_AVX512F=ja, Host: prod1
+ANKER (exakt, committet, scripts/ci_test_inventory_floor.txt) fuer Klasse avx512f: 489
+  -> genau erreicht: 489 == Anker 489 fuer Klasse
+     avx512f (Host: prod1).
+
+PARTITIONS-RECHNUNG: ohne=487 mit=2 summe=489 inventur=489 differenz=0
+
+NENNER (nie eine nackte Null) -- bedingte Registrierungs-Bloecke:
+  [gelaufen     ] pruefling_slots_v1         -> test_pruefling_fixture_ladung                  (Pruefling fixture_min sichert pruefling_slots_v1 zu)
+  [gelaufen     ] r5i_configure_codegen      -> test_v41_anatomy_r5i_configure_codegen         (anatomy-codegen-Werkzeug gefunden (status=FOUND), Snippet vorhanden)
+  [gelaufen     ] f15_measurement            -> test_v41_anatomy_f15_measurement               (anatomy-codegen-Werkzeug gefunden (status=FOUND), Snippet vorhanden)
+  [gelaufen     ] r5g_adhoc_autobuilt        -> test_v41_anatomy_adhoc_autobuilt_load          (comdare-adhoc-emitter gefunden, 48 Permutations-DLLs emittiert)
+  [gelaufen     ] r5d_f15_compare_cli_smoke  -> f15_compare_cli_smoke                          (Target comdare_f15_compare_cli vorhanden)
+
+  489 Tests in der Inventur; 5 bedingte Registrierungs-Bloecke,
+  davon 5 gelaufen und 0 uebersprungen.
+  Quelle: build-covguard/comdare_registrierungs_protokoll.txt
+
+DRITTE ACHSE (Fremd-Inventur): NICHT GEFAHREN -- COMDARE_FREMD_INVENTUR ist
+  ungesetzt. Der Nenner ist damit nur gegen den eigenen Quelltext belegt
+  (Protokoll oben), nicht gegen den Baum eines anderen Jobs.
+
+DEKLARIERTE JOB-AUSWAHLEN (Quelle: Manifest):
+  [deckt ]  contract                     -R   ^test_abi_interface$                                                        1 Tests   (ohne rules-Gate)
+  [deckt ]  pmc                          -L   pmc                                                                         2 Tests   (COMDARE_PMC_LANES ungesetzt -> ANNAHME deklariert (Lauf ausserhalb der CI))
+  [inaktiv] arm64_smoke                  -R   ^(test_cpuid_probe|test_conformance_gate)$                                  2 Tests   (opt-in COMDARE_ISA_MATRIX='' != 'true' -> keine Deckungsgutschrift)
+  [deckt ]  sanitize_asan                -R   ^(test_abi_interface|test_config_durability|test_conformance_gate|test_experiment_driver_v13|test_chaos_drift_gate)$    5 Tests   (ohne rules-Gate)
+  [deckt ]  contract_durability          -R   ^test_config_durability$                                                    1 Tests   (ohne rules-Gate)
+  [deckt ]  contract_conformance         -R   ^(test_conformance_gate|test_188_4c0_known_compositions_conformance|test_188_4cii_flat_wrapper_traversal|test_216h2_stat_reset_after_load|test_v41_anatomy_module_abi|test_cmd1_a_axis_command_base|test_ap15_2_get_allocator_proxy|test_ap15_3_driveable_map_contract|test_29_container_framework|test_v41_cache_engine_facade)$   10 Tests   (ohne rules-Gate)
+  [deckt ]  contract_pool_flip           -R   ^(test_188_4bbV_pool_adapter_flip_compile|test_188_4a_eytzinger_organ|test_s7_([1-9]|10)_)   12 Tests   (ohne rules-Gate)
+  [deckt ]  contract_harness             -R   ^(test_harness_compile|test_lazy_resume_binary)$                            2 Tests   (ohne rules-Gate)
+  [deckt ]  contract_profile_coverage    -R   ^(test_profile_coverage|test_smoke_coverage_profile|test_wdk_datasets_fairness|test_sota_st2_dedup|test_validate_profile|test_h2_score_akte|test_profile_roundtrip|test_experiment_parser|test_measurement_categories|test_axis_registry_roundtrip)$   10 Tests   (ohne rules-Gate)
+  [deckt ]  contract_experiment_driver   -R   ^test_experiment_driver_v13$                                                1 Tests   (ohne rules-Gate)
+  [deckt ]  contract_node_shape          -R   ^test_234_                                                                  6 Tests   (ohne rules-Gate)
+  [deckt ]  chaos_drift                  -R   ^test_chaos_drift_gate$                                                     1 Tests   (ohne rules-Gate)
+  [deckt ]  test_unit                    -LE  pmc                                                                       487 Tests   (ohne rules-Gate)
+  [deckt ]  sanitize_tsan                -R   ^(test_concurrency_disciplines|test_rcu|test_v41_axis_08_concurrency)$      3 Tests   (ohne rules-Gate)
+
+BILANZ: 489 von 489 registrierten Tests werden von einem fahrenden Job ausgefuehrt.
+        1 von 14 Gate(n) UNGEPRUEFT -- Deklarations-
+        variable in diesem Lauf nicht gesetzt, ihre Deckung ist ANNAHME, nicht Messung:
+           ANNAHME: pmc (Variable COMDARE_PMC_LANES ungesetzt)
+
+PARTITIONS-BELEG (dieselbe Rechnung, nur andersherum gelesen):
+  bedingte Registrierungs-Bloecke     : 5 von 5 gelaufen (kein stiller Schwund)
+  ohne Label 'pmc' (test:unit)        : 487
+  mit  Label 'pmc' (pmc:amd/intel)    : 2
+  Summe (VERGLICHEN, nicht behauptet) : 489  ==  Inventur 489
+  -> -L und -LE mit demselben Muster sind komplementaer; ein dritter Fall
+     existiert nicht. Die Deckung ist damit strukturell, nicht durch Audit.
+
+  Anker (exakt, committet)            : 489 == 489 fuer Klasse avx512f
+                                        (Host: prod1, Quelle: scripts/ci_test_inventory_floor.txt,
+                                         Klasse gemessen aus build-covguard/CMakeCache.txt)
+  Nenner gegen FREMDE Quelle (e)      : NICHT GEFAHREN
+  Gates mit gesetzter Variable        : 13/14, 1 ANNAHME
+
+ABDECKUNGS-WACHE: GRUEN -- kein Test ohne fahrenden Job,
+und der Nenner ist belegt: 5 von 5 bedingten Bloecken gelaufen, 0 uebersprungen.

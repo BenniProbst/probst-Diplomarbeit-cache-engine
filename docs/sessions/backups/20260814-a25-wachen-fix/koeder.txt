@@ -1,0 +1,2 @@
+zz_probe_flow: {stage: lint, script: [echo probe]}
+"zz_probe_quoted": {stage: lint, script: [echo probe]}
