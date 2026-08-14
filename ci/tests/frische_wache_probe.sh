@@ -270,9 +270,18 @@ fall_ende
 # =============================================================================
 # F6  ZWEI-LAUF-KOEDER, DER FALL DES PAKETS: Altzelle MIT Datenzeile,
 #     Neuzelle NUR Kopfzeile -> ROT. Die fremde Zeile maskiert den Leerlauf.
-#     Zum Beweis, dass die Maskierung real ist, faehrt der Fall zusaetzlich die
-#     AUSBEUTE-Wache ueber denselben Baum und verlangt, dass SIE gruen ist --
-#     die Frische-Wache sagt hier also etwas, das die andere nicht sagen kann.
+#     MASKIERUNGS-BEWEIS am Gegenstueck, NEU GESCHNITTEN seit ##26 M==N
+#     (KON60-05, 96ff69d5, 2026-08-14): die AUSBEUTE-Wache zaehlt die fremden
+#     Zeilen weiterhin als Ausbeute dieses Baums -- ihr Summen-Literal erreicht
+#     die Mindestzahl allein aus der Altzelle, ihr SUMMEN-Gate reisst nicht.
+#     Ihr URTEIL ist seit der Haertung trotzdem rot (leere CSV neben vollen),
+#     aber aus einem Grund, der die Lauf-Kennung nicht kennt: sie sieht "eine
+#     Datei leer", nie "die Zeilen sind fremd". Nur die Frische-Wache sagt,
+#     WESSEN Zeilen das sind. Deshalb fordert der Fall LITERALE der Ausgabe,
+#     nicht mehr rc==0 (bis 96ff69d5 war das Gegenstueck hier rc=0; die alte
+#     rc==0-Forderung ist seit der Haertung am Objekt falsch). Das URTEIL des
+#     Gegenstuecks nagelt dessen eigene Probe fest
+#     (ci/tests/mess_ausbeute_bissprobe.sh), nicht dieser Fall.
 # =============================================================================
 KA="$(wuerfel 1000 49999)-$(wuerfel 1000 49999)"
 KN="$(wuerfel 50000 99999)-$(wuerfel 50000 99999)"
@@ -285,10 +294,17 @@ if [ -f "$AUSBEUTE" ]; then
     sh "$AUSBEUTE" "$D" 1 voll > "$WERK/f6_ausbeute" 2>&1
     RC_AUS=$?
     set -e
-    echo "        Gegenstueck: ci/mess_ausbeute_wache.sh auf demselben Baum -> rc=$RC_AUS"
-    if [ "$RC_AUS" -ne 0 ]; then
-        reiss "die Ausbeute-Wache ist hier rot (rc=$RC_AUS) -- dann belegt F6 keine Maskierung"
-    fi
+    echo "        Gegenstueck: ci/mess_ausbeute_wache.sh auf demselben Baum -> rc=$RC_AUS (dokumentiert)"
+    # Beweis 1: die Summe zaehlt die $ZA FREMDEN Zeilen als Ausbeute -- die
+    # Mindestzahl 1 ist allein aus der Altzelle erfuellt (die Zahl im Literal
+    # ist der Anker: zaehlte die Wache anders, matcht das Literal nicht).
+    fordere_literal "$WERK/f6_ausbeute" "$ZA Datenzeile(n) insgesamt, gefordert waren mindestens 1."
+    # Beweis 2: das SUMMEN-Gate reisst NICHT -- die fremden Zeilen stopfen es.
+    # (Beide Riss-Literale der Summen-Seite beginnen mit diesem Praefix.)
+    fordere_kein_literal "$WERK/f6_ausbeute" "FEHLER: der Messlauf hat"
+    # Beweis 3: was die Ausbeute-Wache sieht, ist der KENNUNGSBLINDE
+    # Datei-Befund (##26 M==N) -- die AUSGABE ist nie herabgestuft.
+    fordere_literal "$WERK/f6_ausbeute" "BEFUND: 1 von 2 CSV-Dateien tragen KEINE Datenzeile."
     grep -F 'Datenzeile(n) insgesamt' "$WERK/f6_ausbeute" | sed 's/^/        | /'
 else
     reiss "ci/mess_ausbeute_wache.sh fehlt -- die Maskierung ist nicht belegbar"
