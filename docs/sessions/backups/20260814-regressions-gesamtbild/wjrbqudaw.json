@@ -1,0 +1,115 @@
+{
+  "summary": "A2.5-Fix des Design-Duos: die TRAEGT_MIT_FIXES-Korrekturen beider Gegenleser in die zwei Design-Dokumente einarbeiten (JOB_DIR-Dateien, kein Repo)",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "quittungen": [
+      {
+        "fund": "#29 F1 (HART, K3 unterzählt: Querschnitt→CEB = 6, nicht 3; Summe 61, nicht 58)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§3a-Matrix ersetzt (Querschnitt-Zeile: ceb 6 ⛔ mit beiden Dateien; Summenzeile neu: '59 Lib-Kanten (49+1+3+6) + 2 App-Kanten = 61' + Zählentscheid-Satz zu den bewusst NICHT gezählten 5 →builder-Kanten der drei Bau-Modul-Werkzeug-Apps); §3c-K3 neu gefasst ('6 Kanten, 2 Dateien', Auflösung: beide Köpfe entkoppeln). Objekt-Nachprüfung: abi/cache_engine_execution_engine_adapter.hpp:14-16 zieht relativ ../../../builder/commands/{execute_engine_command,execution_result,workload}.hpp — bestätigt."
+      },
+      {
+        "fund": "#29 F2 (HART, Matrix-Zeile tier falsch: →Fach 4, →Querschnitt 1 statt 0/0)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§3a tier-Zeile: 'Querschnitt 1 ✓ (perm_runner.hpp:30) · Fach 4 ✓ (perm_runner.hpp:26-29 → anatomy)'; neuer §3b-Punkt 6 'harness/ ist NICHT fach-frei … stufen-neutral erlaubt, wandert beim Tier-Umzug einfach mit'. Objekt-Nachprüfung perm_runner.hpp:26-30 — bestätigt."
+      },
+      {
+        "fund": "#29 F3 (HART, Querschnitt→Fach = 20, nicht 0 — der Querschnitt lehnt am Fach)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§3a Querschnitt-Zeile: 'Fach 20 (anatomy 13 · topics 4 · axes 3)'; §3b(5) ersetzt: Quell-Verteilung abi 11/measurement 4/Rest 5, anatomy_module_abi_v1_decl.hpp:17-20 (am Objekt bestätigt), Folgerung für §1 bleibt, transitive anatomy-Mitnahme + #88-Entscheid 'Verträge heben oder Kante deklarieren'; §1-Bullet ergänzt um 'zieht ihrerseits aber die Fläche-1-Verträge aus anatomy/ (§3b.5)'."
+      },
+      {
+        "fund": "#29 F4 (MITTEL, CEB→Fach 147 statt 134; Kommentar-Treffer in 58/51/4; relative Kanten fehlten)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§3a mit deklarierter Ein-Zählweise (echte #include-Direktiven am Zeilenanfang, direkt+relativ, ohne Kommentar-Erwähnungen): ceb→Fach 147 (anatomy 85 = 74 direkt + 11 relativ · topics 48 · axes 12 · compositions 1 · src 1), ceb→Querschnitt 50 (49+1 relativ commands/auto_permutator.hpp:10 — am Objekt bestätigt), planer→Querschnitt 56, planer→Fach 25 (compositions 3 statt 4, src 2); Messmethoden-Klammer in §3 nennt die früheren Werte 58/51/4 als Kommentar-behaftet; Folge-Angleichungen §1 (74→85) und R8 (134→147)."
+      },
+      {
+        "fund": "#29 F5 (HART, §4.2 'nur neue Dateien' unbaubar — kein libs/CMakeLists.txt; KON59-02-Timing fehlte)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§4.2: '1 Commit: NEUE Dateien libs/traeger/** PLUS GENAU EINE Anschluss-Zeile add_subdirectory(libs/traeger) in der bestehenden Repo-Wurzel-CMakeLists.txt (es gibt KEIN libs/CMakeLists.txt, libs/* hängt direkt an der Wurzel, Z. 737–753)' + Ein-Schreiber-Prüfauflage + 'Timing-Voraussetzung: ce-Schreibsperre der laufenden Wellen-Landung (KON59-02) aufgehoben, dann WE-15./16.-Fenster'; §4-Intro-Behauptung '(neue Dateien, kein Schreiber-Konflikt)' durch die Ein-Zeilen-Berührung ersetzt. Objekt-Nachprüfung: libs/CMakeLists.txt existiert nicht, add_subdirectory(libs/…) an Wurzel Z. 736–753 — bestätigt."
+      },
+      {
+        "fund": "#29 F6 (MITTEL, Brücken-Whitelist deckte nur 41 der 49 K1-Kanten — A2.2-Kollision)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§4.3: Whitelist = K1-Vollmenge (experiment_tree 26 · bestandslog 8 · build_orchestrator/orch_make_stem 6 · codegen/adhoc_emitter+type_name 2 · driver_build_variant_signature 2 · je 1 workload_driver, measure_storage/checkpoint_speicher, lager_ablage, ceb_version_stamp, artifact_transport); Brücke außerhalb der Liste erlaubt bei Besitzkarten-Nachtrag im selben Commit ('lauter Zugang statt Verbot', S-8s 2-Pass/lazy_adhoc_source_gen.hpp benannt); §2a-Verweis 'vier deklarierte Auszugs-Kandidaten' → 'Brücken-Naht-Familien s. §4.3'."
+      },
+      {
+        "fund": "#29 F7 (KLEIN, Präzision+Anker: KON10-02, Zitatort, 18/16, builder 35/22+13, R5 dritte Wurzel, Apps-Zählung, planer→src)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "(a) §1 S-12-Absatz: KON10-02 (Owner 11.08., D17 fünf CI-Stufen, CiYamlBuilder→Child-Pipeline) als Primäranker, KON25-08/-04 als Stützen; (b) K1-Zitatort 'experiment_dock_payload.hpp:24' (am Objekt bestätigt); (c) §2-Nenner '18 Unterverzeichnisse, davon 16 mit C++-Bestand'; (d) §2a builder '35 Unterverzeichnisse: 22 C++-tragende + 13 leere Skelette → #88-Triage'; (e) R5 um dritte Include-Wurzel libs/cache_engine/src ergänzt (<measurement/…> 77× von axes, <concepts>-Std-Header-Kollision, 'traeger/ erbt KEINE Alt-Wurzel'); (f) §3c: planer→src 2 als eigene Mini-Familie (sha512, permutations — 'nicht Teil der 49, Fach-Richtung'); Apps-Zählentscheid in §3a-Summenzeile deklariert; Footer um KON10-02 + A2.5-Neumessung ergänzt."
+      },
+      {
+        "fund": "G-1 HAUPTFUND/FIX 1 (tragend: […]-Kürzung verdeckte KON37-01 Satz 1 — Slot-Projektion w-blind, Alias-Klasse)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "§0-Zitat trägt Satz 1 jetzt wortsichtbar ('CEB gibt wallclock build auf der naechsten Traeger-Stufe frei', gegen Ledger :2148 wortgeprüft) mit Vermerk 'die frühere Kürzung war sinnentstellend, per A2.5 aufgehoben' + B3-Konsequenz-Zitat :2171-2172 ('Die Tier-Gates bleiben — gebaut werden sie nur noch, wenn die erzeugende CEB Wallclock traegt', wortgeprüft); M-8 neu gefasst (CEB-Voll-Stempel + Gleichheit bleiben fest, Kind-Stempel-FORM ausdrücklich owner-offen; w-Blindheit als Alias-Klasse gegen KON34-05 :3229 und B11 algo_semver.hpp:533-537 — beide am Objekt bestätigt); B-1 Phase 3: 'keinen mehr, keinen weniger' ersetzt (w-Abhängigkeit des Tier-Kompilats benannt), Projektion-Zeile → 'Kind-Stempel (M-8): FORM ist F-G1-11'; B-2 'Slot-Projektionen (Kind-Stempel-FORM: F-G1-11)'; B-3 um die Kontraposition ergänzt; neuer Owner-Entscheid F-G1-11 mit den drei Optionen (i) voller Ausdruck / (ii) Kontext-Mitführung / (iii) w als CEB-Selbst-Instrument mit ausdrücklich auszuweisendem B3-Widerspruch, ohne stillen Default."
+      },
+      {
+        "fund": "G-1 AMBIGUITÄT (b)/FIX 2 (EBNF vs. Stufe C: Hardware-Flags zwischen c[cpu_sub] und m)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "Reviewer-Empfehlung übernommen (EBNF gilt): §3.1 'Die Produktion ist ABSCHLIESSEND: zwischen c[cpu_sub] und m steht NICHTS … Hardware-Katalog für den c-Teil meint AUSSCHLIESSLICH c/p/e'; Stufe C gleichlautend präzisiert; B-5 um die Spiegel-Negativ-Probe '1.0.0.c.x512{f}.m{…} ROT AUCH AUF DER MESS-ZEILE' ergänzt."
+      },
+      {
+        "fund": "G-1 AMBIGUITÄT (a)/FIX 3 (Nicht-Injektivität der Projektion: m{t{ma.mi}} = Voll-Ausdruck UND Projektion)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "In M-8 als Eigenschaft ausgeschrieben ('Rolle (Kopf vs. Kind) und Herkunft liegen am TRAEGER … nicht im Wert; Anordnung und Fremd-Slots gehen restlos verloren' mit Herkunfts-Beispielen) und an F-G1-10 angeschlossen; F-G1-10 um die Kind-Anordnungs-Frage erweitert ('KON37-03: Zeiger/Zustaende JE STUFE … hängt an der F-G1-11-Entscheidung')."
+      },
+      {
+        "fund": "G-1 AMBIGUITÄT (c)/FIX 4 (c{p.p}/c{e.e} ableitbar, von keiner Wache verboten)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "Reviewer-Empfehlungsvariante gebaut: neue Regel M-11 'CPU_SUB OHNE DUPLIKATE' (durchgesetzt in mess_version_is_wellformed(), mess-zeilen-lokal; auf System-/Organ-Zeilen ausgewiesenes G-2-Erbe → #17), §3.2-Titel auf M-1…M-11; B-5-Beispiel '1.0.0.c{p.p}.m{b{w}} ROT (M-11)'; Belege flag_catalog_is_satisfied algo_semver.hpp:934-941 (nur Zulassung je Knoten) und :1571 ('andere Fehlerklasse … NICHT gebaut') am Objekt bestätigt."
+      },
+      {
+        "fund": "G-1 KLEINFUNDE/FIX 5 (a-d: §6.2-Geisterverweis, Knotenzahl 13, Registry-Naht verschwiegen, Tooling-id offen)",
+        "urteil": "EINGEARBEITET",
+        "beleg": "(a) B-5-Verweis '(§6.2)' → '(§6, Stufen B/C)'; (b) §3.1 'Knotenzahl des m-Baums maximal 1+3+9=13, die VOLLE Mess-Zeilen-Version trägt mit c{p.e} bis 16 Knoten (13 + c/p/e)' + Stufe A 'm-Baum ≤ 13 / volle Zeile ≤ 16 « 96'; (c) konkrete Wachen-Umstellung dreifach benannt (§3.3 'Für den PARSER wahr; die konkrete Naht heisst aber…', Stufe C 'Konkrete Umstellung: tooling_versionen_wohlgeformt + Schwester-Wachen wechseln…', Stufe F Übernahme-Satz) — measurement_tooling_registry.hpp:58-62 ruft ce_owned_version_is_wellformed, am Objekt bestätigt; (d) neuer Owner-Entscheid F-G1-12 (Tooling-<id> bei Mehr-Stufen-Belegung; anatomy_version_stamp.hpp:256-259 'GENAU die gewählte' — am Objekt bestätigt), Querverweis in §3.3 und Stufe F; Stufe D um F-G1-11-Vorbehalt am Gleichheits-Pin ergänzt; Anhang §9 um Satz-1-/B3-/KON34-05-Zeilenadressen erweitert."
+      },
+      {
+        "fund": "Bestätigungs-Funde beider Reviews (zielstruktur 'GEGENPROBEN GRÜN'; g1 VERIFIZIERT/NACHGERECHNET/WAS TRÄGT: alle Fundstellen, 0/8-Kollisionserhebung, 5 Beispiele, M-1-These, Owner-Zitate)",
+        "urteil": "ENTLASTET",
+        "beleg": "Reine Verifikations-Funde ohne Korrekturauftrag — kein Dokument-Eingriff nötig; als Verdikt-Kontext in den neuen Abschnitten §7 (zielstruktur) bzw. §10 (g1) zusammengefasst."
+      },
+      {
+        "fund": "Auftrags-Pflicht: Abschnitt 'REVIEW-EINARBEITUNG (A2.5, 13.08.2026)' mit Verdikt + Fix-Liste am Ende beider Dokumente",
+        "urteil": "EINGEARBEITET",
+        "beleg": "design_zielstruktur.md neuer §7 (Verdikt TRAEGT_MIT_FIXES + F1–F7-Liste mit Paragraphen-Zeigern), design_g1.md neuer §10 (Verdikt + FIX-1…FIX-5-Liste); Zählweisen bei allen ersetzten Zahlen mitgeführt (61 = 59 Lib (49+1+3+6) + 2 App; 147 = 85+48+12+1+1 mit 85 = 74 direkt + 11 relativ; 20 = 13+4+3; 16 Knoten = 13 m-Baum + c/p/e; 10 Naht-Familien = 26·8·6·2·2·1×5)."
+      }
+    ],
+    "restfragen": [
+      "F-G1-11 (Kind-Stempel-Form/w-Sichtbarkeit, drei Optionen ohne Default — per Review-Fix bewusst ohne Empfehlung vorgelegt) und F-G1-12 (Tooling-<id> bei Mehr-Stufen-Belegung) sind NEUE Owner-Entscheide; die F-G1-4/F-G1-10-Antworten und die Stufe-D-Pin-Form hängen an F-G1-11.",
+      "Feingranulare Matrix-Zellwerte, die ich nicht selbst stichprobenweise nachgemessen habe (topics/axes-Aufteilungen 15/4/48/12, die 11-relativ-Liste anatomy, Querschnitt→Fach-Quellverteilung abi 11/measurement 4/Rest 5), sind dem Gegenleser-Review entnommen (dessen Methode an 7 Stichproben bestätigt); die ohnehin beauftragte #67-Neuerhebung (S-6d) liefert die unabhängige Drittzählung.",
+      "Publikation steht aus: beide Dokumente liegen weiter unpubliziert unter /home/comdare/.claude/jobs/5a19728e/tmp/ (design_zielstruktur.md 30.225 Z., design_g1.md 38.862 Z.); Zielpfade docs/plaene/20260813-DESIGN-* erst nach Owner-GO bzw. nach Aufhebung der ce-/super-Schreibsperre der laufenden Wellen-Landung (KON59-02).",
+      "Der Ein-Schreiber-Check an der Repo-Wurzel-CMakeLists.txt gegen die parallel laufenden WE-Straenge (jetzt Auflage in §4.2) ist zum Skeleton-Commit-Zeitpunkt DURCHZUFUEHREN, nicht hier pruefbar.",
+      "Zielstruktur §6.4 (Strenge der Stufen-Kante) nennt weiterhin 'heute 0 solcher Kanten gemessen' fuer transitives Durchgreifen Stufe 4→2 — vom Review nicht beanstandet und von der Neumessung nicht beruehrt (hybrid→ceb bleibt 0); bei der #67-Neuerhebung mitpruefen."
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Fix"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "fix:design-duo",
+      "phaseIndex": 1,
+      "phaseTitle": "Fix",
+      "agentId": "a0af2754365052054",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786622238158,
+      "queuedAt": 1786622238152,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "A2.5-FIX-STUFE des Design-Duos (#29 Zielstruktur + G-1-Grammatik). Beide Reviews urteilten\nTRAEGT_MIT_FIXES mit vorformulierten Korrekturen. Arbeite JEDEN Fix in die Dokumente ein.\n\nQUELLEN (alles lesen):\n* Voller Workflow-Output mit den UNGEKUERZTEN Reviews (funde + fixes beider Gegenleser):\n  /tmp/claude-1001/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/tasks/w2zv55j8v.output\n  (JSON; resu…",
+      "lastProgressAt": 1786623292761,
+      "tokens": 161196,
+      "toolCalls": 61,
+      "durationMs": 1054603,
+      "resultPreview": "{\"quittungen\":[{\"fund\":\"#29 F1 (HART, K3 unterzählt: Querschnitt→CEB = 6, nicht 3; Summe 61, nicht 58)\",\"urteil\":\"EINGEARBEITET\",\"beleg\":\"§3a-Matrix ersetzt (Querschnitt-Zeile: ceb 6 ⛔ mit beiden Dateien; Summenzeile neu: '59 Lib-Kanten (49+1+3+6) + 2 App-Kanten = 61' + Zählentscheid-Satz zu den bewusst NICHT gezählten 5 →builder-Kanten der drei Bau-Modul-Werkzeug-Apps); §3c-K3 neu gefasst ('6 Kan…"
+    }
+  ],
+  "totalTokens": 161196,
+  "totalToolCalls": 61
+}

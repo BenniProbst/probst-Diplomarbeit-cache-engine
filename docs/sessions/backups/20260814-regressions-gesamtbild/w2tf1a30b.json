@@ -1,0 +1,121 @@
+{
+  "summary": "Ungelesene/unvollstaendig gelesene Workflow-Ergebnisse der letzten 4 Kontexte einsammeln",
+  "agentCount": 4,
+  "logs": [
+    "[lesen:journale-diese-session] failed: You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+    "[lesen:endberichte-voriger-kontext] failed: You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+    "[lesen:journale-voriger-kontext] failed: You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+    "[lesen:endberichte-diese-session] failed: You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message"
+  ],
+  "result": [
+    {
+      "los": "endberichte-diese-session",
+      "ergebnis": null
+    },
+    {
+      "los": "endberichte-voriger-kontext",
+      "ergebnis": null
+    },
+    {
+      "los": "journale-diese-session",
+      "ergebnis": null
+    },
+    {
+      "los": "journale-voriger-kontext",
+      "ergebnis": null
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Lesen"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "lesen:endberichte-diese-session",
+      "phaseIndex": 1,
+      "phaseTitle": "Lesen",
+      "agentId": "aab414a346f6685fd",
+      "model": "claude-sonnet-5",
+      "state": "error",
+      "startedAt": 1786086418467,
+      "queuedAt": 1786086418458,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "cd /home/comdare/wt-super-landung/Code/external/comdare-cac…",
+      "promptPreview": "Du bist ein Explore-/Lese-Agent (read-only).\n\nLAGE: Ueber die letzten vier Kontexte liefen ~86 Workflows mit ~450 Agenten. Die ENDBERICHTE sind\ngesichert und committet unter:\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/voriger-kontext/      (14 Berichte + _INDEX.txt)\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/diese-…",
+      "lastProgressAt": 1786086892662,
+      "error": "You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+      "tokens": 237202,
+      "toolCalls": 55,
+      "durationMs": 474195
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "lesen:endberichte-voriger-kontext",
+      "phaseIndex": 1,
+      "phaseTitle": "Lesen",
+      "agentId": "a41081a67826ed078",
+      "model": "claude-sonnet-5",
+      "state": "error",
+      "startedAt": 1786086418468,
+      "queuedAt": 1786086418459,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "cd /home/comdare/wt-super-landung && grep -n \"b6d87c08\\|T2-…",
+      "promptPreview": "Du bist ein Explore-/Lese-Agent (read-only).\n\nLAGE: Ueber die letzten vier Kontexte liefen ~86 Workflows mit ~450 Agenten. Die ENDBERICHTE sind\ngesichert und committet unter:\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/voriger-kontext/      (14 Berichte + _INDEX.txt)\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/diese-…",
+      "lastProgressAt": 1786086886504,
+      "error": "You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+      "tokens": 214815,
+      "toolCalls": 52,
+      "durationMs": 468036
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "lesen:journale-diese-session",
+      "phaseIndex": 1,
+      "phaseTitle": "Lesen",
+      "agentId": "a8dfdf09432053d23",
+      "model": "claude-sonnet-5",
+      "state": "error",
+      "startedAt": 1786086418468,
+      "queuedAt": 1786086418459,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "grep -n \"Ebene-1-Timing\\|Pruefdock-Wanderung\\|Prüfdock-Wand…",
+      "promptPreview": "Du bist ein Explore-/Lese-Agent (read-only).\n\nLAGE: Ueber die letzten vier Kontexte liefen ~86 Workflows mit ~450 Agenten. Die ENDBERICHTE sind\ngesichert und committet unter:\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/voriger-kontext/      (14 Berichte + _INDEX.txt)\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/diese-…",
+      "lastProgressAt": 1786086883371,
+      "error": "You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+      "tokens": 124428,
+      "toolCalls": 55,
+      "durationMs": 464903
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "lesen:journale-voriger-kontext",
+      "phaseIndex": 1,
+      "phaseTitle": "Lesen",
+      "agentId": "a4d920f46b5b37795",
+      "model": "claude-sonnet-5",
+      "state": "error",
+      "startedAt": 1786086418468,
+      "queuedAt": 1786086418459,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "python3 -c \" import json d = json.load(open('/home/comdare/…",
+      "promptPreview": "Du bist ein Explore-/Lese-Agent (read-only).\n\nLAGE: Ueber die letzten vier Kontexte liefen ~86 Workflows mit ~450 Agenten. Die ENDBERICHTE sind\ngesichert und committet unter:\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/voriger-kontext/      (14 Berichte + _INDEX.txt)\n  /home/comdare/wt-super-landung/docs/sessions/backups/20260807-workflow-endberichte/diese-…",
+      "lastProgressAt": 1786086888730,
+      "error": "You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+      "tokens": 131429,
+      "toolCalls": 33,
+      "durationMs": 470262
+    }
+  ],
+  "totalTokens": 707874,
+  "totalToolCalls": 195
+}

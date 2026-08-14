@@ -1,0 +1,40 @@
+{
+  "summary": "B14-NB2: GOLDEN-XML/KF-6-Nachbesserung nach Codex-Verdikt (N=2^17, Registry-Namen, Wache haerten) + ce-Auflagen bei Disjunktheit",
+  "agentCount": 1,
+  "logs": [
+    "[b14-nb2-bau] failed: You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message"
+  ],
+  "result": {
+    "bau": null
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "b14-nb2-bau",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a56bc71d27957ce89",
+      "model": "claude-opus-5[1m]",
+      "state": "error",
+      "startedAt": 1786011319766,
+      "queuedAt": 1786011319765,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "cd /home/comdare/wt-b14-ce && nice -n 19 cmake --build buil…",
+      "promptPreview": "ROLLE: Bau-Agent der B14-NB2-Welle (GOLDEN-XML-Pflege / KF-6, Nachbesserung nach Codex-Verdikt NACHBESSERN 2xHOCH).\n\nARBEITSVERZEICHNIS: /home/comdare/wt-b14-golden (git-Worktree des SUPER-Repos /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine, Branch b14-golden-kf6). IMMER 'git -C'.\n\nEINTRITTS-GATE (sonst STOPP+Bericht): HEAD MUSS d8073913 sein, 'git status -s' leer.\n\nERDUNG (Pfli…",
+      "lastProgressAt": 1786013426865,
+      "error": "You've hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message",
+      "tokens": 253572,
+      "toolCalls": 140,
+      "durationMs": 2107099
+    }
+  ],
+  "totalTokens": 253572,
+  "totalToolCalls": 140
+}

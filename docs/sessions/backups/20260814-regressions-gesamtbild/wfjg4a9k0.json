@@ -1,0 +1,257 @@
+{
+  "summary": "F1-Baustein: anhang:forward PDF-Gate-Luecke schliessen (AF_PDF_GATE=auto prueft ohne TeX NICHTS auf dem baremetal-Runner) -- CI-YAML = Zwei-Lens-Klasse",
+  "agentCount": 4,
+  "logs": [
+    "texgate gebaut: bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a"
+  ],
+  "result": {
+    "bau": {
+      "commit_sha": "bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a",
+      "diff_kurz": ".gitlab-ci.yml, 1 Datei, +17/-9, NUR der anhang:forward-Bereich. Tragender Hunk am Kern-Aufruf (vorher :2494):\n\n      SNAP_DIR=\"measurement/thesis_compiles\"\n+     # HAERTUNG AF_PDF_GATE (2026-08-13, Befund wuwemnde5, F1-Kette): bisher an COMDARE_TEXLIVE_AVAILABLE\n+     # gekoppelt (unset -> auto); auto prueft auf dem baremetal-Runner OHNE TeX auf dem Job-PATH NICHTS --\n+     # am 12.08. haette der Kanal so den defekten 1x1-Stand nach 289 GEPUSHT (rot erst in der 289-Pipeline).\n+     # Fail-closed (II.7): Gate HART on -- kein TeX im Job-Env => ROT VOR Commit/Push, nie stiller Skip.\n      AF_DEST_REPO=\"$THESIS_CLONE\" \\\n      ...\n-     AF_PDF_GATE=\"$([ \"${COMDARE_TEXLIVE_AVAILABLE:-}\" = \"true\" ] && echo on || echo auto)\" \\\n+     AF_PDF_GATE=on \\\n\nDazu drei Doku-Nachzuege im Job-Kopfblock (Kopplungs-Satz :2356f, \"Zweite Grenze\"-Absatz :2364ff, E-18-SNAP-GRENZE-Parenthese :2401ff), damit kein Doku-Satz mehr das alte auto-Verhalten dieses Jobs behauptet. Der Begruendungs-Kommentar steht bewusst VOR der backslash-Fortsetzung (eine #-Zeile INNERHALB der Fortsetzung risse das Kommando ab -- genau die Fehlerklasse, die bash -n unten deckt). Worktree /home/comdare/wt-super-texgate, Branch bau/texlive-gate-haertung (ahead 1 von origin/development), KEIN Push, wt-super-landung/development unangetastet.",
+      "begruendung": "Erhebung am Objekt: (1) ci/anhang_forward_core.sh entscheidet in run_pdf_gate (:1301-1316) PATH-abhaengig per command -v latexmk/pdflatex; bei auto ohne Werkzeug druckt er \"UEBERSPRUNGEN ... hier wurde NICHT geprueft\" und liefert rc 0 -- der Kanal faehrt zu Commit+Push fort. Nur bei on ist fehlendes Werkzeug FEHLER (return 1), und die Aufrufstelle :1604 macht daraus rollback + exit 1 VOR jedem Commit/Push. (2) Der Job uebergab on nur bei COMDARE_TEXLIVE_AVAILABLE==\"true\", sonst auto (:2494). (3) prod1: TeX Live 2026 IST installiert (/usr/local/texlive/2026/bin/x86_64-linux/latexmk, command -v rc=0 in meiner Shell), aber der PATH-Eintrag kommt AUSSCHLIESSLICH aus /etc/profile.d/texlive.sh (Login-Shells); der gitlab-runner laeuft als eigener User gitlab-runner (root-Service, Home 750, config.toml ohne sudo nicht lesbar) -- der wuwemnde5-Befund, dass der Job-Kontext kein TeX sieht, bleibt am Objekt bestehen und die Haertung ist bewusst von dieser Frage UNABHAENGIG. Wahl der kleinsten tragfaehigen Form: hart AF_PDF_GATE=on am Job -- exakt der vom Kern selbst dokumentierte Erzwingungsweg (Kern :132 \"Wer die Pruefung erzwingen will, setzt AF_PDF_GATE=on\"). Verworfen: COMDARE_TEXLIVE_AVAILABLE=true am Job (wuerde ein FAEHIGKEITS-Merkmal des Runners behaupten, das der Job nicht wissen kann, YAML :106; zudem indirekt ueber die Kopplung) und auto-fail-closed im Kern (aendert dokumentierte Kern-Semantik fuer ALLE Nutzer; die Fixture-Probe faehrt alle Faelle mit off, sechs \"bewusste Grenze\"-Doku-Bloecke hingen dran -- nicht die kleinste Form). Vertraeglichkeit: honest-empty (:633), IDEMPOTENT (:1278) und DRY-RUN (:1288) liegen VOR dem Gate und bleiben auf TeX-losem Runner gruen (sie pushen nichts); JEDER Pfad, der committet, pusht oder einen Compile-Beleg erzeugt (vorwaerts/nachholen/recovery), laeuft durch das Gate und wird ohne TeX jetzt ROT statt still ungeprueft gruen. Fail-closed-Doktrin II.7 damit am einzigen Push-Pfad des Kanals durchgesetzt.",
+      "probe_beleg": "(a) Trocken-Probe der Gate-Logik: Kern-Zeilen 1301-1316 VERBATIM per sed extrahiert (+2-Zeilen-Harness-Schwanz), Fixture mit diplomarbeit.tex (\\documentclass), rc jeweils direkt per rc=$? ohne Pipe. VORAB: PATH=/usr/bin:/bin -> command -v latexmk rc=1; PATH mit /usr/local/texlive/2026/bin/x86_64-linux -> rc=0. FALL A (alte Job-Zeile, COMDARE_TEXLIVE_AVAILABLE unset): ergibt AF_PDF_GATE=auto; ohne TeX literal \"UEBERSPRUNGEN: Haupt-.tex='diplomarbeit.tex' TeX-Werkzeug='<keins>'\" + \"hier wurde NICHT geprueft\", fall_a_rc=0 -> Kanal faehrt ungeprueft zu Commit+Push fort (das Loch). FALL B (neu, on, ohne TeX): literal \"FEHLER: AF_PDF_GATE=on, aber Haupt-.tex='diplomarbeit.tex' / TeX-Werkzeug='<keins>'\", fall_b_rc=1 -> Aufrufstelle Kern :1604 \"if ! run_pdf_gate\" => anhang_rollback + exit 1 VOR Commit/Push. FALL C (neu, on, mit TeX): Werkzeug=latexmk gewaehlt, Gate baut (fall_c_rc=0). (b) bash -n: anhang:forward-Script-Block (148 Zeilen) per python3/yaml aus der geaenderten .gitlab-ci.yml extrahiert, YAML-Parse OK, bash -n rc=0 -- der neue Kommentar zerreisst die backslash-Fortsetzung NICHT, die Gate-Zeile lautet im extrahierten Script exakt \"AF_PDF_GATE=on \\\". (c) ASCII-Gate mit Nenner: grep -P '[^\\x00-\\x7F]' ueber alle 18 hinzugefuegten Diff-Zeilen rc=1 (kein Treffer) bei nachgezaehlten 18 +Zeilen (echte Null, kein leerer Input). (d) Baum nach Commit sauber (diff HEAD leer), wt-super-landung weiter auf development ohne Aenderung.",
+      "offene_punkte": [
+        "KEIN Push (Auftrag): Branch bau/texlive-gate-haertung liegt nur im Worktree /home/comdare/wt-super-texgate (bb03d53b, ahead 1 von origin/development) -- Landung ueber die Lande-Stufe des Workflows (parallel bauen, sequentiell landen), Worktree erst nach gruen+Merge und Submodul-Branch-Pruefung loeschen.",
+        "Infra-Posten VOR dem Scharfschalten (COMDARE_ANHANG_FORWARD-Flip): TeX in den Job-PATH des gitlab-runner-Users bringen (TeX Live 2026 ist auf prod1 installiert, aber nur ueber /etc/profile.d/texlive.sh fuer Login-Shells; /etc/gitlab-runner/config.toml und /home/gitlab-runner ohne sudo nicht einsehbar, sudo -n rc=1). Mit der Haertung wird der Lebend-Check-Lauf ohne diesen Posten ROT statt still zu pushen -- gewollt (fail-closed), aber der Posten muss vorher stehen.",
+        "Ist-Zustand der Projekt-Variablen COMDARE_TEXLIVE_AVAILABLE/COMDARE_ANHANG_FORWARD auf gitlab.comdare.local von hier nicht abgefragt (kein API-Zugriff in dieser Session); die Haertung ist bewusst variablen-unabhaengig. thesis:pdf bleibt unveraendert an COMDARE_TEXLIVE_AVAILABLE gegatet.",
+        "Kern-Semantik auto/off UNVERAENDERT gelassen (kleinste Form): auf einem kuenftigen weiteren Kanal-Aufrufer laege dieselbe auto-Falle -- falls je ein zweiter CI-Aufrufer des Kerns entsteht, dort ebenfalls hart on setzen oder dann den Kern-Default fail-closed drehen (groesserer Schnitt, sechs Doku-Bloecke + Probe betroffen).",
+        "Probe ist Trocken-Probe der verbatim-Entscheidungszeilen + bash -n; ein echter Pipeline-Lauf des inert-by-default-Jobs stand hier nicht an -- der Lebend-Check nach dem Var-Flip bleibt der Restbeweis am lebenden Objekt."
+      ]
+    },
+    "codex": {
+      "verdikt": "TRAEGT_MIT_FIXES",
+      "funde": [
+        "FAIL-CLOSED AM OBJEKT BESTAETIGT: /home/comdare/wt-super-texgate/ci/anhang_forward_core.sh -- Default auto (:299); run_pdf_gate :1305-1315: on + fehlendes Werkzeug ODER fehlende Haupt-.tex => FEHLER return 1, auto => UEBERSPRUNGEN return 0 und Kanal laeuft weiter; Aufrufstelle :1600-1620: Gate-Rot => anhang_rollback + exit 1, Snapshot (:1622), Commit (:1674) und Push (:1733) unerreichbar. Mit AF_PDF_GATE=on ist der einzige Push-Pfad des Kanals fail-closed (II.7).",
+        "LAUF-FAELLE BRECHEN NICHT: (a) TeX im Job-PATH vorhanden: on verhaelt sich identisch zu auto (Unterschied existiert NUR im Werkzeug-fehlt-Fall); (b) TeX fehlt: ROT vor Commit/Push statt stillem Skip -- exakt der SOLL-Fall der Haertung, kein Bruch; (c) COMDARE_ANHANG_FORWARD unset: Rule .gitlab-ci.yml:2442 instanziiert den Job nicht, in-Script-Guard :2447 exit 0 -- unveraendert. Vorpfade honest-empty (:634), IDEMPOTENT (:1277), DRY-RUN (:1286) enden mit exit 0 VOR dem Gate (:1600) und bleiben auf TeX-losem Runner gruen; nachholen/recovery laufen durchs Gate und werden ohne TeX rot statt still beleglos.",
+        "CODEX-LENS-PFLICHT ERFUELLT, ZWEI LENSES PARALLEL (13.08.-Doktrin), beide geantwortet, kein Ausfall: Lens 2 'BRICHT-NICHTS -- der fehlende-TeX-Fall wird beabsichtigt fail-closed' (belegt Commit :1674/Push :1733 unerreichbar); Lens 1 etikettierte 'BRICHT-FALL-b', meint damit aber exakt den GEWOLLTEN Rot-statt-Skip-Fall und bestaetigt in der eigenen Begruendung 'on schlaegt vor jeder Mutation fehl', fail-closed sowie die unschaedliche Kommentar-Position. Beide Lenses decken sich in der Sache mit meiner Objekt-Erhebung.",
+        "FORM UND SYNTAX GRUEN: YAML wohlgeformt (PyYAML, Tag-tolerant), anhang:forward-Script-Block extrahiert und bash -n rc=0; der 4-Zeilen-Kommentar steht VOR Beginn der Backslash-Fortsetzungskette (AF_DEST_REPO...), zerreisst das Kommando nicht (eine #-Zeile INNERHALB der Kette wuerde es -- genau das ist vermieden); Diff ASCII-only (grep -P rc=1); Basis-Commit bb03d53b nur .gitlab-ci.yml +17/-9; KEIN Push, development unangetastet.",
+        "FIX ANGEWENDET (Commit 2cea7287, /home/comdare/wt-super-texgate/.gitlab-ci.yml): das 12.08.-Kontrafaktual 'haette den defekten 1x1-Stand GEPUSHT' war UNBELEGT und stand auf widerlegter Praemisse -- /usr/local/bin/latexmk und /usr/local/bin/pdflatex sind seit 03.07.2026 root-Symlinks auf TeX Live 2026 und auf dem Minimal-PATH sichtbar (TeX-Installation 24.06., die thesis:pdf-Gatung 'sonst sicherer Fail an latexmk fehlt' datiert 26.06., also VOR der Symlink-Farm); die Builder-Begruendung 'PATH-Eintrag AUSSCHLIESSLICH aus /etc/profile.d/texlive.sh' ist am Objekt falsch. Ob der gitlab-runner-Job-PATH TeX sieht, ist ohne root/Testlauf unentscheidbar (config.toml root-only). Kommentar :2491-2494 und Kopfblock-Satz :2358-2359 auf die belegte Aussage umformuliert (auto haengt an der TeX-Sichtbarkeit im Job-PATH, prueft ohne TeX NICHTS; 12.08. als Risiko, nicht als Faktum). Haertung selbst (AF_PDF_GATE=on) UNVERAENDERT. Re-Verify nach Fix: YAML-Parse, bash -n, ASCII alle gruen.",
+        "KONSEQUENZ FUER DEN ERSTEN SCHARFEN LAUF: sieht der Runner-Job-PATH TeX (nach Symlink-Lage wahrscheinlich), kompiliert das Gate ab jetzt WIRKLICH die Thesis im Job -- Laufzeit steigt entsprechend; sieht er es nicht, ist der Kanal LAUT rot vor jedem Commit/Push (gewollt, II.7). Beide Ausgaenge tragen; ein stiller ungeprueft-Push ist in diesem Job nicht mehr moeglich.",
+        "NACHRANGIG, BESTAND (nicht dieser Diff): die Zeilen-Anker im YAML-Kopf (:105 'gatet :2370' fuer COMDARE_ANHANG_FORWARD, :111 ':1808, :2509, :2600') waren schon VOR der Haertung stale (die Rule lag im Altstand real bei :2438); der Diff verschiebt Anker >=2353 um weitere +8. Vorbestehende Drift, kein Regressions-Gegenstand dieser Haertung -- als eigener Aufraeum-Posten melden.",
+        "STANDORT: Worktree /home/comdare/wt-super-texgate, Branch bau/texlive-gate-haertung, ahead 2 von origin/development (bb03d53b Haertung + 2cea7287 Review-Fix), Arbeitsbaum sauber, KEIN Push erfolgt; /home/comdare/wt-super-landung/development unangetastet."
+      ]
+    },
+    "fable": {
+      "verdikt": "BESTANDEN -- Commit bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a existiert im Worktree /home/comdare/wt-super-texgate (Branch bau/texlive-gate-haertung, exakt auf origin/development a103e518 + 1, Baum sauber, KEIN Push), tut was die Begruendung sagt (EINE funktionale Zeile: AF_PDF_GATE hart on statt COMDARE_TEXLIVE_AVAILABLE-Kopplung; Rest Doku-Nachzug + 4-Zeilen-Begruendungskommentar mit Datum/Befund/F1-Kette am Kern-Aufruf), ist fail-closed nach II.7 (on ohne TeX ODER ohne Haupt-.tex => rc 1 an Kern :1309-1311, Aufrufstelle :1604 => anhang_rollback + exit 1 VOR Commit :1676 und dem EINZIGEN Push :1740; set -euo pipefail im Job-Block, keine rc-Maskierung) und deckt alle Pfade: on x TeX-nein = ROT (eigene Probe rc=1), on x TeX-ja = echter latexmk-Bau (rc=0, PDF entstanden), on x kein Haupt-.tex = ROT (rc=1, vom Bauer ungeprobter Quadrant), auto/off im Job unerreichbar (Literal on am einzigen Aufruf, kein Override-Weg ueber CI-Variablen, bash -n + YAML-Parse gruen auf dem 148-Zeilen-Script, Fortsetzungskette intakt). Der V-8-Zustand der alten Fassung (COMDARE_TEXLIVE_AVAILABLE unset => auto => UEBERSPRUNGEN rc=0 => ungeprueft committen+pushen) ist unabhaengig reproduziert und durch den Commit GESCHLOSSEN.",
+      "funde": [
+        "V-8 GESCHLOSSEN (am Objekt reproduziert): alte Job-Zeile ergab bei unset COMDARE_TEXLIVE_AVAILABLE AF_PDF_GATE=auto; verbatim Kern-Zeilen 1301-1316 mit PATH=/usr/bin:/bin ergeben literal 'UEBERSPRUNGEN ... TeX-Werkzeug=<keins>' + 'hier wurde NICHT geprueft' mit rc=0 -- der Kanal waere ungeprueft zu Commit (:1676) und Push (:1740) durchgelaufen. Mit AF_PDF_GATE=on hart am Job: rc=1, rollback + exit 1 VOR Commit/Push.",
+        "PATH-These am Objekt belegt: latexmk existiert NUR ueber /usr/local/texlive/2026/bin/x86_64-linux (env PATH=/usr/bin:/bin => command -v latexmk rc=1; mit TeX-Pfad rc=0); einzige PATH-Quelle ist /etc/profile.d/texlive.sh (Login-Shell); gitlab-runner-User existiert, Job tags=baremetal; in-Repo-Beleg .gitlab-ci.yml:1592 ('sonst sicherer Fail an latexmk fehlt') bestaetigt TeX-losen Job-Kontext.",
+        "OPERATIVE KONSEQUENZ (gewollt, II.7): wird COMDARE_ANHANG_FORWARD=true gesetzt, ist der Job auf dem heutigen baremetal-Runner ROT statt still gruen, bis TeX in den Job-PATH kommt oder ein TeX-faehiger Runner den Job nimmt -- exakt die Fail-closed-Doktrin, im Job-Kommentar deklariert.",
+        "V-8-REST (am Objekt belegt, FALL E): das Gate baut nur das ERSTE Top-Level-.tex mit documentclass (grep -l ... | head -1, Kern :1304). Fixture mit intaktem diplomarbeit.tex + nachweislich kaputtem z_zweitdokument.tex (Gegenprobe latexmk rc=12) => Gate GRUEN rc=0. Heute gegenstandslos (289 traegt genau EIN Hauptdokument, verifiziert 05.08.), aber: kommt ein zweites Hauptdokument (z.B. EN) oder bricht ein NUR im 289-en-Strang wirksamer Stand, ist der Job gruen ohne diesen Teil zu pruefen -- deklarierte Grenze (a) im Job-Kommentar, NICHT Soll dieses Commits; bei Einfuehrung eines EN-Hauptdokuments MUSS der Kern auf eine Liste erweitert werden.",
+        "PFAD-DECKUNG vollstaendig, inkl. des vom Bauer NICHT geprobten Quadranten: on + TeX vorhanden + KEIN Haupt-.tex => FEHLER rc=1 (Haupt-.tex='<keine>') -- die :1308-Bedingung prueft main UND Werkzeug gemeinsam, beide Luecken sind dicht. auto/off sind im Job durch das Literal on am EINZIGEN Kern-Aufruf unerreichbar (keine job-variables, GitLab-CI-Variablen koennen einen Kommando-Env-Prefix nicht ueberschreiben); off bliebe nur per kuenftigem YAML-Edit erreichbar und wuerde im Kern laut geloggt (:1632).",
+        "GRUEN-OHNE-GATE-Pfade sind pushlos (kein Defekt): die exit-0-Stellen VOR dem Gate (Kern :638 honest-empty Weg A, :1223/:1278 IDEMPOTENT, :1294 DRY-RUN, Job-INERT :2448) committen und pushen nichts -- der einzige git push liegt bei :1740 HINTER dem Gate; ein defekter Stand kann auf diesen Pfaden nicht landen.",
+        "BELEG-KORREKTUR am Bau-Bericht: die behaupteten '18 hinzugefuegten Diff-Zeilen' zaehlen die Diff-Headerzeile '+++ b/.gitlab-ci.yml' mit; echte Add-Zeilen = 17 (git show --stat: 17 insertions, 9 deletions; nachgezaehlt: plus_inkl_header=18, added_echt=17). Das ASCII-Ergebnis bleibt gueltig: grep -P '[^\\x00-\\x7F]' ueber die 17 echten Add-Zeilen rc=1 bei nicht-leerem Input (echte Null).",
+        "RANDBEFUND KERN (ausserhalb Commit-Scope, kein Handlungsbedarf am Commit): ci/anhang_forward_core.sh validiert AF_PDF_GATE nicht als Enum (:299 nur Default auto; kein case) -- jeder Wert ausser exakt 'on'/'off' wirkt als auto und wuerde ohne TeX still skippen. Im Job durch das exakte Literal on ausgeschlossen; relevant nur, falls der Wert je wieder variabel wird.",
+        "FORM-VERIFIKATION unabhaengig wiederholt: YAML-Parse mit !reference-Konstruktor gruen, extrahiertes anhang:forward-Script = 148 Zeilen, bash -n rc=0; der 4-Zeilen-HAERTUNG-Kommentar steht VOR Beginn der Fortsetzungskette (AF_DEST_REPO ... \\ bis ci/anhang_forward_core.sh Zeile 58/65) und zerreisst sie nicht; nach dem Aufruf keine rc-Maskierung, set -euo pipefail in Zeile 1 des Blocks; Rule :2442 (inert-by-default hinter COMDARE_ANHANG_FORWARD + development + bot-Ausschluss) unveraendert.",
+        "ISOLATION eingehalten: Worktree /home/comdare/wt-super-texgate sauber (status leer), Branch ahead 1 ohne Upstream-Push; /home/comdare/wt-super-landung unveraendert auf development; development selbst nicht angefasst. Probe-Artefakte liegen unter /tmp/texgate_lens (Fixtures, extrahierte Gate-Funktionen, Diff-Zaehlung)."
+      ]
+    },
+    "fix": {
+      "quittungen": [
+        {
+          "fund": "1 FAIL-CLOSED AM OBJEKT BESTAETIGT",
+          "urteil": "ENTLASTET",
+          "beleg": "Am Endstand re-verifiziert (Zeilen nach Fix-Shift +29): Default auto Kern :303, Gate-Block :1629, Aufruf :1633 in if!-Kondition, Gate-rot => anhang_rollback :1634 + exit 1 VOR Commit; einziger Push :1769 dahinter. Probe E3b (on, PATH=/usr/bin:/bin): rc=1 mit FEHLER-Zeile. Kein Handlungsbedarf."
+        },
+        {
+          "fund": "2 LAUF-FAELLE BRECHEN NICHT",
+          "urteil": "ENTLASTET",
+          "beleg": "Probe E2 (on + TeX): echter latexmk-Bau, rc=0, 'PDF-Gate GRUEN'; E3b (on ohne TeX): rc=1 vor Commit/Push; Rule :2443 + in-Script-INERT-Guard unveraendert (Anker-Schleife OK). Offizielle Suite ci/tests/anhang_forward_probe.sh gegen den Fix-Stand: 18 von 18 gehalten (deckt honest-empty/IDEMPOTENT/DRY-RUN-Vorpfade)."
+        },
+        {
+          "fund": "3 CODEX-LENS-PFLICHT ERFUELLT",
+          "urteil": "ENTLASTET",
+          "beleg": "Prozessbefund ohne Objekt-Defekt; die Sachaussagen beider Lenses (fail-closed gewollt, Commit/Push unerreichbar, Kommentar-Position unschaedlich) decken sich mit meinen unabhaengigen Objekt-Proben (E1-E5, Suite 18/18). Nichts zu aendern."
+        },
+        {
+          "fund": "4 FORM UND SYNTAX GRUEN",
+          "urteil": "ENTLASTET",
+          "beleg": "Nach den Fix-Edits unabhaengig wiederholt: YAML-Parse tag-tolerant OK (57 Jobs), anhang:forward-Script extrahiert 148 Zeilen, bash -n rc=0; Kommentar steht weiter VOR der Backslash-Kette (Suite-Fall A7 gruen); Add-Zeilen beider Fix-Commits ASCII (grep -P rc=1 bei 40 bzw. 11 Zeilen Input)."
+        },
+        {
+          "fund": "5 REVIEW-FIX 2cea7287 (12.08.-Kontrafaktual entschaerft)",
+          "urteil": "BEHOBEN",
+          "beleg": "Durch 2cea7287, in dieser Stufe am Objekt bestaetigt: /usr/local/bin/latexmk+pdflatex sind root-Symlinks vom 03.07.2026 00:06 auf TeX Live 2026; PATH=/usr/bin:/bin sieht sie NICHT (command -v rc=1), PATH mit /usr/local/bin sieht sie (rc=0). Der Kommentar :2491-2494 behauptet nur die belegte Mechanik (auto haengt an TeX-Sichtbarkeit im Job-PATH; 12.08. als Risiko)."
+        },
+        {
+          "fund": "6 KONSEQUENZ ERSTER SCHARFER LAUF",
+          "urteil": "ENTLASTET",
+          "beleg": "Beide Ausgaenge jetzt real vorgefuehrt: E2 = on+TeX baut wirklich (Laufzeit steigt), E3b = on ohne TeX laut rot vor Commit/Push. Im Job-Kommentar deklariert; stiller ungeprueft-Push in diesem Job nicht mehr moeglich."
+        },
+        {
+          "fund": "7 STALE ZEILEN-ANKER IM YAML-KOPF",
+          "urteil": "BEHOBEN",
+          "beleg": "Commit 5363eebb: alle 10 extern-Anker + MEASURE_PROFILE-Weiterreichung am Endstand nachgemessen (Drift war +41..+123, nur :228 stimmte; z.B. ANHANG_FORWARD :2370->:2443, Weiterreichung :2589->:2713), Mess-Datum ehrlich auf 13.08.2026. Schleifen-Probe 20/20 OK (jede behauptete Zeile traegt die Variable in einer if-Bedingung); Edit zeilenneutral 11+/11-, verschiebt selbst nichts."
+        },
+        {
+          "fund": "8 STANDORT ahead 2",
+          "urteil": "ENTLASTET",
+          "beleg": "Am Objekt: jetzt ahead 4 von origin/development (bb03d53b, 2cea7287, 6bd5b263, 5363eebb), Arbeitsbaum sauber (porcelain leer), kein Push; /home/comdare/wt-super-landung unveraendert auf development. Die Fund-18-Angabe 'ahead 1' war Stufen-Versatz vor dem Review-Fix."
+        },
+        {
+          "fund": "9 V-8 GESCHLOSSEN",
+          "urteil": "ENTLASTET",
+          "beleg": "Schliessung steht (bb03d53b); die Reproduktion (auto-Skip unter TeX-losem PATH, rc=0) ist mechanisch korrekt, ihr Kontrafaktual gilt nur unter TeX-losem Job-PATH -- exakt so formuliert es der Kommentar seit 2cea7287. Zusaetzlich verriegelt: Enum-Wache 6bd5b263 laesst keinen Nicht-Enum-Wert mehr still als auto wirken."
+        },
+        {
+          "fund": "10 PATH-THESE (einzige Quelle profile.d)",
+          "urteil": "ENTLASTET",
+          "beleg": "Probe reproduziert (PATH=/usr/bin:/bin: latexmk rc=1), aber der Exklusivitaets-Schluss ist am Objekt widerlegt: /usr/local/bin/latexmk+pdflatex (root-Symlinks 03.07.2026) sind eine ZWEITE Quelle; /usr/bin:/bin enthaelt /usr/local/bin schlicht nicht. Kein Handlungsbedarf am Code: on ist PATH-unabhaengig ehrlich, der Kommentar stuetzt sich seit 2cea7287 nicht auf die Exklusivitaet."
+        },
+        {
+          "fund": "11 OPERATIVE KONSEQUENZ (rot bis TeX im Job-PATH)",
+          "urteil": "ENTLASTET",
+          "beleg": "Bestaetigt und praezisiert: sieht der Job-PATH /usr/local/bin (Symlink-Farm vorhanden), baut das Gate real (E2); sonst laut rot vor Commit/Push (E3b). Gewollt per II.7, im Job-Kommentar deklariert; empirische Antwort liefert der erste scharfe Lauf."
+        },
+        {
+          "fund": "12 V-8-REST FALL E (nur erstes Hauptdokument)",
+          "urteil": "BEHOBEN",
+          "beleg": "Commit 6bd5b263, kleinste tragfaehige Form: Zaehl-Wache in run_pdf_gate -- mehr als EIN Top-Level-Hauptdokument macht on ROT statt Teil-Pruefung als Gruen (Probe E1 mit intaktem Erst- und kaputtem Zweitdokument: rc=1, FEHLER nennt beide), auto baut das erste und sagt LAUT, was ungeprueft bleibt (E5). Heute byte-identisch (genau ein Hauptdokument, E2 gruen). Die Luecke kann nie mehr STILL aufgehen; der Listen-Umbau bleibt der bei EN-Einfuehrung faellige eigene Design-Zug (kaskadiert in den singulaeren E-18-SNAP-Ernte-Vertrag AF_GATE_MAIN/PDF) und wird jetzt vom Objekt erzwungen statt nur im Kommentar erbeten. Doku nachgezogen (Kern-Kopf (a), Parameter-Block, Job-Kommentar)."
+        },
+        {
+          "fund": "13 PFAD-DECKUNG inkl. on+TeX+kein-Haupt-.tex",
+          "urteil": "ENTLASTET",
+          "beleg": "Quadrant reproduziert: E4 (fx ohne .tex, on, TeX da) rc=1 mit Haupt-.tex='<keine>' / TeX-Werkzeug='latexmk'. Literal on am einzigen Kern-Aufruf unveraendert (jetzt :2503); seit 6bd5b263 stirbt zusaetzlich jeder Nicht-Enum-Wert laut (bogus/On/TRUE/1 am echten Kern rc=1 vor jeder Wirkung)."
+        },
+        {
+          "fund": "14 GRUEN-OHNE-GATE-Pfade pushlos",
+          "urteil": "ENTLASTET",
+          "beleg": "Am Endstand nachgemessen: der einzige push des Kerns liegt bei :1769 (git -C AF_DEST_REPO push origin HEAD:AF_BRANCH, hinter dem Gate-Block :1629); die exit-0-Stellen vor dem Gate committen/pushen nichts -- Suite 18/18 bestaetigt die pushlosen Pfade (honest-empty, IDEMPOTENT, DRY-RUN)."
+        },
+        {
+          "fund": "15 BELEG-KORREKTUR 17 statt 18 Add-Zeilen",
+          "urteil": "ENTLASTET",
+          "beleg": "Korrektur bestaetigt: git show --stat bb03d53b = 17 insertions. Dieselbe saubere Zaehl-Methode (Add-Zeilen ohne +++-Header, rc direkt ohne Pipe) in dieser Stufe angewandt: 40 Add-Zeilen (6bd5b263) und 11 (5363eebb), grep -P rc=1 bei nachweislich nicht-leerem Input."
+        },
+        {
+          "fund": "16 RANDBEFUND Enum unvalidiert",
+          "urteil": "BEHOBEN",
+          "beleg": "Commit 6bd5b263: case-Wache direkt an der Quelle (Kern :307, nach dem Default :303) -- on/off/auto passieren (verbatim extrahierter Block, rc=0 je Wert), bogus/On/TRUE/1 sterben am ECHTEN Kern mit rc=1 und lauter FEHLER-Zeile, bevor der Kern irgendetwas anfasst (vor der Wache stehen nur Zuweisungen). 'Relevant nur, falls der Wert je wieder variabel wird' ist damit vorab dicht."
+        },
+        {
+          "fund": "17 FORM-VERIFIKATION unabhaengig wiederholt",
+          "urteil": "ENTLASTET",
+          "beleg": "Nach den Fix-Edits erneut unabhaengig gefahren: YAML-Parse mit !reference-Konstruktor gruen, Job-Script 148 Zeilen bash -n rc=0, Rule inert-by-default + bot-Ausschluss unveraendert (:2441-2443), keine rc-Maskierung nach dem Kern-Aufruf, Fortsetzungskette intakt (Suite A7/A11 gruen)."
+        },
+        {
+          "fund": "18 ISOLATION",
+          "urteil": "ENTLASTET",
+          "beleg": "Gehalten: /home/comdare/wt-super-texgate sauber (porcelain leer), ahead 4 ohne Upstream-Push; /home/comdare/wt-super-landung auf development, status leer. Vorstufen-Belege /tmp/texgate_lens unangetastet; Fix-Stufen-Proben additiv unter /tmp/texgate_fix (Fixtures fx0/fx1/fx2, Harness, Suite-Log, Diff-Zaehlung)."
+        }
+      ],
+      "neue_commit_shas": [
+        "6bd5b263845838a178189bd128b8f83eec6f0669",
+        "5363eebb7df5f8f727acbf39f49438fe02bf7b4f"
+      ],
+      "neue_funde": [
+        "LISTEN-ERWEITERUNG DES PDF-GATES ist der designierte Folge-Zug bei Einfuehrung eines zweiten Hauptdokuments (z.B. EN): der Umbau kaskadiert in den singulaeren E-18-SNAP-Ernte-Vertrag (AF_GATE_MAIN/AF_GATE_TOOL/AF_GATE_PDF, zweiphasige Ernte, compile_snapshot_refixieren baut gegen den GELANDETEN HEAD nach) und ist darum ein eigener Design+Bau+Verify-Zug, kein head-1-Einzeiler. Seit 6bd5b263 erzwingt das Objekt ihn LAUT (on wird bei >1 Hauptdokument rot und nennt die Dateien) statt ihn nur im Kommentar zu erbitten.",
+        "ANKER-DRIFT IST SYSTEMISCH: die CI-INV-Kopfzahlen waren zum zweiten Mal grossflaechig daneben (Kopf selbst dokumentiert '13 von 16' bei der letzten Landung; jetzt 10 von 11 Annotationen stale, Drift +41..+123). Der Kopf deklariert sie als Orientierung mit CiInvarianten als verbindlicher Wache. LANDE-STUFE BEACHTEN: der Merge nach development verschiebt die Zeilen erneut -- die 11 Zahlen am GEMERGTEN Stand nachmessen (Schleifen-Probe dokumentiert in Commit 5363eebb, Werkzeug unter /tmp/texgate_fix).",
+        "PATH-WIDERSPRUCH Fund 5 vs Fund 10 am Objekt aufgeloest: beide Messungen stimmen, nur Fund 10s Exklusivitaets-Schluss war falsch -- /usr/local/bin traegt seit 03.07.2026 root-Symlinks auf latexmk/pdflatex und ist eine zweite PATH-Quelle neben /etc/profile.d/texlive.sh; PATH=/usr/bin:/bin enthaelt /usr/local/bin schlicht nicht. Ob der gitlab-runner-Job-PATH /usr/local/bin sieht, bleibt ohne root/Testlauf offen; der erste scharfe Lauf beantwortet es empirisch und beide Ausgaenge tragen (II.7).",
+        "SUITE-BEIFANG: ci/tests/anhang_forward_probe.sh prueft neben dem Kern auch YAML-Struktur (A7 Registrierung mit Koeder, A11 Aggregator-Aufrufe) und lief 18/18 gegen den kompletten Fix-Stand -- die Kern-Aufrufzahl im YAML ist unveraendert, die Fix-Commits reissen keinen bestehenden Fall.",
+        "STUFEN-VERSATZ IN BERICHTEN: Fund 8 (ahead 2) und Fund 18 (ahead 1) widersprachen sich nur scheinbar -- verschiedene Messzeitpunkte derselben Kette; am Objekt jetzt eindeutig ahead 4. Kein Objektbefund, aber ein Hinweis, Standort-Angaben je Stufe frisch zu messen statt zu uebernehmen."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Lenses"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Fix"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "bau:texgate",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a4fe4ebe50ef04a07",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786621750317,
+      "queuedAt": 1786621750309,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a",
+      "promptPreview": "BAU der TEXLIVE-Gate-Haertung. Erst am Objekt erheben (Job-Definition, Core-Script-\nAuswertung von AF_PDF_GATE, TeX-Verfuegbarkeit auf prod1 als dem Runner-Host), dann die\nkleinste tragfaehige Aenderung bauen. Beweis: der geaenderte Job-Block als Diff +\neine Trocken-Probe der Gate-Logik (die relevanten Zeilen des Core-Scripts mit den\nneuen Variablen durchgespielt, bash -n auf die YAML-Skript-Zeile…",
+      "lastProgressAt": 1786622192981,
+      "tokens": 86947,
+      "toolCalls": 31,
+      "durationMs": 442664,
+      "resultPreview": "{\"commit_sha\":\"bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a\",\"diff_kurz\":\".gitlab-ci.yml, 1 Datei, +17/-9, NUR der anhang:forward-Bereich. Tragender Hunk am Kern-Aufruf (vorher :2494):\\n\\n      SNAP_DIR=\\\"measurement/thesis_compiles\\\"\\n+     # HAERTUNG AF_PDF_GATE (2026-08-13, Befund wuwemnde5, F1-Kette): bisher an COMDARE_TEXLIVE_AVAILABLE\\n+     # gekoppelt (unset -> auto); auto prueft auf dem barem…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "lens:codex",
+      "phaseIndex": 2,
+      "phaseTitle": "Lenses",
+      "agentId": "a29f91ae14d0154e7",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786622192990,
+      "queuedAt": 1786622192983,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "TRAEGT_MIT_FIXES",
+      "promptPreview": "CODEX-LENS (Zwei-Lens-Pflicht fuer CI-YAML): lade via ToolSearch das Tool mcp__codex__codex\nund lass Codex den Diff reviewen (Diff INLINE in den Prompt -- Codex NIE git fahren lassen;\napproval-policy never, sandbox workspace-write, cwd /home/comdare/wt-super-texgate).\nFaellt Codex aus (Fehler/Timeout): NICHT fortschreiben -- als LENS_AUSGEFALLEN melden\nmit dem literalen Fehler. Frage an Codex: bri…",
+      "lastProgressAt": 1786624003957,
+      "tokens": 88476,
+      "toolCalls": 25,
+      "durationMs": 1810964,
+      "resultPreview": "{\"verdikt\":\"TRAEGT_MIT_FIXES\",\"funde\":[\"FAIL-CLOSED AM OBJEKT BESTAETIGT: /home/comdare/wt-super-texgate/ci/anhang_forward_core.sh -- Default auto (:299); run_pdf_gate :1305-1315: on + fehlendes Werkzeug ODER fehlende Haupt-.tex => FEHLER return 1, auto => UEBERSPRUNGEN return 0 und Kanal laeuft weiter; Aufrufstelle :1600-1620: Gate-Rot => anhang_rollback + exit 1, Snapshot (:1622), Commit (:1674)…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "lens:fable",
+      "phaseIndex": 2,
+      "phaseTitle": "Lenses",
+      "agentId": "af9c3609f6a4ebed6",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786622192993,
+      "queuedAt": 1786622192983,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "BESTANDEN -- Commit bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8…",
+      "promptPreview": "UNABHAENGIGER FABLE-LENS (adversarisch, am Objekt): pruefe den Commit im Worktree\n/home/comdare/wt-super-texgate selbst -- existiert er, tut der Diff was die Begruendung\nsagt, ist er fail-closed (II.7), deckt er ALLE Pfade (auto/on/off x TeX ja/nein), und:\nwelcher Zustand liesse den Job GRUEN erscheinen, obwohl das Gate nichts prueft (V-8)?\n\nRAHMEN: Diplomarbeit-Session, Fable 5 max. GEGENSTAND: s…",
+      "lastProgressAt": 1786622837947,
+      "tokens": 91812,
+      "toolCalls": 20,
+      "durationMs": 643719,
+      "resultPreview": "{\"verdikt\":\"BESTANDEN -- Commit bb03d53bc87da19cbbc2d85fd31ff3b7ed08ec8a existiert im Worktree /home/comdare/wt-super-texgate (Branch bau/texlive-gate-haertung, exakt auf origin/development a103e518 + 1, Baum sauber, KEIN Push), tut was die Begruendung sagt (EINE funktionale Zeile: AF_PDF_GATE hart on statt COMDARE_TEXLIVE_AVAILABLE-Kopplung; Rest Doku-Nachzug + 4-Zeilen-Begruendungskommentar mit …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "fix:texgate",
+      "phaseIndex": 3,
+      "phaseTitle": "Fix",
+      "agentId": "a55cae2a8c1303004",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786624003965,
+      "queuedAt": 1786624003957,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "A2.5-FIX-STUFE texgate: jeder Lens-Fund ist Pflicht, dreiwertig quittieren (BEHOBEN/\nENTLASTET/VERTAGT mit Grund). Im Worktree /home/comdare/wt-super-texgate, Branch\nbau/texlive-gate-haertung. KEIN PUSH.\n\nRAHMEN: Diplomarbeit-Session, Fable 5 max. GEGENSTAND: super .gitlab-ci.yml, der\nanhang:forward-Job (Rule ~Z.2438, inert-by-default hinter COMDARE_ANHANG_FORWARD).\nBEFUND (wuwemnde5, am Objekt be…",
+      "lastProgressAt": 1786625199861,
+      "tokens": 145795,
+      "toolCalls": 53,
+      "durationMs": 1195896,
+      "resultPreview": "{\"quittungen\":[{\"fund\":\"1 FAIL-CLOSED AM OBJEKT BESTAETIGT\",\"urteil\":\"ENTLASTET\",\"beleg\":\"Am Endstand re-verifiziert (Zeilen nach Fix-Shift +29): Default auto Kern :303, Gate-Block :1629, Aufruf :1633 in if!-Kondition, Gate-rot => anhang_rollback :1634 + exit 1 VOR Commit; einziger Push :1769 dahinter. Probe E3b (on, PATH=/usr/bin:/bin): rc=1 mit FEHLER-Zeile. Kein Handlungsbedarf.\"},{\"fund\":\"2 LA…"
+    }
+  ],
+  "totalTokens": 413030,
+  "totalToolCalls": 129
+}

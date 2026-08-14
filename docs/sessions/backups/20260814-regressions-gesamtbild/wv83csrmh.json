@@ -1,0 +1,226 @@
+{
+  "summary": "F1-Blocker: diagram_generator 1x1-Flaechen -> HONEST-EMPTY statt pgfplots-FATAL (Explore -> Bau+T-1+Verify -> A2.5-Fix)",
+  "agentCount": 3,
+  "logs": [
+    "Explore fertig: SUPER-Repo, NICHT ce: /home/comdare/wt-super-landung/Code/05_diagram_generator/diagram_generator.cpp (write_heatmap cpp:239; matrix-plot-Emission cpp:512; mesh/cols cpp:468; HONEST-EMPTY-Writer cpp:103-116; Datenlos-Wache cpp:289-295; Flaechen-Aufrufer cpp:1012 und cpp:1042; 1x1-Fatal-Klasse dokumentiert cpp:699-702) + diagram_generator.hpp (REV 7.6-Kopf hpp:5; HeatmapData hpp:99-152, empty_note hpp:125). Rufende Facade M08: Code/08_appendix_generator/appendix_generator.cpp:344-352 (lc_surface_<z>.tex). Sprache: C++23-Bibliothek (kein Skript); CLI appendix-generator (08/CMakeLists.txt:17-20). Die 4 fatalen Artefakte: de+en x {lc_surface_ns_per_op.tex, lc_surface_op_lookup_p50_ns.tex} im 64er-Set /tmp/f1_art/Code/measure_out_smoke/appendix/, Fatal-Beleg /tmp/f1_af_tmp_test/pdf_gate.log:3037-3047 an anhang/de/tabellen/lc_surface_ns_per_op.tex l.38.",
+    "Bau fertig: 915038caee309cd662c66ca83ed102ddbed95a62 auf bau/f1-1x1-honest-empty"
+  ],
+  "result": {
+    "explore_offene_punkte": [
+      "KEIN PUSH aus dem Paket: ce-CI 15785 lief beim Explore noch; Landung beider Repos macht der Lead seriell. Vor der Landung pruefen, ob development inzwischen weitergewandert ist (waehrend des Explores 6316c2d2 -> e3e75350) -- dann MERGE, nie rebase.",
+      "wt-super-landung hat einen AKTIVEN Schreiber (Lead-Landung/S-7 ab Fr 14.08. im selben Worktree, Task #4) -- der F1-Bau MUSS im eigenen Worktree laufen (Anweisung Schritt 1). Submodul-Init im frischen Worktree kann FETCH vom lokalen GitLab ausloesen (erlaubt; nur Push ist verboten); falls Netz klemmt: git submodule update mit --reference auf .git/modules des Hauptklons.",
+      "Restrisiko Voll-Gate: lc_surface3d-1x1 ist per Probe rc=0 gedeckt, aber ld_sweep-1-Punkt-Kurven (ld_sweep_*.tex, 3 Dateien je Sprache) und latency_tradeoff.tex wurden im roten F1-Lauf nie erreicht (halt-on-error stoppte bei der ersten fatalen Datei). Wird das Gate in Schritt 6 an einer dieser Dateien rot: LUECKE=PFLICHT, im selben Paket beheben.",
+      "lc_surface3d-1x1 kompiliert (rc=0), zeichnet aber eine leere 3D-Flaeche mit einem einzelnen Vertex -- kein F1-Blocker, aber kosmetisch fragwuerdig; Kandidat fuer ein spaeteres Paket (gleiche Groessen-Placeholder-Logik fuer surf), keine Owner-Frage noetig.",
+      "\\InputIfFileExists-Haertung des lc_surface-Blocks (Thesis-Repo 289, development de:64-69/en:58-63) als EIGENES Thesis-Paket vormerken -- Owner/Lead-Territorium, nicht Teil des ce/super-Fixes.",
+      "Thesis-Klon liegt auf main (29a1700); der Beweis braucht checkout development (863170f) und den VOLLSTAENDIGEN Rollback inkl. Reset des lokalen Kanal-Commits (AF_NO_PUSH=true committet!). PRE-SHA vorher literal notieren.",
+      "Die EMITTIERTEN Banner bleiben 'REV 7.6' (Byte-Parity-Nenner 60/64; Bestandsbeleg: E-2a/E-2b/P2-Landungen aenderten Banner nie). Sollte der Owner Banner-Bumps je Generator-Revision wollen, waere das eine eigene Entscheidung -- Standard-Annahme hier: nur der Datei-Kopf wird auf REV 7.7 fortgeschrieben.",
+      "Falle F5 der AF_ARTIFACT_ROOTS-Kaskade: im Proof-work_root NUR Code/measure_out_smoke/appendix anlegen (kein Code/measure_out/appendix daneben), sonst gewinnt die falsche Quelle (Script-Default :294).",
+      "/tmp/f1_art und /tmp/f1_probe_1x1 (Proben-Belege dieses Explores: probe2d_lauf.log rc=1, probe2d_1x2_lauf.log rc=1, probe2d_2x2_lauf.log rc=0, probe3d_lauf.log rc=0) NICHT loeschen, bis der Fix gelandet ist -- sie sind die Referenz-Nenner der Verifikation."
+    ],
+    "bau": {
+      "quittung": [
+        {
+          "schritt": "WIP-Pruefung gegen Bau-Anweisung (Resume-Auflage)",
+          "status": "DURCH",
+          "beleg": "c642c35d deckt (a)-(c) + 4 Tests; 3 Abweichungen am Objekt gerechtfertigt: required[] verlangt alle 5 op_*_p50_ns (diagram_generator.cpp:896-898, Minimal-Header der Anweisung waere status_empty_input); op_lookup_p50_ns=1310 = echter Wert aus /tmp/f1_art/.../measurements.csv Zeile Job 376333; 4 Bestands-Ratio-Tests fuhren 2x1/3x1/1x1-Korpora (pre-WIP Zeilen 1316/1420/1443 + DivergentScale 3x1) -> WIP-Hebung auf 2x2/3x2 noetig, Explore-Behauptung 'kein Bestandstest kippt' am Objekt widerlegt"
+        },
+        {
+          "schritt": "Pflicht 1: T-1 ROT ZUERST (Wegwerf-Revert), dann GRUEN",
+          "status": "DURCH",
+          "beleg": "ROT (Fix per git checkout c642c35d~1 -- cpp/hpp entfernt, Testdatei WIP): ctest rc=8; literal: '543 - Stufe05Pipeline.Surface1x1IsHonestSizePlaceholder (Failed) da_unit', '544 - ...Surface1xNAndNx1ArePlaceholders (Failed)', '545 - ...Ratio1x1IsHonestSizePlaceholder (Failed)'; Fehlbild exakt der Defekt: 'Value of: file_contains(out_de, \"matrix plot\") Actual: true Expected: false' (/tmp/f1_bau/t1_rot.log). GRUEN nach Restore: '100% tests passed, 0 tests failed out of 4' (inkl. Gegenkoeder Surface2x2StaysRealFigure), Stufe05 '100% tests passed, 0 tests failed out of 51'"
+        },
+        {
+          "schritt": "Pflicht 1b: volle Suite Release UND Debug (CI-Paritaet)",
+          "status": "DURCH",
+          "beleg": "Endstand nach clang-format: Release configure rc=0, make rc=0, make check rc=0 mit '100% tests passed, 0 tests failed out of 403' (Log-Kopf 'cmake --build \"Code/build-test\"'); Debug configure rc=0, make rc=0, make check rc=0 mit '100% tests passed, 0 tests failed out of 403' (Log-Kopf 'cmake --build \"Code/build-test-debug\"'); Logs /tmp/f1_bau/check_release.log, check_debug.log"
+        },
+        {
+          "schritt": "Pflicht 2: REV 7.6 -> 7.7 mit Aenderungslog im Skript-Kopf",
+          "status": "DURCH",
+          "beleg": "diagram_generator.hpp:9-13 'REV 7.7 (2026-08-13): Groessen-Wache 1x1/1xN/Nx1 -> HONEST-EMPTY ...' im Konventions-Muster; die EMITTIERTEN 'REV 7.6'-Banner-Strings (cpp) unveraendert -- Diff beruehrt sie nicht, 60/64-Byte-Parity haelt"
+        },
+        {
+          "schritt": "Pflicht 3: Regeneration aller 64 Artefakte aus ECHTER Smoke-CSV",
+          "status": "DURCH",
+          "beleg": "appendix-generator rc=0; find-Nenner 64 .tex; diff -rq gegen /tmp/f1_art rc=1 mit GENAU 4 Zeilen = de+en x {lc_surface_ns_per_op.tex, lc_surface_op_lookup_p50_ns.tex} => 60 byte-gleich; je 4 Dateien: matrix_plot=0, HONEST-EMPTY=1, 'nie ausgefuehrt|never executed'=0 (/tmp/f1_bau/regen_diff.txt, regen_liste.txt); /tmp/f1_art unangetastet"
+        },
+        {
+          "schritt": "Pflicht 4: latexmk-Beweis am Thesis-Klon + VOLLSTAENDIGER Rollback",
+          "status": "DURCH",
+          "beleg": "PRE_DEV=863170f0d6124c6b974a67c76f94bea17c0bd5fd, porcelain vorher 0; AF-Lauf (bash, AF_NO_PUSH=true, AF_PDF_GATE=on, AF_SNAP_ROOT_STRICT=false) rc=0; literal: 'kopiert gesamt: 64 .tex', 'PDF-Gate GRUEN: diplomarbeit.tex gebaut', '=== anhang:forward OK (lokal committet; AF_NO_PUSH=true -> kein Push) ==='; Negativ-Proben rot_zeilen=0, pgfplots_error_zeilen=0, matrix_input_zeilen=0 (/tmp/f1_bau/af_lauf.log). Rollback: Kanal-Commit 51f9e6b gesichtet, reset --hard rc=0, porcelain 0 Zeilen, checkout main rc=0, 'git rev-parse development' == 863170f0d6124c6b974a67c76f94bea17c0bd5fd. KEIN Push, nichts zurueckgelassen"
+        },
+        {
+          "schritt": "Pflicht 5: Floor-Sprossen-Nachzug",
+          "status": "ENTLASTET",
+          "beleg": "Keine neue ctest-Registrierungsstelle: alle 4 neuen TEST()-Faelle in der BESTEHENDEN Datei test_05_diagram_generator_cached_fixtures.cpp, Registrierung lief automatisch ueber gtest_discover_tests (ctest-IDs 543-546, Label da_unit, literal im t1-Log); Commit beruehrt nur 3 Dateien, kein CMake, ce-Floor-Datei (ce-STANDALONE-Inventur) unberuehrt"
+        },
+        {
+          "schritt": "Pflicht 6: ASCII-Selbstcheck + cf22",
+          "status": "DURCH",
+          "beleg": "clang-format-22 -i auf diagram_generator.cpp (nur Zeilenumbrueche, String-Inhalte byte-identisch -- Regen-Nenner danach unveraendert 4/60); dry-run --Werror rc=0 auf allen 3 Dateien; sh scripts/ci_diff_ascii_width_guard.sh --seit-basis rc=0, literal 'DIFF-HYGIENE-WACHE: GRUEN.' (/tmp/f1_bau/ascii_wache.log); SELBSTCHECK-Block (ZUSICHERT/ZUSICHERT NICHT) an der Wache im Repo-Muster"
+        },
+        {
+          "schritt": "Pflicht 7: EIN gruener Commit, Botschaft mit Nennern+Koeder-Belegen, KEIN PUSH",
+          "status": "DURCH",
+          "beleg": "915038ca 'fix(05): Groessen-Wache 1x1/1xN/Nx1 -> HONEST-EMPTY statt pgfplots-Fatal (F1)' per Amend der PAUSE-Sicherung c642c35d (im Body zitiert; Basis 3ce69ed2 unveraendert; 3 Dateien, 316+/15-); Body traegt Proben-Nenner, T-1-Rot-Zitat, Regen-Nenner 4/60, Gate-Zitate, Co-Authored-By. git status --porcelain leer. KEIN git push (Branch ohne Upstream, kein Push-Befehl abgesetzt)"
+        },
+        {
+          "schritt": "Pflicht 8: Worktree NICHT loeschen",
+          "status": "DURCH",
+          "beleg": "/home/comdare/wt-f1-1x1 besteht, sauber auf bau/f1-1x1-honest-empty @ 915038ca; Submodule ce f23c18e2 + prt-art c6f07540 exakt auf Gitlink (git submodule status ohne +/-)"
+        }
+      ],
+      "commit_shas": [
+        "915038caee309cd662c66ca83ed102ddbed95a62"
+      ],
+      "worktree_pfad": "/home/comdare/wt-f1-1x1",
+      "branch": "bau/f1-1x1-honest-empty",
+      "offene_punkte": [
+        "Landung durch den Lead seriell (R4/A2.1a): Branch bau/f1-1x1-honest-empty @ 915038ca, Basis 3ce69ed2 -- development steht inzwischen bei a103e518, Zusammenfuehrung per MERGE (nie rebase)",
+        "F1-WF-Rezept korrigieren: ci/anhang_forward_core.sh ist bash (Shebang :1, set -euo pipefail :288) -- der Anweisungs-Aufruf 'sh ci/anhang_forward_core.sh' stirbt unter dash sofort mit 'set: Illegal option -o pipefail' (rc=2, VOR jeder Arbeit; am Objekt belegt /tmp/f1_bau, erster Lauf)",
+        "Lokale AF-Beweislaeufe mit WORK_ROOT ausserhalb eines git-Baums brauchen AF_SNAP_ROOT_STRICT=false (Script-eigener Labor-Schalter): der strikte Lauf brach NACH gruenem PDF-Gate am E-18-SNAP-Vertrag ab (rc=1) und hinterliess einen lokalen Klon-Commit (b4476fc, zurueckgesetzt); fuer die CI irrelevant (WORK_ROOT liegt dort im git-Baum)",
+        "Vormerkung als eigenes Thesis-Paket (Owner/Lead, laut ENTSCHEID nicht in diesem Paket): lc_surface-Block in A_measurements.tex optional auf \\InputIfFileExists heben (Muster existiert dort fuer CI-interaktive Darstellungen, de:103-283)",
+        "Explore-Korrektur fuers Protokoll: 'Alle bestehenden 05er-Fixtures sind 2x2 -- kein Bestandstest kippt' war am Objekt falsch; 4 Ratio-Tests (TrueZeroNumerator p_num 2x1, DivergentScale 3x1, DegenerateAllOnes 1x1, RatioModeDoesNotLeak 2x1) wurden im Paket auf 2x2/3x2 gehoben, gepruefte Semantik unveraendert (Commit-Body)",
+        "Stale Vor-Pause-Logs des unterbrochenen Laufs nach /tmp/f1_bau/stale_prepause/ archiviert (nicht als Beleg verwendet); alle Belege dieses Laufs frisch in /tmp/f1_bau/"
+      ],
+      "konflikte": [
+        "Bau-Anweisung vs. Objekt: 'sh ci/anhang_forward_core.sh' nicht fahrbar (bash-Script mit pipefail) -- mit bash gefahren, dokumentiert",
+        "Bau-Anweisung vs. Objekt: erwartetes af rc=0 gilt nur mit AF_SNAP_ROOT_STRICT=false bei /tmp-WORK_ROOT; der SNAP-Vertrag (AF_SNAPSHOT_ROOT muss in git-Arbeitsbaum liegen) griff nach gruenem Gate -- Labor-Schalter ist der im Script selbst dokumentierte Weg",
+        "Bau-Anweisung vs. Objekt: Minimal-CSV-Header und op_lookup_p50_ns=55 der Anweisung waren am Objekt falsch (required[] cpp:896-898 bzw. echter Wert 1310) -- WIP-Fassung uebernommen, beides im Commit-Body belegt"
+      ]
+    },
+    "fix": {
+      "quittungen": [
+        {
+          "fund": "1. Landung durch den Lead seriell (R4/A2.1a): Branch bau/f1-1x1-honest-empty, Basis 3ce69ed2, Merge (nie rebase)",
+          "urteil": "VERTAGT",
+          "beleg": "Grund: Landung ist Lead-Territorium (R4/A2.1a), KEIN PUSH erlaubt solange CI 15785 laeuft (Bau-Regel). Vorarbeit gemessen: development wanderte waehrend der Stufe weiter -- Fund-Text a103e518 ist stale, gemessen erst eacd3182, am Stufen-Ende 83e06159 (a103e518 ist Ancestor, git branch --contains). merge-base development x Branch = 3ce69ed2 (bestaetigt). Merge-Probe am Objekt: 'git -C /home/comdare/wt-f1-1x1 merge-tree --write-tree development bau/f1-1x1-honest-empty' rc=0 KONFLIKTFREI (tree 864959b5, /tmp/f1_fix_lab/mergetree_final.txt; gegen development@83e06159 und Branch@c134b70a). 0 development-Commits seit 3ce69ed2 beruehren Code/05_diagram_generator (git log 3ce69ed2..development -- ... | wc -l = 0). Wellen-Platz: Lande-Stufe des F1-Pakets HEUTE nach CI-15785-Gruen, vor F1-Endbeleg Fr 14.08. Task-Vorschlag: Lead merged development (dann-aktueller Stand) per MERGE in den Zweig oder landet den Zweig direkt seriell; Zweig traegt jetzt ZWEI Commits (915038ca + c134b70a)."
+        },
+        {
+          "fund": "2. F1-WF-Rezept korrigieren: 'sh ci/anhang_forward_core.sh' stirbt unter dash mit 'set: Illegal option -o pipefail' (rc=2, vor jeder Arbeit)",
+          "urteil": "BEHOBEN",
+          "beleg": "Objekt-Anteil behoben in c134b70a: POSIX-reine BASH-WACHE vor dem ersten Bashismus (jetzt vor set -euo pipefail :301). T-1 ROT zuerst (frisch reproduziert, /tmp/f1_fix_lab/wache_rot_sh.log): 'anhang_forward_core.sh: 288: set: Illegal option -o pipefail', rc=2; /bin/sh -> /usr/bin/dash (readlink -f). GRUEN im selben Lauf: sh-Aufruf jetzt 'FEHLER: ci/anhang_forward_core.sh ist ein bash-Script (Shebang Zeile 1). ... Richtig: bash ci/anhang_forward_core.sh' rc=1 (wache_gruen_sh.log); bash -n rc=0; bash laeuft DURCH die Wache bis zur eigenen Validierung 'FEHLER: AF_DEST_REPO fehlt' rc=1 (wache_bash_transparent.log); VOLLER Labor-Beweislauf mit Wache rc=0, 'kopiert gesamt: 64 .tex', 'PDF-Gate GRUEN: diplomarbeit.tex gebaut', 0x 'matrix input=image' (af_guard_gruen.log:12,82,97). Im Repo war der Aufruf ueberall schon korrekt: CI direkt ueber Shebang (.gitlab-ci.yml:2454 test -x, :2501), Doku bash (docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md:571), Probe explizit bash (ci/tests/anhang_forward_probe.sh:288). Der WF-Rezept-TEXT selbst liegt ausserhalb des Repos -> Korrektur-Task an den Lead in neue_funde. ASCII-Selbstcheck der editierten Datei: LC_ALL=C grep -nP '[^\\x09\\x0A\\x20-\\x7E]' -> 0 Treffer (rc=1)."
+        },
+        {
+          "fund": "3. Lokale AF-Beweislaeufe mit /tmp-WORK_ROOT brauchen AF_SNAP_ROOT_STRICT=false; strikter Lauf brach nach gruenem PDF-Gate am E-18-SNAP-Vertrag (rc=1), Klon-Commit b4476fc zurueckgesetzt",
+          "urteil": "ENTLASTET",
+          "beleg": "Messung: (a) Der Schalter ist der im Script SELBST dokumentierte Labor-Weg: ci/anhang_forward_core.sh:265-267 (KONTRAKT: AF_SNAPSHOT_ROOT MUSS im Arbeitsbaum des 288-Repos liegen), :269-271 ('false ... nur fuer Fixture-/Laborlaeufe; die CI setzt es NIE'), Durchsetzung :866-871 (nach Wache; vor c134b70a :853-858). (b) CI unberuehrt: .gitlab-ci.yml:2490 AF_WORK_ROOT=\"$CI_PROJECT_DIR\", AF_SNAPSHOT_ROOT=\"$CI_PROJECT_DIR/$SNAP_DIR\" (Block :2495ff) -> im git-Baum, STRICT bleibt Default true (:325). (c) Frische Messung dieser Stufe: voller Lauf mit AF_SNAP_ROOT_STRICT=false und WORK_ROOT=/tmp/f1_fix_lab/work -> rc=0, Log literal 'E-18-SNAP-VERTRAG: AF_SNAP_ROOT_STRICT=false -> Verstoss BEWUSST hingenommen' (af_guard_gruen.log:91). (d) b4476fc-Rueckbau verifiziert: aus KEINEM Ref erreichbar (git log --all --format=%h | grep -c b4476fc = 0; Objekt nur noch als loses reflog-Objekt), Thesis-Klon porcelain 0, main@29a1700d, development@863170f. Kein Defekt -- dokumentiertes Laborverhalten."
+        },
+        {
+          "fund": "4. Vormerkung eigenes Thesis-Paket: lc_surface-Block in A_measurements.tex optional auf \\InputIfFileExists heben",
+          "urteil": "VERTAGT",
+          "beleg": "Grund: Thesis-Territorium (Klon nur fuer latexmk-Beweis mit Rollback freigegeben, NIE committen) UND expliziter Owner/Lead-ENTSCHEID im Fund selbst ('laut ENTSCHEID nicht in diesem Paket'). Objekt-Beleg (nur gelesen, 863170f0): anhang/de/A_measurements.tex:64 '\\input{anhang/de/tabellen/lc_surface_ns_per_op.tex}' (blankes \\input), en:63 symmetrisch; das IIFE-Muster existiert IM SELBEN FILE: de:103-283, 30 Vorkommen, Konvention dokumentiert de:76 ('\\InputIfFileExists: kompiliert auch VOR dem ersten Messlauf sauber') und de:83 (jeder Eintrag traegt eigenen Ersatztext). Wellen-Platz: eigenes Thesis-Paket nach F1 (Owner/Lead-Vormerkung). Task-Vorschlag: lc_surface_*-\\input-Block (de:64ff/en:63ff) auf \\InputIfFileExists mit eigenem Ersatztext heben, Muster de:103-283; Warnbeispiel beachten: Branch b-gate8-graph-abbildungen ('ohne \\InputIfFileExists-Eintrag fehlt die Abbildung TROTZ vorhandener .tex')."
+        },
+        {
+          "fund": "5. Explore-Korrektur Protokoll: 'alle 05er-Fixtures 2x2' war falsch; 4 Ratio-Tests (2x1/3x1/1x1) im Paket auf 2x2/3x2 gehoben, Semantik unveraendert",
+          "urteil": "BEHOBEN",
+          "beleg": "Im Paket 915038ca behoben, in DIESER Stufe am Objekt verifiziert. Commit-Body 915038ca literal: 'BESTANDS-KORREKTUR am Objekt: vier 05er-Ratio-Tests fuhren 2x1/3x1/1x1-Korpora (vor-Fix ECHTE Figuren, die pgfplots ablehnt) -> auf 2x2/3x2 gehoben; die gepruefte Semantik (0-Klasse, Log-Symmetrie, Entartung, Bestandsschutz) bleibt dieselbe, die Log-Symmetrie-Zahlen sind identisch.' Objekt: Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp:1483 (TrueZeroNumerator), :1568 (DivergentScale), :1610-1613 (DegenerateAllOnes, Kommentar 'REV 7.7 (2026-08-13): 1x1 -> 2x2-Korpus'), :1640-1643 (RatioModeDoesNotLeak, 'zweite Workload-Spalte ergaenzt ... Nachprobe 2x1 rc=1'). T-1: ROT vor Fix /tmp/f1_bau/t1_rot.log (ctest rc=8, Faelle 543-545 Failed); GRUEN von MIR frisch nachgefahren in BEIDEN Baeumen: ctest -R Stufe05Pipeline Release UND Debug je literal '100% tests passed, 0 tests failed out of 51' mit je 51 Passed-Zeilen, rc=0 (/tmp/f1_fix_lab/stufe05_release_re.log, stufe05_debug_re.log; Falsch-Null 'No tests' ausgeschlossen). Volle Suiten des Pakets: check_release.log + check_debug.log je '100% tests passed, 0 tests failed out of 403'. Diese Quittung traegt die Protokoll-Korrektur."
+        },
+        {
+          "fund": "6. Stale Vor-Pause-Logs nach /tmp/f1_bau/stale_prepause/ archiviert, alle Belege des Laufs frisch in /tmp/f1_bau/",
+          "urteil": "ENTLASTET",
+          "beleg": "Messung (ls -la): /tmp/f1_bau/stale_prepause/ existiert mit 16 Vor-Pause-Dateien (mtimes 10:21-10:37: configure.log, configure_dbg.log, make1.log, make2.log, make3.log, make_dbg.log, check_release.log, check_debug.log, t1_rot.log, t1_gruen.log, t2_stufe05.log, regen.log, regen_liste.txt, regen_diff.txt, submodul.log, ...); die frischen Belege liegen getrennt daneben in /tmp/f1_bau/*.log (mtimes 11:16-11:25, u.a. af_lauf.log 11:23, t1_rot.log 11:20, check_*.log 11:24). Additiv archiviert, nichts geloescht (BU-additiv-Regel eingehalten). Kein Handlungsbedarf."
+        },
+        {
+          "fund": "7. Bau-Anweisung vs. Objekt: 'sh ci/anhang_forward_core.sh' nicht fahrbar -- mit bash gefahren, dokumentiert",
+          "urteil": "ENTLASTET",
+          "beleg": "Die Abweichung des Bau-Agenten war die einzig korrekte: am Objekt ist das Script bash (Shebang ci/anhang_forward_core.sh:1 '#!/usr/bin/env bash'; erster Bashismus set -euo pipefail, vor c134b70a :288); /bin/sh ist dash (readlink -f /bin/sh -> /usr/bin/dash); ROT-Reproduktion dieser Stufe: rc=2 'set: Illegal option -o pipefail' VOR jeder Arbeit (/tmp/f1_fix_lab/wache_rot_sh.log). Alle Repo-Aufrufstellen fahren bash/direkt (CI .gitlab-ci.yml:2501 via Shebang; Probe ci/tests/anhang_forward_probe.sh:288 'bash \"$KERN\"'; Doku WELLENPLAN:571 'bash ci/anhang_forward_core.sh'). Der Gefahren-Rest (kuenftiger sh-Fehlaufruf) ist seit c134b70a durch die BASH-WACHE lesbar abgefangen (Fund 2)."
+        },
+        {
+          "fund": "8. Bau-Anweisung vs. Objekt: af rc=0 gilt nur mit AF_SNAP_ROOT_STRICT=false bei /tmp-WORK_ROOT; Labor-Schalter ist der im Script dokumentierte Weg",
+          "urteil": "ENTLASTET",
+          "beleg": "Frische Messung dieser Stufe (T-1-Form, MIT der neuen Wache im Script): cd /home/comdare/wt-f1-1x1 && setsid -w env AF_DEST_REPO=<Thesis-Klon> AF_BRANCH=development AF_WORK_ROOT=/tmp/f1_fix_lab/work AF_NO_PUSH=true AF_PDF_GATE=on AF_SNAP_ROOT_STRICT=false bash ci/anhang_forward_core.sh -> rc=0; literal 'kopiert gesamt: 64 .tex' (:12), 'PDF-Gate GRUEN: diplomarbeit.tex gebaut' (:82), 'E-18-SNAP-VERTRAG: AF_SNAP_ROOT_STRICT=false -> Verstoss BEWUSST hingenommen' (:91), '=== anhang:forward OK (lokal committet; AF_NO_PUSH=true -> kein Push) ===' (:97), 0 Zeilen 'PDF-Gate ROT', 0x 'matrix input=image' (/tmp/f1_fix_lab/af_guard_gruen.log). Der Schalter ist Script-eigene Doku (:269-271 'nur fuer Fixture-/Laborlaeufe; die CI setzt es NIE'); die CI faehrt strict im git-Baum (.gitlab-ci.yml:2490 AF_WORK_ROOT=\"$CI_PROJECT_DIR\"). Thesis-Klon danach vollstaendig zurueckgesetzt: reset --hard 863170f0 + checkout main, Endzustand main@29a1700d porcelain 0, Labor-Commit 51e93f0 aus keinem Ref erreichbar, KEIN Push (/tmp/f1_fix_lab/thesis_rollback.log). Erwartungs-Korrektur gehoert in den WF-Rezept-Task (neue_funde)."
+        },
+        {
+          "fund": "9. Bau-Anweisung vs. Objekt: Minimal-CSV-Header und op_lookup_p50_ns=55 waren falsch (required[] cpp, echter Wert 1310) -- WIP-Fassung uebernommen, im Commit-Body belegt",
+          "urteil": "ENTLASTET",
+          "beleg": "Objekt ist korrekt, die Anweisung war falsch; beides gemessen: required[] am Objekt Code/05_diagram_generator/diagram_generator.cpp:895-897 verlangt 9 Spalten {binary_id, ns_per_op, workload, two_phase_valid, op_insert_p50_ns, op_lookup_p50_ns, op_erase_p50_ns, op_scan_p50_ns, op_rmw_p50_ns} (fehlt eine -> status_empty_input :898-899) -- der Minimal-Header der Anweisung waere still leer gelaufen. Echter Wert in ALLEN 3 CSV-Formen identisch gemessen: measurements.csv, 20260812-193547__S001.csv und dll/.../result.csv unter /tmp/f1_art/Code/measure_out_smoke/e4_xml/ je 'n_ops=10000 ns_per_op=1199.047 op_lookup_p50_ns=1310'. Commit-Body 915038ca traegt die Korrektur ('Job 376333: n_ops=10000, total_ns=11990468, ns_per_op=1199.047, op_lookup_p50_ns=1310'). Zeilen-Differenz der Anweisung (896-898) vs. Objekt heute (895-897) stammt vom clang-format-Nachschliff; Substanz identisch."
+        }
+      ],
+      "neue_commit_shas": [
+        "c134b70ac8386bc9098e82d17233579add6d351f"
+      ],
+      "neue_funde": [
+        "WF-Rezept-Korrektur an den Lead (Text liegt ausserhalb des Repos, dieser Worktree kann ihn nicht anfassen): (a) Aufruf-Zeile 'sh ci/anhang_forward_core.sh' -> 'bash ci/anhang_forward_core.sh'; (b) fuer Labor-/Beweislaeufe mit WORK_ROOT ausserhalb eines git-Baums AF_SNAP_ROOT_STRICT=false als Pflicht-Env ins Rezept aufnehmen; (c) Erwartungswerte auf das Objekt ziehen (voller 9-Spalten-required[]-Header, op_lookup_p50_ns=1310). Das Objekt faengt den sh-Fall seit c134b70a lesbar ab (rc=1 mit Aufruf-Hinweis statt rc=2 wortkarg).",
+        "development wanderte WAEHREND dieser Fix-Stufe zweimal weiter: Fund-1-Text nannte a103e518, gemessen zunaechst eacd3182, am Stufen-Ende 83e06159. Merge blieb in jeder Messung konfliktfrei (merge-tree --write-tree rc=0, zuletzt tree 864959b5 gegen 83e06159 mit Branch@c134b70a; 0 Beruehrung von Code/05_diagram_generator im development-Vorlauf). Der Lead soll beim Landen gegen den DANN aktuellen development-Stand mergen und die Merge-Probe wiederholen.",
+        "Zeilen-Verweis-Hygiene am af-Kern: der einzige LEBENDE Verweis MANUAL_RUN.md:279 (ci/anhang_forward_core.sh:1297ff, PDF-Gate) wurde in c134b70a auf 1310ff nachgezogen (am Objekt gemessen); die datierten Verweise in Plaenen/Sessions/Ledger (z.B. WELLENPLAN-ANLAGE:487 ':95', Ledger:7650 ':202') zeigten schon VOR diesem Fix nicht mehr auf HEAD-Zeilen -- historische Messungen ihres Datums, bewusst NICHT angefasst (Doku-nie-loeschen).",
+        "Verwechslungs-Warnung fuer kuenftige Greps: die ORIGINAL-Artefakte von Job 376333 unter /tmp/f1_art/.../appendix tragen 'HONEST-EMPTY' (1x) NUR als REV-7.6-Erklaer-Kommentar INNERHALB der echten, kaputten Figur (\\addplot3[matrix plot*] mit (0,0,1199.0470), mesh/cols=1) -- ein grep auf 'HONEST-EMPTY' allein unterscheidet Original und Fix NICHT; tragfaehig ist der Nenner matrixplot=0 UND honestempty>=1 UND nie-ausgefuehrt=0, den die regenerierten 4 Dateien (/tmp/f1_regen_wf/Code/measure_out_smoke/appendix) erfuellen (gemessen)."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Explore"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Fix"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "explore:f1-diagram",
+      "phaseIndex": 1,
+      "phaseTitle": "Explore",
+      "agentId": "a7d8eb549b056e68c",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1786619688207,
+      "lastProgressAt": 1786619688207,
+      "cached": true,
+      "resultPreview": "{\"bau_anweisung\":\"F1-BLOCKER-FIX: 1x1/1xN/Nx1-Flaechen -> HONEST-EMPTY-Platzhalter statt pgfplots-Fatal. Repo: SUPER (probst-diplomarbeit-cache-engine), NICHT ce -- die LAGE-Angabe 'ce-Untermodul M08' ist am Objekt widerlegt: der Generator ist die C++23-Bibliothek Code/05_diagram_generator/ (comdare::diagram_generator, CMake Code/05_diagram_generator/CMakeLists.txt:153-176, REV 7.6 im Kopf diagram…",
+      "promptPreview": "ZEHN-WOCHEN-EXPLORE + BAU-ANWEISUNG fuer den F1-Blocker-Fix. Du lieferst eine OHNE RUECKFRAGE\nausfuehrbare Bau-Anweisung fuer den naechsten Agenten. NUR LESEN, NICHTS SCHREIBEN.\n\nLAGE (vom F1-Endbeleg-Workflow am Objekt gemessen, wuwemnde5): F1 = PDF-Tabellenzeile des\nDurchstich-Messwerts, Frist MORGEN Fr 14.08. Der Kanal ist derzeit NICHT landbar:\nder diagram_generator (Skript-Kopf traegt REV 7.6…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "bau:f1-diagram",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "a05336cb75325b2d4",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786619688217,
+      "queuedAt": 1786619688208,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "/home/comdare/wt-f1-1x1",
+      "promptPreview": "BAU MIT VERIFIKATION des F1-Blocker-Fixes nach der folgenden Bau-Anweisung des Explore-Agenten.\nRESUME NACH PAUSE: ein frueherer Bau-Lauf wurde per TaskStop unterbrochen. Du bist der EINZIGE\nSchreiber. Arbeite im BESTEHENDEN Worktree /home/comdare/wt-f1-1x1 (super-Repo, Branch\nbau/f1-1x1-honest-empty) -- KEINEN neuen Worktree anlegen. Dort liegt der WIP-Commit c642c35d\n(3 Dateien: Code/05_diagram_…",
+      "lastProgressAt": 1786620412138,
+      "tokens": 125045,
+      "toolCalls": 75,
+      "durationMs": 723920,
+      "resultPreview": "{\"quittung\":[{\"schritt\":\"WIP-Pruefung gegen Bau-Anweisung (Resume-Auflage)\",\"status\":\"DURCH\",\"beleg\":\"c642c35d deckt (a)-(c) + 4 Tests; 3 Abweichungen am Objekt gerechtfertigt: required[] verlangt alle 5 op_*_p50_ns (diagram_generator.cpp:896-898, Minimal-Header der Anweisung waere status_empty_input); op_lookup_p50_ns=1310 = echter Wert aus /tmp/f1_art/.../measurements.csv Zeile Job 376333; 4 Bes…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "fix:f1-diagram",
+      "phaseIndex": 3,
+      "phaseTitle": "Fix",
+      "agentId": "aba24433a52715a26",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786620412148,
+      "queuedAt": 1786620412139,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "A2.5-FIX-STUFE (ARBEITSWEISE v4.0): Der Bau des F1-Blocker-Fixes ist durch, aber sein\nVerify/Ergebnis traegt die folgenden Funde. JEDER Fund ist PFLICHT (Owner-Dauerregel 13.08.).\nDreiwertig quittieren: BEHOBEN (mit Rot-zuerst-Beleg) / ENTLASTET (mit Messung) /\nVERTAGT (nur mit Grund + Wellen-Platz + Task-Vorschlag -- z.B. super-/Thesis-Territorium,\ndas dieser ce-Worktree nicht anfassen darf).\n\nOR…",
+      "lastProgressAt": 1786621642546,
+      "tokens": 163582,
+      "toolCalls": 58,
+      "durationMs": 1230398,
+      "resultPreview": "{\"quittungen\":[{\"fund\":\"1. Landung durch den Lead seriell (R4/A2.1a): Branch bau/f1-1x1-honest-empty, Basis 3ce69ed2, Merge (nie rebase)\",\"urteil\":\"VERTAGT\",\"beleg\":\"Grund: Landung ist Lead-Territorium (R4/A2.1a), KEIN PUSH erlaubt solange CI 15785 laeuft (Bau-Regel). Vorarbeit gemessen: development wanderte waehrend der Stufe weiter -- Fund-Text a103e518 ist stale, gemessen erst eacd3182, am Stuf…"
+    }
+  ],
+  "totalTokens": 288627,
+  "totalToolCalls": 133
+}
