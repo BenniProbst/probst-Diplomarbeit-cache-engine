@@ -16,6 +16,222 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 14.08.2026 -- KON61: KOMPLEX-FIX STUFE 2 -- SAMMEL-VERBUCHUNG + STUFE-1/2-ABNAHME (KEIN PUSH)
+
+**Anlass: Komplex-Fix (Stufe 2 der Drei-Stufen-Landung, Design tmp/komplexfix_design.md, als BU committet
+unter docs/sessions/backups/20260814-komplexfix-quellen/). EIN Schreiber, EIN Block via
+scripts/ledger_nachtrag.sh (S3.5). Nummern-Vergabe gemessen, nicht geraten: KON61 hatte vor diesem
+Nachtrag 0 Treffer in 27445 Ledger-Zeilen (/usr/bin/grep -c, rc=1; Gegenprobe am selben Kommando:
+KON60 = 25 Treffer); KON35 bleibt nie vergeben (Praezedenz: nie doppelt, nie Luecke unerklaert) --
+61 ist die naechste freie Nummer nach dem Kopf KON60.**
+
+---
+
+### KON61-01 -- STUFE-1/2-ABNAHME: KOMBIBAU-BILANZ (KON55-FORM) AM KF-ENDSTAND + FLOOR + MERGE-SHAs
+
+    MESSKETTE (KF Phase 2, 14.08., Logs /home/comdare/s1-logs/kf2-*): HEAD-Beleg des
+      gebauten Baums ce 2a3b1eb0 (im Master-Log literal). 4 Zellen SEQUENTIELL
+      (gcc-15 + clang x Release + Debug), JE Literal:
+      kf2-gcc-rel / kf2-gcc-dbg / kf2-clang-rel / kf2-clang-dbg =
+      4x '100% tests passed, 0 tests failed out of 491' (Total Tests: 491).
+      Master-ENDE literal '=== KF2-MESSKETTE ENDE fail=0 2026-08-14T09:06:44+00:00 ==='.
+    STUFE-L (A4-Lock am 2a3b1eb0): --check GRUEN literal 'axis_version_lock: GRUEN bestand
+      konsistent -- 718 Dateien (heuristik=6, organ=640, system=16, mess=1,
+      tier_substanz=55) -- deckt 712 von 712 Overlay-Quellen'; Lock-sha e7263b82 VOR==NACH
+      unveraendert. (Erstaufruf rc=2 war ein Skript-Usage-Fehler; massgeblich ist die
+      protokollierte Wiederholung -- im Master-Log deklariert.)
+    STUFE-C (A2-Floor, covguard): Guard 'genau erreicht: 492 == Anker 492' (avx512f);
+      Klassen-Erzwingung avx512f->avx2 verloren=4 (SOLL 4), avx2->basis verloren=2
+      (SOLL 2), Gegenrichtung je 0 -- Floor 492/488/486 LIVE gedeckt; Raeum-Belege
+      getrackt=0, csv_xlsx=0; config.status byte-gleich wiederhergestellt (cmp rc=0).
+    LANDUNGS-MERGE-SHAs Stufe 1: ce d215b127 (S-7) / 0304ebf1 (Wachen) / a6804dfa (P6)
+      + Floor-Nachzug 643102fb; super 865ff21d (F1) / dbef5b0f (texgate) / ad742bdc (e21)
+      + Designs 85c1174d + 6e796ae5 + KON60-Buchung 09cd97a3 + Stufe-1-Fix 13a16b46.
+    KF-STUFE-2-COMMITS: ce fbe506ee (#48 Gate-Verweis :783ff) / fbe48f99 (#24 xlsx additiv
+      11 von 11) / 2a3b1eb0 (#26c Ausnahme-Kommentare; #61-Regen-Probe 0-Diff = Kenntnis-
+      nahme, N1 Artefakt des alten Pins f23c18e2); super 96ff69d5 (#25 ##26-M==N-Haertung
+      + Bissprobe rot->gruen) / bfac6c2b (#40 Anker-Nachzug, 20 von 20 CI-INV-Behauptungen
+      OK) / 1c2d251a (#98 G-1-Konstruktions-Nachtrag, F-G1-11 aus Bestand + OF-2-Befund) /
+      233cd2b2 (#55+#101c BU-SOFORT 29 Dateien) / dieser Nachtrag (S3.5). KEIN PUSH --
+      Stufe 3 (EIN Push je Repo, EINE CI) folgt nach Verify/A2.5.
+
+### KON61-02 -- LIZENZ-DATUMS-RICHTIGSTELLUNG (CHANGE DATE): 10.08.2026 IST DER ENTSCHEIDTAG
+
+    Originale stehen (Doku-nie-loeschen): die K-Sektion ('CHANGE DATE: ... FUENF JAHRE nach
+    dem 11.08.2026 frei (~2031)', heute Z.3424) und KON22-01(2) ('fuenf Jahre ab
+    Sessiontag, d.h. ~11.08.2031') interpretieren das Owner-Wort 'ab heute' mit dem
+    BUCHUNGS-Sessiontag. RICHTIG: der Entscheid 'C-2: Ja, cache engine nach 5 Jahren frei
+    verfuegbar ab heute' fiel am 10.08.2026 (KON22/WF3-Landetag; KON2 traegt '10.08. Nm.').
+    Referenzdatum kuenftig: 10.08.2026, Change Date ~10.08.2031. 11.08. NICHT weitertragen.
+
+### KON61-03 -- C1 AN INFRA UEBERGEBEN (#15) + KON59-02-ANKER FRISCH GEMESSEN (#30)
+
+    C1 (MinIO-Keys + A-3-Rotation der 776 Runner-Registration-Token): Infra-Handout
+      geschrieben (Cluster-Repo), der OWNER loest Infra aus -- KEIN Session-Bau
+      (Owner-Antwort A2/C1 vom 13.08.). Task #10 bleibt beim Owner/Infra.
+    #30-Anker am gemergten Stand FRISCH (die KON59-02-Korrektur relock :898->:919 und
+      ergebnis:holen :2751->:2809 war ihrerseits schon wieder stale): ce
+      is_original:relock Job-Key heute :918, allow_failure-Zeile :932 (verschoben durch
+      die S1.4-DEKLARIERTE-AUSNAHME-Kommentare, ce 2a3b1eb0); super ergebnis:holen heute
+      :2798 (super 13a16b46). Zeilenzahlen sind ORIENTIERUNG (CI-INV-Doktrin, YAML-Kopf);
+      verbindlich pruefen die Wachen am Objekt.
+
+### KON61-04 -- NON-ASCII-BESTAND DER MINIO-VORLAGE (#16): ENTSCHEID VERBUCHT
+
+    NEIN, der Bestand wird NICHT normalisiert -- Bestand ist Bestand; nur NEUE Zeilen sind
+    ASCII-pflichtig. (Lead-Entscheid per Sammellisten-Empfehlung, keine Gegenstimme in 3
+    Quellen; minio-Vorlage Z.1-56 bleibt unangetastet.)
+
+### KON61-05 -- ZAEHLWERKE AUFGELOEST (#32): 137=123+7+6+1 / #67-29er / KON11-01-ELFERLISTE
+
+    137-vs-123: SCOPE-Differenz, kein Drift. 123 = Same-Line-Literale in den Organ-Homes
+      (97x 1.0.0.c + 24x 1.0.2.c + 2x 1.0.1.c; 122 Traeger-Dateien + 1 Doppel-Literal
+      k_ary). 137 (KON9-05) = ALLE ce-eigenen Literale: 123 Organ + 7 System + 6 Mess +
+      1 Planer -- die Aufloesung stand bereits im Ledger bei KON8-08 (Fundstelle
+      :6862-6863, Stand vor diesem Nachtrag). Die drei 'Differenz 14 unaufgeklaert'-
+      Vermerke (:5272/:5395/:5470, Stand vor diesem Nachtrag) sind damit GESCHLOSSEN.
+      Heute reproduziert die 137 nicht mehr: same-line-Literale ausserhalb axes/topics =
+      0 von 0 (telemetry ist inzwischen CEB-System-Achse, KON58-13).
+    #67 '142 Include-Kanten / 29 Wanderungen': eine Kanten-Definition der 142 EXISTIERT
+      NICHT (0 Belegstellen; einzige Treffer sind die Unbelegt-Vermerke :4528/:4630/
+      :5789). Die 29 IST reproduzierbar: Familien-Header = basename enthaelt
+      version|stamp|semver|fingerprint (24 Dateien in libs/cache_engine); eingehende
+      Include-Zeilen = 29 von 29 (repo-weit 39 = libs 29 + tests 9 + apps 1).
+      UEBERNOMMEN: die 29er-Definition gilt (S-6d/#67-Neuerhebung nutzt sie); 142 =
+      historisch ohne Definition, nicht weitertragen.
+    KON11-01-ELFERLISTE am Objekt, Zeile fuer Zeile: 4 widerlegt (1 ExperimentPlanDirector
+      verdrahtet, 16 Konsumenten + CI-terminal 15764; 3 axis_version_lock v3 mit 718
+      Records deckt 712/712; 7 IResourceControllableTier 5+ Nutzer; 11 Hybrid heute 955
+      Zeilen MIT Stempel-Bezug), 1 teilwiderlegt (2 LagerBaumWriter: Tests ja, weiterhin
+      0 Produktions-Aufrufer), 5 halten (4 run_selection_filter_chain 0 Produktions-
+      Konsumenten; 6 AxisCommand familienintern; 8 i_command.hpp GEPARKT als V32-
+      AUSNAHME; 9 v32_messreihe_antrieb existiert samt Test; 5/10 ram_probe_chain und
+      catalog_codegen.cmake unveraendert). Zusatz: admit_organ als unverdrahtet ebenfalls
+      widerlegt (5 Dateien). BILANZ: 4 widerlegt / 1 teil / 5 halten.
+
+### KON61-06 -- B5-SERIELL-ENTSCHEID (#33), FIXIERT VOR MO 17.08.
+
+    Der A/E-Schnitt ist NICHT leer (3 harte Include-Dateien: mess_konsistenz_gate.hpp,
+    lazy_adhoc_source_gen.hpp, ceb_version_stamp.hpp; dazu Glied-[3]-Inhaltskopplung
+    mess_achsen_naht.hpp und 1 gemeinsamer Test) => B5 faehrt NICHT parallel zum
+    S-6a-Fenster. ENTSCHEID: B5 SERIELL HINTER S-5 -> S-6a, in dasselbe W1-Fenster
+    (ein Schreiber je Datei); B2/B3-Hybrid-Gate-Anteile bleiben parallelisierbar
+    (disjunkt); mess_achsen_naht.hpp nutzt denselben Seriell-Slot. (War in Task #24
+    verbucht; die Ledger-Zeile fehlte -- hiermit nachgetragen.)
+
+### KON61-07 -- UMBRELLA-CI (#34): C2 ERHOBEN, OWNER ENTSCHEIDET
+
+    Nachmessung erledigt (Owner-Antwort C2 13.08.): Fehlbild seit mindestens 10.08.,
+    letzte gruene Umbrella-Pipeline 06.03.; strukturell rot (macos/windows-Jobs ohne
+    Runner; allow_failure bleibt verboten). Der Entscheid (a/b/c) liegt beim Owner;
+    kein Session-Bau.
+
+### KON61-08 -- BRANCH-URTEILE VERBUCHT (#35 + #80): 13 LOKALE + 5 REMOTE, KEINE LOESCHUNG
+
+    13 lokale Urteile der Triage: 8 ausbuchen / 4 ueberholt / 1 landen; das Lande-Urteil
+      ist VOLLZOGEN (p6 GELANDET@a6804dfa). ce-Objekt: 18 von 18 lokale Neben-Branches in
+      development enthalten (abgleich_ce A.6).
+    #80 Remote-Bestand: 8 von 13 origin-bau/b-*-Branches enthalten; 5 NICHT enthalten:
+      90bca126 b-m2-pmc-invariante, 81651f6e b-m3v2-pmc-window, 3f0d989d b-pmc-errno-
+      diag, 237d0952 p2-warnstufe, 708cf156 p3-ci-clang-pflicht. Die AUSBUCHUNG IST das
+      Triage-Urteil; Remote-Loeschung NUR mit explizitem Owner-GO (Memory-Regel);
+      lokale Branch-Hygiene erst nach CI-gruen + Merge-Regel.
+
+### KON61-09 -- NE-10-ZAHLENBLOCK (#46): 126 / 83 / 123
+
+    mp_size der vollen registrierten Organ-Population = 126 (nicht 122); 122 = Varianten
+    mit EIGENEM algo_version-Literal; 123 Literale = 97x 1.0.0.c + 2x 1.0.1.c + 24x
+    1.0.2.c (k_ary traegt zwei); enabled-Tabelle = 83 (beide Zahlen im Test GEMESSEN,
+    nicht gepinnt; T-3-Fremdnenner 126>83). bvset_ist_teilmenge ist AKTIVE Produktions-
+    Skip-Logik (2 Treffer build_orchestrator.hpp: :20 Include-Kommentar + :464 Aufruf).
+    Die Riegel-Praemissen-Haelfte war bereits per KON60-04 (UEBERHOLT-Marker KON58-01)
+    verbucht; dieser Eintrag traegt die fehlende Zahlen-Haelfte nach.
+
+### KON61-10 -- F1-LENS-ZAEHLKORREKTUR (#67): 16 FUNDE -> 24 QUITTUNGEN
+
+    Journal autoritativ: 16 Funde -> 24 Quittungen [7 BEHOBEN / 16 ENTLASTET / 1 VERTAGT]
+    (Aufspaltung; jede Fund-Nr gedeckt). Die Sammellisten-Kopfzeile '20 [4/15/1]' ist
+    unpraezise und wird NICHT weitergetragen (P4-Doktrin: Journal zaehlt).
+
+### KON61-11 -- HONEST-EMPTY-ZWEITPAKET AUSGEBUCHT (#68)
+
+    Branch b-honest-empty @ 838612f3: 0 voraus / 622 hinter development = VOLLSTAENDIG
+    ENTHALTEN, keine offene Datei-Flaeche. Lokale Branch-Loeschung ist Hygiene NACH dem
+    Push (Regel: gruen+gemergt); die remotes rescue/b-honest-empty-final werden NUR mit
+    explizitem Owner-GO angefasst.
+
+### KON61-12 -- WORKFLOW-IDENTITAETS-DOKTRIN (#70)
+
+    Workflow-Identitaet wird NUR ueber runId/Journal gefuehrt; Task-IDs in Sammellisten-
+    Koepfen sind fluechtig und beweisen nichts (L2-Lehre der Pausen-Pruefung: stale
+    Task-IDs in Kopfzeilen).
+
+### KON61-13 -- APPS-ZAEHLUNG (#89): 9, NICHT 10
+
+    KON47-01 nannte '10 Binaries'. Objektbefund FRISCH am ce-HEAD 2a3b1eb0: 9x
+    add_executable unter apps/*/CMakeLists.txt (anatomy_codegen_cli, catalog_codegen_cli,
+    f15_compare_cli, is_original_validator, experiment_planner, adhoc_emitter_cli,
+    h2_score_akte_cli, cache_engine_builder, perm_runner). Korrektur: apps = 9; wer eine
+    10. Binary behauptet, benennt sie am Objekt.
+
+### KON61-14 -- TASK #16 ENTFESSELT (#96)
+
+    'golden festschreiben' ist seit der Stufe-1-Landung ENTFESSELT: BEIDE Vorbedingungen
+    erfuellt (P11 in origin UND P6 gemergt a6804dfa). Der Bau selbst bleibt WE+W1-Posten
+    NACH dem Push (Task-Text fortgeschrieben).
+
+### KON61-15 -- NE-01-ZAHLEN-KORREKTUR (#99d): 1199.047, NICHT 644.020
+
+    Die in NE-01 zitierte ns_per_op=644.020 gehoert NICHT zu Job 376333. Echt ist:
+    n_ops=10000, ns_per_op=1199.047 (identisch in 3 von 3 CSV-Formen; '644' = 0 Treffer
+    im 114244-Byte-Trace). Die Herkunft der 644.020 bleibt offen -- NIE weiter zitieren.
+    TaskUpdate #40/NE-01 folgt im KF-Abschluss (S4.4).
+
+### KON61-16 -- P1-BLOCK: 5 DEKLARIERTE ABWEICHUNGEN DER PAUSIERTEN WORKFLOWS (BEFUND VOLL 5/5)
+
+    (1) bash statt sh im WF-Rezept (F1-Fix) -- quellenseitig begruendet, Task-#41-Text
+        wird nachgezogen.
+    (2) Riegel-Echtfall-Praemisse stale (KON58-01): S-7 liegt ausserhalb der Lock-
+        Domaene, NULL-BEWEIS erbracht (0 Preimage-Bytes).
+    (3) Floor-Commit-Form: 'eigener Commit' entsprach dem DAMALIGEN Datei-Kopf
+        (historisch tragbar); als Vorwaerts-Regel FALSCH -- seit dem gelandeten
+        ANKER-Kopf gilt 'im SELBEN Change' (:25-33), die 'eigener Commit'-Pflicht ist
+        per :35-41 ENTFALLEN (s. Posten #47/A2 des KF-Designs).
+    (4) Branchname laut Task-Order (abweichend vom Script-Wortlaut).
+    (5) Kombibau-Interpretation: 1 Kombibau x 4 Zellen statt 8 Vollbauten -- am
+        Gesamtstand durch KON61-01 gedeckt.
+    Quittungen zaehlen NIE als P1-Beleg, nur das Objekt (Praezedenz: fehlende
+    6eb72ace-Quittung; transport-abgeschnittene S-7-Quittung).
+
+### KON61-17 -- VORMERKUNGEN 'NACH DER WELLE' (EIN Sammelabschnitt; KEINE Vor-Push-Posten)
+
+    #9    Thesis \InputIfFileExists-Hebung lc_surface (de:64ff/en:63ff, Muster
+          de:103-283) -- Owner/Lead-Vormerkung nach F1.
+    #37   Monitor-Lebendprobe beim Scharfschalten -> naechste Arbeitsweise-v4.x-
+          Fortschreibung.
+    #42   PDF-Gate-Listen-Erweiterung beim 2. Hauptdokument (EN) = eigener
+          Design+Bau+Verify-Zug (kaskadiert in den E-18-SNAP-Vertrag).
+    #56   super-Aequivalente der ce-Wachen-Klassen erheben (deckt #88 da_unit
+          GLOBAL-APPEND).
+    #63   N2 Colorbar-Tick-Dedupe (Kosmetik, testfixiert seit P2).
+    #71   12 'super docs/'-Etiketten im ce-Quelltext + fehlendes docs-only-Gate
+          (Doku-Ordnung nach der Welle).
+    #75   hetero_core_dispatch-CT-Etikett + prod2_raptor_lake-Registry-ID-Drift
+          (W7, #21/#22-Umfeld).
+    #78   paper_ref-Divergenz PRT + PAPER_REFERENCES-Luecken A17/A24 (Doku-Posten).
+    #83   Thesis-Doppel-Submodul-Frage -> naechste Owner-Vorlage mitfuehren oder
+          ausbuchen.
+    #84   '|| echo honest-empty' 0 Vorkommen in super ci -> Pruefposten vor dem W4-Bau.
+    #85   doc-anchor-check-Wachen-Vorschlag (F40-Klasse systemisch; 2. Grossflaechen-
+          Fall dokumentiert).
+    #92   Wellenplan-/Restlisten-Pflege: '5 Bloecke (6 Vorkommen, 1 if/else-Paar)'
+          nachtragen; ##08-Rest streichen (3 Messungen als Begruendung); ##20-B
+          streichen + Vollzugs-Fussnote -- datierte Nachtraege, nie loeschen.
+    #101b GliedCount-Kommentare text-stale: bestandslog_factory.hpp:87 'acht' +
+          mess_achsen_naht.hpp:181 '= 8' gegen real 9 (anatomy_fingerprint.hpp:416,
+          static_assert :641) -- naechstes ce-Paket mit Schreibrecht (Muster #73).
+
+---
 ## NACHTRAG 14.08.2026 -- KON60: WELLE-2-LANDUNG STUFE 1 (BEIDE REPOS, KEIN PUSH) + VERBUCHUNG OWNER-SAMMELRUNDE 13.08. (A1/B1/B2/Vorlage-B4/B5/D3/D4) + E-21-VOLLZUG
 
 **Anlass: Drei-Stufen-Landung Stufe 1 (v4.3/A2.1b: serielle --no-ff-Merges MIT Harmonisierung
