@@ -16,6 +16,143 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON66: SESSION-LUECKEN-INVENTUR (Owner-Order "damit nichts verloren geht") -- VIER UNGEBUCHTE WORKFLOW-BLOECKE DIESER SESSION
+
+**Anlass: Owner 15.08.: "Bitte dokumentiere jetzt alle fehlende Punkte ins ledger aus dem
+GESAMTEN Kontext dieser sehr langen session." Selbst-Inventur ergab: KON60-65 decken
+Landung/KF/F1/Grossrunde; VIER Workflow-Ergebnisse waren nur in Tasks/tmp, nicht im
+Ledger. KON66 vor diesem Nachtrag 0 Treffer (zu messen beim Einbuchen).**
+
+### KON66-01 -- BU-WORKFLOW LETZTE 5 KONTEXTE (wf_4f8a80f3, Verify TRAEGT; gemergt via d817d9bd)
+
+    GESICHERT (Branch bau/bu-workflows-5-kontexte @ 90979dc3, 3 Commits, in Stufe-3
+    Schritt 0 gemergt): 379 Task-Outputs (67 MB, tar.gz + sha256-Liste; 387 im Fenster,
+    7 repo-identisch nicht doppelt, 1 ROTATIONSVERLUST bdcfpvlum -- /tmp-Rotation ist
+    AKTIV, Folge-BUs zeitnah) + 39 Workflow-Journale (45 im Fenster, 4 im Alt-Tarball,
+    2 laufende ausgenommen) + 174 Dumps (145 Quell-JSONs byte-identisch zu Originalen,
+    24 leser/abgleich, 5 Explores) + kf_arbeit-Nachsicherung (F1). SECRET-LAGE: 593
+    gescannt, 0 echte Secrets, 20 Fundstellen/12 unique alle als Fachwerte entlastet
+    (ceb_key_sha512-Digests, Posten-Bezeichner), 0 Redaktionen; Koeder-Biss rc=1 vor
+    jeder Null. F5-LEHRE (Memory + Fallen-Register): Koeder-LITERALE im COMMIT-TEXT
+    triggern die stdin-Push-Wache spaeter selbst -- Fix-Muster enge Koeder-Wort-
+    Allowlist in .gitleaks.toml (90979dc3); Koeder kuenftig AUCH in Botschaften
+    maskieren. F3-FUND -> #46/A2 (Transkript im Base-Baum, KON64-01).
+
+### KON66-02 -- LIZENZ-VIER-REPOS (wf_343d7064, Verify TRAEGT_MIT_FIXES) + VERKAUFSFRAGEN-ANTWORT
+
+    VERKAUFSFRAGE ('Da steht noch Apache, aber wir wollten verkaufen??') -- DREI Orte,
+    drei Antworten: (1) super=Apache ist BEWUSSTER Owner-Entscheid 10.08. 10:50Z
+    (Roh 5a19728e:34851 verbatim: 'super soll apache sein, PRT-ART und cache eingine
+    sollen beide frei fuer die Forschung und proprietaer fuer business und
+    Einzelnutzung sein, Diplomarbeit ist nur copyright von Benjamin-Elias Probst') --
+    im SELBEN Satz, der Apache fuer ce+prt-art 'voellig falsch' nennt. (2) prt-art =
+    ECHTER UMSETZUNGS-RUECKSTAND: traegt volle Apache-2.0 + 28 Apache-SPDX-Koepfe,
+    kein NOTICE -- P6/f6d13dfb deckte NUR ce. (3) Thesis-.tex-Matrix (02.08.-Entwurf
+    :196-226) nennt 'PRT-ART unter Apache-2.0' = stale. GENEALOGIE (kein juengerer
+    Entscheid ueberholt den 10.08.): 01.08. Apache+GPL (widerspruechlich) -> 07.08.
+    'restriktivste Lizenz fuer alle 3' -> 10.08. KON2-23 (GELTEND) -> 12.08. KON22
+    (C-2 Change Date, C-4 R&T bleibt) -> 14.08. KON61-02 (Datums-Richtigstellung).
+    SPANNUNG DEKLARIERT: das 07.08.-Wort schloss super ein, der juengere 10.08.-Satz
+    setzt super=Apache -- meint der Owner mit 'verkaufen' AUCH super, waere das eine
+    NEUE Frage, kein Bestand. UMSETZUNG: Thesis-Matrix-Nachzug COMMITTET (717701a5,
+    wt-thesis-lizenz, privat Benjamin-Elias Probst, sauber von UG-Repos getrennt);
+    ce+super bewusst 0 Delta; prt-art VOLLSTAENDIG VORBEREITET im wt-prtart-lizenz
+    (ce-P6-Muster; Fix e610f230: OF1-OFFEN-Platzhalter-Wache + Nenner-Kommentar
+    139/29) -- GATED ALLEIN an OF-1: gilt Change Date 2031-08-10 auch fuer PRT-ART?
+    (C-2 nennt woertlich nur 'cache engine'; das KON2-23-'dito' deckt die
+    Dreiteilung, nicht das Datum.) OF-1 = OFFENE OWNER-FRAGE.
+
+### KON66-03 -- CI-DUAL-COMPILER ALLE C++-REPOS (wf_69b4194e, Verify TRAEGT_MIT_AUFLAGEN, A2.5 komplett 7/7)
+
+    PLAN-BELEGE verbatim gehoben: KON55 (12.08. 'zuerst mit clang und auch mit gcc
+    Pflicht ... Nur clang reicht nicht, weil wir sonst spaetestens im CEB Problemen
+    bek[o]mmen'; Versionen clang 22.1.8/gcc 15.3 GEPLANT; Compiler wird System-Achse)
+    | KON22-01(8) (10.08. 'beide compiler Pflicht! Gebaut wird immer, skip ist
+    VERBOTEN') | T-11b (2x2-Matrix Pruefnorm) | KON10-02/D17 (Mini-Pipeline je
+    Traegerstufe) | KON25-08 (Emissionsliste = volle Pipeline) | Par.61-Dual-Weg |
+    Regressions-Beleg: ce build:clang 'skipped' seit je (COMDARE_CLANG_MATRIX
+    nirgends gesetzt -- 'die clang-Warnungen dieses Projekts hat noch nie jemand
+    gesehen'); test_ms1 lokal -O0 gruen / CI -O3 rot (Klassen-Beleg Debug+Release).
+    GEBAUT (4 Branches, landereif, Task #56): super bau/ci-dual-compiler @ 323101d1
+    (test:unit:clang+:clang:debug NEU, Ketten-Umbau test:unit->test:unit:debug
+    senkt Vollbau-Spitze, ccache-KEY-HYGIENE: Debug zog vorher pull-only auf den
+    gcc-RELEASE-Key = Fehlpassung) | ce bau/ci-dual-ce @ 61d9edd1 (test:unit:debug
+    + clang x2 NEU, pmc-Template explizit -DCMAKE_BUILD_TYPE=Debug, t6-Klasse-B
+    +3 Jobs nachgezogen; KOMBIBAU-BEWEIS am finalen HEAD literal 4x '100% tests
+    passed, 0 tests failed out of 489') | prt-art bau/ci-dual-prtart @ 7444ad1
+    (+2 Jobs, 13->15 Schluessel) | EMISSION bau/ci-dual-emission @ 731b5655
+    (Director-Pins -DCMAKE_C(XX)_COMPILER gcc-15/clang-22 + clang-
+    Zwillingssequenz je Traegerstufe, CompilerPinInvariante T-1 3-rot->4/4-gruen)
+    -- die Traegerstufen-Haelfte des Owner-Satzes ist GEBAUT. Codex-Lens je Repo
+    'LENS-OK' (Zwei-Lens-Klasse erfuellt). S-12-Auflage-Text in Task #3.
+    FUND-6 (W-Posten, kein Zug-Defekt): der 3-Bauten-Deckel prod1 ist NICHT
+    maschinell erzwungen -- runner-mode.sh:43 NORMAL_CC=4 (vier gleichzeitige
+    Jobs je Runner); Werkzeug-Durchsetzung steht aus.
+
+### KON66-04 -- WRITEBACK-TOKEN-HISTORIE KOMPLETT (wf_5ba07e0d) + SICHERHEITS-ZIELBILD
+
+    ROTATIONS-KETTE (drei Quellen deckungsgleich): Ur-Vorschlag 14.07. (nie
+    umgesetzt) -> ERSTANLAGE 06.08. 05:26Z durch die Session (Token id=95 auf 289,
+    Variablen KORREKT auf 288) -> KOMPROMITTIERUNG (KON2-01: Agent gab bei
+    CI-Variablen-Abfrage WERTE statt Namen aus, 7 Geheimnisse im Transkript,
+    darunter dieser Token) -> Owner-Rotations-GO 10.08. (7 Variablen) -> ROTATION
+    12.08. 12:50Z: id=95 revoked, NEU id=97 (Maintainer=UEBERPRIVILEGIERT, bis
+    30.11.) -- ABER die Variablen wurden ENTGEGEN BEIDEN Infra-Handouts auf 289
+    statt 288 gesetzt; auf 288 blieb nur der verwaiste USER -> deshalb Guard-Rot
+    im ersten echten Lauf 14.08. NIE-NUTZUNG BEWIESEN: 5300-Jobs-Scan lueckenlos
+    05.-14.08., anhang:forward existierte EIN MAL (377504 failed) -- kein Token
+    hatte je einen gruenen Lauf vor 377539. AUFGERAEUMT 15.08.: id=97 revoked
+    (HTTP 204), 289-Fehl-Variablen geloescht, id=98 einziges aktives.
+    SICHERHEITS-ZIELBILD (Web-Recherche, GitLab 18.11.7 gemessen): HEUTE Project-
+    Access-Token minimal (id=98: write_repository-only, Developer, Ablauf 15.10.)
+    = exakt die Guard-Empfehlung; ZIEL null gespeicherte GitLab-Secrets via
+    CI_JOB_TOKEN -- G1 (288-eigener Gitlink-Bump) SOFORT aktivierbar
+    (ci_push_repository_for_job_token_allowed), G2 (Cross-Projekt 288->289
+    secretlos) erst ab GitLab >=19.1 (daher OF-3-Upgrade-Strang); GITHUB-Spiegel:
+    fine-grained PAT (nur 2 Repos, nur Contents:RW, 90d-1y) statt breitem PAT.
+    OF-4/G1-Umstellung + id=54-Abloesung: WARTET auf detaillierte Owner-Antwort
+    (KON64-02). Turnus-Bau 30d = Task #54. DEPRECATION-KLAERUNG: eine FRUEHERE
+    formelle Feature-Deprecation existiert nirgends (Nichtfund mit Gegenprobe);
+    Owner-Wort 14.08. 19:19Z ist die Erstnennung -- Feature BEHALTEN + Direkt-
+    Ziele koexistieren, vereinigt in der XML-Publikations-Sektion (#48).
+
+### KON66-05 -- CACHE-LANDSCHAFT (wf_618a5525): TRENNUNG + SPEED-WAHRHEIT + XML-CACHE-SEKTIONS-ECKPUNKTE
+
+    TRENNUNG (Plan-Regeln): "minio caching" = Ebene A = GitLabs EIGENER cache:-
+    Mechanismus (key+paths je Job; Runner-config.toml [runners.cache.s3] ->
+    minio.comdare.de:9000/buildsystem-cache; Inhalt laut KON15-05 NUR ccache+Tools;
+    CE-Code unbeteiligt). "custom artifact caching" = Ebene B+C = die EIGENE
+    ArtifactCache-Klasse (Storage #51, 18.07.): B = CEB-/Tier-Bau-Artefakte per
+    mc-Shellout in GETRENNTEN Bucket (Key build_version/<stem>/perm.dll, Marke
+    perm.dll-zuerst/.version-zuletzt, perm.dll.fingerprint = Skip-Kriterium);
+    C = Messergebnisse per HTTPS-PUT an den measure-drop-Filterpod (KEIN
+    POSIX-Mount, User-Entscheid A 18.07.). Wahl HEUTE per Artefakt-GENUS als
+    CT-Strategy (StandardZiel<Genus>: binary->minio, measurement->NAS, beidseitig
+    drehbar; lager_ziel_strategie.hpp:156-173/216-225) -- KEINE Stufen-Dimension,
+    KEIN lokal-vs-CI-Unterschied; globaler Schalter COMDARE_STORAGE_CACHE
+    Default AUS. NICHT verwechseln: die D-12-LAGER-ORDNUNGS-Kaskade (MESS->SYS->
+    ORGAN vs SYS->ORGAN->MESS) sortiert nur INNERHALB von B/C.
+    SPEED-WAHRHEIT (trace-belegt, ehrlich): A3 heilte die 288-Variablen-Familie +
+    Toolbox -- NICHT den Runner-nativen cache:-Pfad (ANDERE Credential-Familie,
+    config.toml-Svcacct, A4-Liste): Job 376333 zeigt "cache.zip is up to date"
+    SCHON VOR A3 -- der native Pfad war nie krank. SCHNELLER WIRD HEUTE KEIN JOB;
+    die geheilten Keys konsumieren nur die inert-by-default .storage_cache_
+    activation-Bloecke (COMDARE_STORAGE_CACHE nirgends gesetzt, KON33-03).
+    Speed-Gewinn kommt erst mit dem SCHARFSCHALTEN von Ebene B (Binary-Skip
+    per Fingerprint) -- W-Strecke S-17/D3.
+    XSD-STAND: <output><storage backend endpoint> existiert (experiment_schema.
+    xsd:665-680), backend nur xs:string, {local,minio}-Pruefung zur Laufzeit
+    (validate_profile.hpp:1164-1180), Slot INERT (0 Produktions-Konsumenten,
+    2 Unit-Tests). DREI UNGEKOPPELTE VOKABULARE: XSD {local,minio} | Code
+    {objekt_store/'minio', nas_ablage/'nas'} | Owner-Dichotomie {minio caching,
+    custom artifact caching} -- Kopplung = Design-Aufgabe der XML-Cache-Sektion.
+    VIER OFFENE DESIGN-FRAGEN (naechste Owner-Vorlage): (1) was heisst 'minio
+    caching' LOKAL ohne GitLab-cache:? (2) Ziel-Matrix Stufe x Kontext ODER
+    Stufe x Kontext x Genus (bleibt die Genus-Default-Matrix darunter)? (3)
+    welches Vokabular traegt die Sektion (bestehendes Enum + Mechanismus-
+    Attribut vs eigenes Element)? (4) Praezedenz XML vs Env/CI-Variablen +
+    Versiegelung des 376333-Ebene-C-Leaks (sendet trotz INERT, HTTP 401) --
+    letzteres faellt in S-13/#18.
 ## NACHTRAG 15.08.2026 -- KON65: F-G1-RUNDE FINAL (Teil 4-6) + CACHE-XML-ORDER + BENCHMARK-EXPLORE-BEFUNDE
 
 **Anlass: Owner-Antworten 15.08. NACH der KON64-Buchung (kon64_sammlung.md Teile 4-6)
