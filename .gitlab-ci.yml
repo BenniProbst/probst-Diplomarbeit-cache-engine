@@ -278,12 +278,22 @@ build:clang:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
+        # CI-DUAL Lens-Fund 14.08.: die Pfadliste MUSS mit .code-rules IDENTISCH sein (vorher fehlten
+        # configure.sh, Makefile und die zwei Wachen-Dateien). Grund: test:unit:clang (extends
+        # .code-rules) haengt per needs an DIESEM Job -- eine Welle, die nur configure.sh anfasst,
+        # existierte sonst MIT test:unit:clang aber OHNE build:clang => GitLab lehnte die Pipeline-
+        # Erzeugung ab. Die alte Teilmengen-Begruendung galt nur, solange build:clang ausschliesslich
+        # ABHAENGIGER (von verify:submodules) war, nie ABHAENGIGKEIT.
         paths:
+          - "configure.sh"
+          - "Makefile"
           - "Code/**/*"
           - "Code/external/*"
           - "thesis/diplomarbeit"
           - ".gitmodules"
           - ".gitlab-ci.yml"
+          - "scripts/ci_diff_ascii_width_guard.sh"
+          - "ci/wachen_paritaet.sh"
     - when: never
   stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
