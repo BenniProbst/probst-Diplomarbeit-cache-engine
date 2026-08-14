@@ -553,3 +553,136 @@ Zeilen). Eingearbeitete Fixes:
   `measurement_tooling_registry.hpp:58-62`, wechseln auf `mess_version_is_wellformed`;
   §3.3, §6 Stufen C/F) · (d) Tooling-`<id>` bei Mehr-Stufen-Belegung als **F-G1-12**
   vorgelegt (heute GENAU EINE id, `anatomy_version_stamp.hpp:256-259`).
+
+---
+
+## 11. KONSTRUKTIONS-NACHTRAG (14.08.2026, Komplex-Fix S3.3 / Posten 98) -- F-G1-11 aus Bestand
+
+Status dieses Abschnitts: KONSTRUKTION AUS BESTAND per Owner-B1 vom 13.08. (gebucht KON60-08,
+Ledger; dort woertlich: "KONSTRUKTION im Komplex-Fix (aus Bestand, keine weitere
+Rueckfrage-Runde)"). KEIN BAU: der Wrapper-Code-Bau ist W-Strecke (B1-B5, Task 24) NACH dem
+owner-angeordneten 10-Wochen-Explore. Der ENTWURF-Status des Dokumentkopfs gilt fort fuer
+alles ausser F-G1-1/-2 (angenommen, STATUS-NACHTRAG) und dieser F-G1-11-Konstruktion.
+Objekt-Stand der frischen Messungen dieses Nachtrags: ce-Worktree @ 2a3b1eb0 (nur lesend).
+Syntax-Auflage 14.08. eingehalten: kein Kuerzel als atomares Token, das die gebaute Grammatik
+nicht fuehrt; alle Formen unten sind von der EBNF in Paragraf 3.1 erzeugt (Klammer-Baum
+m/b/h/t mit w/ma/mi, cpu_sub c{p} / c{e} / c{p.e} unveraendert; flache Formen existieren
+NICHT); jeder Ausdruck faehrt beim BAU als T-1-Stufe durch den EINEN Parser
+(parse->render-Treue), bevor er in einen Stempel wandert.
+
+### 11.1 Kind-Stempel = das KOMPILAT (KON60-08, woertlich)
+
+Owner-Konstruktion, Ledger KON60-08: "Tier-Stempel = das KOMPILAT: 4 Zeilen, ZWEI SEPARATE
+Arrays (System + Organ) in zwei string_view-Zeilen, nur HAUPT-Achsen, nur Eingebautes."
+Objekt-Anker (frisch gemessen): die zwei Array-Zeilen existieren als gebaute Produktion --
+system_stamp_line() emittiert die kSystemAxisVersionLine (anatomy_version_stamp.hpp:226,
+Kopf :200), organ_stamp_line() die kOrganAxisVersionLine aus den 18 benannten Organ-Achsen
+(:143, Kopf :53); die Mess-Zeile (measurement_stamp_line, :256-307, Paragraf 1) ist die
+G-1-Traeger-Zeile des Kompilat-Stempels. Folge fuer M-8/FIX 3: die Rolle (Kopf vs. Kind)
+liegt am TRAEGER -- die Identitaets-Last liegt nicht allein auf der Mess-Zeile, sondern am
+Kompilat-Stempel als Ganzem; "nur Eingebautes" ist dieselbe Doktrin wie KON34-05 ("Die
+Mess-Schalter ... aendern das Kompilat und den Stempel").
+
+### 11.2 G-1-Slot-Projektion: w-FUEHREND (loest F-G1-11 auf)
+
+REGEL (Konstruktion aus KON60-08: "die G-1-Slot-Projektion muss w-fuehrend sein, wenn die
+erzeugende CEB w traegt" und "w erscheint im Tier-Stempel genau dann, wenn die CEB w traegt
+und einbaut"):
+
+    Traegt die erzeugende CEB w in ihrem b-Slot, fuehrt die Kind-Mess-Zeile VOR dem eigenen
+    Slot einen b-Slot mit GENAU w mit (w-FUEHREND; auch wenn der CEB-b-Slot weitere eigene
+    Instrumente truege, wandert nur das vertragswirksame w in die Kind-Zeile).
+    Traegt die CEB kein w, ist die Kind-Zeile die reine Slot-Projektion; weder das leere b
+    noch fremde Geschwister-Slots werden mitgefuehrt (sie aendern das Kind-Kompilat nicht,
+    und ein mitgefuehrter leerer Slot behauptete einen Zeiger, den das Kind nicht traegt).
+
+Durchgerechnet an den Beispielen dieses Dokuments (nur Formen der EBNF 3.1, M-1..M-11-konform):
+
+    CEB m{b{w}.t{ma.mi}}        (B-1) -> Tier   m{b{w}.t{ma.mi}}   (b traegt dort ohnehin nur
+                                                w: w-fuehrende Form == voller Ausdruck)
+    CEB m{b{w}.h{ma.mi}.t{ma.mi}} (B-2) -> Tier m{b{w}.t{ma.mi}} / Hybrid m{b{w}.h{ma.mi}}
+                                                (der fremde Geschwister-Slot entfaellt)
+    CEB m{b.t{ma.mi}}           (B-3) -> Tier   m{t{ma.mi}}        (kein w: reine Projektion)
+    CEB m{b{w}.t}                     -> Tier   m{b{w}.t}          (leere eigene Belegung
+                                                bleibt adressierbar, M-4)
+
+HERLEITUNG: KON37-01 Satz 1 + B3-Konsequenz (:2148, :2171-2172) machen das Tier-Kompilat
+w-abhaengig; die reine Slot-Projektion war w-blind (M-8: zwei Kompilate, EIN Stempel --
+verboten per KON34-05 und B11-Doktrin). Die w-fuehrende Form ist die Praezisierung von
+Option (ii) aus Paragraf 8 (Kontext-Mitfuehrung), beschraenkt auf das vertragswirksame w,
+mit per M-6 festgelegter Anordnung: das w-tragende b steht VORN. Option (i) (voller
+Ausdruck) ist damit nicht noetig, Option (iii) (w ohne tier-seitige Naht) ist ausgeraeumt --
+der dort benannte Widerspruch ist zugunsten der B3-Konsequenz entschieden, KON60-08
+woertlich: "Der Tier-Pflicht-Wurf (abi_adapter.hpp:476-491) FAELLT per Vererbungsregel;
+die Tier-Gates BLEIBEN." Die Nicht-Injektivitaet des WERTS (FIX 3) bleibt bestehen und ist
+unschaedlich: Rolle und Herkunft liegen am Traeger, und der Kind-Stempel ist per 11.1 der
+KOMPILAT-Stempel, nicht die Mess-Zeile allein. REFERENT-VORSICHT: die Optionsnummern
+(i)/(ii)/(iii) in Paragraf 8 (F-G1-11) und die B1-VORLAGEN-Nummern (i)/(ii)/(iii) in
+KON60-08 sind ZWEI verschiedene Zaehlungen -- nie ueber die Nummer zitieren, immer ueber
+den Gegenstand (Ledger-Referent-Klaerung KON60-08).
+
+### 11.3 Die (iii)-Wallclock-Definition (Owner 13.08., Transkript-Zeile 52798; gebucht KON60-08)
+
+Woertlich nach KON60-08: "Wallclock = separater check-point measure wrapper auf CEB-SEITE
+um das Gesamt-Experiment 'vom Aufruf bis zur Fertigstellung'; Zweck = Bestimmung des
+Messfehlers der eingebauten Macro-/Micro-Fuehler ueber die Gesamtausfuehrungszeit MIT und
+OHNE eingebaute Tier-Fuehler." Die Messfehler-Bestimmung wird als Belegungs-PAARE geplant:
+je Paar genau EIN Schalter Unterschied; WIE VIELE der 32 Belegungen (Nenner KON25-03,
+2^5) gefahren werden, entscheidet allein die Planer-Simulation S-19. Objekt-Anker (frisch):
+Wallclock ist am Objekt die VERGLEICHS-Ebene -- struct Wallclock { ebene =
+MessEbene::Compare; kennung 'WCLK' } (mess/konfiguration.hpp:106-109); der Wrapper bleibt
+CEB-seitig. ABGRENZUNG (KON60-08): two_phase_measure ist ein SEPARATES Muster auf
+Einzel-Operations-Ebene (Warmup/Rollback) -- nie mit der Experiment-Klammer vermengen.
+
+### 11.4 CebVersionen-Alias = der benannte Umbaupunkt der w-Sicht
+
+Ledger-Adresse KON60-08: "CebVersionen-Alias (konfiguration.hpp:40-44)". Am Objekt frisch
+gemessen: mess/konfiguration.hpp:40-44 ist die BESCHREIBUNG des Umbaupunkts ("Faellt die
+Antwort anders aus, aendert sich EINE Alias-Zeile (CebVersionen in steuer_dock.hpp), kein
+Bauteil"); die Alias-DEFINITION selbst steht in mess/steuer_dock.hpp:231 (using
+CebVersionen = detail::ZuDocks<CebPermutationen>::konfigurationen). Ob der Alias beim
+Wrapper-Bau ersetzt oder erweitert wird, "entscheidet das G-1-Design am Objekt" (KON60-08)
+-- dieser Entscheid faellt in der W-Strecke am dann gebauten Objekt, nicht in diesem
+Nachtrag.
+
+### 11.5 START-Grenze der Wallclock-Klammer -- BEFUND aus Bestand (Phase-0-Explore S0.3)
+
+KON60-08 nennt als EINZIGE echte Definitionsluecke die START-Grenze ("vom Aufruf" -- liegt
+Pruefdock-Laden/Anschliessen in der Gesamtzeit?; KON51-02 definiert nur das ENDE).
+
+BEFUND (aus Bestand ableitbar, nicht geraten): Die START-Grenze liegt NACH
+Pruefdock-Laden/Anschliessen. "Vom Aufruf" meint den Aufruf der
+GESAMT-EXPERIMENT-AUSFUEHRUNG an der fertig angeschlossenen Kette; Laden/Anschliessen
+gehoert zur AUFBAU-Phase davor und faellt NICHT in die Gesamtzeit. Belege (Objekt vor
+Prosa, alle am 14.08. frisch nachgemessen):
+
+1. mess/steuer_dock.hpp:118 nennt anschliessen() woertlich "Die WEICHE VOR der Messung:
+   passt diese CEB auf dieses Dock?" -- Anschliessen liegt in der gebauten Produktion
+   ausdruecklich VOR der Messung; Mismatch ist LAUT, keine Schnittmengenbildung (:120-122).
+2. mess/konfiguration.hpp:85-89: AnschliessenBefehl / StartBefehl / EndeBefehl sind DREI
+   GETRENNTE Grundbefehle des Dock-Lebenszyklus ("Sie tragen keine Mess-Semantik, sondern
+   den Lebenszyklus des Kanals") -- der Start der Messung ist vom Anschliessen als eigener
+   Befehl getrennt; die Klammer oeffnet am Start, nicht am Anschluss.
+3. builder/pruef_dock/pruef_dock.hpp:85-88: der measure()-Vertrag ordnet "import -> GATE ->
+   messen"; ein Modul, das am Konformitaets-Gate faellt, liefert
+   dock_status_conformance_failed "ohne zu messen" (:40-41) -- Laden und Gate liegen vor
+   der Mess-Spanne.
+4. Ledger-Seite: KON51-01 (Lade-Verantwortung) und KON25-08 (Raketen-Mechanik: die Stufen
+   zuenden nacheinander, gemessen wird auf der fertig gebauten Kette) ordnen
+   Laden/Anschliessen der Aufbau-Phase zu; KON51-02 definiert nur das ENDE.
+
+STATUS: OF-2 ist damit AUS BESTAND BEANTWORTET -- keine Owner-Frage noetig. Der Befund ist
+Konstruktions-Grundlage; die verbindliche Code-Festlegung (an welcher Objekt-Naht der
+Wrapper exakt oeffnet) faellt beim Wrapper-Bau (W-Strecke, Task 24) als T-1-Stufe mit
+Objektbeleg. Hol-Punkte des Flush: per KON51-02 Explore-Auftrag beim Bau, KEINE Owner-Frage
+(KON60-08).
+
+### 11.6 Abgrenzung dieses Nachtrags
+
+KEIN CODE-BAU: kMessGrammarCatalog (Paragraf 6), Registry-Neubau (KON37-02), der
+check-point-measure-Wrapper selbst und der CebVersionen-Entscheid sind W-Strecke
+(B1-B5, Task 24) nach dem 10-Wochen-Explore (Owner-B1; RANGFOLGE Owner vor Plan: die
+Explore-Pflicht geht der Formulierung "Konstruktionsarbeit Komplex-Fix" vor, soweit CODE
+gemeint waere -- die DOKUMENT-Konstruktion ist hiermit geschehen). F-G1-3 bis F-G1-10 und
+F-G1-12 bleiben offene Owner-Fragen (9 von 12); dieser Nachtrag beantwortet AUSSCHLIESSLICH
+F-G1-11 aus Bestand und traegt den S0.3-Startgrenzen-Befund nach.
