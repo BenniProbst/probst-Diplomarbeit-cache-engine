@@ -94,3 +94,42 @@ BU additiv: Originale auf Platte unangetastet; hier nur Kopien. Session-Transkri
 - Journale: 45 Kandidaten = 39 gesichert + 4 Differenzmenge + 2 laufend.
 - Quell-JSONs: 152 = 145 gesichert + 7 Differenzmenge.
 - Scan: 593 Dateien grob-grep + Vollscan; 20 FP entlastet; 0 redigiert; 0 echte Reste.
+
+## 9. ADDENDUM A2.5-FIX (14.08., Verify-Urteil TRAEGT; Funde F1-F4 + Neufund F5)
+- F1 BEHOBEN: kf_arbeit/ war zu T0 (~08:02) NICHT leer -- Race zur Commit-Zeit 08:17:17Z, par.1c
+  ('kf_arbeit/ leer') ist damit ueberholt; massgeblich ist dieses Addendum. Nachgesichert:
+  kf_arbeit/phase0_explore_messprotokoll.md (4578 B, mtime 2026-08-14T08:02:09,
+  sha256 7a7aa1ca70c9ae3ceaa8a2500feea30a5f4a4c884386f17b96c4f727b7e0679c, cmp gegen Quelle rc=0).
+  Interim-Snapshot eines Derivats des LAUFENDEN KF wf_0d0d78f0; Endstand kommt per Folge-BU (par.7).
+  Quelle auf Platte unangetastet (BU additiv).
+- F2 ENTLASTET (gemessen statt angenommen): Der ECHTE lint:secrets-Job faehrt dir-Modus RELATIV
+  ('gitleaks dir . -c ./.gitleaks.toml --no-banner --redact'; Cluster-ci-templates/base-pipeline.yml:251-258,
+  Klon development@5f9e04b; Projekt-toml schlaegt Basis). generic-api-key ist in der Projekt-toml
+  disabled -> der leser_04-FP kann in Stufe 3 nicht feuern. CI-Nachbau ueber den GANZEN Worktree
+  (inkl. dieser BU + kf_arbeit-Datei): rc=0 'no leaks found'. Verify-Befund bleibt gueltig fuer
+  dir-Scans mit absolutem Root: .gitleaksignore wirkt nur relativ -- fuer den CI-Lauf irrelevant.
+- F3 GEMELDET (Alt-Bestand, Infra/Owner-Territorium, dieser Branch fasst NICHTS an): Base-Baum
+  a103e518 traegt docs/sessions/backups/20260806-session-transkript-verbatim/
+  session-ab-vorletzter-kompaktierung.jsonl (16286813 B, Session-Transkript; Transkript-Tabu-Doktrin
+  vom 08.08. ist juenger als der Bestand). Branch-Diff-Gegenprobe: alle Diff-Pfade unter dieser BU
+  bzw. .gitleaks.toml, 'transkript' im Diff = 0 Treffer. Rotation/Bereinigung = Infra-Territorium.
+- F4 ENTLASTET: par.4-Kandidat '20260814-a25-wachen-fix/' existiert an keinem gemessenen Ort
+  (find ueber jobs-tmp + wt-super-landung/docs/sessions, maxdepth 3 = 0 Treffer; Positiv-Gegenprobe
+  im selben Aufrufmuster beisst 1/1). Reine Kandidaten-Listung, nichts verloren. Join-Universen
+  (38 unique dump-w-IDs eigenes Muster vs. 56 deklariert): BEIDE ungedeckt=0.
+- F5 NEU GEFUNDEN + BEHOBEN (Fallen-Klasse): d9ed8642 traegt zwei gitlab-pat-Koeder-LITERALE im
+  COMMIT-TEXT (par.5-Praezedenz 'nur im Commit-Text'). Der CI-Job scannt Commit-Messages NICHT
+  (dir-Modus), die lokale stdin-Push-Wache (git log -p | gitleaks stdin -c toml) SCHON:
+  Echtlauf rc=1 'leaks found: 2' (Fingerprints :gitlab-pat:13 und :gitlab-pat:15, File leer =
+  Message-Zeilen; strom-relativ, per .gitleaksignore NICHT stabil pinbar). Entlastung: eng
+  geschnittene [[allowlists]]-Zeilen-Klasse in .gitleaks.toml (Wort 'Koeder' vor dem Token in
+  derselben Zeile; eigener Commit). Beleg nach Fix: stdin-Koeder OHNE 'Koeder'-Wort beisst weiter
+  (rc=1 'leaks found: 1'), Echtlauf rc=0 'no leaks found'. git-Modus (gitleaks git, gleiche toml,
+  gleicher Bereich): rc=0 -- Messages nur im stdin-Strom. LEHRE: Koeder-Literale kuenftig AUCH in
+  Commit-Texten maskieren.
+- Scan-Kette dieses Fixes: Grob-grep 11 Muster ueber Stage (75 Dateien, danach final inkl. Addendum);
+  Muster-Selbst-Treffer der par.5-Dokumentation in MANIFEST.md (PRIVATE-KEY-/sk-ant-/eyJ-Prosa je
+  1 Datei, aws_secret_access_key 2 Dateien: MANIFEST.md + wf_f6ad95d0-e60-journal.jsonl Prosa) =
+  Fallen-Register-Klasse, per gitleaks-Null mit Koeder-Beleg entlastet, UNredigiert (Praezedenz).
+  dir-Default-Kanal und CI-Kanal: Koeder rc=1 literal, Echtlauf rc=0 literal. Endgueltige
+  Zahlen-Quittungen im Commit-Text des Fix-Commits und im Workflow-Return (Koeder dort maskiert).
