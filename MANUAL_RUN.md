@@ -276,7 +276,7 @@ hart ab (kein stiller Skip).
 `anhang:forward` (`:2416`).
 
 **Lese-Hinweis (nicht verwechseln):** der PDF-Beweis **dieses** Laufs kommt aus dem **PDF-Gate des
-anhang-Kerns** (`ci/anhang_forward_core.sh:1297ff`, ALLES-ODER-NICHTS gegen den 289-Klon). Der Job
+anhang-Kerns** (`ci/anhang_forward_core.sh:1310ff`, ALLES-ODER-NICHTS gegen den 289-Klon). Der Job
 `thesis:pdf` (`:1585`) baut auf dem Submodul-Stand, mit dem die Pipeline **gestartet** ist — er sieht den
 frischen Gitlink erst im **Folgelauf**. Das ist kein Defekt, sondern die Reihenfolge.
 

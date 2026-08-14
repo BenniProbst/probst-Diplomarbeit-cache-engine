@@ -100,14 +100,23 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
 // in A_measurements.tex an blankem \input (kein \InputIfFileExists) -- eine ausgelassene Datei waere nur
 // ein zweiter, ebenso fataler LaTeX-Fehler. Deshalb hier Platzhalter statt status_empty_input.
 // ASCII-only (Doktrin), Text kommt escape_latex-durchgereicht aus dem Aufrufer.
+// REV 7.7/F1 (2026-08-13): optionaler head_comment -- der GROESSEN-Fall (gemessene Matrix unter dem
+// 2x2-Minimum) uebergibt einen EIGENEN ehrlichen Kommentarblock, denn der Default-Kopf behauptet
+// "KEINE Zelle ... traegt einen ausgefuehrten Messwert" und waere dort falsch (die Zelle IST gemessen).
+// Leer -> die vier Bestandszeilen BYTE-IDENTISCH (28 Bestands-Platzhalter des 64er-Sets bleiben gleich).
 [[nodiscard]] int write_honest_empty_placeholder(std::filesystem::path const& out_path, std::string const& title,
-                                                 std::string const& note, PageConstraints const& cnst) {
+                                                 std::string const& note, PageConstraints const& cnst,
+                                                 std::string const& head_comment = std::string{}) {
     std::ofstream f{out_path};
     if (!f) return status_io_error;
-    f << "% AUTO-GENERATED durch diagram_generator (E-2a HONEST-EMPTY: Metrik ohne Messwerte)\n";
-    f << "% KEINE Zelle dieser (search_algo x workload)-Flaeche traegt einen ausgefuehrten Messwert.\n";
-    f << "% Eine Heatmap daraus waere eine erfundene 0-ns-Flaeche (und bricht pgfplots fatal, weil die\n";
-    f << "% Farbskala auf eine entartete [0.0:0.0]-Domaene faellt). Daher: ehrlicher Vermerk statt Figur.\n";
+    if (head_comment.empty()) {
+        f << "% AUTO-GENERATED durch diagram_generator (E-2a HONEST-EMPTY: Metrik ohne Messwerte)\n";
+        f << "% KEINE Zelle dieser (search_algo x workload)-Flaeche traegt einen ausgefuehrten Messwert.\n";
+        f << "% Eine Heatmap daraus waere eine erfundene 0-ns-Flaeche (und bricht pgfplots fatal, weil die\n";
+        f << "% Farbskala auf eine entartete [0.0:0.0]-Domaene faellt). Daher: ehrlicher Vermerk statt Figur.\n";
+    } else {
+        f << head_comment;
+    }
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
     f << "\\emph{" << escape_latex(note) << "}\n";
     if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
@@ -138,6 +147,17 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
 [[nodiscard]] std::string default_empty_note() {
     return "(No measured values: this metric was never executed in the present corpus -- the surface is "
            "honestly omitted instead of showing invented zeros.)";
+}
+
+// REV 7.7/F1 (2026-08-13): neutraler ASCII-Default fuer den GROESSEN-Fall, falls der Aufrufer
+// HeatmapData::degenerate_size_note leer laesst. Bewusst OHNE "never executed"/"nie ausgefuehrt":
+// die Matrix IST gemessen, nur als Flaeche nicht darstellbar.
+[[nodiscard]] std::string default_degenerate_size_note(std::size_t ny, std::size_t nx) {
+    return "(Measured, but not drawable as a surface: the corpus spans only " + std::to_string(ny) + " row(s) x " +
+           std::to_string(nx) +
+           " column(s); pgfplots matrix plot requires at least 2 rows and 2 columns. The measured "
+           "value(s) are present in the corpus; the surface is omitted honestly instead of failing "
+           "the build.)";
 }
 
 } // anonymous namespace
@@ -292,6 +312,34 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
                   << "\n";
         return write_honest_empty_placeholder(out_path, data.title,
                                               data.empty_note.empty() ? default_empty_note() : data.empty_note, cnst);
+    }
+
+    // -- REV 7.7/F1 GROESSEN-WACHE (2026-08-13), NACH der Datenlos-Wache (deren "nie ausgefuehrt"-Text
+    //    ist fuer eine DATENLOSE 1x1 der wahrere), VOR dem ofstream. pgfplots' matrix input=image
+    //    verlangt >= 2 Zeilen UND >= 2 Spalten; darunter bricht pdflatex kompilier-fatal ab:
+    //    "'matrix input=image' is unsupported for line plots (or matrix plots with just 1 row or 1
+    //    column)". Proben 13.08.2026 (texlive 2026, compat=1.18, /tmp/f1_probe_1x1): matrix plot*
+    //    1x1 rc=1, 1x2 rc=1, 2x2 rc=0; \addplot3[surf] 1x1 rc=0. Der F1-Smoke-Korpus (Job 376333:
+    //    1 Algo x 1 Workload, ns_per_op=1199.047) ist GENAU dieser Fall: GEMESSEN, aber unter dem
+    //    Minimum -- die E-2a-Wache deckte nur Datenlosigkeit, nicht die GROESSE.
+    // SELBSTCHECK
+    //   ZUSICHERT: jede lc_surface_/lc_surface_ratio_-Datei kompiliert auch bei 1x1/1xN/Nx1-Korpora
+    //              (Platzhalter statt matrix plot*; Rueckgabe status_ok, die Datei existiert).
+    //   ZUSICHERT NICHT: nichts ueber den 3D-surf-Pfad (write_surface3d_*: \addplot3[surf] kompiliert
+    //              bei 1x1, Probe 13.08.) und nichts ueber Nicht-Matrix-Writer (Bar/Scatter/Sweep/...).
+    if (ny < 2 || nx < 2) {
+        std::cerr << "diagram-generator: HONEST-EMPTY (Groesse) -- gemessene " << ny << "x" << nx
+                  << "-Flaeche unter dem 2x2-Minimum von matrix input=image \"" << data.title
+                  << "\" -> Platzhalter-Vermerk statt Heatmap: " << out_path.string() << "\n";
+        std::string head;
+        head += "% AUTO-GENERATED durch diagram_generator (HONEST-EMPTY (Groesse): Flaeche unter 2x2)\n";
+        head += "% Zelle(n) GEMESSEN, aber die Flaeche liegt unter dem 2x2-Minimum von matrix input=image\n";
+        head += "% (pgfplots bricht bei 1 Zeile ODER 1 Spalte kompilier-fatal ab). Der Vermerk behauptet\n";
+        head += "% ausdruecklich KEINE Datenlosigkeit: der Messwert steht im Korpus.\n";
+        return write_honest_empty_placeholder(out_path, data.title,
+                                              data.degenerate_size_note.empty() ? default_degenerate_size_note(ny, nx)
+                                                                                : data.degenerate_size_note,
+                                              cnst, head);
     }
 
     std::ofstream f{out_path};
@@ -1008,6 +1056,38 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
                          : ("(No measured values: " + metric +
                             " was never executed in the present corpus. This surface is honestly omitted instead of "
                             "claiming a 0 ns measurement.)");
+    // REV 7.7/F1 (2026-08-13): sprach-lokalisierter GROESSEN-Vermerk (Matrix GEMESSEN, aber unter dem
+    // 2x2-Minimum von matrix input=image -- 1x1/1xN/Nx1 kompilier-fatal). Er darf ausdruecklich NICHT
+    // "nie ausgefuehrt" behaupten: der Messwert ist im Korpus VORHANDEN (F1-Beleg Job 376333, 1x1-Smoke,
+    // ns_per_op=1199.047). Wortlaut nennt Metrik + Groesse + Vorhandensein.
+    {
+        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // F1-FIX (2026-08-13, Lens-Fund e-ii): Numerus nach der ZAHL DER MESSWERTE, nicht pauschal
+        // Singular -- eine gemessene 1x3-Matrix traegt drei Messwerte, "Der Messwert selbst ist" war
+        // dort sachlich falsch. Gezaehlt wird mit exakt der Zellen-Logik des Writers (Masken-Wache +
+        // cell_displayable), nicht ueber ny*nx: nicht ausgefuehrte Zellen sind keine Messwerte. Der
+        // ratio-Pfad unten bleibt zu Recht IMMER Plural (jede Verhaeltnis-Zelle = Zaehler UND Nenner).
+        bool const  note_mask = heatmap_mask_matches(data);
+        std::size_t n_meas    = 0;
+        for (std::size_t y = 0; y < data.matrix.size(); ++y)
+            for (std::size_t x = 0; x < data.matrix[y].size(); ++x)
+                if (cell_displayable(data, note_mask, y, x)) ++n_meas;
+        bool const one = (n_meas == 1);
+        data.degenerate_size_note =
+            de ? ("(Gemessen, aber nicht als Flaeche darstellbar: " + metric +
+                  " liegt im vorliegenden Korpus nur als " + size_txt +
+                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
+                  "2x2. " +
+                  (one ? "Der Messwert selbst ist" : "Die Messwerte selbst sind") +
+                  " im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
+                  "statt den Bau zu brechen.)")
+               : ("(Measured, but not drawable as a surface: " + metric + " spans only a " + size_txt +
+                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
+                  "requires at least 2x2. " +
+                  (one ? "The measured value itself is" : "The measured values themselves are") +
+                  " present in the corpus; the surface is "
+                  "omitted honestly instead of failing the build.)");
+    }
     // write_heatmap WIEDERVERWENDEN (view={0}{90} matrix plot + colormap/viridis).
     return write_heatmap(out, data, cnst);
 }
@@ -1039,6 +1119,23 @@ int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span
            : ("(No comparable measurements: " + metric + " has no reference series for " + reference_algo +
               " in the present corpus (or was never executed). This surface is honestly omitted "
               "instead of claiming a ratio against a missing reference.)");
+    // REV 7.7/F1 (2026-08-13): GROESSEN-Vermerk des ratio-Pfades -- die Verhaeltnis-Matrix traegt Daten
+    // (Referenz IM Korpus), ist aber unter dem 2x2-Minimum. KEINE "nie ausgefuehrt"-Behauptung; der
+    // Wortlaut nennt Metrik, Referenz, Groesse und dass die Messwerte im Korpus VORHANDEN sind.
+    {
+        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        data.degenerate_size_note =
+            de ? ("(Gemessen, aber nicht als Flaeche darstellbar: das Verhaeltnis " + metric + " zur Referenz " +
+                  reference_algo + " liegt im vorliegenden Korpus nur als " + size_txt +
+                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
+                  "2x2. Die Messwerte selbst sind im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
+                  "statt den Bau zu brechen.)")
+               : ("(Measured, but not drawable as a surface: the ratio of " + metric + " to reference " +
+                  reference_algo + " spans only a " + size_txt +
+                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
+                  "requires at least 2x2. The measured values themselves are present in the corpus; the "
+                  "surface is omitted honestly instead of failing the build.)");
+    }
     return write_heatmap(out, data, cnst);
 }
 
