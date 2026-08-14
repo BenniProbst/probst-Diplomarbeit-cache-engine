@@ -1488,7 +1488,8 @@ visibility:tier-binaries:
   script:
     - 'echo "== Toolchain =="; cmake --version'
     - cd Code
-    - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # CI-DUAL Tranche 2 (F2-Default Debug): BuildType EXPLIZIT -- vorher LEER (-O0-Klasse).
+    - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug
     # W1 (05.08.2026, F1-HART): 'plan dump' ist die PLANER-Rolle und lebt in der eigenen ce-Binary
     # comdare-experiment-planner. Der Treiber-Bau bleibt daneben stehen -- dieser Job beweist die
     # Bau-Sichtbarkeit BEIDER Stufen-Traeger (CEB + Planer).
@@ -1538,7 +1539,8 @@ integration:smoke:
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
-    - cmake -B build-integration -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # CI-DUAL Tranche 2 (F2-Default Debug): BuildType EXPLIZIT -- vorher LEER (-O0-Klasse).
+    - cmake -B build-integration -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc.
     - cmake --build build-integration --target sample_data_generator binary_to_csv_cli csv_to_latex_cli diagram_generator_cli
     - |
