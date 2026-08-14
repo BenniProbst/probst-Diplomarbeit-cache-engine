@@ -1,0 +1,12 @@
+# E-18-SNAP RECOVERY-IDENTITAET (PENDING)
+# Diese Datei nennt den 289-Stand, den DIESER Lauf gepusht hat. Stirbt der Lauf danach,
+# weiss ein spaeterer Lauf trotzdem, welchem Stand der Compile-Beleg fehlt -- unabhaengig
+# davon, wohin der 289-HEAD inzwischen gewandert ist (Codex NB2-2).
+pending_lauf_kennung=r16-j377539
+pending_erzeugt_utc=2026-08-14T19:48:53Z
+pending_thesis_branch=development
+pending_thesis_commit_sha=2eabaec33c37bc24395c13432255e14c2121b217
+pending_super_commit_sha=904d22b21039b9a3ea3a34750bc8562f5d75f445
+pending_kanal_lauf_id=15800
+erfuellt_durch=20260814-194856-r16-j377539
+erfuellt_utc=2026-08-14T19:48:57Z

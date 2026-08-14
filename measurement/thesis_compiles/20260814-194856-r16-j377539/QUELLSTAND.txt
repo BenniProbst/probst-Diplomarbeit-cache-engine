@@ -1,0 +1,27 @@
+# E-18-SNAP Compile-Schnappschuss -- QUELLSTAND
+# OWNER-KERN (Ledger frueh-6): 'so laesst sich ein compile nachvollziehen'.
+# Diese Datei nennt GENAU die Staende, aus denen die danebenliegende PDF entstanden ist:
+# thesis_commit_sha ist der Quellstand der Diplomarbeit (Projekt 289), super_commit_sha
+# der Stand des Mess-/Bau-Repos (Projekt 288), der den Kanal-Lauf ausgeloest hat.
+snapshot_id=20260814-194856-r16-j377539
+lauf_kennung=r16-j377539
+generiert_utc=2026-08-14T19:48:57Z
+thesis_commit_sha=2eabaec33c37bc24395c13432255e14c2121b217
+thesis_branch=development
+super_commit_sha=904d22b21039b9a3ea3a34750bc8562f5d75f445
+super_commit_ref=development
+kanal_lauf_id=15800
+kanal_lauf_url=https://gitlab.comdare.local/comdare/research/probst-diplomarbeit-cache-engine/-/pipelines/15800
+quelle_kind=artefakt
+quelle_ref=Code/measure_out_smoke/appendix
+haupt_dokument=diplomarbeit.tex
+tex_werkzeug=latexmk
+pdf_datei=diplomarbeit.pdf
+pdf_bytes=918803
+pdf_sha256=e4e06b2e8f8b11786b5c17c107b12344703da1b417d6012b6e1de49a560287fc
+compile_export=compile-export.txt
+anhang_dateien_uebernommen=64
+modus=vorwaerts
+recovery_quelle=NA
+thesis_commit_aus_diesem_lauf=ja
+gepusht=ja
