@@ -245,16 +245,16 @@ Jede Variable schaltet **genau einen** Job scharf; die drei Regeln sind **paarwe
 | Opt-in | schaltet scharf | Gate-Stelle |
 |---|---|---|
 | `COMDARE_DURCHSTICH` | `measure:smoke` (`:1810`) | `.gitlab-ci.yml:1838` |
-| `COMDARE_PERSIST_MEASUREMENTS` | `persist:measurements` (`:2241`) | `.gitlab-ci.yml:2270` |
-| `COMDARE_ANHANG_FORWARD` | `anhang:forward` (`:2416`) | `.gitlab-ci.yml:2438` |
+| `COMDARE_PERSIST_MEASUREMENTS` | `persist:measurements` (`:2294`) | `.gitlab-ci.yml:2323` |
+| `COMDARE_ANHANG_FORWARD` | `anhang:forward` (`:2474`) | `.gitlab-ci.yml:2496` |
 
 `persist:measurements` und `anhang:forward` laufen zusätzlich **nur auf `development`**
 (Branch-Bedingung in derselben Regel). Fehlt ein Opt-in, **entsteht der Job gar nicht** — die Regel
 greift nicht; die `INERT`-Zeile im Skript ist nur der zweite Gurt („defense-in-depth; die rules gaten
-bereits", `.gitlab-ci.yml:2274`).
+bereits", `.gitlab-ci.yml:2327`).
 
 > **Der Lauf muss von einem Menschen gestartet werden.** Beide Schreib-Jobs tragen als **erste** Regel
-> `$GITLAB_USER_LOGIN =~ /_bot_/ → when: never` (`:2268`, `:2436`) — ein von einem Bot/Token ausgelöster
+> `$GITLAB_USER_LOGIN =~ /_bot_/ → when: never` (`:2321`, `:2494`) — ein von einem Bot/Token ausgelöster
 > Lauf misst zwar, schreibt aber **weder** nach 288 **noch** nach 289 zurück, und zwar **ohne** roten Job.
 
 > ⚠️ **`COMDARE_RUN_MEASURE` NICHT setzen.** Es erzeugt zugleich `measure:golden-320` (Timeout **10 Tage**),
@@ -266,17 +266,17 @@ hart ab (kein stiller Skip).
 
 | Variablenpaar | Projekt | Gate-Stelle |
 |---|---|---|
-| `COMDARE_WRITEBACK_USER` / `COMDARE_WRITEBACK_TOKEN` | 288 (super) | `.gitlab-ci.yml:2278-2280` |
-| `COMDARE_THESIS_WRITEBACK_USER` / `COMDARE_THESIS_WRITEBACK_TOKEN` | 289 (Thesis) | `.gitlab-ci.yml:2446-2453` |
+| `COMDARE_WRITEBACK_USER` / `COMDARE_WRITEBACK_TOKEN` | 288 (super) | `.gitlab-ci.yml:2331-2333` |
+| `COMDARE_THESIS_WRITEBACK_USER` / `COMDARE_THESIS_WRITEBACK_TOKEN` | 289 (Thesis) | `.gitlab-ci.yml:2504-2508` |
 
 `anhang:forward` prüft **beide** Paare: das 289er für den Anhang-Push, das 288er für den Gitlink-Bump
-(`.gitlab-ci.yml:2451-2452`).
+(`.gitlab-ci.yml:2504-2511`).
 
-**Beweisjobs, in dieser Reihenfolge:** `measure:smoke` (`:1810`) → `persist:measurements` (`:2241`) →
-`anhang:forward` (`:2416`).
+**Beweisjobs, in dieser Reihenfolge:** `measure:smoke` (`:1810`) → `persist:measurements` (`:2294`) →
+`anhang:forward` (`:2474`).
 
 **Lese-Hinweis (nicht verwechseln):** der PDF-Beweis **dieses** Laufs kommt aus dem **PDF-Gate des
-anhang-Kerns** (`ci/anhang_forward_core.sh:1310ff`, ALLES-ODER-NICHTS gegen den 289-Klon). Der Job
+anhang-Kerns** (`ci/anhang_forward_core.sh:1321ff`, ALLES-ODER-NICHTS gegen den 289-Klon). Der Job
 `thesis:pdf` (`:1585`) baut auf dem Submodul-Stand, mit dem die Pipeline **gestartet** ist — er sieht den
 frischen Gitlink erst im **Folgelauf**. Das ist kein Defekt, sondern die Reihenfolge.
 
