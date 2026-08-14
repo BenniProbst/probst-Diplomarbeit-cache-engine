@@ -16,6 +16,137 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON65: F-G1-RUNDE FINAL (Teil 4-6) + CACHE-XML-ORDER + BENCHMARK-EXPLORE-BEFUNDE
+
+**Anlass: Owner-Antworten 15.08. NACH der KON64-Buchung (kon64_sammlung.md Teile 4-6)
++ Kernbefunde des per KON64-03 georderten Benchmark-Explores (wf_2e3d0e0d). Vollzug im
+selben Zug: G-1-Design Paragraf 12 (M-8/M-9-Finalfassung) + beide MARKER-PFLICHTEN aus
+KON64-03. Nummern-Vergabe gemessen: KON65 vor diesem Nachtrag 0 Treffer.**
+
+### KON65-01 -- F-G1-3 'Jetzt volles GO' + PLANER-VERTRAGS-SLOT: EIGENE ZEILE VOR DEM SHA
+
+    F-G1-3 FINAL (Teil 4): 'Jetzt volles GO.' -- m-Flag bleibt b/h/t OHNE
+      Planer-Slot; der CEB-Stempel traegt den PLANER-VERTRAGS-SLOT
+      (Versions-Pin des Planer<->CEB-Steuer-Vertrags, KON64-03).
+    FORM/ORT entschieden (Teil 5, Frage F6): EIGENE Stempel-Zeile 'zwischen
+      die derzeit letzte echte Zeile vor das SHA', ins SHA-Hashing
+      EINGEBUNDEN. Nur auf der CEB; Kinder tragen ihn nicht.
+
+### KON65-02 -- F-G1-4 VOLLSTAENDIG FINAL (Teil 6 beantwortet beide Rueckfragen)
+
+    RUECKFRAGE 1 (w-Widerspruch), Owner verbatim: 'Bitte Option (a). Die
+      Wallclock time ist in CEB gegen Tier/Hybrid eingebaut und wird je
+      Organ-Achse zusaetzlich zu deren Spezialparameter erhoben.' --
+      Tier-Wallclock-Gates w-BEDINGT gebaut (w-Wechsel = Kind-Rekompilation);
+      B3-Konsequenz + w-fuehrender Kind-Stempel (KON60-08/F-G1-11)
+      BESTAETIGT; der F-G1-4(b)-Sonderfall betrifft NUR die rein CEB-seitige
+      checkpoint_measure-Klammer. NEU: w wird JE ORGAN-ACHSE zusaetzlich zu
+      deren Spezialparametern erhoben (deckt sich mit der segmentierten
+      per-Achsen-Messung, 18 seg_<achse>-ns).
+    RUECKFRAGE 2 (CEB-Granularitaet), Owner-Kern: 'fuer den build je
+      einzelner Vertrag aber fuer das Messen fuer beide Vertraege zusammen'.
+      BUILD je EINZELVERTRAG (CEB<->Tier, CEB<->Hybrid GETRENNT permutiert);
+      ORDNUNG: naeher-an-CEB => Funktionsumfang >= Folge-Stufen (abwaerts-
+      kompatibel); DEFAULT: Tier==Hybrid-Messfuehler-Konfiguration; MESSEN
+      beide Vertraege ZUSAMMEN (Tier/Hybrid gegen CEB = EIN Ziel).
+    KLASSEN-PRAEZISIERUNG (Teil 4, 'Freigabe'): 'die CEBs werden also je
+      Mess-Achsen Variationen gebaut und passen auf ihre Mess-Achsen Klasse
+      an Tier/Hybrid.' -- EIN CEB-Kompilat je Mess-Belegungs-VARIATION
+      (nicht je Kind-Instanz); jede Klassen-CEB treibt ueber das Pruefdock
+      ALLE Tier/Hybrid ihrer Klasse.
+    xlsx-KLARSTELLUNG (Teil 4): 'die xlsx traegt auch in allen Tabellen die
+      verfuegbaren CSV Spalten' (bestaetigt KON60-05-Kind-Doktrin); NEU:
+      'Die Aufmachung der xlsx ist geplant (10 Wochen explore).' ->
+      EXPLORE-ORDER xlsx-Aufmachung (Blattform/Tabellen-Layout), gebuendelt
+      in den S-13-Vorlauf (Task #55).
+    VOLLZUG: G-1-Design Paragraf 12 publiziert (M-8/M-9-FINALFASSUNG,
+      12.1-12.7) + UEBERHOLT-Marker an G-1 3.3/7.4 -- MARKER-PFLICHT (2)
+      aus KON64-03 VOLLZOGEN.
+
+### KON65-03 -- F1-F8-FAMILIENRUNDE (Teil 5) + 32er-FALLEN-KORREKTUR
+
+    F1 PMC-SONDER-GRAMMATIK ('Korrekt erkannt'): 'existiert keine PMC, wird
+      allerdings gar nicht erst eine eingetragen' (Abwesenheit = KEIN
+      Eintrag, kein leerer Slot); PMC DREIPHASIG auf CEB UND Tier/Hybrid als
+      PERMUTIERENDE Messeinrichtung, 'die als ZUSAETZLICHE Achse die
+      Permutation gegen w/ma/mi erweitert' (NENNER-ERWEITERUNG).
+    F2 PLANER-HARDWARE-ERKENNUNG (Ausnahme NUR fuer PMC, Owner verbatim):
+      '... ausnahmsweise eine Hardware-Erkennung im Planer nur fuer PMC
+      durchfuehrt und diese Freigabe an die System-Achse freigibt, die hier
+      nur als Proxy fungiert ...' -- System-Achse = PROXY der PMC-Freigabe.
+    F3 LASTSEQUENZ-INTERPRETER: 'Die CEB traegt im Stempel die
+      Last-Frameworks die eingebaut sind ... Die Last-Sequenzen sind dabei
+      eine Unter-Achse als XML-Ablaufinterpreter der Last-Abfrage-
+      Anordnungen zur Laufzeit und eine Erweiterung der bestehenden
+      Last-Frameworks ...' -- ERWEITERUNG statt Doppelheimat (Frameworks-
+      EINGEBAUT = Stempel/load_framework, Ablauf = XML-Interpreter);
+      Owner-Gegenfrage 'single source?' im Chat beantwortet, damit geloest.
+    F4 HYBRID-META-META BLEIBT: 'Director an die Moeglichkeiten, welche die
+      CEB auf dem Hybriden fahren darf' -- Planer entscheidet per XML ueber
+      Grenzen der Tier-Binaries an den Hybrid-Docks + DYNAMISCHE Laufzeit-
+      Anpassung (Wahl/Austausch an Pruefdocks) + manuelle SYNTHESE-
+      FUNKTIONEN zum Uebersteuern des break-even ('erweiterte hybrid
+      experimente'); Thema zerfaellt in getrennte Einzelbereiche.
+    F5 'Ja korrekt': VIELZAHL Anforderungen/Grammatiken, auch Unter-Achsen
+      designen (Familie Task #53). F8 'exakt korrekt': ZWEI PMC-Systeme
+      (AMD/Intel), 'ueber das Durchreichen kommunizieren, abbilden und
+      durch Kompilate abbilden muessen. Freigabe.' F6 s. KON65-01.
+    32er-FALLE KORRIGIERT (Owner verbatim): 'Bezueglich der 32 Mess-
+      Belegungs-Kombinationen hat die Falle wieder zugeschnappt, die
+      Mess-Achsen Permutationen sind entkoppelt von der Menge an Pruefdocks
+      am Hybriden. Ist schon mal vorgekommen.' -- Belegungs-Welt (32=2^5)
+      von Dock-Zahl/Schicht-Groessen ENTKOPPELT (KON25-03/KON41-03
+      bestaetigt); die dock-gekoppelte Formulierung 'je bis 8' der
+      Rueckfrage 2 ist verworfen.
+    VOLLZUG: MARKER-PFLICHT (1) aus KON64-03 VOLLZOGEN -- datierter
+      UEBERHOLT-Marker am 06.08.-PMC-Plan :363 ('PMC als Unter-Achse von
+      micro') gesetzt, Original steht.
+
+### KON65-04 -- CACHE-XML-WAHL-ORDER + MINIO-DEV/PROD-KLAERUNGSFRAGE
+
+    NEUE XML-ANFORDERUNG (Teil 5, Owner verbatim): 'In der XML sollte
+      einstellbar sein, ob ein minio caching oder custom artifact caching
+      fuer alle Planer und Traeger-Stufen verwendet werden sollte, sowohl
+      fuer die lokale Komplett-Durchfuehrung durch einen Anwender, als auch
+      in der CI auf gitlab.' -- XML-Cache-Sektion (Schwester der
+      Publikations-Sektion, Task #48-Design); Explore-Order minio- vs
+      custom-artifact-caching-Regeln laut Plan: wf_618a5525 LAEUFT
+      (Start 15.08.).
+    MINIO-KLAERUNGSFRAGE (Teil 4): dev minio.comdare.local vs prod
+      minio.comdare.de -- geheilt (A3) ist die Instanz hinter .de/cluster-
+      intern (K8s databases-Namespace; Beweis: neuer Key dort sofort
+      gueltig, gitlab-backups+buildsystem-cache dort); ob .local eine
+      SEPARATE dev-Instanz mit eigenem Paar ist = PRUEFPOSTEN (Task #55;
+      Verify hatte .local als Reachability-Fail markiert, nicht
+      Auth-Reject).
+
+### KON65-05 -- BENCHMARK-EXPLORE-KERNBEFUNDE (wf_2e3d0e0d) + OFFENER POSTEN
+
+    w-HALBE-WAHRHEIT am Objekt: am gebauten System B ist w NICHT
+      faktorisiert -- Wallclock ist eines von drei Instrumenten IN
+      DERSELBEN Konfiguration (mess::Voll, konfiguration.hpp:218); MK-Tag
+      und Dock-Identitaet permutieren w mit (steuer_dock.hpp:229-235); der
+      separate CEB-Wrapper (KON60-08 (iii)) ist UNGEBAUT
+      (planner_mengen_types.hpp:32: 'checkpoint_measure ist heute in KEINE
+      Mess-Schleife verdrahtet') -> der WRAPPER-BAU ist BAU-VORBEDINGUNG
+      des per Teil 6 eingegrenzten F-G1-4(b)-Sonderfalls (w-Klammer
+      entfernbar ohne Kind-Rekompilation), kein Ist-Zustand. Der Live-Pfad
+      misst heute ausschliesslich host-seitige Wall-Clock-Brackets; ma/mi
+      als getrennte Kind-Instrumente wurden nie produktiv gemessen.
+    IDEMPOTENZ-SACHKETTE (Urfundstellen-Explore): die Wendung 'idempotent
+      zu beiden Vertragspartnern' faellt ERSTMALS 14.08. 20:56 (Transkript
+      5a19728e:55129; beide Voll-Korpora + Ledger-Volltext davor 0
+      Treffer); die SACHE traegt eine Kette aelterer Entscheide: 21.07.
+      MODI-VOLLDEFINITION (Observer per Metaprogrammierung ABSCHALTBAR),
+      22.07. Sec.64-AUSRICHTUNGS-MECHANIK (beidseitige CEB<->Tier-
+      Ausstattung), 09.08. K5 ('Overhead = Differenz, kein eigener
+      Messkanal'), 12.08. KON37-01 ('Durchfuehrung im Vertrag zwischen CEB
+      und Tier/Hybrid'). GENUIN NEU 14.08.: die RICHTUNGSUMKEHR fuer
+      schwache Kinder (die ANGEZEIGTE Kind-Belegung bestimmt das
+      CEB-Kompilat).
+    OFFEN: OF-1 prt-art-CHANGE-DATE weiter UNBEANTWORTET (ce-Change-Date
+      ist entschieden, KON61-02: ~10.08.2031; die prt-art-Frage NICHT) --
+      Lande-Zug Task #56 (prt-art-Lizenz-Commit) wartet darauf.
 ## NACHTRAG 15.08.2026 -- KON64: OWNER-GROSSRUNDE 14.08. ABENDS/NACHTS (B/C/D-BLOECKE + VORLAGE-RUNDE + F-G1-KOMPLETT) + INFRA-VOLLZUEGE + MESS-ACHSEN-FAMILIEN-KARTE
 
 **Anlass: Owner-Antworten in vier Nachrichten (14.08. abends bis nachts) auf die offene
