@@ -33,3 +33,14 @@ paths = [
 description = "Test-Fixtures mit absichtlichen Pseudo-Schlüsseln"
 regexTarget = "match"
 regexes = [ '''(?i)(example|dummy|sample|test|fake|placeholder)[-_]?(key|token|secret|pw|password)''' ]
+
+[[allowlists]]
+# A2.5-FIX 14.08.: Scan-Ketten-Doktrin dokumentiert Koeder-Belege; d9ed8642 traegt zwei
+# glpat-Koeder-Literale im COMMIT-TEXT (Praezedenz 'nur im Commit-Text, sonst Selbst-Trigger').
+# Der lint:secrets-Job (dir-Modus) scannt Messages NICHT, die lokale Push-Wache (stdin-Modus
+# ueber git log -p) SCHON -> diese Zeilen-Klasse entlastet NUR Zeilen, die das Token selbst
+# als Koeder deklarieren ('Koeder' vor dem Token in derselben Zeile). Koeder sind per
+# Doktrin Zufallswerte, nie echte PATs. Neue Commit-Texte fuehren Koeder MASKIERT.
+description = "Deklarierte Koeder-Prosa: Wort 'Koeder' vor glpat-Token in derselben Zeile"
+regexTarget = "line"
+regexes = [ '''(?i)koeder[^\r\n]{0,80}glpat-[0-9a-zA-Z_-]{20}''' ]
