@@ -1,0 +1,25 @@
+chore(gitlink): neunter Zug 5f3f26a5 -> 4f18f478 (Stufe-3-Landung + Lint-Fix nach 15792) + PZW-Fussnote atomar
+
+Die Drei-Stufen-Landung kommt in super an: der Gitlink zieht auf den CI-bewiesenen
+ce-Stand 4f18f478 (ce-Pipeline 15793 TERMINAL SUCCESS -- status=success,
+finished_at 2026-08-14T13:39:29.790Z, duration 2345 s, Jobs 23 success +
+1 manual von 24 (is_original:relock = deklarierte Ausnahme), 0 failed; die
+Vorgaenger-Pipeline 15792 @ 2a3b1eb0 war ROT an lint:format Job 377292 (80
+clang-format-Verstoesse in 2 Lizenz-Testdateien) + lint:static Job 377293 (2x
+cppcheck uninitMemberVarNoCtor); Heilung 4f18f478 mit T-1 RED->GREEN lokal).
+Richtungsbeweis V6.8: merge-base --is-ancestor 5f3f26a5 4f18f478 rc=0 (vorwaerts).
+
+PZW-FUSSNOTE ATOMAR (KON4-07/R1), Zahlen mit der Wache-Formel am Baum 4f18f478
+frisch erhoben -- zum sechsten Mal in Folge bewegt sich KEINE der fuenf Zahlen:
+  PZW-CE-SHA 5f3f26a5 -> 4f18f478 · SCHEMA 40/21/2 (Nenner 501 -> 504 Test-.cpp,
+  59 Rohzeilen) · CI 2/0 (Nenner 2768 -> 2835 YAML-Zeilen).
+thesis_profiles R1: 11 von 11 mit xlsx>=1 (/usr/bin/grep -c xlsx je Profil,
+frisch am Arbeitsstand == 4f18f478).
+Floor: 492/488/486 (KON61-01 STUFE-C, covguard 'genau erreicht: 492 == Anker 492').
+Kombibau-Bilanz: 4x '100% tests passed, 0 tests failed out of 491' (fail=0),
+gemessen @ 2a3b1eb0 (KON61-01); Delta 2a3b1eb0..4f18f478 ist Lint-only
+(Format-Re-Wraps + 2 NSDMI), gedeckt durch ce-CI 15793 (test:unit + contract).
+Landungs-Merge-SHAs (6): ce d215b127 (S-7) / 0304ebf1 (Wachen-Floor) / a6804dfa
+(P6); super 865ff21d (F1) / dbef5b0f (texgate) / ad742bdc (e21).
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
