@@ -246,6 +246,12 @@ Spezifikations-Stempel auf X.Y.Z gesetzt hat, hier auf den Mess-Gegenstand ueber
 FRAMEWORK-Mess-Achse, liegt selbst auf einem Achsen-Interface — F-G1-9), PMC bleibt
 Meta-Meta mit eigener Versions-Quelle (Klasse (k), `pmc_vendor_registry.hpp` — F-G1-8).
 
+**[UEBERHOLT 15.08.2026 -- beide 'bleibt'-Aussagen des vorstehenden Satzes sind anders
+entschieden (F-G1-8/-9-KORREKTUREN, KON64-03 + KON65): PMC = eigenstaendige DREIPHASIGE
+Meta-Meta-Achse mit Sonder-Grammatik (s. Paragraf 12.5), Lastsequenz = EIGENE Mess-Achse
+mit XML-Ablaufinterpreter-Unter-Achse (s. Paragraf 12.6). Original oben bleibt stehen
+(Doku-Doktrin).]**
+
 ---
 
 ## 4. Fuenf durchgerechnete Beispiele
@@ -425,6 +431,9 @@ Meldung — erst laute Compile-Fehler, dann verschieben (Hausdoktrin).
    greift ihr nicht vor (nur die S-3-Relation wird als Baustein WIEDERVERWENDET).
 4. **PMC und Lastsequenz** — bleiben nach Aktenlage Meta-Meta (eigene Versions-Quellen/
    Klammer-Anhaenge); Einbindung als Owner-Fragen F-G1-8/F-G1-9, nicht als stiller Entwurf.
+   **[UEBERHOLT 15.08.2026 -- die Owner-Fragen F-G1-8/F-G1-9 sind beantwortet und BEIDE
+   Punkte anders entschieden (KON64-03 + KON65): PMC = eigenstaendige DREIPHASIGE
+   Meta-Meta-Achse (Paragraf 12.5), Lastsequenz = EIGENE Mess-Achse (Paragraf 12.6).]**
 5. **KEIN BAU.** §15.2 verlangt einen Design-VORSCHLAG; jede Zeile dieses Dokuments ist
    Vorlage. Bau erst nach Owner-GO, dann als Stempel-Strecken-Posten (KON38: Fable 5 max).
 
@@ -686,3 +695,186 @@ Explore-Pflicht geht der Formulierung "Konstruktionsarbeit Komplex-Fix" vor, sow
 gemeint waere -- die DOKUMENT-Konstruktion ist hiermit geschehen). F-G1-3 bis F-G1-10 und
 F-G1-12 bleiben offene Owner-Fragen (9 von 12); dieser Nachtrag beantwortet AUSSCHLIESSLICH
 F-G1-11 aus Bestand und traegt den S0.3-Startgrenzen-Befund nach.
+
+---
+
+## 12. NACHTRAG 15.08.2026 (F-G1-Runde final, KON64/KON65)
+
+Status: FINALFASSUNG der F-G1-Runde nach den Owner-Antworten 14./15.08. Quelle der
+Wortlaute: kon64_sammlung.md dieser Session (Teile 1-6; Teile 1-3 gebucht als KON64-03,
+Teile 4-6 als KON65) + Kernbefunde des per KON64-03 georderten Benchmark-Explores
+(wf_2e3d0e0d; w-halbe-Wahrheit und Idempotenz-Sachkette, s. 12.1 und Ledger KON65-05).
+Die beiden Rueckfragen der M-8/M-9-Formalisierung sind beantwortet (Teil 6): F-G1-4 ist
+damit VOLLSTAENDIG FINAL, F-G1-3 hat 'Jetzt volles GO' (Teil 4). Der Kopf-STATUS-NACHTRAG
+('OFFEN 9 von 12') ist damit HISTORIE: ALLE F-G1-Punkte sind entschieden. Dieser Paragraf
+ersetzt M-8/M-9 (Paragraf 3.2) in der Sache und UEBERHOLT die markierten Saetze in
+Paragraf 3.3/7.4; der uebrige Bestand bleibt unveraendert stehen (Doku-Doktrin).
+KEIN BAU: Bau bleibt W-Strecke nach Plan (11.6); der Wrapper-Bau ist ausserdem
+BAU-VORBEDINGUNG des F-G1-4(b)-Sonderfalls (12.1, letzter Absatz).
+
+### 12.1 (M-8 FINAL) Projektion unter der IDEMPOTENZ-DOKTRIN (F-G1-4; Owner 14./15.08.)
+
+Ersetzt M-8 (Paragraf 3.2). Die Vertraege werden 'technisch gesehen gleich idempotent zu
+beiden Vertragspartnern ... gefuehrt zwischen CEB und Tier/Hybrid' (Owner verbatim,
+Transkript 5a19728e:55129; kon64_sammlung Teil 3): je KIND-Belegung existiert ein PERFEKT
+ANGEPASSTES CEB-Kompilat -- die CEB haelt gegen kein Kind einen Ober-Funktionsumfang vor
+(Klassen-Schnitt: je Mess-Achsen-VARIATION, nicht je Kind-Instanz -- 12.3). Fest bleibt:
+die CEB stempelt den vollen Vertrags-Ausdruck (Kopf beider Vertraege, KON13-02); der
+Kind-Stempel ist der KOMPILAT-Stempel (11.1) mit w-fuehrender Slot-Projektion (11.2).
+NEU: ein SCHWAECHER ausgepraegtes Kind ist zulaessig und MUSS die schwaechere Belegung
+ueber den Stempel anzeigen (die Kind-Mess-Zeile traegt die ECHTE Belegung); 'die
+Traeger-Stufe davor misst dann einfach das was die nachfolgende Traeger-Stufe leisten
+kann' (Owner verbatim, Teil 3) -- realisiert NICHT durch Laufzeit-Anpassung (die
+Dock-Weiche kennt KEINE Schnittmengenbildung, Mismatch ist LAUT: steuer_dock.hpp:118-126),
+sondern PLAN-seitig: der Planer erzeugt/waehlt zum angezeigten Kind-Stempel das
+CEB-Kompilat GLEICHER Belegung (Kette F-G1-4(a): Planer -> CEB-Kompilat -> Kind-Kompilat,
+'welches auch zur CEB passt', Teil 1). GRUND (Owner, Teil 3): der Overhead der CEB, einen
+Vertrag mit hohem Funktionsumfang aufrechtzuerhalten, zwingt, Macro und/oder Micro aus der
+CEB AUSKOMPILIERBAR zu halten, 'um die differenz zu erkennen' -- Overhead ist Differenz
+zweier Messungen (K5 09.08.), und die Messfehler-PAARE (11.3: je Paar genau EIN Schalter)
+setzen die Auskompilierbarkeit auf BEIDEN Vertragsseiten voraus. Die Projektions-
+GLEICHHEIT gilt damit VERTRAGS-PAARIG: Mess-Belegung des Kind-Kompilats == Mess-Belegung
+des es bauenden CEB-Kompilats an der gemeinsamen Vertragsflaeche; am ABI ist sie als
+identische Monomorphisierung + tag()-Vergleich VOR der Messung bereits gebaut
+(konfiguration.hpp:149-156, checkpoint_measure.hpp:201-203).
+
+W-AUFLOESUNG (Rueckfrage 1 beantwortet -- der fruehere W-VORBEHALT ENTFAELLT). Owner
+verbatim (Teil 6): 'Bitte Option (a). Die Wallclock time ist in CEB gegen Tier/Hybrid
+eingebaut und wird je Organ-Achse zusaetzlich zu deren Spezialparameter erhoben.' Damit
+gilt: die Tier-Wallclock-Gates werden w-BEDINGT gebaut -- ein w-Wechsel ist eine
+Kind-Rekompilation; die B3-Konsequenz (KON37-01 :2171-2172) und der w-fuehrende
+Kind-Stempel (11.2, F-G1-11) sind BESTAETIGT. Der F-G1-4(b)-Sonderfall 'w entfernen ohne
+Tier/Hybrid-Rekompilation' (Teil 1) betrifft AUSSCHLIESSLICH die rein CEB-seitige
+checkpoint_measure-Klammer (11.3-Wrapper), NIE die tier-seitigen Gates. NEU dazu: w wird
+JE ORGAN-ACHSE zusaetzlich zu deren Spezialparametern erhoben (deckt sich mit der
+segmentierten per-Achsen-Messung: 18 seg_<achse>-ns-Werte). OBJEKT-VORBEHALT aus dem
+Benchmark-Explore (wf_2e3d0e0d): am gebauten System B ist w heute NICHT faktorisiert
+(w ist Instrument IN mess::Voll, MK-Tag/Dock permutieren es mit; konfiguration.hpp:218,
+steuer_dock.hpp:229-235) und der separate CEB-Wrapper ist UNGEBAUT -- der Wrapper-Bau
+(W-Strecke) ist damit BAU-VORBEDINGUNG des F-G1-4(b)-Sonderfalls, kein Ist-Zustand.
+
+### 12.2 (M-9 FINAL) Exaktheit = gelebte Gleichheit; Teilmenge nur plan-seitig (F-G1-4/-5)
+
+Ersetzt M-9 (Paragraf 3.2). Fuer die GUELTIGKEIT eines Mess-Stands gilt unveraendert
+GLEICHHEIT der Belegung (zweischneidiger Filter B, KON9-09; jede Belegungs-Aenderung =
+anderes Kompilat und anderer Stempel, KON34-05). GESCHAERFT: auch der VERTRAG selbst wird
+gleich-idempotent gefuehrt. Die Abwaerts-Kompatibilitaets-Teilmenge ('Kind-Belegung liegt
+in der CEB-Vertragsfaehigkeit') ist 'technisch' existent, wird aber 'in der Realitaet ...
+durch weitere perfekt angepasste CEB Kompilate' unterbunden (Owner verbatim, Teil 3): sie
+beschreibt AUSSCHLIESSLICH (a) die Freigabe-Seite Phase 1 (gefordert liegt in
+freigegeben; S-3-Relation flag_menge_ist_teilmenge unveraendert wiederverwendet, Stufe E),
+(b) die FAMILIE der CEB-Kompilate, die der Planer je Kampagne vorhaelt (struktureller
+Nenner: die 32 Belegungen KON25-03; WIE VIELE real gefahren/vorgehalten werden, rechnet
+allein die Planer-Simulation S-19) und (c) die STUFEN-ORDNUNG der Rueckfrage-2-Antwort
+(Teil 6, s. 12.3: naeher-an-CEB => Funktionsumfang >= Folge-Stufen) -- NIE einen zur
+Laufzeit gelebten Ueber-Vertrag, NIE einen Lager-Skip, NIE eine Dock-Schnittmenge. Am
+gelebten Vertrag steht IMMER Gleichheit: ein Binary mit weniger Instrumenten erfuellt den
+Vertrag nicht (Flaeche 3 fehlt), eines mit mehr verfaelscht die Messung (Latenz) UND
+verletzt zusaetzlich die Idempotenz-Doktrin (Ober-Funktionsumfang = unerkennbarer
+Overhead). LAGER-KONSEQUENZ: der Paarungs-Schluessel ist die ANGEZEIGTE Belegung
+(Kind-Mess-Zeile, 12.1); das Lager fuehrt je gefahrener Belegung das gleich-belegte
+CEB-Kompilat und paart NIE staerker gegen schwaecher.
+
+### 12.3 Klassen-Praezisierung, Build-/Mess-Granularitaet, 32er-Entkopplung
+
+* KLASSEN-PRAEZISIERUNG (Teil 4, F-G1-4 'Freigabe', Owner verbatim): '... daher gibt es
+  fuer jedes Tier/Hybrid eine passende CEB, aber es gibt nicht pauschal eine separate
+  CEB fuer jedes Tier/Hybrid, die CEBs werden also je Mess-Achsen Variationen gebaut
+  und passen auf ihre Mess-Achsen Klasse an Tier/Hybrid.' -- Idempotenz gilt JE
+  MESS-ACHSEN-KLASSE: EIN CEB-Kompilat pro Mess-Belegungs-VARIATION, nicht pro
+  Kind-Instanz; jede Klassen-CEB treibt ueber das Pruefdock ALLE Tier/Hybrid ihrer
+  Klasse. Konsistent zum 32er-Nenner.
+* BUILD-/MESS-GRANULARITAET (Teil 6, Rueckfrage 2, Owner verbatim): 'Es gilt in der
+  Permutation je Einzelvertrag. ... Daher gilt es fuer den build je einzelner Vertrag
+  aber fuer das Messen fuer beide Vertraege zusammen, weil hier Tier/Hybrid Einstellung
+  gegen die CEB als ein Ziel zusammenfallen.' -- BUILD: je EINZELVERTRAG permutiert
+  (CEB<->Tier und CEB<->Hybrid GETRENNT); ORDNUNG: 'Traeger Stufen, die naeher an der
+  CEB sind', muessen 'immer einen Funktionsumfang groesser gleich der nachfolgenden
+  Traeger-Stufen haben' (Abwaerts-Kompatibilitaet); DEFAULT: 'default tragen einfach
+  Tier und Hybrid dieselbe Konfiguration fuer Messfuehler'. MESSEN: BEIDE Vertraege
+  ZUSAMMEN -- Tier/Hybrid-Einstellung gegen die CEB fallen als EIN Ziel zusammen.
+* 32er-ENTKOPPLUNG (Teil 5, Owner verbatim): 'Bezueglich der 32 Mess-Belegungs-
+  Kombinationen hat die Falle wieder zugeschnappt, die Mess-Achsen Permutationen sind
+  entkoppelt von der Menge an Pruefdocks am Hybriden.' -- die Belegungs-Welt (32 = 2^5,
+  KON25-03) ist von Dock-Zahl und Schicht-Groessen ENTKOPPELT (KON41-03 bestaetigt);
+  dock-gekoppelte Zaehl-Formulierungen ('je bis 8') sind verworfen.
+
+### 12.4 PLANER-VERTRAGS-SLOT auf der CEB (F-G1-3 final + F6)
+
+F-G1-3: 'Jetzt volles GO.' (Teil 4). Das m-Flag bleibt b/h/t OHNE Planer-Slot (der Planer
+ist Sprecher der Phase 1, kein Belegungs-Traeger -- Paragraf-8-Empfehlung angenommen).
+NEU (Teil 3, Owner verbatim): 'ja der Planer bekommt einen eigenen slot aber nur auf der
+CEB, weil diese die Befehle des Planers entgegennehmen und beantworten muss. Daher muss
+die Version zwischen Planer und CEB fuer den Vertrag stimmen. ... Der Planer entscheidet
+ueber den Vertrag zwischen CEB und Tier/Hybrid die also bezueglich der m zusammenpassen
+muessen.' FORM/ORT entschieden (Teil 5, Frage F6): der Planer-Vertrags-Slot ist eine
+EIGENE Stempel-Zeile 'zwischen die derzeit letzte echte Zeile vor das SHA' -- sie steht
+zwischen der derzeit letzten echten Zeile des CEB-Stempels und der SHA-Zeile und wird ins
+SHA-Hashing EINGEBUNDEN. Traeger: NUR der CEB-Stempel (Versions-Pin des
+Planer<->CEB-Steuer-Vertrags, Steuerkanal-Bezug); Kinder tragen ihn nicht.
+
+### 12.5 F-G1-8-KORREKTUR: PMC = eigenstaendige DREIPHASIGE Meta-Meta-Achse
+
+UEBERHOLT die Aktenlage in Paragraf 3.3/7.4 ('PMC bleibt Meta-Meta ... AUSSERHALB des
+m-Flags' als blosser Verbleib). Owner (Teil 1): 'Die PMC ist hardware und wird per
+dreiphasig als Meta-Meta-Achse als eigenstaendig eingepflegt, aber nicht in der
+existierenden Achse, bitte lies den Plan, das ist geplant (explore!).' Der Plan-Explore
+ist gefahren (KON64-04, wf_6b1d9de5). PRAEZISIERUNGEN (Teil 5):
+
+* F1 SONDER-GRAMMATIK ('Korrekt erkannt'): 'existiert keine PMC, wird allerdings gar
+  nicht erst eine eingetragen' -- Abwesenheit = KEIN Eintrag, kein leerer Slot
+  (bewusster Kontrast zur m-Grammatik M-4, wo der leere Slot Zeiger-Traeger ist). PMC
+  wird DREIPHASIG auf CEB UND Tier/Hybrid eingetragen als PERMUTIERENDE
+  Messeinrichtung, 'die als ZUSAETZLICHE Achse die Permutation gegen w/ma/mi
+  erweitert' -- eine NENNER-ERWEITERUNG gegen die 2^5-Welt (KON25-03 bleibt der
+  w/ma/mi-Kern; PMC multipliziert als eigene Achse dazu).
+* F2 PLANER-HARDWARE-ERKENNUNG (Ausnahme, NUR PMC; Owner verbatim): 'Ich entscheide,
+  dass ein als neue Haupt-Achse bzw. Meta-Meta-Achse PMC ausnahmsweise eine
+  Hardware-Erkennung im Planer nur fuer PMC durchfuehrt und diese Freigabe an die
+  System-Achse freigibt, die hier nur als Proxy fungiert und dann PMC auch als
+  Hardware-Eigenschaft und eigene Meta-Meta-System-Achse freigibt.' -- die System-Achse
+  ist PROXY der PMC-Freigabe, keine zweite Heimat.
+* F8 ZWEI PMC-SYSTEME ('exakt korrekt'): AMD und Intel, 'die wir ueber das Durchreichen
+  kommunizieren, abbilden und durch Kompilate abbilden muessen. Freigabe.'
+
+Das Grammatik-Design der PMC-Achse ist das PMC-Schwester-Dokument der Familie (Task #53;
+Reihenfolge KON64-04: PMC zuerst).
+
+### 12.6 F-G1-9-KORREKTUR: Lastsequenz = EIGENE Mess-Achse mit XML-Ablaufinterpreter
+
+UEBERHOLT die Aktenlage in Paragraf 3.3/7.4 ('bleibt im load_framework-Meta-Meta-
+Segment'). Owner (Teil 2): 'Nein, das ist doch eine eigene Mess-Achse wie geplant
+(explore 10 Wochen). Aber ja diese Achse beschreibt in ihren Flags die geplante
+Zugriffs-Sequenz auf ein Tier/Hybrid Interface und das unterstuetzte und verwendete
+(geplante) Framework set.' ARBEITSTEILUNG (Teil 5, Frage F3, Owner verbatim): 'Hier gibt
+die Mess-Achse die Durchfuehrung an die CEB frei, welche sie dann vorbehaltslos
+uebernimmt. Die CEB traegt im Stempel die Last-Frameworks die eingebaut sind und
+technisch gefahren werden koennten. Die Last-Sequenzen sind dabei eine Unter-Achse als
+XML-Ablaufinterpreter der Last-Abfrage-Anordnungen zur Laufzeit und eine Erweiterung der
+bestehenden Last-Frameworks und fahren diese aus der CEB heraus gegen Tier/Hybrid.' --
+die CEB stempelt die EINGEBAUTEN Frameworks (Stempel/load_framework = Kompilat-Wahrheit);
+die Sequenzen sind eine ERWEITERUNG als Laufzeit-Unter-Achse, KEINE Doppelheimat
+(Single-Source je Datum: Frameworks-EINGEBAUT im Stempel, Ablauf im XML-Interpreter --
+die Owner-Gegenfrage 'Was meinst du mit single source?' wurde im Chat beantwortet, danach
+geloest). Der 10-Wochen-Explore bleibt PFLICHT vor dem Sequenz-Achsen-Design (Task #53).
+
+### 12.7 Bestaetigte Einzelpunkte + Familien-Verweis
+
+* F-G1-6 PRAEZISIERT (Teil 1, Owner verbatim): leere Slots ja, 'aber nur bei
+  Mess-Achsen DREIPHASIG. Sonst sind sie nicht erlaubt und tragen mindestens ein
+  Flag/Tag. Bei CPU muss es ja mindestens einen e core oder p core geben, damit ein
+  Rechner ueberhaupt existieren kann, auch wenn das Basis flag c ist.' -- die
+  M-4-Leere-Slots bleiben MESS-lokal (dreiphasig); G-2/Hardware behaelt die
+  Mindest-Tag-Doktrin.
+* F-G1-10 ANGENOMMEN (Teil 2): 'Freigabe, genau wie du sagst.' -- der String traegt die
+  Anordnung (M-6), die Mess-Home-Tabelle pinnt die FREIGEGEBENE(N) Anordnung(en).
+* HYBRID-META-META BLEIBT eigene Achse (Teil 5, Frage F4, Owner-Kern): 'Director an die
+  Moeglichkeiten, welche die CEB auf dem Hybriden fahren darf' -- der Planer entscheidet
+  per XML ueber die Grenzen der Tier-Binaries an den Hybrid-Docks, DAZU dynamische
+  Laufzeit-Anpassung (Wahl/Austausch der Tier-Binaries an Pruefdocks) und manuelle
+  SYNTHESE-FUNKTIONEN verschiedener Achsen-Parameter zum Uebersteuern des break-even
+  ('erweiterte hybrid experimente'). Der h-Slot der m-Grammatik macht sie NICHT
+  gegenstandslos; das Thema zerfaellt in getrennte Einzelbereiche (bestaetigt).
+* F5 FAMILIEN-UMFANG (Teil 5): 'Ja korrekt' -- die Familie traegt eine VIELZAHL von
+  Anforderungen/Grammatiken, auch Unter-Achsen werden designt. Traeger: DESIGN
+  MESS-ACHSEN-FAMILIE, Task #53 (G-1-Schwester-Dokumente; Reihenfolge KON64-04).

@@ -356,6 +356,20 @@ Das ist eine **Folge** der Hybridizitaet, nicht ihr Ort.
 
 ### 3.3 Haupt-Achse oder Unter-Achse? Und was ist RT, was CT?
 
+> **[UEBERHOLT-MARKER 15.08.2026 -- betrifft die EINRICHTUNG-Zeile der Tabelle unten
+> ('PMC-Domaenen-Satz = Unter-Achse der Mess-Tooling-Achse (micro)'):** die Zuordnung
+> 'PMC als Unter-Achse von micro' ist UEBERHOLT. (1) Owner 10.08.: PMC = META-META-Achse
+> mit EIGENER Permutation (AMD != Intel), keine Unter-Achse der Tooling-Achse
+> (OWNER-ANTWORTEN 10.08.). (2) Owner 14./15.08. (KON64-03 F-G1-8-KORREKTUR + KON65):
+> PMC = EIGENSTAENDIGE DREIPHASIGE Meta-Meta-Achse mit SONDER-GRAMMATIK (existiert keine
+> PMC, wird gar nicht erst eine eingetragen -- KEIN Eintrag statt leerer Slot); als
+> ZUSAETZLICHE permutierende Messeinrichtung erweitert sie den Nenner gegen w/ma/mi;
+> Planer-Hardware-Erkennung AUSNAHMSWEISE NUR fuer PMC, die System-Achse fungiert als
+> PROXY; ZWEI PMC-Systeme (AMD/Intel) via Durchreichen + Kompilate. Geltende Fassung:
+> G-1-Design Paragraf 12.5 (20260813-DESIGN-g1-grammatik-dreiphasige-messachse.md) +
+> PMC-Schwester-Design der Mess-Achsen-Familie (Task #53). Das Original unten bleibt
+> unveraendert stehen (Doku-nie-loeschen).]**
+
 | Ding | Haupt/Unter | Stufe 1 (RUNTIME-Freigabe) | Stufe 2 (COMPILE-TIME-Einbau) | Stufe 3 |
 |---|---|---|---|---|
 | **FAKTUM** `is_hybrid` + Domaenen-Karte | **dyn. UNTER-Achse an `target_isa`** | CEB erhebt zur Laufzeit: CPUID 0x1A -> sysfs `cpu_core`/`cpu_atom` -> hwloc | als Host-Deskriptor in den Stempel; **nicht** in `binary_id` | -- |
