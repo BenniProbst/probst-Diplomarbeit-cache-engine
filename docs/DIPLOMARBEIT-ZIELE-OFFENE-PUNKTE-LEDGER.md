@@ -16,6 +16,49 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON69: A2 VOLLZOGEN -- TRANSKRIPT EINZELN+HAENDISCH GEGEN DEN GESAMTEN VAULT GEPRUEFT: 0 FUNDE, REWRITE OHNE GEGENSTAND
+
+**KON69 vorher 0 Treffer. Owner-Verfahren (14.08. verbatim): 'einzeln und haendisch gegen
+alle existierenden Passwoerter im cred vault pruefen und redigieren ... Das Transcript
+muss technisch gesichert erhalten bleiben, nur eben redigiert.'**
+
+### KON69-01 -- GEGENSTAND UND VERFAHREN (blind, Werte nie nach stdout/Transkript)
+
+    Gegenstand: docs/sessions/backups/20260806-session-transkript-verbatim/
+    session-ab-vorletzter-kompaktierung.jsonl (16.286.813 B, 1 Commit 1f2d476c,
+    getragen von 7 origin-Branches + main/dev/rescue auf github). Verfahren:
+    JEDE Vault-Quelle einzeln gegen die Datei, nur Zahlen/Hashes nach stdout.
+    Quellen-Nenner: 77 Einzel-Key-Dateien (Cluster/keys/* inkl. SSH-Keys, PATs,
+    MinIO, Valkey, Registry, minisign + ~/keys/gitlab-pat-r20260813) sowie
+    28 VAULT-MDs (CREDENTIALS-VAULT{,-DEV,-PROD}.md + ALLE 24 .bak-Generationen
+    mit Alt-Passwoertern 06/2026-08/2026).
+
+### KON69-02 -- BEFUND: 0 ECHTE VAULT-WERTE IM TRANSKRIPT (jede Null mit Gegenprobe)
+
+    Teil A (77 Key-Dateien, jede Zeile >=16 Z. als Kandidat): 0 Treffer.
+    Haertung 1: ZWEITLAUF mit JSON-escaped Variante (\ -> \\, " -> \") ueber
+    1708 Kandidaten-Zeilen: 0 Treffer (Umbruch-Falle geprueft: alle Wert-Zeilen
+    < 95 Z., kein Terminal-Umbruch moeglich). Teil B (28 MDs, Token-Heuristik
+    >=12 Z.): 13.345 Roh-Treffer -> 43 UNIQUE Tokens, ALLE 43 einzeln
+    klassifiziert-entlastet: 3 Datum + 1 URL/Host + 2 Pfad + 7 GROSS-Label +
+    29 im Repo oeffentlich belegt + 1 EINZELFALL haendisch beurteilt (len=25,
+    beidseitig maskiert inspiziert: Dateinamens-Fragment 'CREDENTIALS-VAULT-
+    DEV.md.' aus einem ls-Listing im Transkript; im Vault selbst nur 'Siehe ...'-
+    Querverweis, Z.279 PROD.md -- KEIN Wert). Haertung 2 (K13): echter Key-Wert
+    als Koeder in KOPIE angehaengt -> Scan beisst (1 Treffer); identischer Scan
+    am ECHTEN Transkript: 0. Zwischen-Dateien (tokenmap) geshreddert.
+
+### KON69-03 -- KONSEQUENZ: KEINE REDAKTION, KEIN FILTER-REPO; DATEI BLEIBT ERHALTEN
+
+    Die Owner-Order 'pruefen und redigieren' ist erfuellt: Redaktionsbedarf = 0.
+    Ein filter-repo-Rewrite (6835 Commits, alle Refs beider Remotes force-push)
+    ohne einen einzigen Fund waere Historien-Zerstoerung ohne Gegenstand -- NICHT
+    gefahren. Das Transkript bleibt UNVERAENDERT technisch gesichert erhalten
+    (strengere Erfuellung der Erhaltungs-Auflage). F3-Fund aus KON66-01 damit
+    GESCHLOSSEN; Task #46 completed (A4-Rotations-Aufschub bleibt verbucht,
+    Vormerkung bei Arbeits-Pause). Kuenftige Transkript-BUs: Sperre '0 *.jsonl
+    committen' gilt weiter (KON61-Kette); diese eine Bestands-Datei ist per
+    Owner-Order 06.08. gewollt und jetzt vault-verifiziert sauber.
 ## NACHTRAG 15.08.2026 -- KON68: MAXIMAL-PARALLEL-RUECKKEHR (5/5 STRAENGE) + PATCH-AKTEUR-KLAERUNG + LANDE-ZUG 2 (SKELETON+D12-ARCHIV, 4 CIs GRUEN)
 
 **KON68 vorher 0 Treffer. Quellen: wf_cf930b76 (5 Straenge, 0 Ausfaelle, journal.jsonl) +
