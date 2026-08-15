@@ -16,6 +16,106 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON68: MAXIMAL-PARALLEL-RUECKKEHR (5/5 STRAENGE) + PATCH-AKTEUR-KLAERUNG + LANDE-ZUG 2 (SKELETON+D12-ARCHIV, 4 CIs GRUEN)
+
+**KON68 vorher 0 Treffer. Quellen: wf_cf930b76 (5 Straenge, 0 Ausfaelle, journal.jsonl) +
+Strang-A-Endfassungs-Return + Lande-Zug 2 wf_a07dcfb3 + kon64_sammlung Teil 10/10-B.**
+
+### KON68-01 -- PATCH-AKTEUR KANONISCH GEKLAERT: KEIN FREMDAKTEUR (Peer-Auftrag)
+
+    DREI vermeintliche Fremdeingriffe der Infra-Nacht, ALLE = Strang-A-Agent selbst
+    (af144d49a4d304d6a), bewiesen aus dessen EIGENEM Transkript + Bastion-mtimes:
+    (1) S2-Patch 03:08:07Z = sein Guard-Skript strangA_s2_execute.sh (Write 02:34:39Z,
+    SELBST gestartet 03:08:06.410Z via ssh bastion 'bash -s' <, Wirkung 1 s spaeter;
+    Guard Fenster==0/Primary/healthy hielt). (2) Valkey-'Kollision' 03:29:57Z = Fassung 1
+    seines strangA_s3_valkey.sh (Lauf 03:29:56.688Z), die er 03:30:58Z UEBERSCHRIEB und
+    mit Fassung 2 (03:31:02.004Z) selbst rammte. (3) 'Fremde' Bastion-Dateien
+    values_gitlab_chart10_entwurf.yaml/PLAN_HELM_10_1_4.md = sein eigener values-Lauf
+    (mtimes 03:33:33Z/03:36:08Z, sekundengenau zu seinen Transkript-Aufrufen).
+    Gegenproben: gut-wie-wirst 0 kubectl, Haupt-Session 0 kubectl (nur Message-Echos),
+    alle anderen Agenten 0 valkey. KEIN Sicherheitsvorfall, keine Doppelinstanz.
+    PROZESS-LEHRE (Peer hat uebernommen, Doppelzustellungs-These selbst zurueckgezogen):
+    Selbst-Attribution NUR ueber die eigene Kommando-Historie; nach Resume Historie neu
+    laden VOR Fremdakteur-Verdacht; ssh 'bash -s' < skript + Ueberschreiben zerstoert
+    die Beweis-Fassung -> Skripte versionieren (v1/v2-Suffix).
+
+### KON68-02 -- STRANG A ENDSTAND: #52 b/c/d/f ZU, e=ENTWURF; helm-REST VORBEREITET
+
+    gitlab-pg 2/2 healthy auf PG 17.11 (S1: pg_rewind-Endlosschleife seit Crash 04.08.
+    war der tragende Defekt, 'closed pool' nur stale Phase; Replica-Rebuild gitlab-pg-7.
+    S2: offline in-place, DB-Loch 03:08:22-03:14:28Z ~6 min im GEMESSEN leeren Fenster;
+    Barman NEUER Pfad serverName=gitlab-pg-v17, PITR endet an der Major-Grenze, Alt-Pfad
+    + pre17-Dumps additiv; ScheduledBackup aktiv; Readiness 15/15). Valkey 7.2.14 laeuft
+    (AUTH+AOF+5Gi-PVC, Persistenz ueber Pod-Kill bewiesen; Kollisions-Reste geloescht,
+    3x NotFound, Kette intakt). VAULT-NACHZUG Hauptsession: keys/gitlab-valkey-password-
+    r20260815 (48 B, 0600) + Blind-Append, Dedup clean, Cluster-Commit 7acd14c.
+    helm 10.1.4 BEWUSST NICHT gefahren; Upgrade-Path BELEGT direkt (10.1.4 = GitLab
+    19.1.4; Required Stops 19er erst 19.2/19.5/19.8/19.11); Rollback-Grenze: nach
+    19.1-Migrationen nur noch Restore; RESTPLAN_helm_10.1.4.md + konvergierte Values-
+    Entwuerfe auf pve1:/root/strangA-backups/. backup-utility-Backup FERTIG, Literal
+    '[DONE] ... s3://gitlab-backups/1786764874_2026_08_15_18.11.7_gitlab_backup.tar'.
+    OFFEN als Owner-Vorlagen (#59): comdare-app-pg gleiche stale-Phase (FREMDE Flaeche),
+    40 Zombie-Pipelines Feb-Jul (Cancel-Ausnahme noetig), helm-Fenster+GO.
+
+### KON68-03 -- STRANG B: PMC-GRAMMATIK-VORLAGE LIEGT (KEIN BAU), F-P1..F-P10 OFFEN
+
+    tmp/design_pmc_grammatik.md: v2-Profil/EIN Parser (pmc=<vendor>@X.Y.Z.c.pmc{stufen},
+    Kollision 0/62 mit beissender Positiv-Kontrolle); zweifache Abwesenheit = GAR KEIN
+    Eintrag (Unterscheidung lebt im Planer-Befund Phase 1); PM-5 CEB-Voraussetzung
+    (t/h erfordert b) als Form-Regel empfohlen; PM-6 Slot-Deckung+Spiegel-Ordnung;
+    pmc-fuehrender Kind-Stempel + pmc-BEDINGTER Bau (w-Gate-Mechanik) -> danach
+    datierter UEBERHOLT-Marker an 'Tier-Fingerprint pmc-frei' (KON34-02, Ledger :4419/
+    :4079); Nenner: je pmc-Host 5 Zustaende multiplikativ zum 2^5-Kern, Vendor trennt
+    MESS-WELTEN ueber Maschinen (prod1=amd/prod2=intel), Fahr-Zahl rechnet NUR S-19;
+    W7-P/E Empfehlung Option A (cpu_sub); Typ-Heimat = 2. Traeger von
+    MeasurementMetaMetaAxis, PmcSystemAxis BLEIBT System-Proxy; WARNING->FATAL-Flip;
+    XML <pmc>-Element, Vendor NIE aus der XML. 10 Owner-Fragen mit Empfehlungen ->
+    Owner-Vorlagen-Runde #59; Bau-Anker nach GO = W2 (#24/KON37-02).
+
+### KON68-04 -- STRANG C: #51 UMBRELLA-CI ZU (ERSTE GRUENE SEIT 06.03.)
+
+    v7.1.0 @ 759db0ec (nur GitLab-Remote): macos -> when:manual (B6-Ausnahme c),
+    Windows-Cross-Jobs ENTFERNT (b; liefen auf stalen macos-Hosts), x86-BM + 18er-
+    docker-Matrix -> manual (6 Runner stale), k8s-Doku-Guard VOR apt (heilt Netz-Rot),
+    allow_failure ueberall entfernt (arm64/riscv jetzt Pflicht). Pipeline 15827
+    TERMINAL SUCCESS: 41 success + 22 manual, 0 failed, 277 s statt ~90-120 min
+    Haenger; 1 transienter k8s-Flake per Retry 378073 geheilt. Push->gruen erfuellt.
+
+### KON68-05 -- STRANG D: D12-URTEILE IM DETAIL + NEUE GITLEAKS-FALLE
+
+    3x ENTHALTEN patch-aequivalent (m2 4fd42896~8894d983 + 18 Merge-Zeilen woertlich;
+    m3v2 ~2b5ecd29; errno ~22e17f57); p2 NICHT-ENTHALTEN+WIEDERVERWENDBAR (Warn/Opt-
+    Split fehlt in dev; Re-Anwendung als Patch-Vorlage, direkter Merge konfliktet);
+    p3 TEIL-UEBERHOLT (test_ci_invarianten.cpp 933 Z. = Material fuer S-12/#3;
+    Pruefgedanke I3 needs-Paritaet clang==gcc bleibt offen). Archiv 0ffc63a2 (Restore-
+    Drill gruen), origin 5x deleted + Gegenprobe 0/5, GitHub 0/5.
+    NEUE FALLE (Fallen-Register + Memory nachgezogen): Koeder mit 'koeder_'-Praefix
+    BISS NICHT -- die Koeder-Prosa-Allowlist Z.46 der .gitleaks.toml (eingefuehrt mit
+    90979dc3 fuer Commit-Text-Maskierung) frisst ihn; Koeder-Label muss NEUTRAL sein.
+
+### KON68-06 -- STRANG E + LANDE-ZUG 2: SKELETON GELANDET, GITLINK ATOMAR, 4 CIs GRUEN
+
+    Skeleton be2d9e4e (INTERFACE-Stufenkette der 4 Traeger-Unterprojekte, FATAL_ERROR-
+    Wache beisst per K13-Koeder, Lock 718/712 byte-identisch; Diff-Hygiene-Rot 15826
+    im Strang geheilt -> ce-CI 15831 SUCCESS). LANDE-ZUG 2 (wf_a07dcfb3, seriell):
+    Z1 ce-Merge 0817c7bf -> CI 15832 SUCCESS (26+1 manual). Z2-BEFUND: bau/bu-
+    workflows-5-kontexte war BEREITS in dev enthalten (d817d9bd vor 81aa80f6) --
+    #45-Stufe-3 war faktisch vollzogen; stattdessen D12-Archiv-Branch gelandet
+    (dbed284b, 7/7 Dateien, toml unveraendert) -> CI 15833 SUCCESS. Z3 Gitlink ce
+    04f76b65 -> 0817c7bf ATOMAR mit DESIGNPLAN-9.5-Anker-Nachzug (PZW-Stale-Anker
+    rc=2 VOR Push entdeckt, im selben Commit geheilt -- Plan-Anker ist beim Gitlink-
+    Bump PFLICHT-Harmonisierungsflaeche) = 56946d96 -> CI 15834 SUCCESS 36/36 +
+    Bridge 15835 SUCCESS; PZW final rc=0 '5 von 5 Ankern', 40/21/2/2/0 (achter Zug).
+    Endstaende dual synchron: ce dev = 0817c7bf, super dev = 56946d96. gitleaks-Kette
+    je Push mit NEUTRALEM Koeder-Label (KON68-05-Falle beruecksichtigt), 3x Koeder
+    rc=1 / ECHT rc=0. Worktrees stehen (Loeschung = separater Schritt nach Doktrin).
+
+### KON68-07 -- #47-VOLLBELEG + TASK-STAND
+
+    Thesis-Writeback-Retry-Job 377539 SUCCESS (Poller berzxcs6n TERMINAL) -- der
+    A1-Token id=98 traegt den F1-Kanal. Tasks: #47/#51/#58 completed; #52 in_progress
+    (nur helm-Rest + Ernten); #53 in_progress (PMC-Vorlage liegt); NEU #58 Lande-Zug 2
+    (vollzogen), #59 Owner-Vorlagen-Runde (F-P1..P10 + 3 Infra-Entscheide).
 ## NACHTRAG 15.08.2026 -- KON67: LANDE-ZUG CI-DUAL+LIZENZ KOMPLETT (4 REPOS, 6 CIs GRUEN) + OWNER-FINALRUNDE CACHE/LAGER (TEILE 7-9) + NOTICE/PRT-ART-GITLINK-NACHZUG
 
 **KON67 vorher 0 Treffer. Quellen: Lande-Zug wf_238eb0a0 (Verify TRAEGT) + kon64_sammlung
