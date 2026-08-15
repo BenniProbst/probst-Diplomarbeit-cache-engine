@@ -45,7 +45,15 @@ KON74 vorher 0 Treffer. Alle 8 Straenge des Maximal-Parallel-2-Workflows TERMINA
     Adapter foermlich stillgelegt; Ladebeweis-Configure rc=0. Waisen: ce
     bau/prtart-waisen-archiv, TIP = b4f960d6 (NICHT b39d62a2): 15859 @ b39d62a2
     FAILED (Diff-Hygiene-Wache, Allowlist-Zeilen >120 Spalten) -> Fix b4f960d6 ->
-    CI 15861 SUCCESS. Inhalt: 7 Legacy-Waisen per git mv 100% nach tests/deprecated.
+    CI 15861 SUCCESS. Inhalt [KORREKTUR 15.08., A2.5-FUND-1 der Nachstufe]:
+    4 Waisen-Dateien per git mv 100% nach tests/deprecated (Commit b39d62a2 =
+    7 geaenderte Dateien: 4 Renames + VERMERK.md neu + 2 Anpassungen Allowlist/
+    test_pa1_tote_ausnahme; die fruehere "7 Legacy-Waisen" las die shortstat-
+    Zeile als Waisen-Zahl). SPRACHREGEL: in Landungs-/Ledger-Texten immer
+    "4 Waisen-Dateien (7 geaenderte Dateien im Commit)"; die ANDERE Menge
+    "7 Waisen-TUs" (GA-09/22b: br4_emit, br4_load, kf16, a9b, c3b, d4b, rf2)
+    bleibt unveraendert gueltig. Objekt-Anker: VERMERK.md-Klarstellung
+    7e1bf6a9 auf bau/prtart-waisen-archiv (CI 15864).
     EIN-SCHREIBER-DOKTRIN HIELT: W-B verwarf wt-ce-b2 (fremder Schreiber W-A mit 7
     uncommitteten abi/mess-Aenderungen) und nahm eigenen Worktree wt-ce-prtart-waisen.
 
