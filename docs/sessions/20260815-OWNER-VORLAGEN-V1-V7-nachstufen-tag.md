@@ -112,6 +112,20 @@ ENTSCHEID: (a) belassen (Backup-Charakter, Trailer nur in der Seitenlinie)
 ODER (b) gleichbehandeln: Bundle-Sicherung + filter-repo + Force-Update des
 Refs bzw. Loeschung nach Bundle (braucht dein gegenstands-genaues GO).
 
+## V10 -- 19. Achse vs ORG-18-Kanon (aus #67, dein Commit d2f51ca 14.08.)
+
+IST: Dein Beitraege-Umbau sagt woertlich: "eine optionale neuzehnte Achse
+existiert nur, wenn man IO auf eine Festplatte aktiviert und in den
+Algorithmus-Entwurf mit einbindet." Der Code-Kanon fuehrt SEIT der
+Achtzehner-Korrektur genau 18 Organ-Achsen (T17 persistence_target ist der
+18. Slot, In-Memory-gepinnt); die Thesis traegt jetzt deine Fassung
+(Rangfolge OWNER > PLAN, Merge statt Verdraengung).
+
+ENTSCHEID: Ist die 19. Achse (a) ein ZUKUENFTIGES Optional (Kanon bleibt 18,
+Text beschreibt die Erweiterungsstelle — dann ist NICHTS zu bauen) ODER
+(b) ein SOLL fuer den Abgabe-Stand (dann braucht es einen eigenen Design-
+Strang am Achsen-Modell, golden-Fenster-nah, NIE beilaeufig)?
+
 ## Zur Kenntnis (kein Entscheid noetig)
 
 - Talos-Node-CA-Trust gegen registry.comdare.local ist defekt (x509,
