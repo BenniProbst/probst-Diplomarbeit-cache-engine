@@ -16,6 +16,193 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON72: GROSS-KONSOLIDIERUNG DES KONTEXTS -- ALLE OWNER-RUNDEN (F-P KOMPLETT + VORLAGE-B/C), NEUE ARCHITEKTUR-KERNE, #16-BAU TRAEGT, helm 19.1.4 DEPLOYED, LIEGENGEBLIEBENE POSTEN KARTIERT
+
+**Owner-Order 15.08.: "Bitte konsolidiere alle Antworten dieses Kontextes, und alle
+vergessenen nicht dokumentierten Detailpunkte und Gesamt-Zusammenhaenge, bitte in das
+Ledger und dokumentiere liegengebliebene Aufgaben, die du auch in die Wellen eintraegst."
+Verbatim-Quellen: kon64_sammlung.md Teile 10-15B. KON72 vorher 0 Treffer. Push dieses
+Commits WARTET auf die S6-Entwarnung (helm-Migrationsphase; Sperre deklariert).**
+
+### KON72-01 -- OWNER-ENTSCHEIDE-RUNDEN KOMPLETT (drei Nachrichten 15.08.)
+
+    F-P-RUNDE ZU 10/10: F-P1 FREI (Basis-Klasse + erbende Impls je PMC-Typ;
+      Factory-Parser laufzeit-voll beim Freigeber / CT nur planer-angeforderte
+      Varianten in den Vertraegen = weitere echte CT-Permutation ueber Folgestufen;
+      EINE Meta-Meta-Achse wie die Messfuehler-Achse; DOPPELTE Versionierung HW+SW
+      je doppelt in Mess/System/Organ-Stapelung; HW-Katalog per Web-Recherche je
+      Kern-Typ) · F-P2 KORRIGIERT+ERGAENZT (Kompilat-Stempel = nur Umgesetztes;
+      kein Konzept "eingebaut aber unverwendet", nur "Hardware vorhanden, nicht
+      durch Software verwendet"; NO-BLOAT s. -02) · F-P3 BESTAETIGT+NEU
+      (Aufzeichnung != Messfuehler; iw/ima/imi s. -02) · F-P4 ENTSCHIEDEN
+      (p/b/h/t s. -02) · F-P5 BESTAETIGT ("Tier-Fingerprint pmc-frei" final
+      UEBERHOLT; Meta-Meta dreiphasig in Micro je Achsen- + Macro je
+      Genus-Interface; Stempel-Integration CEB vs Tier/Hybrid per Dualitaet) ·
+      F-P6 VERWORFEN (dritte 32er-Ruege s. -02) · F-P7 = Option A (cpu_sub
+      c{p}/c{e}/c{p.e}, W7-Andockstelle zu) · F-P8 VOLLES GO + Explore-Order +
+      System-Proxy KORRIGIERT zu AND-FREIGABE (s. -02; Owner verlangte
+      Verstaendnis-Rueckfragen -> RF-A/B/C GESTELLT, Antwort AUSSTEHEND) ·
+      F-P9 VOLLES GO ("Wir heben auf C++23 Metaprogrammierung an"; #if-Kaskade ->
+      Katalog/Praedikat; WARNING->FATAL-Flip) · F-P10 korrekt (XML sagt WO,
+      Host sagt OB/WELCHER Vendor).
+    VORLAGE-B-RUNDE ZU 6/6 (LABEL: Vorlage-B, NICHT Mess-Schalter-B!):
+      B1 Zombie-Pipelines: CANCEL-AUSNAHME ERTEILT ("Bitte raeume das Auf") ->
+      Task #64. B2 PRT-ART: Codex-VOLLREVIEW gegen ce + 10W-Planungs-Explore +
+      Aufraeumen Praeferenz (a) "neu verdrahten wenn Sinnvoll unter Umbau" ->
+      Task #65, Workflow wf_59f82faf LAEUFT. B3 super-Randbestand: Loeschung
+      frei, "Gesammelter audit reicht" -> Task #66. B4 CI_JOB_TOKEN: volles GO +
+      "wenn alles funktioniert bitte den PAT Kanal aus der Sicht des Repos
+      abschalten. Wir arbeiten als einzige Instanz mit PAT" -> #54. B5 Thesis-
+      Trailer-Rewrite: "Volles GO sofort bei naechster Gelegenheit" + NEUER
+      SYNC-AUFTRAG (Owner-Aenderungen der letzten 2 Wochen gegenlesen; Code ->
+      Thesis VORRANGIG; Owner-Ergaenzungen als Planungserweiterung -> Code-Teil)
+      -> #61 + #67. B6 Betreuer-PDFs: WERDEN veroeffentlicht ("die Diplomarbeit
+      ist ein oeffentliches Dokument") -- Release-Checklisten-Frage ZU.
+      TEIL C: "volles go" (Abschluss-Liste bestaetigt: C-3a in der Sache zu,
+      OF-1 final, Wallclock/E-Label per KON37, 4 Klone Zielzustand, Drift-
+      Kennzeichnung, A2 zu).
+    FRUEHERE RUNDEN DERSELBEN SITZUNG (Referenz): Frage 1 A2-Lesart bestaetigt
+      (KON69 final) · Frage 2 Flotte "(a), Freigabe" + Infra-Ausnahme (KON71-03)
+      · Frage 3 Thesis-Rewrite GO · Frage 5 comdare-app-pg GO (VOLLZOGEN s. -03)
+      · Frage 7 helm "Sofort" (VOLLZOGEN s. -05) · Frage 8 Branch-Loeschung GO
+      mit Re-Pruefungs-Auflage (#62).
+
+### KON72-02 -- NEUE ARCHITEKTUR-KERNE (alle verbatim in kon64_sammlung 12-14)
+
+    NO-BLOAT-DOKTRIN: NIE Funktionen einbauen, die die Hardware nicht ausfuehren
+      kann; Kompatibilitaet NUR durch Abspecken unter den Hardware-Funktionsumfang;
+      Stempel zeigt nur Eingebautes. PLAN-BELEGE (Explore): 16.07. "Binary-ISA
+      ⊆ Host-Capability ist das Mess-Gate" · 17.07. H-7 "einkompilieren ODER
+      bewusst weglassen" · KON16-02 Seitenlogik (Freigabe IMPLIZIERT, Compile
+      FORDERT) · M-9 Teilmenge NUR freigabeseitig -- fuer MESS-GUELTIGKEIT gilt
+      GLEICHHEIT der Belegung; Teilmengen-Relation asymmetrisch fail-closed;
+      Gate-Formvorbild simd_build_gate/admit_organ_on_machine WIEDERVERWENDEN.
+    p/b/h/t = TRAEGERSTUFEN-BUCHSTABEN in STRIKTER Ort-Ordnung Planer/CEB/Hybrid/
+      Tier (b = CEB!); h optional eingeschoben; p als vierter Buchstabe neu.
+    PMC IN BIS ZU ZWEI KATEGORIEN ZUGLEICH: System-Achsen-Eintrag IMMER bei
+      Einbau; Mess-Achsen-Eintrag NUR bei Planer-Zulassung; Syntax
+      pmc{c.{p.e}}.b.t etc.; p/e = Flags fuer zwei verschiedene PMCs unter c;
+      AEQUIVALENZ komprimiert pmc{c.{p.e}}.b.t == {pmc{c.{p}}.b.t,
+      pmc{c.{e}}.b.t}; p(Planer-Suffix) und p(P-Core in c{}) = getrennte
+      Namensraeume ueber Position (Grammatik-Wache je Position).
+    iw/ima/imi = AUFZEICHNUNGS-INTERFACE-FLAGS: die vorangehende Stufe traegt
+      das Aufzeichnungsinterface fuer Messfuehler der nachfolgenden (CEB: ima/imi
+      gegen Tier/Hybrid-Fuehler; Planer: iw, i.d.R. immer); "Wenn eine
+      vorangehende Traeger-Stufe das Interface der nachfolgenden nicht lesen
+      kann, koennen keine Messdaten zu diesem Thema erhoben werden."
+      Abwaerts-Funktionsumfangs-Regel gilt NUR fuer Aufzeichnung, nicht Fuehler.
+    AND-FREIGABE STATT PROXY (F-P8): vorangehende Achsen-Kategorien schalten
+      nachfolgende frei (wie Traegerstufen); System darf PMC nur umsetzen, wenn
+      Mess es erlaubt -- AND aus zwei Kategorien in hierarchischer Reihenfolge;
+      PMC-Mess-Achse "war schon immer der HAUPTTRAEGER AUF DEM PLANER ueber ihre
+      dreiphasige Eigenschaft"; RF-A/B/C beim Owner.
+    DRITTE 32er-RUEGE: Mess-Permutation DYNAMISCH >32 (Quellen: PMC, Lastsequenz,
+      iw/ima/imi, Pruefling 1-3, dynamic_dims), NUR S-19 rechnet sie am
+      Experiment-B+-Baum aus den XML-Freigaben; einzige feste 32 = willkuerlicher
+      Dock-Deckel; S-19 = MEILENSTEIN + "Hauptziel der naechsten Wellen";
+      Memory (Index+Detail) KORRIGIERT.
+    FLOTTE/OS-REALM (KON71-03, Referenz): je Node eigener Lager-Pool je
+      OS-Hardware-Realm; kein Cross-Compile; zwei Mess-Klassen bare-metal
+      mess-faehig vs. VM nur --debug; vorerst NUR beide Ubuntu-bare-metal =
+      Komplett-Durchlauf-Pflicht; nie allow_failure.
+
+### KON72-03 -- EXPLORE-/VOLLZUGS-ERGEBNISSE DES KONTEXTS
+
+    COMDARE-APP-PG GEHEILT (Frage 5 KOMPLETT): Urteil DEFEKT-NICHT-GEWOLLT (0
+      Migrations-Belege; wortgleiche stale Phase wie gitlab-pg, 281 Neustarts,
+      eingefroren seit 01.08.; etcd abgegrenzt+unberuehrt); S1-Heilweg: pg_dump
+      (comdare+postgres+globals, sha256) -> Guard 2x -> PVC/Pod -3 weg ->
+      Operator-Rebuild -> LITERAL "Cluster in healthy state" readyInstances=3
+      (neu -4), beide Replicas streaming; Longhorn Retain/Released = zweites
+      Netz; Skripte versioniert.
+    B+-BAUM-ROHKARTE (fuer S-19; Fable-xhigh-Tieflesen wf_3337a24d LAEUFT):
+      Wurzel->Blatt Mess->System->Organ, je Tiefe eine Achse, lazy seit 02.06.;
+      binary_id = materialisierter Pfad; Geschwister-Vergleich bei identischem
+      Nachfolgepfad = methodischer Kern, hat KEINE Code-Funktion (S-19-Design-
+      Posten); Freigabe = LAUFZEIT-Abfrage am Baum, NIE im Stempel;
+      system_config (opt/simd) NIE in binary_id. 🔴 CHECK-SIZE-LUECKE: heutiger
+      Pfad rechnet VOLLSTAENDIG IM PLANER (Director-Walk, 3. ConcreteBuilder) --
+      Owner-Auftrag verlangt Berechnung AUF der CEB (vorsorglicher CEB-Bau +
+      Vertrags-Befragung) => Pflicht-Input S-19-Design (#7).
+    #16-BAU KOMPLETT + VERIFY TRAEGT: bau/golden-homes @ 0eea2a0a, CI 15844
+      SUCCESS (T-1-Kette 15838-15842); Homes system_axes/+mess_axes/ (17 Traeger,
+      git mv, Overlay repointet, CT-Home-Pin, 17 #error-Wegweiser), Lock-Regen
+      718 "deckt 712/712", S-18-Split SystemDetail/MessDetail (DREIPHASIG mess =
+      benannte Leerstelle bis G-1-Stufe-C), Rider #95, Floor 493/489/487 LIVE,
+      golden 4x320 byte-unberuehrt. Verify-Notizen: N1 Bericht-Hash fd495b97
+      NICHT weiterzitieren (live 5a00bdc9...) · N2 Koeder-U-organ -> #17 ·
+      N3 Hygiene-Funde -> #19.
+    🔴 B2-FESSEL AM OBJEKT BESTAETIGT OFFEN (Bau-Explore-Behauptung WIDERLEGT):
+      mess_achsen_naht.hpp:107 "EHRLICHE GRENZE DIESER SCHEIBE -- macro UND
+      micro SIND HEUTE NICHT TRENNBAR" + :135 "Folgepaket (G3-Gate)" --
+      mess_gates_glied/kMessGatesTuGlied (07.08.) ist das PREIMAGE-Glied
+      (Stempel-Seite), NICHT die Gate-TRENNUNG (Schalter-Seite); dritte
+      Namens-Verwechslungs-Klasse (nach P6-Lizenz/P6-Fessel). KON70-01-Ordnung
+      HAELT: B2-Bau (#24) zuerst, dann B2+#16 in EINEM golden-Fenster landen.
+
+### KON72-04 -- helm 19.1.4 DEPLOYED + ZWEITE DOPPELINSTANZ-LEHRE
+
+    HELM: Release gitlab Rev.24, Chart 10.1.4, App v19.1.4, deployed 10:37:19
+      CEST; Migrations-Job lief bei Buchung (S6-Poller des Leads bbdwl89c6:
+      Migrationen -> Rollout -> Version/Readiness/Valkey-redis_version/
+      bundled-Redis/Sidekiq); PUSH-SPERRE bis S6-Entwarnung.
+    VORFALL-KETTE (beide Lehren Register+Arbeitsweise-Kandidat): (1) Lead-ACK
+      per SendMessage an den Workflow-Container-Agenten weckte eine RESUME-
+      DOPPELINSTANZ ("no active task; resumed from transcript"), die den
+      RESTPLAN parallel fuhr (Sidekiq-Stopp 08:21:29Z -- vom Original als
+      Fremdeingriff gemeldet, kanonisch als Selbst/Doppel geklaert); (2) der
+      TaskStop 08:26Z auf die Doppelinstanz schrieb den Interrupt-Marker ins
+      GETEILTE Transkript und kontaminierte den Original mit -- er fuehrte helm
+      noch aus und returnte 08:39Z MITTEN im Upgrade statt S6 zu fahren.
+      LEHREN: NIE SendMessage an Workflow-Container-Agenten (Rueckkanal
+      einseitig; ACK nur als DATEI an dessen Arbeitsorte); eine Doppelinstanz
+      ist NICHT isoliert stoppbar; nach jedem Zwischenstand-Return SOFORT Objekt
+      messen und Beobachtung selbst uebernehmen. KEINE Kollision am Release
+      (helm-History war vor S5 unveraendert Rev.23; Fensterzustand gewollt).
+
+### KON72-05 -- LIEGENGEBLIEBENE POSTEN KARTIERT + WELLEN-EINSORTIERUNG (Task-Karte)
+
+    NEU ANGELEGT: #68 FOLGE-BU DRINGEND (WE/-; ~8 neue Workflow-Journale +
+      Outputs seit der 5-Kontexte-BU; /tmp-Rotation frisst, 1 Verlust belegt) ·
+      #69 #41-NACHLAUF (W2/M vor W3: Messwert-Rohbefund 750-vs-1310 Maschinen-
+      Analyse + prod2-TeX-Probe) · #70 XORFILTER-SOFORTPRUEFUNG (W1/P-nah:
+      30/256 False Negatives = Korrektheitsfehler -- vor der naechsten Messung
+      pruefen/beheben oder entlasten) · #71 W2-TRIAGE LESER-HEBUNGEN (W2/W:
+      KON-15 measurement_on/single_thread 0 Leser; KON-43 Betreuer-Pflichten
+      D-12/D-03/D-04; KON-44 termine/INDEX stale T9-T11; machines-Schluessel
+      Zen4->Zen5; concurrency-Konflikt 1-vs-2/24-vs-4 -> OWNER-VORLAGE) ·
+      #72 QUEUING-UMZUG ins Organ-Home (W1-W2/P-nah; 42 Lock-Records; war nicht
+      in der #16-Direktive) · #73 helm-NACHLAUF (WE/-: finale Values +
+      Upgrade-Ergebnis als Cluster-Handout committen; Toolbox-Backup-Smoke
+      unter 19.1; Umbrella-manual-Aktivierung nach Runner-Rueckkehr).
+    AKTUALISIERT: #7 S-19 (+check-size-Luecke +Geschwister-Funktion als
+      Design-Inputs) · #17 (+Koeder-U-organ N2) · #19 (+N3-Vormerkung) ·
+      #49 (C9-BEFUND liegt per KON64-04 -- Rest = Staffelungs-Design vor W4) ·
+      #53 (F-P-Runde KOMPLETT; Design-Nachzug: G-1-Nachtrag iw/ima/imi +
+      p/b/h/t + Doppel-Kategorie + Doppel-Versionierung NACH RF-A/B/C).
+    WELLEN-PLAETZE NEUE TASKS: #60 Flotten-Runner W2/M (VM---debug-Pflicht vor
+      Scharfschalten; nach helm) · #61 Thesis-Rewrite WE/- (naechste ruhige
+      Gelegenheit nach S6) · #62 Branch-Loeschung W0b-W1/- (nach helm; vor #19)
+      · #64 Zombie-Cancel WE/- (nach S6) · #65 PRT-ART W1/W (Review laeuft;
+      Aufraeum-Vollzug danach; Pruefling-Einsetzung = Design-Input #53/#7) ·
+      #66 Randbestand WE/- (nach S6; vor #19) · #67 Thesis-Sync WE-W1/W (nach
+      #61, vor naechstem Writeback).
+    GEDECKT/ZU: wf_5ba07e0d-Langfrist-Token-Vorlage AUFGELOEST durch Vorlage-B4
+      (#54 traegt Umsetzung+PAT-Abschaltung) · PA-3 durch Vorlage-B2 (#65) ·
+      Betreuer-PDF-Frage durch B6 · D13/Zombie-Einzelfall durch B1 (#64).
+
+### KON72-06 -- OFFENE OWNER-RUECKFRAGEN (Restbestand, vollstaendig)
+
+    (1) RF-A/B/C zu F-P8 (gestellt, Antwort aussteht): Planer-Stempel pmc-frei
+        vs. Freigabe-Anzeige · AND-Freigabe als CT-static_assert · Semantik
+        System-Eintrag OHNE Mess-Eintrag.
+    (2) HOME-NAMEN system_axes/ + mess_axes/ (Design-Entscheid #16 ohne
+        Planquelle) -- Rueckbestaetigung; Umbenennung vor F2 kostenlos.
+    (3) RIDER-#95-SCHEMA-Bein als Halb-Skip in ce-standalone (Single-Source-XSD
+        lebt im super; im super-Kontext hart) -- genuegt das?
+    (4) CONCURRENCY-KONFLIKT (Leser-Hebung, nie vorgelegt): concurrency=1
+        (Messschutz) vs. OD-7 concurrent=2/24-Worker vs. Memory "concurrent=4"
+        -- welche Zahl gilt je Kontext (Bau vs. Messung vs. --debug)?
 ## NACHTRAG 15.08.2026 -- KON71: OWNER-ANTWORTRUNDE AUF DIE KONTEXT-VORLAGE -- NO-BLOAT-DOKTRIN, iw/ima/imi-TOKENS, DRITTE 32er-RUEGE, VIER SOFORT-GOs
 
 **Quelle: zwei Owner-Nachrichten 15.08. (verbatim in kon64_sammlung Teile 12+13).
