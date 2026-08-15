@@ -16,6 +16,69 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON67: LANDE-ZUG CI-DUAL+LIZENZ KOMPLETT (4 REPOS, 6 CIs GRUEN) + OWNER-FINALRUNDE CACHE/LAGER (TEILE 7-9) + NOTICE/PRT-ART-GITLINK-NACHZUG
+
+**KON67 vorher 0 Treffer. Quellen: Lande-Zug wf_238eb0a0 (Verify TRAEGT) + kon64_sammlung
+Teile 7-9 + Lager-Explore wf_39c8b954.**
+
+### KON67-01 -- DER LANDE-ZUG (Task #56, alle Ziele, 4 CI-Rots T-1-geheilt)
+
+    Z1 ce: Merges 7858f70a (ci-dual-ce) + edbe2811 (emission); t6-Nenner 25/33->28/36
+       harmonisiert; CI 15810 ROT (K13-Klasse: d2-Koeder 12x Hex REIN NUMERISCH,
+       p~0,35%, Ganzzahl-Zweig unerreicht -- Bestands-Defekt seit #39) -> T-1-Fix
+       04f76b65 ('x'-Praefix, strukturell nicht-numerisch) -> CI 15811 SUCCESS
+       (26+1 manual; NEUE Jobs test:unit:debug 408s / :clang 776s / :clang:debug
+       504s GRUEN). ce origin+github = 04f76b65.
+    Z2 super: Merge 81aa80f6 (ci-dual-compiler); ccache-Keys je genau EIN Writer;
+       Meta-Gate GRUEN 13/26+13; CI 15812: 36/36 eigene Jobs gruen (neue Zellen
+       101s/46s/85s/38s; PZW gruen); Bridge trigger:cache-engine ROT (ce MAIN @
+       e114cabd Altstand: m3v2_pmc_smoke unter PMC-Multiplexing, KEIN Zug-Defekt,
+       kein main-Push erlaubt) -> Bruecken-Retry identischer SHA -> 15816 SUCCESS.
+    Z3 prt-art: LIZENZ FINALISIERT (OF-1-GO Change Date 2031-08-10; 7 Platzhalter
+       ersetzt, Wache 9/9 inkl. Koeder A-C; ded8157) + Merges 8d5e264+ee77e30;
+       CI 15817 ROT (7 clang-format-Bestandsverstoesse) -> Fix 9bcf887 -> CI 15818
+       SUCCESS 9/9 (inkl. build:clang/:clang:debug NEU). prt-art = 9bcf8873.
+    Z4 thesis (privat, nur Thesis-Remotes): ff auf 2eabaec + Merge ea72c0d
+       (Matrix-Nachzug 47+/25-); CI 15819 ROT (chktex-Ganzbaum: 61 Befunde, 44x W1
+       longtable -- VORBESTAND der generierten Writeback-Tabellen + 2 Lizenz-Zeilen)
+       -> T-1-Fix 16c12c2 (ausgabe-neutral) -> CI 15820 SUCCESS (heilt zugleich
+       das vorbestehende 15804-Rot).
+    Z5 super Gitlink-Bump bc66585a ATOMAR: ce-Gitlink 4f18f478->04f76b65 + PZW-
+       Anker (7. Zug ohne Zahlbewegung; SCHEMA 40/21/2, CI 2/0) + R1 11/11 xlsx.
+    VERIFY TRAEGT; FUND 1 = super-NOTICE Z.92 trug noch 'Apache License' fuer
+    prt-art (15794-Klasse) -> GEFIXT in diesem Nachtrag-Commit: NOTICE Z.92 ->
+    'Comdare Research License, Version 1.0' + prt-art-GITLINK c6f0754->9bcf8873
+    im SELBEN Commit; Lizenz-Wache lokal 27/27 PASSED. FUND 2: OF1-OFFEN-Treffer
+    am prt-art-Baum sind NUR Wachen-Mechanik (Nadel-Literale). FUND 3 (Vorbestand):
+    thesis-main origin/github DIVERGENT -- Hygiene-Posten, kein Zug-Schaden.
+    OFFEN (W-Posten): ce-csv_to_latex-Emitter emittiert chktex-unreine Formen
+    (naechster Writeback erzeugt W1-Befunde neu -- Emitter-Nachzug ce-seitig);
+    ce-main-Altstand m3v2_pmc_smoke (PMC-Multiplexing) -> main-FF #19 heilt.
+
+### KON67-02 -- OWNER-FINALRUNDE CACHE/LAGER (Teile 7-9, verbatim in kon64_sammlung)
+
+    LAGER-FESTLEGUNG BELEGT (Kette KON9-11 11.08. -> KON43 12.08. -> D3 13.08.;
+    aeltere Vorstufe Par.31-A4 19.07. 'Planer ausserhalb' dadurch ERWEITERT):
+    alle 4 Traeger-Binaries versioniert im Lager; CI-Skip bei exaktem Stempel-
+    Fund ausser rebuild-Flag je Stufe (Feature-Phase: dauerhaft AN); CI-Zukunft
+    hauptsaechlich XML-Mess-Laeufe; Speed-Hebel = stempel-korrektes Lager.
+    CODE-STAND (Explore wf_39c8b954): entschieden aber NICHT vollstaendig gebaut
+    -- Planer 0 Lager-Code, CEB nur Praefix, nur Tier hat push/pull, Teilprojekt-
+    Skip 0 Treffer => LAGER-VOLLAUSBAU = PFLICHT (Owner: 'Wir sollten die Luecken
+    ALLE schliessen', 'Volles Programm als Pflicht') = Task #57, W2 mit S-13/#48.
+    CACHE-FRAGE 1: 'erst (a) dann erweiterung durch (c)' -- Topologie: Lager =
+    WAHRHEIT der 4 Binary-Klassen (NAS-Kaskade); minio pflichtig nur Ebene A +
+    GitLab-Interna + Nicht-Lager-Gut; ArtifactCache-Bucket = optionaler stempel-
+    gekeyter CI-Spiegel auf der .de-Instanz (Umzug erst nach #55); DANN Kontext-
+    Ziel-Wahl (local|ci) ALLES per XML.
+    CACHE-FRAGE 2: '(a) ist richtig' -- XML steuert NUR die eigene Maschinerie
+    (Ebene B/C + git/FS-Publikation); Ebene A bleibt config.toml-nativ;
+    (b)-Emitter nachruestbar. FRAGE 4 (14.08.): XML > Env, temporaer je Lauf.
+    XML-SYNTAX-VORSCHLAG liegt: tmp/xml_ziel_sektion_vorschlag.md (<publish>-
+    Sektion, targets {lager|minio|filesystem|git}, scope local|ci, rebuild-Flags
+    default an, git immer fail-loud) -- Design-Grundlage fuer #48/#57 in W2.
+    MAXIMAL-PARALLEL-GO (Teil 8): 5 Straenge A-E nach Lande-Zug-Rueckkehr +
+    A2-Rewrite seriell danach -- ZUENDET MIT DIESEM NACHTRAG.
 ## NACHTRAG 15.08.2026 -- KON66: SESSION-LUECKEN-INVENTUR (Owner-Order "damit nichts verloren geht") -- VIER UNGEBUCHTE WORKFLOW-BLOECKE DIESER SESSION
 
 **Anlass: Owner 15.08.: "Bitte dokumentiere jetzt alle fehlende Punkte ins ledger aus dem
