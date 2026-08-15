@@ -206,7 +206,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 0817c7bf51089eebf8d9e726b50d53a35c6bb56c
+PZW-CE-SHA         = 8fe66469af9decdc39ddd50baeff34b9b23bb635
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
@@ -214,9 +214,28 @@ PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
-**Nachzug 15.08.2026 (zweiter Zug des Tages) -- elfter Gitlink-Zug (Lande-Zug 2, v4.3/#58;
-Task-Frame Z3), und zum achten Mal in Folge bewegt sich KEINE der fuenf Zahlen. Die vorherige
-Fassung bleibt darunter stehen.**
+**Nachzug 15.08.2026 (dritter Zug des Tages) -- zwoelfter Gitlink-Zug (W-B-Stufe-1-Landung
+nach Nachstufe, KON76-02), und zum neunten Mal in Folge bewegt sich KEINE der fuenf Zahlen.
+Die vorherige Fassung bleibt darunter stehen.**
+
+Der Gitlink zieht von `0817c7bf` auf **`8fe66469`** (1 Merge: `8fe66469` 'Landung:
+bau/prtart-waisen-archiv in development (--no-ff)' @ Branch-Tip `00d3910a`, 8 Dateien --
+4 R100-Renames der prt-art-Legacy-Waisen nach `tests/deprecated/`, VERMERK.md, Allowlist-
+und `test_pa1`-Anpassung, Test-Map-Nachzug; KEINE neue Test-`.cpp`, KEINE ce-CI-Beruehrung.
+ce-Pipeline **15879 TERMINAL SUCCESS** @ `8fe66469`: 25 success + 1 manual von 27,
+is_original:relock = deklarierte Ausnahme, 0 failed.) Die Verschiebung der 4 Waisen-Dateien
+INNERHALB des Baums laesst alle fuenf Zaehlwerke unberuehrt (Nenner bleibt 504 Test-`.cpp`).
+
+| Anker | alt (Stand `0817c7bf`) | neu (Stand `8fe66469`) | Zaehlweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `0817c7bf51089...` | **`8fe66469af9de...`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | 504 Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 504 Test-`.cpp` im Baum `8fe66469` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 504 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2945 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2945 Zeilen, Muster mit `-F` |
+
+**Vorherige Fassung (Stand `0817c7bf`, elfter Zug):**
 
 Der Gitlink zieht von `04f76b65` auf **`0817c7bf`** (1 Merge: `0817c7bf` 'merge(traeger/#29):
 Skeleton der vier Traeger-Unterprojekte' @ Branch-Tip `be2d9e4e`, 10 Dateien / 132 Insertions,
