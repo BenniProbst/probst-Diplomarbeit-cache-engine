@@ -1,0 +1,2 @@
+{"type":"started","key":"v2:5a486ecc85716f161de3f47f00da4331bf6670ee98a39c8ec51784f67ed4f2c8","agentId":"a942977742c6710de"}
+{"type":"result","key":"v2:5a486ecc85716f161de3f47f00da4331bf6670ee98a39c8ec51784f67ed4f2c8","agentId":"a942977742c6710de","result":"Upgrade-Check-Hook ist Complete durchgelaufen, helm appliziert jetzt die Manifeste; der neue Migrations-Job sollte gleich erscheinen. Ich warte auf die naechsten Monitor-Events."}
