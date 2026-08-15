@@ -206,13 +206,43 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 04f76b65bf6c29d2844fdedd80efa2b34f17968d
+PZW-CE-SHA         = 0817c7bf51089eebf8d9e726b50d53a35c6bb56c
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 15.08.2026 (zweiter Zug des Tages) -- elfter Gitlink-Zug (Lande-Zug 2, v4.3/#58;
+Task-Frame Z3), und zum achten Mal in Folge bewegt sich KEINE der fuenf Zahlen. Die vorherige
+Fassung bleibt darunter stehen.**
+
+Der Gitlink zieht von `04f76b65` auf **`0817c7bf`** (1 Merge: `0817c7bf` 'merge(traeger/#29):
+Skeleton der vier Traeger-Unterprojekte' @ Branch-Tip `be2d9e4e`, 10 Dateien / 132 Insertions,
+nur Adds: Wurzel-`CMakeLists.txt` + `libs/traeger/` mit CMakeLists+README je {planner,ceb,tier,
+hybrid} -- KEINE Datei unter `tests/`, keine ce-CI-Beruehrung. ce-Pipeline **15832 TERMINAL
+SUCCESS** @ `0817c7bf`: 26 success + 1 manual von 27, die vier Zellen test:unit 875 s /
+test:unit:debug 512 s / test:unit:clang 91 s / test:unit:clang:debug 147 s alle gruen,
+test:coverage-guard 1282 s; is_original:relock = deklarierte Ausnahme, 0 failed.)
+
+| Anker | alt (Stand `04f76b65`) | neu (Stand `0817c7bf`) | Zaehlweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `04f76b65bf6c2...` | **`0817c7bf51089...`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | **504** Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 504 Test-`.cpp` im Baum `0817c7bf` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 504 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | **2945** Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2945 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich nichts bewegt -- mit der Wache selbst am Baum `0817c7bf` erhoben** (`sh
+ci/plan_zahlen_wache.sh` rc=0, Protokoll: '5 von 5 Ankern decken sich mit dem Objekt'; Nenner
+unabhaengig gegengemessen: `git ls-tree -r 0817c7bf` liefert 504 Test-`.cpp`, die super-CI-YML
+hat 2945 Zeilen): der Zug fuegt in ce ausschliesslich das Traeger-Skeleton hinzu (Unterprojekt-
+Geruest ohne Quell- oder Testdateien) -- der Test-`.cpp`-Nenner bleibt 504, Treffer exakt
+40/21/2. Die super-`.gitlab-ci.yml` ist in diesem Zug unberuehrt (der Z2-Merge `dbed284b` traegt
+nur `docs/sessions/backups/20260815-branch-archiv-d12/`); beide CI-Muster unveraendert
+(2 Aufrufe, 0 Altmuster).
 
 **Nachzug 15.08.2026 — zehnter Gitlink-Zug (LANDE-ZUG CI-DUAL + LIZENZ, v4.3/#56; Task-Frame
 Z5), und zum siebten Mal in Folge bewegt sich KEINE der fünf Zahlen. Die vorherige Fassung bleibt
