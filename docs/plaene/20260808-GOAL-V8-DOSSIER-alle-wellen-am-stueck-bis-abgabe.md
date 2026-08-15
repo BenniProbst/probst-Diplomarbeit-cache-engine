@@ -14,6 +14,17 @@
 
 > **Owner-Auftrag KON19-00 (12.08.):** dieses Dossier ist — mit Wellenplan v2, DESIGNPLAN-tdd und ARBEITSWEISE-GESAMT-DOKTRIN — **Haupt-Referenzdokument**; spätere Planungsdokumente werden **gegen diese vier gemessen**, nicht umgekehrt. Nichts wird gelöscht: Originaltext bleibt, Überholtes trägt datierte Marker an der Stelle selbst.
 > **Fakten-Quelle für den lebenden Stand:** Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`, Abschnitt **„LEDGER-KONSOLIDIERUNG IV"** (A–M inkl. ERGÄNZT) + **KON24–KON38**. Bei Widerspruch: **Owner-Wort schlägt alles · Neueres schlägt Älteres.** Dieses Dossier bleibt Stand 08.08. + datierte Nachträge; es **verweist** auf den Ledger, es dupliziert ihn nicht.
+> ⚠️ **MARKER 15.08.2026 (KON71-KON73):** PRAEZISIERT/ERWEITERT — (1) Der VI.2-Nenner-32-
+> Marker vom 12.08. ist seinerseits UEBERHOLT: die Mess-Permutation ist DYNAMISCH >32
+> (PMC dreiphasig, Lastsequenz, iw/ima/imi, Pruefling, dynamic_dims); NUR die
+> Planungs-Simulation S-19 (MEILENSTEIN, "Hauptziel der naechsten Wellen") errechnet sie
+> am Experiment-B+-Baum aus den XML-Freigaben; die einzige feste 32 = willkuerlicher
+> Dock-Deckel. (2) NO-BLOAT-Doktrin + PLANER-BLOAT-AUSNAHME (der Planer ist die einzige
+> Traeger-Stufe mit Universal-Kompilat). (3) REPO-ROLLEN: ce=Framework/Hauptstrang,
+> super=Installations-Code+Anwender-XML+CI-Einstieg; prt-art/thesis = Ausbrueche.
+> (4) DREI-BEREICHE-CONCURRENCY (CI-normal 3/2 · CI-heavy 16 · ce-intern floor((T-4)/4)x4
+> bzw. --debug Tx1). Volltext: Ledger KON71-KON73 + kon64_sammlung (Folge-BU #68).
+
 > **Die Korrektur-Tabelle A (Stelle→ALT→GILT), die Neu-Liste B und die Bestätigungs-Liste C stehen im Volltext-Träger** `docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md` **Teil A.1** — die betroffenen Stellen dieses Dossiers tragen datierte Einzel-Marker. Kurzfassung der tragenden Korrekturen: VI.1(a) Kette → Bau-Modul/Träger-Rakete/Emission-endet-im-Lager (ORT-Reihenfolge gilt weiter) · VI.2 „0 % gebaut" → „0 % ANGESCHLOSSEN"; Nenner = **32** aus 5 Schaltern, Hybrid-Mess-Schicht hält · VI.5 → T-15a ≠ T-15b (je 5 für Build UND Messung, 3 Erfolgs-Werte einzeln) · OD-7 = 16, `--debug` bis **T−3 (~12.09.) = echte Messung** · **KON38: Stempel-Strecke = Fable 5 max in allen Workflow-Teilen** · B1–B5 (System A/B) in jeder Durchführungs-Planung.
 
 ---

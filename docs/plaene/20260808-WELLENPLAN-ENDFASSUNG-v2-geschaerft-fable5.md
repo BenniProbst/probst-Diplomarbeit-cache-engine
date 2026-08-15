@@ -2190,4 +2190,32 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
     P1  vor P2   simd_build_gate-Kopplung                      => S-3-Landung VOR S-7-Bau
                  (beide im selben Worktree wt-ce-mess-ordnung — ein Schreiber)
     P3  vor P5   anatomy_module_abi_v1_decl.hpp                => EIN Schreiber; alle decl-
-                 Aenderungen (Layout 7, #38d, S-6a-POD) fahren im EINEN Bump-Buendel-Slot
+                 Aenderungen (Layout 7, #38d, S-6a-POD) fahren im EINEN Bump-Buendel-Slot## 18.8 NACHTRAG 15.08.2026 -- TASK-EINSORTIERUNG #60-#74 + NEUE OWNER-DOKTRINEN (KON71-KON73)
+
+> Fortschreibung von §18.2-18.7 nach der Owner-Entscheide-Serie 15.08. (KON71-KON73).
+> Klassen-Regel §18.1 unveraendert. Die Fessel P6-vor-P4 ist per KON70-01 KORRIGIERT:
+> ihr Gegenstand ist die B2-GATE-TRENNUNG (#24), nicht der Lizenz-Branch; #16-Landung
+> gesperrt bis B2. NEU: EIN golden-Fenster buendelt B2 + #16-Homes + organ_axes-Rename
+> (F5) + queuing-Umzug (#72) = ein Bruch statt vier.
+
+| Task | Gegenstand | Klasse | Welle |
+|---|---|---|---|
+| #24/B2 | Gate-Trennung G2/G3 = NAECHSTER BAU (echte P6-Fessel) | (P) | W1 sofort |
+| #16+#72+F5 | golden-Fenster-Landung (Homes+organ_axes+queuing) NACH B2 | (P) | W1 |
+| #60 | Flotten-Runner WS2022/Win11/macOS + runner-mode 3/2 (F7/KON71-03) | (M) | W1-W2 |
+| #61/#67 | Thesis-Trailer-Rewrite -> Code<->Thesis-Sync (B5) | (-) | WE-W1 seriell |
+| #62 | 14 ce-origin-Branches Re-Pruefung->Bundle->Loeschung (Frage 8) | (-) | WE, vor #19 |
+| #64/#66/#68/#73 | Zombie-Cancel · Randbestand · Folge-BU · helm-Nachlauf | (-) | WE (laeuft) |
+| #65 | PRT-ART: cmake-Ladeweg-Fix + Ladebeweis + Waisen-Archiv | (W) | W1 |
+| #69 | Messwert 750-vs-1310 + prod2-TeX | (M) | W2 vor W3 |
+| #70 | XorFilter-Korrektheit (30/256 FN) VOR naechster Messung | (P-nah) | W1 |
+| #71 | Leser-Hebungs-Triage (KON-15/43/44/machines) | (W) | W2 |
+| #74 | Repo-Rollen-Umbau: XSD-Hoheit -> ce (F6) | (W) | W2 |
+| NEU | Paper-Experiment-XML je Paper (Fadenriss 20.07., Grundfigur 2/3) | (M) | W2 mit #18 |
+| NEU | PMC-Schwester-Design (KON73-01-Kerne) -> Owner-Vorlage -> Bau | (P/M) | W1-Design, W2-Bau |
+
+DOKTRIN-NACHTRAEGE dieses Datums (Quelle KON71-KON73): No-Bloat + Planer-Bloat-AUSNAHME ·
+Mess-Interfaces = eigene Mess-Haupt-Achse (iw/ima/imi) · AND-Freigabe der Kategorien ·
+Drei-Bereiche-Concurrency (CI-normal 3/2 je 4 Kerne · CI-heavy Deckel 16 · ce-Build
+floor((T-4)/4)x4, --debug-Messung Tx1) · OS-Realm-Lager-Pooling · Repo-Rollen (ce=Framework,
+super=Einstieg) · Mess-Permutation DYNAMISCH >32, NUR S-19 (Meilenstein).

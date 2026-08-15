@@ -16,6 +16,131 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON73: OWNER-TAG KOMPLETT ENTSCHIEDEN -- PMC/FLOTTEN/REPO-ROLLEN/CONCURRENCY FINAL + VIER EXPLORE-KARTEN + VOLLES GO MAXIMAL PARALLEL
+
+**Quellen: kon64_sammlung.md Teile 12-22 (VERBATIM-Primaerquelle, per Folge-BU #68 im Repo
+unter docs/sessions/backups/20260815-folge-bu-kontext7/) + Explore-Workflows wf_9d604fea/
+wf_3337a24d/wf_59f82faf/wf_1f981ed4. KON73 vorher 0 Treffer. Schluss-GO Owner: "volles GO
+und volle Fahrt voraus. Volles GO maximal parallel."**
+
+### KON73-01 -- PMC-GESAMTBILD FINAL (alle Fragen zu; Details Sammlung 12/14/19)
+
+    F-P1..P10 + Kontext-F1..F4 ALLE entschieden. TRAGENDE KERNE: Planer-Stempel
+    TRAEGT Mess-Zeile ueber FREIGEBBARE Mess-Achsen inkl. PMC-Meta-Meta (System-
+    Zeilen erst ab CEB) · 🔴 PLANER-BLOAT-AUSNAHME (einzige Stufe; Universal-
+    Einstieg ueber ALLE Systeme; Meta-Meta via CMake mit VOLLER Analyse-
+    Funktionalitaet, C++23 abi-stabil; Systemtest = Planer zuerst, baut Folge-
+    stufen XML+System-angepasst) · 🔴 MESS-INTERFACES = EIGENE MESS-HAUPT-ACHSE
+    (iw/ima/imi kennzeichnen Steuerungs-/Mess-FLAECHEN-Interfaces an den
+    ZWISCHENVERTRAEGEN; Interfaces unabhaengig von Fuehlern baubar) · AND-FREIGABE
+    = CT-WACHE (Planer begrenzt CEB-Freigabe gegen Tier/Hybrid-Vertraege) ·
+    System-only-Eintrag = MITGEFUEHRTES, NICHT AUSGEPRAEGTES POTENTIAL ("Sonderfall
+    dualer Kategorie in dreiphasigen Systemen") · Zuordnung = WEG (b) DUAL +
+    HYBRIDFORM (geschachtelte Haupt-Achsen + Meta-Meta-Erweiterungen + komplexe
+    Klammerungen) · p/b/h/t = Traegerstufen-Suffixe strikt (b=CEB, h optional,
+    p neu; pmc{c.{p.e}}.b.t == {pmc{c.{p}}.b.t, pmc{c.{e}}.b.t}; p/p getrennte
+    Namensraeume per Position) · doppelte HW+SW-Versionierung je Kategorie-
+    Stapelposition · F-P7=Option A (cpu_sub) · F-P9 GO ("Wir heben auf C++23
+    Metaprogrammierung an") · F-P10 korrekt · WEB-RECHERCHE-Order PMC-HW-Katalog.
+
+### KON73-02 -- WEITERE OWNER-ENTSCHEIDE DES TAGES (Details Sammlung 15/19/20/22)
+
+    F5: DREI Homes mess_axes/system_axes/ORGAN_AXES (auch axes/->organ_axes,
+      640 Records golden-brechend -> ins EINE B2+#16-Fenster).
+    F6 🔴 REPO-ROLLEN-DOKTRIN: ce = FRAMEWORK/Hauptstrang; super = NUR
+      Installations-Code + Anwender-XML + CI-Einstieg (Gesamt-Verlauf XML->
+      Ausgabe); prt-art = dynamischer Ausbruch; thesis = delegierter Ausbruch.
+      #95-Richtung "voellig widersinnig" -> XSD-Hoheit in die ce (Task #74).
+    F7 🔴 DREI-BEREICHE-CONCURRENCY: (1) CI-normal prod1=3/prod2=2, je 4 Kerne
+      [runner-mode NORMAL_CC=4 FALSCH -> Fix] · (2) CI-heavy volle Threads
+      Deckel 16 beide [deckt OD-7] · (3) in der ce: Build floor((T-4)/4)
+      Strecken x 4 Threads (4er-Planer-Reserve, R-F7 bestaetigt (a)+(b)) --
+      prod1(32T)=7 Strecken, prod2(24T)=5; --debug-Messung ALLE Threads x 1.
+    Vorlage-B KOMPLETT: B1 Zombie-Cancel-Ausnahme (#64) · B2 PRT-ART-Review+
+      (a)-unter-Umbau (#65) · B3 Randbestand-Sammel-Audit (#66) · B4 CI_JOB_TOKEN
+      + PAT-Kanal repo-seitig abschalten nach Gruen (#54) · B5 Thesis-Rewrite GO
+      + SYNC-AUFTRAG Code<->Thesis (#61/#67) · B6 Betreuer-PDFs WERDEN
+      veroeffentlicht ("oeffentliches Dokument"). Teil C GO.
+
+### KON73-03 -- VIER EXPLORE-/REVIEW-KARTEN (Details Sammlung 14-B/16/18/21)
+
+    NO-BLOAT belegt seit 16.07. ("Binary-ISA ⊆ Host-Capability = Mess-Gate";
+      Mess-Gueltigkeit = GLEICHHEIT; Gate-Formvorbild simd_build_gate wieder-
+      verwenden). B+-BAUM verifiziert (Fable xhigh): Organ=18 (nicht 17);
+      "B+-Baum"=Owner-Etikett ueber Praefixbaum/mixed-radix; Geschwister-
+      Arithmetik existiert (variant_tuple/flat_index), Familien-View fehlt;
+      🔴 check-size rechnet IM PLANER statt AUF der CEB (deklarierte Luecke,
+      SOLL-Doku fuehrt CEB-Rechnung) -> 6 S-19-DESIGN-FESTLEGUNGEN in #7 (inkl.
+      🔴 Arena-Faktor-Widerspruch 2-vs-18 Faktor 9 -> measure_storage-Entscheid).
+    PRT-ART (3/3 konvergent inkl. Codex R1-R4): C++-Flaeche PASST vollstaendig;
+      EIN Bruch = comdare_pruefling.cmake 5 Tage hinter W0a-Kontrakt (~10 Zeilen);
+      4 Waisen: 3/4 unverdrahtbar (Gegenstaende mit Owner-OK 01.06. geloescht),
+      1/4 redundant -> ARCHIVIEREN + 3 aufgegebene Deckungs-Luecken verbuchen;
+      sinnvoller (a)-Umbau = lebender Ladeweg-Fix + Ladebeweis. NEBENFUND:
+      Paper-Experiment-XML je Paper fehlt seit Fadenriss 20.07. (Grundfigur 2/3)
+      -> W2-Posten mit S-13.
+    ACHSEN-HIERARCHIE (F4-Order): Hybridform-Karte komplett -- §42.b-Ursprung
+      d[d1,d2,d3] (19.07.), OD-5-Dual-Natur, E2-Anhaenge-Regel, v2-Klammer-
+      Regeln, sub_axis/option_source-Praezedenz (numa_node/page; core_class
+      braucht keine Struktur); offene Design-Punkte: Meta-Meta-Rekursion je
+      Realm, EBNF der Doppel-Versionierung.
+
+### KON73-04 -- helm-ENDBEWEIS + ZWEITE DOPPELINSTANZ-LEHRE (Details Sammlung 15-B)
+
+    GitLab 19.1.4 END-BEWIESEN: Rev.24 deployed, Migrationen succ=1, Valkey
+    redis_version 7.2.4 via Rails, 0 bundled-Redis-Pods, Readiness ok, 15 Runner,
+    TEST-PIPELINE 15846 TERMINAL SUCCESS. Sidekiq-HPA existiert im neuen Chart
+    nicht mehr (Values-Frage #73). comdare-app-pg GEHEILT (3/3, Urteil DEFEKT-
+    NICHT-GEWOLLT, etcd unberuehrt). 🔴 LEHREN-PAAR (Register+Arbeitsweise-
+    Kandidat v4.4): (1) NIE SendMessage an Workflow-Container-Agenten (weckt
+    Resume-DOPPELINSTANZ auf dem GETEILTEN Transkript; ACK nur als DATEI);
+    (2) TaskStop auf die Doppelinstanz KONTAMINIERT den Original mit (Interrupt-
+    Marker im geteilten Transkript -> Original returnte mitten im helm-Upgrade);
+    (3) nach jedem Zwischenstand-Return SOFORT Objekt messen + Beobachtung
+    selbst uebernehmen.
+
+### KON73-05 -- VOLLES GO MAXIMAL PARALLEL: DER DISJUNKTE SCHNITT (Wellen-Form v3.8/A2.1a)
+
+    KONSOLIDIERUNG: dieser Nachtrag + Wellenplan-§18.8 + GOAL-Marker in EINEM
+    super-Commit (Lead-only, seriell nach WE-Kette wf_0f553647).
+    STRAENGE (je EIN Schreiber, disjunkte Flaechen, Drei-Bauten-Deckel):
+      W-A ce/wt-ce-b2: B2-GATE-TRENNUNG (Stempel-Thema=Fable max alle Phasen;
+          Branch-only, Landung ins EINE golden-Fenster B2+#16+organ_axes+queuing)
+      W-B prt-art+ce/wt-ce-prtart: #65-Vollzug (cmake-Fix+Ladebeweis; 4 Waisen
+          archivieren -- unverdrahtet, disjunkt zu W-A)
+      W-C tmp->super-spaeter: PMC-SCHWESTER-DESIGN (Fable max; alle KON71-73-
+          Kerne + 4 Explore-Karten; Owner-Vorlage vor Bau)
+      W-D Infra: #60 Flotten-Runner (KVMs, VLAN, runner-mode NORMAL_CC 3/2)
+      W-E read-only Explores (Sonnet max vt): S-6-Glieder (Pflicht vor S-6) ·
+          #55 xlsx-Aufmachung+minio.local · #49-Staffelungs-Design-Vorlauf
+      W-F read-only Analyse (Fable max): #70 XorFilter-Reproduktion + #71-
+          Objektpruefungen (KON-15/43/44/machines)
+      W-G read-only: #74-Inventur (was lebt faelschlich im super)
+    SERIELL DANACH: WE-Kette-Rueckkehr lesen -> Konsolidierungs-Commit -> #61
+    Thesis-Rewrite (exklusiv) -> #67 Sync -> #62 Branch-Loeschung -> golden-
+    Fenster-Landung. Lande-Bahn: 1 Voll-Gate + 1 Zweit-Slot + n read-only.
+
+### KON73-06 -- VOLLZUGSSTAND BEI BUCHUNG (Nachtrag im selben Zug)
+
+    WE-KETTE KOMPLETT: Folge-BU GELANDET (Merge 95fb059b, 310/310 Dateien, Ledger
+    0/310 unberuehrt, CI 15857 SUCCESS, beide Remotes) -- die Verbatim-Sammlung
+    kon64_sammlung.md (Teile 1-24) + design_pmc_grammatik.md + design_pmc_
+    schwester_v2-Quellen liegen im Repo (docs/sessions/backups/20260815-folge-
+    bu-kontext7/). helm-Nachlauf-Handout Cluster 3765f996 (Valkey-Lebendprobe
+    redis 7.2.4/valkey 7.2.14, Toolbox-Smoke gruen, Sidekiq-HPA-Values-Frage).
+    ZOMBIE-BEFUND: 0 zu canceln -- die 19.1-Migration raeumte die 40 selbst;
+    B1-Ausnahme blieb ungenutzt. RANDBESTAND: 4/4 auditiert, Bundle, origin 2/2
+    geloescht, CI 15856. FLOTTE (W-D): 4/4 Windows-Runner BEREITS ONLINE
+    (fremd-integriert seit 07-26); node6 lebt headless (Owner-Handout C1-C5),
+    node5 tot; runner-mode v3 20ebba5 GELANDET+DEPLOYT (concurrent prod1=3/
+    prod2=2 LIVE, HEAVY_J=16 beim naechsten heavy-Signal). PMC-DESIGN v2 fertig
+    (576 Z., PM-11..16, MMR-1, OP-1..5, Web-HW-Katalog) -> Owner-Vorlage.
+    LIMIT-TOD-ZWISCHENFALL: Fable-Limit toetete W-A/W-B/WE-Kette; A4-konform am
+    Objekt rekonstruiert (nichts doppelt, nichts verloren), per editierter
+    Skripte + resumeFromRunId wiederaufgenommen; W-A (B2) + W-B (prt-art-
+    Ladebeweis; Fix a782c56 lag schon) laufen. A2.5-NACHSTUFEN-PFLICHT fuer
+    W-A/W-B vor Landung deklariert (Verify -> Fix -> Dual-Review), Selbst-
+    pruefung gegen v4.3 in Sammlung Teil 23.
 ## NACHTRAG 15.08.2026 -- KON72: GROSS-KONSOLIDIERUNG DES KONTEXTS -- ALLE OWNER-RUNDEN (F-P KOMPLETT + VORLAGE-B/C), NEUE ARCHITEKTUR-KERNE, #16-BAU TRAEGT, helm 19.1.4 DEPLOYED, LIEGENGEBLIEBENE POSTEN KARTIERT
 
 **Owner-Order 15.08.: "Bitte konsolidiere alle Antworten dieses Kontextes, und alle
