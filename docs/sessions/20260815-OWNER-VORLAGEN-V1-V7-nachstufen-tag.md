@@ -1,9 +1,10 @@
-# OWNER-VORLAGEN V1-V7 (15.08.2026, Nachstufen-Tag)
+# OWNER-VORLAGEN V1-V9 (15.08.2026, Nachstufen-Tag)
 
-> Sieben Ein-Satz-Entscheide im Gesamtzusammenhang. Nichts davon blockiert die
+> Ein-Satz-Entscheide im Gesamtzusammenhang. Nichts davon blockiert die
 > laufende Arbeit ausser V2 (S-6-Bau) und V7 (W4-Diagramm-Formen). Quellen je
-> Vorlage im Text; Primaerquellen: Ledger KON74, Sammlung Teile 26-30 (Folge-BU
-> folgt), Karte tmp/staffelungs_karte_49.json (wf_ec5b9516).
+> Vorlage im Text; Primaerquellen: Ledger KON74-KON76, Sammlung Teile 26-31
+> (Folge-BU folgt), Karte tmp/staffelungs_karte_49.json (wf_ec5b9516).
+> NACHTRAG 15.08. abends: V8+V9 aus dem #61-Rewrite ergaenzt.
 
 ## V1 -- XorFilter (#70): Ruling re-bestaetigen ODER Umbau (vor der naechsten Messreihe)
 
@@ -84,6 +85,32 @@ die DIAGRAMM-FORM (Heatmap/2D/3D je Achse) haengt ausschliesslich an Organ.
 
 ENTSCHEID: Lesart bestaetigen ODER korrigieren -- vor der Festlegung der
 W4-Auswertungs-Formen (Staffelungs-Design, #49-Rest).
+
+## V8 -- SECURITY (aus #61): GitHub-PAT rotieren + Credential-Store bereinigen
+
+IST: ~/.git-credentials traegt eine FEHLGEFORMTE Zeile mit einem GitHub-
+Fine-Grained-PAT im USERNAME-Feld; der Wert wurde bei der Push-Fehlerdiagnose
+des Rewrites EINMAL im lokalen Agent-Transkript sichtbar (nicht committet;
+Transkripte sind tabu und bleiben lokal). Die tote 'x-access-token'-Erstzeile
+war zudem die Ursache des 401-Push-Fehlschlags. Der Store bleibt bis zu
+deiner Rotation UNANGETASTET, weil die funktionierende super->GitHub-Kette
+darueber laeuft.
+
+ENTSCHEID/HANDGRIFF: (1) Diesen GitHub-Fine-Grained-PAT auf github.com
+rotieren; (2) danach GO fuer mich, die drei github.com-Zeilen des Stores zu
+bereinigen (tote Zeile raus, gueltige Zeile sauber).
+
+## V9 -- Rescue-Ref mit Alt-Trailern (aus #61): belassen oder gleichbehandeln
+
+IST: refs/rescue/w3-thesis-c = b1ec8379 (Seitenlinie 02.08., 337 Commits,
+95 Trailer-Zeilen) liegt auf BEIDEN Thesis-Remotes AUSSERHALB von heads/
+tags und wurde vom Rewrite nach Backups-additiv-Doktrin bewusst NICHT
+erfasst. Solange er steht, bleiben dort Alt-Commits mit Co-Authored-By-
+Trailern erreichbar (die Haupt-Historie ist sauber: 0/372).
+
+ENTSCHEID: (a) belassen (Backup-Charakter, Trailer nur in der Seitenlinie)
+ODER (b) gleichbehandeln: Bundle-Sicherung + filter-repo + Force-Update des
+Refs bzw. Loeschung nach Bundle (braucht dein gegenstands-genaues GO).
 
 ## Zur Kenntnis (kein Entscheid noetig)
 
