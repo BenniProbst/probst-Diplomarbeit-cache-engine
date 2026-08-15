@@ -16,6 +16,93 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON71: OWNER-ANTWORTRUNDE AUF DIE KONTEXT-VORLAGE -- NO-BLOAT-DOKTRIN, iw/ima/imi-TOKENS, DRITTE 32er-RUEGE, VIER SOFORT-GOs
+
+**Quelle: zwei Owner-Nachrichten 15.08. (verbatim in kon64_sammlung Teile 12+13).
+KON71 vorher 0 Treffer. "halte inne" der ersten Nachricht durch die zweite aufgehoben.**
+
+### KON71-01 -- ENTSCHIEDEN/BESTAETIGT
+
+    FRAGE 1 (A2): "Ja genau wie du es empfohlen hast" -- 0 Funde = erfuellt, KEIN
+      filter-repo, Transkript bleibt unveraendert. R1 ZU (KON69 final).
+    FRAGE 3 (KI-Trailer Thesis): "(a) ... Bitte history rewrite, Freigabe" -- Prof.
+      Habich einverstanden ("Es ist meine Idee und ich soll die Fruechte ernten").
+      AUFTRAG: Co-Authored-By-Trailer-Rewrite Thesis-Repo (289+Overleaf+GitHub),
+      Verfahren vorab vorlegen, ruhiger serieller Slot.
+    FRAGE 5 (comdare-app-pg): "volles GO zum Beheben ... Ausnahme fuer infra
+      fregegeben ... aber erst Sonet Explore, ob der infra nicht mitten in der
+      Migration steck[t] und der Zustand nicht per sessions gewollt ist. etcd 2/3
+      war gewollt derzeit" -- UG in Testphase/offline, Wartungsfenster ~1 Monat.
+      etcd 2/3 NICHT anfassen.
+    FRAGE 7 (helm 19.1): "Sofort, volles GO." -- Vollzug startet in diesem Zug.
+    FRAGE 8 (14 ce-origin-Branches): "GO, Loeschung sofern nochmal geprueft wurde,
+      dass dort alles gelandet oder resolved ist" -- Re-Pruefung + Bundle + Loeschung
+      NACH dem helm-Fenster.
+    FRAGE 6 (Zombie-Pipelines): NICHT beantwortet -- bleibt in #59.
+    FRAGE 2 (Flotte): "(a), Freigabe" + Infra-Ausnahme -- s. KON71-03.
+
+### KON71-02 -- 🔴 NEUE ARCHITEKTUR-KERNE (verbatim in der Sammlung)
+
+    NO-BLOAT-DOKTRIN (F-P2erg): NIE Binaries mit Funktionen bloaten, die die Hardware
+      nicht ausfuehren kann; Kompatibilitaet NUR durch ABSPECKEN unter den Hardware-
+      Funktionsumfang; der Stempel zeigt nur Eingebautes, nie Hardware-Vorhandenes;
+      der Planer gewaehrleistet die Hardware-Freigabe fuer dual-Bereich Sonder-Hardware
+      wie PMC ("Hybrid zwischen Mess-Achse und System-Achse"). EXPLORE-ORDER (1):
+      No-Bloat-Doktrin im Plan heben (Sonnet max vt, 10 Wochen).
+    AUFZEICHNUNG != MESSFUEHLER (F-P3): Die Abwaerts-Funktionsumfangs-Regel gilt NUR
+      fuer die AUFZEICHNUNGSEINRICHTUNG; die CEB traegt KEINE eigenen Messfuehler,
+      aber das Aufzeichnungsinterface fuer nachfolgende Stufen. 🔴 NEUE GRAMMATIK-
+      TOKENS: iw / ima / imi = Interface-Flags der vorangehenden Stufe gegen
+      eingebaute Messfuehler der nachfolgenden (Planer traegt iw i.d.R. immer).
+      "Wenn eine vorangehende Traeger-Stufe das Interface der nachfolgenden nicht
+      lesen kann, koennen keine Messdaten zu diesem Thema erhoben werden."
+    PMC-VOLLBILD (F-P1 Freigabe + Kerne): Basis-Klasse + erbende Implementierungen
+      je PMC-Typ (erst p/e, spaeter Spezial-ISA); Factory-Parser laufzeit-voll beim
+      Freigeber, compile-time NUR die planer-angeforderten Varianten in den
+      DREIPHASIG-Vertraegen (= weitere echte CT-Permutation ueber Folgestufen);
+      EINE Meta-Meta-Achse (wie Messfuehler-Achse); 🔴 DOPPELTE VERSIONIERUNG
+      Hardware UND Software, je doppelt in Stapel-Reihenfolge Mess/System/Organ;
+      Hardware-Katalog per WEB-RECHERCHE je Kern-Typ.
+    F-P5 bestaetigt: Meta-Meta-Mess-Achsen dreiphasig in Micro (je Achsen-Interface)
+      UND Macro (je Genus-Interface), wenn gewuenscht+vorhanden; Stempel-Integration
+      CEB vs Tier/Hybrid folgt der Mess/System-Dualitaet. "Tier-Fingerprint pmc-frei"
+      damit final UEBERHOLT. F-P10 korrekt. F-P4/7/8/9: Kontext-Vorlage folgt.
+    🔴🔴 DRITTE 32er-RUEGE (F-P6): "Du hast schon wieder die 32 falsch getrennt, zum
+      dritten Mal." Die Mess-Permutation ist DYNAMISCH >32 und wird NUR vom Planer
+      am Experiment-B+-Baum aus den XML-Freigaben errechnet (S-19); die einzige
+      feste 32 = willkuerlicher Dock-Deckel. S-19 = MEILENSTEIN, "Hauptziel der
+      naechsten Wellen" ("schon 4 mal ermahnt"). MEMORY KORRIGIERT (Index-Hook +
+      Detail-Abschnitt); EXPLORE-ORDER (2): Experiment-B+-Baum-Planung 10 Wochen
+      (Sonnet max vt + Fable 5 xhigh Tieflesen).
+
+### KON71-03 -- FLOTTEN-AUFTRAG (Frage 2, Infra-Ausnahme) + OS-REALM-DOKTRIN
+
+    AUSNAHME: Session uebernimmt zwischenzeitlich die Infra-Rolle -- pruefen ob
+      WS2022 + Windows 11 (KVMs auf BEIDEN prod) + der EINE verbliebene macOS-
+      Rechner (der andere ist AUSGEFALLEN) oben sind; GitLab-Runner nach
+      VLAN-Tabellen-Konventionen einrichten, Nodes "zur Verfuegung stellen und
+      mit ziehen".
+    PFLICHT-STAFFELUNG: vorerst NUR Komplett-Durchlauf auf beiden Ubuntu-bare-metal
+      Pflicht; uebrige Nodes erst nach Fertigstellung des Gesamtsystems als hartes
+      Pipeline-Gate. NIE allow_failure -- stattdessen Nodes gezielt hinzukonfigurieren.
+    🔴 OS-REALM-DOKTRIN: jede Node fuehrt Cache-Engine-System + LAGER-POOL fuer ihren
+      eigenen OS-Hardware-Realm aus ("sonst bleibt Hardware-Erweiterungs-pooling je
+      OS bestehen"); Cross-Compile ueber OS-Grenzen war falsch -- Cross-Job-
+      Entfernung RICHTIG.
+    🔴 ZWEI MESS-KLASSEN: "bare metal Mess-Faehig" vs. "nur VM --debug Stufe"
+      (Feasibility + echte Bug-Erkennung unter --debug-Ungenauigkeit) -- gilt fuer
+      alle Docker-Pflichten und alle geplanten OS auf Maschinen und im Cluster.
+      KVM-Stand laut Owner: prod1+prod2 fuer alle KVM eingerichtet; --debug-measure
+      auf diesen OS in der Vor-Scharfschalt-Phase PFLICHT.
+
+### KON71-04 -- VOLLZUGS-REIHENFOLGE DIESES ZUGS
+
+    (1) Memory-32er-Korrektur VOLLZOGEN · (2) KON71 gebucht+gepusht VOR dem
+    helm-Fenster · (3) helm-Upgrade-Workflow STARTET (RESTPLAN, Fenster-Guard,
+    "Sofort"-GO) · (4) Explores parallel (No-Bloat + B+-Baum + comdare-app-pg-
+    Infra-Sessions) · (5) nach helm: Runner-Einrichtung (KON71-03) -> Branch-
+    Loeschung (Frage 8) -> Thesis-Trailer-Rewrite (Frage 3) · (6) F-P4/7/8/9-
+    Kontext-Vorlage + PMC-Design-Nachzug (F-P2/P3-Korrekturen) mit #53.
 ## NACHTRAG 15.08.2026 -- KON70: HANDLUNGS-PRUEFUNG H1-H10 (Owner-Order) -- P6-NAMENSKOLLISION AUFGEDECKT: #16 WAR NIE ENTFESSELT, LANDUNG HINTER B2 GESPERRT
 
 **Owner-Order 15.08.: 'Bitte pruefe dein Handeln aus diesem Kontext aufgrund der neuen
