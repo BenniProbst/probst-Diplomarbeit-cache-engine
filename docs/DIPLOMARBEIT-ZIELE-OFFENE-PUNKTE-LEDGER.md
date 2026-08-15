@@ -16,6 +16,113 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 15.08.2026 -- KON70: HANDLUNGS-PRUEFUNG H1-H10 (Owner-Order) -- P6-NAMENSKOLLISION AUFGEDECKT: #16 WAR NIE ENTFESSELT, LANDUNG HINTER B2 GESPERRT
+
+**Owner-Order 15.08.: 'Bitte pruefe dein Handeln aus diesem Kontext aufgrund der neuen
+Faktenlage und starte gezieltes tieflesen ... Sonet 5 max very thourough explore ueber die
+letzten 10 Wochen ... lies das ledger wirklich ab dem Zeitpunkt der Erstellung von goal v8
+vollstaendig ein.' VOLLZUG: Lead-Eigen-Tieflesen Z.1-2082 + Konsolidierung IV (Z.3859-4525)
++ GOAL-v8-Geburts-KERNe (Z.27086-27433) SELBST; Explore (Sonnet max vt, Transkript-
+Kernzeilen extrahiert) + 4 Fable-max-Volltext-Leser ueber die Restspanne 08.-12.08.
+(wf_49aa16bd, 5/5, 1,11M Tokens). KON70 vorher 0 Treffer.**
+
+### KON70-01 -- 🔴 DER KERNFUND: 'P6' BEZEICHNET ZWEI GEGENSTAENDE -- KON61-14 IST EIN BEZUGSFEHLER
+
+    ZWEI OBJEKTE, EIN NAME (alle 5 Pruefer unabhaengig konvergent):
+      P6 (FESSEL, Wellenplan 18.7 + KON58-10): der LANDESLOT von #24/B2 GATE-TRENNUNG
+        G2/G3 -- 'golden-brechend', 'golden-Identitaetskette, strikt seriell',
+        Lande-Ordnung ...->P10->P6->P3->... ; Task #24 traegt sie bis heute
+        ('B2 vor #16 (Fessel P6)') und ist PENDING.
+      P6-SLOT (LANDUNG, KON60-02): bau/p6-lizenz-umsetzung, Task #42, Merge a6804dfa
+        -- der LIZENZ-Branch, mit der Gate-Trennung inhaltlich unverbunden.
+    KON61-14 ('#16 ENTFESSELT ... BEIDE Vorbedingungen erfuellt: P11 in origin UND
+    P6 gemergt a6804dfa') stuetzte die Entfesselung auf den LIZENZ-P6 -- ein
+    BEZUGSFEHLER der L-8-/V12-Klasse (Nummern sind kein Autoritaetsbeleg) und exakt
+    die Owner-Ruege 14.08. (Stempel-Syntax-Memory: 'Cluster vor der Verwendung gegen
+    den Plan und Architektur pruefen'). DATIERTER MARKER an KON61-14 hiermit gesetzt
+    (Original steht): die S-14a-/P11-Haelfte der Entfesselung HAELT (b91b22fc);
+    die P6-Haelfte ist FALSCH BEZOGEN -- B2 ist NICHT gelandet, die Fessel STEHT.
+    KONSEQUENZ (sofort vollzogen): die #16-LANDUNG ist GESPERRT bis B2 gelandet ist.
+    Der laufende #16-BRANCH-Bau (bau/golden-homes, KEINE dev-Landung) bricht den
+    Fessel-BUCHSTABEN ('B2 LANDET vor #16') nach uebereinstimmender Lesart von
+    3 Pruefern nicht -- er wird als DEKLARIERTE Vorleistung mit Lande-Vorbehalt
+    gefuehrt. ZIEL-ORDNUNG nach KON24-01/Q-c ('EIN Aenderungsfenster, sonst zweimal
+    Golden-Bruch'): B2 als NAECHSTER Bau, dann B2 + #16 in EINEM golden-Bruch-
+    Fenster seriell landen (B2-Merge zuerst, #16 darauf harmonisiert) -- ein Bruch
+    statt zwei, die Fessel bleibt dem Sinn nach erfuellt.
+
+### KON70-02 -- HANDLUNGS-URTEILE H1-H10 (5 unabhaengige Pruefer, konsolidiert)
+
+    GEDECKT (STUETZT, keine Auflage): H1 Patch-Akteur-Klaerung (V11/V1-Figur;
+      Praezedenz KON56-02) · H2 Lande-Zug 2 (KON43-Schnitt, atomarer Gitlink,
+      Bridge mitgeprueft) · H4 #31-Ausbuchung (KON49-02 + KON22-02: lokal autonom,
+      origin nur mit GO -- Vorlage #59) · H8 KON68/69-Buchung (Nummern-Doktrin,
+      Push->gruen) · H9 Task-Korrekturen #33/#3 (L-4-Klasse, 'am Objekt pruefen,
+      nicht die Liste zitieren').
+    GEDECKT MIT AUFLAGE: H3 A2-Vollzug -- Verfahren einwandfrei (blinde Einzel-
+      pruefung, JSON-escaped-Zweitlauf, beissende Koeder-Gegenprobe = KON2-01-Form);
+      die LESART '0 Funde => kein filter-repo' ist vertretbar, aber keine zwingende
+      Lesart des Owner-Wortlauts ('history rewrite uebernehmen ... nur eben
+      redigiert') -> als DEKLARIERTE ABWEICHUNG dem Owner zur RUECKBESTAETIGUNG
+      vorgelegt (#59/R1). H7 Valkey-Vault (juengere 14.08.-Praxis deckt Session-
+      Vault-Commits; Peer-GO-Muster konsistent). H10 Infra-Reste -- Zurueckhaltung
+      korrekt; AUFLAGE aus E-20 ('Du musst an den infra agenten pushen sonst sieht
+      er es nicht'): Infra-Ergebnisse gehoeren als HANDOUT ins Cluster-Repo
+      docs/sessions/ + Push, nicht nur in den Manager-Kontext -> KON70-04.
+    WIDERSPRUCH/TEILS: H5 #16-Start -- s. KON70-01 (Start ohne dokumentierte
+      Fessel-Pruefung war eine Lead-seitige Planverkuerzung auf Basis des
+      KON61-14-Bezugsfehlers; jetzt korrigiert + Vorbehalt gebucht). H6 Umbrella --
+      die ENTFERNUNG der Windows-Cross-Jobs ist durch B6(b) TEXTLICH gedeckt
+      (letzte Owner-Vorlage 54817: '(b) Jobs entfernen'; Owner 54942:
+      'Ausnahmegenehmigung erteilt a,b,c'); ABER die Plattform-Flotte ist
+      OWNER-BESTAND (KON-26/27 der 10-Wochen-Spanne: WS2022-Schluessel GEKAUFT,
+      Flotte Win11+WS2022+7 Linux-Docker+2 macOS dimensioniert den
+      operating_system-Katalog) -> Entfernen ohne Reaktivierungs-Notat waere
+      stilles Aufgeben; REAKTIVIERUNGS-POSTEN hiermit gebucht (KON70-03) und die
+      manual-Jobs werden als DEKLARIERTE DECKUNGSLUECKE gefuehrt (KON3-14-Klasse:
+      'ein Job, der nicht faehrt, verdeckt alles, was nur sein Uebersetzer sieht';
+      beide Mengen nennen: geprueft UND nicht geprueft).
+
+### KON70-03 -- NEUE/NACHGEZOGENE POSTEN AUS DER PRUEFUNG
+
+    (a) UMBRELLA-FLOTTEN-REAKTIVIERUNG (aus H6): Windows-Cross-Jobs sind ENTFERNT
+        (759db0ec, Historie traegt sie), macos/x86-BM/18er-Docker manual. Posten:
+        bei Runner-Rueckkehr ODER auf Owner-Termin die Flotte reaktivieren; der
+        GEKAUFTE WS2022-Schluessel bleibt verzeichnet. Owner-Frage #59/R2: Flotten-
+        Reaktivierung terminieren (z.B. nach Abgabe) oder Umbrella dauerhaft
+        Linux-only-Pflicht?
+    (b) LESER-HEBUNGEN der 10./11.08.-Spanne mit PRUEF-AUFTRAG (Stand der Spanne,
+        gegen juengere Deckung zu pruefen, dann buchen oder entlasten):
+        🔴 KON-17 XorFilter 30/256 ECHTE False Negatives = KORREKTHEITSFEHLER
+          ('jede Messreihe darueber misst ein falsches Programm') -- in keinem
+          Ledger-Posten verankert; SOFORT-Pruefposten vor der naechsten Messung.
+        🔴 KON-37 27 Prozent KI-Co-Autor-Trailer im THESIS-Repo (juengster Fall
+          06.08., Overleaf/GitHub-gespiegelt) -- Eigenstaendigkeits-Relevanz der
+          Diplomarbeit -> Owner-Vorlage #59/R4.
+        KON-61 machines-Schluessel fuehrt prod1 als amd_zen4_avx512, belegt Zen5
+          (9950X3D) -- Datenintegritaets-Warnung, Pruefauftrag vor W3.
+        KON-15 measurement_on/single_thread 0 Leser (Station 7 Release-Modus
+          strukturell nicht baubar) · KON-20/26 concurrency-Konflikt (1 vs 2/24
+          vs 4) · KON-43 Betreuer-Pflichten (D-12 Ordnungsmodi, D-03 Prefix-
+          Lookup, D-04 'CE Off'-CSV-Spalte) · KON-44 termine/INDEX.md stale
+          (T9-T11 fehlen) · PA-3 4 PRT-ART-Testdateien (Owner-Entscheid) --
+          alle in die W2-Triage bzw. #59-Sammelliste.
+    (c) EXPLORE-RESTLUECKE DEKLARIERT: Roh-Transkript 46375cdc (313 MB,
+        06.07.-11.08.) nur 5-Muster-gegrept, nicht tief gelesen -- Restrisiko
+        uebersehener Owner-Aussagen dieser Aera bleibt OFFEN benannt; die
+        Ur-Wortlaute der Full-Platform-Doktrin (03.07.) liegen ausserhalb beider
+        gepruefter Transkripte.
+
+### KON70-04 -- VOLLZUEGE IM SELBEN ZUG
+
+    Task #16 korrigiert (Fessel wiederhergestellt, Lande-Vorbehalt) · Task #24/B2
+    hochpriorisiert (naechster Bau-Slot, Ziel EIN golden-Fenster mit #16) ·
+    Task #59 um R1 (A2-Rueckbestaetigung), R2 (Flotten-Reaktivierung),
+    R4 (KI-Trailer Thesis) erweitert · INFRA-HANDOUT (E-20-Auflage) ins
+    Cluster-Repo docs/sessions/ geschrieben + gepusht: Strang-A-Endstand,
+    backup-utility [DONE]-Literal, RESTPLAN-Verweis pve1, Valkey-Vault-Stand,
+    comdare-app-pg-Befund. PLATTEN-HYGIENE verbucht (Teil 11-B der Sammlung:
+    5 super-Worktrees + warnbau nach Loeschregel, 13G->17G->28G frei).
 ## NACHTRAG 15.08.2026 -- KON69: A2 VOLLZOGEN -- TRANSKRIPT EINZELN+HAENDISCH GEGEN DEN GESAMTEN VAULT GEPRUEFT: 0 FUNDE, REWRITE OHNE GEGENSTAND
 
 **KON69 vorher 0 Treffer. Owner-Verfahren (14.08. verbatim): 'einzeln und haendisch gegen
