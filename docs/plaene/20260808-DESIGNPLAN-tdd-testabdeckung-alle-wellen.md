@@ -56,6 +56,7 @@ PE-AllowFailure [A W0b 1] · PE-Startgate-Vertrag [B W1 2.5] · PM-PAPI [C W7* 3
 XL-L1 Facade zweistufig [A W0b(A-Stufe)/W1(B-Stufe) 10] · LG-E2Exlsx Facade [A W1 6] · XL-CsvDtor-Leck [B W2 2]
 
 > ⚠️ **MARKER 13.08.2026 (KON59):** [D-5 → §10]: die xlsx-„null Aufrufer"-Aussage von K7 ist präzisiert — **8 von 9** `thesis_profiles` sind xlsx-blind (KON4-07/R1 + KON36-02/H), nicht alle 9; es fehlt der T-3-Klasse-Posten mit Profil-Nenner (Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum). Die Zeile bleibt stehen.
+> ✅ **R1-NEUAUSZAEHLUNG 15.08.2026 (zehnter Gitlink-Zug, ce `04f76b65`):** Profil-Nenner **9 → 11** (`git ls-tree` über `libs/cache_engine/algorithm_profiles/thesis_profiles/`, 11 `.profile.xml`); xlsx-blind **0 von 11** — alle 11 tragen ein aktives `<method value="xlsx"/>` (KF #24, 14.08., Owner-B4 „xlsx ist Standard"; Messung `git grep -E '<[^!]*xlsx'` gegen den Baum, je Datei >= 1 Element-Treffer). Die L-4-Lehre hat geliefert: die 13.08.-Zahl war 2 Tage später doppelt überholt (Nenner UND Zähler).
 
 **Einzelfälle (2):** PK-WinsorWert (absturzfreiheit-statt-aussage: `isfinite` ersetzt den Wert) [B W2 2] · XL-L4 n/a-Konkurrenz (kennzahl-ohne-nicht-bestimmbar) [A W1 3].
 
@@ -205,13 +206,45 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 4f18f478f1bdefb2690a8f3c0c3e5129ff5b9016
+PZW-CE-SHA         = 04f76b65bf6c29d2844fdedd80efa2b34f17968d
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 15.08.2026 — zehnter Gitlink-Zug (LANDE-ZUG CI-DUAL + LIZENZ, v4.3/#56; Task-Frame
+Z5), und zum siebten Mal in Folge bewegt sich KEINE der fünf Zahlen. Die vorherige Fassung bleibt
+darunter stehen.**
+
+Der Gitlink zieht von `4f18f478` auf **`04f76b65`** (4 Commits: CI-DUAL-Landungs-Merges `7858f70a`
+(bau/ci-dual-ce @ 61d9edd1: 4-Zellen-Matrix {gcc,clang} x {Release,Debug}, 3 neue Jobs, ccache-
+Writer-Wechsel clang-Key) / `edbe2811` (bau/ci-dual-emission @ 731b5655: Traegerstufen-Emission
+gcc-15-Pins + clang-22-Zwilling, E1–E5) + K13-Testfix `04f76b65`: d2-Koeder strukturell nicht-
+numerisch — Heilung der roten ce-Pipeline 15810 (test:unit Job 377638, Koeder 628959349117 war
+rein numerisch, p=(10/16)^12; test:unit:debug skipped via needs). ce-Pipeline **15811 TERMINAL
+SUCCESS** @ `04f76b65`: 26 success + 1 manual von 27 — die vier Zellen test:unit 995 s /
+test:unit:debug 408 s / test:unit:clang 776 s / test:unit:clang:debug 504 s alle gruen;
+is_original:relock = deklarierte Ausnahme, 0 failed.)
+
+| Anker | alt (Stand `4f18f478`) | neu (Stand `04f76b65`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `4f18f478f1bde…` | **`04f76b65bf6c2…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | **504** Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 504 Test-`.cpp` im Baum `04f76b65` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 504 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | **2945** Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2945 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich nichts bewegt — mit der Wache-Formel am Baum `04f76b65` frisch erhoben** (git grep -F
+gegen den Baum, Kommentarzeilen abgezogen; identische Formeln wie `ci/plan_zahlen_wache.sh`): der
+Zug beruehrt in ce nur `.gitlab-ci.yml`, `test_t6_wachen_inventar.cpp` (+3 Job-Zeilen, keine
+Schema-Stelle), Planer-Emission (`experiment_plan_director.hpp` + Test, keine Schema-Stelle) und
+den d2-Koder-Fix — Test-`.cpp`-Nenner bleibt 504, Treffer exakt 40/21/2. Die super-`.gitlab-ci.yml`
+wuchs durch den CI-DUAL-Merge `81aa80f6` (2835 → 2945 Zeilen); beide CI-Muster unveraendert
+(2 Aufrufe, 0 Altmuster). R1-NEUAUSZAEHLUNG im selben Zug: `thesis_profiles`-Nenner **9 → 11**,
+alle 11 mit aktivem `<method value="xlsx"/>` (KF #24, 14.08.) — s. Marker beim D-5-Posten.
 
 **Nachzug 14.08.2026 — neunter Gitlink-Zug (STUFE-3-LANDUNG der Drei-Stufen-Landung, KON60/KON61,
 inkl. Lint-Fix nach roter ce-Pipeline 15792), und zum sechsten Mal in Folge bewegt sich KEINE der
@@ -497,7 +530,7 @@ Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-w
 **D-2 — Kapazität** (§8, „~118 h"): #87/#78/#86/KON9-05/HY-A sind **(P), MÜSSEN vor F2, fallen NIE** (§13.3); Reserve-WE 22./23.08. dafür gezogen; **Band B/W1 (62 h) „geschlossen gestrichen"**. §8-Bedingung (2) damit entschieden.
 **D-3 — Shell-Bissproben sind Alt-Last** (§9.3 `mess_ausbeute_bissprobe.sh`, **§9.5 (Z.338)** `plan_zahlen_probe.sh`): KON6-05: `ci/tests/*.sh` müssen Google Tests werden, KEINE Ausnahme; Teil der stehenden Regression **S-16** (14 Dateien/8.528 Z., 0 retired; Skip-Verbot KON22). MECHANIK vorbildlich, FORM zu migrieren; **KON37-08s TEST-KONSOLIDIERUNG dockt hier an** (Ziel-Testmodule = Zielstruktur auch für S-16).
 **D-4 — S-Strecke hat KEINE Testposten** (Lücke, als GEZÄHLTE Warteliste): S-6, S-13, S-14, S-17…S-21 fehlen im 117er-Katalog; T-9 läuft für den größten Baublock leer. Neu: **S-21 Kategorien-Ordnungs-Wache** (=S-6c, Owner-GO, Vorbild `organ_gruppen_decken_die_komposition`, KON21-03). S-6-Umfang erst nach Layout-Bump-Lösung (`decl.hpp:293`) schätzbar.
-**D-5 — xlsx-Nenner** (§2/K7 „null Aufrufer"): KON4-07/R1+KON36-02/H: **8 von 9** `thesis_profiles` xlsx-blind — Kampagnen-Blocker; fehlender T-3-Klasse-Posten mit Profil-Nenner. Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum.
+**D-5 — xlsx-Nenner** (§2/K7 „null Aufrufer"): KON4-07/R1+KON36-02/H: **8 von 9** `thesis_profiles` xlsx-blind — Kampagnen-Blocker; fehlender T-3-Klasse-Posten mit Profil-Nenner. Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum. *R1-Neuauszählung 15.08.2026 (ce `04f76b65`, zehnter Gitlink-Zug): Nenner **11**, xlsx-blind **0 von 11** (alle mit aktivem `<method value="xlsx"/>`, KF #24) — der Kampagnen-Blocker ist auf Profil-Ebene aufgelöst; der T-3-Klasse-Posten mit Profil-Nenner bleibt als Wache-Lücke offen.*
 **D-6 — PMC-Vertragsfolge ungetestet**: PMC = Meta-Meta-Achse, AMD/Intel = zwei Komponenten (KON8-12); CI fährt PMC ohne Vendor (WARNING, KON34-02). MT-L11 misst nur Injektion — CEB→Tier-CT-Vertragsanpassung ohne Posten.
 **Summen-Regel:** 117/386 h werden NICHT angefasst, bis die S-Strecke durchgezählt ist — sonst derselbe T-3-Fehler, den §9 korrigiert.
 
