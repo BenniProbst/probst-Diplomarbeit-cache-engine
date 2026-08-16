@@ -16,6 +16,38 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON92: ARENA-KETTEN-KARTE KOMPLETT (wf_eebc8294 4/4) -- 8 DELTAS ZUM P2-KERN, 6 UEBERHOLT-MARKER, BAU-POSTEN E1-E10 = S-13-KERNSTUECK; 1 KLEINES OWNER-DETAIL (C6 fest-vs-wachsend)
+
+    KARTE (arena_kette_karte.md, Folge-BU-2): IST 21 Fundstellen, GEPLANT 8.
+    DELTAS zum P2-Owner-Kern: C1 Fassung 3 schreibt 2 Ausgabezeilen je
+    Aufruf (In/Out, ergebnis_mappe.hpp:157-226) -- Roh->1-Sheet-Zeile-
+    Aggregation existiert nirgends; C2 Kaltwert wird an der Entstehungs-
+    stelle VERWORFEN ((void)timed_op(), tier_observe_trace_abi.hpp:137),
+    kein Kalt-Diff-Feld im Header; C3 run_observable_perm misst kalt OHNE
+    Waermer/Rollback + 4 Segment-Warmups ohne Rollback; C4 Live-Pfad ist
+    das GEGENTEIL von Arena-first (ergebnis_mappe_naht persistiert
+    synchron aus der Mess-Schleife, push_back IM Messfenster); C5 Hard-
+    Abort lebt im Code (kXlsxZeilenlimit-Wurf), .2-Folgeblatt nur EBNF-
+    Plan, Drain-Schleife Arena->Blaetter existiert nicht (Arena und
+    Writer kennen einander nicht); C6 gebaute Arena bricht NIE ab
+    (Ueberlauf zaehlen+melden+WEITERMESSEN) -- unvereinbar mit P2 "stirbt
+    nur am RAM-Limit wenn Arena voll"; C7 Faktor-2-Kommentar stale
+    (verdrahtet ist drift_faktor <=18); C8 Arena-Zeile = 32-Byte-POD
+    (1 Messwert) -- zu schmal fuer ~150-Spalten-Zeile+Kalt-Diff.
+    UEBERHOLT (D1-D6): ErgebnisSchreibFehler{zeilenlimit}-Doktrin (per
+    KON88 SYSTEMFREMD; Code lebt noch -> E5) · KON87-2-Zeilen-Annahme
+    (In/Out-ROHEBENE bleibt, AUSGABE = 1 Zeile) · KON87-P2-Frage
+    (beantwortet) · S001 (entfallen) · KON45-03-Zell-Warmup (ersetzt
+    durch KON47-04-PAAR) · Faktor-2-Kommentar. BAU-POSTEN E1-E10 (Kern:
+    E4 Aggregator Roh->Sheet-Zeile, E5 Folgeblatt statt Wurf, E6 DRAIN-
+    SCHLEIFE = S-13/#18-Kernstueck des measurement_sink-Kanals KON32-01,
+    E7 Zwei-Phasen an Arena, E8 PAAR-Muster landen, E9 measure_storage
+    produktiv). OWNER-DETAIL C6 (einziges neues Wort, halb gedeckt):
+    P2-Wort deckt "Abbruch NUR bei Arena-voll" bereits -- offen ist
+    allein FESTE Kapazitaet (Planer-bemessen via drift_faktor, Abbruch
+    bei Ueberlauf; deterministisch, S-19-berechenbar; EMPFEHLUNG) ODER
+    dynamisch WACHSEND bis RAM-Ende. "Weitermessen bei Ueberlauf" ist
+    in beiden Lesarten zu heilen (stiller Datenverlust).
 ## NACHTRAG 16.08.2026 -- KON91: P1-VOLLBILD KOMPLETT (artifacts/binaries+measurement-Wurzeln, full-join-Spalten ab ma) + C-3a=JA (#38a2 FEST IM W1-BUMP-BUENDEL) -- KONTEXT-ENDE, UEBERGABE GESCHRIEBEN
 
 ### KON91-01 -- P1-VOLLBILD (Owner verbatim Teil 37; ergaenzt KON88/KON89)
