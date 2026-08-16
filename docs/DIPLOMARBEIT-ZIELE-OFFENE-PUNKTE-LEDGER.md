@@ -1748,7 +1748,7 @@ EINE CI, streng seriell. Nummern-Vergabe gemessen: KON62 hatte vor diesem Nachtr
       test:frische-wache-probe       377426 (Referenz 376315) -- nach 853cea9a
       test:persist-sammler-probe     377427 (Referenz 376316)
       test:anhang-forward-probe      377431 (Referenz 376320)
-      test:anhang-snapshot-probe     377432 (Referenz 376321)
+      test:anhang-snapshot-einbuchen-probe 377432 (Referenz 376321) [KORREKTUR 16.08./KON82-03: Jobname vervollstaendigt]
       docs:plan-zahlen-wache         377434 (Referenz 376323) -- PZW nach 65c364b8
     Der erste Verify-Durchgang (vor #81) kannte P-GLIED und die Folge-Commits
     nicht; DIESE Messung laeuft am Gesamtstand NACH Komplex-Fix und Landung.
