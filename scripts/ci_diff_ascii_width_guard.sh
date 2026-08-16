@@ -465,6 +465,11 @@ _ce_awk_prog='
         para = sprintf("%c%c", 194, 167)
     }
     function is_scoped(fname,    base, i, last_dot, ext) {
+        # BU-ROHDATEN-AUSNAHME (KON82-Dauer-Rot 15904-15907, 16.08.): Dateien
+        # unter docs/sessions/backups/ sind gesicherte Rohdaten fremder Herkunft
+        # (BU-additiv-Doktrin: nie umschreiben) -- sie zaehlen als Daten, nicht
+        # als super-eigener Code, unabhaengig von der Endung.
+        if (index(fname, "docs/sessions/backups/") == 1) return 0
         base = fname
         i = length(base)
         while (i > 0 && substr(base, i, 1) != "/") i--
