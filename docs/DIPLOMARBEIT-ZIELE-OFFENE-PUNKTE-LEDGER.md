@@ -16,6 +16,66 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON95: O1-O3 ENTSCHIEDEN (Owner verbatim) -- O3 KORRIGIERT DIE EMPFEHLUNG: DEFAULT = FEINGLIEDRIG DISJUNKT MIT LEER-ZELLEN, GLOBAL-UNIFORM NUR ALS XML-OPTION
+
+**Quelle: Owner-Nachricht 16.08. (nach KON94-Vorlage), verbatim unten. KON95
+vorher 0 Treffer. Damit sind ALLE drei Full-Join-O-Fragen zu; die
+FJ-1..FJ-10-Posten (S-13/#18, Di 25.08.) sind vollstaendig owner-gedeckt.**
+
+### KON95-01 -- O1: MARKIERTER LEERWERT BESTAETIGT + NEUE w-AGGREGATIONS-SEMANTIK
+
+    OWNER (verbatim): "O1 wie empfohlen, weil die Achsen-Aktionen in
+    zeitlich versetzter Reihenfolge stattfinden, aber aus Sicht einer ma
+    Messung ueber viele mi Messungen einen gesammelten Block ergeben, der
+    in ma dennoch wie von dir beschrieben mit leer-Werten ueberbrueckt
+    werden kann. Nur wenn w nach einer ma Zusammenfassung fragt, laesst
+    sich die Akkumulation aller Zeilen nachtraeglich als eine Zeile
+    zusammenfassen."
+    FESTSCHREIBUNG: (a) Union-Schema STABIL, Zell-Abwesenheit = MARKIERTER
+    Leerwert (nie honest-0, nie Spalten-Wegfall); (b) NEU -- die ma-Sicht
+    ist ein GESAMMELTER BLOCK ueber viele zeitlich versetzte mi-Zeilen;
+    (c) NEU -- w-AGGREGATION: erst wenn w nach einer ma-ZUSAMMENFASSUNG
+    fragt, wird die Zeilen-Akkumulation NACHTRAEGLICH zu EINER Zeile
+    zusammengefasst (Aggregation ist ABFRAGE-getrieben, nie Schreib-Default).
+    BAU-WIRKUNG: FJ-3/FJ-4 (E4-Aggregator) bekommt ZWEI Modi -- Block-
+    Durchreichung (Default) + w-getriebene Ein-Zeilen-Zusammenfassung.
+
+### KON95-02 -- O2: JA (kV3AxisSchema + seg_*) + FUNDSTELLEN-VERWEIS DEEP-RESEARCH
+
+    OWNER (verbatim): "O2: Ja genau. Dazu gibt es auch einen workflow mit
+    deep research." EINORDNUNG: Achsen-Erfolgs-Parameter E(A) =
+    kV3AxisSchema + seg_*-Segmente je Achse; die inhaltliche Quelle je
+    Achse ist der Deep-Research-Parameter-Katalog
+    docs/sessions/20260804-DOSSIER-achsen-qualitaets-parameter-katalog.md
+    (855 Z., 27 Parameter-je-Achse-Eintraege; bereits per KON64-02/C11 als
+    A1-Durchzug-Quelle freigegeben). FJ-2 (E(A)-Registrierung) baut gegen
+    BEIDE Quellen: Code-Kandidat + Dossier-Katalog (Abgleich, Luecken laut).
+
+### KON95-03 -- O3: KORREKTUR -- DEFAULT FEINGLIEDRIG DISJUNKT, PROFIL-BILDUNG, UNION-AKKUMULATION NACH OBEN; GLOBAL-UNIFORM = NACHTRAEGLICHE XML-FORDERUNG
+
+    OWNER (verbatim): "O3: Je Messung ueber die verfuegbaren mit leer-
+    Zellen je Messzeile, weil nicht alle Messungen auf jeder Achse zur
+    gleichen Zeit stattfinden, sondern es ergibt sich ein Profil. Der
+    wechsel zwischen global uniform kann nachtraeglich auf der XML
+    gefordert werden, aber default ist feingliedlig disjunkt mit leer-
+    Zellen ueber den Gesamtverlauf, wobei je Zeile nur die Werte einer
+    betroffenen mi Achse festgehalten werden, die dann einfach union
+    Akkumulieren ueber die uebergreifenden hoeheren Schichten im Messbaum
+    groeberer Gliederung."
+    Die KON94-03-Empfehlung (global-uniform) ist damit KORRIGIERT.
+    FESTSCHREIBUNG: (a) DEFAULT = je Messung NUR die verfuegbaren
+    Parameter, Leer-Zellen je Messzeile; je Zeile traegt NUR die Werte der
+    EINEN betroffenen mi-Achse; (b) es entsteht ein PROFIL (zeitlich
+    versetzte Achsen-Messungen); (c) die Spaltenmengen UNION-AKKUMULIEREN
+    nach OBEN durch die hoeheren Schichten des Messbaums groeberer
+    Gliederung (mi -> ma -> w: jede Schicht = Union ihrer Kinder);
+    (d) GLOBAL-UNIFORM ist eine NACHTRAEGLICH per XML forderbare
+    Umschaltung, KEIN Default. BAU-WIRKUNG: FJ-1 (Spaltenfunktion) wird
+    SCHICHT-PARAMETRISCH (Union je Messbaum-Knoten statt einer globalen
+    Konstante); der XML-Hebel (uniform-Schalter) geht in die S-13-
+    <publish>/<export>-Familie (#18/#48/#57, Di 25.08.); KON94-01-
+    Bildungsregel-Zeile "ma UND w = Union aller E(A)" gilt PRO KNOTEN
+    des Messbaums, nicht global (dieser Nachtrag ist die Praezisierung).
 ## NACHTRAG 16.08.2026 -- KON94: BEIDE 10-WOCHEN-EXPLORES KOMPLETT (Full-Join 12 Deltas/FJ-1..FJ-10 + Arena-6GB 7 Deltas/E11-NEU) -- SCHICHTUNGS-KORREKTUR AN KON93-02, DREI O-FRAGEN AN OWNER
 
 **Quellen: wf_f052f900 (6/6 Agenten, 0 Fehler; je 2 Sonnet-max-Kartierer
