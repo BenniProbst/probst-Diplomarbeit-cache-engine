@@ -16,6 +16,54 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON82: ULTRACODE-FORTSCHRITTSAUDIT 11.-16.08. KOMPLETT (wf_67540590, 21/21) -- VERLUSTLISTE LEER (51/51 VERORTET), 4 DOKTRIN-BEFUNDE, KON-INDEX VOLLSTAENDIG
+
+### KON82-01 -- SUBSTANZ-BILANZ: NICHTS VERLOREN
+
+    51 SOLL-Features aus Ledger KON60-79 + Journal-BUs + Fenster-Stand:
+    35 GELANDET+SUBSTANZ-BEWIESEN (Dateien/Symbole/Tests am Objekt) +
+    12 BRANCH-GESICHERT (B2 e966ee81 + golden-Fenster 5fa37f36-Kette
+    369b62ce->bc389bb2->2a83e3fe->5fa37f36 live verifiziert; Lock-718
+    exakt nachgezaehlt) + 4 Doktrin-Posten. IST: 37 VORHANDEN, 3 TEILWEISE,
+    9 NICHT_PRUEFBAR -> ALLE 12 Verify-Nachpruefungen DOCH_VORHANDEN
+    (Fundorte: Ledger/BUs, Cluster-Repo, Umbrella, Archiv-Branch origin+
+    github, thesis-Reflog). C-VERLUSTLISTE = LEER mit Gegenproben-Nennern.
+    Einziger realer Verlust: Commit-OBJEKTE des nested-Worktree-Vorfalls
+    (KON79-02) -- Inhalt vollstaendig rekonstruiert (Kategorie B, nicht C).
+    Matrix: docs/sessions/backups/20260816-folge-bu-kontext8/
+    fortschrittsaudit_matrix.md.
+
+### KON82-02 -- LANDE-DOKTRIN: 2 ABWEICHUNGEN + 1 WIEDERHOLUNGS-VORFALL + 1 POSITIV
+
+    (1) A2.1a-ABWEICHUNG BESTAETIGT: W-A(B2)+W-B(Waisen) haetten in EINEM
+    ce-Push landen muessen; W-B landete allein (15879), W-A blieb offen --
+    keine deklarierte Push-Ausnahme. KORREKTUR: Fenster-Landung als EIN Zug
+    (B2+golden, EIN Push/EINE CI, Floor EINMAL live); Ausklammerungen
+    kuenftig VORHER als Push-Ausnahme deklarieren. (2) EINGESCHRAENKT:
+    Schluss-Strecke 15.08. = 6 Landeakte/8 CIs in 3 Projekten -- formal
+    durch "SERIELL DANACH" (KON73-05) gedeckt, faktisch gegen die EIN-Push-
+    Lesart. KORREKTUR: Lande-Stufe buendelt repo-gleiche Gegenstaende zu
+    EINEM Push/CI je Repo. (3) WIEDERHOLTE ABWEICHUNG (3. Vorfall):
+    Loeschregel + v3.9/A3-Worktree-Erhebung standen in Kraft; wt-ce-b2
+    ungemergt + wt-ce-golden-homes weder gruen noch gemergt geraeumt.
+    KORREKTUR (Werkzeug-Vollzug): Loeschregel-WACHE vor jedem worktree
+    remove (nested gitdirs aufzaehlen, Tips gegen Remote, hart abbrechen)
+    -- Bau-Posten SOFORT. (4) POSITIV: A2.5-Nachstufen-Pflicht 10/10
+    eingehalten; gelandete Straenge landeten NACH Nachstufe.
+
+### KON82-03 -- KON-INDEX + NAECHSTE SCHRITTE (F1-F7 des Audits)
+
+    KON-Index vollstaendig: 81 Nummern, einzige Luecke KON35 (dokumentiert
+    "nie vergeben"); KON3 = Register ohne ###-Header (Formatierung, keine
+    Vergabe-Luecke); 0 Doppelvergaben. AUDIT-MIKROFEHLBEFUND (einziger):
+    KON62 nennt 'test:anhang-snapshot-probe' statt 'test:anhang-snapshot-
+    einbuchen-probe' -> Korrektur-Posten. SCHRITTE: F1 golden-rettung
+    fertig (495/2-rot tilgen, B2-Merge, Floor EINMAL, Lock 718) -> F2
+    Fenster-Landung EIN Zug nach A2.1a + super-Gitlink atomar -> F3 KON62-
+    Mikrokorrektur -> F4 Loeschregel-Wache (SOFORT-Posten) -> F5 ce-
+    Submodul-Hygiene (lokaler development stale 346b6da9 -> 8fe66469) ->
+    F6 #54-Aktivierung A1-A3 (KON80-V4-GO) + 290-Verankerung -> F7 Raeumung
+    golden-rettung erst nach gruen+gemergt+Pruefung.
 ## NACHTRAG 16.08.2026 -- KON81: PMC-OP-RUNDE ENTSCHIEDEN (OP-3/OP-5 BESTAETIGT, OP-4 PRAEZISIERT, OP-1/OP-2 = EXPLORE-AUFTRAEGE)
 
     OP-3 BESTAETIGT: HW-Versions-Katalog Schema ARCH.KAT.REV + Entwurfs-
