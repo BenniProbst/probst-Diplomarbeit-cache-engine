@@ -16,6 +16,27 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON84: F6/#54-AKTIVIERUNG A1-A3 VOLLZOGEN -- ROTATIONS-TURNUS SCHARF (naechster Lauf 01.09. 04:03Z)
+
+    A1: Project-Access-Token id=99 (comdare-writeback-rotate-r20260816,
+    scopes api, access_level 40, expires 2027-08-01 effektiv = beantragt,
+    POST 201) loest id=54 ab; 288-Variable COMDARE_WRITEBACK_TOKEN per PUT
+    ersetzt (200, masked+protected unveraendert, newline-frei via jq -j);
+    Blind-Proben neuer Token: /personal_access_tokens/self 200 (id=99) +
+    /projects/288 200. A2: ROTATE_TOKEN am 290 POST 201 (masked, nicht
+    protected). A3: Schedule id=1 active=TRUE (PUT 200), next_run
+    2026-09-01T04:03Z; Beweis-Trigger Pipeline 15902 SUCCESS (27s, Job
+    379536: literal "3 von 3 Pruefungen ausgefuehrt, 0 Mutationen" +
+    token_id=99 + Variable masked=true). VAULT: keys/gitlab-writeback-
+    pat-288-r20260816 (0600, blind) Commit 00b07c6 origin-only; gitleaks
+    1/1 Finding = die bewusste Vault-Ablage selbst (Policy keys/=Vault),
+    0 ausserhalb. A4-VERMERK: id=54 (expires 2026-10-09) bewusst NICHT
+    revoked -- Revoke bei Arbeits-Pause. OFFEN: naechster Schedule-Lauf
+    01.09. laeuft SCHARF (ROTATE_DRY_RUN=false: id=99 rotiert sich selbst,
+    ROTATE_TOKEN zieht nach; DANACH lokaler Vault-Nachzug ROTATE_VAULT_
+    PULL=true faellig -- Betriebs-Posten) + erster echter 288-Writeback
+    mit id=99 = naechster Messlauf (api deckt write_repository, Proben
+    200). #54 damit KOMPLETT AKTIV.
 ## NACHTRAG 16.08.2026 -- KON83: OP-1 GESCHLOSSEN (Q-D/Q-E/Q-F 26.07. = DIE Entscheidung) + OP-2 HERLEITUNG FERTIG (i{pmc} BEDINGT-JA, wartet auf Owner-Ein-Wort)
 
 ### KON83-01 -- OP-1 FESTGESCHRIEBEN: META-META-REKURSION SEIT 26.07. ENTSCHIEDEN
