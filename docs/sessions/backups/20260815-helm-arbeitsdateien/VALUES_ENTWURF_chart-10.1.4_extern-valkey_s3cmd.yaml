@@ -1,0 +1,226 @@
+# =====================================================================
+# ENTWURF - NICHT ANGEWANDT (STRANG A / S3, 2026-08-15)
+# Ziel: helm upgrade gitlab gitlab/gitlab --version 10.1.4 -n gitlab -f DIESE_DATEI
+# Chart 10.1.4 = GitLab 19.1.4 (Ist: Chart 9.11.8 = GitLab 18.11.7, Rev. 23)
+# Grundlage: helm get values gitlab -n gitlab (gitlab_values_ist_20260815.yaml, 218 Z.)
+# Deltas gegenueber Ist:
+#   D1 EXTERNES VALKEY: redis.install=false; global.redis.host/port/auth auf
+#      databases/gitlab-valkey (valkey/valkey:7.2.14-alpine, AUTH erzwungen,
+#      appendonly yes, noeviction, 5Gi longhorn-database PVC).
+#      Secret-Kette: gitlab/gitlab-valkey-password (key password) - identisches
+#      Material wie databases/gitlab-valkey-password (digest-verifiziert).
+#      NOTIZ (Koordinator 15.08.): governing Service gitlab-valkey ist NICHT
+#      headless - akzeptierter dokumentierter Zustand; KEINE StatefulSet-
+#      Neuanlage vor dem Chart-10-Upgrade.
+#   D2 NGINX-INGRESS-WEITERFUEHRUNG: unveraendert global.ingress.class=nginx,
+#      nginx-ingress.enabled=false (zentraler ingress-nginx Controller bleibt).
+#   D3 TOOLBOX-BACKUP: backups.objectStorage.config.key connection -> s3cmd-config
+#      (Key existiert im Secret gitlab-object-storage: verifiziert).
+# Diese Datei ist die VOLLSTAENDIGE kuenftige User-Values-Datei (kein --reuse-values).
+# =====================================================================
+certmanager:
+  startupapicheck:
+    enabled: false
+gitlab:
+  gitaly:
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClass: longhorn-database
+  gitlab-shell:
+    maxReplicas: 4
+    minReplicas: 4
+    replicaCount: 1
+    service:
+      annotations:
+        metallb.io/address-pool: apps-vlan40
+      type: LoadBalancer
+  kas:
+    ingress:
+      enabled: true
+      tls:
+        secretName: gitlab-apps-tls-secret
+    maxReplicas: 4
+    minReplicas: 4
+    replicaCount: 1
+  registry:
+    maxReplicas: 4
+    minReplicas: 4
+  sidekiq:
+    concurrency: 10
+    maxReplicas: 4
+    memoryKiller:
+      checkInterval: 3
+      graceTime: 900
+      maxRss: 5500000
+      shutdownWait: 30
+    minReplicas: 4
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 2
+        memory: 6Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  toolbox:
+    backups:
+      objectStorage:
+        config:
+          key: s3cmd-config
+          secret: gitlab-object-storage
+  webservice:
+    ingress:
+      enabled: true
+      tls:
+        secretName: gitlab-apps-tls-secret
+    maxReplicas: 4
+    minReplicas: 4
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 2
+        memory: 5Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+gitlab-runner:
+  install: false
+global:
+  appConfig:
+    artifacts:
+      bucket: gitlab-artifacts
+      connection:
+        key: connection
+        secret: gitlab-object-storage
+      enabled: true
+    ldap:
+      preventSignin: false
+      servers:
+        main:
+          active_directory: true
+          admin_group: CN=Domain Admins,OU=Admin,DC=comdare,DC=local
+          base: DC=comdare,DC=local
+          bind_dn: CN=Service Apps-LDAP,OU=Services,DC=comdare,DC=local
+          encryption: simple_tls
+          host: 10.0.30.5
+          label: Comdare AD
+          password:
+            key: password
+            secret: gitlab-ldap-password
+          port: 636
+          uid: sAMAccountName
+          user_filter: (objectClass=person)
+          verify_certificates: true
+    lfs:
+      bucket: gitlab-lfs
+      connection:
+        key: connection
+        secret: gitlab-object-storage
+      enabled: true
+    omniauth:
+      autoLinkLdapUser: true
+    packages:
+      bucket: gitlab-packages
+      connection:
+        key: connection
+        secret: gitlab-object-storage
+      enabled: true
+    uploads:
+      bucket: gitlab-uploads
+      connection:
+        key: connection
+        secret: gitlab-object-storage
+      enabled: true
+  certificates:
+    customCAs:
+    - keys:
+      - ca.crt
+      secret: gitlab-ca-secret
+  edition: ce
+  hosts:
+    domain: comdare.local
+    gitlab:
+      name: gitlab.comdare.local
+    https: true
+    kas:
+      name: kas.comdare.local
+    registry:
+      name: registry.comdare.local
+    shell:
+      name: shell.comdare.local
+  ingress:
+    annotations: {}
+    class: nginx
+    configureCertmanager: false
+    enabled: true
+    tls:
+      enabled: true
+  initialRootPassword:
+    key: password
+    secret: gitlab-initial-root-password
+  minio:
+    enabled: false
+  praefect:
+    dbSecret:
+      key: secret
+      secret: gitlab-praefect-dbsecret
+    enabled: true
+    psql:
+      dbName: praefect
+      host: gitlab-pg-rw.databases.svc.cluster.local
+      port: 5432
+      user: comdare-database
+    replicas: 2
+    virtualStorages:
+    - gitalyReplicas: 2
+      maxUnavailable: 1
+      name: default
+  psql:
+    database: gitlabhq_production
+    host: gitlab-pg-rw.databases.svc.cluster.local
+    password:
+      key: postgresql-password
+      secret: gitlab-postgresql-password
+    port: 5432
+    username: comdare-database
+  redis:
+    auth:
+      enabled: true
+      key: password
+      secret: gitlab-valkey-password
+    host: gitlab-valkey.databases.svc.cluster.local
+    port: 6379
+  serviceAccount:
+    create: false
+    enabled: true
+    name: gitlab-workload-sa
+  smtp:
+    address: stalwart-lb.email.svc.cluster.local
+    authentication: ""
+    domain: comdare.de
+    enabled: true
+    openssl_verify_mode: none
+    password:
+      key: password
+      secret: gitlab-smtp-password
+    port: 25
+    starttls_auto: false
+installCertmanager: false
+nginx-ingress:
+  enabled: false
+postgresql:
+  install: false
+prometheus:
+  install: false
+redis:
+  install: false
+registry:
+  enabled: true
+  ingress:
+    enabled: true
+    tls:
+      secretName: gitlab-apps-tls-secret
+  storage:
+    key: registry-storage
+    secret: gitlab-object-storage
