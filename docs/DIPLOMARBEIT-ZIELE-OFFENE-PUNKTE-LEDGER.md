@@ -16,6 +16,29 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON90: V9-EINARBEITUNG = NULL-BEFUND MIT DOPPELTER GEGENPROBE -- SEITENLINIE VOLLSTAENDIG ABSORBIERT, NICHTS FEHLT
+
+    D2-Vollzug (Owner-GO "Zeige mir das Ergebnis hier"): Die Owner-
+    Textbestandteile aus refs/rescue/w3-thesis-c (b1ec8379, 02.08.) sind
+    BEREITS VOLLSTAENDIG in der heutigen Thesis: git cherry 313/313
+    Non-Merge-Commits patch-aequivalent in development (0 fehlend; 336
+    gesamt, 23 Merges) + Zwei-Punkt-Inhaltsdiff KOMPLETT gelesen (~252
+    Seitenlinien-NUR-Zeilen klassifiziert: woertlich vorhanden / anders-
+    orts konserviert / durch SPAETERE Owner-Fassung ersetzt). Die Owner-
+    Pakete der Seitenlinie (Danksagung, Sperrvermerk/Lizenz-Entwurf, K5
+    12900K, Rang-3, F10-Wortfix) sind alle absorbiert; Sperrvermerk/
+    Lizenz zusaetzlich durch KON2-23 (Comdare Research License 1.0,
+    10.08.) ersetzt, 02.08.-Entwurf als Historien-Kommentar erhalten.
+    14 Nicht-Einarbeitungs-Posten mit je 1-Satz-Grund dokumentiert
+    (ueberholt durch Owner-Overleaf 13.-14.08. / Ehrlichkeits-Nachzuege /
+    generierte Alt-Staende / byte-identisch). EINARBEITUNG WAERE
+    VERDRAENGUNG IN DIE FALSCHE RICHTUNG GEWESEN. 0 neue Commits, HEAD
+    unveraendert 4ae5378 (beide Remotes identisch), CI 15885 success
+    weiter gueltig; chktex 0 Befunde, latexmk DE 202 S. / EN 192 S. je
+    rc=0; Rescue-Ref UNANGETASTET auf beiden Remotes. NAECHSTER SCHRITT
+    (Owner): haendische Konsolidierung nach eigenem Ermessen -> danach
+    gegenstands-genaues Loesch-GO fuer refs/rescue/w3-thesis-c (Bundle
+    vor Loeschung obligatorisch).
 ## NACHTRAG 16.08.2026 -- KON89: F5=MIRRORING-GO + D1-D4 ENTSCHIEDEN (CSV-FACTORY-FILESYSTEM-PRAEZISIERUNG) + C-3a HIER PRAESENTIERT
 
     F5 ENTSCHIEDEN: GitLab-Push-Mirroring statt lokalem GitHub-PAT ("Das
