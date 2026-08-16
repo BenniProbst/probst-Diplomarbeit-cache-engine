@@ -16,6 +16,48 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON80: OWNER-ANTWORTRUNDE V1-V10 KOMPLETT ENTSCHIEDEN (Verbatim Sammlung Teil 32)
+
+### KON80-01 -- ENTSCHEIDE (Quelle: Owner 16.08., woertlich in Sammlung Teil 32)
+
+    V2 S-6 BAUBAR ("bitte zieh es durch") -> #15-Buendel nach golden-Fenster.
+    V1 XORFILTER = DIREKT (b): Offline-Peeling-Umbau Graf/Lemire ("wir machen
+    es gleich richtig, sonst haben wir doppelt arbeit") -> deklariertes
+    golden-Ereignis Filter-Zelle, #70 wird BAU-Posten W1.
+    V7 FESTGESCHRIEBEN: Break-Even-Kurven NUR ueber die Parameter der in
+    w/ma/mi gemessenen ORGAN-Achsen; Mess-+System-Achse liefern NUR die
+    Permutation der aeusseren Umwelt-Rahmenbedingungen unter denen Organ-
+    Achsen der Tier/Hybrid laufen; Mess+System geben je fuer Tier/Hybrid
+    FREI, was gemessen werden kann. ("Deine Lesart ist exakt korrekt.")
+    -> #49-Staffelungs-Design ENTBLOCKT.
+    V3 SHEET-NAMEN: Vorschlag S001..Snnn ABGELEHNT ("Holzweg") — die
+    w/ma/mi-Mess-HIERARCHIE fuehrt zu einer HIERARCHISIERUNG der Sheets,
+    detailliert geplant: Sheet-Schnitt = Traeger-Stufe x erhobene Messebene,
+    ALLE Parameter stehen im Blatt; xlsx selbst SPARSE als Lagereinordnung
+    in einer Kette benannt; Sheets SPARSE gegen ihre Funktion im Sheet-
+    System benannt. AUFTRAG: Sonnet-5-max-very-thorough-Explore + Fable-5-
+    xhigh-Tieflesen + Fable-5-max-Design (10-Wochen-Explore) -> laeuft.
+    V4 ROTATIONS-TURNUS: VOLLES GO fuer A1-A3; Owner-Schritte werden
+    vorgelegt. V5 SIDEKIQ-HPA: BEHALTEN (wie empfohlen).
+    V6 KORREKTUR: node6 hoert auf den PASSWORTLOSEN cluster key, AUTONOM
+    bedienbar (mein "0 Ports offen -> Owner-Handout" war falsch); node5
+    TOT (bestaetigt) -> node6-Runner-Einrichtung wird autonomer Posten.
+    V8 GITHUB-PAT: Owner rotiert HEUTE; Handout an Infra-Kanal geschrieben
+    (Cluster-Repo). Store-Bereinigung nach Rotation durch Session.
+    V9 rescue/w3-thesis-c: Textbestandteile des Owners WIEDER EINARBEITEN
+    (Konsolidierung in die heutige Thesis); Loeschung des Refs ERST nach
+    manueller haendischer Konsolidierung ("VOLLES GO" erst danach).
+    V10 = (b): NEUNZEHNTE ACHSE KOMMT — erste ORGAN-META-META-ACHSE (IO):
+    extrahiert IO-Eigenschaften der Paper; bietet Algorithmen als optionale
+    PERSISTIERUNG der anderen Tier-Binaries + Gesamt-Suchalgorithmen; NUR
+    unter expliziter XML-Anfrage eingebaut (Gattung+Genus arbeiten heute
+    rein im Hauptspeicher); braucht eigene Serialisierung; bietet Laden/
+    Speichern von Genus-Interface-Algorithmen als Genus-metaprogrammierte
+    Erweiterung; bei Verwendung erweitert sich das GENUS-INTERFACE um
+    store() und load(). -> Design-Posten ORG-19/IO-Meta-Meta, Grammatik-
+    Slot-Deklaration golden-Fenster-nah (vor F2 deklarieren, Bau spaeter;
+    No-Bloat-konform da XML-opt-in). ORG-18-Kanon damit UEBERHOLT zu
+    "18 + 1 optionale Meta-Meta".
 ## NACHTRAG 16.08.2026 -- KON79: WORKTREE-LANDUNGS-BILANZ + NESTED-WORKTREE-VORFALL (Fenster-Stand GERETTET als 5fa37f36) + FOLGE-BU 2
 
 ### KON79-01 -- LANDUNGS-BILANZ ALLER PARALLEL-BAUTEN (Owner-Frage 16.08.)
