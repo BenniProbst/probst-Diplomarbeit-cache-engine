@@ -16,6 +16,64 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON93: V9-LOESCHUNG VOLLZOGEN (Bundle-ZUERST, Gegenprobe 0/0) + C6-OWNER-ENTSCHEID (ARENA = 6GB STATISCH, PLANER-RESERVIERUNG) + V8 LAEUFT BEIM OWNER + EINLESE-ORDER
+
+**Quellen: Owner-Worte 16.08. verbatim (3 Nachrichten) + Lead-Vollzug mit
+Literalen. KON93 vorher 0 Treffer.**
+
+### KON93-01 -- w3-thesis-c GELOESCHT: Bundle-Sicherung ZUERST (8aacc77a), dann beide Remotes, Gegenprobe 0/0
+
+    OWNER-GO (verbatim): "Zu Frage 2: Ich wollte den Kontext selbst
+    bewerten, aber Loeschen kannst du nach Anzeige dieses Kontextes der zu
+    entscheiden ist, gerne selbst. V9 Zusammenfassung reichte mir
+    ehrlichgesagt, daher volles GO." (Anzeige = KON90-Bericht: Null-Befund,
+    313/313 absorbiert, 14 Nicht-Einarbeitungs-Gruende.) VOLLZUG in harter
+    Reihenfolge: (1) Bundle complete-history von b1ec8379 (git bundle
+    verify rc=0 "The bundle records a complete history."), SHA256
+    1b6f0556c094... in SHA256SUMS, VERMERK.md mit GO-Zitat + Restore-Weg;
+    (2) Commit 8aacc77a auf BEIDEN super-Remotes GELANDET (origin+github,
+    490e9ebd..8aacc77a); (3) DANACH Loeschung: git push origin/github
+    :refs/rescue/w3-thesis-c je " - [deleted]" literal; (4) GEGENPROBE
+    ls-remote refs/rescue/* origin=0 + github=0 Treffer. Damit ist der
+    letzte Traeger von Alt-Trailern getilgt (Haupt-Historie war 0/372,
+    KON76-01); die Thesis-Remotes tragen KEINE rescue-Refs mehr. Zwei
+    Pushes statt einem: VORAB deklarierte sicherheitsbedingte
+    Serialisierung (Bundle MUSS remote liegen, bevor die einzige andere
+    Remote-Kopie stirbt) -- A2.1a-konform als Ausnahme benannt.
+
+### KON93-02 -- C6 ENTSCHIEDEN (Owner 16.08.): MESS-ARENA-KAPAZITAET = 6GB FEST, STATISCH, PLANER-RESERVIERUNG ZU EXPERIMENT-BEGINN AENDERBAR + 10-WOCHEN-EXPLORE
+
+    OWNER (verbatim): "Die Kapazitaet wird auf 6GB festgesetzt (bitte
+    explore ueber 10 Wochen) und ist statisch, sie kann zu Beginn eines
+    Experimentes fuer die Reservierung auf dem Planer veraendert werden."
+    EINORDNUNG: Das schliesst KON92-C6 -- Variante (a) FESTE Kapazitaet
+    gewinnt, konkretisiert als 6GB-Default; "statisch" = kein dynamisches
+    Wachsen zur Laufzeit; der EINE Freiheitsgrad ist die Reservierungs-
+    Groesse am PLANER zu EXPERIMENT-BEGINN (XML-/Planer-Hebel, nicht
+    Laufzeit). ANKER-VORBESTAND: KON51 (12.08.) traegt die 6GB BEREITS als
+    Warnschwelle ("WARNUNG an Planer > 6 GB") -- der Owner-Satz hebt sie
+    von Warnung auf KAPAZITAET. Der Ueberlauf-Pfad bleibt per P2-Wort:
+    harter Abbruch NUR wenn die Mess-Arena voll ist; das heute gebaute
+    "Ueberlauf zaehlen+weitermessen" (mess_arena.hpp:36-38,213,266) ist in
+    dieser Lesart zu heilen (stiller Datenverlust). BAU: geht in die
+    Arena-Posten E1-E10 (KON92) im S-13/#18-Buendel. EXPLORE-AUFTRAG
+    (10 Wochen) GESTARTET: Herkunft/Bemessung der 6GB + Planer-
+    Reservierungs-Mechanik + drift_faktor-Bezug in Rohtranskripten und
+    Plaenen ("das ist geplant").
+
+### KON93-03 -- V8 IN ARBEIT BEIM OWNER (mit Infra-Agent) + EINLESE-ORDER FUER DIESEN KONTEXT
+
+    OWNER: "Bei V8 - ich mach gerade mit dem infra Agenten." -- die
+    GitHub-PAT-Rotation laeuft ausserhalb dieser Session; Session-Anteil
+    danach: Store-Bereinigung (3 github.com-Zeilen) + F5-Mirroring
+    (KON89-D2). Bis zur Vollzugs-Meldung bleibt ~/.git-credentials
+    UNANGETASTET. FERNER Owner-Order: Einlese-Protokoll der letzten 3
+    Kontextuebergaben fahren -- die 4 Haupt-Planungsdokumente (GOAL v8,
+    Wellenplan v2 inkl. §18, Designplan TDD, ARBEITSWEISE-GESAMT-DOKTRIN
+    im Umbrella) + aktuelle Ledger-Teile vollstaendig in den Kontext
+    kippen (Vollzug beginnt mit diesem Commit; Deckung wird gemessen).
+    PARALLEL GESTARTET: Full-Join-Explore mi->ma (KON91-01) + Arena-6GB-
+    Explore (KON93-02) als Hintergrund-Workflow.
 ## NACHTRAG 16.08.2026 -- KON92: ARENA-KETTEN-KARTE KOMPLETT (wf_eebc8294 4/4) -- 8 DELTAS ZUM P2-KERN, 6 UEBERHOLT-MARKER, BAU-POSTEN E1-E10 = S-13-KERNSTUECK; 1 KLEINES OWNER-DETAIL (C6 fest-vs-wachsend)
 
     KARTE (arena_kette_karte.md, Folge-BU-2): IST 21 Fundstellen, GEPLANT 8.
