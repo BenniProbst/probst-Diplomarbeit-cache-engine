@@ -16,6 +16,48 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON79: WORKTREE-LANDUNGS-BILANZ + NESTED-WORKTREE-VORFALL (Fenster-Stand GERETTET als 5fa37f36) + FOLGE-BU 2
+
+### KON79-01 -- LANDUNGS-BILANZ ALLER PARALLEL-BAUTEN (Owner-Frage 16.08.)
+
+    GELANDET (development, CI gruen): W-B beide Straenge (8fe66469 ce /
+    3077e102 prt-art) · #61-Rewrite (Thesis 4ae5378, Gitlinks f4fb1d19) ·
+    #62-Archiv (f6c33559) · KON74-78-Zuege · Worktree-Reste-BU fb5f1eb2
+    (5 lokal-vor-umparken + 13 helm-Arbeitsdateien, gitleaks no-git rc=0).
+    BRANCH-GESICHERT (fenster-gebunden, Landung nach Nachstufe): B2
+    e966ee81 + golden-Fenster-Stand 5fa37f36 auf origin/bau/golden-homes.
+    GERAEUMT nach Loeschregel (gruen+gemergt+Submodul-Pruefung): wt-super-
+    landung, wt-super-archiv62, wt-prtart-lizenz, wt-prtart-nachstufe,
+    wt-ce-prtart-waisen; lokale Branches bau/branch-archiv-62, bau/folge-
+    bu-20260815, bau/lizenz-vier-repos geloescht (Tips je enthalten).
+    VERBLEIBEND: wt-ce-golden-rettung (aktive Bau-Flaeche) + wt-thesis-
+    lizenz (lebende Thesis-Arbeitsflaeche).
+
+### KON79-02 -- VORFALL: NESTED WORKTREES STARBEN MIT DEM ELTERN-WORKTREE
+
+    Das worktree remove von wt-super-landung riss DREI ce-/prt-Worktrees
+    mit, deren gitdir unter .git/worktrees/wt-super-landung/modules/...
+    lag (wt-ce-b2, wt-ce-golden-homes, wt-ci-dual-prtart): die Submodul-
+    Objektspeicher des Eltern-Worktrees trugen deren Historie. VERLUST-
+    BILANZ: B2 e966ee81 war auf origin (0 Verlust) · ci-dual 731b5655 in
+    dev enthalten (0 Verlust) · golden-homes: lokale Fenster-Commits als
+    OBJEKTE verloren, ARBEITSBAUM vollstaendig erhalten -> Rekonstruktion
+    als EIN Commit 5fa37f36 (949 Dateien +52341/-2311, Original-Messages
+    im Body dokumentiert, gitleaks Probe rc=1/ECHT rc=0, Push origin
+    literal 0eea2a0a..5fa37f36). Bekannter Reststand vor Verlust: 495
+    Tests / 2 rot (queuing-Wurzel-Eintragung topics/queuing/ vs organ_
+    axes/...; prt_art-Include der Perm-Piloten = V1-Diskrepanz-Klasse).
+    LEHRE (Register+Memory): VOR jedem worktree remove eines SUPER-
+    Worktrees pruefen, ob .git/worktrees/<name>/modules/*/worktrees/
+    KINDER fuehrt — nested Worktrees IMMER zuerst umhaengen/sichern.
+
+### KON79-03 -- FOLGE-BU 2 (Kontext 8): 11 Dateien additiv
+
+    docs/sessions/backups/20260816-folge-bu-kontext8/: kon64_sammlung.md
+    (Teile 1-31), staffelungs_karte_49.json, design_pmc_schwester_v2.md,
+    kon74-78-Nachtraege, 3 Workflow-Journale (wf_bb387379 Nachstufe,
+    wf_ec5b9516 Staffelung, wf_a2f3387c Maximal-Parallel-2). gitleaks
+    no-git rc=0. KEINE agent-*.jsonl (Transkript-Tabu).
 ## NACHTRAG 15.08.2026 -- KON78: #62 VOLLZOGEN (15/15 re-geprueft, gebundelt, geloescht) + T-1-WACHEN-NACHZUG (15881/15886 -> 15888 GRUEN) -- SCHLUSS-STRECKE BIS AUFS GOLDEN-FENSTER KOMPLETT
 
 **Quellen: #62-Agent-Return (Rohdaten-JSON) + Lead-T-1 + Lead-Landung.
