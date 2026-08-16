@@ -16,6 +16,84 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON94: BEIDE 10-WOCHEN-EXPLORES KOMPLETT (Full-Join 12 Deltas/FJ-1..FJ-10 + Arena-6GB 7 Deltas/E11-NEU) -- SCHICHTUNGS-KORREKTUR AN KON93-02, DREI O-FRAGEN AN OWNER
+
+**Quellen: wf_f052f900 (6/6 Agenten, 0 Fehler; je 2 Sonnet-max-Kartierer
+Rohtranskripte+Plaene/Code + Fable-max-Synthese). Karten VERBATIM in
+docs/sessions/backups/20260816-folge-bu-kontext9/ (explore_fulljoin_karte.md
+335 Z., explore_arena6gb_karte.md 310 Z.). KON94 vorher 0 Treffer.**
+
+### KON94-01 -- FULL-JOIN mi->ma (KON91-01): PRINZIP ALT, SPALTEN-AUSPRAEGUNG NEU; BILDUNGSREGEL DESTILLIERT
+
+    HERKUNFT: als PRINZIP seit 26.07. geplant (Drei-Stufen-Messkette,
+    Ledger:28532ff: Stufe 2 = "Akkumulation ALLER verwendeten Achsen
+    Parameter" = mi->ma auf WERTE-Ebene); die SPALTEN-Auspraegung ist
+    Wortpraegung 16.08. 12:08Z (Teil 37; davor 0 Fundstellen, doppelt
+    gegengeprobt). Zwei-Ebenen-Lesart versoehnt beides: SCHEMA = alle
+    MOEGLICHEN Parameter, WERTE = die VERWENDETEN. WARNUNG Falsch-Positiv:
+    "full join" ist DREIFACH ueberladen -- (A) Algorithmen-Merge (GEBAUT:
+    AxisFullJoin/Stufe3_FullJoin -- faengt jede naive Codesuche), (B)
+    Fristschaetzung 08.08., (C) Spalten-Union 16.08. (NICHT gebaut).
+    BILDUNGSREGEL: mi(A) = NUR Achsen-Erfolgs-Parameter E(A) (Code-
+    Kandidat kV3AxisSchema+seg_*); ma UND w = Union aller E(A) + op_*/
+    Wallclock + PMC-compound + Kalt-Diff-Traeger; Ordnungsquelle bleibt
+    Single-Source (lazy_csv_header, KON74-04), MENGE je Ebene neu.
+    ABWESENHEIT: Sheet-Ebene belegt (kein Sheet), PMC-Achsen-Eintrag
+    belegt (Sondergrammatik KON65-03/F1), Zell-Ebene UNGEREGELT -> O1.
+    VERZAHNUNG MIT ARENA: EIN Bauwerk -- Full Join = Ziel-Schema, E4-
+    Aggregator = mechanischer Join-Ort (Pivot deskriptor_ix->Spalte),
+    E6-Drain = Sheet-Regel-Konsument (S-13/#18-Kernstueck, heilt
+    measurement_sink KON32-01). 12 DELTAS D1-D12 (u.a. Spaltenfunktion
+    einstufig, ein konstantes Sheet, keine sequentiellen Tabellen,
+    2-Zeilen-statt-Kalt-Diff, synchron-statt-Arena-first, 32-Byte-POD,
+    PMC honest-0, E(A) ohne benannte Heimat). BAU-POSTEN FJ-1..FJ-10
+    fuer S-13/#18 (Di 25.08.): Vertraege (FJ-1 Spaltenfunktion, FJ-2
+    E(A)-Registrierung) -> Join+Felder (FJ-3/4 = E4/E2/E3) -> Drain+
+    Export (FJ-5/6 = E6+#18-Kern) -> flankierend (FJ-7 6GB, FJ-8 Baum/
+    CSV-Factory) -> abschliessend (FJ-9 PMC-Randstellen, FJ-10 Doku).
+
+### KON94-02 -- ARENA-6GB (KON93-02): SCHICHTUNG STATT ABLOESUNG (KORREKTUR AN KON93-02) + E11 NEU
+
+    KORREKTUR an KON93-02 (dort: "hebt sie von Warnung auf KAPAZITAET"):
+    Die 6GB-Kapazitaet SCHICHTET sich ueber die KON51-Warnschwelle, sie
+    loest sie NICHT ab -- als Abloesung waere die Warnung unerreichbar.
+    DREI SCHICHTEN an ZWEI SPEICHERN: (1) Warnschwelle 6GB delayed-
+    informativ am CEB-AGGREGAT (KON51/52, bleibt) · (2) OOB-Opt-in hart
+    am CEB (KON52, bleibt) · (3) Kapazitaet 6GB STATISCH je MESS-PROZESS-
+    Arena, voll = harter Abbruch (KON93; Abbruch-Semantik per Bestands-
+    Doktrin: failed ohne Retry, Arena-Bestand persistieren). CHRONOLOGIE
+    7 Owner-Stationen 09.08.->16.08. in der Karte; P2-Datierung = 16.08.
+    (kon64_sammlung:1388f), die 12.08.-Angabe einer Teil-Karte war
+    Lesefehler. 7 DELTAS: Kern = Ueberlauf zaehlen+weitermessen
+    (mess_arena.hpp:36-38/213/263-269, stiller Datenverlust, heilen auf
+    fest+Abbruch); 6GB-Default fehlt (verifizierter Literal-Nichtfund);
+    Bytes->Zeilen fehlt; Planer-Verdrahtung fehlt (init() 0 Aufrufer,
+    check-size-Sackgasse); XML-Hebel fehlt; Warn/OOB 0 Code; stale
+    Faktor-2-Texte. "Statisch" strukturell gedeckt (mmap ohne Remap).
+    E11 NEU ("KON93-Kapazitaets-Vollzug", 5 Teilposten, E11.1-3 VOR E9)
+    -- KEIN bestehender Posten E1-E10 traegt den Kapazitaets-Bau; E1
+    verschlankt (Politik-Haelfte durch KON93 entschieden). S-19: Formel
+    n_ops x zeilen_je_op x drift_faktor(<=18) wird BEDARFS-/PRUEFGROESSE
+    gegen die Reservierung (Deckelurteil VOR Messstart); Laufzeit-Abbruch
+    = Restschutz. XML-HEBEL-VORSCHLAG: neues Element <mess_speicher
+    arena_reserve_bytes ram_warn_bytes ram_oob_bytes> als Geschwister von
+    <drift_gate> (dessen Parser-Muster inkl. Doppel-Speisung), NICHT an
+    run_options (ctest-Zeichengleichheits-Wache); XSD ohne Schema-
+    Defaults; drift_gate-XSD-Luecke im selben Zug. HERKUNFT DER 6:
+    dokumentarischer Nichtfund (Korpus erschoepft; 2 markierte unbelegte
+    Rekonstruktions-Kandidaten) -- nachrangig, blockiert nichts.
+
+### KON94-03 -- OFFENE PUNKTE AUS BEIDEN KARTEN (Owner-Vorlage, nicht bau-blockierend)
+
+    Arena: bau-blockierend NULL. Full-Join, drei nicht-explorierbare
+    O-Fragen (je mit Empfehlung, Posten erst W2/Di 25.08. -- Antwort bis
+    dahin genuegt): O1 Zell-Abwesenheit im Union-Schema (Empfehlung:
+    Schema stabil, MARKIERTER Leerwert statt honest-0) · O2 Begriffs-
+    umfang "Achsen-Erfolgs-Parameter" == kV3AxisSchema+seg_* (Empfehlung:
+    JA) · O3 Union global-uniform vs. messungs-verfuegbar (Empfehlung:
+    GLOBAL-UNIFORM; Verfuegbarkeit regeln Sheets+Werte). Aufgeloest mit
+    Beleg (keine Owner-Fragen mehr): w-Einschluss, Traegerfrage (Arena-
+    Pivot), i{...}-Tore, P1-Bestaetigung, RAM-Politik.
 ## NACHTRAG 16.08.2026 -- KON93: V9-LOESCHUNG VOLLZOGEN (Bundle-ZUERST, Gegenprobe 0/0) + C6-OWNER-ENTSCHEID (ARENA = 6GB STATISCH, PLANER-RESERVIERUNG) + V8 LAEUFT BEIM OWNER + EINLESE-ORDER
 
 **Quellen: Owner-Worte 16.08. verbatim (3 Nachrichten) + Lead-Vollzug mit
