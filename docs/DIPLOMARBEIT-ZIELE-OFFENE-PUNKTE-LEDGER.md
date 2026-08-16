@@ -16,6 +16,31 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON89: F5=MIRRORING-GO + D1-D4 ENTSCHIEDEN (CSV-FACTORY-FILESYSTEM-PRAEZISIERUNG) + C-3a HIER PRAESENTIERT
+
+    F5 ENTSCHIEDEN: GitLab-Push-Mirroring statt lokalem GitHub-PAT ("Das
+    ist sauberer") -- Einrichtung auf 288+286 (+289? beim Bau messen,
+    welche Repos GitHub-Spiegel haben) NACH der V8-Rotation mit dem NEUEN
+    Token als Mirror-Credential; danach entfaellt der lokale GitHub-
+    Credential vollstaendig und meine Zuege pushen nur noch origin
+    (Dual-Remote-Mechanik wird server-seitig). Posten im Infra-Handout-
+    Umfeld. D1: OP-1-ZUORDNUNG RUECKBESTAETIGT ("Ja, Freigabe") -- die
+    KON83-Kenntnisnahme-Notiz ist geschlossen, Q-D/Q-E/Q-F 26.07. IST die
+    Entscheidung. D2: V9-Einarbeitung GO -- Textbestandteile aus
+    rescue/w3-thesis-c in die heutige Thesis einarbeiten, ERGEBNIS DEM
+    OWNER HIER ZEIGEN, danach haendische Owner-Konsolidierung, erst dann
+    Loesch-GO (Agent gestartet). D3 PRAEZISIERT (Owner verbatim Teil 36):
+    xlsx=Stamm, CSV=Kind IST korrekt; per XML koennen BEIDE an einem Ziel
+    stehen; die CSV-Ausgabe ist eine FACTORY als verschachtelte Ausgabe
+    JEDES xlsx-Sheets in ein weiter verzweigtes FILESYSTEM: ein GESAMT-
+    ORDNER analog zur xlsx (mit allen Sheets) -> darin EIN ORDNER JE SHEET
+    -> darin die finalen CSVs der einzelnen UNTER-ACHSEN-FAHRTEN (= die
+    sequentiellen Tabellen aus KON88/P1). Ergaenzt KON88-Design; geht ins
+    S-13/#18-Buendel. D4: id56-Explore -> id18-Ein-Wort-Vorlage + node6-
+    Runner autonom FREIGEGEBEN. C-3a: Vorlage (136a1798, Frist Mi 19.08.)
+    dem Owner in dieser Sitzung VOLLSTAENDIG praesentiert (eine Frage:
+    Tripwire ausloesen+ersetzen als eigenes Paket im W1-Bump-Buendel;
+    Empfehlung JA) -- Antwort steht aus.
 ## NACHTRAG 16.08.2026 -- KON88: P1-P3-RUNDE -- SHEET-DESIGN GRUNDLEGEND KORRIGIERT (KON87 TEIL-UEBERHOLT), KALT-DIFF-ZEILENPRINZIP, PMC=COMPOUND-SPALTEN; F1-ROTATION AN INFRA-HANDOUT
 
     P1 (Owner verbatim Teil 35; MEINE beiden KON87-Vorschlaege FALSCH):

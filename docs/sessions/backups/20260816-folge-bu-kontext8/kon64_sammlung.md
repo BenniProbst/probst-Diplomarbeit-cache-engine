@@ -1428,3 +1428,21 @@ F1: "Volles GO diesen autonom zu rotieren, aber erst loeschen, nachdem du
 den neuen in den cred vault eingetragen hast, das ist ausserdem die Aufgabe
 von infra agent, besser bitte ein handout an diesen fuer die Aufgabe,
 erweitere das noch nicht bearbeitete handout an ihn."
+
+================================================================================
+TEIL 36 — OWNER 16.08. F5/C-3a/D1-D4 (VERBATIM-KERNE)
+================================================================================
+F5: "Bitte wechsel wie empfohlen auf das Mirroring. Das ist sauberer."
+C-3a: "Bitte stelle mir alle Fragen und den Gesamtzusammenhang mit allen
+Erklaerungen und Entscheidungen bitte jetzt hier."
+D1 (OP-1-Zuordnung Q-D/Q-E/Q-F 26.07.): "Ja, Freigabe."
+D2 (V9-Ablauf Einarbeitung w3-thesis-c): "Korrekt, GO. Zeige mir das
+Ergebnis hier sobald du fertig bist."
+D3 (xlsx/csv): "xlsx und csv als Kind aus der xlsx ist korrekt, aber es
+koennen nach Wunsch aus der XML beide an einem Ziel stehengelassen werden.
+Dabei ist die CSV nur eine factory als verschachtelte Ausgabe jedes xlsx
+sheets, sodass in einem noch weiter verzweigten filesystem die einzelnen
+Unter-Achsen Fahrten unter einem Ordner je sheet einer xlsx unter einem
+weiteren Gesamt-ordner der analogen xlsx selbst mit allen sheets, die
+finalen csv ausgegeben werden."
+D4 (id56-Explore->id18-Vorlage, node6 autonom): "Freigabe."
