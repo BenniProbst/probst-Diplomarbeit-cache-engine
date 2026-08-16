@@ -1384,3 +1384,47 @@ bestaetigen"
 TEIL 34 — OWNER 16.08. (VERBATIM): "i{pmc} ja und bitte erweitere die Syntax
 in der Dokumentation, sodass diese Form der interface Erweiterung auch im
 allgemeinen Fall bei Vertraegen zwischen Traeger-Stufen gilt."
+
+================================================================================
+TEIL 35 — OWNER 16.08. P1/P2/P3/V8/F1 (VERBATIM-KERNE)
+================================================================================
+P1 (beide Vorschlaege FALSCH, beides vereinbar): "Wenn wir uns die Hauptachsen
+im Lager als Baum betrachten, die dann in einer compile time Binary muenden,
+die dort durch alle Unter-Achsen nachgelagert zur Laufzeit die Unter-Achsen-
+Einstellungen ermoeglichen. Dann sind die Mess-Kategorien wallclock/macro/
+micro Benchmarking die Tiefen eines Baumes und die Unter-Achsen die
+Auffaecherungen an den Nodes dieses Baumes. Jedes sheet und deren Tabelle
+werden also zu genau einer Unter-Achsen-Einstellung erzeugt. Wenn jetzt aber
+die w/ma/mi ein eigener Baum ist, laesst sich dieser als noch tiefere
+Filesystem ordnung neben dem Binary generieren und dadurch je w/ma/mi Nodes
+in immer feiner zergliederte Mess-Bestandteile zerlegen, die waehrend eines
+Experimentes tatsaechlich vonstattengegangen sind. ... unter ma also noch die
+Filesystem Zergliederung in Interfaces des Genus-Interface-Subjektes als
+weiterer Layer ..., bevor in einer noch tieferen Ebene mi fuer die Interfaces
+der Achsen-Microbenchmarks ... erreicht wird, sodass als Blaetter xlsx
+Dokumente gespeichert werden, welche dann die Teil-Entscheide der Unter-
+Achsen Laufzeitparameter fuer die betreffende Feinkategorie festhalten. Ich
+wuerde zusaetzlich dazu uebergehen nur einzelne sheets/Tabellen fuer je eine
+Unterachse anzulegen, in der dann alle Laufzeit-Permutationen durchgewechselt
+werden und in sequentiell abgetrennten Tabellen im selben sheet dokumentiert
+werden." [Auftrag: Design in eigenen Worten erklaeren]
+P2: "Excel darf je Mess-Aufruf nur eine Zeile schreiben. ... der zuerst
+gemessene Kalte Aufruf wird in jeder Spalte des nachfolgenden warmen Aufrufes
+als 'Kalt-diff' zusaetzlich in jedem einzelnen Feld der verbleibenden Zeile
+fuer jeden Parameter relativ vermerkt (-x negativer Einfluss +x positiver
+Einfluss des ersten kalten Aufrufes gegen den zweiten warmen mit rollback
+nach dem ersten). Harter Abbruch ist nicht Moeglich und auch keine Option,
+weil alle Messwerte ja zuerst (geplant und dokumentiert, bitte explore ueber
+10 Wochen mit Sonet 5 max very thourough) in Arenen abgelegt werden, bevor
+die xlsx Persistierung folgt. Wenn ein Blatt nicht reicht, muss eben ein
+weiteres eroeffnet werden, solange bis alle Messwerte in alle sequentiellen
+Blaetter passen. ... Der harte Abbruch kann also nur am RAM Limit sterben,
+wenn die Mess-Arena voll ist."
+P3: "PMC ist eine Haupt-Meta-Meta-Achse, all deren gemessene Parameter
+bekommen Spalten in den Blaettern und das ist damit eine compound-Dimension.
+Daher ist deine annahme korrekt wie empfohlen."
+V8: "noch nicht durch, brauche noch etwas Zeit."
+F1: "Volles GO diesen autonom zu rotieren, aber erst loeschen, nachdem du
+den neuen in den cred vault eingetragen hast, das ist ausserdem die Aufgabe
+von infra agent, besser bitte ein handout an diesen fuer die Aufgabe,
+erweitere das noch nicht bearbeitete handout an ihn."

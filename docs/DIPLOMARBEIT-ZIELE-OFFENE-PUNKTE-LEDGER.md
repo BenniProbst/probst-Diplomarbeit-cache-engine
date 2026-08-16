@@ -16,6 +16,38 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON88: P1-P3-RUNDE -- SHEET-DESIGN GRUNDLEGEND KORRIGIERT (KON87 TEIL-UEBERHOLT), KALT-DIFF-ZEILENPRINZIP, PMC=COMPOUND-SPALTEN; F1-ROTATION AN INFRA-HANDOUT
+
+    P1 (Owner verbatim Teil 35; MEINE beiden KON87-Vorschlaege FALSCH):
+    Die w/ma/mi-HIERARCHIE lebt im FILESYSTEM, NICHT in Sheet-Namen: der
+    Haupt-Achsen-Lagerbaum muendet je Pfad in EINER CT-Binary; NEBEN der
+    Binary wird der w/ma/mi-Baum als noch tiefere Filesystem-Ordnung
+    generiert -- unter ma ein weiterer Layer je GENUS-INTERFACE des
+    Subjekts, darunter mi je ACHSEN-MICROBENCHMARK-Interface; die BLAETTER
+    dieses Baums sind die xlsx-Dokumente (je Feinkategorie, halten die
+    Teil-Entscheide der Unter-Achsen-Laufzeitparameter). IM Dokument: EIN
+    Sheet je UNTER-ACHSE; darin ALLE Laufzeit-Permutationen als SEQUENTIELL
+    ABGETRENNTE TABELLEN im selben Sheet ("Jedes sheet und deren Tabelle
+    ... zu genau einer Unter-Achsen-Einstellung" -- die 26.07.-Regel lebt
+    als TABELLE je Einstellung weiter). KON87-Sheet-EBNF (ebene[.traeger].
+    gegenstand) damit TEIL-UEBERHOLT: Ebenen-Zergliederung = Ordner, nicht
+    Sheet-Name; Verstaendnis-Rueckgabe an Owner laeuft.
+    P2: EINE Zeile je Mess-Aufruf (nicht 2): der kalte Cache-Waermer-Aufruf
+    (mit Rollback) bekommt KEINE eigene Zeile, sondern wird je Spalte als
+    relativer KALT-DIFF im Feld der warmen Zeile vermerkt (+/-x Einfluss).
+    Harter Abbruch am Excel-Limit ist SYSTEMFREMD: Messwerte liegen ZUERST
+    in ARENEN, xlsx-Persistierung folgt nachgelagert -> sequentielle
+    Folge-Blaetter bis die Arena geleert ist; einziges hartes Limit = RAM
+    der Mess-Arena. EXPLORE-AUFTRAG (10 Wochen, Sonnet 5 max very
+    thorough): die geplante+dokumentierte Arena-Ablage-Kette heben ->
+    gestartet (wf-arena). KON87-P2-Fortsetzungsblatt-Empfehlung damit in
+    der Sache bestaetigt, die 2-Zeilen-Annahme des Profilschemas KORRIGIERT.
+    P3 BESTAETIGT: PMC = Haupt-Meta-Meta-Achse, ALLE gemessenen Parameter
+    = Spalten (compound-Dimension), keine eigene Blatt-Dimension.
+    V8: Owner braucht noch Zeit (Rotation offen). F1: VOLLES GO autonome
+    Rotation r20260812 -- Reihenfolge NEU-IN-VAULT ZUERST, DANN loeschen;
+    Ausfuehrung = INFRA-AGENT via erweitertem Handout (Cluster-Repo,
+    20260816-HANDOUT-github-pat-rotation... um Teil B erweitert).
 ## NACHTRAG 16.08.2026 -- KON87: V3-SHEET-HIERARCHIE-DESIGN KOMPLETT (wf_8a193a8c 13/13, 90 Treffer) -- V-A9-6 ENTSCHIEDEN (S001..Snnn ENTFAELLT), 3 OWNER-PUNKTE P1-P3
 
     KERN (Design-Datei design_sheet_hierarchie_v3.md, in Folge-BU-2):
