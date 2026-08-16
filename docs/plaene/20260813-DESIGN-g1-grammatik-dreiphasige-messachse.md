@@ -878,3 +878,75 @@ geloest). Der 10-Wochen-Explore bleibt PFLICHT vor dem Sequenz-Achsen-Design (Ta
 * F5 FAMILIEN-UMFANG (Teil 5): 'Ja korrekt' -- die Familie traegt eine VIELZAHL von
   Anforderungen/Grammatiken, auch Unter-Achsen werden designt. Traeger: DESIGN
   MESS-ACHSEN-FAMILIE, Task #53 (G-1-Schwester-Dokumente; Reihenfolge KON64-04).
+
+---
+
+## 13. NACHTRAG 16.08.2026 -- Allgemeine Interface-Erweiterungs-Regel an Traeger-Stufen-Vertraegen (KON85, 16.08.2026)
+
+Status: OWNER-ENTSCHEID, gebucht als KON85 (super-Ledger 16.08.2026). Wortlaut-Quelle:
+kon64_sammlung.md Teil 34 (docs/sessions/backups/20260816-folge-bu-kontext8/, Ende der
+Datei). Gegenstand: die INTERFACE-ACHSE der Mess-Achsen-Familie ("Die Mess-Interfaces sind
+technisch gesehen eine eigene Mess-Haupt-Achse", Owner, Sammlung Teil 19 -- F1
+Planer-Vollbild) und ihre Erweiterbarkeit an den Zwischenvertraegen der Traeger-Stufen.
+Grammatik-Ort der Achse: PMC-Schwester-Design Par. 2.1 (E3) + PM-15
+(docs/plaene/20260816-DESIGN-pmc-schwester-meta-meta-achse-v3.md). KEIN BAU: Bau bleibt
+W-Strecke nach Plan (11.6); dieser Paragraf ist der Doku-Vollzug des KON85-Auftrags.
+
+### 13.1 Owner-Verbatim (Sammlung Teil 34, 16.08.2026)
+
+    "i{pmc} ja und bitte erweitere die Syntax in der Dokumentation, sodass diese Form der
+    interface Erweiterung auch im allgemeinen Fall bei Vertraegen zwischen Traeger-Stufen
+    gilt."
+
+Der erste Halbsatz entscheidet OP-2 des PMC-Schwester-Designs (i{pmc} = JA); der zweite hebt
+den Mechanismus zur ALLGEMEINEN Regel fuer Vertraege zwischen Traeger-Stufen.
+
+### 13.2 Die allgemeine Regel
+
+    JEDES Steuerungs-/Mess-Flaechen-Interface an einem Zwischenvertrag zwischen
+    Traeger-Stufen (p -> b -> h -> t; strikte Ordnung, h optional -- F-P4) darf
+    ADDITIV als i{<token>} gekennzeichnet werden.
+
+* VORHANDENSEIN-SEMANTIK. Das i-Flag kennzeichnet das VORHANDENSEIN des Interfaces -- wie
+  i{w}/i{ma}/i{mi}/i{pmc} (Owner-Kurznamen iw/ima/imi; flache Formen existieren NICHT,
+  Zerlegungs-Pflicht 14.08.). Die Flags "[betreffen] speziell die Steuerungs- und
+  Mess-Flaechen-Interfaces an den Zwischenvertraegen [...] und deren Vorhandensein
+  kennzeichnen" (Owner, Sammlung Teil 17) -- nie eine Belegung oder Nutzung.
+* RICHTUNG (PM-15 BLEIBT). Kennzeichnung je Traeger-Stufe NUR fuer das, was SIE gegen die
+  NACHFOLGENDE Stufe traegt (Zwischenvertraege Planer<->CEB und CEB<->Tier/Hybrid).
+* TRAGENDE BEGRUENDUNG (F-P3-Schluss-Satz): "Wenn eine vorangehende Traeger-Stufe das
+  Interface der nachfolgenden nicht lesen kann, koennen keine Messdaten zu diesem Thema
+  erhoben werden." (Owner, Sammlung Teil 13) -- ohne lesbares Interface der nachfolgenden
+  Stufe keine Messdaten zum Thema; deshalb muss das Vorhandensein je Zwischenvertrag
+  stempelbar sein.
+* NEGATIV-BATTERIE-DOKTRIN fuer neue Token. Das i{...}-Alphabet ist NICHT abschliessend,
+  sondern per REGEL erweiterbar; jedes NEUE Token ist ROT bis zu seiner Aufnahme in den
+  Interface-Katalog. AUFNAHME = dokumentierte Ableitung nach diesem Muster: der Tatbestand
+  "Steuerungs-/Mess-Flaeche an einem Zwischenvertrag" wird per SUBSUMTION am Gegenstand
+  belegt (Muster-Vorlage: die KON83-02-Subsumtion fuer i{pmc} -- der PMC-Zwischenvertrag
+  traegt BEIDE Flaechen: Mess = Aufzeichnungsinterface gegen die PMC-Fuehler, exakt das
+  ima/imi-Muster; Steuer = Planer-Erkennung + AND-Freigabe F2/F-P8). Ist der Tatbestand so
+  belegt, ist KEIN Einzelfall-Owner-Wort mehr noetig; ohne dokumentierte Subsumtion bleibt
+  jeder Kandidat ROT.
+
+### 13.3 Das i-Alphabet nach KON85: {w, ma, mi, pmc}
+
+    iface_flag := 'i' '{' element [ '.' element ]* '}'
+    element    := 'w' | 'ma' | 'mi' | 'pmc'      -- Stand KON85; Erweiterung NUR nach 13.2
+
+i{pmc}-Semantik (Grammatik-Konsequenz KON83-02, durch das KON85-JA in Kraft):
+
+* 'pmc' ist innerhalb i{...} ATOMAR -- keine Sub-Flags; der Werk-Detailgrad (typ_spec
+  c{p}/c{e}/c{p.e}) bleibt Sache des pmc-Eintrags selbst, nicht des Interface-Flags.
+* Dasselbe Literal unter ZWEI Eltern ist per Klammer-Bindung (v2-R3) eindeutig: pmc als
+  i-Element (i{pmc}) und pmc als Eintrags-Basis (pmc{c{...}}) sind ueber das
+  (token,eltern)-Paar GETRENNTE Elemente; ein flaches 'ipmc' ist ungueltig.
+* i{pmc} ist HARDWARE-/FREIGABE-BEDINGT: es erscheint nur, wo der PMC-Zwischenvertrag real
+  besteht (Hardware vorhanden, Freigabe-Kette erfuellt) -- KEIN "i.d.R. immer" wie i{w}
+  beim Planer (F-P3).
+
+DOKU-FOLGE: das PMC-Schwester-Design fuehrt ab v3 i{pmc} als AUFGENOMMEN (OP-2 = JA) und
+referenziert diese Regel (docs/plaene/20260816-DESIGN-pmc-schwester-meta-meta-achse-v3.md);
+die v2-Negativ-Batterie-Zeile "i{pmc} heute ROT bis Owner-Wort OP-2" ist UEBERHOLT. Die
+#53-PMC-Vorlage ist mit KON81/KON83/KON85 VOLLSTAENDIG ENTSCHIEDEN; der Bau geht als
+Stempel-Strecken-Posten in die Kette (KON85).
