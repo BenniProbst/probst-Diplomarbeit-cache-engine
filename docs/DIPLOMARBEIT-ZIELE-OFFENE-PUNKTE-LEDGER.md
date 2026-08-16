@@ -16,6 +16,66 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON86: VOLL-LESE-NACHZUG ALLER WORKFLOW-RUECKLAEUFER (Owner-Order) -- 4 LUECKEN GESCHLOSSEN, NEUE SUBSTANZ VERBUCHT
+
+### KON86-01 -- LESE-BILANZ (4 abgeschnittene/ungelesene Teile nachgeholt)
+
+    (1) wf_433b1889/OP-2-Ende: Grammatik-Punkte (d) Parser normalisiert
+    nicht, Vorhandensein = Kompilat-/Stempel-Differenz; (e) Negativ-
+    Batterie-Zeile kippt mit KON85-Festschreibung in die Positiv-Batterie
+    (BP-Reihe). rest_unsicherheiten: ORCHESTRATOR-DEFEKT — im op12-
+    Workflow-Skript kamen ${...}-Platzhalter UNINTERPOLIERT beim Urteils-
+    Agenten an (eigener Template-Escape-Fehler); Agent rekonstruierte
+    vollstaendig aus dem Journal, Urteilsbasis intakt — FIX-POSTEN:
+    kuenftige Workflow-Skripte ohne Escape-Konstrukt. OP-1-ZUORDNUNG =
+    beweisgestuetzte Rekonstruktion (einzige existierende Entscheidung,
+    Gegenproben echt), Owner-Rueckbestaetigung als Kenntnisnahme-Notiz.
+    (2) wf_5ba07e0d-Schluss: #48-PRAEZISIERUNG war unverbucht — Publika-
+    tions-Sektion je Klasse git UND/ODER Filesystem, PRO KLASSE MEHRFACH
+    moeglich; anhang:forward wird NICHT ersetzt sondern rekonfiguriert
+    (Wachen bleiben, Konfig-Quelle CI-Env -> XML). SECHS offene Fragen
+    lagen unverbucht: (F3) Instanz >=19.1 — DURCH HELM-UPGRADE ERLEDIGT:
+    G2 = SECRETLOSER CROSS-PROJEKT-PUSH 288->289 ist seit 19.1.4 FREI-
+    GESCHALTET -> neuer Posten: E-18-Bump in S-13 auf CI_JOB_TOKEN
+    umstellen (G1-Setting ci_push_repository_for_job_token_allowed auf
+    288), danach Writeback-PAT-Linie fuer 289 abloesbar = der gesuchte
+    "sichere Mechanismus ohne PAT". (F1) PAT r20260812 (Maintainer,
+    ueberprivilegiert, aktiv bis 30.11.): Widerrufs-GO = Owner-Vorlage.
+    (F2) Rotations-Politik r20260814 (Ablauf 15.10.): Vormerkung.
+    (F5) GitHub-Haelfte: fine-grained PAT als CI-Var ODER GitLab-Push-
+    Mirroring (remote_mirrors heute leer) — verbindet sich mit V8-
+    Rotation, Owner-Vorlage. (F6) USER-Var-Diskrepanz 12./14.08. =
+    Ledger-Hygiene-Notiz. NEBENBEFUND: verwaiste 288-Variable
+    COMDARE_THESIS_WRITEBACK_USER ohne TOKEN-Gegenstueck.
+    (3) Staffelungs-Karte A/ORGAN (erstmals komplett): FORMEN-KANON
+    17+1 — Tabellen (1) Bias-Bruch-Matrix, (6) 4x Austauschbarkeits-
+    Longtables, (10) Observer-Detail (n/a statt 0), (15) Achsen-Inventar
+    (einzige kategorienuebergreifende Form), (16/17) historisch;
+    Diagramme (2) 6x Latenz-Heatmaps log10/viridis, (3) 6x 3D NUR
+    Rohdaten/QA (kein Ergebnis-Diagramm, Owner-KERN E-2), (4) Baseline-
+    relative Verhaeltnis-Matrix = DIE Analyse-Figur, (5) normalisierte
+    Balken, (7/8) Forest-Plots + linear_scan-Referenz, (9) Attribution
+    18+1 Segmente 100%=seg_run_total_ns, (11) Range p50->p99 KEIN
+    Box-Plot, (12) ECDF, (13) Pareto p50-vs-p99, (14) Working-Set-Sweep
+    #156-gated; Phantom P2 Space-Pareto bewusst NICHT gebaut (honest-0).
+    4 VARIABLE Achsen (search_algo/node_type/memory_layout/prefetch,
+    4x4x5x4=320) vs 14 gepinnte — mit Owner-Gegen-Anker "golden-320
+    deckt viel zu wenig ab" (Ledger:19151). Experiment-B+-Baum: in der
+    AUSWERTUNGS-SCHLEIFE alle Haupt+Unter-Achsen GLEICHRANGIG, das
+    Erste-Klasse-Gefaelle liegt NUR in der Diagramm-Form. karte_e E5-E7:
+    C5-Reporting (Provenance je Tabelle, D-Split, P/E getrennt), E7
+    xlsx=DEFAULT/CSV "XOR (Strategy, kein CoR)" — WIDERSPRUCHS-NOTIZ:
+    die juengere Owner-Entscheidung 09.08. (KON60-05) ist DREIWERTIG
+    (xlsx/csv/beide, kein XOR) und geht vor; Karte zitiert aelteren Stand.
+    (4) Audit-Matrix: Struktur A-E vollstaendig gelesen (159 Z., C leer).
+
+### KON86-02 -- FOLGE-POSTEN AUS DEM VOLL-LESEN
+
+    (a) E-18-auf-CI_JOB_TOKEN-Umstellung (G1+G2, jetzt frei) -> in S-13/
+    #18-Buendel W2. (b) Owner-Vorlagen-Nachtrag: r20260812-Widerruf +
+    GitHub-Weg (PAT-Var vs Push-Mirroring). (c) verwaiste USER-Variable
+    raeumen (Hygiene, mit (b)). (d) Workflow-Template-Fix (Escape).
+    (e) Formen-Kanon 1-17 = W4-Design-Grundlage (an #49-Rest).
 ## NACHTRAG 16.08.2026 -- KON85: i{pmc} = JA + INTERFACE-ERWEITERUNG ALS ALLGEMEINE REGEL (Owner-Verbatim Teil 34)
 
     OP-2 ENTSCHIEDEN: i{pmc} JA -- i-Alphabet {w,ma,mi} -> {w,ma,mi,pmc}
