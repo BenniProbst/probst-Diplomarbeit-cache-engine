@@ -16,6 +16,40 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON87: V3-SHEET-HIERARCHIE-DESIGN KOMPLETT (wf_8a193a8c 13/13, 90 Treffer) -- V-A9-6 ENTSCHIEDEN (S001..Snnn ENTFAELLT), 3 OWNER-PUNKTE P1-P3
+
+    KERN (Design-Datei design_sheet_hierarchie_v3.md, in Folge-BU-2):
+    Blatt-Schnitt = TRAEGER-STUFE x ERHOBENE MESSEBENE; real existieren
+    NUR b*w, t*ma, t*mi + im Hybrid-Zweig h*ma/h*mi (Planer erhebt nie,
+    traegt iw als Aufzeichner); jede Zelle unter 4 Toren (Zweig, Schalter,
+    iw/ima/imi, V7-Umwelt-Freigabe); Nenner dynamisch (nur S-19 rechnet).
+    DATEI-Haelfte BEREITS GEBAUT: xlsx sparse = <datum>-<zeit>[_kvkette
+    der noch variierenden Unter-Achsen] als letztes Glied der Lager-Kette
+    (lager_pfad_grammatik.hpp:398-436, consteval-getestet); Konstanten ->
+    INFO, Haupt-Achsen -> Ordner-Kette. SHEET-EBNF: "INFO" | ebene
+    [.traeger].gegenstand (ebene=w|ma|mi anfuehrend per Owner-CSV-Regel;
+    traeger b|t|h NUR bei Mehrdeutigkeit, p nie; gegenstand=Rekombination|
+    Funktion(6 kOpKindNames)|Achse(18 Namen)); 31-BEWEIS: laengster
+    regulaerer Name mi.h.persistence_target = 23 <= 31; RT-Ueberlauf
+    deterministisch <ebene>.h16.<sha512-hex16> (22-23) -> S001..Snnn
+    ENTFAELLT, V-A9-6 ENTSCHIEDEN. ALLE Parameter im Blatt: Spalten
+    AUSSCHLIESSLICH lazy_csv_header() (189) + 8-Spalten-Profilschema
+    (2 Zeilen je Aufruf); Unter-Achsen-Permutation = ZEILEN-Schluessel,
+    SheetSchluessel = Zeilen-GRUPPEN-Schluessel -> die 26.07.-
+    Permutations-Blaetter gehen in der w-Ebene AUF (P1-Vorlage). Hybrid-
+    "4. Messebene" = Traeger-Differenzierung h*ma/h*mi, KEIN 4. Token
+    (entschaerft Test-#465-Umnummerierung konstruktiv); Einschub-POSITION
+    bleibt CEB-Permutations-Sache, nie im Namen. INFO-Blatt = Resolver
+    mit 6 Funktionen (Sysinfo/V7-Umwelt, Haupt-Achsen-Spiegel, Konstanten,
+    Sheet-Legende inkl. h16-Aufloesung, Stempel-Erkennungs-Quelle der
+    Lager-Factory maschinell, Freigabe-Karte nicht existierender Zellen
+    als Falsch-Null-Schutz). CSV-Kind: sheetname__stamm.csv.
+    OFFENE OWNER-PUNKTE: P1 26.07.-Permutations-Familie geht in w-Ebene
+    auf (Zeilen- statt Blatt-Schluessel) -- bestaetigen? P2 Zeilenlimit-
+    Politik (harter ErgebnisSchreibFehler{zeilenlimit} ODER
+    deterministisches Fortsetzungsblatt ".2", EBNF-Reserve da, max 26)?
+    P3 PMC spannt KEINE eigene Blatt-Dimension auf (Werte=Spalten,
+    Permutation=Umwelt-Glied+INFO, ggf. Mappen je Phase) -- bestaetigen?
 ## NACHTRAG 16.08.2026 -- KON86: VOLL-LESE-NACHZUG ALLER WORKFLOW-RUECKLAEUFER (Owner-Order) -- 4 LUECKEN GESCHLOSSEN, NEUE SUBSTANZ VERBUCHT
 
 ### KON86-01 -- LESE-BILANZ (4 abgeschnittene/ungelesene Teile nachgeholt)
