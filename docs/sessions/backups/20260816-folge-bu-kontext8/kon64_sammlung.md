@@ -1372,3 +1372,10 @@ selbst serialisierung auf der Platte und bietet das Laden und Speichern von
 Genus-Interface-Algorithmen als zusaetzliche Genus-Metaprogrammierte-
 Erweiterung an. Das bedeutet bei Verwendung dieser Achse erweitert sich die
 Flaeche bzw. Das Genus Interface um store() und load() Funktionen."
+
+================================================================================
+TEIL 33 — OP-RUNDE (16.08., VERBATIM): "OP-1 jetzt entscheiden und explorieren
+(ist schon entschieden), OP-2 bitte mit explore 2 Wochen aufloesen, OP-3
+bestaetigen, OP-4 Ja genau, also unabhaengig wie empfohlen NUR fuer die
+Sonderfaelle der Dualitaet zwischen Mess-Achse und System-Achse, OP-5
+bestaetigen"

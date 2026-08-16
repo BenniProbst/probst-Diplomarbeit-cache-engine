@@ -16,6 +16,24 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON81: PMC-OP-RUNDE ENTSCHIEDEN (OP-3/OP-5 BESTAETIGT, OP-4 PRAEZISIERT, OP-1/OP-2 = EXPLORE-AUFTRAEGE)
+
+    OP-3 BESTAETIGT: HW-Versions-Katalog Schema ARCH.KAT.REV + Entwurfs-
+    Literale (design_pmc_schwester_v2.md Par. 8.4); PIN-Belege SDM/PPR beim
+    Bau als T-1. OP-5 BESTAETIGT: Normalisierung pmc{c.{p.e}}/{p,e} ->
+    pmc{c{p.e}} (reine Orthographie). OP-4 ENTSCHIEDEN+PRAEZISIERT:
+    sw_version UNABHAENGIG je Kategorie, ABER NUR fuer die SONDERFAELLE der
+    DUALITAET zwischen Mess-Achse und System-Achse (die Dual-Kategorien der
+    PMC-Meta-Meta; hw_version bleibt identisch, PM-11-Wache). OP-1 = KEINE
+    NEUE ENTSCHEIDUNG NOETIG ("ist schon entschieden") -> Explore-Auftrag:
+    die EXISTIERENDE Owner-Entscheidung zur system_meta_meta-Rekursion in
+    den Quellen finden und festschreiben (ALLES-IST-GEPLANT-Doktrin).
+    OP-2 = 2-WOCHEN-EXPLORE-Auftrag: i{pmc}-Interface-Token gegen die
+    Quellen der letzten 2 Wochen (KON64-KON80-Aera, iw/ima/imi-Doktrin
+    15.08.) aufloesen. Beide Explores gestartet (wf-op12). Damit ist die
+    #53-PMC-Vorlage bis auf die zwei Explore-Ergebnisse owner-gedeckt;
+    Bau geht danach als Stempel-Strecken-Posten in die Kette.
+    (Verbatim: Sammlung Teil 33.)
 ## NACHTRAG 16.08.2026 -- KON80: OWNER-ANTWORTRUNDE V1-V10 KOMPLETT ENTSCHIEDEN (Verbatim Sammlung Teil 32)
 
 ### KON80-01 -- ENTSCHEIDE (Quelle: Owner 16.08., woertlich in Sammlung Teil 32)
