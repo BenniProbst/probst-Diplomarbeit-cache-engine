@@ -16,6 +16,29 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON85: i{pmc} = JA + INTERFACE-ERWEITERUNG ALS ALLGEMEINE REGEL (Owner-Verbatim Teil 34)
+
+    OP-2 ENTSCHIEDEN: i{pmc} JA -- i-Alphabet {w,ma,mi} -> {w,ma,mi,pmc}
+    nach KON83-02-Grammatik (atomar in i{...}, Eltern-Bindung R3, flaches
+    'ipmc' ungueltig, hardware-/freigabe-bedingt). VERALLGEMEINERUNG
+    (Owner woertlich): "diese Form der interface Erweiterung [gilt] auch
+    im allgemeinen Fall bei Vertraegen zwischen Traeger-Stufen" -> das
+    i{...}-Alphabet ist NICHT abschliessend, sondern per REGEL erweiterbar:
+    JEDES Steuerungs-/Mess-Flaechen-Interface an einem Zwischenvertrag
+    zwischen Traeger-Stufen (p->b->h->t) darf additiv als i{<token>}
+    gekennzeichnet werden (Vorhandensein-Semantik wie iw/ima/imi/i{pmc};
+    F-P3-Schluss-Satz als tragende Begruendung: ohne lesbares Interface
+    der nachfolgenden Stufe keine Messdaten zum Thema). Kennzeichnung je
+    Traeger-Stufe NUR fuer das, was SIE gegen die NACHFOLGENDE Stufe
+    traegt (PM-15 bleibt). Neue Token folgen der Negativ-Batterie-Doktrin
+    (ROT bis zur Aufnahme in den Katalog; Aufnahme = dokumentierte
+    Ableitung nach diesem Muster, kein Einzelfall-Owner-Wort mehr noetig,
+    sofern der Tatbestand "Steuerungs-/Mess-Flaeche an Zwischenvertrag"
+    per Subsumtion belegt ist). DOKU-AUFTRAG (delegiert): G-1-Nachtrag
+    "Allgemeine Interface-Erweiterungs-Regel" + PMC-Design-v2-Update
+    (MMR-1-Umformulierung KON83-01 + i{pmc}-Aufnahme + OP-Block-Nachzug:
+    OP-1 geschlossen, OP-2 JA, OP-3/4/5 per KON81). #53-PMC-Vorlage damit
+    VOLLSTAENDIG ENTSCHIEDEN -> Bau als Stempel-Strecken-Posten frei.
 ## NACHTRAG 16.08.2026 -- KON84: F6/#54-AKTIVIERUNG A1-A3 VOLLZOGEN -- ROTATIONS-TURNUS SCHARF (naechster Lauf 01.09. 04:03Z)
 
     A1: Project-Access-Token id=99 (comdare-writeback-rotate-r20260816,

@@ -1379,3 +1379,8 @@ TEIL 33 — OP-RUNDE (16.08., VERBATIM): "OP-1 jetzt entscheiden und explorieren
 bestaetigen, OP-4 Ja genau, also unabhaengig wie empfohlen NUR fuer die
 Sonderfaelle der Dualitaet zwischen Mess-Achse und System-Achse, OP-5
 bestaetigen"
+
+================================================================================
+TEIL 34 — OWNER 16.08. (VERBATIM): "i{pmc} ja und bitte erweitere die Syntax
+in der Dokumentation, sodass diese Form der interface Erweiterung auch im
+allgemeinen Fall bei Vertraegen zwischen Traeger-Stufen gilt."
