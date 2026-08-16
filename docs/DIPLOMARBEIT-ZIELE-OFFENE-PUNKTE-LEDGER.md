@@ -16,6 +16,41 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON91: P1-VOLLBILD KOMPLETT (artifacts/binaries+measurement-Wurzeln, full-join-Spalten ab ma) + C-3a=JA (#38a2 FEST IM W1-BUMP-BUENDEL) -- KONTEXT-ENDE, UEBERGABE GESCHRIEBEN
+
+### KON91-01 -- P1-VOLLBILD (Owner verbatim Teil 37; ergaenzt KON88/KON89)
+
+    BAUM-ORDNUNG VOLLSTAENDIG: (1) ZUERST der Gattung+Genus-Baum im
+    Buildsystem-Ziel; (2) DARUNTER je Genus-Tier-Binary der eigentliche
+    Lagerbaum; (3) WURZEL-WAHL per XML: gemeinsam 'artifacts' ODER
+    getrennt 'binaries'+'measurement' VOR dem Gattung+Genus-Baum
+    (getrennt = DEFAULT); (4) Binaries-Seite: die Binary ueber alle
+    Achsen; Messwerte-Seite: die xlsx-Baum-Wurzel (w/ma/mi-Hierarchie
+    nach KON88), die per FLACHEM CSV-Splitting weiter auffaechert (CSVs
+    analog zu den zerteilten Sheets sortiert -- deckt sich mit D3/KON89).
+    SPALTEN-REGEL: ab der ma-Ebene tragen ALLE Sheets ALLE moeglichen
+    Parameter inkl. PMC -- als FULL JOIN der jeweils spezifischen
+    ACHSEN-ERFOLGS-PARAMETER aus der mi-Ebene der einzelnen Achsen-
+    Interfaces (mi misst nur die eingeschraenkten Erfolgs-Parameter
+    seiner Achse). SHEET-REGEL: EIN Sheet je Unter-Achse gilt JE der 3
+    Ebenen w/ma/mi, SOFERN die Unter-Achse in der Messung verfuegbar ist.
+    EXPLORE-AUFTRAG (10 Wochen, geplant+dokumentiert): der full-join-
+    Mechanismus mi->ma (Achsen-Erfolgs-Parameter -> Gesamt-Spaltenmenge)
+    -- ERSTER POSTEN DES NAECHSTEN KONTEXTS (mit Arena-Explore
+    wf_eebc8294 zusammenfuehren, der laeuft/lief zum Kontext-Ende).
+    "Ansonsten alles korrekt verstanden, volles GO."
+
+### KON91-02 -- C-3a ENTSCHIEDEN: JA ("geau so wie empfohlen")
+
+    Tripwire ausloesen + durch den Orchestrator-Weg ersetzen
+    (aggregate_required_for_axes, per-Binary genau, D3.4 unberuehrt) als
+    EIGENES PAKET IM EINEN W1-BUMP-BUENDEL: #15/S-6 (Format 4->5, Layout
+    6->7) + #38a2 (Comp-Gate-Stempel organ_stamp_line JE COMP -- Memory-
+    Only verliert Disk-Suffix) + #38d (Budget-Konstanten) = EIN Bruch vor
+    F2 (Fr 21.08.). Frist Mi 19.08. ERFUELLT, Fallregel 18.6(3)
+    GEGENSTANDSLOS. Schaltet Comp-Gate-VOLLBAU frei (KON45-02/KON47-03);
+    fuegt sich mit ORG-19-IO (KON80/V10): erste required-Deklaration =
+    Festplatten-IO-Meta-Meta.
 ## NACHTRAG 16.08.2026 -- KON90: V9-EINARBEITUNG = NULL-BEFUND MIT DOPPELTER GEGENPROBE -- SEITENLINIE VOLLSTAENDIG ABSORBIERT, NICHTS FEHLT
 
     D2-Vollzug (Owner-GO "Zeige mir das Ergebnis hier"): Die Owner-

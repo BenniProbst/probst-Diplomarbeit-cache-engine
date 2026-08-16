@@ -1446,3 +1446,28 @@ Unter-Achsen Fahrten unter einem Ordner je sheet einer xlsx unter einem
 weiteren Gesamt-ordner der analogen xlsx selbst mit allen sheets, die
 finalen csv ausgegeben werden."
 D4 (id56-Explore->id18-Vorlage, node6 autonom): "Freigabe."
+
+================================================================================
+TEIL 37 — OWNER 16.08. SCHLUSS-RUNDE (VERBATIM): P1-VERVOLLSTAENDIGUNG + C-3a=JA
+================================================================================
+P1-VERVOLLSTAENDIGUNG: "es [gibt] im Buildsystem Ziel erst den Baum
+Gattung+Genus, darunter den eigentlichen Lagerbaum je Genus Tier-Binary
+(diesen ausserdem wahlweise per XML gemeinsam fuer Binary und Messwerte mit
+'artifacts' Wurzel oder getrennt mit 'binaries' und 'measurement' Wurzel vor
+dem Gattung+Genus Baum (default)), dann folgt bei den Binaries einfach die
+Binary ueber alle Achsen und bei den Messwerten die Wurzel des xlsx Baumes
+wie durch dich beschrieben, welcher durch ein flaches splitting in CSV noch
+weiter auffaechern kann, um die CSV analog zu den zerteilten xlsx sheets zu
+sortieren. Hierarchisch ist in den Plaenen bereits exakt w/ma/mi dokumentiert
+und die Zergliederung in zu den Blaettern hin immer feinere Ausfuehrungs-
+bestandteile des Gesamt-Experimentes erklaert. In den Spalten aller sheets ab
+der ma Ebene finden wir ALLE moeglichen Parameter, also auch die PMC
+Parameter, welche der full join aller Parameter jeweils spezifischen Achsen-
+Erfolgs-Parameter aus der mi Ebene der einzelnen Achsen-Interfaces ist
+(nochmal explore ueber 10 Wochen, das ist geplant). Ein sheet je Unter-Achse
+gilt fuer jede der 3 w/ma/mi Ebenen, sofern die jeweilige Unter-Achse in der
+Messung verfuegbar ist, weil ja die mi Ebene nur die eingeschraenkten
+Erfolgs-Parameter einer Achse messen kann. Ansonsten alles korrekt
+verstanden, volles GO."
+C-3a: "Ja, geau so wie empfohlen." [= Tripwire ausloesen + Orchestrator-
+Ersatz als eigenes Paket im W1-Bump-Buendel]
