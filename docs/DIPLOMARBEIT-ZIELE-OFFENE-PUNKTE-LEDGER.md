@@ -16,6 +16,56 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON83: OP-1 GESCHLOSSEN (Q-D/Q-E/Q-F 26.07. = DIE Entscheidung) + OP-2 HERLEITUNG FERTIG (i{pmc} BEDINGT-JA, wartet auf Owner-Ein-Wort)
+
+### KON83-01 -- OP-1 FESTGESCHRIEBEN: META-META-REKURSION SEIT 26.07. ENTSCHIEDEN
+
+    Die vom Owner gemeinte existierende Entscheidung ist die Layer-Modell-
+    Antwort Q-D/Q-E/Q-F vom 26.07.2026 (~13:51 UTC, Rohtranskript
+    backups/20260726-session-plaintext-verlauf/verlauf-32.txt:896;
+    kanonisiert 20260726-SESSION-layer-modell-antworten-QA-QF-*.md:40-52):
+    WOERTLICH "Q-D: Ja das Prinzip ist formal rekursiv, zum Beispiel bei
+    NVIDIA GPUs die als Cluster am PCIe haengen. Q-E: ... auf der obersten
+    Ebene und dann rekursiv je Layer Unterteilung. Q-F: Wir haben solche
+    Achsen noch nicht, aber es ist ein generell gueltiges Konzept und darf
+    bei Erweiterung ueberall zum Einsatz kommen." -> Rekursion FORMAL
+    UNBEGRENZT, gilt in ALLEN Realms inkl. system_meta_meta; am 26.07.
+    GEBAUT (hardware_meta_meta_axis.hpp:327-331 hub_depth_v ohne Maximum +
+    :369-375 static_asserts Tiefe 0-3 "die vierte Ebene braucht keine
+    einzige Zeile Code"; axis.hpp:27-31; anatomy_stamp_entries.hpp:716-719
+    Nested-Literal = das Owner-Q-D-Beispiel als Test). KORREKTUR am PMC-
+    Design Par. 6/MMR-1: "HIER NICHT ENTSCHEIDEN/offen" ist FALSCH
+    (Fehllesart aus Teil 21(b): "Rekursion bleibt offen" = strukturell
+    offen, kein Deckel — nicht "unentschieden"; Bestands-Pflicht-Verstoss
+    des 15.08.-Explores, Quellenluecke belegt). MMR-1 wird UMFORMULIERT:
+    "Rekursion in ALLEN Realms ERLAUBT und mechanisch vorhanden (Q-D/Q-F,
+    hub_depth_v, Stempel-Klammer-Tiefe); die PMC-Achse macht von ihr
+    KEINEN GEBRAUCH (Blatt per Design)" — Q-F ist ERLAUBNIS, kein Zwang;
+    die Entlastung "PMC braucht sie nicht" traegt. KEINE Grammatik-Sperre
+    gegen kuenftige tiefere Verschachtelung einbauen. OP-1 aus der
+    Vorlage GESTRICHEN (Festschreibung statt Frage).
+
+### KON83-02 -- OP-2 HERLEITUNG: i{pmc} FOLGT AUS DER DOKTRIN (BEDINGT-JA)
+
+    Subsumtion: (1) F-P3 (15.08., Teil 13): ima/imi kennzeichnen das
+    Aufzeichnungsinterface der vorangehenden Stufe gegen eingebaute
+    Messfuehler der nachfolgenden; "Wenn eine vorangehende Traeger-Stufe
+    das Interface der nachfolgenden nicht lesen kann, koennen keine
+    Messdaten zu diesem Thema erhoben werden." (2) Teil 17: Flags =
+    "Steuerungs- und Mess-Flaechen-Interfaces an den Zwischenvertraegen
+    ... deren Vorhandensein". (3) PMC-Zwischenvertrag traegt BEIDE
+    Flaechen (Mess: Aufzeichnungsinterface gegen PMC-Fuehler = exakt das
+    ima/imi-Muster; Steuer: Planer-Erkennung + AND-Freigabe F2/F-P8) ->
+    Tatbestand ERFUELLT, Token folgt als ABLEITUNG. Kein Ausschluss
+    (Negativsuche 0 Treffer ueber Ledger+Teile 1-33+beide Designs+G-1).
+    ABER: i{}-Alphabet heute abschliessend {w,ma,mi} (PM-15, Negativ-
+    Batterie "i{pmc} ROT bis Owner-Wort"); Owner hat 16.08. BEAUFTRAGT,
+    nicht entschieden -> Katalog bleibt zu bis Owner-Ein-Wort.
+    GRAMMATIK-KONSEQUENZ bei GO (additiv, E2): i-Alphabet {w,ma,mi,pmc};
+    'pmc' innerhalb i{...} ATOMAR (keine Sub-Flags); dasselbe Literal
+    unter ZWEI Eltern eindeutig per Klammer-Bindung (R3), flaches 'ipmc'
+    ungueltig; i{pmc} hardware-/freigabe-bedingt (nicht "i.d.R. immer"
+    wie iw). OFFEN AN OWNER (Ein-Wort): i{pmc} JA/NEIN.
 ## NACHTRAG 16.08.2026 -- KON82: ULTRACODE-FORTSCHRITTSAUDIT 11.-16.08. KOMPLETT (wf_67540590, 21/21) -- VERLUSTLISTE LEER (51/51 VERORTET), 4 DOKTRIN-BEFUNDE, KON-INDEX VOLLSTAENDIG
 
 ### KON82-01 -- SUBSTANZ-BILANZ: NICHTS VERLOREN
