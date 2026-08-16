@@ -16,6 +16,86 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 16.08.2026 -- KON96: LEDGER-GEGENLESE KON1-59 KOMPLETT (5x Opus max + Fable-Synthese) -- 73 LEBENDE POSTEN (KORB A ERWEITERT DAS F2-BUENDEL UM 14), 18 W-MARKER-AUFTRAEGE, 3 OWNER-FRAGEN
+
+**Quellen: wf_750a0423 (6/6; 5 Opus-5-max-Leser ueber KON59-36 + Konsolidierung
+IV/III/II vollstaendig, ~1,05M Tokens; Fable-max-Synthese gegen den Kopf
+KON60-93). VOLLKARTE VERBATIM: docs/sessions/backups/20260816-folge-bu-
+kontext9/ledger_gegenlese_karte.md (166 Z., Koerbe A-D einzeln mit Ankern).
+KON96 vorher 0 Treffer. Owner-Auftrag 16.08.: "wenigstens mit einem Agenten
+Opus 5 max alles von KON1 bis 59 gegen die uebrigen KONXXX gegenlesen".**
+
+### KON96-01 -- BILANZ + KORB A: 14 POSTEN ERWEITERN DAS EINE F2-BUMP-/GOLDEN-FENSTER
+
+    BILANZ: ~230 Roh-Befunde -> 73 konsolidiert (A 14 F2-wirksam · B 20
+    W2-Buendel · C 15 Trigger/W3 · D 24 ohne Frist-Anker); Kopf-Deckung der
+    Altsubstanz nur ~50%, bei den geschlossenen Doktrin-Bloecken (Kanal
+    KON50-54, MeasureStorage, Emissions-Doktrin, Vollbau-Gate, Steuerdocks)
+    NULL -- die Karte ist ab jetzt PFLICHT-BEILAGE jeder W1/W2-Bau-Planung.
+    KORB A (alle -> #15-Buendel, Task nachgefuehrt): (1) 10. Stempel-Glied
+    Hybrid-Map-Zeile, GliedCount 9->10 (KON45-01/KON5-04); (2) Preimage-
+    Budget kAnatomyFingerprintPreimageMax=4096 heben MIT Beleg (KON45-01/5);
+    (3) Synthese-Key-Grammatik + Map-VALUE=Tier-SHA + RT<=CT-Invariante
+    (KON45-01/6+KON47-02); (4) VOR dem Bruch entscheiden: Glied-FOLGE +
+    AxisKind-Ordnung im SELBEN Bruch mitnehmen (KON5-04/05 -- sonst steht
+    der teuerste Bruch spaeter erneut an); (5) work_mode-Enum-Umbau Debug
+    raus/Build rein, kWorkModeCount=4 (Z13694); (6) Stufe/Phase-Umbenennung
+    preimage-wirksam (KON16-09); (7) E-1-Heuristik-Rekursions-Felder Tiefe+
+    Stufen-IDs im Stempel (Z15504); (8) prod2-Registry-Umbenennung (Z15650);
+    (9) FullJoin-MergeStrategy UMBENENNEN (Namens-Kollision mit KON91-Full-
+    Join; KON30-02); (10) S-6-Schnitt-Inhalt komplett inkl. VERBOTSZONEN
+    (KON21-03/KON20-02); (11) 5. ABI-Symbol Stempel: OPTIONAL -> PFLICHT
+    (KON7-01); (12) B3 = Umzug der SCHALTER-HOHEIT, kein Instrument-Umzug
+    (KON37-01); (13) EISERNE REGEL bis zum Fenster: nichts unter axes/
+    topics/ heuristik/ (KON58-05); (14) KEINE 123 Literal-Bumps einplanen
+    (KON58-05-Korrektur: nur Stempel-UNTERSTUETZUNG gefordert).
+
+### KON96-02 -- KOERBE B/C/D IN DIE TASK-KARTEN + W-MARKER-AUFTRAG
+
+    KORB B (20) -> #18/#57/#20/#24/#3-Design-Grundlage: Kanal-Doktrin-Naht-
+    Schablonen (KON50-54), MeasureStorage-8-Festlegungen + variadische
+    Durchreich-Luecke (Z15143ff/Z14855ff), Lagerbaum-Wurzelebenen (K1),
+    Bestandslog-Restliste (LAG-P2), Emissions-Doktrin fuer S-12, 4. Ebene =
+    SPALTE der Macro-Stufe (K5), B1/B4-Design (KON37-02/03, KON34/KON40-02).
+    KORB C (15) -> #7/#13 + Betriebs-Tasks vor Trigger/W3: KON22-VOLLBAU-
+    GATE als Vorlage VOR dem Trigger; HEAVY-Signal senden; Deckel-Rechnung
+    16W; T-15x KF-10 = 9 Messungen je Zelle (Mess-Phase VERDREIFACHT, in
+    check-size + S-19); Warmup-PAAR run_observable_perm; Drift-Gate OHNE
+    Debug-Ausnahme (sonst ab 29.08. JEDE Zelle rot -- Paket mit T-15/D4 VOR
+    W3); Messung NICHT zweilanig (resource_group hart amd -- Bau-Posten vor
+    W3); Skip-Oekonomie W12-B; Bestandslog-SKIP-Wache; MinIO-Ebene-B-Beweis.
+    KORB D (24) -> W2-Triage-Block neben #71 (u.a. S-3-Kombibau nie gefahren,
+    KON58-Fesseln/Lande-Ordnung, C-4-Wache 6/152, Compiler-System-Achse,
+    15-Stationen-Kette [8er-Memory korrigieren], PUBLIC-GANG-Buendel,
+    Konformitaets-Register 17%, neun lebende Streichlisten-Posten Z16345).
+    W-MARKER-AUFTRAG (Doku-Posten W2, nicht blockierend): 12 Widersprueche
+    per juengerem Owner-Wort + datiertem Marker AM ORT aufloesen (W2-Nenner,
+    W3-Ebenen, W4-Lastsequenz, W5-Systemachsen-Menge, W6-HW-Erkennung,
+    W7-Parallel-Deckel, W10-debug-Ende, W11-Change-Date 10.08.2031, W12-
+    Dock-32, W15-Repo-Rollen, W16-checkpoint_measure, W18-merge-Zeile
+    AUSTRAGEN [Ledger:8941 fuehrt verbotenen Gegenstand als offenen Bau --
+    Trigger-Risiko]); 5 per Explore (W8 S-12-Naht, W9 Lager-Inhalt, W13
+    CEB-Erreichbarkeit nach B2, W14 T17-vs-ORG-19, T-15-Granularitaet).
+    W17 ENTLASTET ohne Explore: KON60-11(3) loest BEFUND 3 auf --
+    pre-secret-scrub-20260802 = owner-autorisierte 10.08.-Loeschung (A-1
+    "volles GO", Z.35912, OHNE Bundle-Auflage; Bundle war nie Teil der
+    genehmigten Empfehlung), w3-thesis-c = ANDERES Objekt (Thesis-rescue,
+    16.08. MIT Bundle geloescht, KON93-01) -- kein Widerspruch.
+
+### KON96-03 -- DREI ECHTE OWNER-FRAGEN (kein Explore loest sie; naechstes Owner-Fenster)
+
+    (a) KON3-03 XML-WACHE: zwei nachweislich unbeobachtbare Zweighaelften
+        der XML-Wohlgeformtheits-Wache -- ist die Teilabdeckung ZULAESSIG
+        (deklarierte Grenze) oder Bau-Auftrag? (seit Wochen unbeantwortet)
+    (b) KURVEN-STACK (E-5 + K4, Z16005/Z15076): kanonischer Statistik-/
+        Kurven-Stack der Auswertung festlegen (sonst entscheidet der
+        Aufraeumpass implizit) + das nie gestellte K4 (mess/-Subsystem ohne
+        S-Position) -- GETRENNT vorzulegen.
+    (c) REGISTRATION-TOKEN-RESET (KON58-04): je Projekt vs. instanzweit --
+        Infra-Entscheid.
+    BEDINGTE Kandidaten erst nach Explore: W8/W13/W17-Klasse (W17 bereits
+    entlastet), 24-vs-48 (nur falls S-19 sie nicht determiniert), Z16388-
+    Entscheide (D-5, CEB-38, CEB-Identitaet A/B, variant-Ausnahme).
 ## NACHTRAG 16.08.2026 -- KON95: O1-O3 ENTSCHIEDEN (Owner verbatim) -- O3 KORRIGIERT DIE EMPFEHLUNG: DEFAULT = FEINGLIEDRIG DISJUNKT MIT LEER-ZELLEN, GLOBAL-UNIFORM NUR ALS XML-OPTION
 
 **Quelle: Owner-Nachricht 16.08. (nach KON94-Vorlage), verbatim unten. KON95
