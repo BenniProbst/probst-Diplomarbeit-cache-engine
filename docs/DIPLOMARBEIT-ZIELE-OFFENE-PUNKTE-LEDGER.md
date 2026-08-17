@@ -16,6 +16,87 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG C (KON100) -- 17.08.2026: Zehn-Wochen-Explore der V-Fragen (13 -> 12 verengt, 8 Streichungen) + s13-Lens-Zyklus + HY-A-Dual-Lens + VL-5-Buchungen VOLLZOGEN
+
+### KON100-01 -- ZEHN-WOCHEN-EXPLORE OWNER-VORAB-15 (Owner-Ruege 17.08. "Hast du alle Fragen
+    vorher mit einem 10 Wochen explore geprueft?" -- Antwort war NEIN; nachgeholt per A2.3)
+- wf_e129dbb8 (4x Sonnet 5 max very thorough disjunkt + Fable-5-max-Synthese; 1,13M Tokens,
+  309 Tool-Calls): super-Ledger VOLLSTAENDIG (30214 Z.) + Plaene + Sessions + 17.08.-Backups +
+  Code am Objekt + unverlinkte Memories (Volltext fuer V-09..V-13, Schluesselwort-Grep ueber
+  alle 323 fuer den Rest). ERGEBNIS: 13 Kandidaten -> 1 komplett gestrichen, 7 Haelften
+  gestrichen, 12 VERENGTE Rest-Fragen. Praesentierfaehige Fassung GELANDET:
+  docs/sessions/20260817-OWNER-VORAB-15-restfragen.md (ersetzt die 13er-Liste als Vorlage).
+- STREICHLISTE (je mit Beleg; S7/S8 zusaetzlich per Stichprobe am Roh-Text BESTANDEN):
+  S1 V-07 KOMPLETT entschieden: KON7-08 (11.08., :10333) "Basisform mit Strategy Builder
+     Pattern ... ist Pflicht" + KON7-01 (:10163) "SEPARAT ABI STABIL" -- die Export-ODER-CRTP-
+     Dichotomie war eine Fehlstellung, der Owner legte BEIDES auf verschiedenen Ebenen fest;
+     Rest = autonomer Erbinnen-Bau nach P4/P5 (K3).
+  S2 V-01-Haelfte Glied-FOLGE: KON21-03 (12.08., :7695) "Ja genau, meint auch #87 und #78";
+     KON96/KON97 zitierten nur die stale KON5-Quelle (Gegenstand vor Nummer).
+  S3 V-03-Haelfte Makro-Signatur: dieselbe KON21-03-Stelle; #87 = Makro-/Argumentfolge
+     (:5792, :7792); Owner kannte die golden-Kosten VOR der Zustimmung (:10700-10703).
+  S4 V-05-Dichotomie: F7 (06.08., :24627) legt CT-Name + eigenes Stempel-Interface fest;
+     nur die VERORTUNG bleibt (V-05R).
+  S5 V-08-OB: KON2-06 (10.08., :11587-11589) "Fingerprint SHA wie alle Planer/CEB/Tier-
+     Binary/Hybrid-Tier-Binary" + "Das ist jetzt alles korrekt."
+  S6 V-09-VORHER-Beleg: Code hat "Messung schlaegt Planung" vollzogen (machine_identity
+     :191/:250); keine Owner-Frage mehr.
+  S7 V-10a avx512 -- EMPFEHLUNGS-UMKEHR: Owner-KERN 26.07. verbatim "AVX512 GEHOERT MIT ...
+     Das golden-Profil hatte avx512 faelschlich als 'nicht universell' herausdefiniert -- das
+     ist der Filter, der ENTFAELLT" (Memory project_achsen_neuordnung...:88-93, STICHPROBE am
+     Roh-Transkript 46375cdc BESTANDEN: Wortlaut literal; korroboriert durch Owner 10.08.
+     CEB-Reihe 12 = 4 opt x 3 simd). Die fruehere Vorlage-Empfehlung "kein AVX-512 in golden"
+     war FALSCH HERUM. 2 stale XML-Stellen -> Korrektur-Posten K1.
+  S8 V-11-Haelfte Weg a: Owner verbatim 06.08. vormittag-50 (:24722-24727, STICHPROBE am
+     Ledger-Rohtext BESTANDEN) "F3: Bitte sauber die fixture nachziehen und am besten nochmal
+     gruendlich planen" + fertiger 689-Z.-Plan (20260806-PLAN-scheibe6-weg-a). Die r4-Karte
+     uebersah die Antwort (Ledger umgekehrt-chronologisch: spaetere Nachtraege bei
+     NIEDRIGEREN Zeilennummern -- Fallen-Register-Kandidat).
+- AUTONOME POSTEN K1-K6 (aus den Streichungen): K1 golden-XML-avx512-Filter-Korrektur
+  (Wirksamkeits-Pruefung VOR Edit; wirksamer Filter = golden-Inhalt = V-03R-Buendel) - K2
+  Weg-a-Plan umsetzen (Koordination mit K1, dieselbe Fixture, NIE parallel) - K3 Erbinnen-Bau -
+  K4 Vorlage-Wortlaut-Korrektur (in Rest-Vorlage vollzogen) - K5 gruppe6-Namens-Skizze
+  verworfen (Name = Funktion des Fingerprints, :24628) - K6 = diese Buchung (KON96/97-V-01-
+  Stale + Muster: 3x uebersehenes Juenger-Material S2/S7/S8).
+
+### KON100-02 -- s13-DESIGN: LENS-ZYKLUS (A2.5 rekursiv, Stand Runde 2)
+- Erst-Lens wf_100fa0b3 (Fable 5 max, 231k Tokens): TRAEGT_MIT_FIXES, 4 MUSS + 8 SOLL + 1 KANN.
+  Kern-MUSS: (1) Arena-Ueberlauf-Semantik gegen KON93-02/KON94-02 (P2-Wort 16.08.: volle
+  Mess-Arena = harter Abbruch; das Design hielt T-12c(3)-Weiterlauf fuer richtig -- Rangfolge
+  OWNER > PLAN); (2) sechs Di-25-FJ-Posten fehlten komplett (Zwei-Modi-E4, uniform-Schalter,
+  FJ-1/FJ-2, Join-Ort, KON91-01-Wurzel-Wahl); (3) S13-18 zementierte Wurf am xlsx-Limit gegen
+  KON88-P2 (Folge-Blaetter); (4) result.csv-Resume-Arbiter ungeschuetzt.
+- Fix-Runde des Autors (s13-design): 1222 -> 1559 Z. (+337). Folge-Lens wf_f81878a9: 12/13
+  BEHOBEN (alle Ledger-Zitate verbatim korrekt, IST-Anker am Objekt nachgemessen), MUSS-4
+  TEIL-BEHOBEN. Restliste Runde 2 (laeuft): NEU-M1 (W5 in S13-27 widerspricht dem Resume-
+  Vertrag -- Ein-Satz-Fix), NEU-S1 (X-9 Inertness-Wache + Wurzel-Ordnungs-Frage K1-09.08. vs
+  KON91-01-16.08. MIT Traeger ausweisen), NEU-S2 (S13-18-Doppel-Residuum 6(4)/Slot-Summe),
+  NEU-S3 (Stale-Ueberlauf-Reste 1.1/7.1 + 7.3-Einfuege-Fehler), NEU-K1 (X-8-Koeder).
+  Landung erst nach TRAEGT des Kurz-Verify.
+- FOLGE-BUCHUNG: Designplan Par.12 T-12c(3) traegt jetzt den UEBERHOLT-Marker (dieser Zug).
+
+### KON100-03 -- HY-A-BAU: DUAL-LENS (Opus 5 max erhebt + Fable 5 max bewertet, wf_be439c1e)
+- URTEIL TRAEGT_MIT_FIXES; KEIN Konzept-Fehler: Registry/Factory/Array/Parser folgen SOLL-
+  Design + K2 Option a; A-13/Overlay/S-14a-Lock/golden am Objekt NACHWEISLICH unberuehrt
+  (overlay_source_set:201 = Verzeichnis-Join "anatomy", anatomy_drive ist Geschwister; Lock
+  0 Treffer); Concepts nicht aufgeweicht; ODR/Include-Zyklen/ABI-Beruehrung negativ gejagt.
+- 2 MUSS: F-1 Floor-Nachzug fehlt (Zweig heute CI-rot, Guard Exit 4); Fable-Lens korrigierte
+  die Opus-Fix-Zahl -- die 498 aus dem PRUEFLINGLOSEN build-hy einzutragen wiederholte exakt
+  die 16.08.-Fehlkalibrierung; gueltig NUR Live-Messung in der covguard-Form MIT
+  -DCOMDARE_CE_PRUEFLINGE (Arithmetik-Erwartung 499/495/493). F-2 K2-CMake-Verkabelung ist
+  unexerziertes No-Op (ce_anatomy_drive NULL Konsumenten; if(TARGET)-Waechter reihenfolge-
+  fragil -> harte target_link_libraries). Dazu 4 SOLL (Wachen-Scope anatomy_drive, max_docks-
+  Deckel, genus_fehlt-Status, Zonen-Wache kommentar-fest/Stellen) + 5 NOTIZen. Fix-Runde
+  F-1..F-11 liegt beim hy-a-bau-Agenten (Owner-Dauerregel: alle Funde in derselben Runde);
+  danach Folge-Lens, dann Landung (Owner-Hinweis 17.08.: parallel gebaut, Landung separat).
+
+### KON100-04 -- VL-5-DOKU-BUCHUNGEN VOLLZOGEN (dieser Zug; Bauplan VL-5 a-e komplett)
+- (a+b+d) Wellenplan Par.19.1: PRAEZISIERUNGS-Absatz vor Par.19.2 -- VS-A..VS-F entschieden
+  07.08. (E-B=(i), faehrt im #15-golden-Ereignis), r3 A1/A3 geheilt, O-2 am Objekt geheilt
+  (Option-A/B gegenstandslos), all_axes erledigt 08.08., V-07 entschieden, G-5 -> V-12.
+- (c) Vorlage 20260807-OWNER-VORLAGE-stopp-gates: HISTORISCH-Vermerk im Kopf.
+- (e) Wellenplan Z.2193: Par.18.8-Ueberschrift vom P3-Fessel-Text getrennt (Umbruch-Defekt zu).
+- (+) Designplan Par.12: T-12c(3)-UEBERHOLT-Marker (KON93/94-Owner-Linie, s13-Lens MUSS-1).
 ## KONSOLIDIERUNG XCIX (KON99) -- 17.08.2026: CI-Heilung 15941 + Owner-Vorlagen-Landung + Buendel-Synthese #15 + HY-A-Baustand + Voll-Einlesung Kontext
 
 ### KON99-01 -- super-CI-ROT 15941 GEHEILT + CI-BEWIESEN (A2.5-Fix der golden-Fenster-Landung)

@@ -1,5 +1,12 @@
 # OWNER-VORLAGE — die sechs STOPP-Gate-Entscheide E-A bis E-F
 
+> **HISTORISCH (Vermerk 17.08.2026, VL-5c/KON100):** Dieses Frage-Dokument ist BEANTWORTET —
+> alle sechs Buchstaben wurden am 07.08. abend-23 entschieden (Ledger :27970-27979; E-A =
+> SHA-256/64 Hex, E-B = Variante (i) mit Owner-SETZUNG "Wir brechen golden-CRC!" — der Owner
+> ueberstimmte die Empfehlung b/ii/a/a/a/a in ZWEI Buchstaben). E-E/E-F sind am Objekt
+> vollzogen; die Ausfuehrung von E-A/E-B/E-C/E-D lebt im #15-Buendel (BUENDEL-BAUPLAN-15.md).
+> Nicht mehr als offene Vorlage verwenden.
+
 **Stand 07.08.2026 nachmittags.** Gegenstand: `docs/plaene/20260806-PLAN-versionierungs-interface-stempel.md`
 Sec. 5.2 (Zeilen 648–653). Diese sechs Entscheide blockieren den Owner-KERN **F7 = Option b**
 (gesondertes Versionierungs-Interface + CT-Namensfunktion, Owner-Verbatim `LEDGER:6629`).

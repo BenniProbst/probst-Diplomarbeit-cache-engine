@@ -641,6 +641,15 @@ kein Alloc, kein I/O, EIN Deskriptor-Verweis statt Achsen-Kette (Allokations-Ver
 Koeder: eine Aggregations-Allokation wird ROT); (5) IN-ohne-OUT-Invariante je (Prozess, Thread,
 Interface) als Auswerte-Wache (r5 A12/N-6).
 
+> UEBERHOLT-MARKER 17.08.2026 (KON99/KON100, s13-Lens MUSS-1): Pflicht (3) "Ueberlauf = BEFUND:
+> weiterlaufen + zaehlen + beim Auslesen melden" ist durch die JUENGERE Owner-Linie ueberholt —
+> KON93-02/KON94-02 (P2-Owner-Wort 16.08. verbatim: "Der harte Abbruch kann also nur am RAM Limit
+> sterben, wenn die Mess-Arena voll ist"): volle Mess-Arena = HARTER ABBRUCH, failed ohne Retry,
+> Arena-Bestand persistieren; das gebaute "zaehlen+weitermessen" ist DER Kern-Delta ("heilen auf
+> fest+Abbruch"). Der Koeder-Teil "still verworfene Zeilen werden ROT" bleibt gueltig; der
+> Weiterlauf-Teil ist zu ersetzen (Rangfolge OWNER > PLAN). Geltende Fassung: s13-Design
+> 20260817-DESIGN-s13-buendel-di25.md S13-05/S13-07.
+
 **T-12d — FULL-JOIN-SCHEMA-TESTS (FJ-1..FJ-10)** (KON91/KON94/KON95): GEZAEHLTE Pflichten:
 (1) Spaltenmenge E(A) = kV3AxisSchema + seg_* (KON95-O2) mit BEZUGSGROESSE: Summe der 19
 Organ-Segmente + seg_framework_ns == seg_run_total_ns (an golden-Daten verifiziert); Koeder:

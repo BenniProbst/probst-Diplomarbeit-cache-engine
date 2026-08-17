@@ -2190,7 +2190,9 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
     P1  vor P2   simd_build_gate-Kopplung                      => S-3-Landung VOR S-7-Bau
                  (beide im selben Worktree wt-ce-mess-ordnung — ein Schreiber)
     P3  vor P5   anatomy_module_abi_v1_decl.hpp                => EIN Schreiber; alle decl-
-                 Aenderungen (Layout 7, #38d, S-6a-POD) fahren im EINEN Bump-Buendel-Slot## 18.8 NACHTRAG 15.08.2026 -- TASK-EINSORTIERUNG #60-#74 + NEUE OWNER-DOKTRINEN (KON71-KON73)
+                 Aenderungen (Layout 7, #38d, S-6a-POD) fahren im EINEN Bump-Buendel-Slot
+
+## 18.8 NACHTRAG 15.08.2026 -- TASK-EINSORTIERUNG #60-#74 + NEUE OWNER-DOKTRINEN (KON71-KON73)
 
 > Fortschreibung von §18.2-18.7 nach der Owner-Entscheide-Serie 15.08. (KON71-KON73).
 > Klassen-Regel §18.1 unveraendert. Die Fessel P6-vor-P4 ist per KON70-01 KORRIGIERT:
@@ -2274,6 +2276,20 @@ Owner-Frage G-5/C-7 (r1 A13, r4 C-7) · all_axes_golden.profile.xml nicht wohlge
 Ausnahme entfernen (r3 A12) · F5-Owner-Halbsatz: XML-Syntax/Semantik + Planer-Interpreter (r3
 A15) · telemetry-silent-Wiring golden-gebunden (r4 A-01) · stale Kommentar
 bestandslog_document.hpp:22-26 faellt (r1 A28).
+
+PRAEZISIERUNG 17.08.2026 (VL-5-Buchung, KON99/KON100; Belege BUENDEL-BAUPLAN-15.md Abs.8 +
+Zehn-Wochen-Explore wf_e129dbb8): Die vorstehende Zusatzliste traegt KARTEN-Staende, die am
+HEAD ueberholt sind — (1) VS-A..VS-F sind ALLE SECHS seit 07.08. abend-23 ENTSCHIEDEN
+(Ledger :27970-27979; E-B = Variante (i), Owner-SETZUNG "Wir brechen golden-CRC!"); offen ist
+nur die AUSFUEHRUNG A/B/C/D; E-B faehrt AUSDRUECKLICH im #15-golden-Ereignis (gruppe7-Pflicht,
+C7-Warnung: sonst zweiter golden-Bruch nach F2). (2) r3 A1 (kCebFingerprint) + r3 A3
+(COMDARE_MEASUREMENT_ON) sind GEHEILT 06.-07.08. (62a5b6f7 / 2e1f9c1d). (3) O-2 ist AM OBJEKT
+GEHEILT (Glied [5] traegt cxx/opt/build_type, Glied [6] = bvset) — die Option-A/B-Frage ist
+GEGENSTANDSLOS. (4) all_axes_golden '--' + Flag (r3 A12) ist beidseitig ERLEDIGT seit 08.08.
+(ce 90a31961, super 2983e9ba). (5) Versionierungs-Interface: KON7-01/KON7-08 (11.08.) legen
+ABI-Aussenflaeche UND CRTP-Basisform-Pflicht fest — V-07-Frage entschieden, Rest = autonomer
+Erbinnen-Bau. (6) G-5/run_methodology bleibt echte Owner-Frage (V-12 der Rest-Vorlage
+20260817-OWNER-VORAB-15-restfragen.md, dort auch die uebrigen 11 Rest-Fragen).
 
 ## 19.2 KORB B → DAS Di-25.08.-BUENDEL (#18 S-13 + Arena + #57 Lager + Naehte; 20 Posten)
 
