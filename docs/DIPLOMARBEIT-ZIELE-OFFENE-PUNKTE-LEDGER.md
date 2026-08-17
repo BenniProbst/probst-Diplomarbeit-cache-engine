@@ -16,6 +16,89 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CIX (KON109) -- 17.08.2026 abends: E-5-SYSTEM-KERN (Owner-Antwort
+## Frage 2 VERBATIM) + SAUBERE PAUSE -- WELLE 1 GELANDET (lokal), ALLES GESICHERT
+
+### KON109-01 -- OWNER-KERN FRAGE 2 VERBATIM (die Konsumkette des EINEN Systems)
+- Owner verbatim (17.08. abends): "Der measurement_curve_loader ist das Puzzleteil,
+  das aus bereits bestehenden Mess-Parametern, wobei in der XML auch bestimmte zu
+  optimierende Messwerte gewuenscht werden koennen, zeitliche Kurven ueber die echten
+  Messwert-Parameter der w/ma/mi Ebenen ermittelt und synthetisiert. Das hier scheint
+  mir also der korrekte Einstiegspunkt fuer die Funktions-Synthese zu sein. Es kann
+  multiple Schnittepunkte geben, die dann also Bereiche erkennen lassen, in denen das
+  eine Tier-Binary fuer eine Last staerker ist als ein anderes. Dieser Vorgang ist
+  sehr rechenaufwaendig, weil faktisch jede Parameterklasse einer Tier-Binary als
+  Funktion synthetisiert und gegen alle anderen Tier-binaries verglichen werden muss
+  - uebrig bleiben die Bereiche je Parameter-Wert fuer die eine bestimmte Tier-Binary
+  unter der Vorgeschichte eines bestimmten inneren Zustandes (tracing der Operationen
+  auf den Genus-Interfaces und Achsen-interfaces) am besten geeignet ist. Da es dann
+  je Parameter diese Abschnitte gibt, fragt sich, wie die einzelnen Parameter zu
+  gewichten sind fuer die Gesamtperformance (Anwender kann das default in der XML
+  ueberschreiben) und daher ergeben sich ueber den gesamten Mix aller Parameter
+  Bereiche zusammengezogen auf eine Linie eine Punktemaessige Ueberlagerungsbewertung
+  des besten Gesamt-Algorithmus ueber multiple Streckenabschnitte -> das ist der
+  curve_fit der eigentlich den ersten Teil konsumieren sollte, weil ohne
+  Funktions-Synthetik die curve fit nicht auswertbar sind. Der Hybrid macht nichts
+  anderes, als den vorbereiteten curve_fit fuer das Laden der fuer eine heuristisch
+  gemessen/erkannte Last, die optimalen und top-ranking 32 Tier-Binaries in seine
+  Pruef-Docks zu laden und je Last-Vorbedingung und geschaetztem benoetigten Profil
+  anzusprechen. Und da kommen wir zur Komponente 3, welche genau den curve_fit
+  konsumiert und die beste binary dann aus der synthetisierten Bereichs-linie (aus
+  der Berechung der ranking Parameter-Bewertungs-Schnitte) immer das passende Binary
+  auswaehlt und abwaegt, ob sich die Latenz fuer den Wechsel von einem Pruef-Dock am
+  hybriden auf ein anderes Lohnt -> zu feingranulare Wechsel vermeiden. Es ist ein
+  System aus genau diesen 3 Komponenten, stelle gerne weitere Rueckfragen. Die
+  Vermutung war korrekt. Ich beantworte gleich weiter."
+- BUCHUNG: KONSUMKETTE Stufe 1 measurement_curve_loader(+Spline/BreakEven) =
+  Funktions-Synthese (XML-Ziel-Wunsch; All-vs-All je Parameterklasse; Bereiche
+  konditioniert auf Zustands-Vorgeschichte via TRACING der Genus-/Achsen-Interface-
+  Operationen) -> Stufe 2 curve_fit KONSUMIERT Stufe 1 (Parameter-GEWICHTUNG Default
+  + XML-Override; Ueberlagerung auf EINE Bereichs-Linie mit Streckenabschnitten) ->
+  Hybrid laedt vorbereiteten curve_fit (top-ranking 32 in die Pruef-Docks je
+  erkannter Last) -> Stufe 3 best_binary_selector-B KONSUMIERT curve_fit (Wahl aus
+  der Bereichs-Linie + WECHSELKOSTEN-ABWAEGUNG, zu feingranulare Wechsel vermeiden).
+  SECHS NEUE ELEMENTE gegenueber allen drei Designplaenen: XML-Ziel-Wunsch |
+  Zustands-Vorgeschichte als Kurven-Dimension | Gewichtungs-Default+Override | EINE
+  Bereichs-Linie | Top-32-Dock-Fuellung | Wechselkosten/Anti-Flattern (Naehe zu
+  KON97-M-2 FLATTERN + Hybrid-Mess-Schicht Reroute-Overhead). Die "Deprecate-
+  Kandidaten"-Lesart des 09.08.-Bauplans ist UEBERHOLT (kein Kanon-Wettbewerb,
+  sondern EIN System); Par.75-Sperre bleibt bis zum Unifikations-Design.
+- RUECKFRAGEN RF-A..RF-E an Owner GESTELLT (offen): A Tracing-Kanal = Observer/
+  Mess-Visitor-Bestand oder neu? Zustandsklassen diskret? | B Gewichtungs-Default
+  aus T-9-Katalog? | C Top-32 = Deckel, Docks bleiben bei <32 leer? | D Wechsel-
+  Latenz GEMESSEN von der Hybrid-Mess-Schicht (Reroute-Overhead) oder Konstante? |
+  E Laufzeit-Schnitt: Synthese+Ueberlagerung NUR zur Bau-/Auswertungszeit auf der
+  CEB, zur Laufzeit nur vorbereitete Strukturen -- bestaetigen. BU verbatim:
+  docs/sessions/backups/20260817-folge-bu-kontext11/20260817-e5-owner-kern-drei-
+  komponenten/.
+
+### KON109-02 -- SAUBERE PAUSE (Owner: "sichere alles abbruchsicher und pausiere
+### alles sauber") -- VOLLZOGEN
+- WELLE 1 GELANDET (lokal): development = 6a8cdc65 (Merges hy-a a4366cb8 / vl12
+  cd011e60 / vl3 7bf66ddd / k2 7a5ed464), 27 Commits vor origin, BEWUSST ungepusht
+  (A2.1a: Push erst nach Kombibau-Bilanz). Floor 500/496/494 DOPPELT bestaetigt
+  (zwei unabhaengige kalte covguard-Laeufe, byte-gleich; Doppelstart-Vorfall der
+  Lande-Inkarnationen selbst dedupliziert). TSan 5/5. ABBRUCHSICHERUNG: Bundle 35M
+  (verify "is okay", development + 4 Bau-Branches) im Folge-BU-Kanal.
+- ALLE PROZESSE BEENDET: Workflows gestoppt (wf_b5b4ac36 resumierbar 17/22;
+  wf_e06c7f73 komplett), Kombibau-Schleife dreistufig gekillt -- deren ctest-Logs
+  sind KILL-ARTEFAKTE ("490 failed" = ctest gegen halb gebauten Baum, KEIN Befund;
+  4-Zellen-Bilanz = Wiederanlauf-Schritt 1), Platten-Monitor aus, Slots leer, 26G.
+- UNCOMMITTED GESICHERT: Floor-Nachzug im Hauptklon (2 Dateien, Diff in BU; Commit
+  nach gruener Bilanz) + hy-a-Kommentar-Zeile (Diff+Volltext in BU).
+- FOLGE-BU-KONTEXT11: 18 Ordner / 53M nach docs/sessions/backups/
+  20260817-folge-bu-kontext11/ (alle Tages-Berichte, Bundle, Diffs, Kombibau-Logs,
+  Owner-Kern-Verbatims, Talos-Explore Korpus+Web+Live). Journal-BU = T-NEU-4 beim
+  Wiederanlauf (Journale liegen persistent unter ~/.claude, kein /tmp-Risiko).
+- HANDOVER: docs/sessions/20260817-SESSION-UEBERGABE-pause-welle1-gelandet-
+  ungepusht.md (Wiederanlauf-Rezept 7 Schritte, bindende Reihenfolge).
+- NEBENSTAENDE der Sitzung: Cluster T-NEU-12 ERLEDIGT (ee2f933) | ARBEITSWEISE v4.4
+  IN KRAFT (Umbrella 4117214) | KON107 CI 15961 + KON108 CI 15963 gruen | Talos-
+  Kenntnisnahme b' liegt (Task #87: Core-PMC-Zuschnitt, v1.13.x NICHT v1.14
+  [sandboxd, GA 27.08. = 1 Tag nach Trigger], perf_event_paranoid=3 live gemessen).
+- OFFEN BEIM OWNER: RF-A..RF-E | Frage 3 (mess/-S-Position, Erklaerung geliefert) |
+  R-1..R-5 (PV-4) | Kenntnisnahme b' (Widerspruch genuegt). Owner kuendigte weitere
+  Antworten an.
 ## KONSOLIDIERUNG CVIII (KON108) -- 17.08.2026 abends: OWNER-ANTWORTEN AUF DIE 6ER-LISTE
 ## (KON107-03) -- E-5-KERN "EIN STACK AUS 3 KOMPONENTEN", v4.4 IN KRAFT, ORG-19+T19-GO, E-1-JA
 
