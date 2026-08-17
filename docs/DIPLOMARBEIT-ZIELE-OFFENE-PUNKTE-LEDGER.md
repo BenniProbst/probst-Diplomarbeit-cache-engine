@@ -16,6 +16,102 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CIV (KON104) -- 17.08.2026: OWNER-ANTWORTEN D-GRUPPE + ETA/UEBERTRAGBARKEITS-EXPLORE + WELLEN-BILANZEN
+
+### KON104-01 -- OWNER VERBATIM (17.08., Antwort auf die 20er-Vorlage, Gruppe D)
+- "D-1: volle Wohlgeformtheit muss hergestellt sein und sonst wie empfohlen deklarierte Grenze
+  nur als Uebergang. Die gesamte Syntax und Semantik muss pruefbar sein. D-2: Ich brauche hier
+  mehr Verstaendnis und Kontext. D-3: Wie empfohlen. D-5: Bitte wie geplant aufbauen, das muss
+  noch. D-6: Wie empfohlen, wir muessen sie spaeter neu erheben. D-7: Genau wie empfohlen, wir
+  muessenhier nacharbeiten. D-8: Bitte deep research dazu, wie die Achse aussehen muesste.
+  D-9: Bitte explore und tief lesen gegen den Plan, die neueste Aussage gewinnt. D-10: Ist
+  erledigt, ausbuchen."
+
+### KON104-02 -- KONSEQUENZEN JE ENTSCHEID
+- D-1 XML-WACHE: VOLLE Wohlgeformtheit ist das ZIEL (beide bisher unbeobachtbaren Zweighaelften
+  werden beobachtbar; gesamte Syntax UND Semantik pruefbar); die deklarierte Grenze ist NUR
+  UEBERGANG bis zum Bau. Bauposten im W2-Umfeld (XML-Wachen-Strecke), Uebergangs-Deklaration
+  faehrt vorab.
+- D-2 KURVEN-STACKS: Owner braucht Kontext -- Explore der drei Statistik-/Kurven-Stacks (E-5)
+  gestartet; die Gegenueberstellungs-Vorlage (drei Stacks nebeneinander + K4 mess/-S-Position)
+  folgt HEUTE als eigenes Fenster. Bis dahin waehlt KEIN Aufraeumpass implizit (Par.75-Sperre).
+- D-3 REGISTRATION-TOKENS: WIE EMPFOHLEN -- instanzweit abschalten + Umstieg auf
+  Runner-Authentication-Tokens. An Infra uebergeben (Infra-Meldung Abschnitt 1 aktualisiert);
+  sinnvoll im SELBEN Wartungsfenster wie die A-1-Rotation.
+- D-5 TALOS-ZWEI-REGIME: UMKEHR der Vorlage-Empfehlung -- NICHT zurueckziehen, sondern "wie
+  geplant AUFBAUEN, das muss noch". Plan-Hebungs-Explore gestartet (was genau der Plan
+  definiert); wird eigener Bau-/Infra-Posten vor W4. Bis zum Aufbau bleibt die Thesis-Passage
+  als SOLL mit Luecken-Marker, NICHT als IST.
+- D-6 p50/p95/p99-ALTZAHLEN: als ueberholt MARKIEREN, spaetere NEU-ERHEBUNG mit der Kampagne
+  (Owner: "wir muessen sie spaeter neu erheben"). Thesis-Anhang-Posten.
+- D-7 ANHANG A 16/44: Weg 1 -- ehrliche Luecken-Zeile jetzt, NACHARBEIT (28 leere Fragmente)
+  mit Kampagnen-Daten. Thesis-Anhang-Posten, gekoppelt an W3.
+- D-8 persistence_target/T19: DEEP RESEARCH angeordnet ("wie die Achse aussehen muesste") --
+  gestartet (Literatur + Objekt: T19-Pinnung, ORG-19-Kopplung, Persistenz-Zielgroessen).
+- D-9 ccache-ALLOWLIST (A11): EXPLORE + TIEFLESEN gegen den Plan angeordnet -- Chronologie
+  Plan-Posten vs. Code-Kommentar (Marathon-Scan-Schutz); DIE NEUESTE AUSSAGE GEWINNT. Gestartet.
+- D-10 NAS-CREDS (A12/E-14): ERLEDIGT, ausgebucht -- Gegenstand lebt als
+  COMDARE_NFS_DROP_TOKEN-Posten weiter.
+
+### KON104-03 -- EXPLORE-ERGEBNIS OV-S13-2b (ETA) + OV-S13-4 (UEBERTRAGBARKEIT)
+### (wf 875f28df: 2x Sonnet max Explore + Fable max Tieflese, 910k Tokens; Backup
+### ~/backups-workflow/20260817-ovs13-eta-uebertragbarkeit/)
+- ETA-SEMANTIK (bauleitend, KEINE Owner-Frage mehr): EIN Kalibrier-Ereignis, ZWEI Log-Werte,
+  DREI Verwendungs-Ebenen -- (A) eta_s = selbstkalibrierendes LEASE (einzige Urteils-Verwendung
+  Takeover elapsed > 1.5 x eta_s, pro-forma 30 min, dreifach fail-closed); (B) avg_size_bytes =
+  Kapazitaets-/Dispositionswert (RAM-Puffer 256 MB + Storage-Forecast Par.65); (C) Kampagnen-
+  Ebene: BEIDE speisen die Voll-Bau-Projektion, literales Gate, danach autonomer Trigger
+  (F5-Baupunkt 6). df-Wachen-Entscheid IST GEFALLEN (per Design ja, Par.65(iii)); es fehlt NUR
+  der Produktions-Aufrufer (BatchReservierung ohne Perm-Feld -> eigener syntax_version-Bump).
+  KEINE Slice-Disposition ueber eta_s (nirgends definiert -- nicht bauen).
+- 2a-BAU-AUFLAGEN: Der pick_reservierung-Merge-Defekt ist heute der AKTIVE BEGRENZER (Iterator
+  drosselt bewusst auf 1 Veroeffentlichung je Slice-Fenster); last_update_utc entsperrt die
+  volle F5-Baupunkt-3-Fortschreibung. Beim 2a-Bau PFLICHT: 2 stale Doku-Stellen umschreiben
+  (builder_registration.hpp:282-286 + DESIGN-s13:1564 "kein Live-Pfad" -- beide falsch seit
+  8139cca3).
+- UEBERTRAGBARKEIT (bauleitend): DREI Bedingungen GEMEINSAM -- (1) Permutations-Gleichheit
+  (SHA512-Fingerprint), (2) Kern-Identitaets-Gleichheit (CPU-Fabrikation + RAM-Frequenz/CAS als
+  KLASSEN-Eigenschaft, nie Hostname), (3) bedingte Erweiterungs-Deckung (jede benutzte
+  Meta-Meta-Achse; gilt fuer Replay UND Binary-Nutzung, Par.62-D-Klammer). "Minimale notwendige
+  HW-Konfiguration" (Owner 17.08.) = Aequivalenzklasse modulo UNGENUTZTER Meta-Meta-Achsen.
+  Fingerprint notwendig, NICHT hinreichend (zwei Schluessel-Welten, Par.62-D). V-10b = exakte
+  Anwendung der Regel (Bau-Skip ja, Mess-Skip nein: Bedingung 2 scheitert prod1/prod2);
+  F8 = Zeit-Degeneratfall derselben Maschine. s13-Marker-Ersatztext (i)-(v) liegt vor.
+- NEUE EIN-SATZ-OWNER-FRAGE R4 (einziger echter Rest, in die C-3a-Vorlage #38a1, Frist Mi
+  19.08.): Fliesst die Kern-Identitaet nach C-3a-Scharfschaltung (a) als festes
+  target_isa-Glied in JEDES Preimage (Par.69.2-Lesart; dann impliziert Fingerprint-Gleichheit
+  kuenftig Kern-Identitaet, "no_extension ueberall gleich" gaelte nur vor C-3a) ODER (b) nur
+  gate-/routen-bedingt sichtbar (Par.70.9-Lesart, vertraeglich mit V-10b 17.08.)? Quellen legen
+  es nicht fest.
+- KORREKTUREN an den Explore-Karten am Rohtext: 7 Stueck (u.a. Merge-Defekt = aktiver Begrenzer
+  statt latentes Loch; eta_s hat Kampagnen-Projektions-Rolle; Par.62-D-Klammer "Replay UND
+  Binary-Nutzung"; Par.69.2 loest OD-2 auf: Kern-Identitaet = target_isa-Glieder).
+
+### KON104-04 -- WELLEN-BILANZEN (nach Teammate-Meldungen + eigener Erhebung)
+- VL-3 FERTIG (Teammate-Bilanz): bau/vl3-debug-flag @ a3a26bda -- --debug-Traeger + Sperre,
+  T-1 zweistufig rot->gruen (21/21), Koeder K13-A/B bissen literal, Release UND Debug ctest je
+  "100% tests passed, 0 tests failed out of 495", gitleaks Koeder biss/Echt rc=0. ZWEI autonome
+  Design-Entscheide mit Haus-Muster (Kenntnisnahme-Vorlage an Owner): (a) Freigabe-Gate
+  COMDARE_DEBUG_FREIGABE=="true" (einziges Boolean-Env-Idiom im Repo, COMDARE_BESTANDSLOG),
+  (b) neuer Exit-Code 8 (7 = Lane-Fehlrouting, Kollision vermieden). +1 ctest-Registrierung ->
+  Floor-Nachzug 496/492/490 gehoert in die SERIELLE LANDUNG (Harmonisierungs-Flaeche
+  tests/unit/CMakeLists.txt mit VL-1/VL-2). Clang-Haelfte des Warnungs-Reviews steht aus ->
+  Landung. KON28-01-Praezisierung offen (faehrt die W3-Kampagne selbst --debug?).
+- HY-A VOLL-BILANZ (Teammate): F-1..F-13 dreiwertig -- 12 BEHOBEN, F-9 begruendet VERTAGT
+  (specialization-after-instantiation; HY-A2-Posten, Factory-Zusage unberuehrt), FUND-11
+  auftragsgemaess quittiert. F-13-UMKEHR am Paarlauf GEMESSEN: echter TEST-DEFEKT (Assert
+  reads>0 im Recht; vor Fix 8/50 rot, nach Fix 50/50 + 90 Lastlaeufe gruen; EAGAIN hart
+  ausgeschlossen ulimit-Kontrast 20/20 vs 245493 frei) -- die Doku-Zeilen-These des Leads war
+  FALSCH, der Fix war notwendig. F-12 latenter Bau-Bruch (CI-verdeckt via make-inventar-
+  Reihenfolge) geheilt. NICHT gedeckt (benannt): Debug, asan/tsan, prod2, CI (kein Push).
+  Folge-Lens laeuft (wf 750d2441).
+- k2 WIEDERANLAUF GRUEN: Bau rc=0 + ctest CTEST_RC=0 (pipefail; Testzahl wird bei der
+  Floor-Messung der Landung literal erhoben). vl12: Teammate baut selbst weiter (cmake-Prozess
+  11:00 beobachtet) -- Bilanz ausstehend; MEIN paralleler Wiederanlauf (CTEST_RC=8) war ein
+  DOPPELSTART auf denselben Baum und wird als eigener Fallen-Beleg gebucht: die
+  pgrep/nohup-Falle traf diesmal MICH (Teammate-Lebendprobe vor Wiederanlauf unterlassen);
+  Wiederanlaeufe kuenftig NUR nach Log-Wachstums-Probe je Worktree.
+- KON103-ZUG GruEN: 421bbb2f auf beiden Remotes, super-CI 15955 SUCCESS.
 ## KONSOLIDIERUNG CIII (KON103) -- 17.08.2026: OWNER-ANTWORTEN A-1/A-2/B-1/C-1..C-3 + V-02R-EXPLORE-ERGEBNIS
 
 ### KON103-01 -- OWNER VERBATIM (17.08., Antwort auf die 20er-Vorlage, Gruppen A/B/C)

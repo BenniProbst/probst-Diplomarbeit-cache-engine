@@ -37,10 +37,11 @@ Wartungsfenster sperren. Wir machen das sofort."
   registrierten Runner (deren Authentication-Tokens bleiben) -- es verhindert NEUE
   Fremd-Registrierungen. Neuregistrierung nur noetig, wo Runner ohnehin neu aufgesetzt werden.
 - **Die 286er-Mess-Pipeline ist ein Mehrtages-Experiment: NIE pollen, NIE anfassen.**
-- **Offene Owner-Frage D-3** (instanzweite ABSCHALTUNG der Registration-Tokens + Umstieg auf
-  Runner-Authentication-Tokens) ist noch NICHT entschieden. Die Rotation jetzt ist davon
-  unabhaengig und sofort wirksam; ein spaeteres D-3-JA macht die ganze Leck-Klasse dauerhaft
-  gegenstandslos. Infra-Einschaetzung dazu gern ueber den Owner zurueckspielen.
+- **D-3 ENTSCHIEDEN (Owner 17.08., "Wie empfohlen"):** Registration-Tokens werden INSTANZWEIT
+  ABGESCHALTET (`allow_runner_registration_token=false`) und die Flotte auf
+  Runner-Authentication-Tokens umgestellt -- das macht die ganze Leck-Klasse (GR-Format)
+  dauerhaft gegenstandslos. Sinnvoll im SELBEN Wartungsfenster wie die Rotation; Reihenfolge
+  (erst rotieren, dann abschalten -- oder direkt abschalten) liegt bei Infra.
 
 ## 2. SACHVERHALT A-2: Vault-Eintrag samba-comdare-socks-pw in die Rotationsliste
 
