@@ -16,6 +16,102 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CV (KON105) -- 17.08.2026: ZEHN-WOCHEN-EXPLORE UEBER ALLE 12 OFFENEN
+## RUECKFRAGEN -- 10 VON 12 WAREN ENTSCHIEDEN; ES BLEIBEN GENAU ZWEI OWNER-FRAGEN (E-1, E-3)
+
+### KON105-01 -- ANLASS UND FORM
+- Owner 17.08. (Dreifach-Auftrag): (1) R4-Korrektur verbatim: "Die Grundaussage der
+  Kernidentitaet kann so nicht stimmen, denn diese kann nur durch alle Stempelzeilen
+  ausgedrueckt werden, die jeweils verbucht sind. Bitte explore ueber den gesamten Kontext
+  dieser Session und gruende dich neu, kippe erstmal die 4 Basis /goal Dokumente in den
+  Kontext, es ist alles schon entschieden und du hast es vergessen wie ich sehe."
+  (2) "Bitte explore zu allen jetzt noch offenen Rueckfragen der letzten 2 Kontexte und
+  diesem ueber 10 wochen bitte." (3) "Dann frage erneut, was offen bleibt."
+- NEUGRUENDUNG VOLLZOGEN: alle vier /goal-Referenzdokumente komplett in den Kontext gekippt
+  (GOAL-v8-Dossier 816 Z. · ARBEITSWEISE v4.3 Umbrella 1220 Z. · Designplan Kern+Par.10-12 ·
+  Wellenplan Struktur+Par.17-19 komplett).
+- EXPLORE: 12 Fragen je ein Sonnet-max-Explorer (Standard-Hypothese ENTSCHIEDEN, Owner-Wort
+  woertlich heben; Quellen inkl. Roh-Transkript-Backups kon64_sammlung + docs/termine).
+  Erster Lauf starb komplett am Spend-Limit; Resume nach /login: 12/12 fertig (2,6M Tokens).
+  Backups: ~/backups-workflow/20260817-zehn-wochen-explore-offene-fragen/ (12 Berichte + Roh).
+
+### KON105-02 -- DIE ZEHN GESCHLOSSENEN FRAGEN (je: Verdikt, tragendes Owner-Wort, Bau-Folge)
+- R4 KERN-IDENTITAET: ENTSCHIEDEN als Synthese dreier bestehender Schichten -- (1) ISA-Familie
+  target_isa (Haupt-System-Achse, immer eine Zeile, x86_64/aarch64); (2) Kern-Identitaets-
+  Komplex sub_axis target_isa_complex (Par.69.2 "feste Rekombination", prod1_zen5/
+  prod2_raptor_lake, binary_id="never" => REPLAY-Schluessel Par.62-D, NIE Bau-Fingerprint);
+  (3) Comp-Gate-Beitraege JE PERMUTATION verbucht (Par.70.9 "Gate-Beitraege MUESSEN bei der
+  Scharfschaltung in der Identitaet sichtbar werden", Traeger: system_version_suffix +
+  Toolchain-Glied Key[7]="gate" + CEB-Zwilling; KEIN fuenfter Kanal, Par.73.1). Die
+  R4-Dichotomie (festes Glied ODER Gate-Kanal) las zwei getrennte, beide entschiedene Kanaele
+  als EIN Feld. Owner-Korrektur 17.08. ("alle jeweils verbuchten Stempelzeilen") IST diese
+  Architektur. V-10b damit STRUKTURELL DAUERHAFT (NoExtension: route_allows liefert fuer jeden
+  Flag-Tier false -- Schicht 3 kann nie etwas verbuchen; Bau-Skip ja bleibt fuer immer,
+  Mess-Skip nein via Schicht-2-Replay-Schluessel). C-3a-Vorlage #38a1 braucht KEINE neue
+  Owner-Antwort: KON91-02 ("Comp-Gate-Stempel organ_stamp_line JE COMP") traegt die Semantik
+  bereits -- R4 ist RESTLOS ZU.
+- P1 --debug-KAMPAGNE: ENTSCHIEDEN (KON41-01, Owner verbatim "Beides, weil wir immer bis
+  3 Tage vor Abgabe Generalprobe laufen..."): GENERALPROBEN-DOKTRIN -- die W3-Kampagne selbst
+  faehrt --debug (nproc-parallel, Werte = Ausschuss, Loeschung bei T-3 ~12.09. als einzige
+  Ausnahme der Messdaten-Doktrin, KON29-01); echte 1-Thread-Messung T-3->Abgabe. Bau-Rest
+  (bestehender Posten C-09/Korb C): Drift-Gate-Debug-Ausnahme VOR W3.
+- P2 XORFILTER: ENTSCHIEDEN -- UMKEHR: Owner 16.08. hat den UMBAU (Offline-Peeling
+  Graf/Lemire) DIREKT ANGEORDNET; P78 "behalten" (05.08.) ist UEBERSCHRIEBEN. #70 =
+  reiner W1-Bau-Posten vor der naechsten Messreihe (am Objekt 17.08. noch nicht gebaut).
+- P3 V7 MESS/SYSTEM-SCHNITT: ENTSCHIEDEN 16.08., Owner verbatim (kon64_sammlung:1339-1345):
+  "Die Break even kurven werden nur ueber die Parameter der in w/ma/mi Messebenen gemessenen
+  Organ-Achsen Parameter gemessen. Die Mess-Achse und die System-Achse liefern nur eine
+  Permutation der aeusseren Umwelt-Rahmenbedingungen... Deine Lesart ist exakt korrekt.
+  Bitte schreibe das so fest." -- Staffelungs-Design (#49) ist entsperrt.
+- P4 OF-4/id54: ENTSCHIEDEN + VOLLZOGEN (V4 "Volles GO" 16.08., kon64_sammlung:1355).
+- P5 V8/V9: V9 (rescue-Ref w3-thesis-c) ENTSCHIEDEN+VOLLZOGEN (KON93-01); V8 (GitHub-PAT-
+  Rotation) = WAS entschieden, VOLLZUG offen -> Rotations-/Infra-Posten, kein Owner-Bedarf.
+- E-2 BAUSTEINE_BEWERTUNG: ENTSCHIEDEN -- das Format ist BETREUER-Auflage (Habich H2,
+  Termin 7 08.05., Habich_Feedback_2026_05_08.txt:46-82), das Anlegen ist Bauposten R-26
+  (Wellenplan 19.7). Bau: Format anlegen + aus Adapter-Bestand fuellen, Sign-Off-Feld
+  "ausstehend" (nie autonom). KEINE Owner-Frage.
+- D2c SIEGER-SEMANTIK: ENTSCHIEDEN (dreifach konvergent 05./06./09.08.): Sieger JE
+  EINGANGSLAST, mehrere gleichzeitig; "Der Fork ist real und nicht aufgeloest" beschreibt
+  einen BAU-RUECKSTAND (best_binary_selector/rank_binaries nicht umgebaut), keine offene
+  Design-Frage (Ledger selbst: "DREI POSTEN WAREN BAU-RUECKSTAND, KEINE ENTSCHEIDUNG").
+  Bau-Posten: Selektor auf je-Last-Sieger + Front-Ausgabe umbauen (W2/W4-Zuordnung im
+  Staffelungs-Design).
+- D2a KANON: ENTSCHIEDEN+GEBAUT+LIVE seit 09.08. (latency_stats.hpp:26-34 SELBSTCHECK
+  "EINZIGE Umrechnung", c98b4b95, seither unangefasst; percentile_canon.hpp delegiert).
+  Enger Rest = REV-DATA-12-ARCHITEKTUR (best_binary_selector haelt wertgleiche EIGENE Formel
+  = Abschrift-statt-Aufruf) -> Bau-Posten im D2c-Umbau miterledigen.
+- E-4 FF0/PLATTFORM: IM KERN ENTSCHIEDEN -- die eingefrorene FF0-Formulierung (Scope-Freeze
+  Termin 4, 12.04.; thesis 01_einleitung.tex:91-94) nennt "Hybrid-CPUs, Sapphire Rapids",
+  WEDER ARM NOCH RISC-V; der Scope-Split ist PILOT-ENTSCHEID 07.08. (Ledger:25858-25861:
+  "macOS x86+ARM, RISC-V (VisionFive 2), Pi 5: kompilieren und messen, aber nur im
+  DEBUG-Modus... prod1+prod2 zuerst vollstaendig, NUR echt gemessenes bare metal"); 21 Images
+  = Owner O-C 07.08. Die heutige E-4-Empfehlung war eine unerkannte WIEDERHOLUNG der
+  10 Tage aelteren Ledger-Zeile. Rest = Doku-Nachzug (die weite "Multi-Plattform-
+  Generalitaets"-Charakterisierung in der Ur-Ledger-Tabelle Par.1/:18669 traegt einen
+  UEBERHOLT-Marker; Anhang D fuehrt ARM/RISC-V bereits korrekt als ISA-Angebots-Katalog).
+
+### KON105-03 -- WAS OFFEN BLEIBT: GENAU ZWEI OWNER-FRAGEN
+- E-1 ULTIHASH-AUFNAHME (TEIL-ENTSCHIEDEN): Konzept-INHALT + Code-Auflage (kein
+  ComdareDB-Code) sind owner-entschieden; OFFEN ist ausschliesslich die AUFNAHME-Entscheidung:
+  kommt das Konzept ("beste Tier-Binary als ABI-stabiles Produktions-Release") als TEXT in
+  Selbstverstaendnis- + Deploy-Kapitel der Thesis? Ein Ja/Nein genuegt.
+- E-3 PV-4-RUECKSPRACHE-TERMIN (TEIL-ENTSCHIEDEN): das Bau-GO steht woertlich ("Ja unter
+  sorgfaeltiger Design Planung bitte bauen, Ruecksprache mit mir im Detail", Ledger:29396);
+  OFFEN ist ausschliesslich der TERMIN dieser zugesagten Ruecksprache (Vorschlag: eigener
+  Slot vor W4, ich lege den Design-Schnitt vor: ein Experiment-XML je Paper, profile_ref
+  dereferenzieren, Regel der abstrakt-leeren Achse). Eine Slot-Nennung genuegt.
+- KEINE weiteren offenen Entscheidungen: die 20er-Vorlage ist komplett beantwortet
+  (KON101-104), die 13 V-Kandidaten sind zu (KON100/101), die OV-S13-Serie ist zu (KON102),
+  R4 ist zu (KON105-02). Erinnerungs-Posten ohne Entscheid-Charakter: Infra-Meldung A-1/D-3
+  an Infra uebergeben (liegt, KON103); Flotten-Handout-Aktionen node6-Login/node5-physisch/
+  id56/id18 (#60); VL-3-Kenntnisnahmen (Exit 8, COMDARE_DEBUG_FREIGABE — Widerspruch genuegt).
+
+### KON105-04 -- STALE-KORREKTUREN AUS DEM EXPLORE (Nachzuege)
+- Task #70 nachgezogen (P78-Ueberschreibung 16.08. statt "Owner-Wahl offen").
+- e3-Beleg-Anker: die Ledger-Anker :15584/:16628/:16760 fuer das PV-4-GO sind STALE
+  (Einfuegungs-Drift) -- geltende Fundstelle :29396 (V14: Anker ueber Abschnitt, nie Zeile).
+- E-4: Ur-Ledger-Tabellen-Zeile :18669 (weite FF0-Charakterisierung) braucht UEBERHOLT-Marker
+  (Doku-Zug, gebuendelt mit dem naechsten docs-Paket).
 ## KONSOLIDIERUNG CIV (KON104) -- 17.08.2026: OWNER-ANTWORTEN D-GRUPPE + ETA/UEBERTRAGBARKEITS-EXPLORE + WELLEN-BILANZEN
 
 ### KON104-01 -- OWNER VERBATIM (17.08., Antwort auf die 20er-Vorlage, Gruppe D)
