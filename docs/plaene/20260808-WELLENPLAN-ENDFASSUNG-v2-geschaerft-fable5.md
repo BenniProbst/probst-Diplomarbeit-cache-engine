@@ -2573,6 +2573,11 @@ E3 F2). PMC-Schwester-Design ebenfalls bereits §18.8.
 > Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
 
 ## 20.1 GELANDET+GEPUSHT (Stand dieses Nachtrags)
+> MARKER 17.08. spaetnachts (Sweep B-3): KOMPLETT = die LANDUNG des Gebauten; die
+> W1-ABNAHMEFORMEL (:952, HY-A-Zeile) steht am Objekt 0/4 -> Luecke traegt P.20.2,
+> Abnahme vor F2. CI-Nachtrag: 15971 auf 6cdcf1c9 war ROT (Format/ASCII/Lock);
+> Heilung a43ea18f+965b121a gepusht -> Gitlink-Ziel in P.20.4 = der GRUENE Stand,
+> nie 6cdcf1c9.
 Welle 1 KOMPLETT: ce development 04ac26fa -> 6cdcf1c9 (31 Commits, origin+github):
 hy-a a4366cb8 | vl12 cd011e60 | vl3 7bf66ddd | k2 7a5ed464 (4x --no-ff) + f45e995b
 (TSan-Grenze+Terminierung) + 316c488f (add_dependencies-Kante, T-1 rot->gruen) +
@@ -2586,7 +2591,8 @@ Floor PRUEFLING-Form 500/496/494 live + Restore-Beweis + Wache rc=0 (MASSGEBLICH
   test_hy_f8_reroute + Registry-"22->23" fehlen; W1-ABNAHMEFORMEL :952 NICHT erfuellt;
   E-1 IST ENTSCHIEDEN (HeuristikAdapter=3/FunctionInterfaceReroute=5, KON39) -> Bau
   haengt am #15-decl-SLOT, nicht an Owner; E-6 ("welche Registry=22") = 12W-Explore,
-  dann ggf. Owner. TRAEGER: neuer Posten im #15-Bump-Buendel-Zug (Task #89).
+  dann ggf. Owner. TRAEGER: neuer Posten im #15-Bump-Buendel-Zug (KORREKTUR Sweep B-4: #15-decl-Slot,
+  NICHT Task #89 -- #89 ist P-H Paper->Prueflinge).
 - #15-BUMP-BUENDEL selbst (Layout 6->7 + Format 4->5 + 10. Glied + #38a2/#38d +
   PMC-Spalten + bestandslog v5 + HY-A2-Map-Zeile) — Design-Karte liegt (W1-Workflow),
   Bau = letzter Preimage-Schritt vor F2.
@@ -2670,3 +2676,40 @@ HANDLUNGEN: V8-GitHub-PAT | node6/node5/id56/id18.
 - OWNER-NEUZUGANG aus dem Kontextende: NP-46 (E-1-Anschlussfrage Text-Aufnahme woertlich)
   + NP-48 (UltiHash<->ComdareDB vierte Entitaet?) — in die naechste Vorlagen-Runde
   (A2.3a-geprueft); dazu 20.7-Punkte (Talos b-Strich, Infra-Fenster-Termin, E-5-Chat-Rest).
+
+## 20.9 SOLL-IST-SWEEP KONTEXT 11 (17.08. spaetnachts, wf_1a1db763; Volltext BU
+## folge-bu-kontext12-rueckkehrer/sweep-soll-ist-synthese.json) -- IST/SOLL VERBUCHT
+
+- BAU-BUCHUNGS-FEHLER-REGISTER B-1..B-7 (Kern: Strang-lokale Bilanzen als Landungs-
+  Beleg; Lande-Gate-Kette Format/Hygiene/Lock lief vor dem Push nicht -- CI-Rot 15971
+  war die Quittung; Kombibau-Logs existieren jedoch: 4x "100% ... out of 499" in BU
+  kombibau-logs-steward/). B-1 KRITISCH: super-Fixture-Wache skippt seit W1-Landung
+  STILL (FIXTURE-Pfad existiert nach ce-Rename nicht mehr; SYNC-SKIP :56-62 laesst
+  genau diese Datei gruen durch) -> super-Zug P.20.4 ist damit DRINGLICH, FATAL statt
+  Skip. B-2 behoben (Marker P.20.1). B-3/B-4 = Marker gesetzt. B-5: main.cpp:515
+  zweite unbelegte Byte-Gleichheits-Zusicherung -> W2-1. B-6/B-7 AUFGELOEST: N-Liste
+  komplett geborgen (Transkript Z65903) -- N1=W2-clang, N5=--debug x dump|ci|cmake,
+  N6=Bytevergleich (alle getragen W2-1/W2-2), N3 AUSGEBUCHT (Allowlist fuehrt nur
+  Ausserhalb-Bauweg; Tests liegen im Bauweg), N7 BEHOBEN 316c488f, N8 erledigt;
+  #80-Status: FIX-Runde IST gelandet (b334a657^2), Rest=HY-A2/A3+M-1/M-2.
+- FEHLENDE POSTEN M-1..M-6 EINGEBUCHT: M-1 F-9-Sentinel NAMENTLICH ins #15/HY-A2-
+  Paket (hybrid_dock_array.hpp:206-219 "A2.5-FUND F-9, NICHT BEHOBEN"; tragender Weg
+  = attach-Definition in gemeinsamem drittem Header) | M-2 TSAN-AUSBAU (fence-Naht
+  messbar machen; heute nur Grenz-Doku test_rcu_concurrency:96-105) ins #15/HY-A2-
+  Umfeld -- war der einzige Posten ohne Besitzer | M-3 stdout-Bytevergleich als
+  MESSUNG + main.cpp:515 -> W2-1 (mit N5 buendeln) | M-4 = B-6 (aufgeloest) |
+  M-5 R-OPTION: Sa 22./So 23. traegt KEINE HY-A-Reserve -- faellt HY-A2 aus dem
+  #15-Zug vor F2, ist das WE die letzte Flaeche (Slotliste P.20.7 hiermit ergaenzt) |
+  M-6 owner-vorlagen-Redundanz-Triage (Ultracode-Funde 7-9/20) klein vor der
+  naechsten Owner-Praesentation.
+- OBJEKT-PRAEZISIERUNGEN in den #15-Text: HY-A2-Enums EXISTIEREN (anatomy_base.hpp:89
+  HeuristikAdapter=3, :141 Reroute-Genus) -- es fehlt allein der ABI-decl-SLOT;
+  HY-A3: KEINE Registry steht auf 22 (AllStrategies=22 TYPEN, Aggregat=26,
+  cache_engine_axis_registry=18, system_axis_registry=3) -> E-6-Explore benennt
+  ZUERST die Ziel-Registry.
+- T-NEU-1 NACHGEBUCHT (S-3): s13-F3-Kurz-Verify GEBORGEN (wf_0e1f240b) = 
+  TRAEGT_MIT_FIXES -- 5/5 Runde-2-Fixes vollstaendig, Rest 2 KANN-Kosmetika
+  ("LANDBAR, keine weitere Lens-Runde noetig"; Basis ce 04ac26fa, 1652 Z.);
+  Gate KON100-02 ERFUELLT, die 2 Ein-Zeilen-Edits als Auflage in den Di-25-Zug.
+  Vorstufen-Verify wf_100fa0b3 (2 MUSS: Arena-Ueberlauf-Semantik OWNER>PLAN +
+  FJ-Posten-Luecken) ist durch F3+diesen Kurz-Verify konsumiert.
