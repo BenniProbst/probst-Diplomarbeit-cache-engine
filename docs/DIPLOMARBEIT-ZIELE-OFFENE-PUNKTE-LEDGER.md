@@ -16,6 +16,49 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CII (KON102) -- 17.08.2026: OWNER-ANTWORTEN OV-S13-2..-6 -- Di-25-Buendel voll entsperrt (2 Explore-Auftraege)
+
+### KON102-01 -- OWNER VERBATIM (17.08., Antwort auf die 5 OV-S13-Vorlagen des s13-Designs)
+- "OV-S13-2: Bitte (a) und fuer (b) bitte erneut explore, das ist UMFASSEND ueber die letzten
+  10 Wochen definiert und MUSS nachgelesen werden. OV-S13-3: Mit in den Bruch, das ist der
+  Kern-messwert der ganzen Arbeit. OV-S13-4: Das braucht einen explore, das ist schon definiert
+  ueber die letzten 12 Wochen, ein Messwert ist uebertragbar bei gleicher minimaler notwendiger
+  hardware konfiguration einer anderen Maschine -> bitte Sonnet max explore und Fable 5 max tief
+  lesen. OV-S13-5: Bitte merge wie empfohlen. OV-S13-6: Es soll doch auf Ebene 3 unter Gattung
+  und Genus."
+
+### KON102-02 -- KONSEQUENZEN JE ENTSCHEID
+- OV-S13-2 ETA-MERGE: (a) ANGENOMMEN -- EIN neues Feld last_update_utc (Syntax-Bump ans Ende der
+  Feld-Folge) loest Merge-Konflikt UND Uhr-Anker; Bau im Di-25-Buendel (S13-21-Umfeld).
+  (b) EXPLORE-PFLICHT: die ETA-Semantik (Lease-Timer vs. Dispositions-/Kapazitaetswert, und ob
+  avg_size_bytes der Eingang in die df-Wache wird) ist UMFASSEND ueber die letzten 10 Wochen
+  definiert -- nachlesen, nicht raten (Explore gestartet: wf ov-s13-2b/4).
+- OV-S13-3 PMC-FLAG-FELDER: MIT IN DEN #15-BRUCH -- Owner-KERN: "das ist der Kern-messwert der
+  ganzen Arbeit". Die Flag-Felder (je PMC-Zaehler die Quellen-Wahrheit) kommen in den Mess-POD,
+  die neuen CSV-Spalten fahren im EINEN golden-Fenster des Bruchs. Bauplan-Zuordnung: B-5-Umfeld
+  (POD-Anbau faehrt im selben Layout-6->7-Bump) + Darstellungs-Haelfte im Di-25-Buendel (S13-11).
+- OV-S13-4 UEBERTRAGBARKEIT: EXPLORE-PFLICHT (Sonnet max + Fable 5 max tief lesen; seit 12 Wochen
+  definiert). OWNER-KERN-DEFINITION: "ein Messwert ist uebertragbar bei gleicher minimaler
+  notwendiger hardware konfiguration einer anderen Maschine" -- das ist PRAEZISER als die
+  Fingerprint-Gleichheits-Lesart: Traeger der Uebertragbarkeit ist die MINIMALE NOTWENDIGE
+  HW-Konfiguration, nicht der Fingerprint allein. Die dokumentierte Vollform wird gehoben
+  (Explore laeuft), dann OV-S13-4-Marker im Design nachgezogen.
+- OV-S13-5 BLATTZAHL: MERGE WIE EMPFOHLEN -- die A21-Formel wird Navigations-Bild, die Sheet-Zahl
+  je xlsx-Dokument = 1 + |verfuegbare Unter-Achsen| (KON88-P1/KON91-01-Schnitt). S13-14/-15
+  bauen nach dem Merge; OV-S13-5 ist ZU.
+- OV-S13-6 LAGERBAUM-WURZEL: "Es soll doch auf Ebene 3 unter Gattung und Genus" -- die GEBAUTE
+  Ordnung (gattung -> genus -> realm auf Ebene 3) IST die gewollte; das juengere KON91-01-Wort
+  ("VOR den Baum") ist damit owner-seitig praezisiert: die artifacts/binaries+measurement-Wahl
+  lebt AUF EBENE 3. KEIN Kaskaden-Umbau, KEINE Verbotszonen-Beruehrung; X-9 baut Schema +
+  Validator + Inertness-Wache gegen die Ebene-3-Form. OV-S13-6 ist ZU; der Wellenplan-/Design-
+  Marker wird im naechsten docs-Zug nachgezogen.
+
+### KON102-03 -- STATUS
+- Damit sind ALLE fuenf OV-S13-Vorlagen beantwortet: -3/-5/-6 final entschieden, -2a final,
+  -2b/-4 als Owner-angeordnete Explores in Arbeit. Das Di-25-Buendel ist voll entsperrt
+  (Bau-Vorstaffel WE 22./23.). Offen beim Owner bleibt NUR noch die 20-Fragen-Vorlage
+  (A-1/A-2, B-1 [Frist Mi 19.08.], C-1..C-3, D-1..D-3/D-5..D-10, E-1..E-4; D-4 = OV-S13-2a
+  ist durch diese Runde miterledigt).
 ## KONSOLIDIERUNG CI (KON101) -- 17.08.2026: OWNER-ANTWORTEN V-01R..V-13 KOMPLETT -- DER #15-BRUCH IST ENTSPERRT
 
 ### KON101-01 -- OWNER VERBATIM (17.08., Antwort auf docs/sessions/20260817-OWNER-VORAB-15-restfragen.md)
