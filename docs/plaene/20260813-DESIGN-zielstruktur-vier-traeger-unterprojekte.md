@@ -62,7 +62,7 @@ Monolith `libs/cache_engine/` @ 5f3f26a5: **1.292 C++-Dateien (hpp+cpp) / 157.19
 | `profile_facade/` (Wurzel 22 D.) | 32 | 15.437 | **PLANER** (1) | KON47-01: „die Planer-Substanz (Director, plan_legend, planner_*-Familie) lebt als profile_facade/planner/ im Monolithen" |
 | — davon `profile_facade/planner/` | 10 | 4.721 | **PLANER** (1) | experiment_plan_director, plan_legend, planner_version … |
 | `builder/` (35 Unterverzeichnisse: 22 C++-tragende 156 D./35.376 Z. + 13 leere Skelette → #88-Triage; dazu 13 Wurzel-D./3.152 Z.) | 169 | 38.528 | **CEB** (2) | build_orchestrator, pruef_dock, experiment_driver …; Brücken-Naht-Familien s. §4.3 |
-| `mess/` | 6 | 1.140 | **TIER** (3) | genus_kaskade, steuer_dock, mess_naht = Tier-Laufzeit-Messkaskade (Fläche 3); Naht-TYPEN → Querschnitt, s. K2 |
+| `mess/` | 6 | 1.140 | ~~**TIER** (3)~~ **EIGENE S-POSITION S-22** (ERSETZT per Owner KON110-05, 17.08.; Register Wellenplan §16.2) | genus_kaskade, steuer_dock, mess_naht = Tier-Laufzeit-Messkaskade (Fläche 3); Naht-TYPEN → Querschnitt BLEIBT, s. K2 |
 | `harness/` | 2 | 612 | **TIER** (3) | drift_gated_cell, perm_runner = Mess-Harness des Tier-Laufs |
 | `hybrid/` | 4 | 955 | **HYBRID** (4) | heuristik_adapter_* (Heuristik-Adapter-Gattung, Reroute-Genus); 0 Produktions-Konsumenten, nur 3 Unit-Tests → frei formbar |
 | `heuristik/` | 6 | 1.961 | **HYBRID** (4), Vorschlag | break_even, axis_spline, workload_cluster; nur 4 Test-Konsumenten; Planer-Mitnutzung (Break-Even-Bereichskarte KON7-05) offen, s. §6 |
@@ -176,7 +176,7 @@ Eine Zählweise für alle Zellen (A2.5-Neumessung): **echte `#include`-Direktive
 
 1. **Wurzel + Namen:** `libs/traeger/{planner,ceb,tier,hybrid}` mit Zielen `comdare_planner/_ceb/_tier_emission/_hybrid` — finale Familien-Namen mit S-6d/#67 (dessen Zahlen unbelegt sind und neu erhoben werden); Entscheid `planner`(EN-Bestand) vs `planer`(DE-Ziel): GEFALLEN per Owner-B3 (13.08., englisch) -- Zielname `planner`, Kollision mit profile_facade/planner damit geloest.
 2. **heuristik/-Zuordnung:** Default HYBRID (Stufe 4); Planer-Mitnutzung der Break-Even-Bereichskarte (KON7-05) spätestens bei HY-A bestätigen oder Heuristik-Anteil in den Querschnitt heben.
-3. **mess/-Schnitt:** Default Kaskade→TIER, geteilte Naht-Typen→Querschnitt (löst K2); Zeitpunkt der Typ-Hebung: mit #18/S-13 oder erst #88.
+3. **mess/-Schnitt:** ~~Default Kaskade→TIER~~ **GEDREHT per Owner KON110-05 (17.08.): mess/ = EIGENE S-Position S-22** (Register Wellenplan §16.2, #92-Vollzug 18.08.); geteilte Naht-Typen→Querschnitt BLEIBT (löst K2), sofern das Bau-Design nichts anderes ergibt; Zeitpunkt der Typ-Hebung: mit #18/S-13 oder erst #88.
 4. **Strenge der Stufen-Kante:** Default adjazent-only (N+1 linkt NUR N); ob transitives Durchgreifen (z. B. Stufe 4→2) je erlaubt wird, entscheidet der erste Bedarfsfall LAUT (heute 0 solcher Kanten gemessen).
 5. **experiment_tree-Besitz (die 26-Kanten-Frage):** Default: plan-seitige Single-Source-Header → Planer/Querschnitt bei #88, Builder-Iterator-Seite bleibt CEB.
 6. **Lager-Substanz (bestandslog/lager_ablage):** Querschnitt-Kandidat (Stempel-Rolle 3 Lager-Schlüssel; „Emission endet im Lager", KON17-02) vs CEB-Eigentum — bei S-17 (Lager-Baum-Writer) festzurren.

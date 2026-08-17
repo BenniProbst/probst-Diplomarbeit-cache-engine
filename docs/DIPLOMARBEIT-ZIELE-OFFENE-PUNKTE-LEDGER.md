@@ -16,6 +16,32 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXVII (KON117) -- 18.08.2026 frueh: #92 VOLLZOGEN -- mess/ = S-22
+## (Register-Nachtrag + S-10-Naehe-Klaerung + Besitzkarten-Marker)
+
+- REGISTER-VERIFIKAT (Auftrag ">=S-22 verifizieren", KON112-10): hoechste vergebene
+  Nummer = S-21 (Wellenplan Par.16.2: S-19/S-20/S-21). Gegenprobe ueber super-Ledger +
+  docs/plaene + ARBEITSWEISE + ce-/prt-art-ledger-sections + ce-docs GESAMT: alle
+  "S-22"-Treffer sind (a) Selbstreferenzen auf den Auftrag selbst (3x) oder (b)
+  BR-3-OBS-22 (anderes Namensschema, Substring, 4x in ce docs/architecture/27_*.md).
+  Muster-Gegenprobe traf S-20/S-21 => Nichtfund belastbar. S-22 IST FREI.
+- NACHTRAG VOLLZOGEN: Wellenplan Par.16.2 NEUE TEILE + S-22-Zeile -- mess/-Subsystem
+  als EIGENE S-Position (Owner-Verbatim KON110-05 in der Zeile), ersetzt die
+  mess/->TIER-Haelfte des #29-Defaults; Naht-Typen->Querschnitt BLEIBT (loest K2),
+  sofern das Bau-Design nichts anderes ergibt.
+- S-10-NAEHE GEPRUEFT (Auftrag "S-10-Naehe pruefen ... Design entscheidet"): FACHLICH
+  BESTAETIGT -- S-10 = Steuer-Naht-Rahmen (Teilbaum-Serialisierung hinab + Cursor-/
+  Delta-Rueckkanal hinauf, Par.38); mess_naht.hpp = Schwester-Naht der MESS-Seite an
+  Flaeche 3 (Zweiform Steuer-/Mess-Naht, vgl. #20/P-F). NUMMERN-Nachbarschaft nicht
+  herstellbar (S-11..S-21 vergeben) => die Naehe lebt als Register-VERWEIS, nicht als
+  Nummer. Die INNERE Ordnung der S-22-Stufe entscheidet das Bau-Design (KON110-05);
+  der KON110-05-Spannungs-VERMERK (Nachsatz vs Lead-Empfehlung) bleibt unveraendert
+  stehen.
+- BESITZKARTEN-MARKER gesetzt (Marker, kein Streichen): 20260813-DESIGN-zielstruktur
+  Tabelle Z.65 (mess/-Zeile: TIER durchgestrichen -> S-22 mit Quelle) + Par.6.3
+  (GEDREHT-Vermerk). #92 DAMIT KOMPLETT -- naechster sequentieller Schritt: E-6-12W-
+  Explore (HY-A3-Ziel-Registry), danach #15-Bump-Buendel.
+
 ## KONSOLIDIERUNG CXVI (KON116) -- 18.08.2026 frueh: WELLE 2 KOMPLETT GELANDET+CI-GRUEN
 ## (xorf+f3v+a11 -> ce 20c111c4, CI 15979 SUCCESS) | WELLEN-ENDE-LEHRE VERANKERT
 
