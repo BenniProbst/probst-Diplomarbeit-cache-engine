@@ -16,6 +16,119 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CVII (KON107) -- 17.08.2026: VOLL-LESUNG ALLER WORKFLOW-ERGEBNISSE +
+## F-FRAGEN-RUNDE (F1-F6) ZU -- ES BLEIBEN SECHS OWNER-SAETZE + ZWEI KENNTNISNAHMEN
+
+### KON107-01 -- ANLASS UND VOLLZUG DER VOLL-LESUNG (Owner-Auftrag 17.08.)
+- Owner verbatim: "Bitte lies alle zurueckgekehrten Workflow Ergebnisse vollstaendig. Bitte
+  lies auch die beiden workflows zu den Fragen Ergebnissen vollstaendig und gruende dich so
+  neu, dass du wieder im Stoff stehst, lies dazu besonders die '/goal' Kernbestandteile und
+  den workflow ueber die Zusammenfassung und Konsolidierung des ledgers von heute."
+- VOLLZOGEN mit Einlese-Protokoll (B.3, je Datei eine Protokollzeile): 7 Rueckwaerts-
+  Konsolidierungs-Berichte (synthese-kon106 + kon101-v-runde + kon102-ovs13 + kon103-abc +
+  kon104-d-rest + e1-drei-projekte + arbeitsweise-luecke) KOMPLETT; 12 Zwoelf-Wochen-
+  Fragen-Berichte (r4/p1-p5/e1-e4/d2a/d2c) KOMPLETT; 4 D-Auftrags-Berichte (d2/d5/d8/d9)
+  KOMPLETT; 6 F-Explorer (F1-F6) + Fable-max-Tieflese-Synthese KOMPLETT. Neugruendung:
+  GOAL-v8-Dossier (816 Z.) komplett + ARBEITSWEISE Teil A (A1/A1.1/A2.0/A2.5/A2.1a/b/
+  A2.2/A2.3) + B.3-Nachtrag + v4.4-Kandidatenblock frisch gelesen.
+- BU (additiv): ~/backups-workflow/20260817-f-fragen-explore/ (f1..f6.md +
+  synthese-fable.md + synthese-roh.json). Workflow wf_7f847de1: 7 Agenten, 0 Fehler,
+  1,99M Tokens.
+
+### KON107-02 -- F-VERDIKTE (Fable-Tieflese, je Frage Stufe-2-Nachlesung am Rohtext)
+- F1 PV-4-DETAILS: ALLE DREI GESCHLOSSEN -- (a) ein Paper = genau ein Experiment-XML,
+  "Es gibt keine Kandidaten" (Owner 08.08.); A_full = Standard (messreihen.xml + Thesis
+  03_messsystem:1309-1311; Habich-Zitat betrifft woertlich Reihe B, traegt als generelle
+  Vollstaendigkeits-Direktive). (b) voll w/ma/mi ("Jede Reihe wird in drei Granularitaeten
+  erhoben"); Paper-Isolations-Modus = anderer Gegenstand, Ausblick (06_fazit:88-91).
+  (c) abstrakt-leere Achse = volle CE-Wiederverwendung voll auspermutiert (ce 24_mess-
+  modell Par.8.9.1, 30.05., nie korrigiert); V-11R = reine Umbenennung. Offen NUR der
+  Ruecksprache-TERMIN. Bau: #44 profile_ref dereferenzieren + Vokabular-Naht
+  (SPARSE_NODE4_ART vs node4).
+- F2 KURVEN-STACK: E-5 ECHT OFFEN + REFERENTEN-KORREKTUR -- E-5 meint am Urtext doppelt
+  eindeutig die SPLINE-Trias (heuristik/ vs builder/curve_fit+decision_lambda_trees vs
+  best_binary_selector-Haelfte-B; Hybrid-Bauplan:222 + "1802 Zeilen ueber drei parallele
+  Stacks, null Produktions-Konsumenten"). Der d2-Bericht kartierte die FALSCHE Trias
+  (Statistik-Stacks HDR/Selector-A/Kanon -- diese ist groesstenteils entschieden: Kanon
+  D2a zu, Sieger-Semantik D2c zu, Rest REV-DATA-12 = Bau). Die dem Owner zugesagte
+  D-2-Gegenueberstellung MUSS auf die Spline-Trias zugeschnitten werden, sonst
+  beantwortet der Owner eine geschlossene Frage und die echte Wahl faellt an Par.75.
+- F3 K4 mess/-S-POSITION: ECHT OFFEN -- null Owner-Verbatim in 12 Wochen; #29-Default
+  (mess/ -> TIER, Naht-Typen -> Querschnitt) ausdruecklich "Owner kann drehen" (Par.6.3);
+  B4 loest nur die Auswahl-Mechanik; eigene Position waere kein Doktrin-Verstoss
+  (stufen-neutrale Zonen existieren); ohne Antwort setzt Par.75/#88 den Default still.
+- F4 ccache/A11: GESCHLOSSEN DURCH VERFAHRENSREGEL + FAKTENLAGE -- Ergebnis: A11
+  AUSFUEHREN (droppen), SICHTBAR. Doppelbeleg: (i) d9-Chronologie: A11 (02.08.) juenger
+  als Code-Kommentar (27.07.); N-9/GESAMTBILD hatten die Reihenfolge invertiert.
+  (ii) F4-Substanz: die Kausal-Behauptung des Kommentars (Job 335274 = ccache-Marathon)
+  wurde AM SELBEN TAG in derselben 27.07.-Uebergabe widerlegt (".ccache widerlegt --
+  git clean raeumt vor Scan"; echte Wurzel gr-eof-watchdog, 36 Restarts/24h, Infra-Fix
+  v3); seit 10.08. traegt lint:secrets einen 10-min-Timeout-Deckel (Owner "D-1: raus
+  nehmen") -- ein Rezidiv wuerde laut. d9s Restzweifel ("nie erneut widerlegt") ist
+  damit FALSCH -- d9 hatte die 27.07.-Uebergabe nicht im Pruefumfang. Vollzug: Zeile +
+  Kommentar aus BEIDEN .gitleaks.toml, ci-templates/.lint-secrets pruefen, Vermerk mit
+  korrigierter Chronologie + Watchdog-Beleg + Timeout-Deckel, Gegenprobe-Lauf im Zug.
+- F5 T19-KATALOG-ZEILE: ECHT OFFEN (EIN Bestaetigungssatz) -- Deep-Research liegt
+  (5 Zielgroessen, pareto=true analog T18, K17-neutral, W14-robust); der Code selbst
+  deklariert die Zeile als Owner-Entscheid ("OFFEN, NICHT ERFUNDEN ... Owner-Entscheid
+  (Katalog nachziehen)", axis_optimization_catalog.hpp:50-53) -- kein autonomer Bau;
+  consteval-Anker bricht beim Anlegen absichtlich laut (im Zug mitziehen). ORG-19 =
+  Meta-Meta, nur Grammatik-Slot-Deklaration vor F2 faellig. C-2 deckt D-8 nicht.
+- F6 TALOS: ALLE DREI WEICHEN GESCHLOSSEN -- (a) VIRTUALISIERT (Lesart B): Bare-Metal-
+  Ubuntu + Talos-VM mit cpu mode=host-passthrough, K81-Architektur seit 23.06. live
+  (id15 online); d5s A-vs-B-Weiche war NUR d5s Cluster-Repo-Luecke (liegt lokal unter
+  Projekte/Cluster). (b) NIE vierte OS-Familie (OP-10: Familie=Klasse, os_version=
+  Instanz; Container melden eigenes os-release). Praezisierung: Ledger "GENAU DREI
+  System-Haupt-Achsen" und OP-10-Familien-Drei sind ZWEI verschiedene Dreizahlen, nie
+  als ein Beleg fuehren. (c) DEFINIERTE TEILMENGE: Owner-F-01 07.08. woertlich
+  "Messung im Debug mode ... OS support builds"; ADR-12-Allquantor = Formulierungs-
+  ungenauigkeit; ADR-12-Satz "wird nach der Abgabe erhoben" ist stale gegen C-2
+  ("NICHTS nach der Abgabe") -> beim Aufbau ersetzen. BAUZUSCHNITT-KORREKTUR an d5:
+  Talos-Lane misst OHNE PMC (ADR-12-Konsequenz: PMC nur im privilegierten Regime) --
+  d5-Posten 3/4 (System Extension, privilegierte Pods, vPMU) ENTFALLEN; Rest =
+  measure:talos-Job auf id15 + Debug-Strang + CSV-platform-Wert + Thesis-Nachzug.
+
+### KON107-03 -- DIE FINALE OWNER-LISTE (nur wirklich Offenes, antwortfertig)
+- 1. E-3/PV-4: TERMIN-Slot fuer die zugesagte Detail-Ruecksprache (Vorschlag: eigener
+  Slot vor W4) -- die drei Inhaltspunkte sind saemtlich entschieden, Slot-Nennung genuegt.
+- 2. E-5/KURVEN-STACK: welcher der drei Break-Even-SPLINE-Stacks wird kanonisch --
+  heuristik/ ODER builder/curve_fit+decision_lambda_trees ODER best_binary_selector-
+  Haelfte-B? (JA zu heuristik/ macht die anderen zwei zu Konsumenten/Deprecate-
+  Kandidaten; Perzentil-Kanon ist NICHT Teil der Frage; Par.75-Sperre laeuft.)
+- 3. K4/mess-S-POSITION (getrennt): #29-Default bestaetigen (Kaskade=Tier, Naht-Typen->
+  Querschnitt) ODER eigene S-Position?
+- 4. D-8/T19: Katalog-Zeile jetzt nach Deep-Research-Skizze anlegen (5 Zielgroessen,
+  pareto=true, K17 bleibt gepinnt) -- ja?
+- 5. E-1/ULTIHASH: kommt das Release-Konzept als TEXT in Selbstverstaendnis- + Deploy-
+  Kapitel -- ja/nein? (Drei-Projekte-Praezisierung ist verbucht; "nur Provenienz-Satz"
+  waere bisher Interpretation.)
+- 6. NP-50/ARBEITSWEISE v4.4: Regel-Kandidaten 9-11 freigeben (Vorlage-Sperre mit
+  NEIN-Probe, Stand-Empfehlungs-Gegenlese, Strang-Dopplungs-Probe)?
+- KENNTNISNAHMEN (Widerspruch genuegt): (a) D-9-VOLLZUG: A11 wird ausgefuehrt (Drop
+  beide Repos, sichtbar, korrigierte Chronologie + Watchdog-Beleg + Timeout-Deckel,
+  Gegenprobe im Zug). (b) D-5-BAUZUSCHNITT: Talos = Debug-Messung auf bestehender
+  id15-Lane OHNE PMC; ADR-12-"nach der Abgabe"-Satz wird ersetzt.
+
+### KON107-04 -- NACHZUEGE AUS DER VOLL-LESUNG (Tasks nachgezogen)
+- #83 (PMC fail-loud): vier Wachen-Fundstellen 1:1 uebernommen (CMakeLists.txt:67,
+  m3v2_pmc_smoke.cpp:71, linux_perf_pmc_smoke.cpp:58-63, 4x experiment_plan_director) +
+  Warnungs-Signalpfad (neu) + AMD-errno=2-Klassifikationsluecke + OV-S13-3-Spaltenliste
+  (Ziel-POD ComdareMeasurementSnapshotV1, VOR der #15-Budget-Rechnung beziffern).
+- #82 (I-PMC-2/3): Terminkollision WE 22./23. ungebucht (S-19 #7 + T-15b #13 + A-1-
+  Fenster #84) -> Slot-Plan vor dem WE; Zen-5-RAW-Research als Bau-Vorbedingung;
+  csv_to_latex.cpp:985-986-Nachzug im selben Zug.
+- #15 (Bump-Buendel): NP-39-Live-Gegenprobe -- "all_axes nicht wohlgeformt +
+  PROFILE_ALLOW_COMMENT_TEXT_DEFECT entfernen" ist STALE (Datei WELLFORMED, Flag nie
+  gebaut, Heilung 08.08. ce 25fe4fbf) -> Nachposten GESTRICHEN (#16-Rest = 2 statt 3);
+  Drei-Versionszaehler-Falle benannt (bestandslog 4->5 / Preimage 4->5 / Layout 6->7);
+  OV-S13-2a-Folgen (Ein-Publish-Drossel lockern, Takeover-Uhr-Migration, Tie-Break-
+  Mikrofrage) aufgenommen.
+- #85 (NEU): Nachzugs-Paket Voll-Lesung -- D-2-Vorlage auf Spline-Trias, Ledger-Zitat-
+  Korrektur KON104-02 ("KON58-13" -> KON6-07/6-08), B-1 = EIN GO (KON91-02), D-10-
+  Interpretations-Vermerk + COMDARE_NFS_DROP_TOKEN/CE_SUBMODULE_TOKEN als eigene
+  Posten, M-01..M-36-Marker-docs-Zug, D-6+D-7 = EIN Regenerierungs-Posten.
+- STAND WELLE #81: vl12 + k2 LANDEREIF; hy-a Fix-Runde 2 + vl3 Fix-Runde laufen am
+  Objekt -- serielle Landung A2.1a nach deren Bilanz (Floor 500/496/494 PRUEFLING-Form).
 ## KONSOLIDIERUNG CVI (KON106) -- 17.08.2026: RUECKWAERTS-KONSOLIDIERUNG DER OWNER-ANTWORTEN
 ## KON101-105 GEGEN DIE 12-WOCHEN-VORGESCHICHTE -- 6 EXPLORER + V1-TIEFLESE, E-1-VERBATIM
 ## ERSTVERBUCHT, UEBERHOLT-SAMMELLISTE FUER DEN NAECHSTEN DOCS-ZUG, ARBEITSWEISE-SELBSTMESSUNG
