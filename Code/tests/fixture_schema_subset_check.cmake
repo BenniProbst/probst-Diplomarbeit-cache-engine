@@ -17,6 +17,13 @@
 # super-seitige Weg ist die Wache. Sie wird hier gebaut, die Umbenennung bleibt als dokumentierte
 # ce-Auflage offen. Damit steht das F27/TABU-11-Muster (gleichnamig-divergent OHNE jede Wache) nicht mehr.
 #
+# VOLLZUGS-NACHZUG (17.08.2026, super-k2-Zug): die ce-Umbenennung IST VOLLZOGEN (Weg a, ce 44a909c1,
+# gelandet 7a5ed464/965b121a) -- die ce-Fixture heisst jetzt EINDEUTIG experiment_kern_seam_fixture.xml.
+# Diese Wache BLEIBT die richtige Form (kein Byte-Sync: die Werte weichen weiter ABSICHTLICH ab);
+# geaendert hat sich nur der FIXTURE-Pfad in add_test UND die Skip-Disziplin unten: ein fehlendes
+# FIXTURE bei EXISTIERENDEM ce-Checkout ist seit dem Rename ein VERDRAHTUNGSFEHLER (genau so blieb
+# die Wache nach der W1-Landung still gruen, Sweep-Befund B-1) und ist jetzt FATAL.
+#
 # MECHANIK (zwei Beine, beide FATAL):
 #   (1) MASTER-Bein: die super-golden ist gueltig gegen experiment_schema.xsd.
 #   (2) FIXTURE-Bein: dasselbe fuer die ce-Fixture. Faengt "die ce-Fixture uebt eine Naht, die es im
@@ -96,6 +103,19 @@ if(NOT EXISTS "${MASTER}")
         "super-Repo selbst (Code/test_data_xml/) -- kein Nachbar-Checkout, also kein SKIP.")
 endif()
 if(NOT EXISTS "${FIXTURE}")
+    # B-1-HAERTUNG (17.08.2026): SKIP nur, wenn der ce-NACHBAR-CHECKOUT wirklich fehlt (Submodul
+    # nicht ausgecheckt). Existiert das ce-Verzeichnis, aber die Datei nicht, ist das ein
+    # VERDRAHTUNGSFEHLER (falscher/veralteter FIXTURE-Pfad) -- der stille Skip hat genau diese
+    # Klasse nach dem Weg-a-Rename gruen durchgelassen. Jetzt FATAL mit beiden Pfaden im Text.
+    get_filename_component(_fixture_dir "${FIXTURE}" DIRECTORY)
+    get_filename_component(_ce_root "${_fixture_dir}" DIRECTORY)
+    get_filename_component(_ce_root "${_ce_root}" DIRECTORY)
+    if(EXISTS "${_ce_root}")
+        message(FATAL_ERROR
+            "${_ctx}: FIXTURE '${FIXTURE}' EXISTIERT NICHT, obwohl der ce-Checkout "
+            "'${_ce_root}' vorhanden ist -- das ist KEIN fehlender Nachbar, sondern eine "
+            "falsch verdrahtete add_test-Zeile (Skip-Klasse B-1, seit Weg-a-Rename FATAL).")
+    endif()
     # B14-NB4 / Befund B4: Grund und MARKER auf getrennten Zeilen, der Marker ohne jede Interpolation.
     message(STATUS "Nachbar-Checkout fehlt (FIXTURE='${FIXTURE}') -- diese Wache kann nichts aussagen.")
     message(STATUS "COMDARE-XML-WACHE-SKIP")

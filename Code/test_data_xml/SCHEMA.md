@@ -45,7 +45,8 @@ bleiben". Daraus folgt eine feste Reihenfolge bei jeder Achsen-/Schema-Aenderung
    Bestands-Instanzen gueltig bleiben).
 3. `experiment_golden_kern.xml` deklariert ihn und beziffert die Kardinalitaets-Folge.
 4. Die Wachen laufen: `xmllint --schema` (Struktur), ctest
-   `test_fixture_schema_experiment_golden_kern` (Vokabular gegen die eine XSD),
+   `test_fixture_schema_experiment_golden_kern` (Vokabular gegen die eine XSD;
+   ce-seitig seit Weg a 17.08.2026: `experiment_kern_seam_fixture.xml`),
    ctest `test_golden_n_consistency` (Deckung mit dem ce-Schwester-Traeger),
    `validate_experiment_profile` (Registry-/Wert-Ebene, Code).
 

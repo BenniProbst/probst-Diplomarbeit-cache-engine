@@ -16,6 +16,26 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXV (KON115) -- 18.08.2026 frueh: SUPER-K2-ZUG VOLLZOGEN (B-1-Wache
+## GEHEILT + Gitlink 965b121a ATOMAR) -- ce-CI 15974 GRUEN (26/26+1manual)
+
+- ce-CI-KETTE GRUEN: 15974 @ 965b121a SUCCESS (26 Jobs + is_original:relock manual) --
+  die W1-Landung + beide Fix-Zuege sind CI-bewiesen; super 15975 @ 376bb7f2 SUCCESS.
+- K2-6-SCHRITT-REZEPT VOLLZOGEN (EIN Commit, ATOMAR): (1) tests/CMakeLists.txt:348
+  FIXTURE-Repoint auf experiment_kern_seam_fixture.xml + Gitlink -> 965b121a im selben
+  Commit; (2) fixture_schema_subset_check.cmake B-1-HAERTUNG: FIXTURE fehlt bei
+  EXISTIERENDEM ce-Checkout = FATAL (vorher stiller SKIP -- exakt so blieb die Wache
+  nach der W1-Landung gruen ohne Gegenstand); SKIP nur noch bei echt fehlendem
+  Nachbar-Checkout; (3) MUTATIONSPROBE dreiseitig LITERAL: korrekt -> RC=0 "OK (FIXTURE)
+  -- 38 Elemente / 50 Attribute, gueltig"; ALTER Pfad bei existierendem ce -> RC=1
+  FATAL "Skip-Klasse B-1" (0 SKIP-Marker); ce-Checkout fehlt -> RC=0 + COMDARE-XML-
+  WACHE-SKIP; (4) Kopf-Nachzuege (Rename VOLLZOGEN Weg a 17.08., ce 44a909c1; Wache
+  bleibt die richtige Form, kein Byte-Sync); (5) SCHEMA.md-Zusatz (ce-seitiger Name);
+  (6) dieser Ledger-Vollzug. PZW-Anker: STELLEN 41 / DATEIEN 22 UNVERAENDERT am neuen
+  Baum LIVE gemessen (Nenner 507->512 Test-.cpp), PZW-CE-SHA -> 965b121a.
+- NAECHSTE SCHRITTE (sequentiell): serielle Welle-2-Landungen xorf b8d6edab (golden-
+  Ereignis) -> f3v dac3d91a -> a11 ec048560 (+super-Patch) je mit VOLLER Gate-Kette;
+  danach #92 -> E-6-Explore -> #15-Buendel.
 ## KONSOLIDIERUNG CXIV (KON114) -- 17.08.2026 nachts (sequentielle Nachtstrecke): CI-15971-ROT
 ## GEHEILT (2 Fix-Zuege) | AUDIT-VOLLBERICHT VERARBEITET (Bau-Buchungs-Fehler + Klaerung) |
 ## SOLL-IST-SWEEP VERBUCHT (P.20.9) | T-NEU-1-VERDIKT GEBORGEN | N-LISTE AUFGELOEST

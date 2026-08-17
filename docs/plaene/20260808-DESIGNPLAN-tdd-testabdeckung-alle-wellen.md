@@ -206,7 +206,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 04ac26fa81306dd02798bfd759eac211502d875c
+PZW-CE-SHA         = 965b121a5246f129aaf64f54c71ce0b60e046b75
 PZW-SCHEMA-STELLEN = 41
 PZW-SCHEMA-DATEIEN = 22
 PZW-SCHEMA-LITERAL = 2
@@ -214,6 +214,10 @@ PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
+> NACHZUG 17.08.2026 spaetnachts (Gitlink ce `965b121a`, W1-Landung + 2 CI-Fix-Zuege,
+> super-k2-Zug): STELLEN/DATEIEN am neuen Baum LIVE gemessen (Formeln der Wache selbst);
+> die W1-Testdateien (hy-a/vl3/k2) tragen die Delta-Stellen. Alte Werte bleiben unten
+> als Historie.
 > NACHZUG 17.08.2026 (Gitlink ce `04ac26fa`, golden-Fenster-Landung): SCHEMA-STELLEN 40 -> **41**,
 > SCHEMA-DATEIEN 21 -> **22** — die B2-Gate-Trennung des Fensters traegt eine zusaetzliche
 > Schema-Stelle in einer neuen Testdatei (Zaehlweise der Wache: 507 Test-.cpp am Gitlink-Baum,

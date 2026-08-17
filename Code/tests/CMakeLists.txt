@@ -337,15 +337,16 @@ add_test(NAME test_fixture_sync_prt_registry
 # CMakeLists.txt setzt COMDARE_V32_EXPERIMENT_GOLDEN_XML darauf). Seine Wache abzuschalten waere ein
 # Wach-Verlust ohne Gegenwert -- Scheibe 6 ist deshalb ein HINZUFUEGEN, kein Umbiegen.
 # Das Neu-Paar ist KEIN Byte-Paar (die ce-Datei ist eine eigenstaendige Naht-Fixture mit absichtlich
-# abweichenden Werten, literal verdrahtet in test_experiment_kern_seam.cpp) -- die Begruendung und die
-# offene ce-Umbenennungs-Auflage stehen im Kopf von fixture_schema_subset_check.cmake.
+# abweichenden Werten, literal verdrahtet in test_experiment_kern_seam.cpp) -- die Begruendung steht im
+# Kopf von fixture_schema_subset_check.cmake. Die ce-Umbenennungs-Auflage ist VOLLZOGEN (Weg a,
+# 17.08.2026, ce 44a909c1/7a5ed464: eindeutiger Name experiment_kern_seam_fixture.xml).
 # Geprueft wird deshalb das gemeinsame VOKABULAR gegen die EINE Single-Source experiment_schema.xsd:
 # beide Seiten duerfen nur Element-/Attribut-Namen benutzen, die das Ziel-Schema deklariert.
 add_test(NAME test_fixture_schema_experiment_golden_kern
     COMMAND "${CMAKE_COMMAND}"
         "-DSCHEMA=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_schema.xsd"
         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
-        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden_kern.xml"
+        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
 # Zweites Bein derselben Wache auf dem ALT-Paar: es kostet nichts und haelt die v1-Instanz + ihre
 # ce-Kopie ebenfalls am EINEN Schema-Vokabular (das Byte-Gate oben sagt nur "gleich", nicht "gueltig").
