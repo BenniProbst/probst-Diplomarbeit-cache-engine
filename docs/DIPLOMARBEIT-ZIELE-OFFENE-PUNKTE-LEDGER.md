@@ -16,6 +16,101 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CIII (KON103) -- 17.08.2026: OWNER-ANTWORTEN A-1/A-2/B-1/C-1..C-3 + V-02R-EXPLORE-ERGEBNIS
+
+### KON103-01 -- OWNER VERBATIM (17.08., Antwort auf die 20er-Vorlage, Gruppen A/B/C)
+- "A-1: Bitte sofort dem Infra melden und ueber mich synchronisieren, weil 5 Agenten parallel
+  arbeiten muessen und infra orchestrieren kann, wir koennen so gesteuert ein Wartungsfenster
+  sperren. Wir machen das sofort. A-2: Ja aufnehmen, auch direkt an infra. B-1: Ja genau so wie
+  empfohlen. C-1: (a) und (b) und (c) alle ja. Aber Warnung bei (c) wenn PMC vorhanden, aber
+  nicht verwendet. Korrekt sonst, volles GO. Stille nullen gibt es bei Messung nicht, wir hatten
+  fail loud ueber die letzten 10 wochen explore geplant. C-2: Wir lassen nichts weg und machen
+  NICHTS nach der Abgabe, es gibt also nur vor der Abgabe, volles Programm bitte. Ja krischer
+  Pfad muss gegangen werden, egal was. C-3: Es gibt dazu immer noch einen deep research workflow,
+  bitte selbst tief lesen."
+
+### KON103-02 -- KONSEQUENZEN JE ENTSCHEID
+- A-1 TOKEN-ROTATION 286/288/289: NICHT session-seitig fahren -- SOFORT-Meldung an INFRA,
+  Synchronisation UEBER DEN OWNER (5 Agenten parallel; Infra orchestriert + sperrt ein
+  Wartungsfenster). Meldung angelegt:
+  docs/sessions/20260817-INFRA-MELDUNG-runner-token-rotation-wartungsfenster.md (dieser Zug).
+  Damit ist der A-1-Weg entschieden; die Ein-Punkt-Zug-Empfehlung der Vorlage ist ueberholt.
+- A-2 samba-comdare-socks-pw: IN DIE ROTATIONSLISTE aufnehmen UND direkt in die Infra-Meldung
+  (Abschnitt 2 des Handouts). Keine Fenster-Abhaengigkeit, reine Listen-Aufnahme.
+- B-1 COMP-GATE (#38a2): JA WIE EMPFOHLEN -- C-3a-Tripwire ausloesen, Ersatz = per-Binary-
+  Orchestrator-Weg, gebuendelt im EINEN #15-Bruch (B-Plan: B-5-Umfeld). Der Frist-Posten
+  Mi 19.08. ist damit VOR der Frist entschieden; die Fallregel (#38a2 -> W2) ist gegenstandslos.
+- C-1 PMC-DREIFACH: (a) JA -- COMDARE_ENABLE_PMC wird INVARIANTE der dynamischen Kette.
+  (b) JA -- "PMC-Quelle nicht gebaut" wird FEHLER statt Skip (Preflight scheitert statt skippt).
+  (c) JA -- Teil-Lauf ohne PMC bleibt buchbar (Bau-Seite soft, Ergebnis-Seite hart,
+  ausdruecklich gekennzeichnet), ABER mit WARNUNG wenn PMC VORHANDEN und NICHT VERWENDET.
+  Owner-KERN: "Stille nullen gibt es bei Messung nicht" -- fail loud ist seit 10 Wochen
+  geplante Doktrin. Bau-Folge: die 4 nicht-beissenden PMC-Wachen werden scharf; der
+  AMD-L3-errno=2-Fall (stille 0 neben Intel-Millionen) wird FEHLER, nie Messwert.
+- C-2 I-PMC-2/3: BAUEN, VOR der Abgabe -- Owner-KERN: "Wir lassen nichts weg und machen NICHTS
+  nach der Abgabe ... volles Programm". Die Kernmetrik-Zusage (Cache-Misses) bleibt VOLL
+  (L3/L2/coherence/energy zusaetzlich zu L1D+dTLB); Zuschneide-Empfehlung der Vorlage ist
+  ABGELEHNT. Der kritische Pfad wird gegangen "egal was" -> I-PMC-2/3 braucht einen EIGENEN
+  SLOT vor W3 (Zen-5-RAW-Ausgang offen; Planung im Wellen-Nachtrag, Vorstaffel WE 22./23.).
+- C-3 best_binary-RICHTUNGEN: KEINE Abhak-Liste -- es EXISTIERT ein Deep-Research-Workflow zu
+  den 6 Selektor-Metriken; Auftrag: SELBST TIEF LESEN (Fable 5 max), dann Richtungs-Fix im
+  Bruch-Umfeld bauen. Suche/Tieflesung laeuft in dieser Session.
+
+### KON103-03 -- V-02R-EXPLORE-ERGEBNIS (wf 969b3bba, 2 Explorer Sonnet max, 671k Tokens):
+### BYTE-FORM GEHOBEN, 0 NEUE OWNER-FRAGEN -- BRUCH-VORAUSSETZUNG (b) ERFUELLT
+- STRUKTUR BESTAETIGT (keine neue Grammatik): KON41-04 (Owner 12.08.) + KON45-01 + KON47-02
+  sind die dokumentierte Form -- Tier-Binary-Stempel + EINE neue Zeile (10. Glied, Tier traegt
+  ""; Format 4->5, GliedCount 9->10, POD komposit_line/len append-only Layout 6->7) = die fuer
+  alle belegten Pruefdocks konkatenierte Map {Synthese-Key -> Tier-SHA}, Dock-Index
+  AUFSTEIGEND; der normale Hybrid-Abschluss-SHA-512 (128-hex, anatomy_fingerprint_hex) deckt
+  die neue Zeile mit. Kein separater dritter Hash ueber die Verkettung.
+- HASH DER MAP-VALUES = SHA-256/64-hex JE DOCK-BEITRAG (Rangfolge-Aufloesung, KEIN
+  Owner-Widerspruch): das heutige Owner-Wort "sha256" (KON101-01) ist das JUENGSTE und EINZIGE
+  Owner-Wort mit Bitlaenge; aeltere Owner-Worte (KON41-04/KON47-02) sagten nur "SHA"/"dessen
+  SHA" -- die 128-hex-Festlegung in KON45-01(5) war Lead-Distillation, kein Owner-Wort.
+  Konstruktion nach E-A-Muster (Ledger E-A 07.08.): eigener SHA-256 ueber DASSELBE Preimage,
+  das den SHA-512-Fingerprint des jeweiligen plain Tiers speist (NICHT die ersten 64 hex des
+  SHA-512). Konsistenz-Linie: E-A (Name) + V-08R (Planer) + Hybrid-Map-Values.
+- BUDGET-FOLGE: KON45-01(5)-Rechnung ist mit 64-hex NEU zu rechnen (32 x (Key+64hex+Trenner)
+  ~= 2,3-2,6 KB statt >4,5 KB) -- der Budget-Bruch faellt kleiner aus; neuer
+  kAnatomyFingerprintPreimageMax-Wert MIT Budget-Beleg ist B-5-Pflicht-Edit.
+- MIKRO-SYNTAX AUS DER DOKUMENTIERTEN FORM ABGELEITET (kein neues Format): KON41-04 "volle
+  Syntax der Organ-Achse" => key=value-Paare, ';'-getrennt (compose_organ_stamp_line-Syntax);
+  Keys UEBERGANGSWEISE adressbasiert stufen_id()=Layer*Nodes+Node (KON45-01(6): Namens-Strings
+  wie "Reroute<View>" verletzen den Glied-Zeichenvorrat), final mit HY-A2.
+- ORDNUNG PRAEZISIERT: "Dock-Index aufsteigend" = die CT-Adresse stufen_id, NICHT der
+  Laufzeit-attach-Slot (DockArray::attach ist first-free/wiederverwendbar, nicht
+  deterministisch; eine CT-Map kann keine RT-Slots tragen). Objekt-Befund: beide Adressraeume
+  existieren unverdrahtet -- B-5a verdrahtet CT-seitig auf stufen_id.
+- V-04R-DECKUNG: die Verkettung IST der Ebenen-Wrap; Rekursion strukturell (ein eingestecktes
+  Hybrid liefert seine eigene Komposit-/Abschlusszeile als Wert der aeusseren Map), kein
+  d=<tiefe>-Feld. Flaeche-2-Durchreichung; RT-Cache der vollen Tier-Stempel an den Docks
+  (KON47-02) bleibt getrennt davon bestehen.
+- ABGRENZUNG: der "measurement-Durchstich" (Flaeche 3, IMessVisitor, KON16-06/KON19-02) ist
+  NICHT dieses Konzept -- gleiches Wort, anderer Gegenstand (RT-Messwerte vs. CT-Stempel).
+  Der IMessVisitor traegt die Hybrid-Ebene bereits als Vertrags-Reserve (visit_hybrid_reroute)
+  -- KEIN zweiter ABI-Bruch fuer die Hybrid-Messung noetig.
+- DETAIL-RESTE = B-5-BAUPOSTEN (kein Owner-Bedarf): (1) neuer Budget-Wert mit Beleg,
+  (2) E-A-kNameSha-Traeger (Vorzug: Tier traegt sein kNameSha als POD-Feld, Hybrid liest ueber
+  die Flaeche -- folgt der V-04R-Durchreich-Linie; Festlegung im B-5a-Design), (3) K1-
+  Abschluss-Marker im SOLL-Design nachtragen (KON41-04 loeste K1, Dokument zeigt es noch
+  offen), (4) K2/K5 des SOLL-Designs bleiben offen, beruehren die Byte-Form nicht.
+- BACKUPS: ~/backups-workflow/20260817-v02r-hybrid-grammatik/ (beide Explorer-Berichte + Roh-
+  JSON). Explorer-Luecken offengelegt (Ledger nicht End-zu-Ende, PLAN-Dokument ~650 Z. Rest,
+  ce-ledger-sections nicht durchsucht) -- fuer die Byte-Form-Frage durch Objekt-Gegenproben
+  gedeckt.
+
+### KON103-04 -- WELLEN-STAND (17.08. mittags)
+- HY-A FERTIG: F-1..F-12 + RCU-Flake geheilt -- Vollbau-ctest clang 498/498 (100%, pruefling-
+  lose Form, SOLL-Delta zu 499 dokumentiert), RCU-Serien mit Fix 25/25 + 25/25 gruen,
+  Original-Lage nachgestellt + Alternativ-Ursache ausgeschlossen (Commits 0c59b629 Anlauf-
+  Sperre + e3fc1390 Befund-Doku). Folge-Lens ist der naechste Schritt, dann Landung.
+- k2/vl12/vl3: die drei Bauten sind mit den Agenten-Kontexten gestorben (k2 letzte Aktivitaet
+  10:26, vl12 10:46, vl3 10:41; kein tragendes ctest-Ergebnis) -- WIEDERANLAUF als nohup-
+  Laeufe MIT Plattenwache (Abbruch <9G) gestartet; Protokolle je Worktree unter
+  build-protokolle/20260817-wiederanlauf-bau-ctest.log. Platte bei Start: 12G frei (96%).
+- OFFEN BEIM OWNER: D-1..D-3, D-5..D-10, E-1..E-4 der 20er-Vorlage (D-4 = OV-S13-2a erledigt);
+  Explores OV-S13-2b/-4 (ETA-Semantik + Uebertragbarkeit) laufen (wf 875f28df).
 ## KONSOLIDIERUNG CII (KON102) -- 17.08.2026: OWNER-ANTWORTEN OV-S13-2..-6 -- Di-25-Buendel voll entsperrt (2 Explore-Auftraege)
 
 ### KON102-01 -- OWNER VERBATIM (17.08., Antwort auf die 5 OV-S13-Vorlagen des s13-Designs)
