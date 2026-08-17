@@ -1284,10 +1284,10 @@ nebeneinander (S13-12-IST gegen S13-25):
   UMSTELLUNG DER LAGER-KASKADE, und die steht in den S-6-VERBOTSZONEN (Wellenplan Par.19.1/A-10),
   die S13-25 selbst zitiert. **GRENZE, ausdruecklich:** X-9 baut in diesem Buendel NUR Schema,
   Validator und die Inertness-Wache aus (a). Die BAUM-Umstellung ist NICHT Teil des
-  Di-25.08.-Bundels und darf nicht nebenbei mitgemacht werden.
+  Di-25.08.-Buendels und darf nicht nebenbei mitgemacht werden.
   **Traeger:** OV-S13-6 (10.3) -- Owner-Ein-Satz, ob die Wurzel-Wahl wirklich VOR den Baum soll
   (dann Kaskaden-Umbau nach dem #15-Bruch, eigener Posten) oder ob die gebaute Ordnung
-  (realm auf Ebene 3) das jueengere Wort bereits sachgerecht umsetzt. Faellt die Antwort auf
+  (realm auf Ebene 3) das juengere Wort bereits sachgerecht umsetzt. Faellt die Antwort auf
   "vor den Baum", ist das ein W3-Posten mit Verbotszonen-Freigabe, kein W2-Nebenzug.
 
 Gegenstueck im Code (EIN Commit mit X-1..X-9): `validate_profile.hpp` bekommt die harten Pruefungen
@@ -1396,7 +1396,7 @@ heutigen Objekt nachgemessen. Sie sind vor dem Bau je Posten zu erheben (Verify-
 des Bau-Tages):
 
     S13-26  Teilprojekt-Commit-Skip ("0 Treffer" aus #57 uebernommen, hier nicht nachgemessen)
-    NEU-S1  Ordnungs-Frage der Lagerbaum-WURZEL (X-9 / S13-25): siehe die Traeger-Zuweisung in 4.7
+    NEU-S1  Ordnungs-Frage der Lagerbaum-WURZEL (X-9 / S13-25): siehe die Traeger-Zuweisung in 5/X-9
             und OV-S13-6 in 10.3 -- am Objekt gemessen, aber owner-seitig unaufgeloest
 
 **ERLEDIGT 17.08. (A2.5-Fix-Runde) -- diese Posten standen bis dahin in der Liste oben und sind
