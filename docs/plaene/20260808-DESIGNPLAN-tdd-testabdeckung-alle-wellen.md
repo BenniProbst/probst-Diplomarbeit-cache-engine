@@ -207,12 +207,18 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 
 ```
 PZW-CE-SHA         = 04ac26fa81306dd02798bfd759eac211502d875c
-PZW-SCHEMA-STELLEN = 40
-PZW-SCHEMA-DATEIEN = 21
+PZW-SCHEMA-STELLEN = 41
+PZW-SCHEMA-DATEIEN = 22
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+> NACHZUG 17.08.2026 (Gitlink ce `04ac26fa`, golden-Fenster-Landung): SCHEMA-STELLEN 40 -> **41**,
+> SCHEMA-DATEIEN 21 -> **22** — die B2-Gate-Trennung des Fensters traegt eine zusaetzliche
+> Schema-Stelle in einer neuen Testdatei (Zaehlweise der Wache: 507 Test-.cpp am Gitlink-Baum,
+> Rohzeilen minus Kommentare). Alte Zahlen bleiben oben in der Historie dieses Abschnitts sichtbar;
+> der Anker-Block traegt die gemessenen neuen Werte.
 
 **Nachzug 15.08.2026 (dritter Zug des Tages) -- zwoelfter Gitlink-Zug (W-B-Stufe-1-Landung
 nach Nachstufe, KON76-02), und zum neunten Mal in Folge bewegt sich KEINE der fuenf Zahlen.
