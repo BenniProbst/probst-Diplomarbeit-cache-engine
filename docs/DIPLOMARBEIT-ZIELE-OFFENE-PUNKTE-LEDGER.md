@@ -16,6 +16,74 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CI (KON101) -- 17.08.2026: OWNER-ANTWORTEN V-01R..V-13 KOMPLETT -- DER #15-BRUCH IST ENTSPERRT
+
+### KON101-01 -- OWNER VERBATIM (17.08., Antwort auf docs/sessions/20260817-OWNER-VORAB-15-restfragen.md)
+- "V-01R: Das AxisKind Enum bezeichnet einfach nur compile time um Welche Mess-Achsen-kategorie es
+  sich bei einer Achse handelt also Mess/System/Organ. Die Kategorie muss bezueglich des
+  Vorhandenseins von Haupt-Achsen und Unter-Achsen erweitert werden, um eine Zuordnung einer
+  Unter-Achse zu einer Haupt-Achse und die Zuordnung einer Haupt-Achse zu einer Kategorie zu
+  gewaehrleisten. Daher definitiv mit drehen, sonst ergibt es keinen Sinn. V-02R: Die exakte Byte
+  Form dafuer wurde in den letzten 10 Wochen entschieden und ist dokumentiert. Die Grammatik ist
+  die einer Tier-Binary mit durchstich zu einer Verkettung von sha256 der eingesteckten
+  Hybrid-Pruefdock-Tier-Binaries. Bitte explore. V-03R: avx512 sollte nie ausgeschlossen werden,
+  es ist Pflicht fuer die Abgabe. Keine chance, damit kommst du nicht durch, wir bauen nach Plan.
+  Ansonsten ja wie empfohlen. V-04R: Es muss im Hybrid einen Ebenen Wrap der
+  Pruefdock-Tier-Binaries seiner Ebene im Stempel geben bei Abfrage ueber die Flaeche wird das
+  durchgereicht. V-05R: Ja, integrieren. V-06: Sie gilt fuer alle Gattungen mit untergeordnetem
+  Genus, also agnostisch wie empfohlen. Aber Genus spezifiziert Gattung und das muss als zwei
+  Symbole mitgefuehrt werden. V-08R: Der Planer traegt ja nur eine Versionsnummer und die wird
+  fuer seinen SHA256 gehasht. V-09R: Bitte wie empfohlen. V-10b: Korrekt, no extension erzeugt
+  denselben fingerprint. Ueberall auf allen Maschinen. Also genau wie du sagst ist es korrekt -
+  wie empfohlen Bau ja, Messung nein. V-11R: Vorschlag angenommen. Genau so. V-12: Bitte wie
+  empfohlen mit drehen. V-13: Es wird nur die Reihenfolge wallclock/macro/micro erlaubt, alles
+  andere ist syntaktisch falsch, bitte mit umstellen."
+
+### KON101-02 -- KONSEQUENZEN JE ENTSCHEID (Bauplan-Zuordnung)
+- V-01R AXISKIND: MITDREHEN + STRUKTURELL ERWEITERN (Owner ueberstimmt die Lead-Empfehlung
+  "append-only lassen" MIT Begruendung): das Enum traegt die Mess-Achsen-KATEGORIE (Mess/System/
+  Organ) compile-time und MUSS um das Vorhandensein von Haupt-/Unter-Achsen erweitert werden --
+  Zuordnung Unter-Achse -> Haupt-Achse UND Haupt-Achse -> Kategorie als CT-Mechanik. Das ist mehr
+  als ein Ordinal-Dreh: topics/axis.hpp bekommt im Bruch (B-5-Umfeld) die Zuordnungs-Erweiterung.
+  Serialisierungs-/Stempel-Wirkung im EINEN Bruch gedeckt.
+- V-02R HYBRID-ZEILE: die Lead-Vorschlags-Grammatik ("hy=" + stufen_id:sha512-128hex) ist
+  UEBERHOLT. Owner-Form: Grammatik EINER TIER-BINARY mit DURCHSTICH zu einer VERKETTUNG von
+  SHA256 der eingesteckten Hybrid-Pruefdock-Tier-Binaries. Die Form ist in den letzten 10 Wochen
+  dokumentiert -- EXPLORE-PFLICHT vor B-5 (gestartet: wf-Explore "hybrid-grammatik-dokumentiert").
+  Konsistenz-Anker: SHA-256-Linie wie E-A (Name) und V-08R (Planer).
+- V-03R GOLDEN-BUENDEL: EIN golden-Ereignis (A-09 + E-B + S-6a-Makro + K1-avx512-Korrektur) mit
+  EINEM Re-Anker, neuer TABU-CRC wird bei der Landungs-Meldung literal vorgelegt -- BESTAETIGT.
+  avx512 = PFLICHT fuer die Abgabe, war nie auszuschliessen ("wir bauen nach Plan") -- deckt die
+  KON100-S7-Streichung erneut; K1 faehrt zwingend im Buendel (kein Vorlauf-Posten).
+- V-04R E-1-FORM: EBENEN-WRAP -- der Hybrid-Stempel wrappt die Pruefdock-Tier-Binaries SEINER
+  EBENE; bei Abfrage ueber die FLAECHE (Interface) wird durchgereicht. Konsistent mit V-02R
+  (die SHA256-Verkettung IST der Ebenen-Wrap); Rekursions-Ablesbarkeit entsteht strukturell je
+  Ebene, kein separates d=<tiefe>-Feld noetig. Design-Vollzug in B-5a + HY-A2-Flaeche.
+- V-05R NAME: in AnatomyVersionLines integrieren (6->7-Bump, sizeof waechst mit) -- wie empfohlen.
+- V-06 SYMBOL-PFLICHT: gattungs-agnostisch fuer ALLE Gattungen mit untergeordnetem Genus -- ABER
+  Gattung UND Genus werden als ZWEI SYMBOLE mitgefuehrt (Genus spezifiziert Gattung). B-7/A-11
+  baut also 2 zusaetzliche Pflicht-Symbole (nicht 1): Gattungs-Symbol + Genus-Symbol am
+  gemeinsamen Traeger-Schnitt.
+- V-08R PLANER-SHA: SHA256 ueber die PLANER-VERSIONSNUMMER (nur diese) -- kein komplexes eigenes
+  Preimage, KEIN Einzug in das Tier-Preimage. Fuellt kFingerprintShaBewusstLeer in B-6.
+- V-09R prod2: Token "prod2_alder_lake"; RMA-Rueckkehr = ADDITIVE neue machine_id -- wie empfohlen.
+- V-10b CROSS-SKIP: no_extension erzeugt denselben Fingerprint ueberall auf allen Maschinen
+  (Owner-Klarstellung) -- Bau-SKIP JA, Mess-SKIP NEIN (Messwerte maschinengebunden, platform-Tag
+  traegt Provenienz).
+- V-11R NAMEN: ANGENOMMEN exakt -- PrueflingVerbundStrategy mit Verbund1_CeOnly / Verbund2_Replace
+  / Verbund3_Union, XML-Achsen-Token "union" statt "fulljoin". B-2 vollzieht.
+- V-12 work_mode-ORDINALE: mitdrehen auf {Build=0, Measure=1, Compare=2, Release=3} im Bruch
+  (B-5d) -- wie empfohlen.
+- V-13 CEB-LEGENDEN: STAERKER als Kanonisierung -- NUR die Reihenfolge wallclock/macro/micro ist
+  erlaubt, jede andere Permutation ist SYNTAKTISCH FALSCH (Wurf, keine stille Normalisierung).
+  ceb_tooling_list wird im Bruch (B-5f) auf Ordnungs-Validierung umgestellt; die permutierten
+  Zwillings-Schluessel verschwinden dadurch klassenweise.
+
+### KON101-03 -- STATUS: BRUCH ENTSPERRT
+- Alle 12 Rest-Fragen beantwortet; zusammen mit den 8 Explore-Streichungen (KON100) sind damit
+  ALLE 13 urspruenglichen OWNER-VORAB-15-Kandidaten entschieden. B-1..B-11 sind freigegeben,
+  SOBALD (a) die laufende Vorlauf-Welle (VL-1/2/3 + K2 + HY-A) seriell gelandet ist und (b) der
+  V-02R-Explore die dokumentierte Byte-Form geliefert hat. Frist unveraendert: vor F2 Fr 21.08.
 ## KONSOLIDIERUNG C (KON100) -- 17.08.2026: Zehn-Wochen-Explore der V-Fragen (13 -> 12 verengt, 8 Streichungen) + s13-Lens-Zyklus + HY-A-Dual-Lens + VL-5-Buchungen VOLLZOGEN
 
 ### KON100-01 -- ZEHN-WOCHEN-EXPLORE OWNER-VORAB-15 (Owner-Ruege 17.08. "Hast du alle Fragen
