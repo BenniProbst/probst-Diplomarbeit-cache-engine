@@ -16,6 +16,90 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CVIII (KON108) -- 17.08.2026 abends: OWNER-ANTWORTEN AUF DIE 6ER-LISTE
+## (KON107-03) -- E-5-KERN "EIN STACK AUS 3 KOMPONENTEN", v4.4 IN KRAFT, ORG-19+T19-GO, E-1-JA
+
+### KON108-01 -- OWNER-ANTWORTEN VERBATIM (17.08. abends, nach /login)
+- Frage 1 (E-3/PV-4-Termin): "Wir sprechen jetzt darueber, es muss jetzt entschieden werden,
+  was ueber reinen Bau hinaus geht."
+- Frage 2 (E-5/Kurven-Stack): "Erstmal ist 'je Eingangslast' definitiv das Parameter Resultat
+  eines Messgeraetes, welches die break even Auswertung auf der CEB anspricht, um mithilfe
+  dieser gegen die bekannten Messwerte fuer den Release die perfekte binary vorzuschlagen,
+  was die Unifikation aller 3 parallelen Designplaene verlangt in einer gemeinsamen
+  Modul-Steuerung der CEB und dazu muessen wir bitte chatten, um herauszufinden, wie die 3
+  zusammengehoeren. Denn es ist EIN Stack aus 3 Komponenten, bitte mit viel Kontext alle 3
+  erklaeren und ich klaere die Zusammenhaenge."
+- Frage 3 (K4): "Was ist eine S-Position? Bitte erklaere. Alles was ich bestaetigen soll,
+  muss ich wirklich erstmal im Detail kennen."
+- Frage 4 (T19/ORG-19): "Ja bitte die optionale neuzehnte Achse anlegen und einbinden. Mit in
+  den Text einbinden und auch die Projekte abgrenzen und kurz erklaeren, dass die Datenbank
+  ohne eine selbst-Optimierung und einen eigenen Compiler nicht die notwendige Performance
+  erreicht."
+- Frage 5 (E-1/UltiHash): "ja nimm das Konzept auf, weil die Datenbank nicht die Performance
+  bringen kann, wenn sie nicht perfekt auf eine maschine optimiert ist, UltiHash laeuft genau
+  nach diesem Prinzip, nur unter einer Gattung, welche den Speicher von Object storage in
+  einem eigenen Verfahren als eigene Gattung mit verschiedenen Genus komprimiert - wir haben
+  dies hier am Beispiel mit Kompilaten und optimierten Binaries fuer Suchalgorithmen
+  aufgefuehrt. Ja."
+- Frage 6 (v4.4): "Ja ich gebe es frei wie empfohlen, bitte commit und push."
+- Kenntnisnahmen: "a Freigabe, aber fuer b explore, es gibt einen neueren Artiekl dazu"
+- Betrieb: Spend-Limit-Abriss (Teammates hy-a-bau/vl3-bau tot, wf_e06c7f73-Synthese tot,
+  wf_b5b4ac36 3 Agenten tot) -> /login -> "Bitte stoppe die aktuellen workflows und resume
+  sie erneut, damit abgebrochene Teile sauber wieder anlaufen."
+
+### KON108-02 -- BUCHUNGEN JE ANTWORT
+- E-3: Die Ruecksprache findet JETZT im Chat statt; Gegenstand = NUR was ueber reinen Bau
+  hinausgeht. Vorlage der Ueber-Bau-Punkte in derselben Sitzung (Vokabular-Naht
+  SPARSE_NODE4_ART/node4, abstract-Profile P08/P09/P33, Registry-Einordnung der Paper-XMLs,
+  fail-loud bei profile_ref-Fehlziel, Wellen-Slot #44).
+- E-5 OWNER-KERN (NEU, ueberschreibt die Frageform von KON107-03/2): Die drei parallelen
+  Designplaene (heuristik/ + builder/curve_fit+decision_lambda_trees +
+  best_binary_selector-Haelfte-B) sind KEINE Konkurrenten, aus denen EINER Kanon wird --
+  sie sind EIN STACK AUS 3 KOMPONENTEN, dessen Unifikation eine GEMEINSAME MODUL-STEUERUNG
+  DER CEB verlangt. "je Eingangslast" = Parameter-Resultat eines MESSGERAETES, das die
+  Break-even-Auswertung AUF DER CEB anspricht, um gegen die bekannten Messwerte fuer den
+  Release die perfekte Binary vorzuschlagen. Naechster Schritt: Drei-Komponenten-Erklaerung
+  mit viel Kontext an den Owner (Chat), Owner klaert die Zusammenhaenge, DANN
+  Unifikations-Design. Die "Deprecate-Kandidaten"-Lesart des 09.08.-Bauplans ist damit
+  UEBERHOLT; Par.75-Sperre bleibt bis zum Unifikations-Design.
+- K4: Owner verlangt Begriffs-Erklaerung "S-Position" vor jeder Bestaetigung -- Erklaerung
+  im Chat geliefert; Entscheid VERTAGT bis nach der Erklaerung. Regel bestaetigt: nichts
+  bestaetigen lassen, was nicht im Detail erklaert wurde.
+- T19/ORG-19 GO: (a) T19-Katalog-Zeile persistence_target nach Deep-Research-Skizze anlegen
+  (5 Zielgroessen, pareto=true, K17 gepinnt, consteval-Anker im Zug); (b) ORG-19-IO als
+  optionale NEUNZEHNTE Achse ANLEGEN UND EINBINDEN (ueber die blosse Grammatik-Slot-
+  Deklaration hinaus -- Einbindungs-Auftrag; XML-opt-in, Genus-Interface-Erweiterung
+  store()/load() bei Verwendung, No-Bloat-konform); (c) Thesis-TEXT: Projekte abgrenzen +
+  Satz "die Datenbank erreicht ohne Selbst-Optimierung und eigenen Compiler nicht die
+  notwendige Performance" -- gebuendelt mit E-1-Textzug.
+- E-1 JA + NEUES INHALTS-WORT fuer die Thesis-Formulierung: UltiHash = dasselbe Prinzip
+  (perfekte Maschinen-Optimierung als Performance-Bedingung), unter EINER Gattung, die
+  Object-Storage-Speicher in einem eigenen Verfahren als eigene Gattung mit verschiedenen
+  Genus KOMPRIMIERT; die Diplomarbeit fuehrt das Prinzip am Beispiel Kompilate/optimierte
+  Binaries fuer Suchalgorithmen. Text-Bausteine: Selbstverstaendnis (Einleitung) +
+  Deploy-/Release-Abschnitt, Drei-Projekte-Abgrenzung, KEIN fremder Code.
+- v4.4 IN KRAFT + VOLLZOGEN: A2.3a VORLAGE-SPERRE (NEIN-Probe, STAND-Empfehlungs-Gegenlese,
+  Strang-Dopplungs-Probe) in Teil A gehoben; Umbrella-Commit 4117214 auf development
+  gepusht (GitLab, einziges Remote). B.3-Kandidaten 1-8 bleiben Owner-gated.
+- K(a) A11: Freigabe -- Vollzug laeuft (wt-ce-a11 @ ec048560, Drop committet; super-Haelfte
+  + Gegenprobe im Workflow-Strang).
+- K(b) TALOS: Bauzuschnitt "ohne PMC" NICHT festgezurrt -- Owner: es gibt einen NEUEREN
+  Artikel dazu. Explore laeuft (Agent talos-artikel-explore: Korpus nach 07.08. + Web:
+  Talos-Extensions/vPMU/KubeVirt-Stand 2026). Zuschnitt erst nach dem Explore.
+
+### KON108-03 -- BETRIEB: STOP/RESUME + PLATTE
+- Beide Workflows auf Owner-Anweisung GESTOPPT und via resumeFromRunId SAUBER RESUMED:
+  wf_b5b4ac36 (W1-Rest, 9/12 Agenten cached, hy-a-fix/vl3-fix/Landung laufen frisch an)
+  + wf_e06c7f73 (Verlust-Audit: 4 Sweeps cached, Fable-Synthese laeuft frisch).
+- Verlust-Audit Sweep-1-Vorbefund (Synthese folgt): ce/super-Restbestaende weitgehend
+  ENTHALTEN/ARCHIVIERT; ECHTER Fixbedarf: Cluster-Repo traegt uncommitted
+  scripts/20260815-helm-1014/ (12 Schrittskripte des helm-Upgrades) + ci-templates-Gitlink-
+  Nachzug -- #73 landete nur das Handout. wip/luecken-stufe2-pause-1308 (super, 13.08.,
+  Wachen-Haertung Stufe 2 UNGEPRUEFT-WIP) = potenziell offener Auftrag. Beides in den
+  Paragraph-20-Nachholarbeit-Nachtrag des Wellenplans (nach Synthese-Ruecklauf).
+- PLATTE: zweimal eng (12G/7G-Peak) -- Slot-Deckel auf 2 reduziert (slot_3 gesperrt),
+  uv-Cache + Build-Verzeichnisse der landereifen Worktrees geraeumt (k2 3,4G + vl12) mit
+  Belegpruefung (0 getrackt, 0 Messdaten); Basis danach 13G. Monitor laeuft.
 ## KONSOLIDIERUNG CVII (KON107) -- 17.08.2026: VOLL-LESUNG ALLER WORKFLOW-ERGEBNISSE +
 ## F-FRAGEN-RUNDE (F1-F6) ZU -- ES BLEIBEN SECHS OWNER-SAETZE + ZWEI KENNTNISNAHMEN
 
