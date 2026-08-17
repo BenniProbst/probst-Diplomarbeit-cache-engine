@@ -160,3 +160,24 @@ Zusammenhang der letzten 15 Kontexte"
 Agent ae7eee40cb12357e0 starb am Session-Limit MIT letztem Ergebnis:
 "Cell 1 green: 100% tests passed, 0 failed out of 499" — die gcc-rel-Zelle des
 Lande-Kombibaus war GRUEN (inkl. beider Planner-Tests nach Dependency-Fix).
+
+## NACHTRAG: std-only-ENTSCHEID + CEB-AUSWERTUNGS-BESCHLEUNIGUNG (spaetabends, 2. Runde)
+"Zur std-only-Frage: ja Spiegelung fällt, nur noch Lager-Ergebnisse lesen.
+best_binary_selector ist mit Komponente 3 zu mergen. Die CEB entscheidet stets die Wahl
+des Tier-Binaries, sogar im Falle der Hybriden, wie über 12 Wochen explore bereits
+definiert. Die Spiegelung war nie Absicht sondern Resultat eines Missverständnisses und
+ein Artefakt des Umbaus beim Split Planer+CEB. Die Mathematik wird also zu den maximalen
+Fähigkeiten der CEB in diese einkompiliert und in der CEB ist auch std::variant erlaubt
+im Gegensatz zu Tier/Hybrid, sodass wir Laufzeit die Verarbeitung mit multithreading und
+SIMD beschleunigen können und auch sollten um solch gigantische Datenmengen effizient
+verarbeiten zu können. Da die CEB selbst Hardware detection trägt, passt sie sich
+eigenständig dynamisch NUR für die Bibliotheken der Messauswertung an und unterstützt
+wahlweise single thread/multithread in Kombination ohne SIMD, AVX2 und AVX512 wenn je
+vorhanden und weitere generell unterstützte erweiterungen (deep research), sie sie zur
+Laufzeit per std::variant einschaltet und dem Planer die Auswertungs-Beschleunigung per
+notification vermeldet. Dabei ist besonders interessant die Anzahl der SIMD einheiten,
+weil immer nur ein thread eine SIMD EInheit ohne thrashing zu einer Zeit reservieren
+darf, auch beim pooling mit multithreading, wo also die meisten threads nur normale CPU
+Kerne ohne SIMD laufen werden, weil sich bereits bis zu 2 Kerne diese Einheiten
+reserviert haben und auf diesen Erweiterungen arbeiten. Das war die Antwort auf die
+Frage RF-E."

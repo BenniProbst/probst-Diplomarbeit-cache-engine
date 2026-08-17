@@ -16,6 +16,65 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXI (KON111) -- 17.08.2026 spaetabends (2. Runde): std-only-ENTSCHEID --
+## DIE SPIEGELUNG FAELLT; SELECTOR-MERGE IN KOMPONENTE 3; CEB-AUSWERTUNGS-BESCHLEUNIGUNG
+## MIT std::variant + HW-DETECTION + SIMD-EINHEITEN-RESERVIERUNG
+
+### KON111-01 -- OWNER-ENTSCHEID std-only (verbatim ASCII-transliteriert; Original mit
+### Umlauten in docs/sessions/backups/20260817-folge-bu-kontext11/20260817-owner-antworten-rf-r-runde/)
+- "ja Spiegelung faellt, nur noch Lager-Ergebnisse lesen. best_binary_selector ist mit
+  Komponente 3 zu mergen. Die CEB entscheidet stets die Wahl des Tier-Binaries, sogar im
+  Falle der Hybriden, wie ueber 12 Wochen explore bereits definiert. Die Spiegelung war
+  nie Absicht sondern Resultat eines Missverstaendnisses und ein Artefakt des Umbaus beim
+  Split Planer+CEB."
+- BUCHUNG: (a) Die std-only-Zweitschrift der Break-Even-Mathematik im
+  best_binary_selector (PiecewiseCurve, Haelfte B) FAELLT ersatzlos -- REV-DATA-12 und
+  die Typ-B-Architektur-Divergenz (d2-Bericht) loesen sich damit AUF, nicht durch
+  Angleichung, sondern durch WEGFALL der Abschrift. (b) best_binary_selector wird MIT
+  KOMPONENTE 3 GEMERGT (in die CEB-Modul-Steuerung); super-seitige Konsumenten lesen
+  kuenftig NUR NOCH LAGER-ERGEBNISSE (Lager-Typ 3 Funktions-Synthese + Typ 4
+  XML-Loesungs-Cache, KON110-04) statt selbst zu rechnen. (c) ENTSCHEIDUNGS-HOHEIT:
+  die CEB entscheidet STETS die Tier-Binary-Wahl -- AUCH fuer Hybride (12W-definiert;
+  der Hybrid wendet zur Laufzeit die CEB-vorbereiteten Profile/Schwellen an und misst
+  die Wechsel-Penalty gegen, KON110-03/RF-D -- er ENTSCHEIDET die Wahl nicht neu).
+- UEBERHOLT-Marker (Orte): best_binary_selector.hpp Kopf-Doktrin "self-contained
+  C++17-Spiegel" + decision_lambda_trees.hpp:10-11 ("SELF-CONTAINED ... traegt eine
+  std-only Spiegelung derselben Rueckwaerts-Wahl") + Ledger-REV-DATA-12-Fuehrung
+  (KON60-Nachtrag A "bleibt OFFEN") -> alle drei mit KON111-Datum markieren; der
+  D2c-Umbau (Sieger je Eingangslast) zieht in den MERGE um, nicht in den Alt-Selector.
+
+### KON111-02 -- CEB-AUSWERTUNGS-BESCHLEUNIGUNG (NEUES ARCHITEKTUR-STUECK)
+- "Die Mathematik wird zu den maximalen Faehigkeiten der CEB in diese einkompiliert und
+  in der CEB ist auch std::variant ERLAUBT im Gegensatz zu Tier/Hybrid" -- damit
+  Laufzeit-Verarbeitung mit MULTITHREADING + SIMD fuer die gigantischen Datenmengen
+  der Auswertung. (Praezisiert die Section-49-Doktrin "KEIN std::variant": das Verbot
+  gilt fuer Tier/Hybrid/statische Achsen -- die CEB-MESS-AUSWERTUNGS-Bibliotheken sind
+  die deklarierte AUSNAHME-ZONE.)
+- HW-DETECTION-SELBSTANPASSUNG: die CEB traegt Hardware-Detection und passt sich
+  eigenstaendig dynamisch NUR fuer die Bibliotheken der MESS-AUSWERTUNG an:
+  wahlweise single/multithread x (ohne SIMD | AVX2 | AVX512 wenn vorhanden | weitere
+  generell unterstuetzte Erweiterungen -> DEEP RESEARCH beauftragt), zur Laufzeit per
+  std::variant eingeschaltet; die CEB VERMELDET dem Planer die gewaehlte
+  Auswertungs-Beschleunigung per NOTIFICATION (Design: in die bestehende
+  Kanal-Doktrin-Nachrichtenklasse hinauf einordnen, kein neuer Kanal).
+- SIMD-EINHEITEN-RESERVIERUNG (Pooling-Regel): immer nur EIN Thread darf eine
+  SIMD-Einheit zu einer Zeit ohne Thrashing reservieren -- auch beim Pooling mit
+  Multithreading laufen die MEISTEN Threads auf normalen CPU-Kernen ohne SIMD, weil
+  sich bereits bis zu 2 Kerne diese Einheiten reserviert haben und darauf arbeiten.
+  -> Der beauftragte DEEP RESEARCH klaert die HW-Fakten je Ziel-CPU (Zen 5 / Raptor
+  Lake: SIMD-Pipes je Kern vs. SMT-Sibling-Konkurrenz, AVX-512-Lizenz-/Frequenz-
+  Verhalten, sinnvolle Reservierungs-Zahl je Maschine) -- die "bis zu 2" ist als
+  Owner-Betriebsannahme gebucht, die Zahl je Maschine liefert der Research + Messung.
+- BAU-FOLGEN: (a) Selector-Merge-Paket (Alt-Werkzeug -> CEB-Komponente 3, super-Leser
+  auf Lager-Ergebnisse umstellen, Alt-Datei deprecaten nie loeschen); (b)
+  Beschleunigungs-Schicht der Auswertungs-Bibliotheken (variant-Dispatch, Thread-Pool
+  mit SIMD-Reservierungs-Slots, Kopplung an Drei-Bereiche-Concurrency ce-intern
+  floor((T-4)/4)x4); (c) Planer-Notification; (d) NEUER Deep-Research
+  SIMD-/Erweiterungs-Matrix (buendeln mit dem RF-B-Filter-Research, Task #88).
+- EINORDNUNG: verlaengert KON110-04 (Auswertung NUR auf der CEB; volle CEB
+  abwaertskompatibel als Auswerte-Instanz) und schliesst die letzte offene
+  Design-Wahl des 3-Komponenten-Systems. Unifikations-Designplan (wf_fab57002,
+  laeuft) nimmt KON111 als Eingang auf.
 ## KONSOLIDIERUNG CX (KON110) -- 17.08.2026 spaetabends: OWNER-ANTWORTEN RF-A..RF-E +
 ## FRAGE 3 + R-1..R-5 -- DAS 3-KOMPONENTEN-SYSTEM VOLLSTAENDIG SPEZIFIZIERT; ZWEI NEUE
 ## LAGER-TYPEN; mess/ BEKOMMT EIGENE S-POSITION; PAPER=PRUEFLINGE MIT VOLLER IDENTITAET
