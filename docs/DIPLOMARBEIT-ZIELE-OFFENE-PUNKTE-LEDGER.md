@@ -16,6 +16,167 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CX (KON110) -- 17.08.2026 spaetabends: OWNER-ANTWORTEN RF-A..RF-E +
+## FRAGE 3 + R-1..R-5 -- DAS 3-KOMPONENTEN-SYSTEM VOLLSTAENDIG SPEZIFIZIERT; ZWEI NEUE
+## LAGER-TYPEN; mess/ BEKOMMT EIGENE S-POSITION; PAPER=PRUEFLINGE MIT VOLLER IDENTITAET
+
+(Verbatims mit Umlauten: docs/sessions/backups/... folge-bu naechster Zug; BU additiv
+~/backups-workflow/20260817-owner-antworten-rf-r-runde/. Ledger-Fassung ASCII-transliteriert.)
+
+### KON110-01 -- FRAGE-2-NACHTRAG: DAS MESSGERAET IST checkpoint_measure
+- Owner: Das Messgeraet = checkpoint_measure, ausgefuehrt ueber w/ma/mi, in mi ueber
+  spezielle ACHSEN-ERFOLGSPARAMETER; traegt alle Messwerte feingliedrig zusammen.
+- WERTVOLLSTE AUSWERTUNG: welche Achse (Achsen-Interface) und welches Gattung+Genus-
+  Interface PROZENTUAL in DAUER und MAECHTIGKEIT der Aufrufe besonders haeufig
+  angesprochen wird -> daraus: fuer welches Last-Profil/Abfrage-Art ein Algorithmus
+  optimal ist. Bei einer Last-Anfrage aufs Interface ist damit BEREITS klar, welches
+  Tier-Binary passt: die Anfrage selbst traegt Ziel, Groesse, Beschaffenheit; ueber
+  einige Anfragen wird das ANFRAGE-MUSTER bekannt -> die vorbereitete Hybrid-Tier-
+  Binary passt sich DYNAMISCH an, ueber Profile aus ihrem MACHINE LEARNING der
+  Messung+Auswertung.
+- 🔴 FLAECHE 3 IST ZWEIFACH VERSCHIEDEN: zwischen Planer<->CEB und CEB<->Tier-Binary
+  aufgrund der Zielsetzung UNTERSCHIEDLICH gestaltet -- Explore-Auftrag: Kanaele und
+  Ziele der Vertraege nachlesen (12W). WIRKT AUF #20 (Flaeche-3-Vereinigung): die
+  Vereinigung darf die ZWEI Vertragsformen nicht zu einer verschmelzen -- Praezisierung
+  in den #20-Strang.
+- KURVENMODELL = FACTORY: Kurvenmodelle duerfen mathematisch ZUSAMMENGESETZT sein;
+  der VERIFY-SWEEP entscheidet je Teilbereich, welche Synthese die Realitaet besser
+  widerspiegelt; KEIN Bloat auf Kleinst-Messpunkte -- Ziel ist PERFORMANCE DURCH
+  ABSTRAKTION: groessere Bereiche durch sehr aehnliche Funktionen mit Ungenauigkeit
+  DEFAULT +-3% JE PARAMETER nachbilden. (Beantwortet RF-Kurvenmodell: weder "ein
+  Kanon" noch "zwei Klassen", sondern Factory + verify-sweep-Wahl je Teilbereich.)
+- std-only-Spiegelung: Erklaerung geschuldet -- GELIEFERT im Chat (siehe KON110-06).
+
+### KON110-02 -- RF-A: TRACING = CEB-ENTWORFENE MESS-EIGENSCHAFT + ARENA-LOGGING,
+### MIT DEM MESSSYSTEM UNTEILBAR VERWACHSEN (Kanal-Buendel-Hierarchie)
+- Tracing ordnet jeden checkpoint_measure()-Aufruf bei ma/mi je Genus-/Achsen-
+  Interface zu; unter w die oberste CEB-seitige Kategorie des gemischten
+  Aufruf-Profils (PROFILER). Jeder Interface-Aufruf wird von Anfang bis Ende auf
+  ERFOLGS-PARAMETER + GESAMT-LAUFZEIT gemessen.
+- KANAL-HIERARCHIE: jedes ACHSEN-Interface = eigener Kanal -> gebuendelt in
+  GENUS-Interface-Kanaele -> gebuendelt in w-CEB-AUFRUF-PATTERN (multiple
+  Genus-Kanaele ueber das Last-Profil zusammengezogen).
+- KLAMMER-SEMANTIK: default wird NUR die INNERSTE checkpoint_measure-Klammer
+  gemessen; umklammernde checkpoint_measure messen selbst immer groebere Ein-/
+  Ausstiegspunkte eines Parameters ueber die inneren Klammern hinweg -> die
+  Arena-Auswertung MUSS die inneren Kanal-Klammern auf den Bereich der aeusseren
+  ZUSAMMENFUEHREN.
+- Owner: "Dieser Prozess ist beschrieben - frische dein Gedaechtnis auf" ->
+  12W-Explore + gruendlicher Fable-5-max-Designplan PFLICHT vor dem Bau
+  (in der ultracode-Gesamtkonsolidierung enthalten).
+
+### KON110-03 -- RF-B/RF-C/RF-D: FILTER-REGISTRY (NEU), 32=DECKEL, ML-WECHSELKOSTEN
+- RF-B GEWICHTUNG: Default kommt aus einer PARALLELEN CACHE-ENGINE-REGISTRY FUER
+  PARAMETER-FILTER -- EXISTIERT NOCH NICHT (Bau-Posten). Erster Filter = KUERZESTE
+  GESAMTZEIT als Erfolgs-Filter fuers Ranking. Danach: der ALTE Deep-Research (09.07.
+  Pareto/Objectives) + ein ZUSAETZLICHER NEUER Deep-Research liefern Filter fuer ALLE
+  Parameter + deren Erfolgskonzepte, per IMPACT sortiert gerankt; in der XML als
+  Auswertungskriterium fuer den Release nach allen 3 Komponentenstufen waehlbar.
+  AUFGABE: Katalog anlegen, AEHNLICH dem Registry-Achsen-Katalog eines Prueflings.
+- RF-C TOP-32: die 32 war ein VORLAEUFIG STATISCH festgelegter Deckel. Liefert die
+  Auswertung WENIGER optimale Tier-Binaries fuer Einstellungen+Last-Profil, wird eine
+  KLEINERE Heuristik-Hybrid-Tier-Binary kompiliert -- mit der statischen Maximal-
+  Anzahl der in Komponente 2 ergruendeten Optimal-Bereiche. (Kein Auffuellen; die
+  Dock-Zahl ist je Hybrid-Kompilat statisch = Anzahl der Optimal-Bereiche.)
+- RF-D WECHSELKOSTEN: der Hybrid MISST ZUR LAUFZEIT GEGEN (Verhalten von Wechsel +
+  Tier-Binaries beim Durchstellen von Befehlen/Signalen). Umstellung = Penalty +
+  Latenz; lohnt per MACHINE LEARNING nur, wenn der Geschwindigkeitsgewinn den Wechsel
+  ausgleicht UND die Loesung per HEURISTIK-LOOKAHEAD auf vermutete FOLGEZUSTAENDE
+  voraussichtlich schneller bleibt -- die Wahrscheinlichkeit des Aufrufprofils einer
+  Eingangslast ist aus ma-Benchmarking in Auswertung mit w-Benchmarking GENAU bekannt.
+  XML: interpretierbare, zum INIT ladbare PROFILE geben die real gefahrenen
+  Heuristik-Strategien vor; einige DEFAULT-Profile werden definiert.
+
+### KON110-04 -- RF-E: KORREKTUR + ZWEI NEUE LAGER-DATENTYP-KATEGORIEN
+- KORREKTUR meiner Bau-/Laufzeit-Annahme: (1) Ueber den PLANER laufen fuer die
+  MESS-PENALTY-Messung VERSCHIEDENE CEB IN SERIE, um die MESSFUEHLER-LATENZEN
+  HERAUSZURECHNEN; (2) dann bauen+messen; (3) dann AUSWERTUNG MIT DER VOLLEN CEB mit
+  allen Messgeraeten (abwaertskompatibel). Die curve_fit-Auswertung findet also NUR
+  auf der CEB zur Laufzeit statt.
+- LAGER-TYP 3 (NEU): FUNKTIONS-SYNTHESE = neue Lager-Datentyp-Kategorie -- DRITTER
+  Typ nach binary und Messung. Batch-Ergebnisse ins Lager; die Messwert-Tabellen
+  (Quelle der Parameter-Synthese-Funktionen) werden im RAM gehalten und ueber die
+  maximale Thread-Zahl einer Maschine verarbeitet. BATCH-PIPELINE-ERWEITERUNG
+  bauen->messen->compare->release ist WOERTLICH gemeint (12W-Explore very thorough).
+- LAGER-TYP 4 (NEU): XML-LOESUNGS-CACHE -- zu einem XML-Profil gibt es genau EINE
+  deterministische Loesung -> Lager-Erweiterung, die XML-Profile gegen Tier-Binary-
+  bzw. Hybrid-Loesungen CACHED.
+- KUR VEN-CACHE-OEKONOMIE: je Maschine wird in der Regel EINMAL voll gemessen; die
+  Synthese-Funktionen bleiben LANGFRISTIG verfuegbar. Komponente 2+3 beziehen sich
+  nach dem Erstlauf NICHT mehr auf die Roh-Messwerte, sondern rechnen aus den
+  Lager-Bestaenden der Synthese-Funktionen; fehlende Permutationen werden im Lager
+  ERGAENZT, der Kernbestand bleibt -> immense Beschleunigung + Vereinfachung der
+  Experiment-Auswertung. (Konsistent mit Bestands-Doktrin: gueltiger Bestand=SKIP.)
+
+### KON110-05 -- FRAGE 3 + R-1..R-5
+- FRAGE 3 ENTSCHIEDEN: mess/ BEKOMMT EINE EIGENE S-POSITION -- Owner: "Ja braucht
+  definitiv eine eigene S-Position, weil der Aufbau sehr komplex und vielschichtig
+  ist, aber gleichzeitig ist es ein additives Feature." VERMERK (kein Glattrechnen):
+  der Nachsatz "genau wie du es empfohlen hast" steht in Spannung zur Lead-Empfehlung
+  (die stuetzte den #29-Default); das WAS ist eindeutig (eigene Position), Registrierung
+  im S-Register mit NAECHSTER FREIER NUMMER via Design (S-10-Naehe pruefen); die
+  geteilten Naht-Typen->Querschnitt-Haelfte des #29-Defaults bleibt davon unberuehrt
+  (loest K2) sofern das Design nichts anderes ergibt.
+- R-1 PAPER=PRUEFLINGE: die 33 Paper werden in PRUEFLINGE uebersetzt -- mangels
+  eigener Achsen ABSTRAKT oder mit vollen Achsen als VOLLER Pruefling; per XML als
+  GESAMT-KLASSE ladbar; NUR EXTERNE Prueflinge brauchen eine Pfadangabe (Paper sind
+  intern = Stand der Technik, gleiches Prinzip). Sie erhalten EIGENE VOLLE
+  LAGER-IDENTITAET mit eigenen Stempeln in den "Farben" der neuen Achsen; deren
+  Achsen muessen ALLEN metaprogrammatischen Anforderungen EXAKT genuegen, sonst
+  COMPILE-TIME-ERROR. FORSCHER-WORKFLOW: eigene Achsen-Algorithmen +
+  Gesamt-Funktions-Kompositionen hinter dem Gattung+Genus-Interface MARKIEREN und
+  ausmessen -> Ranking gegen alle Konkurrenten ueber alle verlangten (default ALLE)
+  Parameter -> der PLANER gibt am Experiment-Ende aus, wo die markierten Achsen je
+  gewaehltem Parameter im Ranking gegen den Lager-Stand stehen -> iteratives Tweaken
+  in neuen Runden.
+- R-2 BEGRIFFS-KONFORMITAET STATT UEBERSETZER: (b) Registry-Deklaration MEHRERER
+  Begriffe, die compile-time als DASSELBE aufgefasst/umbenannt werden (Alias-
+  Deklaration, dieselben Ziele). Muessen wir UEBERSETZEN, ist das eine REGRESSION =
+  COMPILE-TIME-FEHLER. Code-ADAPTER fuer Interfaces erlaubt (Original-Paper
+  erhalten), aber AUSNAHME. XML = WAS/WO/WANN, NIE das WIE.
+- R-3 ABSTRACT-PROFILE: P08/P09/P33 werden zu ABSTRAKTEN PRUEFLINGEN umgebaut; es
+  greift die Regel der abstrakt-leeren Achse MIT DEN 3 JOIN-MODI Pruefling x Stand
+  der Technik x Full join (12W-Explore beauftragt; = Verbund1_CeOnly/Verbund2_Replace/
+  Verbund3_Union nach V-11R-Umbenennung -- Zuordnung im Explore verifizieren), per XML
+  definiert. LAGER-SKIP-LOGIK: ist das Lager vollstaendig (Binaries+Messwerte), wird
+  der Stand der Technik NICHT neu gemessen -- nur Pruefling + Full join.
+- R-4: Fehlziel von profile_ref = harter Planer-Fehler, angezeigt als UNERFUELLBARES
+  XML-ZIEL "ERROR".
+- R-5: Slot BESTAETIGT (#44-Bau W2, gebuendelt mit #18/S-13).
+
+### KON110-06 -- NEUE BAU-/DESIGN-POSTEN AUS DIESER RUNDE (Traeger)
+- P-A KANAL-/ARENA-DESIGN (RF-A): 12W-Explore + Fable-max-Designplan der
+  checkpoint_measure-Kanal-Hierarchie inkl. Klammer-Zusammenfuehrung -> Teil der
+  ultracode-Gesamtkonsolidierung, danach eigener Design-Posten (#53-Umfeld).
+- P-B PARAMETER-FILTER-REGISTRY (RF-B): neuer Katalog analog Achsen-Katalog; Filter 1
+  = kuerzeste Gesamtzeit; alter (09.07.) + NEUER Deep-Research fuer alle Parameter-
+  Erfolgskonzepte, impact-sortiert; XML-waehlbar. NEUER Task.
+- P-C KLEINE HYBRIDE (RF-C): Hybrid-Kompilat mit statischer Dock-Anzahl = Anzahl der
+  Komponente-2-Optimal-Bereiche (<=32) -> in HY-B/HY-C-Design einarbeiten.
+- P-D HYBRID-ML-PROFILE (RF-D): XML-interpretierbare, init-ladbare Strategie-Profile
+  + Default-Profile; Laufzeit-Gegenmessung von Wechsel-Penalty; Lookahead-Heuristik
+  aus ma x w-Wahrscheinlichkeiten -> HY-C/W4-Design.
+- P-E LAGER-TYP-3+4 (RF-E): Funktions-Synthese-Kategorie + XML-Loesungs-Cache ->
+  in #57 (Lager-Vollausbau) und #18/S-13 einarbeiten; Batch-Pipeline woertlich
+  (12W-Explore).
+- P-F FLAECHE-3-DIFFERENZIERUNG: Explore Kanaele/Vertraege Planer<->CEB vs
+  CEB<->Tier VOR der #20-Vereinigung (Praezisierung an #20).
+- P-G mess/-S-POSITION: Register-Nachtrag + Design (Frage 3).
+- P-H PAPER-PRUEFLINGS-UEBERSETZUNG: 33 Paper -> Prueflinge (R-1) + Begriffs-Alias-
+  Registry (R-2) + Markierungs-/Ranking-Ausgabe des Planers -> #44-Umfeld W2.
+- std-only-ERKLAERUNG GELIEFERT (Chat): best_binary_selector ist absichtlich
+  self-contained C++17 ohne Engine-Includes, damit super-Werkzeuge ihn konsumieren
+  koennen; er traegt deshalb eine SPIEGELUNG der Break-Even-Mathematik
+  (PiecewiseCurve statt AxisSpline) statt die Engine zu rufen. Offene Design-Wahl im
+  Licht von RF-E neu gestellt (siehe Chat-Frage an Owner).
+
+### KON110-07 -- BETRIEB
+- Session-Limit-Abriss (resets 10:10pm UTC) toetete den Lande-Steward -- LETZTER
+  BELEG: "Cell 1 green: 100% tests passed, 0 failed out of 499" (gcc-rel-Zelle des
+  Lande-Kombibaus GRUEN inkl. beider Planner-Tests nach Dependency-Fix). /login ->
+  Owner: resume alle + Arbeitsfluesse reparieren. wf_b5b4ac36 resumed; ultracode-
+  Gesamtkonsolidierung 15 Kontexte gestartet. TSan-Grenze-Nachzug f45e995b liegt auf
+  der ungepushten Landung (KON109-Nachlauf).
 ## KONSOLIDIERUNG CIX (KON109) -- 17.08.2026 abends: E-5-SYSTEM-KERN (Owner-Antwort
 ## Frage 2 VERBATIM) + SAUBERE PAUSE -- WELLE 1 GELANDET (lokal), ALLES GESICHERT
 
