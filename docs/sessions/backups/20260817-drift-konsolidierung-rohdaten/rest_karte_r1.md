@@ -1,0 +1,522 @@
+# REST-KARTE r1 — Ledger-Zeilen 16627-19300 (gelesen: jede Zeile)
+
+**Segment-Inhalt:** Nachtraege 08./09.08. (Lager LAG-P1..P4, D5-1 Perzentil-Kanon, TEIL A F1-Durchstich /
+TEIL B Nenner-Divergenz, Rangfolge-Korrektur, D5-5/HDR, Lagerhaltung+AVX-Maximum, W0b-7 Gegenorakel,
+EIN-BLECH + Owner-Richtigstellung, Modell-Matrix, D1-Fehlbefund, BLANKO-GO + GO-1/2/3, zehn Owner-Entscheide
+07.08., CI-Befunde, ledger_nachtrag.sh) · dann UR-LEDGER: §0 GOAL/MISSION + GOAL-V7/V6/V5/V4 + MATRIX ·
+§1-§11 (FF0-FF4, 8 Blocker, Spur S/P, ABI-Budget, CI-Haertung, Governance, §10.1 E-Nomenklatur, §11-G/H/I) ·
+§12 Fortschreibungs-Log 03.07.-16.07. · §13 Nacht-Audit + Katalog #253-#279 + GOAL-V2/V3 ·
+§14 Gate-Sammlung · §15 XML-Experiment-Architektur + Kontextuebergaben 15.9/15.10.
+
+**Massstab-Abgleich:** kopf_referenz_kon60_93.md + ledger_gegenlese_karte.md (73 Posten) + KON94/95/96.
+Was dort gedeckt oder datiert ueberholt ist, steht hier NICHT.
+
+---
+
+## (A) LEBEND-UNGEDECKT
+
+### A-I — Abnahme-, Mess- und Anti-Phantom-Regeln (harte Semantik, sofort wirksam)
+
+1. **Z.16653-16669 (Nachtrag 08.08., LAG-P1)** — ABNAHME AM GEGENSTAND, NICHT AN DER ABSICHTSERKLAERUNG.
+   Die Zeile `[bestandslog] aktiv: doc_key=…` faellt, der Schreibweg scheitert DANACH
+   (`fehlerklasse=reservierung_nicht_gespeichert … Emission laeuft trotzdem weiter`) — ohne Abbruch.
+   *„Wer nur die aktiv-Zeile prueft, kann ein leeres Lager fuer scharf halten."* Gueltige Abnahme =
+   **Existenz des Dokuments im Store (`object_stat`)**, nicht das Log. → **Task-Karte #57 (Lager-Vollausbau)
+   + ARBEITSWEISE (Abnahme-Muster)**
+
+2. **Z.16988-16994 (TEIL B, 09.08.)** — DREITEILIGE VERGLEICHS-GUELTIGKEIT. Ein Vergleich ist nur gueltig,
+   wenn **Commit, Baumzustand UND Host-Klasse** gleich sind; alle drei gehoeren IN die Ausgabe, nicht in einen
+   Kommentar daneben. „457" ist keine Aussage; „457, nach `make` an `404ff6cf`, auf prod1 mit AVX-512" ist eine.
+   Werkzeug existiert: `scripts/ci_host_klassen_bericht.sh`. → **ARBEITSWEISE**
+
+3. **Z.17661-17669 (D1-Fehlbefund, 08.08. nachts)** — DIE UMKEHRUNG VON V11-BELEGZEILE. Eine dokumentierte
+   historische Messung wurde als Ist-Zustand gelesen (Kommentar super-Makefile :107-117, Stand 06.08.).
+   Regel: eine Messung **nach** der Aussage ist eine Korrektur — eine Messung **vor** der Aussage ist KEINE
+   Bestaetigung. *„Jeder aus einem Kommentar oder Ledger-Eintrag uebernommene Zahlenwert braucht eine eigene
+   Ist-Messung, bevor daraus ein Bau-Posten wird."* (Gilt unmittelbar fuer diese Konsolidierung.)
+   → **ARBEITSWEISE**
+
+4. **Z.17795-17804 (zehn Owner-Entscheide, 08.08.)** — LISTEN ALTERN, WAEHREND GEARBEITET WIRD. Fuenf von zehn
+   als „offen" gefuehrten Owner-Entscheiden waren erledigt oder gegenstandslos; drei davon wurden von der
+   laufenden Arbeit miterledigt. *„Ein Posten, der als offen gefuehrt wird und laengst erledigt ist, kostet
+   dieselbe Aufmerksamkeit wie ein echter."* Gegenmassnahme: vor jeder Vorlage die Posten AM OBJEKT pruefen,
+   nie die Liste zitieren. → **ARBEITSWEISE**
+
+5. **Z.17604-17609 (Modell-Matrix-Nachtrag)** — DATIERTE MOMENTAUFNAHME IN EINEM REGELWERK ALTERT LAUTLOS.
+   Ein Doktrin-Absatz mit woertlichem Owner-Zitat UND Datum sieht auch dann wie geltendes Recht aus, wenn er
+   nur noch Geschichte ist. Konsequenz: **jedes woertliche Owner-Zitat im Regelteil braucht einen
+   GUELTIGKEITSVERMERK, nicht nur ein Entstehungsdatum.** → **ARBEITSWEISE (Pflegeregel)**
+
+6. **Z.17093-17099 (nachgeholter Pflicht-Explore)** — TOTE THESIS-DATEIEN VERDREIFACHEN BEFUNDE. Von 22
+   markierten Konflikten hielten 10, fielen 11, 1 unklar; drei Fehlalarme stammten aus toten Thesis-Dateien
+   (Kopfvermerk „NICHT eingebunden", von `diplomarbeit.tex` nicht referenziert). *„Wer nur greppt, ohne die
+   Einbindung zu pruefen, verdreifacht hier seine Befunde."* → **ARBEITSWEISE (Thesis-Greps)**
+
+7. **Z.18711 (#24 P4, 12.07.) — SEGMENT-ATTRIBUTIONS-KOMMENSURABILITAET (haert KON95-O2!).**
+   `Σ(seg_*_ns)/total_ns` = 3x-29x, variabel je Zeile. Die `seg_*_ns` stammen aus einem SEPARATEN
+   19-Segment-Lauf (`run_workload_segmented`, `cache_engine_builder_iterator.hpp:210-214,327-329`) und sind
+   kommensurabel mit **`seg_run_total_ns`**, NICHT mit `total_ns`. An echten golden-320-Daten verifiziert:
+   `Σ(19 Organ-seg + seg_framework_ns) == seg_run_total_ns` exakt (seg_coverage 0.99999). Stapeln gegen
+   `total_ns` ist TABU (Phantom). KON95-O2 definiert die Spaltenmenge `E(A)=kV3AxisSchema+seg_*` — die
+   Bezugsgroesse fehlt dort. → **Designplan-TDD (Sheet-/Auswertungs-Design, #18)**
+
+8. **Z.18269-18291 (§11-H, Deep-Research 11.07.)** — `bytes_in_use_peak` HONEST-0 IST BEWIESEN KORREKT.
+   Drei Disqualifikatoren: 123 per-Allokator-Gauge-Call-Sites in 26 Dateien ohne Chokepoint; EBO-CRTP-Basis
+   ohne Datenmember; 7 Pool-Stores ohne in-use-Gauge (Peak degenerierte je Familie verschieden = Phantom);
+   `restore_statistics`-Memento macht die Fenster-Semantik unbestimmt. Ebenso: LATENCY_MEAN+THROUGHPUT sind
+   REDUNDANT (dieselbe WallClock-Quelle wie total_cycles/op_count/throughput_ops_per_sec). **Jede kuenftige
+   Speicher-/Pareto-Achse muss das respektieren oder das Tracking neu bauen.** → **Designplan-TDD (Pareto/
+   Objectives, G-3) + ARBEITSWEISE (Anti-Phantom)**
+
+9. **Z.18713 (#24 P2, 12.07.)** — SPACE-PARETO IST HEUTE EIN PHANTOM. `bytes_in_use`/`bytes_alloc`/
+   `stat_allocator_*` = 0/162 populiert; der einzige populierte „peak" (`stat_search_algo_peak`, max 21369)
+   ist ein **Element-Count, keine Bytes**, und differenziert die Konfigurationen space-maessig NICHT.
+   P2 wurde bewusst NICHT gebaut. → **Designplan-TDD (bindet an A-8)**
+
+10. **Z.18427 (GO-3 Deklarations-Wahrheit, 12.07.)** — DIE 9 SKALAREN MESS-KERNE SIND EINGEFROREN.
+    `test_striktheit_scan_kernel_purity` friert das Interface der 9 skalaren Mess-Kerne ein: **das
+    Zugriffsmuster IST das Signal, ISA-Routing darin = Signal-Korruption** (SOTA-belegt). Dazu: zentrale
+    ISA-Flag-Kaskade + consteval-Kohaerenz-Guard + real-DLL-Beleg per objdump (zmm/ymm) + Configure-
+    Negativ-Probe. → **Designplan-TDD (Mess-Validitaet) + keine Aktion ausser Schutz**
+
+11. **Z.18693 (CMD-2, 11.07.)** — „STORE" IST THESIS-KANONISCH GENAU T4+T5+T6. (LayoutAwareChunkedStore,
+    `02_suchbaeume:374-380`); „+T11/T13" ist Ledger-Erweiterung. Ein c2/c3-Skalar wurde bewusst NICHT gebaut,
+    weil er Pruefsummen + Bytes + 4x dieselbe Traversierung mischen wuerde (Phantom); er braucht einen
+    modalitaets-gleichen Semantik-Entscheid ODER die Reihe-B-Cross-Permutations-Maschinerie.
+    → **Designplan-TDD / Owner-Vorlage bei Bedarf**
+
+### A-II — Owner-Entscheide und Owner-Fragen ohne Kopf-Spur
+
+12. **Z.17264-17272 (Lagerhaltung/AVX, 09.08.) — ZWEI ECHTE OWNER-ENTSCHEIDE, beide nicht billig ruecknehmbar.**
+    (a) **AVX-512 in die golden-Bau-Matrix?** Das kippt ein stehendes, ZWEIFACH deklariertes Owner-Wort
+    („avx512 ist nicht universell und bleibt draussen", `experiment_golden_kern.xml:339`,
+    `all_axes_golden.profile.xml:181-182`) — eine bewusste Umkehr, kein Nachziehen.
+    (b) **Cross-Maschinen-SKIP fuer `no_extension`:** eine `no_extension`-Binary traegt auf BEIDEN Maschinen
+    denselben Fingerprint (kein `+ext`-Segment, kein Maschinen-Glied im Preimage) → prod2 uebernaehme eine von
+    prod1 gebaute Binary per SKIP. Fuer den BAU plausibel, fuer die MESS-PROVENIENZ heikel.
+    → **Owner-Vorlage (beide), danach Wellenplan/#57**
+
+13. **Z.17786-17793 (08.08.) — FUENF OFFENE OWNER-ENTSCHEIDE aus dem 07.08.-Block, im Kopf unsichtbar:**
+    **G-1** sechs STOPP-Gate-Entscheide E-A…E-F (Lead-Empfehlungen liegen ausgearbeitet vor: `b / ii / b / a /
+    b / a`) · **G-3** vier Entscheide aus Welle C (Pareto) · **G-4** fuenf Entscheide aus Welle D (Cluster) ·
+    **G-5** `RunMethodology`-Enum-Reihenfolge = **Stempel-/ABI-Ereignis** und damit teurer Umbau OHNE Defekt
+    (einziger der fuenf, der ausdruecklich beim Owner bleibt). (G-2 ist als #17 im Kopf.)
+    → **Owner-Vorlage; G-5 zusaetzlich in das F2-Bump-Fenster #15**
+
+14. **Z.17869-17873 (ledger_nachtrag.sh, 08.08.)** — NEUN DOKTRIN-LUECKEN LIEGEN BEIM OWNER. Vom Audit gegen
+    die GESAMT-DOKTRIN v3 ist nur L8 (Nachtrags-Einfuegepunkt) agent-loesbar gewesen; die uebrigen NEUN
+    beruehren Teil A und Teil V — namentlich **L1** („die vom Owner genannte Sequenz steht nicht im Dokument")
+    und **L2** („V2.1(a) delegiert das Gedaechtnis-Lesen ausdruecklich an den Explore-Agenten — also genau das,
+    was geruegt wurde"). → **ARBEITSWEISE + Owner-Vorlage** (pruefen, ob v3.6/3.7/3.8 sie geheilt haben)
+
+15. **Z.17755-17767 (GO-3, 08.08. abends) — DIE HEURISTIK-HYBRID-ACHSE WIRKT AUF DEN BAUPLAN.** Owner
+    woertlich: die Achse kann „direkt in den SearchAlgorithm Hauptalgorithmus … als Strategieplanung aufgerufen
+    werden, welche entweder direkt zu einem Tier-Binary Aufbau fuehrt oder zu einer heuristischen Aufbauweise im
+    Hybrid-Binary mehrfach-Aufbau." Folge: **eine Achse anderer Art als alle bisherigen — sie multipliziert die
+    Binary-Menge und MUSS bei `--check-size` mitgerechnet werden.** → **#7 S-19 (Meilenstein) — Eingangsgroesse**
+
+16. **Z.18384/18386 (S-7, 16.07.) — OWNER-PFLICHT MIT DEEP-RESEARCH, im Kopf nicht sichtbar.**
+    Owner verschaerft: *„Das ist PFLICHT mit deep research und ultracode, weil auch noch Forschungs-Paper und
+    Code zu dieser Achse fehlen. Die Achse muss in der Suchalgorithmen-Gattung UND Container-Gattung echt
+    verwendet werden. Alle Gattungen sollen ihre wichtigen Observer-Messwerte echt ermitteln."* Plan liegt
+    (`backups/20260716-s7-locking-observer-research/PLAN.md`): OptiQL faithful-Reimpl (Lizenz NULL) +
+    ARTSynchronized (Apache-2.0) Vendoring; `UpgradeableConcurrency` als golden-neutraler END-Append
+    (Observer in freie r[5]/r[6], sizeof stabil); **Observer-Audit ALLER Gattungen ist PHANTOM-frei — einzige
+    Substanz-Luecke = T8-Upgradeable.** Offene Bau-Forks: Container-Messung = per-Genus-POD-Eingriff (ABI→GO) ·
+    golden-Verdrahtung Container-Docks · OptiQL-Lizenzanfrage vs. faithful-Reimpl ohne Kontakt.
+    → **Wellenplan (eigener Strang) + Owner-Vorlage (Lizenz/ABI)**
+
+17. **Z.18689 (Doc 21, 10.07.) — SIEBEN OWNER-FORK-ENTSCHEIDE H1-H7, im Kopf unsichtbar.**
+    H1 Frameworks x Workloads statisch + Op/Sequenz dynamisch als generische Strategy-Klassen (13 Frameworks /
+    14 LP / OP-1..6) · H2 „Beschaffenheit" in den Workload-Typ encodiert · **H3 `size` = Cache-Regime-Key**
+    (nicht absolut) · **H4 ALLE std::map-Interfaces variadisch nach std-C++23 — Runner UND XSD beide aendern** ·
+    H5 13-Framework-Registry · **H6 Pareto-Front, Blatt = `tuple<property,time,objective_tag>`** ·
+    H7 alle Slots intakt, telemetry = System/Meta an der Wurzel. Dazu das autoritative Architektur-Modell:
+    B+-Layer-Baum, Haupt-/Unter-Achsen auf EINEM Concept, System==Meta-Achsen an der Wurzel mit
+    Visitor+Strategy, Prozess-Dimension Builder-ueber-State, Decorator-ueber-Visitor-State-Log,
+    **MAXIMALE UTILIZATION**. → **Designplan-TDD + Wellenplan (H4 beruehrt XSD ⇒ #18-Buendel)**
+
+18. **Z.18685 (Doc 20, 10.07.) — MESSFEHLER-ERKENNUNG: DREI OBSERVER-VARIANTEN + KOMPLEMENTAERER 4. SCHRITT.**
+    Owner: Einbau-Varianten (alle+Hybrid / nur Heuristik-Tier / keiner) und **komplementaerer 4. Schritt**
+    (untergebene Heuristik-Tiere OHNE Observer/Benchmarks NEU bauen, Wall-Clock-Vergleich; **Paper-Vergleich
+    geht vor**). Dazu: Messkurven-Typsystem `tree<axis, map<framework, map<type, map<size, map<op,
+    map<observer_type, tuple<property,time>>>>>>>` (compile-time und run-time je Achse SEPARAT) und Auswertung
+    = Filterkette = **Chain of Responsibility strikt im CacheEngineBuilder** (Kontrolle der Tier-Binary-
+    GENERIERUNG, gebaut `076b71cf`). → **Designplan-TDD (Mess-Design) + Wellenplan (W4-Evaluation)**
+
+19. **Z.18538 (#279, Owner 06.07. abends)** — VIER-PUNKT-DIREKTIVE ZUR BAU-/MESS-SICHTBARKEIT:
+    (1) Mess-Durchfuehrung im **RELEASE-Modus** per Konfiguration VOR der PDF-Erstellung aktivierbar;
+    (2) in der Regel faehrt nur der **DEBUG-Modus** (inkl. Compile der CEB + Tier-Binaries);
+    (3) LUECKE: ce/prt-art sind intern NICHT dynamisch in der Pipeline verankert — man kann nicht live sehen,
+    ob der CEB-Orchestrator gebaut wird, **exakt welche Tier-Binary-Rekombinationen laufen und wie viele noch
+    offen sind**; (4) **das Bauen ALLER Tier-Binaries ist im Standard-Build PFLICHT**, und in einem
+    NACHGELAGERTEN Schritt ist zu ueberwachen, welche Tier-Binaries die generischen Tests ueber ihre Interfaces
+    bestehen. Teil-Bestand existiert (`Code/07_tier_binary_report/`, `COMDARE_DA_PIPELINE_MODE`,
+    Job `visibility:tier-binaries`). → **Wellenplan + Task-Karte (Interface-Nachtest je Tier-Binary)**
+
+20. **Z.18516 (USER-KORREKTUR 06.07. abends)** — LAZY IST CACHE, NIE SKIP. Owner: *„Die Fehler muessen behoben
+    werden, nicht der Test geloescht"* — fundamentale Bestandteile des Gesamtsystems laufen in JEDER Pipeline;
+    „nur Aenderungen neu bauen" realisiert sich **ausschliesslich ueber Caches** (ccache, per-Tool-Caches,
+    Tier-Binary-Resume), **NIE ueber Job-/Trigger-Skips**. Dazu (#277-e): **golden-/conformance-Gates bleiben
+    IMMER aktiv — kein Lazy an Beweis-Gates.** Und: die **Diplomarbeit-TEXT-Architektur ist die normative
+    Referenz fuer die Soll-Gesamtpipeline** („vom Selbstaufbau bis zum Einfuegen der Messwert-Tabellen ins
+    Haupt-LaTeX-Dokument"). → **ARBEITSWEISE + Wellenplan (CI-Design)**
+
+### A-III — Bau-Auftraege und Ist-Luecken
+
+21. **Z.17030-17064 (D5-5, 09.08.)** — **HDR IST EINE THESIS-ZUSAGE IM PRAESENS UND HAT NULL PRODUKTIONS-
+    KONSUMENTEN.** Drei Stellen im gepinnten Stand `798e946` sagen HDR zu; Owner-Primaerquelle Termin 3 vom
+    09.04. (nie widerrufen): *„Perzentile werden nicht gemittelt. Je Lauf werden HDR-Histogramme persistiert;
+    Auswertung erfolgt auf den separaten Rohlaeufen oder ueber korrekt zusammengefuehrte Histogramme."*
+    IST: `latency_hdr_histogram.hpp` wird von genau EINER Datei inkludiert (`test_ap8_hdr_histogram.cpp`).
+    D5-5 heisst deshalb nicht mehr „entscheiden", sondern **„HDR verdrahten + Je-Lauf-Persistenz + 0-ns-Zaehler
+    + Toleranz aus `significant_figures=3`"**; die 2-h-Schaetzung ist hinfaellig.
+    → **Designplan-TDD + Wellenplan (Bau-Posten, vor W4)**
+
+22. **Z.17126-17139 (09.08.)** — VIER THESIS-PRAESENS-ZUSAGEN MIT DER GROESSTEN LUECKE (Abgabe 15.09.):
+    (1) „HdrHistogram erhebt p50/p95/p99" — erhebt nichts; **zusaetzlich exportiert die CSV KEIN p95:
+    `LATENCY_P95` ist deklariert, aber nicht exportiert**. (2) „Fairness-Protokollierung je Fremdbibliothek:
+    Compiler, Flags, ISA-Pfad, Allokator, Commit-Hash" — im Mess-Output vollstaendig fehlend.
+    (3) „Datensatz-Akte: Quelle, Pruefsumme, Seed-Regel je Datensatz" — `<datasets>`-Bindung offen.
+    (4) „Berichtsgroessen Mittel und Perzentile p50-p999" — p999-Produzenten-Grenzen ungepinnt.
+    (Gegen KON77 „7 Thesis→Code-Posten" gegenpruefen; (1)-(4) sind dort nicht erkennbar.)
+    → **Wellenplan W4 (Soll-Ist-Register) + Designplan-TDD**
+
+23. **Z.17066-17080 (K3, 09.08.)** — DURCH DEN BAU AUSGELOESTE OFFENE TEXTPFLICHT. D5-1 vermerkt „alle vorher
+    erhobenen p50/p95/p99 ungueltig"; im LEBENDEN Thesis-Anhang stehen genau solche Zahlen unmarkiert als
+    gueltig (`A_measurements.tex:46-49`, `tabellen/bias_matrix_table.tex:2`, „ns/op, nearest-rank").
+    **Wie die Kollision aufzuloesen ist — markieren oder neu erheben — ist nirgends festgelegt.** Dazu:
+    **die Thesis ist beim Median-Mechanismus intern zweistimmig** (Hauptkapitel HDR, Anhang nearest-rank);
+    keine Quelle im Korpus loest die Binnendifferenz auf. → **Owner-Vorlage (klein) + Wellenplan W4**
+
+24. **Z.16807-16837 (D5-1-Reste, 09.08.)** — D5-2/D5-4 KONKRET:
+    (a) die Median-Divergenz sitzt ALLEIN auf der **super**-Seite (`diagram_generator.cpp:1783/1784`, obere
+    statt unterer Mitte) — bewusst nicht mitgezogen, weil sie ueber KONFIGURATIONEN aggregiert, nicht ueber
+    Proben (anderer Gegenstand, gleiche Vokabel); (b) `vals[(n-1)/2]` IST der Kanon-Fall q=0.5 (fuer jedes n
+    ueber n=1..64 nachgerechnet) — der `best_binary_selector` rechnete seit jeher kanonisch;
+    (c) `delete_p99_ns` existiert weiterhin 0-mal (`serialize_abi_tier_trace_json` emittiert fuer `delete` nur
+    p50/p95, waehrend write/read je p50/p95/p99 tragen). → **Designplan-TDD (D5-2/D5-4)**
+
+25. **Z.16818-16837 + Z.17325-17329** — **VENDORING-DRIFT ERZEUGT BLINDE KREUZ-TESTS.** Der vendorierte
+    ce-Stand in super ist `a1d0c201` vom 07.08. und liegt **98 Commits** hinter HEAD (insbesondere VOR D5-1):
+    ein Kreuz-Test ueber `csv_to_latex`/`diagram_generator` waere heute gruen und blind — er wurde deshalb
+    bewusst NICHT gefahren. Derselbe Stand laesst das Host-Klassen-Gegenorakel fail-closed abbrechen
+    (ce-Submodul-Arbeitsbaum neben dem gitlink). → **#74 Repo-Rollen / Vendoring-Nachzug (W2)**
+
+26. **Z.16845-16897 (TEIL A, F1-Durchstich) — DIE CI-TOPOLOGIE, nicht nur die Skripte.**
+    A1: `.gitlab-ci.yml:25-38` ordnet `lint → orchestrate → submodules → analyse → test → integration →
+    planer → manifest → **thesis-pdf** → **measure** → **persist**` — **`thesis-pdf` laeuft VOR `measure` und
+    `persist`**; ein PDF aus derselben Pipeline kann deren Messung NIEMALS enthalten; `ergebnis:holen` sitzt
+    in Stage `planer`, noch weiter vorn. *„Das ist kein Bug in einem Skript. Es ist die Topologie."*
+    Ausserdem: dieselbe `wc -l`-Leerheitspruefung sitzt EIN ZWEITES MAL in `.gitlab-ci.yml` am
+    **WIDE-Aggregat der Mess-Jobs** (gleiche Klasse, gleicher Mini-Lauf-Fall) — als Folgepaket gefuehrt.
+    *(F1 wurde per Lokalstrecke geliefert (KON63) — ob die CI-Kante existiert, ist damit NICHT belegt.)*
+    → **Wellenplan (CI-Kanten) + Task-Karte #18/#48**
+
+27. **Z.17176-17216 (Lagerhaltung, 09.08.) — DAS AVX-MAXIMUM UND DIE VIER TOTEN SCHALTER.**
+    `-march=native` ist ausdruecklich verworfen (17.07.: „host-abhaengig, nicht golden-portabel"); das Maximum
+    entsteht dadurch, dass die CEB die SIMD-Stufe als deklarierte Achsen-Auspraegung permutiert
+    (`no_extension`/`avx2`/`avx512`) und **jede Maschine alle Zellen baut, die ihre Hardware freigibt** — was
+    sie nicht kann, faellt NICHT durch einen CI-Vorfilter, sondern **maschinenseitig mit Warnung samt
+    `machine_id` und Fehlerklasse `HardwareErweiterungFehlt`**; das Experiment misst weiter.
+    IST-Befunde: (1) `COMDARE_BESTANDSLOG` steht in **0 von 2** aktiven `.gitlab-ci.yml` → die gesamte
+    Lager-Koordination ist in Produktion AUS; (3) **`LagerBaumWriter` hat 0 Produktions-Aufrufer** — die
+    Realm-Wurzeln zeigen nicht auf den Mount, auf prod2 nicht belegt; (4) **`simd_build_gate` ist scharf, aber
+    wirkungslos**: alle NEUN Organ-Klassen deklarieren `kRequiredNone`, die Maschinen-Deklaration ist per
+    Default leer → der Faehigkeits-Filter filtert heute **0 Compiles**.
+    Pakete: LAG-P1 6 h · LAG-P2 8 h · **LAG-P3 Realm-Wurzeln + prod2-Mount 6 h** · LAG-P4 2 h.
+    → **#57 Lager-Vollausbau (LAG-P3 fehlt im Board) + C-3a/#38a2 (required-Deklarationen)**
+
+28. **Z.17186-17192 (Lagerhaltung)** — DIE SKIP-TRENNUNG LIEGT NICHT AUF DER `binary_id`. Die trennt
+    AVX-512- von AVX2-Binaries nie (`binary_id="never"` fuer SIMD, 26.07.), sondern `build_version` +
+    `+ext=`-Sidecar + **SHA512-Fingerprint ueber die Stempel-Zeilen**; Fingerprint-Format 3 unterscheidet die
+    ISA bereits ueber das `toolchain_stamp_glied`. **Die gegenteilige Kommentarzeile in
+    `bestandslog_document.hpp:22-26` ist VERALTET** und muss fallen. → **#15-Fenster / #57 (Kommentar-Wahrheit)**
+
+29. **Z.17157-17175 (§62, Owner 21.07.) — SYMMETRIE-PRINZIP + LAGER-KOORDINATIONS-PARAMETER.**
+    *„prod1 baut ALLES, was es kann, und prod2 baut ALLES, was es kann — beide Maschinen fuehren aus, was sie
+    koennen, und MESSEN es durch. Die XML ist fuer BEIDE Maschinen GLEICH."* Ausbuchstabiert:
+    **gelocktes Bestandslog auf minio · Batch-Reservierung a 4096 Binaries mit Zeitstempel ·
+    Gleichverteilungs-Pflicht fuer die Menge, die beide bauen koennen · First-come fuer den ersten Zugriff ·
+    Takeover bei ETA + 50 % ohne Update („Maschine GESTORBEN") · Schreib-Lock mit harter Obergrenze 1800 s.**
+    → **Designplan-TDD (#57) + Wellenplan (Flotte)**
+
+30. **Z.17403-17420 (OWNER-RICHTIGSTELLUNG 09.08.)** — DAS FLOATEN IST DER ENTWURF. Owner woertlich:
+    *„das war so geplant, dass ueber das Lager die Maschinen abstimmen, wer welches Batch verarbeitet und es
+    koennen auch erstmal alle Maschinen alle Jobs aufnehmen."* Die Abstimmung findet **nicht ueber GitLab-Tags**
+    statt, sondern **ueber die Lagerhaltung** — ueber den Bestand, den beide Maschinen sehen, und die
+    SKIP-Entscheidung, die daraus folgt. Ein Tag-Pin waere die grobe statische Antwort auf eine Frage, die im
+    Entwurf bereits fein und dynamisch beantwortet ist. → **Designplan-TDD / Wellenplan (Flotte, #57)**
+
+31. **Z.17432-17442 + Z.17381-17383 (Richtigstellung)** — WAS ALS ECHTE AUFGABE UEBRIG BLEIBT:
+    (a) *„Eine Wache, die einen Nenner aus der Hardware zieht, ist auf zwei Maschinen zwei verschiedene
+    Wachen"* → **jede solche Wache muss ihren Nenner MIT der Maschine ausweisen**; „457 Tests sichtbar" ohne
+    „auf prod2" ist eine Zahl ohne Gegenstand. (b) `persist:measurements` (Z.1122) floatet (`tags:[baremetal]`)
+    — er misst nicht, er committet nur, **ist aber der Rueckschreib-Weg, und ob er maschinenabhaengige Annahmen
+    traegt, ist NICHT geprueft**. → **ARBEITSWEISE (Wachen) + Betriebs-Task vor W3**
+
+32. **Z.17456-17461 + Z.17512-17515 (T-6 / W-1)** — ZWEI BEZIFFERTE WACHEN-LUECKEN:
+    (a) die Hardware-Klasse hat VIER Mitglieder, die Wache sieht ZWEI — `test_simd_field_sum_dispatch_avx512`
+    (:4869) und `test_simd_add_u64_carry_avx512` (:4914) tragen ihre Namen in `${_tgt}` und fallen in die
+    **19 nicht statisch aufloesbaren** Registrierungen: die Wache ZAEHLT sie, kann sie aber nicht pruefen;
+    (b) die 19 sind **nicht durch eine schaerfere Regex heilbar — es braucht eine andere SOLL-Quelle
+    (`cmake --trace`)**. Die Zahl steht bei jedem Lauf in der Ausgabe („eine Luecke mit Zahl statt eines
+    Schweigens"). → **W2-Wachen-Sammelposten (#71) / Bau-Posten `cmake --trace`-SOLL**
+
+33. **Z.17549-17554 (W-1-Review-Verdikt)** — DIE WACHE PRUEFT WEDER FRISCHE NOCH ZUGEHOERIGKEIT IHRER
+    IST-QUELLE: ein stale konfigurierter Baum liefert ein stale Inventar, und niemand merkt es (dieselbe
+    Zeitrichtungs-Luecke, in die der Abnahme-Agent selbst gefallen war). Ausserdem: **die super-Schwesterstelle
+    existiert LATENT** — heute ungefaehrlich, aber sie wartet. → **W2-Wachen-Sammelposten**
+
+34. **Z.17671-17683 (D2, 08.08. bestaetigt und offen)** — KEIN ce-JOB BAUT `comdare_adhoc_emitter_cli`
+    (`grep -c 'adhoc_emitter' .gitlab-ci.yml` = 0) → `_r5g_ae_status` ist in JEDEM CI-Baum ungleich `FOUND`,
+    der R5.G-Block wird uebersprungen, und die beiden darin registrierten Tests
+    (`test_v41_anatomy_adhoc_autobuilt_load`, `f15_compare_cli_smoke`) existieren in der Inventur gar nicht.
+    Die Wache meldet „GRUEN — kein Test ohne fahrenden Job" und hat recht **ueber die Menge, die sie sieht**;
+    ihr Kopf behandelt die Klasse nur fuer den Codegen-Pass, nicht fuer den Adhoc-Emitter-Pass.
+    → **W2 (CI-Job fuer den Adhoc-Emitter) — ergaenzt die J-1..J-4-Vollbau-Regel**
+
+35. **Z.18717-18719 (#25 Teil B, 12.07.) — BESTANDS-PFLICHT FUER S-12/#3.** `codegen.cmake` (672 Zeilen echte
+    Codegen-Logik) ist bereits vollstaendig nach C++23 portiert: `comdare_permutation_codegen_cli` erzeugt
+    `permutations.cmake` + Manifest + `perm_src/perm_<id>.cpp` + `perm_versions/*.version`, **byte-identisch
+    zum cmake-Backend** (smoke 27 / medium 192 / full 336 verifiziert). Es ist ein opt-in-Backend; der
+    Default bleibt `cmake`. **Offen ist NUR der Swap-to-Default** — er braucht einen graceful-skip-Mechanismus
+    (Muster `anatomy_codegen_runner`: Tool fehlt → skip + re-configure statt FATAL_ERROR).
+    → **#3 S-12-Design (vor jeder Neuimplementierung lesen)**
+
+36. **Z.18720 + Z.18708-18716 (#24, 12.07.) — BESTANDS-PFLICHT FUER DAS AUSWERTUNGS-/SHEET-SYSTEM (#18).**
+    Es existiert eine C++23-Facade `Code/08_appendix_generator` (`generate_wide_appendix`), die die WIDE-Matrix
+    **einmal** parst und in-process **16 Darstellungen je Sprache** emittiert (bias + 6x surface + 4x exchange
+    + limitierung + seg_attribution + latency_range + latency_ecdf + exchange_forest), plus eine bereits
+    gebaute CI-Schleife `measure → WIDE-Aggregat → appendix_generator → .tex → persist` und ein
+    ready-to-apply Thesis-Wiring (`docs/thesis-anhang-wiring-READY.md`). honest-empty ist durchgaengig
+    implementiert (`status_empty_input` = OK, keine Datei statt Null-Wert).
+    → **#18 (CSV-Factory/Sheet-System) — Bestand pruefen, nicht neu bauen**
+
+37. **Z.18701 (11.07.) — `thread_count` IST BEWUSST STORED-BUT-UNCONSUMED.** Der T8-Phantom-Fix (Fix B) setzt
+    `apply1 counts=false`, zieht `m3v2 thread_count→1` (label-only, kein Phantom-3x-Sweep) und pinnt das per
+    `test_d13_dll` als Phantom-Guard. Von den fuenf RC-Skalaren sind damit T7/T6/T11/T1 echt und **T8
+    ausdruecklich nicht**. Wer Concurrency misst, darf `thread_count` nicht als „applied" lesen.
+    → **Designplan-TDD (Concurrency/Queuing-Achse)**
+
+38. **Z.18701 (11.07.) — T16/T2-RESTE.** T16: `filter_bit_capacity()`/`bits_per_key()` sind constexpr an allen
+    4 Filtern (Space-Seite); **die gemessene FPR ist ehrlich deferred** (Treiber ohne Negativ-Probe-Set).
+    T2: Indirektionskosten-Objective liegt im **reservierten** POD-Slot `axis_stats[2][6]`; **MP03/MP04 sind
+    GO-pflichtig, weil `mp_size` 2→4 Gate-1 braeche.** → **Designplan-TDD + Owner-Gate (MP03/MP04)**
+
+39. **Z.18689 (Achsen-Utilization-Audit wf_73129d50, 29 Achsen code-verifiziert) — 16 UTILIZATION-LUECKEN.**
+    (a) querschnittlicher **Tag-Kollaps**: ALLE `*_tag` sind nie als `StaticAxisVariants` materialisiert;
+    (b) 16 Luecken, 3 Hebel (SIMD-Dispatch / Allocator-Adapter / Hot-Path-Hebung);
+    (c) Abhaengigkeiten sind ein DAG, keine Include-Zyklen (node↔migration tier-vermittelt);
+    (d) telemetry lag faelschlich als Organ-Slot T10 statt an der Wurzel (nur PULL);
+    (e) **HW-Prefetcher in 4 entkoppelten Formen, `eytzinger` ist die krasseste Luecke**; SOTA-Mapping +
+    Prefetch-Shape/-distance als Unter-Achsen-Design offen. → **#20 Flaeche-3 / Achsen-Design**
+
+40. **Z.19065 (W1, 05.07.) — DER EXPERIMENT-BAUM KENNT KEINE BEDINGTEN EBENEN.** Es gibt keinen
+    Cross-Familie-Constraint-Mechanismus (z. B. `btree_order` nur unter `search_algo=btree` wirksam) — nur
+    gleichrangige flache Ebenen; **eine freigeschaltete Shape-Achse multipliziert formal auch familienfremde
+    T0-Binaries.** Schutz heute nur ueber Default-OFF + `BuildSelection` S1/S2/S3. Ob Redundanz-Pruning
+    ausschliesslich ueber Enabled-Flags/Selektion gewollt ist, **ist nirgends als Entscheidung dokumentiert**.
+    → **#7 S-19 (Kardinalitaets-Rechnung) + Owner-Vorlage bei Bedarf**
+
+41. **Z.18227-18258 (§10.1) — DAS „E"-KOLLISIONS-REGISTER, heute wieder aktuell.** Der Buchstabe E ist
+    vierfach belegt: **E0-E4 Experiment-Maschinerie** (E4 XML/Auswertung · E3 Permutations-B+-Baum ·
+    E2 Tier-Binaries compile-time · E1 RC-Laufzeit · E0 Querschnitt) · **DD-A..DD-E** (ex E-A..E-E) ·
+    **§13.9-Gate E1/E2/E3** · **E2-Sidecar**. Dazu die S↔E-Kreuz-Map (E zaehlt Treiber→Laufzeit als 4→1,
+    S als 1→4) und ein DRITTER „S"-Scope (Spur-S S1-S9). Heute kommen `Arena E1-E11` (KON94),
+    `Bau-Posten E1-E10` (KON92), `E-18-Writeback` und `E-5` hinzu.
+    → **Register-/Vokabelpflege (bei KON80-„V1-V10"-Kollision mitfuehren)**
+
+42. **Z.18217 (§9, Owner 06.07., bindend)** — MODUL vs. PRODUKT-INTERFACE. In der Modul-Matrix ist
+    Template-/Metaprogrammierung **ausdruecklich erlaubt, auch zwischen Modulen**; NUR Produkt-Interfaces sind
+    kunden-geschlossene **pre-compiled Binary-Interfaces** → nach aussen (Products UND Research) ist
+    Template-Abstraktion VERBOTEN. **Research = early Products**; die Diplomarbeit konsumiert die Modul-Matrix
+    ueber eine EIGENE Research-Matrix (die Tier-DLLs SIND deren binaere End-Interfaces).
+    → **#74 Repo-Rollen (W2/W)**
+
+43. **Z.18185 (§4)** — DUPLIZIERTE ABI-KONSTANTE. `best_binary_selector.hpp` fuehrt `kAbiMajor`/`kAbiMagic`
+    ein zweites Mal; die DRY-Aufloesung ist seit Juli offen und der Selector ist ausgeliefert + getestet.
+    → **W2-Triage (klein)**
+
+44. **Z.18214 (§8, E15) + Z.18389 (F7-iii)** — EXTERNE MESS-GATES, die niemand nachhaelt: die
+    **GH200/Grace-Hopper-Miete** (Antrag erneut gestellt; Entsperr-Bedingung = Zusage/Zugang, dann
+    ARM-Voll-Messung) und der **ZIH-Rechenressourcen-Antrag** (der ZIH-README wird ausdruecklich BENOETIGT).
+    Beide entsperren FF0-Multi-Plattform. → **Task-Karte (Warte-Posten, Owner-Info)**
+
+45. **Z.18146-18152 (§1)** — **FF0 HAT KEINEN EXPLIZITEN OWNER-ENTSCHEID.** Die Thesis stellt FUENF Fragen;
+    FF0 (Multi-Plattform-Generalitaet x86 AMD+Intel/ARM/RISC-V) ist als Abgabe-Blocker mit „OWNER FEHLT
+    explizit" gefuehrt und heute nur implizit ueber gated #163/#189 abgedeckt. Der Kopf fuehrt FF0-FF4
+    ueberhaupt nicht. → **W4-Thesis-Fundament + Owner-Vorlage (eine Zeile)**
+
+46. **Z.18709 (12.07.)** — TAG-MISMATCH SPERRT VIER RUNNER AUS. Alle super-CI-Jobs nutzen `tags:[baremetal]`
+    (ohne Bindestrich); die Runner id=6-9 tragen `bare-metal` **mit** Bindestrich → sie matchen nie.
+    Fuer die W3-Kampagne relevant, weil damit faktisch nur ein Blech laeuft. → **Betriebs-Task vor W3**
+
+47. **Z.17829-17850 (08.08.)** — SERIALISIERUNG VERSCHIEBT DEN DRUCK. Eine `resource_group` gegen einen
+    OOM-Kill legte drei Pipelines auf `waiting_for_resource` und wurde zurueckgenommen (ce `75ff9f89`).
+    Lehre: *„Wer sie setzt, muss danach die WARTESCHLANGE messen, nicht nur den geheilten Job."*
+    Relevant, weil die Messung heute auf `resource_group ceb-measurement-exclusive` haengt.
+    → **Betriebs-Task vor W3**
+
+48. **Z.17280-17329 (W0b-7/D2-G5)** — MASCHINENUNABHAENGIGE HOST-KLASSEN-SIMULATION EXISTIERT.
+    `scripts/ci_host_klassen_gegenorakel.sh` konfiguriert denselben Baum dreimal mit Host-Antworten als
+    `-D`-Preset (`check_cxx_source_runs` laesst vordefinierte Variablen stehen) → **der Lauf braucht keine
+    zweite Maschine**; namentlich belegt: avx512f→avx2 verlieren exakt 4 Eintraege, avx2→basis exakt 2,
+    Gegenrichtungen leer (429/425/423). Fuer die ISA-Matrix/Flotte ist das ein fertiges Werkzeug.
+    → **Wellenplan (ISA-Matrix) / keine Aktion ausser Nutzung**
+
+49. **Z.19282 §15.10-(F) + Z.19278 §15.10-(E)** — ZWEI RESTE AUS DER 16.07.-UEBERGABE ohne Kopf-Nachfolger:
+    **F12(i) Standalone-Paritaet** („die gesamte Anlage cmake+C++23 kompilierbar und auf EINER Maschine
+    fahrbar, perfekt synchron parallel" — CI **und** standalone messfaehig) und
+    **F3i-XML-Modellierung** (Owner-Richtung: Reihe C „je Stufe" + eigene Kategorie: Compiler-Systemachse +
+    Voll-Vergleich Tier-vs-ALLE x Datenlast x Compiler x ISA+OS; exakte Schema-Ausgestaltung als Design
+    vorzulegen). → **Wellenplan (F12i ~ T-3/#193) + Designplan-TDD (F3i ~ S-13-XSD)**
+
+50. **Z.17931 + Z.18293-18334 (§11-G, DoD-6 Phase 2)** — DER PARALLELE NAS-ZWEIG. Der Rueckschrieb sollte
+    dieselben datierten Ordner ZUSAETZLICH PARALLEL nach `backup1.comdare.de/Cluster_NFS/cache-engine-experiment`
+    schreiben (doppelte Absicherung); Loop-Schutz (`[skip ci]`/`ci.skip`/`_bot_`-Rule) und FS-sicheres Datum
+    (`YYYYMMDD-HHMMSS`) sind gebaut. Gegen die heutige Lager-/Cache-Topologie (KON67) gegenpruefen, ob der
+    Zweig aufgegangen ist oder fehlt. → **#57 / Explore (kleine Gegenprobe)**
+
+---
+
+## (B) UEBERHOLT-OHNE-MARKER (Liste fuer den Marker-Nachzug)
+
+| Anker | 1 Satz | ueberholt durch |
+|---|---|---|
+| **Z.17938 §0-GOAL-V7-Kopf** | traegt weiterhin „KONSOLIDIERT + **AKTIV** — loest V6 ab", obwohl GOAL v8 die geltende Fassung ist. | GOAL v8 (Memory-Index: „GOAL v8 + TDD-Vertrag, bis 15.09.") |
+| **Z.17877-17934 §0-Vorspann/DoD** | fuehrt ABI-Freeze „nach 3→4 genau EIN Bump 4→5", den EINEN 320-DLL-Neubau bei #215 und „cache-engine ~170 Tests" als geltendes Abbruchkriterium. | heutiger Stempel-/Format-Stand + F2-Bump-Fenster #15; Test-Nenner 4xx (TEIL B) |
+| **Z.18160 §2-B4** | „KEIN ABI-Bump-Budget → ABI-Freeze §4: nach 3→4 GENAU EIN weiterer Bump 4→5, Zwischen-Bumps bis #215 verboten" — ohne Supersede-Vermerk (in §4 existiert einer, in §2 nicht). | ABI-7 + KON60/KON61-Stempelfenster |
+| **Z.17246** | „Nach der Rangfolge **THESIS > OWNER > PLAN > LEAD** … gewinnt die Messung" — alte Rangfolge, 250 Zeilen unter dem Korrektur-Kasten, selbst ohne Marker. | RANGFOLGE-KORREKTUR 09.08.: **OWNER > PLAN > THESIS**, Merge vor Verdraengung |
+| **Z.17252** | „Vorschlag: **dulden bis nach der Abgabe**, im Ledger als bekannt gefuehrt" (prod2-`machine_id`-Umbenennung als Byte-Ereignis). | Owner „Ja umbenennen" (Z15650 / Karte Korb A #8) ⇒ gehoert ins F2-Bump-Fenster #15 |
+| **Z.17557-17614** | die 08.08.-Modell-Matrix (Bau = Opus max + Fable-xhigh-Nachsetzen, Design = Fable, Review-Meta = Fable ueber Codex) steht als geltende Matrix. | v3.6 (Opus ERHEBT / Fable BEWERTET, beide Pflicht) + KON38-Geltungsliste + Memory-Widerruf-Vorbehalt 12.08. |
+| **Z.17946 (V7.2)** | „`compiler` ist KEINE Haupt-Achse, sondern die untrennbare Unter-Achsen-GRUPPE `compiler+opt_level+atomic128`". | KON55-01/KON56-03: Compiler = **5. System-Achse** `gcc\|clang`, Unterachsen opt/flags/commands |
+| **Z.17942/18000/18013 (V7.1-Vermerke)** | „**18 Organ-Achsen** (T00-T17)" als Endstand markiert. | KON80-V10: Kanon = **„18 + 1 optionale Meta-Meta"** (ORG-19-IO) |
+| **Z.17753 (GO-3)** | „Die zuvor gesuchte **fuenfte** Mess-Ebene bleibt davon unberuehrt und weiterhin unbelegt" — haelt die Suche offen. | Karte W3: drei Ebenen, die vierte = SPALTE der Macro-Stufe; die Fuenf-Formel ist als gegenstandslos markiert |
+| **Z.19271 §15.10-(B)** | „**DEADLINE (governing): 28.07.2026**" ohne Verfallsvermerk. | F1 14.08. · F2 21.08. · Bau-Trigger 26.08. · Abgabe 15.09. |
+| **Z.18998 §13.3-#276** | „#276 = **ausdruecklich LETZTE Aufgabe** der Arbeitsreihenfolge". | Wellenplan-Ordnung + OS-Realm-Doktrin/Flotten-Auftrag (KON71) |
+| **Z.19189 §14.4** | „PIPELINE-ENDSTAND (literal): Alle 4 Repos STRIKT GRUEN" mit SHAs vom 07.07. — liest sich wie Status. | Stand-Anker sind HISTORIE; lebender Stand = Ledger-Kopf |
+| **Z.18956-18959 (F12i)** | „ce+super auf beide Remotes gepusht … Ref-Gleichheit literal verifiziert" als Abschluss der snmalloc-Kette. | Der A07-snmalloc-**Laufzeit-Segfault** bleibt ausdruecklich ungefixt (dort selbst notiert) — als offener Posten nirgends gefuehrt |
+
+---
+
+## (C) WIDERSPRUECHE ZUM MASSSTAB OHNE ERKENNBARE AUFLOESUNG
+
+**C1 — `Ofast`.**
+*Ledger Z.17949 (V7.2, 26.07.):* „opt permutiert O0/O1/O2/O3 x simd {no_extension, avx2, avx512} = 12
+System-Perms; avx512 nur wo die Maschine es freigibt …, **Ofast bleibt AUS (IEEE-754/CRC-Determinismus)**."
+*Massstab (Karte Korb D #5, KON55-01/KON56-03):* „Ruling 17.07.: 5. System-Achse `gcc|clang`, Unterachsen
+opt/flags/commands, **Default Ofast**."
+Der aeltere Satz traegt eine harte technische Begruendung (Determinismus des golden-CRC64-Ankers), die nie
+widerlegt wurde. **Empfehlung:** Ofast als Achsen-AUSPRAEGUNG zulassen, aber als DEFAULT nur ausserhalb
+golden-/CRC-tragender Bauten — Explore am Objekt (bricht Ofast den CRC64-Anker?), sonst Owner.
+
+**C2 — `std::variant`.**
+*Massstab (Verstaendnis-Kern 11):* „std::variant verboten" (flach).
+*Ledger Z.17951-17953 (V7.2 + Owner-E1 02.08., verbatim-Session):* das Verbot gilt fuer ALLE **PLAIN**
+Tier-Binaries; die **HYBRID**-Tier-Binary ist die EINE definierte Ausnahme — variant AUSSCHLIESSLICH als
+Traeger der Dock-Typ- und Vertrags-Varianz ihrer N ABI-stabilen Pruef-Docks, in einem wahlweise statischen
+ODER Runtime-Dock-Array, gelesen durch die Abstract-Factory-Methode; die CEB-Duldung bleibt unveraendert;
+NICHT freigegeben bleibt variant fuer die Haupt-Kommunikation zu den Tier-Binary-Observern.
+**Empfehlung:** die E1-Formulierung in den Kanon uebernehmen — die flache Fassung wuerde das vom Owner
+freigegebene Hybrid-Design verbieten. Kein Owner noetig.
+
+**C3 — `allow_failure` am Mess-Batch (OV-16).**
+*Ledger Z.16925-16929 (09.08., ausdruecklich als „Widerspruch offen" notiert):* „die OV-Tabelle des
+Wellenplans traegt den LEAD-Entwurf **„ja = entfernen"**; **GOAL v8 Teil IX sagt bindend „behalten, Entfernen
+waere Regression"**. Beide stehen nebeneinander."
+*Massstab/Memory:* „**allow_failure VERBOTEN** seit 06.07. — ZELLE=Warnung, JOB=rot"; Karte Korb D #18 fuehrt
+drei verbliebene allow_failure als Doktrinverstoss.
+**Empfehlung:** die ZELLE/JOB-Unterscheidung IST die Aufloesung (Zellfehler → Warnung in die xlsx, Job bleibt
+hart); dann faellt `allow_failure` am Mess-Batch und GOAL v8 Teil IX ist per Marker nachzuziehen.
+**Owner-Bestaetigung noetig**, weil Teil IX „bindend" formuliert ist.
+
+**C4 — Identitaet von prod2.**
+*Ledger Z.17243-17247 (09.08., live gemessen, Job 368969):* `Linux prod2`, `GenuineIntel`,
+**„12th Gen Intel Core i9-12900K" = Alder Lake**; die Thesis sagt korrekt „Alder Lake";
+`machine_simd_signature.hpp:90` und Ledger:1330 deklarieren **„i9-14900KS (Raptor Lake)"**.
+*Ledger Z.18641 (08.07.) + Z.17721 (10.07.):* „prod2 = Intel i9-14900KS"; die CPU **starb** und ist im RMA,
+Rueckkehr „erst im September nach dem Austausch".
+Der Massstab kennt weder die Etikett-Falschheit noch den Ersatz. **Folge:** die P/E-Core-/Hybrid-Messung
+(FF0) und die `machine_id`-Umbenennung im F2-Fenster haengen an dieser Frage.
+**Empfehlung:** eine Messung (`lscpu` auf prod2), dann Etikett + Registry-Generator im #15-Fenster nachziehen.
+
+**C5 — Telemetry-Achse und die Slot-Zahl.**
+*Ledger Z.18689 (Owner-Entscheid H7, 10.07.):* „**alle 19 Slots intakt**, telemetry = System/Meta an der
+Wurzel" — gleichzeitig belegt der Utilization-Audit „telemetry FAELSCHLICH Organ-Slot T10 statt Root
+(ABI `kV3AxisCount=19`), muss zur Root-Visitor-Achse (nur PULL)".
+*Massstab/Memory:* „**18 ORGAN-ACHSEN**, nicht neunzehn" + KON80 „18 + 1 optionale Meta-Meta".
+Wenn telemetry aus den Slots an die Wurzel gewandert ist, ist H7s „alle 19 Slots intakt" nicht mehr woertlich
+haltbar. **Empfehlung:** Explore am Objekt (`kV3AxisCount`, `kCompositionAxisNames`) und Ein-Satz-Marker an
+H7; die **„nur PULL"-Semantik der Root-Telemetry-Achse** bleibt in jedem Fall bindend. Kein Owner.
+
+**C6 — Mess-Dauer.**
+*Ledger Z.17702-17714 (GO-1, Owner 08.08.):* „**Es wird auch nicht mehrtaegig**, der Planer hat die
+Aufwands-Berechnung noch nicht, daher wissen wir noch gar nicht wie lange das dauert" — `--check-size` ist
+damit Vorbedingung der Messplanung, die Dauer ein Task NACH der Planung.
+*Massstab (Karte Korb C #3, KON41-01/KON58-03):* „OV-4-Mess-Deckel = f(T-3-Fenster): einlanig **41,4 h@24W →
+~45,6 h@16W**". Das sind knapp zwei Tage.
+**Empfehlung:** kein Owner — die Zahlen sind Eingangs-Hypothesen fuer S-19 (#7); der Deckel ist erst nach
+S-19 zu behaupten, und die Owner-Aussage ist als „Dauer unbekannt bis `--check-size`" zu lesen.
+
+---
+
+## (D) ARCHITEKTUR-KERNE DIESES SEGMENTS
+
+1. **§62 SYMMETRIE-PRINZIP (Owner 21.07.):** *„prod1 baut ALLES, was es kann, und prod2 baut ALLES, was es
+   kann — beide Maschinen fuehren aus, was sie koennen, und MESSEN es durch. Die XML ist fuer BEIDE Maschinen
+   GLEICH."* Der Begriff „Hardware-Job-Pool" ist neu vom 09.08.; die SACHE ist seit dem 19.-22.07. festgelegt.
+2. **Koordination laeuft ueber das LAGER, nicht ueber CI-Tags (Owner 09.08.):** *„das war so geplant, dass
+   ueber das Lager die Maschinen abstimmen, wer welches Batch verarbeitet und es koennen auch erstmal alle
+   Maschinen alle Jobs aufnehmen."* Ein Tag-Pin waere die grobe statische Antwort auf eine bereits fein und
+   dynamisch beantwortete Frage.
+3. **Das Maximum entsteht durch PERMUTATION, nicht durch Host-Erkennung:** `-march=native` ist verworfen
+   („host-abhaengig, nicht golden-portabel"); jede Maschine baut die Zellen, die ihre Hardware freigibt, der
+   Rest faellt maschinenseitig mit `machine_id` + `HardwareErweiterungFehlt` — das Experiment misst weiter.
+4. **SIMD steht NIE in der `binary_id`** (`binary_id="never"`); die Trennung traegt `build_version` +
+   `+ext=`-Sidecar + der SHA512-Fingerprint ueber die Stempel-Zeilen (Format 3 unterscheidet die ISA bereits
+   ueber das `toolchain_stamp_glied`).
+5. **HYBRID ist Pflicht und eine GATTUNG (Owner 08.08.):** „erzeugt eine neue HEURISTIK-ADAPTER Gattung und
+   ein Genus »Function-Interface-Reroute«" — sie erbt per compile time die Interfaces einer Gattung+Genus und
+   stellt sie heuristisch an echte Tier-Interfaces durch. **Ihre Achse wirkt auf den BAUPLAN** und
+   multipliziert die Binary-Menge.
+6. **Rangfolge OWNER > PLAN > THESIS (Owner 09.08.), aber als Stufe 3:** erst fragen, ob es sich ueberhaupt
+   ausschliesst; dann, ob mehr Gruendlichkeit erreichbar ist — dann wird **gemergt**. *„Thesis entsprechend
+   Plan und Owner nachziehen ist erlaubt."*
+7. **Die Mess-Ebenen-Trennung ist eine Kommensurabilitaets-Frage:** `seg_*_ns` gehoeren zu
+   `seg_run_total_ns`, nicht zu `total_ns`; die Summe der 19 Organ-Segmente + `seg_framework_ns` ergibt exakt
+   den Segment-Lauf. Overhead ist eine DIFFERENZ, keine Quote gegen den Real-Workload.
+8. **Die 9 skalaren Mess-Kerne sind eingefroren:** das Zugriffsmuster IST das Signal — ISA-Routing darin waere
+   Signal-Korruption. Deklarations-Wahrheit wird per consteval-Kohaerenz-Guard + objdump-Beleg erzwungen.
+9. **honest-0 ist eine Aussage, kein Defekt:** `bytes_in_use_peak` ist mit drei Disqualifikatoren als
+   nicht-erhebbar belegt; LATENCY_MEAN/THROUGHPUT sind redundant; ein falscher Wert ist schlimmer als
+   honest-0. Space-Pareto ist heute ein Phantom (`stat_search_algo_peak` = Element-Count, keine Bytes).
+10. **Modul vs. Produkt (Owner 06.07.):** in der Modul-Matrix ist Metaprogrammierung ausdruecklich erlaubt,
+    auch zwischen Modulen; nach aussen (Products UND Research) gibt es nur pre-compiled Binary-Interfaces —
+    die Tier-DLLs SIND die binaeren End-Interfaces der Research-Matrix.
+11. **Lazy heisst Cache, nie Skip (Owner 06.07.):** *„Die Fehler muessen behoben werden, nicht der Test
+    geloescht."* Fundamentale Bestandteile laufen in JEDER Pipeline; an Beweis-Gates gibt es kein Lazy.
+12. **Die Diplomarbeit-TEXT-Architektur ist die normative Referenz der Soll-Gesamtpipeline** — „vom
+    Selbstaufbau bis zum Einfuegen der Messwert-Tabellen in das Haupt-LaTeX-Dokument".
+13. **Abnahme misst den GEGENSTAND, nicht die Absicht:** die aktiv-Zeile im Log sagt nichts ueber das Lager;
+    gueltig ist `object_stat`. Ein Vergleich gilt nur mit Commit + Baumzustand + Host-Klasse IN der Ausgabe.
+14. **Eine Wache, die ihren Nenner aus der Hardware zieht, ist auf zwei Maschinen zwei verschiedene Wachen** —
+    sie muss ihren Nenner MIT der Maschine ausweisen. Eine Zahl ohne ihr Verfahren ist nicht ueberpruefbar.
+15. **Regelwerke altern lautlos:** eine datierte Momentaufnahme mit woertlichem Owner-Zitat sieht auch dann
+    wie geltendes Recht aus, wenn sie nur noch Geschichte ist — jedes Zitat im Regelteil braucht einen
+    GUELTIGKEITS-, nicht nur einen Entstehungsvermerk. Und: eine Messung VOR einer Aussage ist keine
+    Bestaetigung dieser Aussage.
+
+---
+
+## BILANZ
+
+| Kategorie | Zahl |
+|---|---|
+| (A) lebend + ungedeckt | **50** (Regeln 11 · Owner-Entscheide/-Fragen 9 · Bau/Ist-Luecken 30) |
+| davon Owner-Vorlage noetig | **7** (A-12a/b, A-13 G-1/G-3/G-4/G-5, A-14, A-16-Lizenz/ABI, A-23, A-38-MP03/04, A-45) |
+| davon F2-Fenster (#15) beruehrend | **4** (A-13 G-5 RunMethodology · A-28 stale Kommentar · B-prod2-Umbenennung · C4) |
+| davon W2/#18-Buendel beruehrend | **12** |
+| davon BESTANDS-PFLICHT (nicht neu bauen!) | **2** (A-35 C++-Permutations-Codegen fuer S-12 · A-36 appendix_generator/CI-Schleife fuer #18) |
+| (B) ueberholt ohne Marker | **13** |
+| (C) Widersprueche ohne Aufloesung | **6** (2 mit Owner-Bedarf: C3, ggf. C1) |

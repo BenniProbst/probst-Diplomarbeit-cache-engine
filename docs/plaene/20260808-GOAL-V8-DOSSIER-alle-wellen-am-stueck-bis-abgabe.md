@@ -27,6 +27,68 @@
 
 > **Die Korrektur-Tabelle A (Stelle→ALT→GILT), die Neu-Liste B und die Bestätigungs-Liste C stehen im Volltext-Träger** `docs/plaene/20260812-WELLENKONSOLIDIERUNG-und-strategische-reihenfolge.md` **Teil A.1** — die betroffenen Stellen dieses Dossiers tragen datierte Einzel-Marker. Kurzfassung der tragenden Korrekturen: VI.1(a) Kette → Bau-Modul/Träger-Rakete/Emission-endet-im-Lager (ORT-Reihenfolge gilt weiter) · VI.2 „0 % gebaut" → „0 % ANGESCHLOSSEN"; Nenner = **32** aus 5 Schaltern, Hybrid-Mess-Schicht hält · VI.5 → T-15a ≠ T-15b (je 5 für Build UND Messung, 3 Erfolgs-Werte einzeln) · OD-7 = 16, `--debug` bis **T−3 (~12.09.) = echte Messung** · **KON38: Stempel-Strecke = Fable 5 max in allen Workflow-Teilen** · B1–B5 (System A/B) in jeder Durchführungs-Planung.
 
+## REFERENZ-STAND 16.08.2026 — KONSOLIDIERUNGS-NACHTRAG (KON97)
+
+> **Owner-Auftrag 16.08.:** die offenen Posten der Gegenlese KON1-59 vs. KON60-93, des Ur-Ledgers
+> (Z.16627-30077) und der 10-Wochen-Drift-Explores sind in die vier /goal-Referenzdokumente
+> konsolidiert; die Gegenlese-Praxis wird wiederkehrender Drift-Ausgleich (ARBEITSWEISE
+> B.3-Nachtrag 16.08.). Dieses Kapitel VERWEIST auf Ledger und Karten, es dupliziert nicht.
+> **Fakten-Quellen:** Ledger **KON94** (Full-Join FJ-1..FJ-10 + Arena E1-E11 + 6-GB-Schichtung) ·
+> **KON95** (O1 markierter Leerwert · O2 Spaltenmenge E(A)=kV3AxisSchema+seg_* · O3 feingliedrig
+> disjunkt) · **KON96** (Gegenlese-Karte, Koerbe A-D, 73 Posten) · **KON97** (diese Konsolidierung
+> + Rest-Karten r1-r5 + Explore-Karten E1-E4). Bei Widerspruch: Owner-Wort schlaegt alles,
+> Neueres schlaegt Aelteres.
+>
+> **Die tragenden Korrekturen/Ergaenzungen der Architektur- und Betriebs-Wahrheit:**
+> **(1) KORB-A-ERWEITERUNG DES BUMP-BUENDELS:** #15 traegt ZUSAETZLICH zu Layout 6→7 + Format 4→5
+> (Wellenplan §18) **14 Einzelposten** — u. a. 10. Stempel-Glied (GliedCount 9→10, Hybrid-Map-
+> Zeile), Preimage-Budget-Bruch (kAnatomyFingerprintPreimageMax=4096), Synthese-Key-Grammatik,
+> Glied-FOLGE/AxisKind-Vorentscheid, work_mode-Enum-Umbau, Stufe/Phase-Umbenennung, E-1-Stempel-
+> Felder, prod2-Umbenennung, FullJoin-Umbenennung, S-6-Verbotszonen, 5. ABI-Symbol = Pflicht,
+> B3 = Umzug der Schalter-Hoheit, EISERNE REGEL (nichts unter axes/ topics/ heuristik/), KEINE
+> 123 Literal-Bumps → Wellenplan **§19.1** (Einzelliste), Ledger KON96/Korb A.
+> **(2) DIE KETTE HAT 15 STATIONEN, NICHT 8** (Z14663-14729): nach AUSWERTEN folgt je gemessener
+> Last single bauen→messen→compare→release, dann der Hybrid-Vierer; COMPARE ist zweimal eigene
+> Station; „Release“ = Optimum je Last → Einzel-Marker an VI.1(b).
+> **(3) VOLLBAU-GATE (KON22) VOR DEM TRIGGER 26.08.:** „Lagerhaltung fertig UND Stempel fertig
+> UND Algorithmen versioniert UND Messung einbaubar“ — Gate-Pruefung als Vorlage VOR dem Trigger;
+> Bau-Reihenfolge danach (KON17-04): Stempel → Planungs-Simulation → von der XML die GESAMTE
+> Kette bis zur PDF — S-13 ist KERN, nicht Anhang → Einzel-Marker an VII.1.
+> **(4) KON94/95-ENTSCHEIDE:** Full-Join ab ma-Ebene = FJ-1..FJ-10 als benannte S-13-Bau-Posten;
+> Arena-Kette E1-E11 (E11 = Kapazitaet, 6 GB FEST/STATISCH per KON93-C6); O1 markierter Leerwert
+> (gebaute honest-empty-Praezedenz, r4 B-06); O2 Spaltenmenge MIT Bezugsgroesse: `seg_*_ns` sind
+> kommensurabel mit `seg_run_total_ns`, NIE mit `total_ns` (r1 A-7); O3 feingliedrig disjunkt →
+> Wellenplan **§19.5**, Designplan **§12** (Testpflichten).
+> **(5) LEBENDE UR-DOKTRIN-BLOECKE (Kopf-Deckung war NULL — nur Verweis, Volltext im Ledger/den
+> Karten):** Kanal-Doktrin KON50-54 (drei Nachrichtenklassen hinauf, NIE Mess-Rohdaten zum
+> Planer, OOB = genau das Fertig-Signal, Sync-Barriere, gefiltertes XML / sparse binary) ·
+> MeasureStorage-Acht-Festlegungen + ZWEI Arenen + Allokations-Verbot (Z15143-15283) · SECHS
+> Steuerdocks + Sammel-Release (Z14784-14853) · Emissions-Doktrin (KEINE YAML, zentrales
+> C++23-Bau-Modul, Rakete rueckwaerts, Abschluss = Lager-Fund) · Registry = ANGEBOT / Anwender-
+> XML = ANZEIGE (.pom-Resolver, DREI art-spezifische Registries, Par.27/28) · EIN-Hauptkanal-
+> Doktrin (Par.71/73: „Eine XML, ein Kanal, Punkt“) · Lager/Batch/ETA/Takeover + Job-Anzahl
+> O(Maschinen) (Par.62-B) · Modi-Volldefinition, RELEASE = „ZIEL DES GESAMTPROJEKTS“ (Par.61/
+> 62-C) · Mess-Tooling-Vereinigungs-Default (Par.64) · Pruefstand: Google-Tests am Pruefdock VOR
+> jeder Messung, Test-Log = Lagerhaltung (Par.62-B/68b) · generalisierte Schnitt-Regel (04.08.) ·
+> `checkpoint_measure` C-1..C-17 (08.08.: uniforme IN/OUT-Funktion, eigener Stacktrace,
+> virtuelle Thread-Slots — Namens-Herkunft damit VOR KON60(iii), r5 C1) · Record-and-Replay als
+> Mess-Vertrag · Release = REKONSTRUKTIONS-Anfrage (loest W9: Binaries muessen nicht aufbewahrt
+> werden) · Break-Even = B-Spline B=3, dreimal je Baum-node-Tiefe · Matrix/Baseline/Familie-
+> Taxonomie 06./07.07. (traegt #74/W15, Explore-Karte E1).
+> **(6) BETRIEBS-WAHRHEIT VOR W3** (Kurzliste, Posten im Wellenplan §19.3): Messung heute NICHT
+> zweilanig · Drift-Gate ohne Debug-Ausnahme · HEAVY signal-gated · drei Projekt-Token (286/288/
+> 289) nachweislich NICHT rotiert (Owner-Vorlage SOFORT, r3 C11) · PMC: vier Wachen beissen
+> nicht, Deckel L1D+dTLB (Owner-Vorlage vor W3, r3 C1/C2).
+>
+> **Die zu setzenden Einzel-Marker dieses Nachtrags stehen als Liste direkt unter diesem Block;**
+> die Wellen-/Task-Wirkung steht im Wellenplan **§19**, die Testseite im Designplan **§12**.
+
+**Einzel-Marker dieses Nachtrags (je eigener `> ⚠️`-Blockquote AM ORT, 16.08.2026, KON97):**
+M-1 VI.1(b) 15-Stationen-Kette · M-2 VI.2 Hybrid-Ausloeser = FLATTERN + Hybrid-Stempel-
+Spezifikation · M-3 VI.4 Release = REKONSTRUKTIONS-Anfrage + WritebackMethod-Luecke · M-4 VI.5
+Drift-Gate ohne Debug-Ausnahme · M-5 VII.1 VOLLBAU-GATE vor dem Trigger 26.08. · M-6 VII.2
+Messung nicht zweilanig · M-7 TEIL IX allow_failure im GENERIERTEN Voll-Mess-Batch.
+
 ---
 
 ## VERSIONSHISTORIE UND ABLÖSUNG
@@ -408,6 +470,12 @@ und ebenso immer dann, wenn ich sonst raten müsste. **Raten ist nie zulässig.*
 Regel steht im Ledger unter „RICHTIGSTELLUNG 09.08.2026": ein korrekt gemessener Befund, den ich
 gedeutet habe, ohne vorher nach dem vorhandenen Entwurf zu suchen.
 
+> ⚠️ **MARKER 16.08.2026 (KON97):** PRAEZISIERT — die Verarbeitungskette hat **15 Stationen,
+> nicht 8** (Z14663-14729): nach AUSWERTEN je gemessener Last single bauen→messen→compare→release,
+> dann Hybrid bauen→messen→compare→multi release; COMPARE zweimal eigene Station; ‚Release' =
+> Optimum je Last; Single-vor-Hybrid zwingend. Das Acht-Stationen-Bild bleibt als Grobbild;
+> die Explore-Ausloeseliste gilt je Station.
+
 ## VI.2 HYBRID — Pflicht, eigene Gattung, 0 % gebaut
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** ÜBERHOLT 12.08.: ‚0 % gebaut' → ‚0 % ANGESCHLOSSEN' — hybrid/ trägt 4 Header/943 Z. + 1802 Z. Vorarbeit, 0 Produktions-Konsumenten (KON9-02).
@@ -415,6 +483,11 @@ gedeutet habe, ohne vorher nach dem vorhandenen Entwurf zu suchen.
 Owner-KERN 08.08.: Gattung **`HEURISTIK-ADAPTER`**, Genus **`Function-Interface-Reroute`**.
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** PRÄZISIERT 12.08.: ZWEI Ebenen GEMEINSAM — AnatomyGattung::HeuristikAdapter=3 (4. Gattung, keine Dock-Gattung) + AnatomyGenus::FunctionInterfaceReroute=5 (sechswertig); genus() liefert NIE den Reroute-Wert (Pass-through, Weg C) — anatomy_base.hpp:53-92 + :131-169; 14 Entscheide E-1…E-10/K1/K2/K5.
+
+> ⚠️ **MARKER 16.08.2026 (KON97):** ERGAENZT — das Ausloese-Signal des Hybriden ist das FLATTERN
+> der besten Tier-Binary (r5 :28945: Stufe 1 mittelt, Stufe 2 sucht das Flattern gezielt —
+> Bereichs-Erkennung, keine Hysterese); Hybrid-Stempel vollstaendig spezifiziert (KON41-04/45/47:
+> Map-Zeile, Value = Tier-SHA, Invariante RT ⊆ CT) → #15/HY-A2.
 
 Sie erbt **compile-time** die Interfaces einer Gattung+Genus und stellt sie nach heuristischer
 Entscheidung an die eigentlichen Tier-Binary-Interfaces durch — *„wie ein heuristik-gesteuertes
@@ -443,6 +516,12 @@ Lehrbuch-Entwurfsmuster, zero-cost · **kein `std::variant`** über statische Ac
 **EIN** Storage-Tree im Code, **ZWEI** Filesystem-Wurzeln (`binaries` / `measurements`), **lazy**
 angelegt, in **zwei Durchläufen** — erst bauen, dann messen. Gültiger Bestand ⇒ **SKIP**, für
 Messdaten **und** Binaries. Neue Binary-Version ⇒ neuer Datensatz **neben** dem alten.
+
+> ⚠️ **MARKER 16.08.2026 (KON97):** ERGAENZT — Release ist eine REKONSTRUKTIONS-Anfrage an die
+> compare-Bibliothek der Messwerte (r5 :29091): Binaries muessen nicht aufbewahrt werden —
+> das loest W9 (‚Lager lagert Messdaten') ohne Owner. IST-Luecke: `WritebackMethod` kennt kein
+> `xlsx` (Enum dreiwertig, XSD prueft freien String) — vierter Registry-Wert + Enum-Wache =
+> #18-Posten (r5 A43).
 
 **Die Ausgabe ist xlsx.** ~~CSV wird NIE verwendet.~~
 
@@ -509,6 +588,12 @@ leer — und der Lauf misst weiter:
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** GETRENNT 12.08.: T-15a (Drift→Kampagnen-Neustart) ≠ T-15b (Build UND Messung dürfen JE 5-mal scheitern, nicht 1+5; Erfolg = 3 Werte je Parameter+Binary EINZELN persistiert, KON37-06). 🔴 die 5 sitzt heute falsch auf der Drift-Achse (ce 4cd1ab91).
 
+> ⚠️ **MARKER 16.08.2026 (KON97):** 🔴 das Drift-Gate kennt KEINE Debug-Ausnahme (`RunMethodology`
+> in drift_detector.hpp = 0 Treffer; Owner: ‚Pruefer … schaltet Debug daher ab', Z13762-13898) —
+> ungebaut ist bei der --debug-Generalprobe ab 29.08. JEDE Zelle rot; Debug-Zahlen sind
+> Ausschuss, NIE ins Messwertlager (Sperrform AdmissionStatus existiert). Paket mit T-15/D4,
+> VOR W3 → Wellenplan §19.3, Designplan §12/T-12a.
+
 **Wir arbeiten NIE mit Zufall** — außer für Köder. Die Gap-Statistik der k-Wahl braucht eine
 Zufalls-Referenz und fällt damit aus; die k-Wahl stützt sich auf Silhouette + Elbow + Domänen-Anker
 **k ≈ 6…14**.
@@ -542,6 +627,12 @@ Zufalls-Referenz und fällt damit aus; die k-Wahl stützt sich auf Silhouette + 
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** *ÜBERHOLT 12.08. (W7-Zeile ‚checkpoint_measure'): checkpoint_measure ist Teil von System B → B4, Owner-KERN 09.08. ‚muss gebaut werden' — gehört in die Durchführungs-Planung, nicht nach W7 (KON34, Wellenplan §17.3).*
 
+> ⚠️ **MARKER 16.08.2026 (KON97):** ERGAENZT — vor dem Bau-Trigger Mi 26.08. 06:00 steht das
+> VOLLBAU-GATE (KON22): ‚Lagerhaltung fertig UND Stempel fertig UND Algorithmen versioniert UND
+> Messung einbaubar' — Gate-Pruefung als Vorlage VOR dem Trigger; danach Bau-Reihenfolge
+> KON17-04 (Stempel → Planungs-Simulation → von der XML bis zur PDF). HEAVY ist SIGNAL-GATED:
+> das Signal fuer das 26.08.-Fenster muss GESENDET werden (KON58-03).
+
 ## VII.2 Betriebsregeln über allen Wellen
 
 - **EIN-BLECH-REGEL:** höchstens **ein** Pipeline-Abnahme-Paket zur Zeit; zweiter Slot nur lokal.
@@ -555,6 +646,19 @@ Zufalls-Referenz und fällt damit aus; die k-Wahl stützt sich auf Silhouette + 
 - Während **W2** (Bau) und **W3** (Kampagne): **null** CI- und Agenten-Last auf prod1. Fremde Last
   kontaminiert Latenzen — **kontaminierte Daten sind die unheilbare Klasse.** Textarbeit über
   Overleaf-Remote.
+
+> ⚠️ **MARKER 16.08.2026 (KON97):** ERGAENZT — die Messung ist heute NICHT ZWEILANIG
+> (`resource_group ceb-measurement-exclusive` hart amd/prod1; §61-Revision `ceb-measure-<host>`
+> vom 21.07. nie umgesetzt, Intel-Gegenstueck fehlt; gegen ce `0c80aa78` am Objekt nachmessen,
+> r4 C-1) — Bau-Posten VOR W3, sonst faehrt die Kampagne einlanig → Wellenplan §19.3.
+
+> ⚠️ **MARKER 17.08.2026 (KON97-VERIFY):** PRAEZISIERT — die IST-Beschreibung des vorstehenden
+> Markers ist teilueberholt: `ceb-measurement-exclusive` existiert weder in der ce-.gitlab-ci.yml
+> (live: `pmu-prod1`/`pmu-prod2` je Host) noch im Generator; der Generator emittiert bereits die
+> „nie umgesetzte" §61-Revision `ceb-measure-<host>` (experiment_plan_director.hpp:1448/:1615).
+> Der C-10-Bau-Posten bleibt (Zweilanigkeit am Objekt nachmessen, r4 C-1 nennt den Auftrag
+> selbst) — die Nachmessung misst gegen den HEUTIGEN Generator-Stand, nicht gegen die alte
+> resource_group-Bezeichnung.
 
 ## VII.3 Der DURCHSTICH (F1, 14.08.)
 
@@ -632,6 +736,20 @@ Codex (GPT-5, read-only) bleibt eingebunden — **als Kritiker, nicht als Zusamm
 | **D2** | Abdeckungs-Wache über zu kleinem Nenner | **offen** — **18** bedingte Registrierungen unter **14** Bedingungen (09.08. am Objekt bestätigt, drei ce-Stände, `scripts/ci_abnahme06_bedingungs_tabelle.sh`); `STATUS_OUT` deckt davon ~~2~~ → **4 von 18** (22 %). Die „2" traf die *Blöcke ohne Registrierung* (`_pa_status`, `_fj_status` — in jeder CI unerreichbar), nicht die gedeckten Registrierungen. **Teilstück D2-G4 ERLEDIGT 09.08.**: Formel ##06 auf „erfüllt ODER Allowlist mit Begründung" korrigiert, Zähl-Skript + `ci/abnahme06_bedingungs_allowlist.txt` gelandet. |
 | **D5** | fünf Median-Implementierungen, drei Antworten | **offen** |
 | **D3-4** | Ausgabe-Gate in `allow_failure`-Job wirkungslos | **offen** — gehört in einen Folge-Job |
+
+> ⚠️ **MARKER 16.08.2026 (KON97):** ERGAENZT — zusaetzlich zur geheilten OV-16-Stelle setzt der
+> GENERIERTE Voll-Mess-Batch `allow_failure` auf JOB-Ebene (experiment_plan_director.hpp:
+> 1332-1333, ausserhalb rules:) — exakt der verbotene Fall ‚ZELLE = Warnung, JOB = rot';
+> Task vor W3 (r3 C3) → Wellenplan §19.3.
+
+> ⚠️ **MARKER 17.08.2026 (KON97-VERIFY):** UEBERHOLT — der vorstehende Marker installiert einen
+> GEHEILTEN Defekt als lebend: experiment_plan_director.hpp traegt heute (90ee6809 wie 8fe66469)
+> nur noch den Kommentar :1631 „Mess-Batch traegt KEIN allow_failure"; Heilung ce `a558e87c`
+> 09.08. („fix(ci): #278 — allow_failure aus der emittierten Mess-Job-YAML raus"). Die
+> r3-C3-Erhebung stammt vom 08.08. (Transkript Z23184-23193), VOR der Heilung — B.3-Regel 4
+> (Befund traegt sein Erhebungsdatum) exakt einschlaegig. KEIN Task vor W3; der
+> §19.3-Verweis des vorstehenden Markers loest entsprechend nicht auf (dort bewusst kein
+> allow_failure-Posten; D-18 fuehrt nur die drei ANDEREN Stellen).
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** *ERGÄNZT 12.08. zu D2: ce hat GENAU EINEN roten Job test:coverage-guard (stempelfremder ISA/Host-Grund); Fix-Reihenfolge bindend erst F1 (Operanden vergleichbar), dann F2 (when:always) — Guard-interne Schritte, NICHT die Fristen F1/F2 (KON8-11 · KON33-02). Zu D5: 3/5 erledigt (ce c98b4b95), offen D5-2-Rest + D5-4.*
 

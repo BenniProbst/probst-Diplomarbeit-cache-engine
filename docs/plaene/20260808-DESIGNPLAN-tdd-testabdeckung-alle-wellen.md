@@ -599,3 +599,59 @@ Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-w
 **T-11c — MUTATIONS-PROTOKOLL ALS ABNAHMEKLASSE** (KON57, verschärft T-1): der Biss jedes neuen Tests wird per **protokollierter Wegwerf-Mutation** belegt (Rot gesehen, dann zurückgenommen) — und die **Köder-LÄNGE/-Form wird geprüft, BEVOR die Mutation zählt** (M-F2-Lehre: 63-statt-64-Zeichen biss aus dem falschen Grund; dieselbe Klasse wie die gitleaks-19/20-Falle). GEZÄHLTE Pflicht je Paket: **je neuem Test ≥1 Wegwerf-Mutation mit literalem Rot + Gegenprobe-Grün**; Vorbild KON57-03 (M-F1/M-F2b/M-F3/M-H10).
 
 **Summen-Regel (unverändert):** 117/386 h bleiben unangetastet; T-11a–c sind erst zu addieren, wenn die S-Strecke (§10/D-4) mit-durchgezählt wird — sonst der T-3-Fehler aus §9.
+
+---
+
+## 12. NACHTRAG — KONSOLIDIERUNG 16.08.2026 (KON94–KON97)
+
+**Status (KON19-00):** Fortschreibung von §10/§11 nach demselben Muster; nichts geloescht,
+nichts an den Summen. Fakten-Quellen: Ledger KON94 (FJ-1..FJ-10, Arena E1-E11, 6-GB-Schichtung) ·
+KON95 (O1/O2/O3) · KON96 (Gegenlese-Karte) · KON97 (Rest-/Explore-Karten). Als GEZAEHLTE
+Posten-Liste (5 neue Testklassen), noch NICHT in den 117er-Katalog eingerechnet — dieselbe
+Summen-Regel wie §10/D-4.
+
+**T-12a — DRIFT-GATE-DEBUG-AUSNAHME-TEST** (Z13762-13898; Owner: „Pruefer … schaltet Debug daher
+ab"): heute `RunMethodology` in drift_detector.hpp = 0 Treffer — bei der --debug-Generalprobe ab
+29.08. waere JEDE Zelle rot. GEZAEHLTE Pflichten: (1) unter `--debug` schaltet das Drift-Gate ab
+(Verzweigung am RunMethodology-Flag; Koeder: eine Fassung, die Debug-Zellen rot drift-prueft,
+wird ROT); (2) Debug-Zahlen tragen die Sperrform (`AdmissionStatus::Gesperrt`, fail-closed) und
+erreichen NIE das Messwertlager (Koeder: eine Debug-Zeile, die im Lager landet, wird ROT —
+T-4-Gegeneingang); (3) Nenner-Zeile: der Test weist BEIDE Zweige mit literalem Rot/Gruen aus.
+
+**T-12b — WARMUP-PAAR AM LEGACY-PFAD** (KON47-04 + KON58-11(b); ergaenzt T-11a): der
+Legacy-Pfad `run_observable_perm` misst heute KALT (perm_runner.hpp:207,213). GEZAEHLTE Pflicht:
+ENTWEDER Paar-Zaehlung 2x3 = 6 Laeufe / 3 Werte auch am Legacy-Pfad (T-11a-Norm, Koeder: kalter
+Einzel-Lauf, der persistiert, wird ROT) ODER ein Ausbuchungs-Beweis, dass der Pfad von keinem
+Produktions-Ziel mehr gefahren wird (Nullbefund NUR mit Gegenprobe „wer ruft ihn?"). Vor der
+Kampagne; haengt an Wellenplan §19.3/C-05.
+
+**T-12c — ARENA-KAPAZITAETS-TESTS (E11)** (KON94 + KON93-C6 + r5 C-1..C-17): GEZAEHLTE
+Pflichten: (1) Kapazitaet 6 GB FEST/STATISCH, Planer-Reservierung nur zu Experiment-Beginn
+(Koeder: Laufzeit-Resize wird ROT); (2) virtuelle Thread-Slots: Obergrenze = Anzahl der
+Thread-Unterachse, compile-time bekannt, Puffer statisch (Koeder: Slot-Ueberschreitung ohne
+LAUTEN Fehler wird ROT); (3) Ueberlauf = BEFUND: weiterlaufen + zaehlen + beim Auslesen melden
+(Koeder: still verworfene Zeilen ODER blockierender Hot-Path werden ROT); (4) Hot-Path-Reinheit:
+kein Alloc, kein I/O, EIN Deskriptor-Verweis statt Achsen-Kette (Allokations-Verbot Z15641;
+Koeder: eine Aggregations-Allokation wird ROT); (5) IN-ohne-OUT-Invariante je (Prozess, Thread,
+Interface) als Auswerte-Wache (r5 A12/N-6).
+
+**T-12d — FULL-JOIN-SCHEMA-TESTS (FJ-1..FJ-10)** (KON91/KON94/KON95): GEZAEHLTE Pflichten:
+(1) Spaltenmenge E(A) = kV3AxisSchema + seg_* (KON95-O2) mit BEZUGSGROESSE: Summe der 19
+Organ-Segmente + seg_framework_ns == seg_run_total_ns (an golden-Daten verifiziert); Koeder:
+ein Test, der seg_*_ns gegen `total_ns` stapelt, wird ROT (Phantom, r1 A-7); (2) markierter
+Leerwert nach KON95-O1: ECHT-0 eigene Klasse ≠ nicht-ausgefuehrt = Auslass (honest-empty-
+Praezedenz r4 B-06; Koeder: ein zmode=log-Pfad, der eine echte 0 verschluckt, wird ROT);
+(3) Full-Join verwirft nichts: je Achse bleibt jede mi-Erfolgs-Spalte erhalten (Koeder:
+Spalten-Drop wird ROT); (4) Namens-Wache: `FullJoin` (MergeStrategy) bleibt getrenntes Objekt
+bis zur 19.1/A-09-Umbenennung (Kollisions-Koeder).
+
+**T-12e — S-3-KOMBIBAU-NACHWEIS** (KON58-08 + KON59-02/NE-10): S-3 ist gebaut (ce 4a89aed5),
+der KON55-Kombibau wurde NIE gefahren (ctest-Starts NULL). GEZAEHLTE Pflichten: (1) die
+2x2-Matrix {clang, gcc} x {Debug, Release} je J-1..J-4 + ctest mit literaler Bilanz (T-11b-Norm)
+EINMAL real durchfahren und protokollieren; (2) Aktivierungs-Beweis „gebaut UND inert" je
+Flag-Seite mit ZWEI Zahlen AM OBJEKT — `bvset_ist_teilmenge` hat 2 PRODUKTIONS-Treffer, „inert"
+ist teilwiderlegt und wird gemessen, nicht behauptet; (3) Koeder: eine (token, eltern)-flache
+Kuerzel-Pruefung wird ROT (Paar-Identitaet, r4 A-04/r5 A30).
+
+**Summen-Regel (unveraendert):** 117/386 h bleiben unangetastet; T-12a–e sind erst zu addieren,
+wenn die S-Strecke (§10/D-4) mit-durchgezaehlt wird — sonst der T-3-Fehler aus §9.

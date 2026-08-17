@@ -16,6 +16,66 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG XCVII+XCVIII (KON97/KON98) -- 17.08.2026: Drift-Konsolidierung gelandet + golden-Fenster-Landung + Floor-Rueckkalibrierung
+
+### KON97 -- DRIFT-KONSOLIDIERUNG IN DIE 4 /goal-REFERENZDOKUMENTE (Owner-Auftrag 16.08.)
+- Workflow wf_9819fde6-9eb (15/15 Agenten: 5 Ledger-Rest-Leser r1-r5 [Z.16627-30077 = 100%-Deckung
+  des Ur-Ledgers] + 4 Zehn-Wochen-Explorer E1-E4 + Dossier [Fable max] + 4 Schreiber [Fable max] +
+  Verify [Fable max]). Einbauten (alle additiv, datiert, byte-/aequivalenz-verifiziert):
+  GOAL-v8 Kopf-Nachtrag KON97 (6 Bloecke) + Einzel-Marker M-1..M-7 (798 Z.) - Wellenplan Par.19
+  DRIFT-KONSOLIDIERUNG 19.1-19.7 (+327 Z., 2548 Z.: Korb A 14 + 10 Zusatz - Korb B 20 - Korb C 15 -
+  Korb D 24 - FJ/E11-Bauposten + 4 r5-Auflagen - 18 Widersprueche [12 Marker/5 Explores/1
+  Austragung W18] + Owner-Fragen-Buendel - R-01..R-38 Ur-Ledger-Rueckkehrer) - Designplan Par.12
+  T-12a..T-12e (+56 Z., 657 Z.) - ARBEITSWEISE B.3-NACHTRAG (4 Verschaerfungen + 8 v4.4-Kandidaten
+  Owner-gated, KEIN Bump, 1220 Z.).
+- VERIFY TRAEGT_MIT_FIXES; beide MUSS im selben Zug vollzogen: MUSS-1 Karten-Persistierung =
+  docs/sessions/backups/20260817-drift-konsolidierung-rohdaten/ (Karten r1-r5 + E1-E4 +
+  kopf_referenz + gegenlese-Karten + DOSSIER.md + VERIFY.md + journal + 21 extrahierte
+  Agenten-Ergebnisse + LESE-SYNTHESE-kontext10.md [805 Z.]; alle Karten-Verweise der Nachtraege
+  loesen ab jetzt HIER auf, nie im tmp) - MUSS-2 GOAL-M-7 per UEBERHOLT-Marker entschaerft
+  (allow_failure-JOB-Ebene war am 09.08. durch ce a558e87c geheilt; r3-C3-Erhebung 08.08. lag VOR
+  der Heilung = Phantom-Task; B.3-Regel 4 einschlaegig) - SOLL-1 GOAL-M-6 praezisiert (live
+  resource_groups pmu-prod1/pmu-prod2; Generator emittiert bereits ceb-measure-<host>
+  :1448/:1615; C-10-Nachmessung gegen den HEUTIGEN Generator-Stand).
+- VOLL-EINLESUNG (Owner 17.08. "lies alle Workflow Ergebnisse vollstaendig ein ... persistiere"):
+  alle 17 Material-Dateien + Dossier + Verify + verstecktes Erst-Ergebnis (Dotfile) + die von den
+  Task-Notifications ABGESCHNITTENEN Felder vollstaendig gelesen; Erkenntnis-Deltas in
+  LESE-SYNTHESE-kontext10.md persistiert. Abschneide-Befunde dokumentiert (Notification kappte
+  4 Felder mitten im Satz; Journal-Extraktion fand das erste Ergebnis nur als Dotfile).
+- Wellenplan-VORBESTAND-DEFEKT notiert (kein Edit): Z.2193 klebt die Par.18.8-Ueberschrift ohne
+  Umbruch an der Par.18.7-Fessel-Zeile -- Kleinfix beim naechsten Wellenplan-Zug.
+
+### KON98 -- GOLDEN-FENSTER-LANDUNG AUF development + FLOOR-RUECKKALIBRIERUNG + THESIS-SYNC
+- FENSTER-LANDUNG (EIN Zug, KON70-01/A2.1a): Merge --no-ff fbe898be -> development = ce 90ee6809
+  (B2 e966ee81 + #16-Homes + organ_axes/F5 + #72-queuing = EIN deklarierter golden-Bruch, 646/718
+  Lock-Records; Kette 369b62ce -> d44008c5 [3 Review-Fixes, T-1] -> 37551a97 [B2-Harmonisierung,
+  0 Inhalts-Delta, P6-Fessel erfuellt] -> fbe898be [Floor-Nachzug]); Kombibau KON55 4x "100% tests
+  passed, 0 tests failed out of 494" (gcc 15.3 + clang 22.1.8 x Debug+Release); Gate-Kette GRUEN
+  (Diff-Hygiene 7470 Zusatzzeilen rc=0 - Lock 718 deckt 712/712 - gitleaks Koeder rc=1 laenge-26 +
+  Echt rc=0 "23 commits scanned"); EIN Push origin+github 8fe66469->90ee6809 (heilt zugleich das
+  15895-Rot des toten bau/golden-homes-Standes); Rescue-Ref refs/rescue/golden-fenster-20260817.
+- CI 15936 @ 90ee6809: 26/27 Jobs gruen (alle 4 Dual-Compiler-Zellen, alle Contracts, Sanitizer,
+  chaos:drift); EINZIGES Rot test:coverage-guard 380164 = FLOOR-FEHLKALIBRIERUNG VOM 16.08.:
+  Anker war auf die prueflinglose Bau-Form geeicht ("CI-Floor-Baum baut OHNE Pruefling" = FALSCH;
+  der covguard-Job konfiguriert build-covguard MIT -DCOMDARE_CE_PRUEFLINGE, T-4). RUECKKALIBRIERT
+  per Live-Belegen (Job 380164 prod2/avx2 = 491 MIT gelaufenem Pruefling-Block; Job 380159
+  prod1/avx512f = 494 OHNE = 495-1 SOLL-DELTA) + Nachmessung 17.08. am Stand 90ee6809 nach
+  Datei-Rezept (build-covguard KALT, make inventar, ctest "Total Tests": 495/491/489, Restore
+  byte-gleich, Leiter -4/-2 namensgleich, Gegenrichtungen leer) = ce 04ac26fa (nur
+  scripts/ci_test_inventory_floor.txt; 16.08.-Block bleibt als FEHLKALIBRIERT markierte Historie).
+  Dokumentierte MESS-FALLE: ctest -N padded Nummern <100 ("Test   #1:") -- ein
+  "^ *Test #N: "-sed verliert die Tests 1..99 still (396 statt 495); Zaehlbasis = "Total Tests: N".
+  Push origin+github 90ee6809->04ac26fa; CI-Poller laeuft.
+- THESIS-SYNC (16.08., nachgebucht): Owner-Audit-Commit c2d21fa (03_messsystem_prtart.tex, 19
+  %-Anmerkungen, Runde 1) von github eingeholt -> Merge c169fd2 TRAILER-FREI -> dev auf origin+
+  github, origin/main FF auf c2d21fa (volle SHA). Einarbeitung = Task #77 (nach F2); super-
+  Gitlink-Nachzug (ce 90ee6809/04ac26fa + BEIDE Thesis-Gitlinks c169fd2) folgt ATOMAR nach
+  ce-CI-Gruen mit PZW-Anker-Nachzug.
+- OFFENE GOLDEN-NACHPOSTEN aus der Voll-Einlesung (das gelandete Fenster kannte sie nicht; als
+  Paket VOR F2 zu disponieren): (a) all_axes_golden.profile.xml nicht wohlgeformt -- drei '--'
+  beseitigen + Flag PROFILE_ALLOW_COMMENT_TEXT_DEFECT entfernen (r3 A12) - (b) telemetry-silent-
+  Wiring +tel=silent golden-byte-gebunden (r4 A-01) - (c) E-B Stempel-Name in den generierten
+  Quelltext bricht golden-CRC (r5 A34/C7; Praezedenz gen_golden_fullpilot --crc64).
 ## NACHTRAG 16.08.2026 -- KON96: LEDGER-GEGENLESE KON1-59 KOMPLETT (5x Opus max + Fable-Synthese) -- 73 LEBENDE POSTEN (KORB A ERWEITERT DAS F2-BUENDEL UM 14), 18 W-MARKER-AUFTRAEGE, 3 OWNER-FRAGEN
 
 **Quellen: wf_750a0423 (6/6; 5 Opus-5-max-Leser ueber KON59-36 + Konsolidierung

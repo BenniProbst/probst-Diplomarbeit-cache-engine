@@ -1,0 +1,18 @@
+# Workflow-Agent-Ergebnis: unbenannt
+(wf_9819fde6-9eb, Vorkommen 21)
+
+EINBAU-BERICHT — /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260808-GOAL-V8-DOSSIER-alle-wellen-am-stueck-bis-abgabe.md
+
+DUPLIKAT-VERMERK (nicht gedoppelt):
+- Block 1.1 (Kopf-Nachtrag "## REFERENZ-STAND 16.08.2026 — KONSOLIDIERUNGS-NACHTRAG (KON97)", 6 Bloecke + Einzel-Marker-Liste M-1..M-7) existierte bereits aequivalent und vollstaendig an der Soll-Stelle (Z.30-90, nach dem 12.08.-Kopf-Nachtrag, vor `---`/VERSIONSHISTORIE). NICHT erneut eingefuegt.
+
+EINGEBAUT (7 Aenderungen, je eigener `> ⚠️`-Blockquote, datiert 16.08.2026, KON97, Marker-Stil des Dokuments, Zeilen <=120, vorhandene Marker unangetastet):
+1. M-1 -> Z.473-477: VI.1(b), nach Absatz "Diese acht Stationen sind zugleich die Explore-Auslöseliste." — PRAEZISIERT 15-Stationen-Kette statt 8.
+2. M-2 -> Z.487-490: VI.2, nach dem PRÄZISIERT-Marker 12.08. (ZWEI-Ebenen/AnatomyGattung) — ERGAENZT Hybrid-Ausloeser = FLATTERN + Hybrid-Stempel-Spezifikation (RT ⊆ CT) -> #15/HY-A2.
+3. M-3 -> Z.520-524: VI.4, nach Kopfabsatz "…neuer Datensatz **neben** dem alten." — ERGAENZT Release = REKONSTRUKTIONS-Anfrage (loest W9) + WritebackMethod-xlsx-Luecke = #18-Posten.
+4. M-4 -> Z.591-595: VI.5, nach dem T-15a/b-Marker 12.08. — 🔴 Drift-Gate ohne Debug-Ausnahme, Paket mit T-15/D4 VOR W3 -> Wellenplan §19.3, Designplan §12/T-12a.
+5. M-5 -> Z.630-634: VII.1, nach dem checkpoint_measure-Marker 12.08. — ERGAENZT VOLLBAU-GATE (KON22) vor Trigger 26.08. + Bau-Reihenfolge KON17-04 + HEAVY signal-gated (KON58-03).
+6. M-6 -> Z.650-653: VII.2, ans Ende der Betriebsregeln (nach "Overleaf-Remote.") — ERGAENZT Messung NICHT ZWEILANIG, Bau-Posten VOR W3 -> Wellenplan §19.3.
+7. M-7 -> Z.732-735: TEIL IX, unmittelbar nach der D3-4-Tabellenzeile (Tabelle intakt, vor dem vorhandenen KON39-Marker) — ERGAENZT allow_failure auf JOB-Ebene im GENERIERTEN Voll-Mess-Batch (experiment_plan_director.hpp:1332-1333), Task vor W3 -> Wellenplan §19.3.
+
+ZEILEN-DELTA: +39 (759 -> 798; 32 Marker-Zeilen + 7 Leerzeilen-Trenner). Nichts geloescht, kein commit/push. Verifiziert: 7x "MARKER 16.08.2026 (KON97)" an den Zielstellen, alle neuen Zeilen <=120 Zeichen; die eine >120-Zeile im Pruefumfeld (Z.737, 352 Z.) ist der VORHANDENE KON39-Marker, unveraendert.
