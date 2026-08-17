@@ -1,0 +1,115 @@
+v2:7180b5d621efb0e34b35c910cffc67e1d09814da09c2f3d7e90428f20e1519da (16808 Zeichen)
+Alle Messungen abgeschlossen. Kritischer Zusatzfund der Verifikation: ce development ist lokal 27 Commits vor origin (die komplette Welle-1-Landung ist ungepusht, existiert nur im lokalen Klon) — das geht als eigenes Frist-Risiko und als Gate fuer jeden Worktree-Abbau in den Text. Hier ist das Ergebnis.
+
+---
+
+# 20. NACHHOLARBEIT-KONSOLIDIERUNG 17.08.2026 (Spend-Limit-Verluste + unverbuchte Auftraege)
+
+> **Anlass:** Spend-Limit-Abriss 17.08. mittags (KON108-03: Teammates hy-a-bau/vl3-bau tot, wf_e06c7f73-Synthese tot, 3 wf_b5b4ac36-Agenten tot; Owner: stoppen + resume -> beide Workflows via resumeFromRunId sauber wieder angelaufen). Danach Vier-Sweep-Verlust-Audit (wf_e06c7f73): (1) Worktree-/Branch-Inventar aller 5 Repos, (2) 222 Workflow-Journale mtime<10d, (3) Transkript-Sweep der letzten 10 Kontexte (Drei-Pfade-UNION, 605+ User-Nachrichten), (4) SOLL-Abgleich Par.18.2-18.8/19.1-19.7 gegen KON94-KON107 + ce-Objekt.
+> **Pruefbilanz (V1, jede tragende Behauptung am Objekt nachgemessen, Stichzeit 17.08. ~18:30):** BESTAETIGT u.a. golden-rettung/p6 = Ancestor, p2/p3 cherry je +1, ce-Remote-unmerged = 0, Cluster-Restbestand, wip/luecken +1, Kurz-Verify ohne Verdikt, R3-D37B-Zeile stale, "#44"-Nummern-Kollision, S-14 ohne Traeger. UEBERHOLT durch Live-Bewegung waehrend des Audits: die Welle-1-Landekette hat GELANDET (development 04ac26fa -> 6a8cdc65, 18:23), f3v hat inzwischen 2 eigene Commits, KON108 ist geschrieben. KORRIGIERT: die #38c-Zielskripte liegen im SUPER-Repo (ce/ci existiert nicht); die Journal-BU-Dringlichkeit haengt NICHT an /tmp-Rotation (Journale liegen persistent unter ~/.claude).
+> **Kernbefund: KEIN Fall VERLOREN-NACHHOLEN.** Alle Verluste sind gesichert oder nachgeholt; was bleibt, sind Buchungs-, Traeger- und Betriebs-Luecken -- unten je mit Posten. Par.13-19 bleiben stehen; was hier steht, ergaenzt und gilt bei Widerspruch vor.
+
+## 20.1 VERWAISTE STAENDE (Ort | Zustand nachgemessen | Traeger/Posten)
+
+| Ort | Zustand (17.08. ~18:30) | Traeger / Posten |
+|---|---|---|
+| wt-ce-hy-a, wt-ce-vl3, wt-ce-vl12, wt-ce-k2 | GELANDET SEIT SWEEP-BEGINN: Landekette Welle1/1..4 (b334a657, be724cb5, c8d7295e, 6a8cdc65); cherry+0 je Tip nachgemessen; Baeume clean (k2: nur Hilfsskript _wiederanlauf.sh) | wf_b5b4ac36-Resume / #81. Restpflicht: Push + CI-gruen (20.5/A1, T-UPD-6); Worktree-Abbau ERST danach (LEAD D) |
+| wt-ce-a11 (bau/a11-ccache-allowlist-drop @ ec048560, clean, 1 Commit vor dev) | IN ARBEIT: ccache-Allowlist-Drop committet; super-Haelfte + Gegenprobe stehen aus (KON108-02/K-a) | A11-Strang im W1-Rest; danach landereif-ungelandet -> in die serielle Landung |
+| wt-ce-g2 (#17, Tip noch 04ac26fa) | IN ARBEIT mit VERLUSTRISIKO: 8 uncommitted Aenderungen = EINZIGE Kopie der G-2-Arbeit | #17 laeuft; SOFORT Zwischencommit/BU (T-UPD-4) |
+| wt-ce-f3v (#20) | IN ARBEIT: seit Audit-Beginn 2 eigene Commits (u.a. dac3d91a, vierter Gate-Quadrant); Sweep-Befund "0 Commits" UEBERHOLT | #20 laeuft; kein Zusatzposten |
+| wt-ce-xorf (#70) | IN ARBEIT: Basis auf 6a8cdc65 nachgezogen, 3 dirty/untracked, noch 0 eigene Commits | #70; Frist "vor naechster Messreihe" (20.5/A5) |
+| Worktrees wf_5834b706-7b5-15 (p2, 237d0952) + -16 (p3, 708cf156) | NICHT in development (cherry je +1, nachgemessen); Inhalt per D12 archiviert (Bundle bau/branch-archiv-d12 = repo-BU 20260815-branch-archiv-d12, origin geloescht) -- kein Verlust, aber Restbestand | Beim #37-Neuschnitt-Vollzug p2 (WIEDERVERWENDBAR) einspielen oder bewusst verwerfen, p3 (TEIL-UEBERHOLT durch S-12/#3) desgleichen; Abbau erst DANACH |
+| Worktree wf_e22d25ef-71c-7 (7f3901fb) | Branch-Inhalt ueberholt/archiviert (#62, Zwillingslinie w0a/d2-floor); im Baum 17 untracked Workflow-Hilfsskripte = unversionierte Session-Rohdaten | BU-Entscheid (BU-additiv-Doktrin) VOR Abbau; in T-NEU-4 aufgenommen |
+| Cluster-Repo | EINZIGER ECHTER REPO-FIXBEDARF: M _infra/ci-templates (Gitlink-Nachzug auf 2352bcf) + untracked scripts/20260815-helm-1014/ (20 Dateien: die 12 Schrittskripte s1..s4 + LEAD_ACK + Begleitdateien); #73 landete nur das Handout | T-NEU-12: committen oder BU -- Entscheid beim Lead (Vorbefund bereits in KON108-03 gebucht, DIESER Paragraph ist der Traeger) |
+| super wip/luecken-stufe2-pause-1308 (6b89fce5, cherry +1, 13.08.) | UNGEPRUEFT-WIP Wachen-Haertung Stufe 2 (anker_wache + tests_registrierung_wache); Bundle existiert (#66), Resume-Marker wf_046aab6c-928 | T-NEU-13: gegen #40 (NE-Rest) abgleichen -- enthalten/ueberholt oder als Bau-Posten heben; bis dahin Branch NICHT anfassen |
+| Reine Aufraeumfaelle (Inhalt nachweislich in development) | golden-rettung, p6, /tmp-Audit-Checkout, 8 ce-Lokalbranches, super b-checkheft, wt-thesis-lizenz | LEAD-Liste C mit Beleg je Kandidat |
+
+## 20.2 GESTORBENE/UNVERBUCHTE WORKFLOWS
+
+Von 222 Journalen waren 46 auffaellig, davon 9 reine Retry-Artefakte; 34/35 echte Faelle sind journal-gesichert UND verbucht/nachgeholt/ueberholt. Die drei Nachpruef-Kandidaten, am Objekt aufgeloest:
+
+| Workflow | Gegenstand | Sicherung | Objekt-Befund heute | Posten |
+|---|---|---|---|---|
+| wf_cd576b6e (WF12, 4 gestartet / 0 zurueck) | Neubau der Straenge C (F1-Durchstich) + A (S-1-Basisklasse) aus den geborgenen WF11-Schnitten (KON49-01: nur Strang D hatte gebaut; Schnitte vollstaendig geborgen inkl. 2 Verify-Korrekturen KON49-04) | Journal + repo-BU 20260814-workflows-letzte-5-kontexte + 20260815-folge-bu-kontext7 | C mutmasslich UEBERHOLT (F1 geliefert 14.08., KON63/#41); A mutmasslich in der S-1-Strecke #30 aufgegangen | T-NEU-2: EIN Abgleich-Zug KON49-04-Schnitte gegen #41 + #30, dann Ledger-Ausbuchung |
+| wf_e6d8983c (R3-D37B-SUPER, 1/0) | Landung der super-Haelfte D3-7b (pruef_only-Modus) | Journal + Folge-BU | GELANDET: super development traegt 9b3a1bcd (10.08.) + Merge 75505b9d (11.08. 13:54); die Ledger-Tabellenzeile (heute Z11532) steht STALE auf "offen" | T-UPD-3: nur Nachbuchung offen -> GELANDET. AUSGEBUCHT |
+| wf_e13d73bf (1/0, gestartet 10.08. ~13:21) | W0a-Einzel-Bau-Agent, Paket unbenannt | Journal + Folge-BU | Journal traegt KEINEN Auftrags-Text (nur agentId/key, nachgeprueft); 0 Ledger-Treffer | T-NEU-3: Identifikation via 5a19728e-Transkript um 10.08. 13:21 (Drei-Pfade-Extraktor), dann gegen #37-Neuschnitt pruefen; NICHT ausbuchen |
+
+Zusatzposten: **Journal-BU-Luecke Kontext 10ff** -- der Folge-BU-Kanal endet bei 20260816-folge-bu-kontext9; im Kanal fehlen wf_a0e17d5d (9/4; inhaltlich verbucht KON98/#16), wf_0e1f240b, wf_a2e443f0-Resume, wf_b5b4ac36 (inkl. Resume-Journal), wf_e06c7f73 (dieses Audit) + Sweep-Rohdaten. KORREKTUR zur Sweep-Dringlichkeit: diese Journale liegen persistent unter ~/.claude/projects/.../subagents/workflows/, NICHT in /tmp; /tmp betrifft nur Scratch-Dateien und den Audit-Checkout. Posten T-NEU-4 (vor dem naechsten Kontextwechsel). -- Die Spend-Limit-Toten von heute mittag sind per KON108-03 STOP/RESUME geheilt; die Welle-1-Landekette ist der sichtbare Vollzug. Einziger Nachlaeufer: 20.3/1.
+
+## 20.3 VERGESSENS-KANDIDATEN AUS DEN TRANSKRIPTEN
+
+1. **s13-Kurz-Verify-Verdikt (5 Stellen, Fassung 3)** -- Gate KON100-02: "Landung erst nach TRAEGT des Kurz-Verify". Der Verify kehrte exakt im Spend-Limit-Moment zurueck; im Ledger existiert bis heute KEIN Verdikt (einziger Treffer = der Gate-Satz selbst, nachgemessen). Einordnung: **W2-VORPOSTEN vor der Di-25-Landung #18**, Traeger s13-design-Strang. T-NEU-1: Verify-Output lesen, TRAEGT/NICHT-TRAEGT in KON109 nachbuchen; bis dahin gilt s13-Fassung-3 NICHT als landereif.
+2. **Wellenplan-Par.20 + KON108 (Zusage des Haupt-Kontexts)** -- KON108 ist 17.08. abends GESCHRIEBEN (Owner-Antworten auf die 6er-Liste); Par.20 ist DIESES Dokument. Mit dem Einbau: **GESCHLOSSEN**.
+3. **46375cdc-Restauftrag (Auslauf-Sicherung 08.08. + Kontrollfrage 16.08.)** -- Gegenprobe am Objekt: die Alt-Session haelt 292 Workflow-Ordner persistent unter ~/.claude; der additive BU-Kanal 20260806-workflow-rohdaten deckt davon nur 2 Journale namentlich (63 BU-Journale ueberwiegend andere Session; outputs mit 269 Dateien breit gesichert). KEIN Verlust am Ursprungsort. Einordnung: **W7/BETRIEB** -- einmaliger additiver Journal-BU der 46375cdc-Aera (in T-NEU-4 integriert), Befund in KON109 vermerken; kein eigener Strang noetig.
+
+Grenzfall, bewusst KEIN Kandidat: K-1 Break-even-Vereinheitlichung -- per KON108-02/E-5 praezisiert (EIN Stack aus 3 Komponenten, gemeinsame Modul-Steuerung der CEB); der Bau-Posten entsteht erst nach der Drei-Komponenten-Klaerung im Owner-Chat; Par.75-Sperre bleibt bis zum Unifikations-Design.
+
+## 20.4 SOLL-LUECKEN: OFFEN-OHNE-TRAEGER (mit Wellen-Zuordnung)
+
+| Posten | Welle/Frist | Beleg |
+|---|---|---|
+| S-14-VOLLAUSROLLUNG (Strecke P.41) | W2 | "vollausroll" = 0 Ledger-Treffer (nachgemessen); Vorbedingung S-18-Homes seit KON98 erfuellt | 
+| S-8/S-9/S-10/S-11-TRAEGERBAU selbst | W2-KOPF | nur als Abhaengigkeit genannt (#3, #22ii, B-01/B-04/B-14/B-16); deckungsgleich R-01 (19.7) |
+| #38c-REST n/a-Zaehler | vor W3 | PRAEZISIERT: Zielobjekt = SUPER-Repo ci/frische_wache.sh + ci/persist_sammler.sh (ce/ci existiert nicht); 0 n/a-Treffer dort nachgemessen; #38 bucht c pauschal ERLEDIGT ohne Arbeitsteilungs-Deklaration |
+| Paper-Experiment-XML je Paper (profile_ref dereferenzieren + Vokabular-Naht) | W2 mit #18 | Entscheide komplett zu (KON107-02/F1 + KON108-02/E-3, Chat-Vorlage laeuft); der Ledger nennt den Bau-Slot "#44" = NUMMERN-KOLLISION mit abgeschlossenem Task #44 (Z54/Z130 nachgemessen) -> bei Anlage NEUE Nummer |
+| C-01 Vollbau-Gate-Vorlage | VOR Trigger Mi 26.08. 06:00 | kein Task; Ledger-Treffer nur historische KON-Zitate (nachgemessen) |
+| C-02 HEAVY-Signal senden | 26.08.-Fenster | Sende-Akt nirgends gebucht; runner-mode v3 wartet auf das heavy-Signal (#60) |
+| C-13 Skip-Oekonomie wiedergewinnen | vor Kampagne Sa 29.08. | 1 Ledger-Treffer = die SOLL-Zeile selbst; kein Task |
+| C-14 Bestandslog-SKIP-Wache | vor Kampagne | kein Task; Risiko seit 12.08. benannt (KON3-06, W7-Liste P.7) |
+| ROT-NAH (Traeger schwach oder kollidiert): C-09 Drift-Gate ohne Debug-Ausnahme (KON105-02 "VOR W3", in keinem Task-Text) · C-10 Zweilanigkeit-Nachmessung (KON97-SOLL-1) · C-12 Fehlerklassen 0/18 bzw. 0/121 (#40 fuehrt T-13/T-14 als W7 = Kollision mit "vor W3", unaufgeloest) · C-15 MinIO-Ebene-B Ein-Blech-Beweis mit Gegenkoeder (#10 war Blind-Smoke) · D-01 S-3-Beweis "ZWEI Zahlen" · D-04 C-4-Wache-Split (6/>=152) · D-06 Modi-als-Phasen (compare vergleicht nichts) · D-15-Rest CEB-38 + CEB-Identitaet A/B · D-22 Karte-4-Spitzengruppe (je EIGENER Pruefposten) · D-24-Rest (CEB-System-Zeile leer, Genus-5-Literale) | W2 / W3-Vorfeld | Sammel-Split aus #71 (T-NEU-8) + Kollisions-Aufloesung (T-UPD-2) |
+| D-08 MEMORY-Korrektur 8 -> 15 Stationen | SOFORT (Doku-Zug, kein Bau) | MEMORY-Index traegt weiter "8-Stationen-Kette" (nachgelesen) |
+
+## 20.5 FRIST-RISIKEN
+
+**A. VOR F2 (Fr 21.08., Identitaets-Freeze):**
+1. **ce-PUSH-RUECKSTAND (neuer Audit-Fund):** development lokal 6a8cdc65 = **27 Commits vor origin/development (04ac26fa)** -- die komplette Welle-1-Landung existiert NUR im lokalen Klon, und die Platte war heute zweimal eng (KON108-03). Push + Pipeline-gruen ist der Schlusspunkt des laufenden Lande-Strangs; bei Strang-Abriss Top-Verlustrisiko. Zugleich GATE fuer jeden Worktree-Abbau (LEAD C/D) und fuer das #15-Buendel-Fundament. (T-UPD-6)
+2. #15-Buendel: Vorlauf-Vorbedingung GEFALLEN (Welle 1 komplett gelandet 18:23) -- der EINE W1-Slot traegt jetzt alle 14 Korb-A-Posten; Rest-Fessel P3->P5 (Ein-Schreiber decl.hpp).
+3. #24/B3 Schalter-Hoheit (Owner-Datum): weiterhin 0 Bau.
+4. #17 G-2: 8 uncommitted Aenderungen als einzige Kopie (T-UPD-4) + blockiert #7/S-19 -> Kaskade auf den Trigger-Nenner (C-03/##51).
+5. #70 XorFilter "vor naechster Messreihe": 0 eigene Commits.
+6. #53 PMC-Schwester: W1-Design-Haelfte eng.
+7. s13-Kurz-Verify-Gate (20.3/1): blockiert sonst still die Di-25-Landung.
+
+**B. VOR TRIGGER (Mi 26.08. 06:00) / KAMPAGNE (Sa 29.08.):** C-01 + C-02 (20.4) · #7 S-19 (Sa 22.-Mo 24., haengt an #15+#17) · #13 T-15b (Sa/So) · #3 S-12-Landung (Di 25.) · #18-Buendel (Di 25.) · C-13/C-14/C-15 vor der Kampagne.
+
+**C. BETRIEB:** Folge-BU kontext10 (20.2, T-NEU-4) vor dem naechsten Kontextwechsel · Slot-Deckel 2 wegen Platte aktiv (KON108-03) · a11-super-Haelfte im Strang.
+
+---
+
+# FUER DEN LEAD (nicht Teil des Wellenplan-Nachtrags)
+
+**A. TASK-NEUANLAGEN:**
+- T-NEU-1: s13-Kurz-Verify-Verdikt lesen + KON109-Buchung TRAEGT/NICHT-TRAEGT (W2-Vorposten, vor #18-Landung; Gate KON100-02).
+- T-NEU-2: WF12-Abgleich -- KON49-04-Schnitte C+A gegen #41 (F1-Lieferung) und #30 (S-1-Strecke), dann Ledger-Ausbuchung wf_cd576b6e.
+- T-NEU-3: wf_e13d73bf-Paket identifizieren (Transkript 5a19728e um 10.08. 13:21, Drei-Pfade-Extraktor), gegen #37-Neuschnitt pruefen.
+- T-NEU-4: Folge-BU kontext10 -- Journale wf_a0e17d5d, wf_0e1f240b, wf_a2e443f0-Resume, wf_b5b4ac36 (inkl. Resume), wf_e06c7f73 + Sweep-Rohdaten + die 17 wf_e22d25ef-Hilfsskripte + einmalig additiver 46375cdc-Journal-BU (292 Ordner).
+- T-NEU-5: S-14-VOLLAUSROLLUNG (W2, Strecke P.41; Vorbedingung erfuellt).
+- T-NEU-6: S-8/S-9/S-10/S-11-Traegerbau als EIGENER W2-Kopf-Posten (deckt die Bauseite von B-01/B-04/B-14/B-16 + R-01).
+- T-NEU-7: Paper-Experiment-XML-Bau (W2 mit #18) unter NEUER Task-Nummer (Kollision "#44").
+- T-NEU-8: W2-Triage-Split aus #71: D-01, D-04, D-06, D-15-Rest, D-22 (je eigener Pruefposten: KON-46-Retry, KON-11/12-Drift, 5 rote Dauer-Tests, Lock-Gate 1/18, MT-L3 0/29, 34x BLOCKIEREND), D-24-Rest.
+- T-NEU-9: C-01 Vollbau-Gate-Vorlage (vor 26.08.).
+- T-NEU-10: C-02 HEAVY-Signal-Sende-Akt (26.08.-Fenster, #60-Umfeld).
+- T-NEU-11: C-13 Skip-Oekonomie + C-14 Bestandslog-SKIP-Wache (vor Kampagne 29.08.).
+- T-NEU-12: Cluster-Entscheid #73-Rest -- helm-1014-Schrittskripte (20 Dateien) + ci-templates-Gitlink committen oder BU.
+- T-NEU-13: wip/luecken-stufe2-pause-1308 gegen #40 abgleichen (enthalten/ueberholt/heben).
+
+**B. TASK-UPDATES:**
+- T-UPD-1: #38 -- c-Rest neu fassen (Objekt = super/ci, nicht ce; Arbeitsteilungs-Deklaration statt pauschal ERLEDIGT).
+- T-UPD-2: #40 -- Wellen-Kollision T-13/T-14 aufloesen (W7 vs. "vor W3"/C-12).
+- T-UPD-3: Ledger Z11532 -- R3-D37B-SUPER "offen" -> GELANDET (Beleg: Merge 75505b9d in super development, 11.08. 13:54).
+- T-UPD-4: #17/wt-ce-g2 -- SOFORT Zwischencommit oder BU der 8 uncommitted Aenderungen (einzige Kopie).
+- T-UPD-5: MEMORY -- D-08-Korrektur 8 -> 15 Stationen.
+- T-UPD-6: #81/Lande-Strang -- Push origin/development (27 Commits ahead) + Pipeline-gruen-Verifikation als expliziter Schlusspunkt; davor kein Worktree-Abbau der Welle-1-Traeger.
+- T-UPD-7: KON109 -- Buchungen aus diesem Nachtrag (Kurz-Verify-Verdikt, WF12-Ausbuchung nach T-NEU-2, R3-D37B-Korrektur, 46375cdc-Befund).
+
+**C. AUFRAEUMBAR (Regel: Inhalt nachweislich in development enthalten UND von belegtem CI-gruen gedeckt -- letzter Beleg Pipelines 15936/15937 auf dem golden-Fenster-Stand bis 04ac26fa, KON98; alles Juengere wartet auf T-UPD-6):**
+1. wt-ce-golden-rettung + Branch golden-rettung -- fbe898be Ancestor von development (merge-base-Probe 17.08. abends), cherry leer, dev 7+ Commits voraus.
+2. Worktree wf_5834b706-7b5-19 + Branch bau/p6-lizenz-umsetzung -- f6d13dfb Ancestor (Probe 17.08.), Task #42 abgeschlossen, Merge a6804dfa.
+3. /tmp-Audit-Checkout ce-audit-7150cc51 -- 7150cc51 Ancestor (Sweep-1-Probe), ephemer; nach /tmp-Wegfall git worktree prune.
+4. ce-Lokalbranches b-m2-pmc-invariante, b-m3v2-pmc-window, b-pmc-errno-diag, w2-A13-M1b, w2-FK-1, w2-FK-2, w2c-TP1FK1-Fixes, w2c-wachen-fixes -- cherry +0 (Stichproben b-m2 und w2-FK-1 heute nachgemessen, Rest Sweep-1 gleichlautend); ce-Remote traegt 0 unmerged Branches (nachgemessen), Remote-Aktionen stehen nicht an.
+5. super b-checkheft-nachtrag -- cherry +0 (heute nachgemessen); #66 am Objekt bestaetigt.
+6. wt-thesis-lizenz -- HEAD c169fd22 == origin/development (heute), 0 eigene Commits (#56 gelandet).
+Vollzugs-Doktrinen je remove: nested-Worktrees pruefen (ls .git/worktrees/NAME/modules/*/worktrees/), Submodul-Branches pruefen, EIN Schreiber; Remote-Loeschungen waeren GO-pflichtig, sind hier aber nicht noetig.
+
+**D. EXPLIZIT NICHT AUFRAEUMEN:** wt-ce-hy-a/vl3/vl12/k2 (gelandet, aber Spitze 6a8cdc65 ungepusht/ohne CI -- erst nach T-UPD-6; Build-Dirs bereits geraeumt, KON108-03) · wt-ce-a11/f3v/g2/xorf (aktive Straenge) · p2/p3 (nicht enthalten, erst #37-Abgleich) · wf_e22d25ef (17 Skripte, BU-Entscheid) · w0a/d2-floor lokal (nicht enthalten; archiviert bau/branch-archiv-62, Abbau erst nach Bundle-Sichtprobe) · super landung/gitlink-aebc4f2c-OBSOLET (cherry +1, nur gebundelt -- Zweifelsregel) · wip/luecken-stufe2 (T-NEU-13) · alle backup/*- und rescue/*-Refs (BU additiv, Owner-Entscheid V9) · b-ci-rueckschrieb-beide-zeiger (beabsichtigt) · origin/rescue-w3c (V9 offen) · Cluster-Bestand (T-NEU-12 = Fixposten) · thesis-Standalone-Klon main-Rueckstand (= #19).
+

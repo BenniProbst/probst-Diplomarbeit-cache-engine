@@ -2562,3 +2562,111 @@ AVX-512-in-golden + no_extension-Cross-SKIP (r1 A-12) · PMC-Gueltigkeit/Anhangs
 (Zeile "NEU … W2 mit #18") — Praezisierung dort: Owner-GO 08.08. ("Ja unter sorgfaeltiger Design
 Planung bitte bauen") + Ist-Befund 0 Experiment-XML, profile_ref nie dereferenziert (r5 A26,
 E3 F2). PMC-Schwester-Design ebenfalls bereits §18.8.
+
+---
+
+# 20. NACHHOLARBEIT + LIEGENGEBLIEBENES DER KONTEXTE 10-11 (17.08.2026 nachts, KON107-KON113)
+
+> Konsolidiert ALLE offenen Zugaenge dieses und des letzten Kontexts fuer GOAL v8.
+> Volltexte: Ledger KON107-KON113 + docs/sessions/backups/20260817-folge-bu-kontext11/
+> (Verlust-Audit-P20-Text, Gesamtkonsolidierungs-Teile 2+3, Audit hy-a/vl3, Owner-Verbatims).
+> Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
+
+## 20.1 GELANDET+GEPUSHT (Stand dieses Nachtrags)
+Welle 1 KOMPLETT: ce development 04ac26fa -> 6cdcf1c9 (31 Commits, origin+github):
+hy-a a4366cb8 | vl12 cd011e60 | vl3 7bf66ddd | k2 7a5ed464 (4x --no-ff) + f45e995b
+(TSan-Grenze+Terminierung) + 316c488f (add_dependencies-Kante, T-1 rot->gruen) +
+c3478a9c (Floor-Anker 500/496/494) + 6cdcf1c9 (VL-3-ROT-2: unbelegte Byte-Gleichheits-
+Zusicherung abgeschwaecht). Kombibau 4/4 Zellen je "100% tests passed out of 499";
+Floor PRUEFLING-Form 500/496/494 live + Restore-Beweis + Wache rc=0 (MASSGEBLICHE Form;
+499 = pruefling-los). ce-CI-Ergebnis ausstehend -> danach super-Zug.
+
+## 20.2 !! VOR F2 (Fr 21.08.) — NEU ERKANNT/UNGEDECKT
+- HY-A2 + HY-A3-ACHSE NIE GEBAUT (Audit hy-a-bau): proxy/tier_module (4 ABI-Symbole) +
+  test_hy_f8_reroute + Registry-"22->23" fehlen; W1-ABNAHMEFORMEL :952 NICHT erfuellt;
+  E-1 IST ENTSCHIEDEN (HeuristikAdapter=3/FunctionInterfaceReroute=5, KON39) -> Bau
+  haengt am #15-decl-SLOT, nicht an Owner; E-6 ("welche Registry=22") = 12W-Explore,
+  dann ggf. Owner. TRAEGER: neuer Posten im #15-Bump-Buendel-Zug (Task #89).
+- #15-BUMP-BUENDEL selbst (Layout 6->7 + Format 4->5 + 10. Glied + #38a2/#38d +
+  PMC-Spalten + bestandslog v5 + HY-A2-Map-Zeile) — Design-Karte liegt (W1-Workflow),
+  Bau = letzter Preimage-Schritt vor F2.
+- VL-3-PFLICHT-FIXES (Audit vl3-bau, A2.5): (a) clang-WARNUNGS-Review (gcc->clang
+  zweimal; 4-Zellen-GRUEN liegt, WARNUNGS-Durchgang fehlt), (b) --debug x plan
+  dump|ci|cmake-Tests (Exit-6-Zweige), (c) Windows-_pclose statischer Blick.
+  ROT-2 (main.cpp-Zusicherung) BEHOBEN 6cdcf1c9.
+- G-2-REST: g2-Strang landereif @ 1528f6fd (Welle 2); Rest-Kategorien lt. Bericht.
+
+## 20.3 WELLE 2 (nach ce-CI-gruen seriell landen, A2.1a)
+g2 1528f6fd -> xorf b8d6edab (golden-Ereignis: Filter-Zelle + algo_version
+1.0.0.c->1.1.0.c) -> f3v dac3d91a -> a11 ec048560 (+ super-Patch BU
+20260817-w1-strang-artefakte/a11_super_patch.diff). Harmonisierungs-Flaechen je
+Bericht (tests/unit/CMakeLists.txt-Dateiende bei g2; f3v disjunkt). Danach Worktree-
+Abbau NUR gelandeter Baeume (Owner-Auflage: erst gruen+gemergt).
+
+## 20.4 SUPER-ZUG (nach ce-CI-gruen)
+k2-6-Schritt-Rezept (tests/CMakeLists.txt:348 -DFIXTURE + Gitlink ATOMAR;
+fixture_schema_subset_check.cmake:98-103 FATAL; Mutationsprobe ROT statt SKIPPED;
+Kopf-Nachzuege; SCHEMA.md:48; Plan/Ledger-Vollzug) + Gitlink-Bump 6cdcf1c9 + PZW.
+
+## 20.5 NEUE BAU-/DESIGN-POSTEN aus KON110-112 (Traeger Task #88 + Teil-2/3-Skizze)
+P-A Kanal-/Arena-Designplan (checkpoint_measure-Kanal-Baum, PROFILER, Klammer-Default,
+Spannung C-1-vs-Default NICHT glattrechnen) | P-B Parameter-Filter-Registry + neuer
+Deep-Research | P-C kleine Hybride (Docks=Optimal-Bereiche<=32) | P-D Hybrid-ML-
+Profile (XML-init, Lookahead ma x w) | P-E Lager-Typ 3 (Funktions-Synthese) + Typ 4
+(XML-Loesungs-Cache) = Bestandslog-FACTORY-Erweiterung -> #57/#18 | P-F Flaeche-3-
+Zweiform (Steuer- vs Mess-Naht; #20 = intra-Naht) | P-G mess/ EIGENE S-Position
+(Register-Nachtrag + Design) | P-H 33 Paper->Prueflinge + Begriffs-Alias-Registry
+(CT, kein Uebersetzer) + Markierungs-/Ranking-Ausgabe -> #44/W2 | P-I Selector-Merge
+in Komponente 3 (std-only-Spiegelung FAELLT; super liest Lager) | P-J CEB-
+Auswertungs-Beschleunigung (std::variant-Ausnahme-Zone, HW-Detection, SIMD-
+Reservierung, Planer-Notification) | P-K SIMD-/Erweiterungs-Deep-Research.
+
+## 20.6 VERLUST-AUDIT-POSTEN (P20-Text, BU verlust-audit/)
+T-NEU-1 s13-Kurz-Verify-Verdikt nachbuchen (Gate KON100-02; s13-F3 bis dahin nicht
+landereif) | T-NEU-2 KON49-Schnitte vs #41/#30 Abgleich | T-NEU-3 wf_e13d73bf
+identifizieren | T-NEU-4 Journal-BU Kontext 10ff | T-NEU-13 wip/luecken-stufe2 vs
+#40 | T-UPD-3 R3-D37B-Zeile stale "offen" -> GELANDET (9b3a1bcd+75505b9d) |
+p2/p3-Worktree-Reste beim #37-Vollzug einspielen/verwerfen.
+
+## 20.7 OFFEN BEIM OWNER (Stand Kontextende)
+(1) Kenntnisnahme b-Strich Talos: Core-PMC-Zuschnitt + v1.13.x-Upgrade (NICHT v1.14,
+sandboxd-GA 27.08.!) ins A-1-Fenster? (2) Infra-Fenster-TERMIN (WE 22./23. ueberbucht:
+S-19 + T-15b + I-PMC + A-1 + evtl. Talos; Slot-Vorschlag liegt). (3) E-5-Chat-Reste:
+Owner wollte Zusammenhaenge der 3 Komponenten weiter klaeren ("Ich beantworte gleich
+weiter" — RF-Runde ist beantwortet, Unifikations-Design-Vorlage folgt aus Teil 2).
+HANDLUNGEN: V8-GitHub-PAT | node6/node5/id56/id18.
+
+## 20.8 NACHTRAG (17.08. spaetnachts): NEUGRUENDUNG VOLLZOGEN + TASK-ANLAGE + REST-REGISTER
+
+- NEUGRUENDUNG (Owner-Auftrag): alle 4 /goal-Referenzdokumente VOLL eingelesen (GOAL 816 Z. |
+  Wellenplan lebende Abschnitte 16.3-20 + Struktur | Designplan 0-12 inkl. T-11a-c/T-12a-e |
+  ARBEITSWEISE v4.4 1265 Z.) + die 7 tragenden Owner-Verbatims der letzten beiden Kontexte
+  aus dem Session-Log wieder eingekippt (BU: tmp/owner_verbatims_k11.txt -> Uebergabe-Doku)
+  + die letzten 5 Workflow-Rueckkehrer VOLLSTAENDIG gelesen (wf_b5b4ac36 Lande-Steward |
+  wf_fab57002 Gesamtkonsolidierung=KON112-Quelle | wf_e06c7f73 Verlust-Audit=P20-Quelle |
+  wf_7f847de1 Tieflese F1-F6 | wf_17600b5a KON106-Entwurf mit NP-01..NP-50 + M-01..M-36).
+- TASK-ANLAGE VOLLZOGEN (KON112 Teil 3 -> Board): #89 P-H Paper->Prueflinge (Ledger-#44-Bau)
+  | #90 P-A Kanalwerk-Designplan | #91 Unifikations-Designplan M0-M14 (Par.75-Sperre faellt
+  erst MIT diesem Design) | #92 P-G mess/-S-Position (>=S-22 verifizieren). UPDATES: #88
+  (Zuschnitt geschaerft: behaelt P-B+P-K; Typ-3/4->#57(7)-(9); P-C/P-D->#91/M9) | #20
+  (Zweiform bindend; Rest=Deckungs-Test) | #86 (+ORG-19-Genus-Kanal-Auflage) | #15 (+HY-A2
+  am decl-Slot + NP-19/NP-23 + B-2-Vermerk) | #57 (+(7)(8)(9)) | #18 (+M12-Sammelzug +
+  T-NEU-1-Gate) | #71 (+Thread-Frage T vs T-4 + T-NEU-8-Split) | #81 (Landung+Push verbucht).
+- REST-REGISTER (Traeger benannt, KEIN Posten verloren): T-NEU-5 S-14-VOLLAUSROLLUNG (W2,
+  Strecke P.41, Vorbedingung S-18-Homes erfuellt) | T-NEU-6 S-8/S-9/S-10/S-11-TRAEGERBAU als
+  eigener W2-KOPF-Posten (deckt B-01/B-04/B-14/B-16 + R-01) | T-NEU-9 C-01 VOLLBAU-GATE-
+  Vorlage VOR Trigger Mi 26.08. 06:00 | T-NEU-10 C-02 HEAVY-Signal-Sende-Akt (26.08.-Fenster,
+  #60-Umfeld) | T-NEU-11 C-13 Skip-Oekonomie + C-14 Bestandslog-SKIP-Wache (vor Kampagne
+  Sa 29.08.) | T-NEU-12 ERLEDIGT (Cluster ee2f933: 20 helm-Skripte + ci-templates-Gitlink)
+  | T-UPD-1 #38c-Rest neu fassen (Objekt=super/ci) | T-UPD-2 #40-Wellen-Kollision T-13/T-14
+  aufloesen (W7 vs vor-W3/C-12) | T-UPD-5 MEMORY-Korrektur 8->15 Stationen (Doku-Zug) |
+  NP-01..NP-50-Posten-Register + UEBERHOLT-Marker M-01..M-36 (KON106) = naechster docs-Zug;
+  M-Marker-Setzung buendelbar mit KON111-11-Liste (KON112).
+- AUFRAEUM-LISTE C (Verlust-Audit, Vollzugs-Doktrinen je remove beachten): golden-rettung |
+  p6-Worktree | /tmp-Audit-Checkout | 8 ce-Lokalbranches (cherry +0) | super b-checkheft |
+  wt-thesis-lizenz. NICHT anfassen (Liste D): W1-Worktrees bis CI-gruen | a11/f3v/g2/xorf
+  (aktiv) | p2/p3 (erst #37-Abgleich) | wf_e22d25ef (BU-Entscheid) | wip/luecken-stufe2
+  (T-NEU-13) | backup/rescue-Refs (V9) | Cluster (erledigt).
+- OWNER-NEUZUGANG aus dem Kontextende: NP-46 (E-1-Anschlussfrage Text-Aufnahme woertlich)
+  + NP-48 (UltiHash<->ComdareDB vierte Entitaet?) — in die naechste Vorlagen-Runde
+  (A2.3a-geprueft); dazu 20.7-Punkte (Talos b-Strich, Infra-Fenster-Termin, E-5-Chat-Rest).
