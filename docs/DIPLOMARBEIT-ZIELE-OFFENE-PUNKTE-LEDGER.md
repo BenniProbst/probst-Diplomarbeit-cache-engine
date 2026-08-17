@@ -16,6 +16,84 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG XCIX (KON99) -- 17.08.2026: CI-Heilung 15941 + Owner-Vorlagen-Landung + Buendel-Synthese #15 + HY-A-Baustand + Voll-Einlesung Kontext
+
+### KON99-01 -- super-CI-ROT 15941 GEHEILT + CI-BEWIESEN (A2.5-Fix der golden-Fenster-Landung)
+- DIAGNOSE: der golden-Fenster-F5-Rename (axes/ -> organ_axes/, ce 04ac26fa) liess den prt-art-Master
+  mit dem Altpfad zurueck -- exakt der von der W-A/W-B-Karte vorhergesagte synchrone Nachzug
+  (A2.1b-Harmonisierungsluecke). test_fixture_sync_prt_registry meldete DRIFT (15941 Job 380340).
+- HEILUNG ZWEISTUFIG (die Zwischenpipeline 15944 deckte die zweite Haelfte auf: die Registry-XML ist
+  GENERIERT, der Generator-Include prt_art/registry_gen/main.cpp:36 trug ebenfalls axes/):
+  prt-art 7ed4a7e (XML header=organ_axes/...) + d11781f (Generator-Include + 2 CMake-Doku-Zeilen).
+  Lokale Gegenprobe gegen frisch konfigurierten ce-Geschwister: "100% tests passed, 0 tests failed
+  out of 1". prt-art-CI 15945 TERMINAL SUCCESS (alle 9 Jobs, build:registry-roundtrip 380390).
+- super-Zug c926efdc (Gitlink-Bump prt-art 3077e102->d11781f mit merge-base-Vorwaerts-Beweis +
+  Owner-Vorlage in EINEM Zug; gitleaks Koeder rc=1/Echt rc=0 ueber 1 Commit; Push origin+github).
+  CI 15946 TERMINAL SUCCESS, ALLE 36 Jobs gruen literal (test:unit 380423, test:unit:debug 380424,
+  test:unit:clang 380425, test:unit:clang:debug 380426; Poller b7ta4chm5 Jobliste komplett) --
+  das 15941-Rot ist beweiskraeftig zu. Push->gruen-Doktrin erfuellt.
+
+### KON99-02 -- OWNER-VORLAGE 17.08. GELANDET (in c926efdc)
+- docs/sessions/20260817-OWNER-VORLAGE-fragenbuendel-parallelstart.md (523 Z., 20 Fragen in 5
+  Gruppen: A-1/A-2 SOFORT Token/Leck-Mengentest + samba-Rotationsliste; B-1 C-3a-Frist Mi 19.08.;
+  C-1..C-3 PMC; D-1..D-10; E-1..E-4; K-1..K-3) MIT g7-Harmonisierung VOR der Landung: der
+  Vorlagen-Verweis "VS-A..VS-F offen" war Karten-Stand -- NACHZUG-Absatz stellt klar: alle sechs
+  seit 07.08. abend-23 entschieden (Ledger :27970-27979), E-B = (i) Owner-SETZUNG "Wir brechen
+  golden-CRC!", nur die Ausfuehrung A/B/C/D ist offen.
+
+### KON99-03 -- BUENDEL-SYNTHESE #15 FERTIG: BUENDEL-BAUPLAN-15 + OWNER-VORAB-15
+- Workflow wf_afe22f0b (7 Flaechen-Explores g1..g7 @ 04ac26fa + Fable-max-Synthese) hat geliefert:
+  (a) BUENDEL-BAUPLAN-15.md -- 23 Schritte VL-1..VL-6 (Vorlauf) -> B-1..B-11 (DER EINE BRUCH:
+  Format 4->5 + Layout 6->7 + GliedCount 9->10 + Budget + S-6a + work_mode-Ordinalschub + alle
+  Overlay-[7]-/golden-Posten A-09/A-08/#70/E-B/telemetry-silent in EINEM Lande-Ereignis, Frist vor
+  F2 Fr 21.08.) -> N-1..N-6 (Nachlauf); Anker-Regel (Wachen je Schritt compile-hart, Byte-/CRC-
+  Anker EINMAL in B-10, nie Delta-Addition); A-14 (keine flaechigen algo_version-Bumps; einzige
+  echten Bumps #70 + kCebContractCodegenMinor 1->2); Posten->Schritt-Matrix deckt Wellenplan 19.1
+  vollstaendig; 9 Karten-Konflikte F-1..F-9 am Objekt entschieden (u.a. F-3 Positions-Asserts
+  :633-637 werden in B-5a AM OBJEKT bewiesen, nicht aus Karten uebernommen; F-4 B3-Wurf sitzt in
+  mess_achsen_naht.hpp:477-517, NICHT abi_adapter -- Datei-Fehlbuchung in KON34/37 korrigiert).
+  (b) OWNER-VORAB-15.md -- 13 Owner-Fragen V-01..V-13, die VOR dem Bruch das Owner-Wort brauchen
+  (V-01 Glied-Folge+AxisKind, V-02 Hybrid-Map-Grammatik, V-03 S-6a-Makro+golden-Buendel-Freigabe,
+  V-04 A-07-Feldform, V-05 Name ins POD [sizeof 120->152], V-06 5.-Symbol-Geltung alle 5 Gattungen,
+  V-07 Interface-Form CRTP+Export, V-08 Planer-SHA, V-09 prod2_alder_lake+RMA+09.08.-Beleg,
+  V-10 AVX-512-in-golden [vor erstem Nach-Bruch-Batch], V-11 PrueflingVerbund-Namen+union-Token,
+  V-12 G-5-Enum-Ordnung Ein-Satz, V-13 kCebFingerprint-Legenden-Kanonisierung). OHNE mindestens
+  V-01..V-08/V-10/V-11 kann B-1 nicht starten.
+- PERSISTIERT (B.3-Karten-Sicherung): ~/backups-workflow/20260817-buendel15-und-wf10/ (11 Dateien:
+  Bauplan, Owner-Vorab, g1-g7, ledger-gegenlese-kon1-59.folded, sheet-hierarchie-v3.folded).
+
+### KON99-04 -- HY-A-BAUSTAND (Worktree wt-ce-hy-a, Baum sauber, NOCH NICHT gelandet)
+- 5 Commits: eea70895 HY-A1 Dock-Schicht (Vertrags-Registry + Standard-Pruefdock + Factory +
+  Dock-Array) -> c9d083f4 HY-A3 Parser der <hybrid_tier>-Sektion (Zweiweig-Schalter + XML-Deckel-
+  Override) -> 8516de82 README-Ist-Stand + Anker-Korrektur -> a5a2cfea 2 Bestands-Wachen bedient ->
+  9d366502 K2: Loader-Schicht STUFEN-NEUTRAL extrahiert (Owner-Entscheid 09.08., Option a; deckt
+  sich mit Wellenplan 19.2/B-10 "Loader stufen-neutral") + W12 + KON45-Wache.
+- ABNAHME AUSSTEHEND: Code-Landungsklasse = 2 Lenses vor der Landung; Landung seriell nach
+  Lens-Urteilen (A2.1). Der Bestands-Explore (Dock/Loader/Router, 17.08.) liegt als Faktenbasis.
+
+### KON99-05 -- s13-DESIGN-LENS LAEUFT (wf_100fa0b3, Fable 5 max)
+- docs/plaene/20260817-DESIGN-s13-buendel-di25.md (1222 Z., bewusst untracked bis Lens-Urteil;
+  Soll-Design-Landungsklasse = 1 Lens). 6 Pruefauftraege: IST-Stichproben >=8, die vier 7.3-Nicht-
+  Deckungen als Pflicht-Nachmessung, golden-Byte-Ausgrenzung gegen den #15-Bruch, Reihenfolge-
+  Azyklik, T-12-Deckung, W1/O2-Widerspruchs-Check. Bei TRAEGT -> Landung; bei TRAEGT_MIT_FIXES ->
+  A2.5-Fix-Runde an den (idle adressierbaren) s13-design-Agenten.
+
+### KON99-06 -- EINLESE-PROTOKOLL DIESES KONTEXTS (Owner-Auftraege 17.08.: "letzte 6 Kontexte
+    einlesen, sie waren komplex und holprig" + "Workflows der letzten beiden Kontexte vollstaendig")
+- GELESEN VOLLSTAENDIG: alle User-Messages der letzten 6 Kontexte (64 KB, extrahiert aus dem
+  Session-Transkript, Compact-Grenzen Z55631/57305/59214/60174/61035/61635/62209); eigene
+  Schluss-Berichte der letzten beiden Kontexte (inkl. Worktree-Verifikations-Antwort: development
+  enthaelt alle Ergebnisse der geloeschten Worktrees, merge-base/cherry-bewiesen; einzige Ausnahme
+  87d70adf = deklarierter Nur-lokal-Sicherungs-Commit aus #66); die 4 Bestands-Explores aus
+  Kontext -3 komplett (Hybrid Dock/Loader/Router 37 KB - xlsx/A9-Kette 14 KB - WritebackMethod/
+  XSD/Sink 18 KB - Lagerbaum/#57 21 KB); BUENDEL-BAUPLAN-15 + OWNER-VORAB-15 komplett; alle 7
+  Gruppen-Karten g1-g7 komplett (aus dem persistierten Backup).
+- NICHT NEU GELESEN (deklariert): ledger-gegenlese-kon1-59.folded (177 KB) + sheet-hierarchie-v3
+  .folded (244 KB) -- Rueckkunft lag VOR den letzten beiden Kontexten, Voll-Lektuere erfolgte im
+  Kontext -1 (dokumentiert KON97-Zeile "Voll-Einlesung"), Kern-Essenz traegt die Kontext-Summary +
+  das s13-Design; Dateien liegen persistent im Backup-Pfad (KON99-03).
+- Der 15941->15946-Fix, die Vorlagen-Landung und der Lens-Start dieses Protokolls sind in
+  KON99-01/-02/-05 verbucht; Task #79 completed.
 ## KONSOLIDIERUNG XCVII+XCVIII (KON97/KON98) -- 17.08.2026: Drift-Konsolidierung gelandet + golden-Fenster-Landung + Floor-Rueckkalibrierung
 
 ### KON97 -- DRIFT-KONSOLIDIERUNG IN DIE 4 /goal-REFERENZDOKUMENTE (Owner-Auftrag 16.08.)
