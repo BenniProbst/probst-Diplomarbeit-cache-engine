@@ -16,6 +16,51 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXVI (KON116) -- 18.08.2026 frueh: WELLE 2 KOMPLETT GELANDET+CI-GRUEN
+## (xorf+f3v+a11 -> ce 20c111c4, CI 15979 SUCCESS) | WELLEN-ENDE-LEHRE VERANKERT
+
+### KON116-01 -- WELLE-2-LANDUNG (A2.1a seriell, EIN Push, EINE CI)
+- MERGE-KETTE auf ce/development (alle --no-ff, volle Gate-Kette je Zug): 3da40dd3 Merge
+  xorf (#70-Peeling-Umbau, golden-Ereignis) -> fc2127dc Format-Fixup -> 731bfd34 Lock-
+  Regen (axis_filter_xor 1.0.0.c -> 1.1.0.c, Exit-3-Mechanik korrekt ausgeloest) ->
+  1b148844 Merge f3v (#20 Flaeche-3-Deckungstest, 9 Dateien, NEU tests/unit/
+  test_flaeche3_deckung_ceb_aus_tier_an.cpp) -> 065d3572 Format-Fixup -> 7fbcce8e Merge
+  a11 (ce-.gitleaks.toml ccache-Drop) -> c98831d1 Floor-Anker 501/497/495 (NUR Wertzeilen
+  + datierter Absatz).
+- CI 15978 @ c98831d1 ROT (2 Jobs) -> IN EINEM ZUG GEHEILT als 20c111c4: (a) kumulative
+  Diff-Hygiene-Haelfte des coverage-guard misst den main-FF-Bereich e114cabd..HEAD (171
+  Commits) -- 12 Umlaut-Zeilen in axis_filter_xor.hpp aus dem xorf-Strang, push-lokal
+  unsichtbar; Voll-Transliteration, git diff -w = 13/13 kommentar-only, kumulative
+  Hygiene LOKAL GRUEN ueber 26 888 Zeilen am exakten CI-Bereich VOR dem Push; (b) Lock-
+  Regen am WELLEN-ENDSTAND wiederholt -- der fruehe Regen (731bfd34) lief VOR dem
+  f3v-Merge, f3v aenderte danach abi_adapter/mess_visitor_abi/observable_tier -> 4 Drifts
+  -> --write -> Nach-Check 0 ROT. Koeder biss (glpat-26, "leaks found: 1"), Echt-Scan
+  "no leaks found".
+- CI 15979 @ 20c111c4 SUCCESS (API-direkt gemessen; Poller diesmal mit Output). WELLE 2
+  DAMIT KOMPLETT CI-BEWIESEN. Floor 501/497/495 traegt (Deckungs-Test registriert).
+
+### KON116-02 -- WELLEN-ENDE-LEHRE (Owner-Doktrin-Erweiterung A2.1a/b, im Commit-Text
+### von 20c111c4 verankert)
+- LOCK-REGEN + KUMULATIVE DIFF-HYGIENE GEHOEREN ANS ENDE DER WELLE, nach dem LETZTEN
+  Merge: beide messen geteilte Zaehlwerke ueber den GESAMTSTAND (Lock = Digest aller
+  anatomy-Traeger; kumulative Hygiene = main-FF-Bereich) -- ein Lauf pro Welle, nie je
+  Strang, nie Deltas addieren (deckungsgleich mit der Harmonisierungs-Regel v4.2/A2.1b).
+- Push-lokale Gates (Format, push-lokale Hygiene, Koeder, Kombibau) bleiben JE ZUG;
+  nur die beiden Gesamtstand-Gates wandern ans Wellen-Ende.
+
+### KON116-03 -- SUPER-ZUG 2 (dieser Commit)
+- Gitlink -> 20c111c4 ATOMAR + a11-super-Patch eingespielt (super-.gitleaks.toml
+  ccache-Drop-Haelfte, Quelle BU 20260817-w1-strang-artefakte/a11_super_patch.diff:
+  Kausalbefund Job 335274 widerlegt, .ccache wird MITGESCANNT, Fund dort = echter
+  Befund) + PZW-Anker LIVE neu gemessen: STELLEN 41 / DATEIEN 22 unveraendert, Nenner
+  512 -> 513 (der f3v-Deckungstest ist eine neue Test-.cpp), PZW-CE-SHA -> 20c111c4.
+- Task-Stand: #70 (XorFilter-Umbau) GELANDET via xorf · #20 (Flaeche-3-Deckungstest)
+  GELANDET via f3v · #81-Vorlaufwelle: alle 5 Straenge (vl12/k2/xorf=70/f3v=20/a11)
+  GELANDET; hy-a (#80) und vl3 laufen als W2-Fixrunden weiter.
+- NAECHSTE SCHRITTE (sequentiell): #92 (mess/-S-Position, klein, vor F2) -> E-6-12W-
+  Explore (HY-A3-Ziel-Registry) -> #15-Bump-Buendel (letzter Preimage-Schritt vor F2
+  Fr 21.08.).
+
 ## KONSOLIDIERUNG CXV (KON115) -- 18.08.2026 frueh: SUPER-K2-ZUG VOLLZOGEN (B-1-Wache
 ## GEHEILT + Gitlink 965b121a ATOMAR) -- ce-CI 15974 GRUEN (26/26+1manual)
 
