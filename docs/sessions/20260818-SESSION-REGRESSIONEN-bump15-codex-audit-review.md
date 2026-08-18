@@ -179,10 +179,55 @@ Diff-Zuschnitts und sind am Objekt ENTLASTET (transparent in Abschnitt 4).
 - **[D-F4a]** "Emitter rendert MergeStrategy" -- sota_catalog.hpp:238/:243 rendert bereits
   PrueflingVerbundStrategy (nur die D-F4b-Haelfte haelt, s. 1.2).
 
-## 5. [NACHTRAG AUSSTEHEND] CLAUDE-REVIEW-BEWERTER + SYNTHESE (wf_13b562e7)
+## 5. CLAUDE-REVIEW wf_13b562e7 -- 5a VORAB KONSOLIDIERT: die 5 Stufe-1-ERHEBER (zurueckgekehrt)
+
+Die 5 Erheber (217 erhobene Stellen, neutral ohne Urteil) sind zurueck und wurden per
+Stichwort-Scan (16 befund-verdaechtige Zustandsnotizen) gegen Abschnitt 1-3 konsolidiert.
+NEU in die Liste (fehlten):
+
+- **[E-1] ERNST (T-4-Klasse): Loader-Codes 9/10 werden nirgends real ERZEUGT** --
+  test_q2_identitaets_riegel.cpp:127-136 prueft die NAME-Zuordnung von status 9/10/11; grep ueber
+  tests/+libs/: die einzigen Vorkommen von status_gattung_symbol_missing/status_genus_symbol_missing
+  sind die Loader-Definition selbst -- es existiert KEINE Negativ-Fixture (Modul OHNE
+  gattung-/genus-Symbol), die Code 9 bzw. 10 tatsaechlich ausloest. Der neue Fehlerpfad ist
+  ungefahren. FIX: 2 Negativ-Fixtures (nur-gattung-fehlt / nur-genus-fehlt) mit EXAKTER
+  Status-Erwartung. -> A2.5.
+- **[E-2] MITTEL (mit D-F1 buendeln): measure_parallelism-Randzellen** --
+  measure_parallelism.hpp:35-53: Env "0" -> nproc (die v>0-Kante schluckt die explizite 0 still)
+  und Ziffern-Akkumulation v=v*10+d OHNE Bereichsdeckel (Ueberlauf-Kandidat bei absurden Werten).
+  FIX: "0" als expliziten Fehler ODER dokumentierte Semantik + Bereichs-Deckel; Tests je Zelle.
+- **[E-3] HINWEIS->TRIAGE: zweiter Nenner fehlt in test_validate_profile.cpp:607-626** -- der
+  Profil-Nenner deckt die stille Null des Verzeichnisses (<8 -> rot), aber bei leerem/verfehltem
+  load_profiles/ bliebe `known` leer und der <workloads>-Zweig unprueft -- stille-Null-Klasse
+  im Test selbst. -> A2.5-Triage.
+
+OBJEKT-VERSTAERKUNGEN bestehender Funde (kein neuer Posten, Beleg-Zellen):
+- **zu [B-F1]:** Erheber-Wahrheitstafel anatomy_fingerprint.hpp:237-250 belegt am Objekt:
+  `'12=abc;44=xy' -> true` (Wert-Laenge/Hex ungeprueft), `'a==b' -> true`, `';x=1' -> true`
+  (fuehrendes Semikolon passiert) -- exakt die unbewachte produktive Grammatik; :230-234 erlaubt
+  ';'/'=' an JEDER Position des injizierten Vorrats.
+- **zu [D-F6-Rest]:** Erheber tests:308-313 benennt die unbelegte Zelle woertlich: der
+  Set-.so-Cast (nullptr-Ergebnis) wird ausgefuehrt, aber nicht gemessen.
+- **zu [D-F3]:** validate_profile.hpp:294-330-Zellen: {merge leer -> ungeprueft/ok} ist die
+  dokumentierte Default-Semantik (""=>Verbund2_Replace) -- die Triage prueft nur noch den
+  unbekannte-Token-Ablehnpfad (Koeder "fulljoin").
+- Neutral bestaetigt: Loader-Fruehreturns sauber (kein destroy noetig vor create) · decl-Pin-
+  Arbeitsteilung (Designatoren/Sonde/Typ-Folge/sizeof/Gleichheits-Gate) dokumentiert · 2-arg-
+  Kurzform (system, organ) mit ""-Mess-Zeile = DEKLARIERTER golden-Bruch (Lande-Notiz).
+
+### 5b. [NACHTRAG AUSSTEHEND] BEWERTER + SYNTHESE
 
 Wird nach Ruecklauf hier konsolidiert (5 Flaechen-Verdikte + Gesamt-Verdikt + Findings-Delta
 gegen Abschnitt 1-2).
+
+### 5c. RESUME-BILANZ "failed/unvollstaendig" dieses Kontexts (Owner-Frage, gemessen 18.08. ~15:05)
+
+18 heutige Task-Outputs geprueft: die 2 unvollstaendigen Workflows laufen BEREITS als sequentielle
+Resumes (Audit wf_794b904b als wg7df0h36 · Review wf_13b562e7 als w5swesjti); w4nd6h751/wr7d5euhg/
+wvphu5hjz/whrw9nqai sind Vorlaeufe DERSELBEN zwei Runs (doppelt, kein Neustart); w78hb9hii =
+verwaister 0-Byte-Doppelstart des Review-Runs 04:52 (gleiche Run-ID, tot, kein Resume noetig);
+4 MCP-Codex-Tasks durch Plan-B-CLI ersetzt und KOMPLETT; uebrige = abgeschlossene Bash-Tasks
+(Ergebnisse konsumiert). ES GIBT KEINEN weiteren nicht-doppelten failed Workflow/Agenten.
 
 ## 6. [NACHTRAG AUSSTEHEND] VOLL-AUDIT-SYNTHESE (wf_794b904b, 688 Zusagen)
 
