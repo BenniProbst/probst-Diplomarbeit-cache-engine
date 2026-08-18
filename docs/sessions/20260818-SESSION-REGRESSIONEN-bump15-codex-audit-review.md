@@ -1,0 +1,213 @@
+# REGRESSIONEN-REGISTER #15-BUMP-BRUCH -- 18.08.2026 (LEBENDES DOKUMENT, wird je Workflow-Ruecklauf fortgeschrieben)
+
+> Owner-Auftrag 18.08. (verbatim): "bitte erstelle jetzt ein session Dokument ueber gefundene Plan,
+> Architektur und Code Regressionen, beginne mit den codex regressionen und dann konsolidiere die
+> workflows hinzu sobald sie zurueck kommen."
+> GEGENSTAND: der ungelandete #15-Bruch (wt-ce-bump15, bau/bump15-preimage-bruch @ 67dafa46,
+> 25 Commits auf ce/development 20c111c4). QUELLEN-STAND dieser Fassung: 4/4 Codex-Lenses
+> (gpt-5.6-sol, reasoning ultra, je Lauf-Header belegt; Outputs ~/.claude/jobs/5a19728e/tmp/
+> codex-lens/lens{A..D}_out.txt) + 36/688 Audit-Verdikte (verif-1..3). AUSSTEHEND (Abschnitte 5/6
+> als Platzhalter): Claude-Review-Bewerter+Synthese (wf_13b562e7) · Voll-Audit-Synthese
+> (wf_794b904b, sequentiell ueber 652 Rest-Zusagen).
+> Jeder Fund traegt seinen A2.5-Weg; dreiwertige Quittung (BEHOBEN/ENTLASTET/VERTAGT) folgt in der
+> Fix-Stufe. Arbeitskopie der Rohliste: ~/.claude/jobs/5a19728e/tmp/findings_sammelliste_bump15.md.
+
+## 0. LAGE IN DREI SAETZEN
+
+Die vier Codex-Lenses (erste erfolgreiche Codex-Laeufe nach 7 bwrap-Toden; Plan B = Diff-Volltext
+im Prompt) liefern 3 KRITISCH + ~12 ERNST echte Funde -- der Bruch landet erst nach einer vollen
+A2.5-Fix-Runde. Die zwei schaersten Funde treffen die IDENTITAETS-Kernidee des Stempels
+(Preimage-Kollision moeglich, Map-Grammatik am Produktionsweg unbewacht) -- genau die Klasse,
+fuer die der Dual-Review gebaut ist. Drei Codex-"Blocker" waren Scope-Artefakte des
+Diff-Zuschnitts und sind am Objekt ENTLASTET (transparent in Abschnitt 4).
+
+## 1. CODE-REGRESSIONEN (Defekte im gebauten Bruch-Code; Codex-Lenses A-D)
+
+### 1.1 KRITISCH -- Identitaets-Klasse (Fingerprint/Preimage)
+
+- **[B-F2] Preimage-KOLLISION durch stillen Stellen-Verwurf** -- anatomy_fingerprint.hpp:1222-1234:
+  `komposit_key_text()` verwirft Dezimalstellen oberhalb der achten STILL (IDs 100000000 und
+  200000000 werden beide zu "00000000"); die Ordnungswache vergleicht die ORIGINAL-IDs und sieht
+  die Kollision nicht. ZWEI verschiedene Hybrid-Kompositionen koennen DASSELBE Preimage erhalten --
+  bricht die Fingerprint-Doktrin (Stempel = Identitaet/Cache-/Lager-Schluessel/Skip-Marke; ein
+  Lager-SKIP wuerde die falsche Binary fuer gueltig halten). FIX: fail-loud bei Rest nach 8 Stellen
+  bzw. stufen_id<=99'999'999 erzwingen; das 32-Dock-Argument braucht einen GEKOPPELTEN Nachweis.
+- **[B-F1] Map-Grammatik nur im optionalen Builder bewacht** -- ebd. :511-531/:806-815/:1262-1291:
+  Der produktive Weg (COMDARE_HYBRID_KOMPOSIT_GLIED / direkte KompositMapGlied{string_view}) prueft
+  NUR die allgemeine Glied-Grammatik -- exakt-64-Lowerhex, kanonische Schluessel, strenge Ordnung,
+  Duplikate, ';'/'='-Positionen werden dort NICHT erzwungen => nichtkanonische/mehrdeutige Maps
+  moeglich. FIX: EIN gemeinsamer constexpr-Parser fuer den finalen String, im Carrier UND als
+  static_assert auf dem Define (leer ODER <=32 Segmente, Key 1-8 Dezimal ohne fuehrende Nullen,
+  genau ein '=', Wert exakt 64 Lowerhex, ';' nur zwischen Segmenten, Keys streng steigend).
+- **[A-F1] Proxy-Bindungszustand spaltbar** -- hybrid_binary_proxy.hpp:225-229/:251-264/:278-280:
+  `ziel_binden()` uebernimmt ZWEI unabhaengige Zeiger ohne gepaarte Nullheit, Objektidentitaet
+  oder `basis->genus()==ZielGenus`-Pruefung -- Operationspfad (antrieb) und Lifecycle/Identitaet
+  (ziel_) koennen auf VERSCHIEDENE Objekte zeigen; nach dem Loader-Gate kann genus() sogar den
+  Reroute-Wert liefern. FIX: EIN typisierter Binding-Handle, aus dem beide Sichten entstehen;
+  alternativ Nullheit+Most-Derived-Identitaet+Ziel-Genus atomar vor jeder Mutation.
+
+### 1.2 ERNST
+
+- **[A-F5] Loader: rohe uint8->Enum-Casts ungeprueft** -- anatomy_module_loader.cpp:179-180/:198:
+  ein Modul, das konsistent Genus 5 (FunctionInterfaceReroute) meldet, PASSIERT den
+  Konsistenz-Riegel, obwohl Genus 5 nie ABI-sichtbar sein darf; unbekannte Bytewerte erreichen
+  gattung_of(). FIX: Whitelist der 5 ABI-sichtbaren Ziel-Genera VOR dem Cast, sonst
+  status_identity_mismatch + native_unload.
+- **[A-F4] Leak-Pfad beim Identity-Mismatch** -- ebd. :199-205: potenziell werfendes Logging
+  (dll_path.string()) VOR pfn_destroy()/native_unload() -- bei Exception lecken Instanz+Handle.
+  FIX: Scope-Guards ab Erwerb (destroy vor unload beim Unwinding), Diagnose nach dem Cleanup.
+- **[A-F3] CT-Sperre der Hybrid-Makros umgehbar** -- hybrid_module_abi_v1.hpp:71-72/:99-104:
+  ZielGenusExpr wird ZWEIMAL ausgewertet (Template-Argument + Laufzeitkontext) -- ein
+  kontextabhaengiger Ausdruck (is_constant_evaluated) besteht die CT-Sperre als SearchAlgorithm
+  und exportiert View; der Loader faengt das erst als Status 11. FIX: Ziel EINMAL als constexpr
+  AnatomyGenus einfrieren, Typ und beide Exports daraus ableiten.
+- **[B-F3] Identitaetswirksamer leerer Default** -- anatomy_fingerprint.hpp:970-989/:1164-1174/
+  :1309-1316: alle 3 APIs tragen MessGatesGlied{""} als Default, obwohl der eigene Kommentar den
+  Default-Weg verbietet; die nie-leeren TU-Gates sind still auslassbar, die 3-Param-Proben nutzen
+  genau diesen Weg. FIX: leeren Default entfernen, TU-Wert explizit verlangen (Overload-Schnitt).
+- **[B-F4] 32-Dock-Deckel unerzwungen** -- ebd. :1264-1291: 33 Beitraege (2233 B) passen in den
+  2368-B-Puffer; die Puffergrenze beweist den Deckel NICHT. FIX: size()<=Deckel fail-loud vor der
+  Schleife + im Map-Parser.
+- **[B-F5] Dangling string_view via Temporary** -- ebd. :1208-1212: `hybrid_komposit_map_bilden(...)
+  .sv()` auf dem Temporary erlaubt -- gespeicherter KompositMapGlied haelt nach Vollausdrucks-Ende
+  einen dangling View (der geloeschte Carrier-Ctor sieht nur den fertigen View). FIX: sv() const& +
+  sv()&& = delete.
+- **[B-F6] 64-Hex-Wache prueft nur Byte 64** -- ebd. :1362-1369: Arraygroesse+Terminator geprueft,
+  Bytes [0..63] weder auf Lowerhex noch eingebettete NULs. FIX: alle 64 Nutzbytes [0-9a-f] pruefen.
+- **[C-F2] Typ-Folge-Wache 18 statt 20 Typen** -- anatomy_module_abi_v1_decl.hpp:~445: die Wache
+  behauptet 20 Felder, prueft 18 Typen -- name_line(FeldZgr)/name_len(FeldU64) fehlen am Ende =>
+  Typwechsel der 2 Append-Felder unentdeckt (verkuerzte Aggregatinitialisierung bleibt gruen);
+  Objekt-Indiz: :392 FeldZahl=20 gegen :435 "18 Argumente". FIX: FeldZgr,FeldU64 anhaengen,
+  Kommentare 18/19 -> 20/21.
+- **[D-F4b] Toter Enum-Name im Emissions-Pfad** -- merge_plan.hpp:78 liefert String
+  "Verbund2_Hybrid"; das Enum PrueflingVerbundStrategy kennt NUR Verbund1_CeOnly/Verbund2_Replace/
+  Verbund3_Union; sota_catalog.hpp:238/:243 rendert `pf::PrueflingVerbundStrategy::<strategy>` --
+  eine Emission des "merge"-Pfads erzeugte UNGUELTIGES C++. Kommentar merge_plan:69-73 deklariert
+  den Pfad als dormant, traegt aber KEINEN fail-loud-Riegel vor der Emission. FIX: "merge" an der
+  Emissions-Stelle LAUT ablehnen (oder Enum-Wert materialisieren) -- dormant-Prosa allein ist
+  keine Wache (LUECKE=PFLICHT).
+- **[D-F5] F8-Roundtrip-Koeder umgeht das Dock** -- test_hy_f8_reroute.cpp:126-151:
+  `cea::IDriveableTier* antrieb = &ziel;` bindet DIREKT am Fixture vorbei am Dock --
+  tier_insert/tier_lookup pruefen die Dock-Weiterleitung nicht; eine kaputte funktionale
+  Weiterleitung bliebe gruen (T-2/T-4-Klasse). FIX: Antrieb ausschliesslich ueber den vom
+  Proxy/Dock gelieferten Griff beziehen und den Koeder hindurch fahren.
+- **[D-F6-Rest] F8-dlopen-Haelfte belegt 4 der 6 Symbole; Set-Modul-Cast-Ergebnis ignoriert**
+  (der 6-Symbol-Beleg lebt im Q2-Test; fuer die F8-Haelfte gilt Codex' Punkt) -- FIX: je Modul
+  alle 6 Symbole handle-lokal aufloesen+aufrufen; Set-Proxy-Typ und Standard-Dock pruefen.
+
+### 1.3 HINWEIS (Code)
+
+- **[B-F7]** BudgetSum==6057-Assert erkennt kompensierende Aenderungen nicht (Kommentar behauptet
+  es) -- 10 Einzel-Summanden einzeln pinnen (Array-Vergleich).
+- **[A-F6]** kDeklarierteRerouteZiele==2-Assert tautologisch -- geschlossene constexpr-Whitelist
+  {SearchAlgorithm, Set}, Praedikat+Anzahl daraus ableiten.
+- **[D-F2]** work_mode-Namen-Anker doppelt gepflegt (Registry + Literal-Liste), Fehlertext nennt
+  Release vor Compare -- Single-Source herstellen.
+- **[D-F1]** resolve_measure_parallelism_of_mode()/volle "debug"-Exception ohne Tests.
+- **[D-F8]** test_hy_f8 nutzt std::cout ohne <iostream>.
+- **[C-F5]+[A-F7] Kommentar-Wahrheiten:** "sizeof 136"->152 (decl:314-Umfeld) · "4 Pflicht-
+  Symbole"->6 (loader.cpp:211 + hybrid_module_abi_v1.hpp:7-10/:52-56) · genus_build_admission
+  :68/:90 "View=4"/"alle FUENF" -> Reroute=5/sechs · "neun Codes" -> zwoelf (0..11) ·
+  [B-F8] "leeres 10. Glied waere ohne Bump byte-identisch" ist falsch (9. Separator kommt dazu;
+  Format-5-Begruendung bleibt via Umsortierung+Schema) · [B-F9] "nur Vertauschungen uebersetzen
+  nicht mehr" gilt nur fuer S-6b, nicht S-6a (Mess/Organ wechseln [1]/[3]).
+
+## 2. ARCHITEKTUR-REGRESSIONEN/-SPANNUNGEN
+
+- **[A-F2] MaxDocks-Vertrag vs. Ein-Ziel-Zustand** -- hybrid_binary_proxy.hpp:183-193/:258-280:
+  Der Proxy DEKLARIERT 1..32 Docks, haelt aber EIN globales ziel_ -- beim zweiten Slot delegieren
+  Lifecycle und genus() an das zuletzt gebundene Ziel; Slot-Loesen loescht ziel_ fremder Slots.
+  Architektur-Entscheid des Minimal-Schnitts EHRLICH machen: static_assert(MaxDocks==1) JETZT;
+  slotbezogene Basiszeiger + explizite Routing-Regel = HY-B/W3-Design (nicht still halb).
+- **[C-F4] Abi7-Freeze verwechselbar mit lebendem Minor** -- decl.hpp:~780/:784: beide oeffentlich,
+  typgleich, aktuell wertgleich 2 -- ein Konsument kann den Freeze-Wert ziehen; unsichtbar bis zum
+  naechsten Live-Bump. Kapselung als unteilbares Abi7-Tupel bzw. technische Begrenzung auf
+  Freeze-/Ablehnungstests.
+- **[D-F3] fail-loud-Kette der Verbund-Tokens** -- merge_plan.hpp:79 laesst UNBEKANNTE Tokens
+  (inkl. Alt-Token "fulljoin") still auf Verbund2_Replace fallen. ENTLASTET, WENN der Validator
+  davor hart ablehnt (kExperimentAxisMergeModes {"replace","merge","union"} @
+  validate_profile.hpp:705 + Q1-Wache is_bekannter_verbund_strategie_name) -- der Ablehnpfad ist
+  in der A2.5 zu MESSEN (Koeder "fulljoin" muss VOR merge_plan sterben), sonst Tiefen-Fix dort.
+- **[C-F3] Layout-6-Probe prueft die ZAHL, nicht das Layout** -- decl.hpp:~548:
+  stamp_pod_layout_probe(6u) baut das 20-Feld-Layout mit Versionszahl 6 (K-4-Klasse: Gleichheits-
+  wache numerisch bewiesen, Offsets-Differenz NICHT). Entweder eingefrorener Layout-6-Mirror
+  (sizeof==120 + offsetof-Vergleiche) oder Probe EHRLICH als Nur-Zahlen-Beweis dokumentieren.
+
+## 3. PLAN-REGRESSIONEN (Soll-Ist; 36/688 Audit-Verdikte, Rest laeuft)
+
+- **[LS2-34, Audit KRITISCH] Lock-Regen fehlt in den 25 Commits** -- target_isa_complex_axis.hpp
+  geaendert (765ee421), axis_version.lock traegt den ALTEN Digest. DECKUNGSGLEICH mit dem
+  deklarierten Lande-Schritt (KON116: Lock-Regen am ENDSTAND der Welle) -- Plan haelt, der Beleg
+  ist jetzt am Objekt; der Regen ist Schritt 3 der Lande-Kette, KEIN Vorab-Worktree-Fix.
+- **[seg1-37, Audit KRITISCH] AxisKind-Ordnung NICHT gedreht** -- topics/axis.hpp unberuehrt;
+  anatomy_fingerprint.hpp:891-914 dokumentiert den Gegenteil-Entscheid. GEDECKT durch KON5-04
+  (AxisKind war immer Owner-VORLAGE, nie festgelegt) => F2-Owner-Vorlage Punkt 1; ohne GO kostet
+  die spaetere Drehung einen weiteren Preimage-Bruch.
+- **[seg1-04, ERNST] 3 stale E-6-Verweise** -- hybrid_config_xml.hpp:52-55 + hybrid/README.md:33
+  (+ super-Konformitaetszeile) behaupten weiter "offene Owner-Frage E-6 / Registry 22->23" --
+  ueberholt durch KON118 (Phantom-Nenner; kGenusBuildSlotCounts 5->6 IST gebaut). A2.5-Doku-Fix.
+- **[seg1-40, ERNST] V-08R nur zur NAME-Haelfte im Bruch** -- planner_version.hpp:78-84:
+  fingerprint_sha() weiter leer (kFingerprintShaBewusstLeer=true). Triage: Buendel-SOLL oder
+  deklarierter Folgeposten (B-6-Split) -- Audit-Synthese entscheidet, nicht glattrechnen.
+- **[seg1-43, ERNST] Tooling-ORDNUNG unvalidiert** -- ceb_tooling_list wirft nur bei unbekannter
+  id/Deckel/leer; die wallclock/macro/micro-Ordnung haengt am OFFENEN V-13 (Owner-Scheibe) =>
+  vermutlich deklariert-ungedeckt; Kandidat fuer die Vorlagen-Runde, kein stiller Bau.
+- **[seg1-44, ERNST] golden-Nachposten-Spannung** -- nur der S-6a-Anker-Teil ist im Bruch;
+  K1-avx512-Filter, E-B-CRC, telemetry-silent NICHT. Task-#15-Text sagt "3 golden-Nachposten im
+  Bruch", die Kontext-13-Uebergabe deklariert "E-B/A-11 = golden-gebundener FOLGEZUG (V-03R-Budget
+  frei)". SPANNUNG AUSGEWIESEN -- Aufloesung durch Audit-Synthese + ggf. Owner-Satz.
+- **[seg1-45, ERNST] PMC-Snapshot traegt 1 statt 5 Flags** -- measurement_snapshot.hpp nur
+  pmc_available; die 5 Quell-Flags nicht uebernommen. Gehoert zum #83-Umfeld (PMC fail-loud,
+  eigener Task, "im Bruch-Umfeld") -- Triage: nicht Kern-Buendel, Frist beachten.
+- **[LS2-33, ERNST] A1-Durchzug 9-vs-18 offen** -- simd_organ_requirement 9x kRequiredNone gegen
+  Registry 18; Kette verdrahtet, Durchzug fehlt (bekannter W1-Posten "A1-Durchzug 18 Achsen").
+- **[seg4-15, ERNST] S-16-Regression waechst** -- ci/tests/*.sh 13->14 (guard_basis_bissprobe.sh),
+  8656 Zeilen; Eindeutigkeits-Riegel weiter NUR Shell. Dauerposten W2 (KON37-08/S-16).
+- **[seg3-kon28-01, ERNST] Ledger-Marker fehlt** -- Ledger §69.6 "prod1=24 Worker" ohne
+  UEBERHOLT-Vermerk (OD-7: 16). Docs-Zug.
+- **HINWEISE:** SHA-Zuordnungs-Detail 9f8e2be8-vs-3ba0f7b3 (Ledger) · super build:clang
+  Kill-Switch when:never + docs-only-changes (D-2-Kandidat, W2-Triage).
+- **9x UEBERHOLT** sind korrekt (der Bruch ueberholt dev-Staende -- Soll-Karten waren aelter).
+
+## 4. ENTLASTETE CODEX-BLOCKER (Scope-Artefakte des Flaechen-Zuschnitts; am Objekt gemessen)
+
+- **[C-F1]** "7. Hybrid-Makrostelle fehlt" -- hybrid_module_abi_v1.hpp:70 EXISTIERT mit beiden
+  Symbolen (:101 gattung_of((ZielGenusExpr)), :104 genus=Ziel-Genus, Weg C) -- die Datei liegt in
+  der Lens-A-Flaeche, nicht im l1c-Diff.
+- **[D-F7]** "Q2-Datei fehlt vollstaendig" -- tests/unit/test_q2_identitaets_riegel.cpp existiert
+  (8039 B), Fixture-Tabelle prueft EXAKTE Stati (:111 alt_major7 -> status_magic_mismatch).
+- **[D-F4a]** "Emitter rendert MergeStrategy" -- sota_catalog.hpp:238/:243 rendert bereits
+  PrueflingVerbundStrategy (nur die D-F4b-Haelfte haelt, s. 1.2).
+
+## 5. [NACHTRAG AUSSTEHEND] CLAUDE-REVIEW-BEWERTER + SYNTHESE (wf_13b562e7)
+
+Wird nach Ruecklauf hier konsolidiert (5 Flaechen-Verdikte + Gesamt-Verdikt + Findings-Delta
+gegen Abschnitt 1-2).
+
+## 6. [NACHTRAG AUSSTEHEND] VOLL-AUDIT-SYNTHESE (wf_794b904b, 688 Zusagen)
+
+Wird nach Ruecklauf hier konsolidiert (Gesamturteil je Dimension, FEHLT/ABWEICHUNG-Liste
+vollstaendig, Lande-Freigabe-Urteil); die 36 Fruehverdikte aus Abschnitt 3 werden dann gegen die
+Vollmenge abgeglichen.
+
+## 7. POSITIV-BESTAETIGUNGEN DER LENSES (fuer die Lande-Begruendung zitierfaehig)
+
+POD 20 Felder / 8+9x16=152 @align 8 korrekt · designierte Initialisierer vollstaendig in
+MESS,SYSTEM,ORGAN · 6 sichtbare Makros signatur-identisch, Fortsetzungszeilen nach der
+120-Normierung intakt · Gate-Grammatik dreifach synchron auf 9 Felder (512 Formen, AUS-Laenge
+3+26+8=37 nachgerechnet) · anatomy_name_hex WIRKLICH consteval + Terminierung garantiert ·
+Budget-Rechnung 32+768+256+256+128+512+1536+128+64+2368+9=6057 unabhaengig nachgerechnet
+(Reserve 2135 zu 8192) · Erzeuger konsistent MESS,SYSTEM,ORGAN; Format 5 / 10 Glieder /
+Komposit [9] schluessig gepinnt · K-1-Sperren wirksam · Loader: alle neuen Returns entladen,
+destroy VOR unload; 6 Exports extern "C" korrekt · Alt-Major-Fixtures isolieren Magic/Major
+getrennt, kein ODR-Problem · Admission: Groesse 6 + Hybrid-CT-Konstante + Cross-Pin korrekt ·
+3 implementierte Verbund-Strategien altsemantik-treu · 4 work_modes nutzen Release · B4-Paare
+4/6 direkt geprueft.
+
+## 8. KONSEQUENZ
+
+Alle Abschnitt-1/2-Posten + die A2.5-faehigen Abschnitt-3-Posten gehen als EINE Fund-Liste in die
+A2.5-FIX-STUFE (Fable max, T-1 je Fund, dreiwertige Quittung, Rekursion bis 0 neue Funde) im
+Worktree wt-ce-bump15 -- Start nach Ruecklauf der Review-Synthese; Audit-Reste speisen die
+Fix-Runde 2 bzw. die Lande-Triage. Danach Landung nach dem Rezept der Kontext-13-Uebergabe
+(5e0b7f95, Abschnitt 4).
