@@ -1,0 +1,1024 @@
+Reading additional input from stdin...
+OpenAI Codex v0.146.0
+--------
+[1mworkdir:[0m /home/comdare/.claude/jobs/5a19728e/tmp/codex-lens
+[1mmodel:[0m gpt-5.6-sol
+[1mprovider:[0m openai
+[1mapproval:[0m never
+[1msandbox:[0m read-only
+[1mreasoning effort:[0m ultra
+[1mreasoning summaries:[0m none
+[1msession id:[0m 01a0154e-5b2e-7e81-a80a-b722b5043261
+--------
+[36muser[0m
+WICHTIG: Dateizugriff und Kommando-Ausfuehrung sind in dieser Umgebung DEFEKT (bwrap). Der KOMPLETTE Auftrag inkl. Diff-Volltext steht UNTEN in DIESER Nachricht. Lies NICHTS von Platte, fuehre KEINE Kommandos aus, antworte allein aus dem hier gegebenen Material. Wo der Text unten "Lies die Datei X" sagt, gilt: ihr Inhalt STEHT HIER.
+
+Code-Review LENS D (Semantik-Kern + Tests) eines ungelandeten C++23-Bruchs. Dein Dateizugriff ist defekt (bwrap) — BEIDE Diffs sind eingebettet; arbeite NUR auf ihnen, keine Kommandos.
+
+SOLL-KONTEXT: (1) work_mode-Umbau: Enum {Build=0,Measure=1,Compare=2,Release=3}, Token "debug" wird fail-loud abgelehnt (exakte Meldung, Registry-abgeleitete Token-Liste, EINE Quelle), alle 4 Modi cmake_build_type=Release; neue resolve_measure_parallelism_of_mode(WorkModeInfo) — Token-Weg delegiert byte-identisch. (2) j3-Debug-Mechanik wird über State getestet: Decorator DebugSemantikInjektor (IPlanBuilder-Zwischenschicht im Aufrufpfad Director→Builder) dreht build_semantic auf {Debug, misst, nicht-1-Thread}; Gegenprobe "ohne Injektor kein Debug" gegen Tautologie. (3) Verbund-Rename: PrueflingVerbundStrategy {Verbund1_CeOnly,Verbund2_Replace,Verbund3_Union}; XML-Token union; merge_plan :70 Kern-Projektion. (4) test_hy_f8_reroute: Roundtrip-Köder durch beide .so, 6-Symbol-Beleg am GELADENEN Modul, B4-Paare 4/6. (5) test_q2_identitaets_riegel: Riegel-Ausgabe je Fixture-Klasse + Negativ-Belege alt_major7→magic_mismatch.
+
+PRÜFE HART: (a) Tautologie-Freiheit: prüft der Injektor-Test den DIRECTOR-Walk oder nur den eigenen Decorator? Ist die Gegenprobe scharf (würde sie bei kaputtem Injektor rot)? (b) Meldungs-Konsistenz: ist die fail-loud-Token-Liste wirklich aus EINER Quelle abgeleitet oder existiert eine zweite Handliste? (c) Verhaltens-Identität des Token-Wegs nach der Delegation (Env-Auswertung, nproc-Default, single_thread-Gate), (d) Rename-Semantik in merge_plan/pruefling_merge: Alt-Verhalten hinter neuem Namen? Verbund2_Hybrid-Zeile korrekt? (e) test_hy_f8: prüfen die 4 TESTs unabhängige Aussagen oder überdecken sie sich? dynamic_cast auf final-Klasse (bekanntes clang -O3-Thema, per ENABLE_EXPORTS geheilt) — trägt der Test einen Rest-Hazard? (f) test_q2: sind die NEGATIV-Belege echt (können sie fälschlich grün werden, wenn der Loader die Reihenfolge ändert)?
+
+AUSGABE: nummerierte Findings mit Datei:Zeile, Schwere, Begründung+Fix. Ende: LANDBAR / LANDBAR_MIT_FIXES / NICHT_LANDBAR.
+
+=== DIFF 1 (Semantik-Kern) ===
+diff --git a/libs/cache_engine/anatomy/pruefling_merge.hpp b/libs/cache_engine/anatomy/pruefling_merge.hpp
+index c0e61c47..4f164036 100644
+--- a/libs/cache_engine/anatomy/pruefling_merge.hpp
++++ b/libs/cache_engine/anatomy/pruefling_merge.hpp
+@@ -9,6 +9,19 @@
+ //
+ // Pruefling-Repos (z.B. prt-art) extenden den Slot per Concept-Detection.
+ //
++// NAMENS-NACHTRAG V-11R (18.08.2026, Owner "Vorschlag angenommen. Genau so."):
++// Das Wort "Stufe" oben ist der WORTLAUT der Ur-Direktive vom 26.05. und bleibt als
++// Zitat stehen (Doku-Doktrin: supersedieren, nie loeschen). Der GELTENDE Bezeichner
++// ist seit V-11R ein anderer -- KON91-01 (16.08.) hat "full join" fuer den Lager-/
++// xlsx-Sinn belegt, und "Stufe" traegt projektweit die TRAEGER-Stufe (Planer/CEB/
++// Tier/Hybrid). Beide Kollisionen raeumt die Umbenennung:
++//   Stufe 1 -> PrueflingVerbundStrategy::Verbund1_CeOnly  (Alias Verbund1Axis)
++//   Stufe 2 -> PrueflingVerbundStrategy::Verbund2_Replace (Alias Verbund2Axis)
++//   Stufe 3 -> PrueflingVerbundStrategy::Verbund3_Union   (Alias Verbund3Axis)
++// XML-Achsen-Token: "fulljoin" -> "union". Die CMake-/Artefakt-Namensfamilie
++// comdare_perms_ce / comdare_perms_<pruefling> / comdare_perms_full_join ist davon
++// NICHT beruehrt (eigene Familie, Target-Namen -- s. Bericht P7-ce).
++//
+ // @doku docs/architektur/14_achsen_komposition_organ_metapher.md §18-§19
+ // @task #699 V41.F.6.1.R5.C
+ // @related [[3-kompositionale-joins-anatomie]] [[pruefling-replace-not-extend]]
+@@ -89,15 +102,15 @@ concept IsSearchAlgorithmSlot = PrueflingSlotConcept<Slot> && IsSlotOfGenus_v<Sl
+ // (2) Stufe 1 — comdare_perms_ce (CE-only, KEINE Pruefling-Beteiligung)
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-/// StufeOneAxis — identisch zur DefaultList (kein Pruefling).
++/// Verbund1Axis -- identisch zur DefaultList (kein Pruefling).
+ template <class DefaultList>
+-using StufeOneAxis = DefaultList;
++using Verbund1Axis = DefaultList;
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+ // (3) Stufe 2 — comdare_perms_<pruefling> (ERSETZT-mit-Fallback)
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-/// StufeTwoAxis — wenn Pruefling-Slot belegt: PrueflingVariants ERSETZEN DefaultList.
++/// Verbund2Axis -- wenn Pruefling-Slot belegt: PrueflingVariants ERSETZEN DefaultList.
+ /// Sonst Fallback auf DefaultList.
+ ///
+ /// Beispiel:
+@@ -107,31 +120,31 @@ using StufeOneAxis = DefaultList;
+ ///           static constexpr bool has_pruefling = true;
+ ///       };
+ ///   }
+-///   using Stufe2 = StufeTwoAxis<ce::axis_03a::DefaultVariants, prt_art::axis_03a::Slot>;
+-///   // → Stufe2 = mp::mp_list<PrtArtRadix512>  (CE-Defaults ueberschrieben)
++///   using Verbund2 = Verbund2Axis<ce::axis_03a::DefaultVariants, prt_art::axis_03a::Slot>;
++///   // -> Verbund2 = mp::mp_list<PrtArtRadix512>  (CE-Defaults ueberschrieben)
+ template <class DefaultList, class Slot>
+-using StufeTwoAxis = std::conditional_t<HasPruefling_v<Slot>, typename Slot::PrueflingVariants, DefaultList>;
++using Verbund2Axis = std::conditional_t<HasPruefling_v<Slot>, typename Slot::PrueflingVariants, DefaultList>;
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+ // (4) Stufe 3 — comdare_perms_full_join (Union non-redundant)
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-/// StufeThreeAxis — Union aller Default + Pruefling-Varianten, dedupliziert.
++/// Verbund3Axis -- Union aller Default + Pruefling-Varianten, dedupliziert.
+ /// MP11-Idiom: mp_unique<mp_append<...>>.
+ ///
+-/// Identisch zu permutations::AxisFullJoin aber mit Slot-Detection statt
++/// Identisch zu permutations::AxisVerbundUnion aber mit Slot-Detection statt
+ /// raw PrueflingLists.
+ template <class DefaultList, class... Slots>
+-using StufeThreeAxis = mp::mp_unique<mp::mp_append<DefaultList, typename Slots::PrueflingVariants...>>;
++using Verbund3Axis = mp::mp_unique<mp::mp_append<DefaultList, typename Slots::PrueflingVariants...>>;
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+-// (5) MergeStrategy enum + dispatched Helper
++// (5) PrueflingVerbundStrategy enum + dispatched Helper
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-enum class MergeStrategy {
+-    Stufe1_CeOnly,           // KEINE Pruefling
+-    Stufe2_PrueflingReplace, // ERSETZT-mit-Fallback
+-    Stufe3_FullJoin          // Union non-redundant
++enum class PrueflingVerbundStrategy {
++    Verbund1_CeOnly,  // KEINE Pruefling
++    Verbund2_Replace, // ERSETZT-mit-Fallback
++    Verbund3_Union    // Union non-redundant
+ };
+ 
+ // -----------------------------------------------------------------------------
+@@ -146,7 +159,7 @@ enum class MergeStrategy {
+ //   Zwei BYTE-VERSCHIEDENE Merge-Binaries duerfen NIE namensgleiche Organ-Segmente rendern.
+ //
+ // Warum das jetzt scharf sein muss: das Organ-Segment ist "<achse>=<name()>@<X.Y.Z[flag]>". Rendern eine
+-// ce-only-Binary und ihre Stufe2-Ersetzung dasselbe Segment, sind ihre Organ-Zeilen identisch -- und damit
++// ce-only-Binary und ihre Verbund2-Ersetzung dasselbe Segment, sind ihre Organ-Zeilen identisch -- und damit
+ // (bei gleicher System-/Mess-Zeile) ihr SHA512-Fingerprint. Unter dem SHA512-only-Skip-Gate (F7) wuerde die
+ // eine fuer die andere wiederverwendet. Solange die merge-Zeile existierte, trennte sie die beiden; ohne sie
+ // ist der NAME die einzige Trennung, und die muss eine Wache sein, keine Absprache.
+@@ -192,13 +205,13 @@ template <class ListA, class ListB>
+ }
+ 
+ namespace detail {
+-template <MergeStrategy S, class Default, class... Slots>
++template <PrueflingVerbundStrategy S, class Default, class... Slots>
+ struct MergeImpl;
+ 
+ template <class Default, class... Slots>
+-struct MergeImpl<MergeStrategy::Stufe1_CeOnly, Default, Slots...> {
+-    using type = StufeOneAxis<Default>;
+-    // Stufe1 ist die ce-only-Referenz: schon INNERHALB der Default-Liste darf kein Paar dasselbe Segment
++struct MergeImpl<PrueflingVerbundStrategy::Verbund1_CeOnly, Default, Slots...> {
++    using type = Verbund1Axis<Default>;
++    // Verbund1 ist die ce-only-Referenz: schon INNERHALB der Default-Liste darf kein Paar dasselbe Segment
+     // rendern, sonst waeren zwei ce-Binaries untereinander ununterscheidbar.
+     static_assert(merge_lists_render_distinct_segments<type, type>(),
+                   "A13-M3/C5 (Owner-Q2): zwei VERSCHIEDENE Achsen-Varianten der ce-Default-Liste rendern "
+@@ -208,8 +221,8 @@ struct MergeImpl<MergeStrategy::Stufe1_CeOnly, Default, Slots...> {
+ };
+ 
+ template <class Default, class Slot>
+-struct MergeImpl<MergeStrategy::Stufe2_PrueflingReplace, Default, Slot> {
+-    using type = StufeTwoAxis<Default, Slot>;
++struct MergeImpl<PrueflingVerbundStrategy::Verbund2_Replace, Default, Slot> {
++    using type = Verbund2Axis<Default, Slot>;
+     // Der ERSETZUNGS-Fall ist der eigentliche Q2-Fall: die ce-only-Binary (Default) und die ersetzte
+     // Binary (type) existieren NEBENEINANDER, obwohl die ce-Variante aus DIESER Binary verschwunden ist.
+     // Ihre Segmente muessen sich unterscheiden -- KREUZWEISE, nicht nur je Liste fuer sich.
+@@ -223,19 +236,19 @@ struct MergeImpl<MergeStrategy::Stufe2_PrueflingReplace, Default, Slot> {
+ };
+ 
+ template <class Default, class... Slots>
+-struct MergeImpl<MergeStrategy::Stufe3_FullJoin, Default, Slots...> {
+-    using type = StufeThreeAxis<Default, Slots...>;
++struct MergeImpl<PrueflingVerbundStrategy::Verbund3_Union, Default, Slots...> {
++    using type = Verbund3Axis<Default, Slots...>;
+     // Die Union dedupliziert per mp_unique nur gleiche TYPEN. Zwei verschiedene Typen mit gleichem Namen
+     // und gleicher Version ueberleben sie -- und ergaeben zwei Permutationen mit identischem Segment.
+     static_assert(merge_lists_render_distinct_segments<type, type>(),
+-                  "A13-M3/C5 (Owner-Q2): die FullJoin-Union enthaelt zwei verschiedene Varianten, die "
++                  "A13-M3/C5 (Owner-Q2): die Verbund3-Union enthaelt zwei verschiedene Varianten, die "
+                   "dasselbe Organ-Segment <achse>=<name>@<version> rendern. mp_unique dedupliziert nur "
+                   "gleiche TYPEN -- die Stempel-Identitaet braucht unterschiedliche NAMEN oder Versionen.");
+ };
+ } // namespace detail
+ 
+ /// MergeAxis<Strategy, Default, Slots...> — disambiguated dispatch zu Stufe 1/2/3.
+-template <MergeStrategy S, class Default, class... Slots>
++template <PrueflingVerbundStrategy S, class Default, class... Slots>
+ using MergeAxis = typename detail::MergeImpl<S, Default, Slots...>::type;
+ 
+ } // namespace comdare::cache_engine::anatomy::pruefling
+diff --git a/libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp b/libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp
+index 9bc29f6d..7816ec1f 100644
+--- a/libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp
++++ b/libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp
+@@ -18,10 +18,22 @@
+ 
+ namespace comdare::cache_engine::builder::experiment {
+ 
+-/// Leitet cfg.measure_parallelism aus der Methodik ab (siehe Datei-Kopf). Env-unparsebar/0 => nproc-Default (kein throw
+-/// fuer Env-Fehler). R5: run_methodology_for_ids wirft bei >1 Methoden (Kontraktbruch, validate-gegated) -- exactly-one.
+-[[nodiscard]] inline std::size_t resolve_measure_parallelism(std::vector<std::string> const& run_methodology) {
+-    auto const& m = ::comdare::cache_engine::measurement::run_methodology_for_ids(run_methodology);
++/// A-05/V-12 (18.08.2026) -- DIE MECHANIK AM ZUSTAND, GETRENNT VOM TOKEN-WEG.
++///
++/// WARUM DIESE UEBERLADUNG EXISTIERT: der Gate unten verlangt (measurement_on && !single_thread). Seit dem
++/// work_mode-Umbau erfuellt das KEINE Registry-Zeile mehr -- der ausgebaute Modus "debug" war die einzige.
++/// Damit war alles hinter dem Gate (Env-Auswertung, nproc-Default) ueber den Token-Weg UNERREICHBAR: ein
++/// Zweig, den kein Test mehr betreten kann, verrottet still und meldet sich erst, wenn ihn jemand wieder
++/// scharfschaltet. Diese Ueberladung ist der Zugang, der ihn beobachtbar haelt.
++///
++/// SIE AENDERT NICHTS: die Token-Fassung unten delegiert hierher (EIGENER Name statt Ueberladung -- eine
++/// Ueberladung waere bei resolve_measure_parallelism({}) mehrdeutig gewesen, und ein Test, der sich um
++/// diese Mehrdeutigkeit herumschreiben muss, verdeckt sie nur), das Verhalten je Token ist byte-identisch,
++/// und die Ueberladung fuegt KEINE neue Politik hinzu -- sie nimmt die Registry-Zeile entgegen, statt sie
++/// selbst nachzuschlagen. Wer die Faehigkeit "misst UND laeuft parallel" wieder in Betrieb nimmt (S-8/W2
++/// --debug-Flag oder eine kuenftige Registry-Zeile), findet sie hier unveraendert vor.
++[[nodiscard]] inline std::size_t
++resolve_measure_parallelism_of_mode(::comdare::cache_engine::measurement::WorkModeInfo const& m) {
+     if (!m.measurement_on || m.single_thread) return 0; // Measure/Release/undeklariert => 1-Thread (byte-neutral)
+     if (char const* e = std::getenv("COMDARE_MEASURE_PARALLEL"); e != nullptr && *e != '\0') {
+         std::size_t v     = 0;
+@@ -40,4 +52,13 @@ namespace comdare::cache_engine::builder::experiment {
+     return hw > 0 ? static_cast<std::size_t>(hw) : 1; // nproc-Default; hw==0 (unbekannt) => 1
+ }
+ 
++/// Leitet cfg.measure_parallelism aus der Methodik ab (siehe Datei-Kopf). Env-unparsebar/0 => nproc-Default (kein throw
++/// fuer Env-Fehler). R5: run_methodology_for_ids wirft bei >1 Methoden (Kontraktbruch, validate-gegated) -- exactly-one
++/// -- und seit Welle B/1 auch bei UNBEKANNTEM Token (fail-closed; der ausgebaute "debug" faellt seit V-12 darunter).
++/// Der Aufruf ist die EINE Nachschlage-Stelle; die Rechnung selbst steht in der Ueberladung oben.
++[[nodiscard]] inline std::size_t resolve_measure_parallelism(std::vector<std::string> const& run_methodology) {
++    return resolve_measure_parallelism_of_mode(
++        ::comdare::cache_engine::measurement::run_methodology_for_ids(run_methodology));
++}
++
+ } // namespace comdare::cache_engine::builder::experiment
+diff --git a/libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp b/libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp
+index d0e49b1b..0675d00d 100644
+--- a/libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp
++++ b/libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp
+@@ -1,6 +1,6 @@
+ #pragma once
+-// Run-Methodik-Mess-UNTER-Achse (Ledger Section 47 / Section 54-T2 / Section 55, 2026-07-20): die 4 Ablauf-
+-// Methoden {Debug, Measure, Release, Compare} des Mess-Vollzugs. Sie TYPISIERT den offenen TODO in
++// work_mode-Mess-UNTER-Achse (Ledger Section 47 / Section 54-T2 / Section 55; Enum-Umbau A-05/V-12,
++// 2026-08-18): die 4 Arbeits-Modi {Build, Measure, Compare, Release}. Sie TYPISIERT den offenen TODO in
+ // measurement_axis_registry.xml:55-56 ("die 3 Mess-Modi Debug/Mess/Release existieren NICHT als Typen ->
+ // nicht emittiert; erst nach ihrer Typisierung als Mess-Unter-Achse reflektierbar").
+ //
+@@ -16,12 +16,22 @@
+ // compare braucht EIGENE Optionen mit LESENDEM Lager-Zugriff, und release liest die Messwerte ebenfalls
+ // nach -- es erzeugt daraus die OPTIMALE Binary. Beides ist noch nicht gebaut (Paket D2, s. unten).
+ //
+-// NICHT VERWECHSELN: die REGISTRY-Reihenfolge unten ist {debug, measure, release, compare} -- eine
+-// AUFZAEHLUNG in der historischen Reihenfolge ihrer Entstehung, KEINE Ablauf-Ordnung. Die Ablauf-Ordnung
+-// ist measure -> compare -> release (s.o.). Die Enum-Reihenfolge wurde bewusst NICHT umgestellt: sie ist
+-// stempel-/ABI-relevant, und der Owner-Entscheid O-A betrifft die formale STUFEN-Ordnung, nicht die
+-// Aufzaehlung. Wer eine Ablauf-Ordnung braucht, leitet sie aus der Enthaltungs-Ordnung ab
+-// (measure ist in compare enthalten, compare in release), nicht aus dem Enum-Index.
++// DIE TRENNUNG VON ENUM-INDEX UND ABLAUF IST AUFGEHOBEN (Owner V-12, 2026-08-17: "Bitte wie empfohlen
++// mit drehen"). Bis hierher stand an dieser Stelle das Gegenteil -- "die Enum-Reihenfolge wurde bewusst
++// NICHT umgestellt: sie ist stempel-/ABI-relevant" -- und wer eine Ablauf-Ordnung brauchte, musste sie
++// aus der Enthaltungs-Ordnung ableiten. Das war eine ehrliche, aber teure Konstruktion: zwei Ordnungen
++// im selben Typ, von denen nur eine im Index sichtbar war.
++//
++// JETZT GILT: Enum-Index == Ablauf-Ordnung == Registry-Zeilen-Ordnung, in EINER Reihenfolge
++// {Build=0, Measure=1, Compare=2, Release=3}. Der Ordinal-Doppelschub gegenueber der Altfassung
++// (Release 2->3, Compare 3->2) ist stempel-wirksam und faehrt deshalb im EINEN Bruch mit -- getrennt
++// waere er ein zweiter Identitaets-Bruch fuer dieselbe Sache.
++//
++// DEBUG IST AUSGEBAUT, BUILD IST EINGEBAUT (A-05). debug war das einzige work_mode, das MASS UND DABEI
++// PARALLEL LIEF -- eine Doppelrolle, die Zahlen erzeugt, die niemand mit den 1-Thread-Messungen
++// vergleichen darf. Was der Ablauf wirklich braucht, ist der Schritt DAVOR: bauen, ohne zu messen.
++// Genau das ist build. Der Verdrahtungs-Check, den debug leistete, wandert auf das --debug-CLI-Flag
++// der Planer-Shell (VL-3) -- eine Schalter-Frage, keine Mess-Methodik.
+ //
+ // WAEHLBARKEIT, NICHT VOLLZUG: seine Build-Semantik ist heute bewusst release-GLEICH
+ // {Release, misst NICHT, parallel}, damit die Wahl von compare an KEINER Emissions-Naht ein anderes Verhalten
+@@ -51,18 +61,18 @@
+ namespace comdare::cache_engine::measurement {
+ 
+ /// Die Run-Methodik-UNTER-Achse: WELCHE Ablauf-Methode der Mess-Vollzug faehrt (Section 47/55; Section 32-F1/F7).
+-enum class RunMethodology : std::uint8_t {
+-    Debug,   ///< Debug-Lauf -- parallel/schnell, KEINE Mess-golden-Zahlen (Verifikation der Verdrahtung)
+-    Measure, ///< Mess-Lauf -- 1-Thread/deterministisch, die golden-Messung (Run-to-Run-stabil)
+-    Release, ///< Release-Lauf -- Voll-Optimierung ohne Mess-Instrumentierung (Referenz-Durchsatz)
+-    Compare, ///< COMPARE-Lauf -- Stufe VOR release (O-A): liest das Messwertlager, eigene Optionen; Etikett bis D2
++enum class WorkMode : std::uint8_t {
++    Build   = 0, ///< Bau-Lauf -- baut die Binaries, MISST NICHT. Der Schritt vor jeder Messung.
++    Measure = 1, ///< Mess-Lauf -- 1-Thread/deterministisch, die golden-Messung (Run-to-Run-stabil)
++    Compare = 2, ///< COMPARE-Lauf -- Stufe VOR release (O-A): liest das Messwertlager, eigene Optionen
++    Release = 3, ///< Release-Lauf -- Voll-Optimierung ohne Mess-Instrumentierung (Referenz-Durchsatz)
+ };
+ 
+ // Single-Source: Drift einer 5. Methode bricht hier compile-time (statt still 4 zu bleiben).
+-inline constexpr std::size_t kRunMethodologyCount = 4;
++inline constexpr std::size_t kWorkModeCount = 4;
+ 
+-struct RunMethodologyInfo {
+-    RunMethodology   methodology;
++struct WorkModeInfo {
++    WorkMode         methodology;
+     std::string_view id;   ///< kanonischer XML-/Legenden-Token ("debug"/"measure"/"release")
+     std::string_view name; ///< exakt der Enum-Name (Doku/Reporting)
+     // S5-P1 (P-VOLLZUG, Section 47/55, 2026-07-20): die Build-Semantik jeder Ablauf-Methode. Der Planer speist
+@@ -81,7 +91,7 @@ struct RunMethodologyInfo {
+     bool single_thread; ///< MESS-Sequentialitaet (Mess-Loop 1-Thread, Section 38.b) -- NICHT Bau-Politik
+ };
+ 
+-/// Die EINE Registry der Run-Methodik-UNTER-Achse -- Index == RunMethodology-Wert (static_assert-gesichert).
++/// Die EINE Registry der Run-Methodik-UNTER-Achse -- Index == WorkMode-Wert (static_assert-gesichert).
+ /// S5-P1-Build-Semantik: measure = deterministischer 1-Thread-Messlauf (Release, misst); debug = paralleler
+ /// Verdrahtungs-Check (Debug, misst, KEINE 1-Thread-Determinismus-Garantie); release = Referenz-Durchsatz (Release,
+ /// misst NICHT). Der Emitter waehlt fuer die S5-Mess-Strecke die measure-Zeile (der Methodik-Fanout ist S6).
+@@ -90,66 +100,69 @@ struct RunMethodologyInfo {
+ /// golden-Zahlen. Es baut deshalb wie release (Release, misst NICHT, parallel); die Zeile ist bewusst
+ /// byte-gleich zu release: Waehlbarkeit ohne Verhaltens-Aenderung (Vollzug D2). Danach erst release, das die
+ /// Messwerte ebenfalls nachliest und daraus die OPTIMALE Binary erzeugt -- auch das ist Paket D2.
+-inline constexpr std::array<RunMethodologyInfo, kRunMethodologyCount> kRunMethodologyRegistry{{
+-    {RunMethodology::Debug, "debug", "Debug", "Debug", true, false},
+-    {RunMethodology::Measure, "measure", "Measure", "Release", true, true},
+-    {RunMethodology::Release, "release", "Release", "Release", false, false},
+-    {RunMethodology::Compare, "compare", "Compare", "Release", false, false},
++inline constexpr std::array<WorkModeInfo, kWorkModeCount> kWorkModeRegistry{{
++    {WorkMode::Build, "build", "Build", "Release", false, false},
++    {WorkMode::Measure, "measure", "Measure", "Release", true, true},
++    {WorkMode::Compare, "compare", "Compare", "Release", false, false},
++    {WorkMode::Release, "release", "Release", "Release", false, false},
+ }};
+ 
+ namespace detail {
+-[[nodiscard]] consteval bool run_methodology_registry_is_complete() {
+-    for (std::size_t i = 0; i < kRunMethodologyCount; ++i) {
+-        if (static_cast<std::size_t>(kRunMethodologyRegistry[i].methodology) != i) return false;
+-        if (kRunMethodologyRegistry[i].id.empty()) return false;
+-        if (kRunMethodologyRegistry[i].name.empty()) return false;
+-        if (kRunMethodologyRegistry[i].cmake_build_type.empty()) return false; // S5-P1: Build-Typ nie leer
++[[nodiscard]] consteval bool work_mode_registry_is_complete() {
++    for (std::size_t i = 0; i < kWorkModeCount; ++i) {
++        if (static_cast<std::size_t>(kWorkModeRegistry[i].methodology) != i) return false;
++        if (kWorkModeRegistry[i].id.empty()) return false;
++        if (kWorkModeRegistry[i].name.empty()) return false;
++        if (kWorkModeRegistry[i].cmake_build_type.empty()) return false; // S5-P1: Build-Typ nie leer
+     }
+     return true;
+ }
+ } // namespace detail
+-static_assert(kRunMethodologyRegistry.size() == kRunMethodologyCount,
+-              "kRunMethodologyRegistry: Array-Groesse == kRunMethodologyCount (Anzahl-Anker).");
+-static_assert(detail::run_methodology_registry_is_complete(),
+-              "kRunMethodologyRegistry: 4 Eintraege, Index==RunMethodology, id/name nie leer.");
++static_assert(kWorkModeRegistry.size() == kWorkModeCount,
++              "kWorkModeRegistry: Array-Groesse == kWorkModeCount (Anzahl-Anker).");
++static_assert(detail::work_mode_registry_is_complete(),
++              "kWorkModeRegistry: 4 Eintraege, Index==WorkMode, id/name nie leer.");
+ // Namen-Anker: Drift eines id-Tokens (Umbenennung/Vertauschung) bricht hier compile-time.
+-static_assert(
+-    kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Debug)].id == std::string_view{"debug"} &&
+-        kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Measure)].id == std::string_view{"measure"} &&
+-        kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Release)].id == std::string_view{"release"} &&
+-        kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Compare)].id == std::string_view{"compare"},
+-    "kRunMethodologyRegistry: id-Tokens sind {debug,measure,release,compare} (Namen-Anker).");
++static_assert(kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Build)].id == std::string_view{"build"} &&
++                  kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Measure)].id == std::string_view{"measure"} &&
++                  kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Release)].id == std::string_view{"release"} &&
++                  kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Compare)].id == std::string_view{"compare"},
++              "kWorkModeRegistry: id-Tokens sind {build,measure,compare,release} (Namen-Anker, Enum-Ordnung).");
+ // S5-P1 Build-Semantik-Anker: Drift der Build-/Mess-/Thread-Politik einer Methode bricht hier compile-time. Der
+ // Emitter verlaesst sich auf measure == {Release, misst, 1-Thread} (die S5-Mess-Strecke); direkter Index-Zugriff,
+-// weil run_methodology_info() erst weiter unten deklariert ist.
+-static_assert(kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Measure)].cmake_build_type ==
++// weil work_mode_info() erst weiter unten deklariert ist.
++static_assert(kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Measure)].cmake_build_type ==
++                      std::string_view{"Release"} &&
++                  kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Measure)].measurement_on &&
++                  kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Measure)].single_thread,
++              "kWorkModeRegistry: measure = {Release, misst, 1-Thread-deterministisch} (S5-Mess-Strecke).");
++// A-05/V-12: BUILD ERSETZT DEBUG. Der Anker prueft, dass build NICHT misst -- das ist der ganze
++// Unterschied zum abgeloesten debug-State, der als einziger Modus MASS UND DABEI PARALLEL LIEF. Genau
++// diese Doppelrolle war die Begruendung fuer seinen Ausbau: ein Modus, der misst, aber die
++// 1-Thread-Determinismus-Garantie nicht gibt, liefert Zahlen, die niemand vergleichen darf.
++static_assert(kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Build)].cmake_build_type ==
+                       std::string_view{"Release"} &&
+-                  kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Measure)].measurement_on &&
+-                  kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Measure)].single_thread,
+-              "kRunMethodologyRegistry: measure = {Release, misst, 1-Thread-deterministisch} (S5-Mess-Strecke).");
+-static_assert(kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Debug)].cmake_build_type ==
+-                      std::string_view{"Debug"} &&
+-                  kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Debug)].measurement_on &&
+-                  !kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Debug)].single_thread,
+-              "kRunMethodologyRegistry: debug = {Debug, misst, parallel/kein 1-Thread-Garantie}.");
+-static_assert(kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Release)].cmake_build_type ==
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Build)].measurement_on &&
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Build)].single_thread,
++              "kWorkModeRegistry: build = {Release, misst NICHT, parallel} -- der Bau-Schritt vor der Messung.");
++static_assert(kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Release)].cmake_build_type ==
+                       std::string_view{"Release"} &&
+-                  !kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Release)].measurement_on &&
+-                  !kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Release)].single_thread,
+-              "kRunMethodologyRegistry: release = {Release, misst NICHT, parallel} (Referenz-Durchsatz).");
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Release)].measurement_on &&
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Release)].single_thread,
++              "kWorkModeRegistry: release = {Release, misst NICHT, parallel} (Referenz-Durchsatz).");
+ // Lane D (Q-5): compare = {Release, misst NICHT, parallel} -- der ETIKETT-Stand. Der Anker ist die Tripwire fuer
+ // D2: wer compare seinen eigenen Ablauf gibt (Replay-Vergleich statt Bau/Mess-Semantik von release), muss ihn
+ // BEWUSST loesen, statt still eine Emissions-Naht mitzunehmen. cmake_build_type nicht-leer ist Pflicht (consteval
+-// run_methodology_registry_is_complete) -- "Release" ist die korrekte Wahl, weil compare Release-Sichten vergleicht.
+-static_assert(kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Compare)].cmake_build_type ==
++// work_mode_registry_is_complete) -- "Release" ist die korrekte Wahl, weil compare Release-Sichten vergleicht.
++static_assert(kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Compare)].cmake_build_type ==
+                       std::string_view{"Release"} &&
+-                  !kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Compare)].measurement_on &&
+-                  !kRunMethodologyRegistry[static_cast<std::size_t>(RunMethodology::Compare)].single_thread,
+-              "kRunMethodologyRegistry: compare = {Release, misst NICHT, parallel} (Etikett-Stand, Vollzug D2).");
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Compare)].measurement_on &&
++                  !kWorkModeRegistry[static_cast<std::size_t>(WorkMode::Compare)].single_thread,
++              "kWorkModeRegistry: compare = {Release, misst NICHT, parallel} (Etikett-Stand, Vollzug D2).");
+ 
+-/// constexpr-Lookup (Index == RunMethodology-Wert, durch static_assert garantiert).
+-[[nodiscard]] constexpr RunMethodologyInfo const& run_methodology_info(RunMethodology m) noexcept {
+-    return kRunMethodologyRegistry[static_cast<std::size_t>(m)];
++/// constexpr-Lookup (Index == WorkMode-Wert, durch static_assert garantiert).
++[[nodiscard]] constexpr WorkModeInfo const& work_mode_info(WorkMode m) noexcept {
++    return kWorkModeRegistry[static_cast<std::size_t>(m)];
+ }
+ 
+ namespace detail {
+@@ -157,9 +170,9 @@ namespace detail {
+ /// keine handgepflegte Aufzaehlung, die bei einer 5. Methode still veraltet).
+ [[nodiscard]] inline std::string run_methodology_known_ids() {
+     std::string out;
+-    for (std::size_t i = 0; i < kRunMethodologyCount; ++i) {
++    for (std::size_t i = 0; i < kWorkModeCount; ++i) {
+         if (i > 0) out += ", ";
+-        out.append(kRunMethodologyRegistry[i].id);
++        out.append(kWorkModeRegistry[i].id);
+     }
+     return out;
+ }
+@@ -174,7 +187,7 @@ namespace detail {
+ /// validate_profile.hpp); diese Wache traegt den UNVALIDIERTEN Direkt-Pfad (Struct-Injektion, Entry ohne Validat).
+ /// SINGLE-SOURCE fuer den Runtime-Konsum UND fuer den Planer (experiment_plan_director::build_semantic_of_run_
+ /// methodology delegiert hierher) -- der Mess-Loop leitet daraus single_thread ab (debug => paralleler Mess-Loop).
+-[[nodiscard]] inline RunMethodologyInfo const& run_methodology_for_ids(std::vector<std::string> const& ids) {
++[[nodiscard]] inline WorkModeInfo const& run_methodology_for_ids(std::vector<std::string> const& ids) {
+     // R5/§61-STUFEN (LED:3190): GENAU EINE Methodik je Call. >1 ist ein Kontraktbruch -- der Validator gated ihn
+     // VOR dem Bau (validate_profile: run_methodology.size()>1 => nicht ok). Hier defensiv HART (statt still ids.front()),
+     // damit eine mehrdeutige 2-Modi-Liste NIE zufaellig eine Modus-Semantik (z.B. debug-Mess-Loop) waehlt.
+@@ -182,9 +195,9 @@ namespace detail {
+         throw std::invalid_argument(
+             "run_methodology_for_ids: " + std::to_string(ids.size()) +
+             " Methoden deklariert -- GENAU EINE erlaubt (exactly-one je Call, Ledger 61-STUFEN).");
+-    if (ids.empty()) return run_methodology_info(RunMethodology::Measure); // Abwesenheit => measure-Default
+-    for (std::size_t i = 0; i < kRunMethodologyCount; ++i)
+-        if (kRunMethodologyRegistry[i].id == ids.front()) return kRunMethodologyRegistry[i];
++    if (ids.empty()) return work_mode_info(WorkMode::Measure); // Abwesenheit => measure-Default
++    for (std::size_t i = 0; i < kWorkModeCount; ++i)
++        if (kWorkModeRegistry[i].id == ids.front()) return kWorkModeRegistry[i];
+     throw std::invalid_argument("run_methodology_for_ids: unbekannter Modus-Token \"" + ids.front() +
+                                 "\" -- gueltig sind {" + detail::run_methodology_known_ids() +
+                                 "}. FAIL-CLOSED (Welle B/1): ein stiller measure-Ersatz wuerde eine Messung "
+@@ -193,10 +206,10 @@ namespace detail {
+ 
+ /// Compile-time-Iteration ueber die Run-Methodik-UNTER-Achse (Metaprogrammierungs-Interface).
+ template <class Visitor>
+-constexpr void for_each_run_methodology(Visitor&& visitor) {
++constexpr void for_each_work_mode(Visitor&& visitor) {
+     [&]<std::size_t... I>(std::index_sequence<I...>) {
+-        (visitor(kRunMethodologyRegistry[I]), ...);
+-    }(std::make_index_sequence<kRunMethodologyCount>{});
++        (visitor(kWorkModeRegistry[I]), ...);
++    }(std::make_index_sequence<kWorkModeCount>{});
+ }
+ 
+ } // namespace comdare::cache_engine::measurement
+diff --git a/libs/cache_engine/profile_facade/merge_plan.hpp b/libs/cache_engine/profile_facade/merge_plan.hpp
+index cff76281..0537410c 100644
+--- a/libs/cache_engine/profile_facade/merge_plan.hpp
++++ b/libs/cache_engine/profile_facade/merge_plan.hpp
+@@ -4,7 +4,7 @@
+ // Pruefling-Identitaet, xml_config_parser.hpp) und dem direktiven-getriebenen Emitter (sota_catalog K5). KERN-A hat
+ // den per-Achse merge_mode NUR geparst + validiert (validate_profile.hpp:965-980, {replace,merge}); dieses Modul
+ // projiziert ihn auf einen expliziten Direktiven-Vektor, der den Emitter von der KATALOG-Verdrahtung (die 6 hart
+-// aufgelisteten <Host>PrtStufeN-Typen) auf eine AxisMergeDirective-getriebene MergeAxis<>-Instanziierung
++// aufgelisteten <Host>PrtVerbundN-Typen) auf eine AxisMergeDirective-getriebene MergeAxis<>-Instanziierung
+ // generalisiert (Section 59-A: "kein Neubau, sondern Umverdrahtung + Schema").
+ //
+ // REIN DATEN (POD/Strings), isoliert testbar, KEIN Bau/keine Messung/kein DLL-Emit. ADDITIV + golden-neutral:
+@@ -14,7 +14,8 @@
+ // Heute traegt KEIN committetes Profil per-Achse-Direktiven => alle emittierten .cpp-Quelltexte bleiben byte-gleich,
+ // der golden-CRC 0xF1C1F26A1232073B unberuehrt (die Merges sind ein additiver id-Satz).
+ //
+-// @related sota_catalog.hpp (render_directive_merge_module_source) ; pruefling_merge.hpp (MergeStrategy/MergeAxis
++// @related sota_catalog.hpp (render_directive_merge_module_source) ; pruefling_merge.hpp
++// (PrueflingVerbundStrategy/MergeAxis
+ //          + die A13-M3/C5-Q2-Wache an der Merge-Namens-Naht)
+ //
+ // A13-M3/C5 (K-6-Sweep): der frueher hier verwiesene DRITTE Tier-Stempel (anatomy_version_stamp.hpp::
+@@ -37,44 +38,50 @@ namespace mp_cx = ::comdare::builder::xml;
+ 
+ /// AxisMergeDirective -- EINE per-Achse Merge-Direktive (POD/Strings). Sie ersetzt die frueher hart aufgelistete
+ /// (Host, Stufe)-Katalog-Wahl durch eine deklarative Achsen-Anweisung: WELCHE Achse (axis_ref) wird mit WELCHER
+-/// MergeStrategy (strategy, pruefling_merge.hpp-Name) um WELCHEN Pruefling-Slot (pruefling_slot) gemergt, ueber
++/// PrueflingVerbundStrategy (strategy, pruefling_merge.hpp-Name) um WELCHEN Pruefling-Slot (pruefling_slot) gemergt,
++/// ueber
+ /// WELCHE Varianten-Whitelist (allowed_variants; leer = die volle Registry-Liste, Fork 5 Obergrenze = Angebot).
+ struct AxisMergeDirective {
+     std::string axis_ref; ///< Registry-axis-id (== ExperimentAxisDefault::ref, z.B. "path_compression")
+     std::string
+-        strategy; ///< MergeStrategy-Name ("Stufe1_CeOnly"/"Stufe2_PrueflingReplace"/"Stufe2_Hybrid"/"Stufe3_FullJoin")
+-    std::string pruefling_slot; ///< Pruefling-Identitaet, die den Slot belegt ("" / "CacheEngine"/"self" = ce, Stufe1)
++        // PrueflingVerbundStrategy-Name ("Verbund1_CeOnly"/"Verbund2_Replace"/"Verbund2_Hybrid"/"Verbund3_Union")
++        strategy;
++    // Pruefling-Identitaet, die den Slot belegt ("" / "CacheEngine"/"self" = ce, Verbund1)
++    std::string              pruefling_slot;
+     std::vector<std::string> allowed_variants; ///< Achsen-Varianten-Whitelist (Teilmenge; leer = volle Liste)
+ };
+ 
+-/// merge_mode_to_strategy(merge_mode) -- die per-Achse merge_mode-Semantik ({replace,merge,fulljoin}) auf die
+-/// MergeStrategy-Namen abbilden (Single-Source der Zuordnung). ""/"replace" => Stufe2_PrueflingReplace (die
++/// merge_mode_to_strategy(merge_mode) -- die per-Achse merge_mode-Semantik ({replace,merge,union}) auf die
++/// PrueflingVerbundStrategy-Namen abbilden (Single-Source der Zuordnung). ""/"replace" => Verbund2_Replace (die
+ /// Pruefling-Achse ERSETZT die CE-Achse mit Fallback).
+-/// R6 (Nacht-Audit 2026-07-22, §59-A(2)-Wortlaut = Gesetz): "merge" und "fulljoin" sind NICHT dasselbe und werden
++/// R6 (Nacht-Audit 2026-07-22, §59-A(2)-Wortlaut = Gesetz): "merge" und "union" sind NICHT dasselbe und werden
+ /// NICHT mehr vermischt --
+-///   "merge"    => Stufe2_Hybrid   (§59-A(2): CE + Pruefling HYBRID je Pruefling),
+-///   "fulljoin" => Stufe3_FullJoin (§59-A(3): kombinierte Union CE + Pruefling, non-redundant; validate erzwingt die
++///   "merge"    => Verbund2_Hybrid   (§59-A(2): CE + Pruefling HYBRID je Pruefling),
++///   "union" => Verbund3_Union (§59-A(3): kombinierte Union CE + Pruefling, non-redundant; validate erzwingt die
+ ///                 Phase-3-Bindung, validate_profile.hpp).
+-/// Die fruehere Projektion (beide -> Stufe3_FullJoin) war die Regression: sie kollabierte die Trennung der
++/// Die fruehere Projektion (beide -> Verbund3_Union) war die Regression: sie kollabierte die Trennung der
+ /// Merge-KATEGORIEN. HISTORIE (Doku-Doktrin: supersedieren, nie loeschen): bis A13-M3 fiel dieser Kollaps am
+-/// DRITTEN Tier-Stempel auf, weil merge_stamp_line die Strategie VERBATIM trug ("merge=Stufe2_Hybrid" !=
+-/// "merge=Stufe3_FullJoin"). Diese Zeile gibt es seit Owner-E2 nicht mehr; die Trennung lebt hier -- in der
++/// DRITTEN Tier-Stempel auf, weil merge_stamp_line die Strategie VERBATIM trug ("merge=Verbund2_Hybrid" !=
++/// "merge=Verbund3_Union"). Diese Zeile gibt es seit Owner-E2 nicht mehr; die Trennung lebt hier -- in der
+ /// Projektion selbst -- und in den erweiterten Namen/Flags der gemergten Varianten (Owner-Q2).
+-/// MATERIALISIERUNG DEFERRED (Director-Konsum, post-S4): das MergeStrategy-Enum (pruefling_merge.hpp) traegt heute
+-/// NUR Stufe1_CeOnly/Stufe2_PrueflingReplace/Stufe3_FullJoin -- KEIN Stufe2_Hybrid. Der direktiven-getriebene Emitter
+-/// (sota_catalog.hpp: render_directive_merge_module_source) rendert die Strategie als pf::MergeStrategy::<strategy>-
++/// MATERIALISIERUNG DEFERRED (Director-Konsum, post-S4): das PrueflingVerbundStrategy-Enum (pruefling_merge.hpp) traegt
++/// heute
++/// NUR Verbund1_CeOnly/Verbund2_Replace/Verbund3_Union -- KEIN Verbund2_Hybrid. Der direktiven-getriebene Emitter
++/// (sota_catalog.hpp: render_directive_merge_module_source) rendert die Strategie als
++/// pf::PrueflingVerbundStrategy::<strategy>-
+ /// TEXT; eine reale "merge"-Direktive MIT realem Slot ist damit erst kompilierbar, wenn die Materialisierung
+-/// (Enum-Wert Stufe2_Hybrid + Spezialisierung) landet -- heute 0 Produktions-Aufrufer (dormant, nur String-getestet).
+-/// Section-59-A(1) Stufe1_CeOnly ist die Abwesenheit einer Pruefling-Direktive (kein axes_default_lookup-merge / self).
++/// (Enum-Wert Verbund2_Hybrid + Spezialisierung) landet -- heute 0 Produktions-Aufrufer (dormant, nur String-getestet).
++/// Section-59-A(1) Verbund1_CeOnly ist die Abwesenheit einer Pruefling-Direktive (kein axes_default_lookup-merge /
++/// self).
+ [[nodiscard]] inline std::string merge_mode_to_strategy(std::string const& merge_mode) {
+-    if (merge_mode == "fulljoin") return "Stufe3_FullJoin"; // §59-A(3): kombinierte Union CE + Pruefling
+-    if (merge_mode == "merge") return "Stufe2_Hybrid"; // §59-A(2): CE + Pruefling HYBRID je Pruefling (!= FullJoin)
+-    return "Stufe2_PrueflingReplace";                  // "" (Default) und "replace" => ERSETZT-mit-Fallback (Stufe2)
++    if (merge_mode == "union") return "Verbund3_Union";  // §59-A(3): kombinierte Union CE + Pruefling
++    if (merge_mode == "merge") return "Verbund2_Hybrid"; // §59-A(2): CE + Pruefling HYBRID je Pruefling (!= Union)
++    return "Verbund2_Replace"; // "" (Default) und "replace" => ERSETZT-mit-Fallback (Verbund2)
+ }
+ 
+ /// profile_pruefling_identity(ep) -- die Pruefling-Identitaet der Merge-Phasen des Profils. Die erste <phase>, die
+ /// einen expliziten pruefling deklariert und NICHT als CacheEngine-self markiert ist (identity!="CacheEngine"/"self",
+-/// pruefling!="CacheEngine"/"self"), liefert den Pruefling; sonst "" (kein Pruefling = ce/self, Stufe1). Fork 3:
++/// pruefling!="CacheEngine"/"self"), liefert den Pruefling; sonst "" (kein Pruefling = ce/self, Verbund1). Fork 3:
+ /// identity="CacheEngine"/self ist ein expliziter self-Pruefling => trage NICHTS zum Merge bei (leere Slot-Liste).
+ [[nodiscard]] inline std::string profile_pruefling_identity(mp_cx::ExperimentProfile const& ep) {
+     auto const is_self = [](std::string const& s) { return s == "CacheEngine" || s == "self"; };
+@@ -82,7 +89,7 @@ struct AxisMergeDirective {
+         if (is_self(ph.identity)) continue; // Fork 3: self-Phase traegt keinen Merge-Pruefling
+         if (!ph.pruefling.empty() && !is_self(ph.pruefling)) return ph.pruefling;
+     }
+-    return {}; // kein deklarierter Merge-Pruefling => ce/self (Stufe1, leere Slot-Liste)
++    return {}; // kein deklarierter Merge-Pruefling => ce/self (Verbund1, leere Slot-Liste)
+ }
+ 
+ /// merge_plan_from_profile(ep) -- die DEKLARATIVE Projektion: je <axes_default_lookup><axis ref merge=..>-Eintrag
+=== DIFF 2 (Tests) ===
+diff --git a/tests/unit/hybrid_tier_module.cpp b/tests/unit/hybrid_tier_module.cpp
+new file mode 100644
+index 00000000..30879978
+--- /dev/null
++++ b/tests/unit/hybrid_tier_module.cpp
+@@ -0,0 +1,23 @@
++// HY-A2 (2026-08-18) -- Hybrid-Binary-Modulquelle, ZIEL SearchAlgorithm.
++//
++// Die MODUL-AUTOR-Seite der Gattung HeuristikAdapter: erste .so des Baums, deren
++// comdare_create_anatomy() KEIN plain Tier liefert, sondern einen Reroute-Proxy. Sie materialisiert
++// via COMDARE_DEFINE_HYBRID_MODULE die VIER extern-"C"-ABI-Pflicht-Symbole
++// (comdare_anatomy_abi_version / comdare_anatomy_abi_magic / comdare_create_anatomy /
++// comdare_destroy_anatomy) -- buchstabengleich zu denen der plain Tiere, damit derselbe
++// gattungs-agnostische AnatomyModuleLoader sie ohne Aenderung laedt (Begruendung im Makro-Header).
++//
++// WARUM ES ZWEI HYBRID-MODULQUELLEN GIBT (diese + hybrid_tier_module_set.cpp): der Header deklariert
++// ZWEI zulaessige Reroute-Ziele. Waere nur eines als .so gebaut, bliebe die zweite Deklaration eine
++// BEHAUPTUNG -- Text, den nie ein Compiler gesehen hat. Erst die zweite Quelle macht aus "waere
++// zulaessig" ein "ist gebaut". Beide sind bewusst winzig: die Belegung ist die Aussage, nicht der
++// Inhalt.
++//
++// WAS SIE NICHT TUT: sie bindet kein Ziel. Ein frisch geladener Proxy hat sein Standard-Dock, aber
++// noch keinen Antrieb daran -- das Binden gehoert dem Aufrufer, der die Ziel-.so ebenfalls geladen
++// hat und beide Lebensdauern kennt (destroy-vor-dlclose). Eine Factory, die selbst ein Ziel suchte,
++// muesste dafuer einen Lader IM Modul mitfuehren und haette damit eine zweite Ladestrecke geoeffnet.
++
++#include <hybrid/hybrid_module_abi_v1.hpp>
++
++COMDARE_DEFINE_HYBRID_MODULE(::comdare::cache_engine::anatomy::AnatomyGenus::SearchAlgorithm)
+diff --git a/tests/unit/hybrid_tier_module_set.cpp b/tests/unit/hybrid_tier_module_set.cpp
+new file mode 100644
+index 00000000..a39f119a
+--- /dev/null
++++ b/tests/unit/hybrid_tier_module_set.cpp
+@@ -0,0 +1,13 @@
++// HY-A2 (2026-08-18) -- Hybrid-Binary-Modulquelle, ZIEL Set. Zwilling von hybrid_tier_module.cpp.
++//
++// Der Zweck dieser zweiten Quelle steht dort ausfuehrlich: sie belegt, dass die ZWEITE
++// Ziel-Deklaration (RerouteZiel<Set>, hybrid_binary_proxy.hpp) baubar ist und nicht bloss
++// dasteht. Ein Ziel aus einer ANDEREN Gattung als die erste (Set = Container-Gattung,
++// SearchAlgorithm = Gattung Map) belegt zugleich, dass der Reroute nicht an einer Gattung klebt.
++//
++// DASS BEIDE .so DIESELBEN VIER SYMBOLNAMEN EXPORTIEREN, ist kein Konflikt: es sind getrennte
++// Objekte mit getrenntem dlopen-Handle. Genau darauf beruht die eine Ladestrecke.
++
++#include <hybrid/hybrid_module_abi_v1.hpp>
++
++COMDARE_DEFINE_HYBRID_MODULE(::comdare::cache_engine::anatomy::AnatomyGenus::Set)
+diff --git a/tests/unit/test_hy_f8_reroute.cpp b/tests/unit/test_hy_f8_reroute.cpp
+new file mode 100644
+index 00000000..cbc77504
+--- /dev/null
++++ b/tests/unit/test_hy_f8_reroute.cpp
+@@ -0,0 +1,280 @@
++// test_hy_f8_reroute.cpp -- HY-A2 F8-MINIMAL-DoD: der Reroute-Roundtrip ueber GENAU EIN Standard-Dock
++// auf ZWEI plain-Tier-Ziele.
++//
++// WAS DIESER TEST BEWEIST, und warum jeder Teil noetig ist:
++//   (1) ROUNDTRIP-KOEDER -- ein GEWUERFELTES Token geht durch das Dock ins Ziel und kommt literal
++//       gleich zurueck. Ein fester Wert waere kein Koeder: er koennte aus einem Default, einem
++//       Nullwert oder einem stehengebliebenen Puffer stammen und saehe genauso aus. Der Wert wird
++//       deshalb aus einem deterministisch geseedeten PRNG gezogen (reproduzierbar, aber nicht
++//       vorhersehbar aus dem Code heraus) und VOR/NACH dem Dock verglichen.
++//   (2) UMSCHALTUNG -- dasselbe Dock traegt nacheinander ZWEI verschiedene Ziele. Ohne den zweiten
++//       Durchgang bewiese der Test nur, dass irgendein Zeiger irgendwo hinzeigt; erst der Wechsel
++//       zeigt, dass der Umschaltpunkt WIRKT und das Ergebnis dem NEUEN Ziel folgt.
++//   (3) DOCK-ZAHL VORHER/NACHHER -- die Abnahme-Zahl der DoD, literal gedruckt.
++//   (4) DELEGATION statt Eigenleben -- der Proxy meldet den Lebenszyklus des ZIELS. Die Probe
++//       schaltet das Ziel auf Running und liest die Antwort AM PROXY: kaeme sie aus einem eigenen
++//       state_, bliebe sie Idle. Genau das ist die zweite Wahrheit, die der Delegations-Schnitt
++//       verhindert (K2).
++//   (5) DIE B4-PAARE -- beide Ebenen, im selben Lauf, damit die Zahlen nicht in zwei Berichten
++//       auseinanderlaufen.
++//
++// DIE CT-SPERRE steht NICHT hier, sondern am Eigentuemer (hybrid_binary_proxy.hpp:62, RerouteZiel primaer
++// undefiniert, + :96-115 die Negativ-Pins): ein nicht
++// deklariertes Reroute-Ziel ist per Konstruktion unbaubar, und ein unbaubarer Aufruf laesst sich in
++// einer Test-TU nur als auskommentierter Text ablegen, der nichts prueft. Was hier geprueft wird,
++// ist die BEDINGUNG, unter der die Sperre bestehen bleibt -- dieselbe Bauform wie bei S-6b.
++
++#include <hybrid/hybrid_binary_proxy.hpp>
++
++#include <builder/anatomy_module_loader/anatomy_module_loader.hpp>
++
++#include <gtest/gtest.h>
++
++#include <cstdint>
++#include <map>
++#include <random>
++#include <string_view>
++
++namespace {
++
++namespace hy     = ::comdare::cache_engine::hybrid;
++namespace cea    = ::comdare::cache_engine::anatomy;
++namespace cee    = ::comdare::cache_engine::execution_engine;
++namespace loader = ::comdare::cache_engine::builder::anatomy_loader;
++
++/// Ein plain Tier-ZIEL. Bewusst winzig: der Test misst die REROUTE-Naht, nicht eine Anatomie. Es
++/// erfuellt genau die zwei Flaechen, die der Proxy braucht -- IAnatomyBase (Delegations-Ziel) und
++/// den funktionalen Antrieb (Dock-Ziel).
++class PlainZiel final : public cea::IAnatomyBase, public cea::IDriveableTier {
++public:
++    explicit PlainZiel(std::string_view name, std::size_t organe) noexcept : name_{name}, organe_{organe} {}
++
++    // -- IExecutionEngine (das ECHTE Eigenleben -- der Proxy hat keines) --
++    [[nodiscard]] std::string_view          engine_name() const noexcept override { return name_; }
++    [[nodiscard]] cee::EngineLifecycleState lifecycle_state() const noexcept override { return zustand_; }
++    void                                    warm_up() override { zustand_ = cee::EngineLifecycleState::Warming; }
++    void                                    run() override { zustand_ = cee::EngineLifecycleState::Running; }
++    void                                    reset() override { zustand_ = cee::EngineLifecycleState::Idle; }
++    void                                    shutdown() override { zustand_ = cee::EngineLifecycleState::Shutdown; }
++
++    // -- IAnatomyBase --
++    [[nodiscard]] std::string_view  composition_name() const noexcept override { return name_; }
++    [[nodiscard]] std::string_view  paper_id() const noexcept override { return "plain-fixture"; }
++    [[nodiscard]] cea::AnatomyGenus genus() const noexcept override { return cea::AnatomyGenus::SearchAlgorithm; }
++    [[nodiscard]] std::size_t       organ_count() const noexcept override { return organe_; }
++
++    // -- IDriveableTier: der funktionale Antrieb, ueber den der Koeder laeuft --
++    [[nodiscard]] bool tier_insert(std::uint64_t key, std::uint64_t value) noexcept override {
++        daten_[key] = value;
++        return true;
++    }
++    [[nodiscard]] bool tier_lookup(std::uint64_t key, std::uint64_t* out_value) const noexcept override {
++        auto const it = daten_.find(key);
++        if (it == daten_.end()) return false;
++        if (out_value != nullptr) *out_value = it->second;
++        return true;
++    }
++    [[nodiscard]] bool          tier_erase(std::uint64_t key) noexcept override { return daten_.erase(key) != 0; }
++    void                        tier_clear() noexcept override { daten_.clear(); }
++    [[nodiscard]] std::uint64_t tier_size() const noexcept override {
++        return static_cast<std::uint64_t>(daten_.size());
++    }
++
++private:
++    std::string_view                       name_;
++    std::size_t                            organe_;
++    cee::EngineLifecycleState              zustand_ = cee::EngineLifecycleState::Idle;
++    std::map<std::uint64_t, std::uint64_t> daten_{};
++};
++
++/// Der Koeder-Wert. Deterministisch geseedet (reproduzierbar), aber nicht als Literal im Code --
++/// waere er eins, koennte ein Vergleich gegen einen stehengebliebenen Puffer zufaellig passen.
++[[nodiscard]] std::uint64_t gewuerfeltes_token(std::uint64_t seed) {
++    std::mt19937_64                              rng{seed};
++    std::uniform_int_distribution<std::uint64_t> dist{1, ~std::uint64_t{0}};
++    return dist(rng);
++}
++
++} // namespace
++
++TEST(HyF8Reroute, EinDockZweiZieleRoundtripKoeder) {
++    hy::HybridBinaryProxy<cea::AnatomyGenus::SearchAlgorithm> proxy;
++
++    // (3) DOCK-ZAHL VORHER/NACHHER -- die Abnahme-Zahl der F8-DoD.
++    EXPECT_EQ(proxy.belegte_docks(), 0u) << "vor dem attach traegt der Proxy kein Dock";
++    int const slot = proxy.dock_anlegen();
++    ASSERT_GE(slot, 0) << "attach lieferte -status statt eines Slot-Index";
++    EXPECT_EQ(proxy.belegte_docks(), 1u) << "F8-DoD: GENAU EIN Standard-Dock";
++    EXPECT_EQ(proxy.dock_kapazitaet(), 1u);
++    std::cout << "  F8-DoD Dock-Zahl: vorher 0 -> nachher " << proxy.belegte_docks() << " (Kapazitaet "
++              << proxy.dock_kapazitaet() << ")\n";
++
++    // Ungebunden: ehrliche Sentinels statt Dereferenzierung im Fenster zwischen attach und Bindung.
++    EXPECT_FALSE(proxy.ist_gebunden());
++    EXPECT_EQ(proxy.engine_name(), std::string_view{"hybrid_ungebunden"});
++    EXPECT_EQ(proxy.organ_count(), 0u);
++
++    PlainZiel ziel_a{"plain_ziel_a", 18};
++    PlainZiel ziel_b{"plain_ziel_b", 18};
++
++    // ---- (1)+(2) ROUNDTRIP-KOEDER durch das Dock, zweimal, auf ZWEI Ziele --------------------
++    // VOID-Lambda mit Ausgabe-Parameter, nicht bool-Rueckgabe: ASSERT_* expandiert zu `return;` und
++    // waere in einem Lambda mit Rueckgabetyp ein Typfehler (am Objekt gemessen: "inconsistent types
++    // 'void' and 'bool' deduced for lambda return type"). Der Befund wandert deshalb ueber eine
++    // Referenz heraus -- die Abbruch-Semantik der ASSERTs bleibt damit erhalten.
++    auto koeder_durch_das_dock = [&](PlainZiel& ziel, std::uint64_t seed, char const* etikett, bool& gleich) {
++        auto const token = gewuerfeltes_token(seed);
++        auto const key   = gewuerfeltes_token(seed ^ 0x5DEECE66Dull);
++
++        ASSERT_EQ(proxy.ziel_binden(static_cast<std::size_t>(slot), nullptr, &ziel), hy::hybrid_status_ok);
++        // Der Antrieb wird als IDriveableTier gereicht -- die Op-Flaeche, ueber die der Koeder laeuft.
++        // (Der Dock-Slot fuehrt den Observer-Zeiger; fuer den funktionalen Roundtrip genuegt der
++        //  Antrieb, und genau den prueft die F8-DoD.)
++        cea::IDriveableTier* antrieb = &ziel;
++        ASSERT_NE(antrieb, nullptr);
++
++        ASSERT_TRUE(antrieb->tier_insert(key, token)) << etikett << ": insert durch das Dock";
++        std::uint64_t zurueck = 0;
++        ASSERT_TRUE(antrieb->tier_lookup(key, &zurueck)) << etikett << ": lookup durch das Dock";
++        EXPECT_EQ(zurueck, token) << etikett << ": das Token kam NICHT literal gleich zurueck";
++        std::cout << "  Koeder " << etikett << ": key=" << key << " token=" << token << " zurueck=" << zurueck
++                  << (zurueck == token ? "  [GLEICH]" : "  [ABWEICHUNG]") << "\n";
++
++        // Die DELEGATION am selben Griff: der Proxy nennt jetzt DIESES Ziel.
++        EXPECT_TRUE(proxy.ist_gebunden());
++        EXPECT_EQ(proxy.engine_name(), ziel.engine_name()) << etikett << ": engine_name wird NICHT delegiert";
++        EXPECT_EQ(proxy.organ_count(), ziel.organ_count());
++        gleich = (zurueck == token);
++    };
++
++    bool gleich_a = false;
++    bool gleich_b = false;
++    koeder_durch_das_dock(ziel_a, 0xA11CEull, "ziel_a", gleich_a);
++    koeder_durch_das_dock(ziel_b, 0xB0B0ull, "ziel_b", gleich_b);
++    EXPECT_TRUE(gleich_a) << "Roundtrip ueber ziel_a: Token kam nicht literal gleich zurueck";
++    EXPECT_TRUE(gleich_b) << "Roundtrip ueber ziel_b: Token kam nicht literal gleich zurueck";
++
++    // Die UMSCHALTUNG hat wirklich stattgefunden -- der Proxy nennt das zweite Ziel, nicht das erste.
++    EXPECT_EQ(proxy.engine_name(), std::string_view{"plain_ziel_b"})
++        << "nach dem Umbinden meldet der Proxy noch das ERSTE Ziel -- der Umschaltpunkt wirkt nicht";
++
++    // ---- (4) DELEGATION statt Eigenleben ------------------------------------------------------
++    // Der Proxy hat KEIN state_. Wer den Lebenszyklus am ZIEL dreht, sieht es am PROXY.
++    EXPECT_EQ(proxy.lifecycle_state(), cee::EngineLifecycleState::Idle);
++    ziel_b.run();
++    EXPECT_EQ(proxy.lifecycle_state(), cee::EngineLifecycleState::Running)
++        << "der Proxy fuehrt einen EIGENEN Lebenszyklus -- das ist die zweite Wahrheit, gegen die der "
++           "Delegations-Schnitt gebaut ist (an warm_up haengt die Mess-Semantik)";
++    // Und umgekehrt: der Proxy-Aufruf landet am Ziel, nicht in einem eigenen Feld.
++    proxy.reset();
++    EXPECT_EQ(ziel_b.lifecycle_state(), cee::EngineLifecycleState::Idle)
++        << "proxy.reset() hat das Ziel NICHT erreicht -- die Delegation ist einseitig";
++
++    // ---- WEG C: genus() ist das GEERBTE Ziel-Genus, nie der Reroute-Wert ----------------------
++    EXPECT_EQ(proxy.genus(), cea::AnatomyGenus::SearchAlgorithm);
++    EXPECT_NE(proxy.genus(), cea::AnatomyGenus::FunctionInterfaceReroute)
++        << "genus() liefert den Reroute-Genus -- damit sucht der Host ein Pruef-Dock, das es nicht "
++           "gibt (Weg C, Owner-Entscheid E-1 final)";
++
++    // ---- LOESEN vor dem Entladen (destroy-vor-dlclose) ---------------------------------------
++    ASSERT_EQ(proxy.ziel_binden(static_cast<std::size_t>(slot), nullptr, nullptr), hy::hybrid_status_ok);
++    EXPECT_FALSE(proxy.ist_gebunden());
++    EXPECT_EQ(proxy.antrieb(static_cast<std::size_t>(slot)), nullptr)
++        << "der Slot haelt nach dem Loesen noch einen Zeiger -- das waere ein use-after-dlclose mit "
++           "voll plausiblem Verhalten bis zum ersten Zugriff";
++    EXPECT_EQ(proxy.organ_count(), 0u) << "ohne Ziel traegt der Proxy keine Organe";
++}
++
++TEST(HyF8Reroute, CtSperreUnterscheidetNoch) {
++    // Die Bedingung, unter der die Sperre bestehen BLEIBT (die Verletzung selbst ist unbaubar).
++    // BEIDE zulaessigen und ALLE unzulaessigen -- ein Praedikat, das nur die Ja-Faelle prueft,
++    // koennte auf immer-wahr degeneriert sein, ohne dass es hier auffiele.
++    static_assert(hy::reroute_ziel_deklariert<cea::AnatomyGenus::SearchAlgorithm>());
++    static_assert(hy::reroute_ziel_deklariert<cea::AnatomyGenus::Set>());
++    static_assert(!hy::reroute_ziel_deklariert<cea::AnatomyGenus::FunctionInterfaceReroute>(),
++                  "Gate S1: der Reroute-Genus ist NIE ein Ziel.");
++    static_assert(!hy::reroute_ziel_deklariert<cea::AnatomyGenus::View>(),
++                  "die Sperre darf nicht auf immer-wahr degenerieren.");
++    static_assert(!hy::reroute_ziel_deklariert<cea::AnatomyGenus::Sequence>());
++    static_assert(!hy::reroute_ziel_deklariert<cea::AnatomyGenus::Adapter>());
++    static_assert(hy::kDeklarierteRerouteZiele == 2, "F8-DoD: GENAU ZWEI deklarierte Ziele.");
++    SUCCEED();
++}
++
++// --------------------------------------------------------------------------------------------
++// DIE VIER ABI-PFLICHT-SYMBOLE -- am GELADENEN Objekt, nicht am Symbolnamen
++// --------------------------------------------------------------------------------------------
++//
++// WARUM NICHT `nm`: dass ein Symbol im Export-Verzeichnis STEHT, sagt nicht, dass es das Richtige
++// tut. AnatomyModuleLoader::load ruft alle vier der Reihe nach auf und erreicht status_ok nur, wenn
++// jedes davon liefert. Seine Status-Namen benennen zugleich, WELCHES Symbol versagt hat --
++// symbol_not_found (eines der vier fehlt), magic_mismatch / abi_major_mismatch (version/magic
++// antworten falsch), factory_returned_null (create liefert nichts). Ein status_ok ist damit die
++// staerkere Aussage, und sie kostet nichts, weil der Loader ohnehin existiert.
++//
++// WAS DIESER TEST ZUSAETZLICH ZEIGT und der In-Process-Test NICHT zeigen kann: dass die Gleichheit
++// der vier Symbolnamen wirklich EINE Ladestrecke ergibt. Derselbe Loader, der die plain-Tier-.so
++// laedt, nimmt hier eine Hybrid-.so -- ohne Fallunterscheidung, ohne Gattungs-Wissen vorab.
++TEST(HyF8Reroute, VierAbiPflichtSymboleAmGeladenenModul) {
++    struct Fall {
++        char const*       pfad;
++        cea::AnatomyGenus erwartetes_ziel_genus;
++        char const*       etikett;
++    };
++    Fall const faelle[] = {
++        {COMDARE_HY_MODUL_SEARCHALGORITHM, cea::AnatomyGenus::SearchAlgorithm, "hybrid_reroute_searchalgorithm"},
++        {COMDARE_HY_MODUL_SET, cea::AnatomyGenus::Set, "hybrid_reroute_set"},
++    };
++
++    for (auto const& f : faelle) {
++        loader::AnatomyModuleHandle handle;
++        int const                   st = loader::AnatomyModuleLoader::load(f.pfad, handle);
++        ASSERT_EQ(st, loader::status_ok) << f.etikett << ": load == " << loader::status_name(st)
++                                         << " -- eines der vier "
++                                         << "ABI-Pflicht-Symbole fehlt oder liefert nicht (Pfad " << f.pfad << ")";
++
++        auto* anatomie = handle.anatomy();
++        ASSERT_NE(anatomie, nullptr) << f.etikett << ": Factory lieferte nullptr";
++
++        // WEG C am LEBENDEN Objekt: genus() meldet das ZIEL, nie den Reroute-Wert ...
++        EXPECT_EQ(anatomie->genus(), f.erwartetes_ziel_genus)
++            << f.etikett << ": das geladene Modul meldet ein anderes Ziel-Genus als deklariert";
++        EXPECT_NE(anatomie->genus(), cea::AnatomyGenus::FunctionInterfaceReroute)
++            << f.etikett << ": genus() liefert den Reroute-Wert -- Weg C gebrochen";
++
++        // ... und WEG A daneben: die Identitaet nennt trotzdem den HYBRID. Genau diese beiden
++        // Antworten NEBENEINANDER sind die Trennung der zwei Ebenen -- an einem Objekt, das
++        // wirklich durch dlopen gekommen ist.
++        EXPECT_EQ(anatomie->composition_name(), std::string_view{"HybridBinaryProxy"})
++            << f.etikett << ": die Hybrid-.so ist im Log von einem plain Tier ununterscheidbar";
++        EXPECT_EQ(anatomie->paper_id(), std::string_view{"HY-A2"});
++
++        // Das Standard-Dock kam MIT aus der Factory -- eine Hybrid-.so ohne Aufnahmestelle waere
++        // eine Huelle, die erst beim ersten Reroute-Versuch auffiele.
++        auto* proxy = dynamic_cast<hy::HybridBinaryProxy<cea::AnatomyGenus::SearchAlgorithm>*>(anatomie);
++        if (f.erwartetes_ziel_genus == cea::AnatomyGenus::SearchAlgorithm) {
++            ASSERT_NE(proxy, nullptr) << f.etikett << ": das geladene Objekt ist kein HybridBinaryProxy";
++            EXPECT_EQ(proxy->belegte_docks(), 1u) << f.etikett << ": GENAU EIN Standard-Dock aus der Factory";
++            EXPECT_FALSE(proxy->ist_gebunden()) << f.etikett << ": frisch geladen ist kein Ziel gebunden";
++        }
++
++        std::cout << "  ABI-Pflicht-Symbole OK: " << f.etikett << "  genus=" << static_cast<int>(anatomie->genus())
++                  << "  composition_name=" << anatomie->composition_name() << "  paper_id=" << anatomie->paper_id()
++                  << "\n";
++        // handle-Destruktor: destroy_anatomy VOR dlclose -- das vierte Symbol im Vollzug.
++    }
++}
++
++TEST(HyF8Reroute, B4AbnahmeBeideEbenenPaare) {
++    // Beide Ebenen im SELBEN Lauf -- damit die Zahlen nicht in zwei Berichten auseinanderlaufen.
++    std::cout << "  B4-Paare: kAlleGattungen=" << hy::kAlleGattungen.size()
++              << "  kAlleGenera=" << hy::kAlleGenera.size()
++              << "  (davon ABI-sichtbar=" << hy::abi_sichtbare_genus_anzahl()
++              << ", Klassifikation=" << hy::klassifikations_genus_anzahl() << ")\n"
++              << "  Reroute-CT-Slot-Deckel: " << hy::kRerouteGenusCtSlotCount << "\n";
++    EXPECT_EQ(hy::kAlleGattungen.size(), 4u);
++    EXPECT_EQ(hy::kAlleGenera.size(), 6u);
++    EXPECT_EQ(hy::abi_sichtbare_genus_anzahl(), 5u) << "die Dock-Registry bleibt FUENF";
++    EXPECT_EQ(hy::klassifikations_genus_anzahl(), 1u);
++    EXPECT_EQ(hy::kRerouteGenusCtSlotCount, 32u);
++}
+[1m[33mwarning:[0m[0m Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+[35m[3mcodex[0m[0m
+Ich prüfe ausschließlich die eingebetteten Diffs. Ich teile die sechs harten Prüfpunkte parallel auf und gleiche die Befunde anschließend am tatsächlich gezeigten Patch ab – insbesondere darauf, ob behauptete Tests im Diff überhaupt vorhanden sind.
+[35m[3mcodex[0m[0m
+Die Kernbefunde sind konsistent: Die reine Token-Delegation bewahrt Gate, Env-Parsing und nproc-Fallback; die Abnahmelücken liegen vor allem bei den fehlenden Director-/Q2-Tests und beim HY-End-to-End-Pfad. Zusätzlich ist der Verbund-Rename im gezeigten Gesamtpatch nicht bis XML-Validator und Emitter geführt.
+[35m[3mcodex[0m[0m
+1. `libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp:21-61` / fehlender Director-Test — **HOCH**
+
+   Im gesamten Testdiff fehlen `DebugSemantikInjektor`, `IPlanBuilder` und ein Lauf über den echten Director. Damit sind weder der Pfad `Director → Injektor → Builder` noch die injizierte Semantik `{Debug, misst, nicht single-thread}` belegt. Eine Gegenprobe „ohne Injektor kein Debug“ wäre allein nicht scharf: Bei einem No-op-Injektor bliebe sie grün.
+
+   **Fix:** Denselben Capture-Builder einmal direkt und einmal dekoriert durch den echten Director aufrufen. Callzahl und empfangene Semantik prüfen sowie ausdrücklich `injected != baseline`. Zusätzlich Tests für `resolve_measure_parallelism_of_mode()` und die vollständige `"debug"`-Exception ergänzen.
+
+2. `libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp:119-132` — **MITTEL**
+
+   Die Laufzeitliste ist korrekt aus `kWorkModeRegistry` erzeugt und lautet in Registry-Reihenfolge `build, measure, compare, release`. Der „Namen-Anker“ wiederholt jedoch alle vier Tokens als Literale und nochmals im Assertion-Text. Damit existiert entgegen dem Ein-Quellen-Soll eine zweite handgepflegte Liste; im Ausdruck steht sogar `Release` vor `Compare`.
+
+   **Fix:** Tokenliterale ausschließlich in `kWorkModeRegistry` halten. Compile-time nur generisch Vollständigkeit, Eindeutigkeit und `Index == Enum` prüfen; den exakten Fehlertext separat testen.
+
+3. `libs/cache_engine/profile_facade/merge_plan.hpp:5,53-74` / `validate_profile.hpp:965-980` — **HOCH**
+
+   Der XML-Rename ist nicht durchgängig. `merge_mode_to_strategy()` versteht `"union"`, aber der vollständige Diff ändert weder Validator noch Schema/XML-Vokabular; der Dateikopf verweist weiterhin auf `{replace,merge}`. Außerdem fällt das obsolete `"fulljoin"` wegen des pauschalen Default-Returns lautlos auf `Verbund2_Replace` zurück. Damit kann eine frühere Union unvalidiert zur Ersetzung werden.
+
+   **Fix:** Validator und Schema auf `"union"` umstellen. Nur `""` und `"replace"` explizit als `Verbund2_Replace` behandeln; `"fulljoin"` und unbekannte Werte fail-loud ablehnen.
+
+4. `libs/cache_engine/profile_facade/merge_plan.hpp:65-75` / `libs/cache_engine/anatomy/pruefling_merge.hpp:139-143` — **HOCH**
+
+   Der Rename ist nicht bis zur Emission geführt. Der Vorher-Text dokumentiert, dass `sota_catalog.hpp::render_directive_merge_module_source` `pf::MergeStrategy::<strategy>` rendert; `sota_catalog.hpp` wird im vollständigen Diff nicht geändert. Generierte Quellen verwenden daher den entfernten Enum-Namen.
+
+   `"merge" → "Verbund2_Hybrid"` ist semantisch korrekt und erhält die Trennung zur Union. `Verbund2_Hybrid` existiert aber weiterhin nicht im neuen Enum. Sobald der akzeptierte `merge`-Pfad emittiert wird, entsteht ungültiges C++.
+
+   **Fix:** Emitter auf `pf::PrueflingVerbundStrategy` umstellen und eine gerenderte TU tatsächlich kompilieren. Hybrid entweder materialisieren oder bis dahin vor der Emission gezielt ablehnen.
+
+5. `tests/unit/test_hy_f8_reroute.cpp:126-151` — **HOCH**
+
+   Der behauptete Dock-Roundtrip umgeht das Dock:
+
+   ```cpp
+   cea::IDriveableTier* antrieb = &ziel;
+   ```
+
+   `tier_insert()` und `tier_lookup()` laufen direkt auf dem Fixture. Eine vollständig kaputte funktionale Dock-Weiterleitung bleibt grün; `ziel_binden()` wird nur durch separate Metadaten-/Lifecycle-Abfragen berührt.
+
+   **Fix:** Den Antrieb ausschließlich über den vom Proxy/Dock zurückgelieferten Griff beziehen und darüber den Köder fahren.
+
+6. `tests/unit/hybrid_tier_module.cpp:4-8` / `tests/unit/test_hy_f8_reroute.cpp:213-260` — **HOCH**
+
+   Beide `.so` werden zwar geladen, aber der Loader belegt ausdrücklich nur die vier normalen Anatomy-ABI-Symbole. Der geforderte Sechs-Symbol-Beleg sowie ein Roundtrip durch jedes geladene Modul fehlen. Lokaler Köder und DSO-Load sind zwei unverbundene Testhälften.
+
+   Zusätzlich wird immer nur zu `HybridBinaryProxy<SearchAlgorithm>` gecastet. Beim Set-Modul wird das falsche Cast-Ergebnis ignoriert; dessen konkreter Proxy-Typ und Standard-Dock bleiben ungeprüft. Unter der vorgegebenen `ENABLE_EXPORTS`-Annahme ist der bekannte Clang-`-O3`-Fehler geheilt, der Set-Coverage- und Cross-DSO-RTTI-Rest bleibt dennoch.
+
+   **Fix:** Je Modul alle sechs Symbole handle-lokal auflösen und aufrufen, ein genus-passendes Ziel binden und den Köder durch dessen Dock schicken. Bevorzugt die C-ABI statt eines Casts auf eine finale konkrete Klasse verwenden.
+
+7. `tests/unit/test_q2_identitaets_riegel.cpp:1` — **HOCH**
+
+   Die geforderte Q2-Datei beziehungsweise irgendeine Q2-Änderung fehlt vollständig. Damit existieren weder Riegel-Ausgaben je Fixture-Klasse noch prüfbare Negativbelege. Insbesondere schützt nichts die Zuordnung `alt_major7 → magic_mismatch` gegen eine geänderte Loader-Prüfreihenfolge.
+
+   **Fix:** Jede Fixture mit frischem Handle laden und den exakten Status prüfen, nicht bloß `!= status_ok` oder eine Menge akzeptierter Fehler. `alt_major7` muss exakt `magic_mismatch` erwarten; zusätzliche Fixtures sollten Magic- und Major-Fehler jeweils isolieren.
+
+8. `tests/unit/test_hy_f8_reroute.cpp:25-34` — **NIEDRIG**
+
+   `std::cout` wird ohne direkten `<iostream>`-Include verwendet.
+
+   **Fix:** `#include <iostream>` ergänzen.
+
+Positiv geprüft: Die drei implementierten Verbundstrategien behalten ihre Altsemantik; alle vier Work-Modes verwenden `Release`; der Tokenweg bewahrt Gate, Env-Parsing und nproc-Fallback; die B4-Werte `4/6` werden direkt geprüft. Diese korrekten Teile schließen die fehlenden End-to-End- und Negativbelege jedoch nicht.
+
+**NICHT_LANDBAR**
+[2mtokens used[0m
+40,964
+1. `libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp:21-61` / fehlender Director-Test — **HOCH**
+
+   Im gesamten Testdiff fehlen `DebugSemantikInjektor`, `IPlanBuilder` und ein Lauf über den echten Director. Damit sind weder der Pfad `Director → Injektor → Builder` noch die injizierte Semantik `{Debug, misst, nicht single-thread}` belegt. Eine Gegenprobe „ohne Injektor kein Debug“ wäre allein nicht scharf: Bei einem No-op-Injektor bliebe sie grün.
+
+   **Fix:** Denselben Capture-Builder einmal direkt und einmal dekoriert durch den echten Director aufrufen. Callzahl und empfangene Semantik prüfen sowie ausdrücklich `injected != baseline`. Zusätzlich Tests für `resolve_measure_parallelism_of_mode()` und die vollständige `"debug"`-Exception ergänzen.
+
+2. `libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp:119-132` — **MITTEL**
+
+   Die Laufzeitliste ist korrekt aus `kWorkModeRegistry` erzeugt und lautet in Registry-Reihenfolge `build, measure, compare, release`. Der „Namen-Anker“ wiederholt jedoch alle vier Tokens als Literale und nochmals im Assertion-Text. Damit existiert entgegen dem Ein-Quellen-Soll eine zweite handgepflegte Liste; im Ausdruck steht sogar `Release` vor `Compare`.
+
+   **Fix:** Tokenliterale ausschließlich in `kWorkModeRegistry` halten. Compile-time nur generisch Vollständigkeit, Eindeutigkeit und `Index == Enum` prüfen; den exakten Fehlertext separat testen.
+
+3. `libs/cache_engine/profile_facade/merge_plan.hpp:5,53-74` / `validate_profile.hpp:965-980` — **HOCH**
+
+   Der XML-Rename ist nicht durchgängig. `merge_mode_to_strategy()` versteht `"union"`, aber der vollständige Diff ändert weder Validator noch Schema/XML-Vokabular; der Dateikopf verweist weiterhin auf `{replace,merge}`. Außerdem fällt das obsolete `"fulljoin"` wegen des pauschalen Default-Returns lautlos auf `Verbund2_Replace` zurück. Damit kann eine frühere Union unvalidiert zur Ersetzung werden.
+
+   **Fix:** Validator und Schema auf `"union"` umstellen. Nur `""` und `"replace"` explizit als `Verbund2_Replace` behandeln; `"fulljoin"` und unbekannte Werte fail-loud ablehnen.
+
+4. `libs/cache_engine/profile_facade/merge_plan.hpp:65-75` / `libs/cache_engine/anatomy/pruefling_merge.hpp:139-143` — **HOCH**
+
+   Der Rename ist nicht bis zur Emission geführt. Der Vorher-Text dokumentiert, dass `sota_catalog.hpp::render_directive_merge_module_source` `pf::MergeStrategy::<strategy>` rendert; `sota_catalog.hpp` wird im vollständigen Diff nicht geändert. Generierte Quellen verwenden daher den entfernten Enum-Namen.
+
+   `"merge" → "Verbund2_Hybrid"` ist semantisch korrekt und erhält die Trennung zur Union. `Verbund2_Hybrid` existiert aber weiterhin nicht im neuen Enum. Sobald der akzeptierte `merge`-Pfad emittiert wird, entsteht ungültiges C++.
+
+   **Fix:** Emitter auf `pf::PrueflingVerbundStrategy` umstellen und eine gerenderte TU tatsächlich kompilieren. Hybrid entweder materialisieren oder bis dahin vor der Emission gezielt ablehnen.
+
+5. `tests/unit/test_hy_f8_reroute.cpp:126-151` — **HOCH**
+
+   Der behauptete Dock-Roundtrip umgeht das Dock:
+
+   ```cpp
+   cea::IDriveableTier* antrieb = &ziel;
+   ```
+
+   `tier_insert()` und `tier_lookup()` laufen direkt auf dem Fixture. Eine vollständig kaputte funktionale Dock-Weiterleitung bleibt grün; `ziel_binden()` wird nur durch separate Metadaten-/Lifecycle-Abfragen berührt.
+
+   **Fix:** Den Antrieb ausschließlich über den vom Proxy/Dock zurückgelieferten Griff beziehen und darüber den Köder fahren.
+
+6. `tests/unit/hybrid_tier_module.cpp:4-8` / `tests/unit/test_hy_f8_reroute.cpp:213-260` — **HOCH**
+
+   Beide `.so` werden zwar geladen, aber der Loader belegt ausdrücklich nur die vier normalen Anatomy-ABI-Symbole. Der geforderte Sechs-Symbol-Beleg sowie ein Roundtrip durch jedes geladene Modul fehlen. Lokaler Köder und DSO-Load sind zwei unverbundene Testhälften.
+
+   Zusätzlich wird immer nur zu `HybridBinaryProxy<SearchAlgorithm>` gecastet. Beim Set-Modul wird das falsche Cast-Ergebnis ignoriert; dessen konkreter Proxy-Typ und Standard-Dock bleiben ungeprüft. Unter der vorgegebenen `ENABLE_EXPORTS`-Annahme ist der bekannte Clang-`-O3`-Fehler geheilt, der Set-Coverage- und Cross-DSO-RTTI-Rest bleibt dennoch.
+
+   **Fix:** Je Modul alle sechs Symbole handle-lokal auflösen und aufrufen, ein genus-passendes Ziel binden und den Köder durch dessen Dock schicken. Bevorzugt die C-ABI statt eines Casts auf eine finale konkrete Klasse verwenden.
+
+7. `tests/unit/test_q2_identitaets_riegel.cpp:1` — **HOCH**
+
+   Die geforderte Q2-Datei beziehungsweise irgendeine Q2-Änderung fehlt vollständig. Damit existieren weder Riegel-Ausgaben je Fixture-Klasse noch prüfbare Negativbelege. Insbesondere schützt nichts die Zuordnung `alt_major7 → magic_mismatch` gegen eine geänderte Loader-Prüfreihenfolge.
+
+   **Fix:** Jede Fixture mit frischem Handle laden und den exakten Status prüfen, nicht bloß `!= status_ok` oder eine Menge akzeptierter Fehler. `alt_major7` muss exakt `magic_mismatch` erwarten; zusätzliche Fixtures sollten Magic- und Major-Fehler jeweils isolieren.
+
+8. `tests/unit/test_hy_f8_reroute.cpp:25-34` — **NIEDRIG**
+
+   `std::cout` wird ohne direkten `<iostream>`-Include verwendet.
+
+   **Fix:** `#include <iostream>` ergänzen.
+
+Positiv geprüft: Die drei implementierten Verbundstrategien behalten ihre Altsemantik; alle vier Work-Modes verwenden `Release`; der Tokenweg bewahrt Gate, Env-Parsing und nproc-Fallback; die B4-Werte `4/6` werden direkt geprüft. Diese korrekten Teile schließen die fehlenden End-to-End- und Negativbelege jedoch nicht.
+
+**NICHT_LANDBAR**

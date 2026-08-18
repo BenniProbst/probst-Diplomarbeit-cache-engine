@@ -1,0 +1,427 @@
+{
+  "summary": "Code-Review #15-Bruch: 5 Diff-Flaechen je zweistufig (Erheben -> adversarial Bewerten) + Synthese",
+  "agentCount": 11,
+  "logs": [
+    "Erhebung: 5/5 Flaechen, 217 Stellen",
+    "Bewertung sequentiell: loader-hybrid durch (1/5)",
+    "Bewertung sequentiell: fingerprint-name durch (2/5)",
+    "Bewertung sequentiell: pod-makros-gates durch (3/5)",
+    "Bewertung sequentiell: semantik-kern durch (4/5)",
+    "Bewertung sequentiell: tests durch (5/5)",
+    "Bewertung: 5/5, 33 Findings (1 KRITISCH, 23 ERNST)"
+  ],
+  "result": {
+    "synthese": {
+      "gesamt_verdikt": "LANDBAR_MIT_FIXES",
+      "fix_liste": [
+        {
+          "stelle": "tests/unit/test_q2_identitaets_riegel.cpp:127-136 + libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:169-207 [Dedupe: tests-KRITISCH == loader-hybrid-Fund test_q2:57-136]",
+          "schwere": "KRITISCH",
+          "fix": "Drei Negativ-Fixtures als .so-Targets nach dem Muster der Alt-Fixtures (genus_module_alt_major7.cpp), die die drei neuen Statuscodes durch den ECHTEN dlopen-Ladeweg treiben: (1) Luegner-Modul — aktuelle Magic/Version, comdare_anatomy_genus liefert Sequence/Set, Factory liefert ein anderes Genus -> EXPECT status_identity_mismatch (11) + EXPECT_FALSE(handle.valid()) + Beleg destroy-vor-dlclose (Zaehler im Fixture, unter ASan); (2) Modul OHNE comdare_anatomy_gattung (mit genus) -> status_gattung_symbol_missing (9); (3) Modul OHNE comdare_anatomy_genus (mit gattung) -> status_genus_symbol_missing (10). In test_q2 als eigenen TEST registrieren. Ohne diese Koeder bliebe ein invertierter/toter Riegel bei allen 503 Tests gruen (K13)."
+        },
+        {
+          "stelle": "libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:179-198 + libs/cache_engine/anatomy/anatomy_base.hpp:206 [Dedupe/MERGE: loader-hybrid-Fund + pod-makros-Fund — am Objekt verifiziert KOMPLEMENTAER, nicht redundant]",
+          "schwere": "ERNST",
+          "fix": "Nach cpp:180, VOR pfn_create, ZWEI Wertklassen fail-closed abweisen — eine allein genuegt NICHT (verifiziert: gattung_of Z.206 defaultet unbekannte Bytes still auf Container, also ist_abi_sichtbares_genus(250)==true; und genus_bekannt(5)==true): (a) constexpr bool genus_bekannt(std::uint8_t) neben gattung_of in anatomy_base.hpp (switch ueber die 6 Enum-Werte, default false) — weist jedes Nicht-Enum-Byte (z.B. 250) ab; (b) hybrid::ist_abi_sichtbares_genus(modul_genus) (heuristik_adapter_klassifikation.hpp:210; Richtung builder/->hybrid/ hat Praezedenz genus_build_admission.hpp:53) — weist die verbotene 5 (FunctionInterfaceReroute, 'NIE von genus()') ab. Bei Verstoss native_unload + status_identity_mismatch oder eigener Code 12 status_genus_not_abi_visible mit status_name-Zeile. Container-Fallthrough anatomy_base.hpp:206 als reine -Wreturn-type-Beruhigung kommentieren, die nie ABI-Antwortquelle sein darf. Negativ-Fixtures fuer BEIDE Wertklassen an den KRITISCH-Fixture-Bau andocken."
+        },
+        {
+          "stelle": "tests/unit/test_q2_identitaets_riegel.cpp:101-114 + anatomy_module_loader.cpp:159-164",
+          "schwere": "ERNST",
+          "fix": "Dritte Alt-Fixture genus_module_alt_magic_ohne_symbole.cpp: Alt-Magic (.A7.-Muster), NUR die vier alten Symbole, KEINE Identitaets-Symbole; Erwartung status_magic_mismatch (nicht gattung_symbol_missing). Pinnt die dokumentierte Loader-Reihenfolge (Identitaets-Symbole erst NACH Magic/Version) und deckt den benannten Realfall Modul-gegen-alte-ABI wirklich."
+        },
+        {
+          "stelle": "libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:258-264 [KOPPLUNG: zwingend im SELBEN Zug wie der test_hy_f8_reroute-Fix, sonst roter Zwischenstand — der Test bindet heute real (slot, nullptr, &ziel), verifiziert Z.129]",
+          "schwere": "ERNST",
+          "fix": "Am Kopf von ziel_binden: if ((antrieb == nullptr) != (basis == nullptr)) return <neuer hybrid_status_bindung_inkonsistent>; und if (basis != nullptr && basis->genus() != ZielGenus) return hybrid_status_kein_zielfaehiges_genus; erst danach docks_.antrieb_binden. Erzwingt die dokumentierte Null-PAARUNG ('nullptr in BEIDEN heisst geloest') und verhindert, dass ein Fremd-Genus-Adapter die Loader-Riegel-Garantie am gebundenen Proxy nachtraeglich entwertet. Beide Ablehnungen in test_hy_f8_reroute pinnen."
+        },
+        {
+          "stelle": "tests/unit/test_hy_f8_reroute.cpp:125-141 (Kern: Z.129, 133, 134) [KOPPLUNG mit dem ziel_binden-Fix]",
+          "schwere": "ERNST",
+          "fix": "Fixture um die Observer-Flaeche erweitern (PlainZiel zusaetzlich IObservableTier erben lassen oder Mini-Observable danebenstellen), dann ziel_binden(slot, &obs, &ziel) — der Koeder laeuft heute am Dock VORBEI (Antrieb=nullptr gebunden, Roundtrip ueber lokalen Stack-Zeiger). Vor dem Loesen EXPECT_EQ(proxy.antrieb(slot), &obs), nach dem Loesen EXPECT_EQ(..., nullptr) — erst damit misst Z.182 einen Uebergang. Toten ASSERT_NE(antrieb, nullptr) Z.134 streichen; Dateikopf Z.5 und Meldungstexte 'durch das Dock' auf die echte Flaeche ziehen."
+        },
+        {
+          "stelle": "libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:279-280 (Zulaessigkeit :190-192)",
+          "schwere": "ERNST",
+          "fix": "Fuer den F8-Schnitt ehrlich static_assert(MaxDocks == 1, \"Mehr-Dock-Delegation ist nicht definiert\") setzen (empfohlen, minimal) — oder ziel_ an seinen Slot koppeln (Member ziel_slot_, beim Loesen nur nullen wenn Traeger-Slot, Zweitbindung ablehnen). Heute traegt EIN ziel_-Feld die gesamte Delegation bei zugelassenem MaxDocks bis 32: last-bind-wins und Komplett-Nullung beim Loesen EINES Slots waeren still falsch."
+        },
+        {
+          "stelle": "tests/unit/test_hy_f8_reroute.cpp:254-259",
+          "schwere": "ERNST",
+          "fix": "else-Zweig ergaenzen: EXPECT_EQ(proxy, nullptr) << f.etikett << ': die Set-.so darf NICHT als SearchAlgorithm-Proxy casten (final-Cast ueber die dlopen-Grenze)'. Misst die Rest-Hazard-Zelle des R1/ENABLE_EXPORTS-Umbaus (Cast, der NICHT treffen darf) statt sie nur auszufuehren; deterministisch unter gcc und clang, -O0 wie -O2."
+        },
+        {
+          "stelle": "tests/unit/test_q2_identitaets_riegel.cpp:92-94",
+          "schwere": "ERNST",
+          "fix": "Selbstvergleichs-Tautologie aufloesen: Fixture-Tabelle um unabhaengige Spalte cea::AnatomyGattung erwartete_gattung erweitern (Map fuer Hybrid-Search, Container fuer set/sequence/view/adapter/hybrid-set) und hart pruefen EXPECT_EQ(cea::gattung_of(anatomie->genus()), f.erwartete_gattung) — bindet gattung_of an ein Literal statt an sich selbst."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:1231",
+          "schwere": "ERNST",
+          "fix": "Vor der Ziffern-Schleife von komposit_key_text Bereichs-Wurf: if (stufen_id > 10^kAnatomyFingerprintKompositKeyMax - 1) throw std::invalid_argument{\"B-5a/V-02R: stufen_id sprengt kAnatomyFingerprintKompositKeyMax (8 Dezimalstellen) ...\"} — Grenze aus KeyMax GERECHNET, nicht als nackte Zahl. Beseitigt die stille Modulo-10^8-Trunkierung (100000001 und 200000001 -> identischer Key-Text = Duplikat-Keys trotz gruener Streng-Aufsteigend-Wache); CT = Compile-Fehler, RT = benannte Fehlerklasse."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:1265",
+          "schwere": "ERNST",
+          "fix": "Am Anfang von hybrid_komposit_map_bilden: if (beitraege.size() > kAnatomyFingerprintKompositDockDeckel) throw std::invalid_argument{\"B-5a/V-02R: mehr Dock-Beitraege als der Deckel (32) ...\"} — damit ist die dritte SOLL-Wache gebaut (der 2368-Puffer deckt das nicht: 34 zweistellige Keys = 2311 Byte passen) und die Faktor-Herleitung des Budgets am Code erzwungen."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:811",
+          "schwere": "ERNST",
+          "fix": "constexpr-Pruefer komposit_glied_ist_grammatisch(std::string_view) bauen (leer -> true; sonst je Segment: Key 1-8 Ziffern ohne fuehrende Null ausser '0', '=', exakt 64 Kleinhex, ';'-getrennt, Keys streng aufsteigend) und an Z.811 ZUSAETZLICH asserten — heute prueft die Wache weniger als ihr Meldungstext verspricht, und '1=x;2=y' ist als Ein- und Zwei-Segment-Map byte-identisch (Digest-Kollision zweier Kompositionen = falscher Skip). KompositMapGlied-Positions-Probe Z.1047 entweder unveraendert lassen oder auf gueltige Map ('1='+64hex) umstellen und die Grammatik in den Konstruktor ziehen (deckt dann auch den kuenftigen HY-A2-Laufzeitpfad)."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:513",
+          "schwere": "ERNST",
+          "fix": "Im KompositMapGlied-Konstruktor Laengen-Wache: if (v.size() > kAnatomyFingerprintKompositMax) throw std::invalid_argument{\"fehlerklasse=stempel_injektivitaet: Komposit-Glied sprengt sein Budget (2368) ...\"} — 1 Zeile, deckt CT und RT (Laufzeit-Weg waechst heute unbegrenzt, die Zusage Z.67-68 ist am Parameter-Eingang unwahr); Probe \"KM\" bleibt gueltig. Dieselbe Haertung optional fuer die vier Nachbar-Traeger."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:443-446",
+          "schwere": "ERNST",
+          "fix": "In :446 die zwei fehlenden Argumente ', detail::FeldZgr, detail::FeldU64' (name_line/name_len) anhaengen, sodass kVersionLinesNimmt 20 Typ-Argumente prueft (heute 18 — das im selben Bruch appendierte name-Paar fehlt, ein Typwechsel an name_line/name_len durchliefe die Wache still); Kommentar :435 von '18 Argumente' auf '20 Argumente' nachziehen."
+        },
+        {
+          "stelle": "tests/unit/test_m_w12_stamp_bausteine.cpp:703-705",
+          "schwere": "ERNST",
+          "fix": "Nach :704 zwei Offset-Pins ergaenzen: EXPECT_EQ(offsetof(AnatomyVersionLines, name_line), 136u); EXPECT_EQ(offsetof(AnatomyVersionLines, name_len), 144u); Kommentar 'E-A/B-6 + V-05R: die name-Haelfte des Appends' — die Tafel ist laut eigener Deklaration die einzige Wache gegen Tausch gleichtypiger Felder, und genau die zwei neuen Bruch-Felder sind ungedeckt."
+        },
+        {
+          "stelle": "libs/cache_engine/profile_facade/validate_profile.hpp:1156 (+ merge_plan.hpp:78, sota_catalog.hpp:237-239)",
+          "schwere": "ERNST",
+          "fix": "Wache am Eingang analog V-a: nach Z.1155 Gate if (ax.merge_mode == \"merge\") { r.ok=false; Fehlertext 'Verbund2_Hybrid ist nicht materialisiert (kein PrueflingVerbundStrategy-Enum-Wert; Materialisierung deferred, merge_plan.hpp) — bis dahin replace/union verwenden'; } — ODER mindestens fail-loud in render_directive_merge_module_source (d.strategy gegen die drei materialisierten Enum-Namen, bei Fremd-String throw mit Deferred-Hinweis). Heute faellt merge=\"merge\" am slot-hinterlegten Paar erst im NACHGELAGERTEN Bau des emittierten .cpp mit kryptischem Namensfehler (fail-late). Beim spaeteren Materialisieren: Enum-Wert + MergeImpl-Spezialisierung + Wachen-Rueckbau in EINEM Zug."
+        },
+        {
+          "stelle": "libs/cache_engine/profile_facade/merge_plan.hpp:79",
+          "schwere": "ERNST",
+          "fix": "merge_mode_to_strategy fail-closed drehen: expliziter Pfad fuer \"\" und \"replace\" (-> \"Verbund2_Replace\"), danach throw std::invalid_argument fuer jedes andere Token mit Token + gueltiger Menge aus kExperimentAxisMergeModes (Array-Ableitung, keine Handliste) und Hinweis '\"fulljoin\" ist seit V-11R \"union\"'. Der Rest-Kollektor invertiert heute still die Semantik-Klasse von Alt-Token \"fulljoin\" (Union->Replace) auf dem unvalidierten Direkt-Pfad — Doktrin-Asymmetrie zum im selben Bruch fail-closed gebauten run_methodology_for_ids. Negativ-Proben \"fulljoin\" + Tippfehler in test_merge_plan_directive.cpp nachziehen."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp:76/87-90/95-97/189/193 + profile_run_entry.hpp:953-957 + experiment_run_entry.hpp:490-491 + experiment_plan_director.hpp:2287/2290/2294 + validate_profile.hpp:513 + measure_parallelism.hpp:5-7/11/37",
+          "schwere": "ERNST",
+          "fix": "Alle debug-Restbestaende in EINEM Doku-Hunk auf die 4er-Welt {build,measure,compare,release} drehen bzw. als supersediertes Zitat markieren (Doktrin des eigenen Datei-Kopfs Z.19-28); profile_run_entry.hpp:956 empfiehlt heute woertlich den WERFENDEN Fehlerpfad als Beispiel — ersetzen (z.B. 'kuenftig via --debug-CLI-Flag (S-8/W2) bzw. Zustands-Injektion resolve_measure_parallelism_of_mode'); registry Z.95-97 build-Zeile in den Tabellen-Block aufnehmen; measure_parallelism.hpp:37 um Build/Compare ergaenzen."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:1154 + :577 + :130",
+          "schwere": "ERNST",
+          "fix": "Drei stale Vor-S-6a-Ordnungs-Stellen drehen: Z.1154 (Satz DIREKT ueber anatomy_fingerprint_hex) auf '(measurement, system, organ[, Traeger...])'; Z.577 auf 'Glied [1]'; Z.130 ins Praeteritum ('trug damals als Glied [3]', Format-4-Historie) oder auf [1] umformulieren. Nicht kosmetisch: die 2-/3-arg-Makro-Ebene nimmt rohe Literale, ein vertauschter Aufruf uebersetzt — der stale Satz ist die Anleitung, nach der eine vierte Emissions-Stelle falsch gebaut wuerde."
+        },
+        {
+          "stelle": "anatomy_module_loader.hpp:9/153/185-192 + anatomy_module_loader.cpp:62/125/211 + hybrid_module_abi_v1.hpp:52 + tests/unit/hybrid_tier_module.cpp:5-8 + hybrid_tier_module_set.cpp:8 + tests/unit/CMakeLists.txt:2203 + test_hy_f8_reroute.cpp:205/209-212/218/233-234 [Dedupe/MERGE: loader-hybrid- + tests-Fund, Vereinigungsmenge der Stellen]",
+          "schwere": "ERNST",
+          "fix": "Vier-vs-Sechs-Doku ueberall auf SECHS ziehen: load()-Schrittliste hpp:185-192 um '8. comdare_anatomy_gattung resolvable, 9. comdare_anatomy_genus resolvable, 10. Identitaets-Riegel Symbol==genus() + gattung_of-Ableitung' ergaenzen; alle aktiven Vier-Zaehlstellen (hpp:9, hpp:153 'vier Ur-Pflicht + zwei Identitaets-Symbole', cpp:62, cpp:125, cpp:211, Makro-Absatz hybrid_module_abi_v1.hpp:52, beide Modulquellen-Koepfe, CMake-Kommentar Z.2203) nachziehen; Testname VierAbiPflichtSymboleAmGeladenenModul -> SechsAbiPflichtSymboleAmGeladenenModul samt Kommentar und Fehlermeldung Z.233-234; ctest-Namensreferenzen greppen und mitziehen. Historie-Absaetze (Kopf Z.18) bleiben als Historie. Wer heute nach der Doku baut, exportiert 4 Symbole und scheitert unangekuendigt mit Status 9."
+        },
+        {
+          "stelle": "scripts/lint_layer_includes.sh:40 + libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp:51-52",
+          "schwere": "ERNST",
+          "fix": "libs/cache_engine/hybrid in die ZIELE-Liste der Schicht-Wache aufnehmen (heute sofort gruen: 0 builder-Includes unter hybrid/; ALLOWLIST_SOLL bleibt 1) — dann stimmt der Kommentar, der die neue Kante builder/->hybrid/ mit einer Wache begruendet, die fuer diese Kante nicht existiert. Andernfalls Kommentar auf den Ist-Zustand korrigieren ('unbewacht, Richtungs-Doktrin nur dokumentiert'). Empfehlung: Skript erweitern (Wache statt Prosa)."
+        },
+        {
+          "stelle": "Abnahme-Nachweis am Tip 67dafa46: clang-release Vollbau + ctest (Objekt: tests/unit/CMakeLists.txt:2231 R1/ENABLE_EXPORTS)",
+          "schwere": "ERNST",
+          "fix": "VOR der Landung clang-release-Vollbau + ctest am Tip nachfahren (Pflicht ohnehin per Warnungs-Review-zweimal-Doktrin GCC->clang), Nenner 503/503 unter BEIDEN Compilern belegen und die 503-vs-502-Differenz benennen. Zwingend, weil R1 einen NUR-unter-clang-ab-O2-Fehler heilt und test_hy_f8_reroute der einzige final-Cast-Konsument ist — genau die Zelle, fuer die R1 gebaut wurde, ist am Tip ungemessen. Nach Einbau der uebrigen Fixes EINMAL am Ende fahren (gcc-Runde + Wache + Floor ebenso), nicht je Fix."
+        },
+        {
+          "stelle": "libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp:214-219 + :89-90",
+          "schwere": "HINWEIS",
+          "fix": "static_assert(!admit_gattung_build_path(cea::AnatomyGattung::HeuristikAdapter).has_value(), ...) plus Aritaets-Pins fuer FunctionInterfaceReroute (n==32 zugelassen, n==31 -> GattungsSlotAritaet) in die Cross-Pin-Sektion — der neu entstandene vierte Ebene-1-Zustand ist ungepinnt; Kommentar :89-90 'alle FUENF' auf die sechs Eintraege nachziehen."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:53-61",
+          "schwere": "HINWEIS",
+          "fix": "Alt-Beleg-Absatz als Stand-vor-#15 markieren ('(bis #15: 4096; seit S-6a: 8192, Rechnung unten)') und die 50-KB-Prosa maschinell machen: static_assert(::comdare::cache_engine::sha512::fits_compile_time_budget<kAnatomyFingerprintPreimageMax>(), \"...\") neben Z.770."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:741",
+          "schwere": "HINWEIS",
+          "fix": "'~4600' durch '4416' (32*138, oder '~4400') ersetzen — die Alternativ-Rechnung der verworfenen 128-hex-Fassung muss aus den genannten Faktoren reproduzierbar sein."
+        },
+        {
+          "stelle": "tests/unit/test_m_w12_stamp_bausteine.cpp:669 + :673",
+          "schwere": "HINWEIS",
+          "fix": "Test umbenennen AnatomyVersionLinesPodLayoutIsStableAt120 -> ...At152 (der Test pinnt seit dem Bruch 152) und :670-675 als Historie kennzeichnen bzw. '(== 6)' auf '(== 6, seit S-6a == 7)' heben; ctest-Namensreferenzen im Baum greppen und mitziehen."
+        },
+        {
+          "stelle": "libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:22",
+          "schwere": "HINWEIS",
+          "fix": "Include-Kommentar-Anker korrigieren: ':286-Block' -> ':334-Block' oder zeilenfest-frei 'siehe VL-2-Feldzahl-Block unten' (der Anker ist im selben Commit stale geboren)."
+        },
+        {
+          "stelle": "libs/cache_engine/profile_facade/merge_plan.hpp:5 + validate_profile.hpp:1137",
+          "schwere": "HINWEIS",
+          "fix": "Beide Mengen-Kommentare auf {replace,merge,union} drehen (das Array Z.705 traegt drei Tokens); in merge_plan.hpp:5 den stalen Zeilenanker durch ankerfesten Verweis ersetzen ('validate_profile.hpp, KERN-A-Abschnitt axes_default_lookup/kExperimentAxisMergeModes')."
+        },
+        {
+          "stelle": "libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp:46",
+          "schwere": "HINWEIS",
+          "fix": "Vor der Multiplikation Bereichs-Gate: if (v > (std::numeric_limits<std::size_t>::max() - 9) / 10) { digit = false; break; } — Wrap-Eingaben (>=21 Ziffern) fallen wie andere unparsebare Werte auf den nproc-Default; (2s)-Probe mit 21-stelligem Env nachziehen. Vorbestehend+dormant (nur via _of_mode-Injektion erreichbar), aber der Zweig ist fuer die S-8/W2-Wieder-Inbetriebnahme vorgehalten."
+        },
+        {
+          "stelle": "tests/unit/thesis_tiere/test_validate_profile.cpp:609 (TEST (d))",
+          "schwere": "HINWEIS",
+          "fix": "Eine Zeile nach Z.609: ASSERT_FALSE(known.empty()) << 'load_profiles/ nicht gefunden — workloads-Pruefung liefe als stiller Skip'; — (d) bekommt einen eigenen Anker statt sich auf (e) im selben Binary zu verlassen."
+        },
+        {
+          "stelle": "libs/cache_engine/hybrid/heuristik_adapter_klassifikation.hpp:28",
+          "schwere": "HINWEIS",
+          "fix": "Historienblock in die Vergangenheitsform ziehen und nachfuehren: 'pruefte damals ...size() == 5 (seit HY-A3: 6, static_assert heute genus_build_admission.hpp:187, Reroute-Eintrag aus der Hybrid-Bindung)' — Wert und Zeilennummer sind beide stale."
+        }
+      ],
+      "begruendung": "Alle fuenf Flaechen-Verdikte konvergieren unabhaengig auf LANDBAR_MIT_FIXES — konsistent, und die Synthese bestaetigt das: Kein Fund stellt die Substanz des Bruchs in Frage (Layout 6->7, Format 4->5, GliedCount 9->10, S-6a-Ordnung an Signatur+CT-Beweis, 6 Pflicht-Symbole+Riegel implementiert, POD 152/20, Budget-8192-Faktorrechnung, HY-A2/HY-A3, work_mode-4er-Welt, V-11R — von allen Flaechen als richtig gebaut befunden), die Abnahme-Basis ist gruen (gcc 503/503, Wache, Floor 503/499/497, TABU-CRC 0x56F1B721C72DC10E unbewegt), und alle Fixes sind lokal geschnitten und im ungelandeten Zweig billig. NICHT_LANDBAR waere unbegruendet. LANDBAR ohne Fixes verbietet sich aus drei Gruenden: (1) Der eine KRITISCH-Fund — der namensgebende Identitaets-Riegel wird von keinem Test AUSGELOEST, ein invertierter Riegel bliebe 503/503 gruen — verletzt K13 direkt am Kern des Auftrags ('Riegel Symbol==genus()'); er ist eine Beweis-Luecke, kein nachgewiesener Produktionsdefekt, darum mit Fixes landbar. (2) Zwei echte Wachen-Luecken an der Vertrauensgrenze bzw. Injektivitaet: der Loader akzeptiert konsistente Luegen ungueltiger Genus-Werte (am Objekt verifiziert: gattung_of:206 defaultet unbekannte Bytes still auf Container — darum sind die zwei Flaechen-Fixes KOMPLEMENTAER und wurden zu EINEM Doppel-Check vereinigt, ist_abi_sichtbares_genus allein liesse 250 durch, genus_bekannt allein liesse 5 durch), und drei Komposit-Stempel-Stellen (stufen_id-Trunkierung, fehlender Dock-Deckel, Define-Grammatik-Ambiguitaet) erlauben still Duplikat-Keys bzw. Digest-Kollisionen = die Fehlerklasse falscher Skip, die das Glied schliessen soll. (3) Owner-Doktrin 'LUECKE = BEHEBUNG IST IMMER PFLICHT' — auch die 9 HINWEISe sind gelistet, alle billig. Deduplikation: 33 Eingangs-Findings -> 30 eindeutige Fixe (3 echte Duplikate verschmolzen: Riegel-Koeder tests-KRITISCH==loader-ERNST, KRITISCH gewinnt; Loader-Genus-Wache als komplementaeres Paar vereinigt; Vier-vs-Sechs-Doku als eine Vereinigungsmenge). Zwei harte Kopplungen fuer die A2.5-Stufe: ziel_binden-Wachen und test_hy_f8_reroute-Umbau MUESSEN im selben Zug landen (der Test bindet heute real (slot, nullptr, &ziel), Z.129 verifiziert — die neue Paarungs-Wache allein macht ihn rot); die Loader-Wache dockt ihre Negativ-Fixtures an den KRITISCH-Fixture-Bau an. Der deklarierte Rest 'clang-Zelle nach letzter Runde nicht wiederholt' ist redlich benannt, wird aber durch den R1-Befund zur Lande-PFLICHT aufgewertet: ENABLE_EXPORTS heilt einen NUR-clang-ab-O2-Fehler, test_hy_f8_reroute ist der einzige final-Cast-Konsument — genau die Zelle, fuer die der Fix gebaut wurde, ist am Tip ungemessen, und die 503-vs-502-Nenner-Differenz ist unaufgeklaert; die Warnungs-Review-zweimal-Doktrin verlangt den clang-Lauf ohnehin. Ablauf A2.5: KRITISCH+ERNST-Fixes (mit den zwei Kopplungen) einbauen, HINWEISe im selben Zug, danach EINMAL gcc-Vollbau+ctest+Wache+Floor und clang-release-Vollbau+ctest am neuen Tip, 503/503 beidseitig belegen, TABU-CRC erneut quittieren — dann landen (Lock-Regen als Lande-Schritt wie deklariert).",
+      "entlastet": [
+        "clang-debug-PIE: vorbestehend, nicht von diesem Bruch verursacht — deklariert, kein Lande-Blocker",
+        "Lock-Regen: per Definition Teil des Lande-Schritts, kein Review-Gegenstand",
+        "Stempel-Pflicht: golden-Folgezug NACH der Landung, deklariert — kein Blocker dieses Bruchs",
+        "TABU-CRC 0x56F1B721C72DC10E unbewegt: Messdaten-Riegel haelt, keine Flaeche meldet einen Riss",
+        "Kern-Substanz des Bruchs (Layout 7 / Format 5 / GliedCount 10, S-6a-Signatur+CT-Beweis [1], 6-Symbol-ABI mit Riegel-Implementierung, POD 152/20-Append, Budget-8192-Faktorrechnung, HY-A3-Gate 6, work_mode-4er-Welt, V-11R-Wache Z.1156-1163, Compose-Bausteine): von allen fuenf Flaechen ohne Substanz-Defekt befunden — die Funde betreffen Wachen-, Test- und Doku-Naehte, nicht die Architektur",
+        "test_validate_profile (d): prozessual bereits gedeckt — ASSERT_FALSE(known.empty()) liegt in (e) im selben Binary/ctest-Eintrag, der Job wuerde rot; nur (d)s eigene Diagnose-Schaerfe fehlt (darum nur HINWEIS)",
+        "measure_parallelism-Overflow: vorbestehend und im Diff bewusst byte-identisch belassen (Zusicherung hielt), ueber den Token-Weg unerreichbar — dormant; Fix trotzdem gelistet, weil der Zweig fuer S-8/W2 vorgehalten wird",
+        "Delegations- und Umschalt-Proben in test_hy_f8_reroute (engine_name/lifecycle ueber ziel_): echt und beissend — blind ist nur der Dock-Zeigerpfad",
+        "Dauerkoeder (b) und Mengen-Bindung (c) in test_validate_profile: echt und beissend (V-11R-K13 vorbildlich umgesetzt)"
+      ]
+    },
+    "flaechen_verdikte": [
+      {
+        "flaeche": "loader-hybrid",
+        "verdikt": "LANDBAR_MIT_FIXES"
+      },
+      {
+        "flaeche": "fingerprint-name",
+        "verdikt": "LANDBAR_MIT_FIXES"
+      },
+      {
+        "flaeche": "pod-makros-gates",
+        "verdikt": "LANDBAR_MIT_FIXES"
+      },
+      {
+        "flaeche": "semantik-kern",
+        "verdikt": "LANDBAR_MIT_FIXES"
+      },
+      {
+        "flaeche": "tests",
+        "verdikt": "LANDBAR_MIT_FIXES"
+      }
+    ],
+    "findings_gesamt": 33,
+    "kritisch": 1,
+    "ernst": 23
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Erheben"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Bewerten"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "erheb:loader-hybrid",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "afff995aefd7095c0",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231244,
+      "lastProgressAt": 1787064231244,
+      "cached": true,
+      "resultPreview": "{\"erhebung\":[{\"stelle\":\"libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:75-76\",\"was\":\"Definiert PfnGattung/PfnGenus als std::uint8_t(*)() im anonymen Namespace; Kommentar: ueber die C-ABI-Grenze reist der uint8-Enum-WERT, nicht der Enum-Typ.\",\"zustand\":\"Symbol-Aufrufe liefern rohe uint8-Werte; jede Byte-Belegung (auch ausserhalb der Enum-Wertebereiche 0..5 bzw. 0..3) ist …",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "erheb:fingerprint-name",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a5dea94d3bdb023d1",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231244,
+      "lastProgressAt": 1787064231244,
+      "cached": true,
+      "resultPreview": "{\"erhebung\":[{\"stelle\":\"libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:92\",\"was\":\"kAnatomyFingerprintPreimageMax von 4096 auf 8192 gesetzt; Beleg-Absatz Z.72-91 nennt Summe 6057, Luft 2135, Faktor-6-Unterschreitung des sha512-Budgets 50*1024\",\"zustand\":\"8192-6057=2135 rechnerisch korrekt; 51200/8192=6.25 (ctsha512.hpp:164-166 bestaetigt die 50*1024-Konstante); fits_compile_time…",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "erheb:pod-makros-gates",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a26171de4219d7587",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231244,
+      "lastProgressAt": 1787064231244,
+      "cached": true,
+      "resultPreview": "{\"erhebung\":[{\"stelle\":\"libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:203-282\",\"was\":\"struct AnatomyVersionLines: 20 Felder in der Folge stamp_layout_version(u32):203, reserved(u32):204, measurement_line/len:218-219, system_line/len:220-221, organ_line/len:222-223, sha512_line/len:233-234, measurement_entries/count:245-246, system_entries/count:252-253, organ_entries/co…",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "erheb:semantik-kern",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a27615055c6fed8fa",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231244,
+      "lastProgressAt": 1787064231244,
+      "cached": true,
+      "resultPreview": "{\"erhebung\":[{\"stelle\":\"libs/cache_engine/include/cache_engine/measurement/run_methodology_registry.hpp:64-69\",\"was\":\"enum class WorkMode : uint8_t mit EXPLIZITEN Ordinalen Build=0, Measure=1, Compare=2, Release=3 (ersetzt RunMethodology {Debug,Measure,Release,Compare} mit impliziten Ordinalen 0..3).\",\"zustand\":\"Ordinal-Zellen: Build besetzt das frei gewordene Debug-Ordinal 0; Release wandert 2->3…",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "erheb:tests",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a10105cdaef60f1e5",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231244,
+      "lastProgressAt": 1787064231244,
+      "cached": true,
+      "resultPreview": "{\"erhebung\":[{\"stelle\":\"tests/unit/hybrid_tier_module.cpp:27-29\",\"was\":\"Neue Modulquelle: inkludiert hybrid/hybrid_module_abi_v1.hpp und ruft COMDARE_DEFINE_HYBRID_MODULE(AnatomyGenus::SearchAlgorithm). Der Dateikommentar (Z.11-13) spricht von VIER extern-C-ABI-Pflicht-Symbolen; das gerufene Makro materialisiert sechs (s. hybrid_module_abi_v1.hpp:70-105). Kommentar Z.22-25: die Factory bindet KEIN…",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "bewert:loader-hybrid",
+      "phaseIndex": 2,
+      "phaseTitle": "Bewerten",
+      "agentId": "ab05b205b5462a05c",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064231250,
+      "queuedAt": 1787064231245,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787064755786,
+      "tokens": 199910,
+      "toolCalls": 19,
+      "durationMs": 524536,
+      "resultPreview": "{\"findings\":[{\"stelle\":\"libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:179-198 (+ anatomy_base.hpp:206)\",\"schwere\":\"ERNST\",\"befund\":\"Der Konsistenz-Riegel prueft nur KONSISTENZ, nie GUELTIGKEIT des Genus-Werts: ein handgeschriebenes Modul, dessen genus-Symbol 5 (FunctionInterfaceReroute) liefert, dessen gattung-Symbol 3 (== gattung_of(5)) und dessen Instanz genus()==5 me…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "bewert:fingerprint-name",
+      "phaseIndex": 2,
+      "phaseTitle": "Bewerten",
+      "agentId": "a77dbbb88eb5a331f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787064755788,
+      "queuedAt": 1787064755787,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787065402118,
+      "tokens": 188026,
+      "toolCalls": 18,
+      "durationMs": 646330,
+      "resultPreview": "{\"findings\":[{\"stelle\":\"libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:1231\",\"schwere\":\"ERNST\",\"befund\":\"komposit_key_text trunkiert stufen_id >= 10^8 STILL auf modulo 10^8: die Ziffern-Schleife bricht bei n == kAnatomyFingerprintKompositKeyMax (8) ab und verwirft rest > 0 ohne Wurf. Ausgabe traegt dann fuehrende Nullen (100000001 -> '00000001') und kollidiert (100000001 und 20…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "bewert:pod-makros-gates",
+      "phaseIndex": 2,
+      "phaseTitle": "Bewerten",
+      "agentId": "a0838672d04ec1ebc",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787065402120,
+      "queuedAt": 1787065402119,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787066084383,
+      "tokens": 183618,
+      "toolCalls": 25,
+      "durationMs": 682263,
+      "resultPreview": "{\"findings\":[{\"stelle\":\"libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:443-446\",\"schwere\":\"ERNST\",\"befund\":\"Die Typ-Folge-Wache kVersionLinesNimmt prueft nur 18 Typ-Argumente (2x FeldU32, 4x {FeldZgr,FeldU64}, 3x {FeldEintr,FeldU64}, 1x {FeldZgr,FeldU64} — endet bei komposit_len), waehrend die Struct 20 Felder hat; die Fehlermeldung :447 behauptet 'nimmt seine 20 Felder …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "bewert:semantik-kern",
+      "phaseIndex": 2,
+      "phaseTitle": "Bewerten",
+      "agentId": "ab737a5d03e6b9024",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787066084385,
+      "queuedAt": 1787066084384,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787066639058,
+      "tokens": 169295,
+      "toolCalls": 28,
+      "durationMs": 554673,
+      "resultPreview": "{\"findings\":[{\"stelle\":\"libs/cache_engine/profile_facade/validate_profile.hpp:1156 (+ merge_plan.hpp:78, sota_catalog.hpp:237-239)\",\"schwere\":\"ERNST\",\"befund\":\"Der Validator akzeptiert merge=\\\"merge\\\" (kExperimentAxisMergeModes:705) ohne jedes Materialisierungs-Gate, obwohl die projizierte Strategie \\\"Verbund2_Hybrid\\\" keinen Enum-Wert traegt (PrueflingVerbundStrategy pruefling_merge.hpp:144-148 h…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "bewert:tests",
+      "phaseIndex": 2,
+      "phaseTitle": "Bewerten",
+      "agentId": "aa6f1fbd86ba72e7a",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787066639060,
+      "queuedAt": 1787066639059,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787067241602,
+      "tokens": 170390,
+      "toolCalls": 20,
+      "durationMs": 602542,
+      "resultPreview": "{\"findings\":[{\"stelle\":\"tests/unit/test_q2_identitaets_riegel.cpp:127-136 (+ libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:169-207)\",\"schwere\":\"KRITISCH\",\"befund\":\"Der namensgebende Identitaets-Riegel wird von keinem Test AUSGELOEST. Sauberer Grep ueber tests/ (ohne die /builder/-Falle): die einzigen Vorkommen von status_gattung_symbol_missing/status_genus_symbol_missin…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "synthese",
+      "phaseIndex": 3,
+      "phaseTitle": "Synthese",
+      "agentId": "a072a3583c80da6ab",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787067241612,
+      "queuedAt": 1787067241603,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDBAR_MIT_FIXES",
+      "promptPreview": "Code-Review des ungelandeten #15-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Worktree /home/comdare/wt-ce-bump15 (Branch bau/bump15-preimage-bruch, 25 Commits auf development=20c111c4, Tip 67dafa46). Der Bruch: Layout 6->7, Format 4->5, GliedCount 9->10 (Hybrid-Komposit-Map, leer==Identitaet), Budget 8192, S-6a-Ordnung MESS,SYSTEM,ORGAN, 6 ABI-Pflicht-Symbole (+comdare_anatomy_gattung/genus nach Ma…",
+      "lastProgressAt": 1787067629634,
+      "tokens": 69341,
+      "toolCalls": 6,
+      "durationMs": 388022,
+      "resultPreview": "{\"gesamt_verdikt\":\"LANDBAR_MIT_FIXES\",\"fix_liste\":[{\"stelle\":\"tests/unit/test_q2_identitaets_riegel.cpp:127-136 + libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:169-207 [Dedupe: tests-KRITISCH == loader-hybrid-Fund test_q2:57-136]\",\"schwere\":\"KRITISCH\",\"fix\":\"Drei Negativ-Fixtures als .so-Targets nach dem Muster der Alt-Fixtures (genus_module_alt_major7.cpp), die die dre…"
+    }
+  ],
+  "totalTokens": 980580,
+  "totalToolCalls": 116
+}

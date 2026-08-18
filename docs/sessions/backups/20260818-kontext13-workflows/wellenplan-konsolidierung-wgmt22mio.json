@@ -1,0 +1,152 @@
+{
+  "summary": "Kontext-13-Ertrag in den Wellenplan konsolidieren: par.21-Nachtrag + Marker an allen ueberholten Stellen (Wellenplan+Designplan), Wiederaufnahme-Register + alle neuen Aufgaben eingeordnet",
+  "agentCount": 4,
+  "logs": [
+    "Posten-Karte: 42 Posten",
+    "Stellen-Karte: 25 Marker-Ziele"
+  ],
+  "result": {
+    "posten": 42,
+    "marker_ziele": 25,
+    "schreiber": {
+      "par21_unterpunkte": [
+        "21.0 BETRIEBSREGEL (Owner 18.08.): NIE AUSBUCHEN/VERSCHIEBEN + BELEG-TAFEL + PROZESS-ERTRAEGE (4 Posten: Betriebsregel verbatim-Kern; Beleg-Tafel der 8 stillen Kuerzungen + 2 Prozess-Faelle; Codex/bwrap-Plan-B; sequentieller Audit-Umbau + Vollzaehligkeits-Gates)",
+        "21.1 #15-FIX-STAND (FIX-KOMPLETT, UNGELANDET) + LANDE-KETTE + super-ZUG/KON119 + FOLGEZUEGE (4 Posten: e285d316-Stand mit Abnahme-Zahlen; Lande-Kette Schritte 1-4 inkl. Lock-Regen-Drift-Protokoll; super-Zug atomar mit XSD-Patch/PZW/KON119; Bauplan-Folgezuege B-7/B-10/B-8/N-1..N-6/VL-5/VL-6/KORB-A-12)",
+        "21.2 W1-LUECKEN: g2 UNGELANDET (KRITISCH) + B3 OHNE BAU-SPUR (ERNST) + W1-AUDIT #93 (3 Posten; merge-base-Beweis 1528f6fd, Owner-Datum B3, 8 Pruefgruppen + Frist-Dreiteilung)",
+        "21.3 WIEDERAUFNAHME-PLATZIERUNGEN (Register Teil B): JEDER VERTAGTE POSTEN MIT NEUEM PLATZ (9 Posten: Band B/W1 62h; Band-B-Rest ~104,5h; Band C 13h teils UEBERHOLT; ##40-Restbau; HY-Vollausbau; 14 W7-Posten + P/E-Core + IO + par.75-Pass + RaR + PV-1; Rutsch-Klasse aufgehoben; ##31/D1c-Vollformen; Kapazitaets-Ehrlichkeit >200h)",
+        "21.4 NEUE TASKS #94-#98 + B-5f-TRAEGER-LUECKE (6 Posten: #94 Abi7-Kapselung; #95 V-08R-Rest; #96 Wiederaufnahme-Vollzug; #97 C-13/C-14; #98 F-07b + par.5-Arithmetik-Korrektur; B-5f-Traeger-Luecke ausgewiesen und per neu angelegtem Task #99 geschlossen)",
+        "21.5 VERDACHTSFAELLE (Aufloesung via Audit/#93) + LANDE-VORBEDINGUNGS-KETTE (6 Posten: golden-Nachposten seg1-44; V-06 Lesart A; B1; A1-Durchzug 9-vs-18; 23 Band-A-Testposten; Audit-Ruecklauf wf_794b904b -> Fix-Strecke 2 -> #93 -> Landung)",
+        "21.6 OWNER-ZEILEN-TAFEL (Kategorie C) + OFFENE RESTE + F2-VORLAGEN-FENSTER (10 Posten: OV-4; OV-5(b) UEBERHOLT AM OBJEKT; OV-14; Monolith-Split W7/#88; Resttafel OV-2/KON29-01; clang-debug-PIE; Format-Anomalie 122-vs-120; decl.hpp:797; C-3a Frist Mi 19.08.; F2-Owner-Vorlagen-Fenster Punkte 1-6)"
+      ],
+      "marker_gesetzt": 33,
+      "dateien": [
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md"
+      ],
+      "notizen": [
+        "MARKER-BILANZ: 28 im Wellenplan + 5 im Designplan = 33. Wellenplan: Kopf (KON119-Reservierung), par.0-Z.35-Preis-Satz, par.3-W3 ([lok]), par.3-W7-Behaelter, par.5 (Defizit-Arithmetik), par.6 (##31-Rueckfallstufe), 6x nach der par.7-Streichliste (##40 / HY-Vollausbau / Aufraeumpass / ##24+##15-EMITTER / ##31+D1c / Streichkaskade), Kurzfassung Zeile 9, par.11.5, par.12.4, par.12.5, par.12.7, par.13.3, par.13.6, par.14 (volles-Risiko-Praezedenz), par.14.6, par.18.3 (#15-Task-Eintrag), par.18.5, par.18.6, par.19.1, par.19.3, par.20.1, par.20.3. Designplan: par.4-W1 (Z.87), par.4-W7 (Z.99), par.7 (Z.113/114), D-2-Marker Abschnitt 8 (Z.127), D-2-Zeile Abschnitt 10 (Z.591).",
+        "STELLEN-KARTE-TRUNKIERUNG: im Auftragstext waren nur 23 der 25 Eintraege sichtbar (Abbruch mitten im Designplan-par.7-Eintrag). Die 2 fehlenden wurden aus der Posten-Karte rekonstruiert (Posten 21.3-band-b-w1: 'Marker neben dem D-2-Streichungs-Marker') als die beiden Designplan-D-2-Orte (Abschnitt 8 Z.127 + Abschnitt 10 Z.591) -- passt zur aufsteigenden Zeilen-Ordnung der Karte. Der abgeschnittene marker_text_kern des par.7-Eintrags wurde konsistent mit dessen grund-Feld vervollstaendigt ('-> W3-Batch-Pausen [lok] + W4/W4-Fangnetz').",
+        "TABELLEN-SCHUTZ: Blockquote-Marker koennen nicht IN Markdown-Tabellenzeilen stehen, ohne die Tabelle zu brechen; die 6 par.7-Zeilen-Marker stehen deshalb als benannte Einzel-Blockquotes ('*(##40-Zeile)*' usw.) direkt NACH der Tabelle -- exakt der im Dokument etablierte KON39/KON59-Praezedenz-Stil (Z.984/986 alt). Gleiches Verfahren fuer par.12.4, par.14.6, par.18.3 (#15-Zeile) und die Code-Bloecke par.13.6/par.18.6 (Marker nach Blockende, nie im Block).",
+        "120-SPALTEN-REGEL: der vorgegebene par.21-Titel war mit ASCII-'--' 125 Zeichen; er wurde ohne Textverlust auf ZWEI '#'-Zeilen gesplittet -- exakt der hauseigene Praezedenzfall par.20.10 (dort ebenfalls zweizeiliger Header). Em-Dash des Auftragstitels per ASCII-Order als '--' gesetzt.",
+        "HYGIENE-BEWEIS (diff gegen Vorher-Kopien /tmp/wp_base.md + /tmp/dp_base.md, liegen fuer den Lead-Verify bereit): Wellenplan 0 geloescht/geaendert, 409 Zeilen zugefuegt; Designplan 0 geloescht/geaendert, 24 zugefuegt; 0 neue Zeilen >120 Spalten, 0 Nicht-ASCII in neuen Zeilen. Vollzaehligkeits-Gegenprobe: 72 Pruef-Token (decken alle 42 Posten der Karte) alle in par.21 gefunden ('ALLE PRUEF-TOKEN VORHANDEN').",
+        "QUELLEN-PFADE im par.21-Kopf-Blockquote aufgeloest: Regressionen-Register = docs/sessions/20260818-SESSION-REGRESSIONEN-bump15-codex-audit-review.md, Wiederaufnahme-Register = docs/sessions/20260818-SESSION-WIEDERAUFNAHME-REGISTER-nie-ausbuchen-alle-features.md, Uebergabe Kontext 13 = docs/sessions/20260818-SESSION-UEBERGABE-kontext13-bump15-bruch-fertig-audit-laeuft.md.",
+        "B-5f-TRAEGER ANGELEGT: Board-Task #99 ('B-5f Tooling-Ordnungs-Validierung wallclock/macro/micro an allen drei Stellen, KON106-02/NP-18, W2/Di-25.-Schnitt') erstellt und in par.21.4 namentlich gefuehrt -- die ausgewiesene Traeger-Luecke ist damit geschlossen, kein stiller Bau.",
+        "KEIN COMMIT (Order): beide Dateien stehen als 'M' im Arbeitsbaum, HEAD 0f569c8b unbewegt -- der Lead committet nach Verify. K16-Schreiberrolle eingehalten: nur diese zwei Dateien beruehrt."
+      ]
+    },
+    "verify": {
+      "urteil": "VOLLSTAENDIG",
+      "fehlend": [],
+      "funde": [
+        "EVIDENZ (a): 42/42 Posten der ungededupten Karte in par.21 gefunden -- 21.0=4/4, 21.1=4/4, 21.2=3/3, 21.3=9/9, 21.4=6/6 (B-5f mit neu angelegtem Traeger Task #99), 21.5=6/6, 21.6=10/10; keine Luecke.",
+        "EVIDENZ (b): 25/25 Marker an ihren Stellen -- 20 Wellenplan (par.0 @-36, par.3-W7 @-754, par.5 @-920, par.6 @-941, par.7 sechsfach mit *(Zeile)*-Referenz im etablierten KON59-Fussnoten-Stil @-987, Kurzfassung-Z.9 @-1070, par.11.5 @-1162, par.12.4 @-1243, par.12.5 @-1273, par.12.7 @-1312, par.13.3 @-1458, par.13.6 @-1547, par.14.6 @-1763, par.18.5 @-2171, par.18.6 @-2185) + 5 Designplan (par.4-W1 @-88, par.4-W7 @-100, par.7 @-114, par.8 @-128, par.10 @-591).",
+        "EVIDENZ (b, additiv): 8 ZUSAETZLICHE Marker ueber die Stellen-Karte hinaus, alle in par.21 selbst angekuendigt ('Marker ... gesetzt'): Wellenplan-Kopf/KON119, par.3-W3 [lok], par.14-Intro, par.18.3 #15-Zeile, par.19.1 seg1-44, par.19.3 C-12/#97, P.20.1, P.20.3 -- gesamt 33 Marker, additiv, kein Verstoss.",
+        "EVIDENZ (c): NUR Additionen -- numstat 24/0 (Designplan) + 409/0 (Wellenplan) = 433/0; null '-'-Zeilen ausser den zwei '---'-Dateikoepfen; keine geloeschte/geaenderte Bestandszeile.",
+        "EVIDENZ (d): Hygiene sauber -- 0 Nicht-ASCII-Zeichen in allen 433 Additionszeilen (LC_ALL=C grep -P rc=1), laengste Additionszeile 116 Spalten, 0 Zeilen >120.",
+        "EVIDENZ (e): par.21-Kopf traegt Vorrang-Klausel ('par.13-par.20 bleiben stehen; was hier steht, gilt vor' + 'bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres') und 3 Quellen-Pfade (Regressionen-Register, Wiederaufnahme-Register, Uebergabe Kontext 13 unter docs/sessions/20260818-*) -- alle 3 Dateien existieren auf Platte (29888/7790/13446 Bytes, 18.08.).",
+        "HINWEIS (Transparenz, kein Defekt): die Stellen-Karte war im Verify-Auftrag nach Eintrag 22 abgeschnitten (Designplan-Teil); die Zaehlung reconciliert exakt 20 Wellenplan + 5 Designplan = 25, und alle 5 Designplan-Marker sitzen an den im Karten-Muster benannten Orten (par.4-W1/par.4-W7/par.7/par.8/par.10).",
+        "KONSISTENZ: jeder 'Marker ... gesetzt'-Satz in par.21 hat seinen realen Marker im Diff (par.5-Arithmetik-Korrektur nennt Task #98, par.19.3-Marker traegt #97, P.20.1/P.20.3 tragen den g2-merge-base-Beweis 1528f6fd NICHT Ancestor 20c111c4); Tasks #93-#99 existieren im Board deckungsgleich."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Karten"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Schreiben"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "karte-kontext",
+      "phaseIndex": 1,
+      "phaseTitle": "Karten",
+      "agentId": "a4b8a4233819cb590",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787084132054,
+      "queuedAt": 1787084132047,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "WELLENPLAN-KONSOLIDIERUNG KONTEXT 13 (18.08.2026 spaet). Doku-Doktrin: NICHTS loeschen, Marker AM ORT (> Blockquote-Stil wie KON39/KON59/KON97), additiv datiert; ASCII-only in neuen Zeilen, max 120 Spalten. NIE-KUERZEN-Order (Owner 18.08.): jeder Posten des Kontexts kommt VOLL in die Konsolidierung, W7 ist KEIN Endlager mehr. Antworte NUR mit dem geforderten JSON.\nPOSTEN-KARTE: Lies VOLLSTAENDIG (…",
+      "lastProgressAt": 1787084501879,
+      "tokens": 58220,
+      "toolCalls": 4,
+      "durationMs": 369823,
+      "resultPreview": "{\"posten\":[{\"id\":\"21.0-betriebsregel-nie-kuerzen\",\"gegenstand\":\"Betriebsregel (Owner 18.08., verbatim-Kern): 'Es wird NIE etwas ausgebucht oder verschoben' + 'NIE kuerzen, gesamte Kette voll, ALLE Features; morgen mit mehr Kontingent multiple Strecken parallel'. Konsequenzen: jeder vertagte/verschobene Posten erhaelt einen Platz VOR der Abgabe; W7 ist KEIN Endlager mehr, nur noch Nach-Abgabe-Kuer …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "karte-stellen",
+      "phaseIndex": 1,
+      "phaseTitle": "Karten",
+      "agentId": "a3c220ade16b89ae8",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787084501887,
+      "queuedAt": 1787084501879,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "WELLENPLAN-KONSOLIDIERUNG KONTEXT 13 (18.08.2026 spaet). Doku-Doktrin: NICHTS loeschen, Marker AM ORT (> Blockquote-Stil wie KON39/KON59/KON97), additiv datiert; ASCII-only in neuen Zeilen, max 120 Spalten. NIE-KUERZEN-Order (Owner 18.08.): jeder Posten des Kontexts kommt VOLL in die Konsolidierung, W7 ist KEIN Endlager mehr. Antworte NUR mit dem geforderten JSON.\nSTELLEN-KARTE: Finde im Wellenpla…",
+      "lastProgressAt": 1787084979767,
+      "tokens": 134002,
+      "toolCalls": 20,
+      "durationMs": 477880,
+      "resultPreview": "{\"stellen\":[{\"datei\":\"/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md\",\"anker\":\"par.0 Aenderungsvermerk (3) HYBRID, Preis-Satz 'der W2-S-E-Restbau (##40 ...) faellt nach W7' -- heute Z.35 (Momentaufnahme 18.08.)\",\"grund\":\"Der Preis-Satz bucht den ##40-Restbau nach W7 aus; Wiederaufnahme-Register Teil B platziert ih…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "schreiber",
+      "phaseIndex": 2,
+      "phaseTitle": "Schreiben",
+      "agentId": "a6b41dde4769ab906",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787084979777,
+      "queuedAt": 1787084979768,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "WELLENPLAN-KONSOLIDIERUNG KONTEXT 13 (18.08.2026 spaet). Doku-Doktrin: NICHTS loeschen, Marker AM ORT (> Blockquote-Stil wie KON39/KON59/KON97), additiv datiert; ASCII-only in neuen Zeilen, max 120 Spalten. NIE-KUERZEN-Order (Owner 18.08.): jeder Posten des Kontexts kommt VOLL in die Konsolidierung, W7 ist KEIN Endlager mehr. Antworte NUR mit dem geforderten JSON.\nDU BIST DER EINZIGE SCHREIBER an …",
+      "lastProgressAt": 1787086041026,
+      "tokens": 394829,
+      "toolCalls": 66,
+      "durationMs": 1061249,
+      "resultPreview": "{\"par21_unterpunkte\":[\"21.0 BETRIEBSREGEL (Owner 18.08.): NIE AUSBUCHEN/VERSCHIEBEN + BELEG-TAFEL + PROZESS-ERTRAEGE (4 Posten: Betriebsregel verbatim-Kern; Beleg-Tafel der 8 stillen Kuerzungen + 2 Prozess-Faelle; Codex/bwrap-Plan-B; sequentieller Audit-Umbau + Vollzaehligkeits-Gates)\",\"21.1 #15-FIX-STAND (FIX-KOMPLETT, UNGELANDET) + LANDE-KETTE + super-ZUG/KON119 + FOLGEZUEGE (4 Posten: e285d316-…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "verify",
+      "phaseIndex": 3,
+      "phaseTitle": "Verify",
+      "agentId": "a374dd1156abee2ce",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787086041044,
+      "queuedAt": 1787086041036,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "VOLLSTAENDIG",
+      "promptPreview": "WELLENPLAN-KONSOLIDIERUNG KONTEXT 13 (18.08.2026 spaet). Doku-Doktrin: NICHTS loeschen, Marker AM ORT (> Blockquote-Stil wie KON39/KON59/KON97), additiv datiert; ASCII-only in neuen Zeilen, max 120 Spalten. NIE-KUERZEN-Order (Owner 18.08.): jeder Posten des Kontexts kommt VOLL in die Konsolidierung, W7 ist KEIN Endlager mehr. Antworte NUR mit dem geforderten JSON.\nVERIFY (adversarial): Lies git -C…",
+      "lastProgressAt": 1787086316819,
+      "tokens": 109450,
+      "toolCalls": 12,
+      "durationMs": 275775,
+      "resultPreview": "{\"urteil\":\"VOLLSTAENDIG\",\"fehlend\":[],\"funde\":[\"EVIDENZ (a): 42/42 Posten der ungededupten Karte in par.21 gefunden -- 21.0=4/4, 21.1=4/4, 21.2=3/3, 21.3=9/9, 21.4=6/6 (B-5f mit neu angelegtem Traeger Task #99), 21.5=6/6, 21.6=10/10; keine Luecke.\",\"EVIDENZ (b): 25/25 Marker an ihren Stellen -- 20 Wellenplan (par.0 @-36, par.3-W7 @-754, par.5 @-920, par.6 @-941, par.7 sechsfach mit *(Zeile)*-Refer…"
+    }
+  ],
+  "totalTokens": 696501,
+  "totalToolCalls": 102
+}

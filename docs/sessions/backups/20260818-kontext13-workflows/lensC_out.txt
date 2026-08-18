@@ -1,0 +1,1002 @@
+Reading additional input from stdin...
+OpenAI Codex v0.146.0
+--------
+[1mworkdir:[0m /home/comdare/.claude/jobs/5a19728e/tmp/codex-lens
+[1mmodel:[0m gpt-5.6-sol
+[1mprovider:[0m openai
+[1mapproval:[0m never
+[1msandbox:[0m read-only
+[1mreasoning effort:[0m ultra
+[1mreasoning summaries:[0m none
+[1msession id:[0m 01a0154e-57f5-7d22-b010-5e2fbd4e5a0b
+--------
+[36muser[0m
+WICHTIG: Dateizugriff und Kommando-Ausfuehrung sind in dieser Umgebung DEFEKT (bwrap). Der KOMPLETTE Auftrag inkl. Diff-Volltext steht UNTEN in DIESER Nachricht. Lies NICHTS von Platte, fuehre KEINE Kommandos aus, antworte allein aus dem hier gegebenen Material. Wo der Text unten "Lies die Datei X" sagt, gilt: ihr Inhalt STEHT HIER.
+
+Code-Review LENS C (POD/Modul-Makros/Gate-Grammatik) eines ungelandeten C++23-ABI-Bruchs. Lies ZUERST die Diff-Datei /home/comdare/wt-ce-bump15/.review-tmp/l1c_pod_makros.diff (79 KB, development..HEAD fuer anatomy_module_abi_v1_decl.hpp, anatomy_module_abi_v1.hpp, adapter/set/sequence/view_module_abi_v1.hpp, mess_gates_glied.hpp) und DANN bei Bedarf Volldateien im Worktree /home/comdare/wt-ce-bump15/. KEINE git-Kommandos, KEINE Aenderungen.
+
+SOLL-KONTEXT: POD AnatomyVersionLines: Layout 7 (:303), 20 Felder, sizeof==152, Feldfolge MESS,SYSTEM,ORGAN + Appends komposit_line/len + name_line/len; CT-Proben 7=true/6=false/5=false/8=false; Gleichheits-Wache ==7 (NIE >=); Feldzahl-Wache; designierte Initialisierer VOLLSTAENDIG (es gab 110 -Wmissing-field-initializers — angeblich geheilt in stamp_pod_layout_probe + 2 Tests) · kCebContractCodegenMinor=2 (lebend 8.2), kCebContractCodegenMinorAbi7=2 (Historien-Freeze 7.2, UNANGETASTET) · 6 ABI-Pflicht-Symbole je Modul-Makro (4 alte + comdare_anatomy_gattung/genus als uint8; Gattung ABGELEITET via gattung_of, nie getragen); alle 7 Makro-Stellen einzeln (bewusst KEIN Basis-Refactor); Escape-Backslashes zuletzt manuell auf Spalte 120 normiert (55 Zeilen) — Makro-Kontinuitaet ist ein Pruefpunkt · mess_gates_glied: Grammatik 7->9 Felder (hm/hmi HINTEN), AUS-Form "mg=m0;s0;st0;x0;tw0;tm0;tmi0;hm0;hmi0", kMessGatesFeldCount=9, kMessGatesGliedMaxLen=37 (LIVE gemessen), Binde-Assert Praeprozessor==Komponierfunktion, je-Feld-Selbstbeweise, Puffer-Wachen 2^9=512.
+
+PRUEFE HART: (a) POD-Layout: Feldreihenfolge im struct == Reihenfolge in ALLEN designierten Initialisierern (C++ verlangt Deklarationsreihenfolge — ein vertauschter Initialisierer ist Compilefehler, ein VERGESSENER ist stille 0)? sizeof-Pin 152 konsistent mit 20 Feldern (Alignment-Falle: uint32-Paare)?, (b) Makro-Hygiene: ist JEDE Fortsetzungszeile der 7 Makros nach der 120-Normierung syntaktisch intakt (Backslash am Zeilenende, kein trailing space NACH dem Backslash, letzter Makro-Body-Abschluss ohne Backslash)?, (c) Symbol-Konsistenz ueber die 7 Koepfe: identische Signaturen/noexcept/Export-Attribute? liefert der hybrid-Kopf (ZielGenusExpr) den ZIEL-Genus-Wert statt des Reroute-Werts?, (d) Gate-Grammatik: Segment-Tabelle vs Komponierfunktion vs Praeprozessor-Selbstbeweise — alle drei auf 9 Felder synchron? kMessGatesGliedMaxLen=37 nachrechnen (AUS-Form zaehlen)!, (e) CT-Proben: prueft 6=false wirklich ein ANDERES Offsets-Layout (K-4-Lehre) oder nur die Zahl?, (f) Freeze-Schutz: kann ein Konsument versehentlich Abi7 statt des lebenden Minors ziehen?
+
+AUSGABE: nummerierte Findings mit Datei:Zeile, Schwere, Begruendung + Fix. Ende: LANDBAR / LANDBAR_MIT_FIXES / NICHT_LANDBAR.
+
+=== INHALT VON l1c_pod_makros.diff (Volltext): ===
+diff --git a/libs/cache_engine/include/cache_engine/abi/adapter_module_abi_v1.hpp b/libs/cache_engine/include/cache_engine/abi/adapter_module_abi_v1.hpp
+index d12fab20..fea0a452 100644
+--- a/libs/cache_engine/include/cache_engine/abi/adapter_module_abi_v1.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/adapter_module_abi_v1.hpp
+@@ -37,4 +37,17 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        return static_cast<std::uint8_t>(                                                                              \
++            ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::Adapter));    \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::Adapter);                     \
+     }
+diff --git a/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp b/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp
+index 63ca8d98..a4817b0a 100644
+--- a/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp
+@@ -63,8 +63,22 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        using CeaGenus_ = ::comdare::cache_engine::anatomy::AnatomyGenus;                                              \
++        using ::comdare::cache_engine::anatomy::gattung_of;                                                            \
++        return static_cast<std::uint8_t>(gattung_of(CeaGenus_::SearchAlgorithm));                                      \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        using CeaGenus_ = ::comdare::cache_engine::anatomy::AnatomyGenus;                                              \
++        return static_cast<std::uint8_t>(CeaGenus_::SearchAlgorithm);                                                  \
+     }
+-
+ /// COMDARE_DEFINE_ANATOMY_MODULE_ADHOC(...) — R5.G: Materialisiert eine AUTO-ENUMERIERTE Permutation
+ /// (AdHocComposition) als Permutations-Binary, OHNE benannten Composition-Header. Nimmt die 17
+ /// Achsen-Vendor-Typen VARIADISCH (T0..T16 — 15 Such-Achsen + queuing q1/q2, Doc 30 §8.0) und baut die
+@@ -113,11 +127,26 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        using CeaGenus_ = ::comdare::cache_engine::anatomy::AnatomyGenus;                                              \
++        using ::comdare::cache_engine::anatomy::gattung_of;                                                            \
++        return static_cast<std::uint8_t>(gattung_of(CeaGenus_::SearchAlgorithm));                                      \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        using CeaGenus_ = ::comdare::cache_engine::anatomy::AnatomyGenus;                                              \
++        return static_cast<std::uint8_t>(CeaGenus_::SearchAlgorithm);                                                  \
+     }
+-
+-/// COMDARE_ANATOMY_VERSION_STAMP_M(organ_lit, system_lit, measurement_lit) -- A13-M3 (Owner-E2 02.08.2026):
++/// COMDARE_ANATOMY_VERSION_STAMP_M(measurement_lit, system_lit, organ_lit) -- A13-M3 (Owner-E2 02.08.2026):
+ /// die VOLLFORM. Materialisiert das OPTIONALE extern-"C"-Probe-Symbol comdare_anatomy_version_lines() aus DREI
+-/// String-Literalen (Organ-, System- und Mess-Tooling-HAUPT-Stempel). Die frueher hier stehende 4-arg-Form
++/// String-Literalen -- seit S-6a in der Kategorien-Ordnung MESS, SYSTEM, ORGAN (Mess-Tooling-HAUPT-, System-
++/// und Organ-Stempel; KON21-03 #87). Die frueher hier stehende 4-arg-Form
+ /// _MERGE ist ERSATZLOS ENTFALLEN -- "Merge Zeile kann daher nicht existieren"; stehender toter Stempel-Code
+ /// waere ein dritter Ableitungsweg in Wartestellung (O-8-Schritt-12-Lehre). Die Merge-DURCHFUEHRUNG bleibt
+ /// unberuehrt (profile_facade/merge_plan.hpp, Owner-Q2).
+@@ -159,57 +188,87 @@
+ /// GOLDEN-NEUTRAL bleibt es: der EMITTIERTE Makro-CALL (2-/3-arg) ist unveraendert, der Fingerprint
+ /// materialisiert weiterhin erst in der Makro-EXPANSION -- die Round-Trip-Byte-Wachen und der
+ /// binary_id-CRC-Anker sehen davon nichts.
+-#define COMDARE_ANATOMY_VERSION_STAMP_M(organ_lit, system_lit, measurement_lit)                                        \
++#define COMDARE_ANATOMY_VERSION_STAMP_M(measurement_lit, system_lit, organ_lit)                                        \
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT ::comdare::cache_engine::abi::AnatomyVersionLines const*                     \
+     comdare_anatomy_version_lines() noexcept {                                                                         \
+-        static constexpr char kO[] = organ_lit;                                                                        \
++        static constexpr char kM[] = measurement_lit;                                                                  \
+         static constexpr auto kSC  = ::comdare::cache_engine::abi::complete_system_stamp_line_array<                   \
+             ::comdare::cache_engine::abi::complete_system_stamp_line_size(                                             \
+                 system_lit, ::comdare::cache_engine::abi::kSystemCellValuesFromDefine)>(                               \
+             system_lit, ::comdare::cache_engine::abi::kSystemCellValuesFromDefine);                                    \
+-        static constexpr char kM[] = measurement_lit;                                                                  \
++        static constexpr char kO[] = organ_lit;                                                                        \
+         static constexpr auto kFP  = ::comdare::cache_engine::abi::anatomy_fingerprint_hex(                            \
+-            ::comdare::cache_engine::abi::OrganZeile{organ_lit},                                                       \
++            ::comdare::cache_engine::abi::MessZeile{measurement_lit},                                                  \
+             ::comdare::cache_engine::abi::SystemZeile{kSC.view()},                                                     \
++            ::comdare::cache_engine::abi::OrganZeile{organ_lit},                                                       \
++            ::comdare::cache_engine::abi::ToolchainGlied{::comdare::cache_engine::abi::kToolchainStampGlied},          \
++            ::comdare::cache_engine::abi::BvsetGlied{::comdare::cache_engine::abi::kBuildVariantSetSignatureGlied},    \
++            ::comdare::cache_engine::abi::OverlayHash{::comdare::cache_engine::abi::kOverlaySourceHash},               \
++            ::comdare::cache_engine::abi::MessGatesGlied{::comdare::cache_engine::abi::kMessGatesTuGlied},             \
++            ::comdare::cache_engine::abi::KompositMapGlied{::comdare::cache_engine::abi::kHybridKompositGlied});       \
++        /* E-A/B-6 + V-05R: DER NAME, aus DENSELBEN Argumenten wie kFP -- Glied fuer Glied identisch,     */           \
++        /* nur der Hash ist ein anderer (SHA-256 statt SHA-512). Waeren die Argumente hier auch nur an    */           \
++        /* einer Stelle andere, traege das Modul einen Namen, der zu seinem eigenen Fingerprint nicht     */           \
++        /* passt -- deshalb steht der Aufruf unmittelbar unter kFP und nicht an einer dritten Stelle.     */           \
++        static constexpr auto kNM = ::comdare::cache_engine::abi::anatomy_name_hex(                                    \
+             ::comdare::cache_engine::abi::MessZeile{measurement_lit},                                                  \
++            ::comdare::cache_engine::abi::SystemZeile{kSC.view()},                                                     \
++            ::comdare::cache_engine::abi::OrganZeile{organ_lit},                                                       \
+             ::comdare::cache_engine::abi::ToolchainGlied{::comdare::cache_engine::abi::kToolchainStampGlied},          \
+             ::comdare::cache_engine::abi::BvsetGlied{::comdare::cache_engine::abi::kBuildVariantSetSignatureGlied},    \
+             ::comdare::cache_engine::abi::OverlayHash{::comdare::cache_engine::abi::kOverlaySourceHash},               \
+-            ::comdare::cache_engine::abi::MessGatesGlied{::comdare::cache_engine::abi::kMessGatesTuGlied});            \
+-        static constexpr auto kOE =                                                                                    \
+-            ::comdare::cache_engine::abi::parse_stamp_entries<::comdare::cache_engine::abi::count_stamp_entries(kO)>(  \
+-                kO);                                                                                                   \
+-        static constexpr auto kSE =                                                                                    \
+-            ::comdare::cache_engine::abi::parse_stamp_entries<::comdare::cache_engine::abi::count_stamp_entries(       \
+-                kSC.view())>(kSC.chars);                                                                               \
++            ::comdare::cache_engine::abi::MessGatesGlied{::comdare::cache_engine::abi::kMessGatesTuGlied},             \
++            ::comdare::cache_engine::abi::KompositMapGlied{::comdare::cache_engine::abi::kHybridKompositGlied});       \
+         static constexpr auto kME =                                                                                    \
+             ::comdare::cache_engine::abi::parse_stamp_entries<::comdare::cache_engine::abi::count_stamp_entries(kM)>(  \
+                 kM);                                                                                                   \
++        static constexpr auto kSE =                                                                                    \
++            ::comdare::cache_engine::abi::parse_stamp_entries<::comdare::cache_engine::abi::count_stamp_entries(       \
++                kSC.view())>(kSC.chars);                                                                               \
++        static constexpr auto kOE =                                                                                    \
++            ::comdare::cache_engine::abi::parse_stamp_entries<::comdare::cache_engine::abi::count_stamp_entries(kO)>(  \
++                kO);                                                                                                   \
+         static constexpr ::comdare::cache_engine::abi::AnatomyVersionLines kL{                                         \
+             .stamp_layout_version    = ::comdare::cache_engine::abi::kAnatomyVersionLinesLayout,                       \
+             .reserved                = 0u,                                                                             \
+-            .organ_line              = kO,                                                                             \
+-            .organ_len               = sizeof(kO) - 1,                                                                 \
+-            .system_line             = kSC.chars,                                                                      \
+-            .system_len              = kSC.size(),                                                                     \
+             .measurement_line        = kM,                                                                             \
+             .measurement_len         = sizeof(kM) - 1,                                                                 \
++            .system_line             = kSC.chars,                                                                      \
++            .system_len              = kSC.size(),                                                                     \
++            .organ_line              = kO,                                                                             \
++            .organ_len               = sizeof(kO) - 1,                                                                 \
+             .sha512_line             = kFP.data(),                                                                     \
+             .sha512_len              = kFP.size() - 1,                                                                 \
+-            .organ_entries           = ::comdare::cache_engine::abi::stamp_entries_ptr(kOE),                           \
+-            .organ_entry_count       = kOE.size(),                                                                     \
++            .measurement_entries     = ::comdare::cache_engine::abi::stamp_entries_ptr(kME),                           \
++            .measurement_entry_count = kME.size(),                                                                     \
+             .system_entries          = ::comdare::cache_engine::abi::stamp_entries_ptr(kSE),                           \
+             .system_entry_count      = kSE.size(),                                                                     \
+-            .measurement_entries     = ::comdare::cache_engine::abi::stamp_entries_ptr(kME),                           \
+-            .measurement_entry_count = kME.size()};                                                                    \
++            .organ_entries           = ::comdare::cache_engine::abi::stamp_entries_ptr(kOE),                           \
++            .organ_entry_count       = kOE.size(),                                                                     \
++            .komposit_line           = ::comdare::cache_engine::abi::kHybridKompositGlied.data(),                      \
++            .komposit_len            = ::comdare::cache_engine::abi::kHybridKompositGlied.size(),                      \
++            .name_line               = kNM.data(),                                                                     \
++            .name_len                = kNM.size() - 1};                                                                \
+         return &kL;                                                                                                    \
+     }
+ 
+-/// COMDARE_ANATOMY_VERSION_STAMP(organ_lit, system_lit) -- W12-A2 Rueckwaerts-kompatible 2-arg-Form: leitet an
+-/// die 3-arg _M-Vollform mit LEEREM Mess-Tooling-Stempel weiter (measurement_line -> "", measurement_len -> 0).
++/// COMDARE_ANATOMY_VERSION_STAMP(system_lit, organ_lit) -- W12-A2 2-arg-Kurzform: leitet an die 3-arg
++/// _M-Vollform mit LEEREM Mess-Tooling-Stempel weiter (measurement_line -> "", measurement_len -> 0).
+ /// Der Emitter (adhoc_emitter.hpp) haengt diese Makro-Zeile NACH COMDARE_DEFINE_ANATOMY_MODULE_ADHOC an; bis die
+ /// Mess-Tooling-HAUPT-Auffaecherung (S4/P-MESSTOOL) den gewaehlten Tooling-Stempel durchreicht, bleibt das
+-/// Mess-Feld leer (ehrlich: kein Tooling einkompiliert), waehrend das POD-Layout bereits final ist. Der ce-only-/
+-/// Katalog-Pfad emittiert weiterhin GENAU diese 2-arg-Form -> der emittierte Quelltext bleibt byte-identisch
+-/// (golden-CRC unberuehrt).
+-#define COMDARE_ANATOMY_VERSION_STAMP(organ_lit, system_lit) COMDARE_ANATOMY_VERSION_STAMP_M(organ_lit, system_lit, "")
++/// Mess-Feld leer (ehrlich: kein Tooling einkompiliert), waehrend das POD-Layout bereits final ist.
++///
++/// S-6a: DIE ARGUMENT-FOLGE IST GEDREHT -- (system_lit, organ_lit) statt (organ_lit, system_lit), weil die
++/// Kategorien-Ordnung MESS, SYSTEM, ORGAN lautet (KON21-03, #87 = Makro-/Argumentfolge) und die Mess-Zeile
++/// in dieser Kurzform gerade die weggelassene ERSTE ist. Damit ist sie NICHT mehr rueckwaerts-kompatibel:
++/// der emittierte Quelltext aendert sich, und das ist der DEKLARIERTE golden-Bruch dieser Scheibe
++/// (KON5-04, Kosten-Ebene 1) -- die Byte-Identitaets-Wachen des Emitters und der golden-CRC-Anker
++/// bewegen sich mit und werden im golden-Regen-Schnitt neu gesetzt, NICHT hier.
++///
++/// ACHTUNG, WARNUNG AN JEDEN, DER EINE EIGENE EMISSION SCHREIBT: beide Argumente sind Zeichenketten, ein
++/// vertauschter Aufruf uebersetzt also. Die Sperre dagegen sitzt eine Ebene tiefer und nur fuer den
++/// Fingerprint (die Traeger-Typen MessZeile/SystemZeile/OrganZeile); der POD selbst nimmt, was er kriegt.
++/// Alle Emissions-Stellen im Haus sind mit diesem Commit gedreht (adhoc_emitter.hpp,
++/// adhoc_emitter_shaped.hpp, sota_catalog.hpp) -- wer eine vierte baut, prueft die Reihenfolge am
++/// gerenderten Stempel, nicht am Kompilieren.
++#define COMDARE_ANATOMY_VERSION_STAMP(system_lit, organ_lit) COMDARE_ANATOMY_VERSION_STAMP_M("", system_lit, organ_lit)
+diff --git a/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp b/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp
+index 6ac6ceca..e1e468fc 100644
+--- a/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp
+@@ -21,6 +21,7 @@
+ #include "stempel_baustein_trait.hpp"               // S-1: leichter Baustein-Trait (Spezialisierungen unten)
+ 
+ #include <cstdint>
++#include <type_traits> // VL-2: die Feldzahl-Sonde + die Typ-Folge-Wache (S-6a-Nachzug, s. :286-Block)
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+ // ABI-Version + Magic-Number (Compile-Time-Konstanten fuer Module-Loader-Check)
+@@ -86,7 +87,7 @@
+ /// keine neue Organ-Haupt-Achse, organ_count() bleibt 18, der Observer-POD bleibt axis_stats[18][8] +
+ /// seg_ns[18] (sizeof 1344). golden_fullpilot_320 und der CRC-Anker kNewGolden131072Crc64 sind deshalb
+ /// byte-neutral, und es entsteht KEINE golden_fullpilot_320_binary_ids_abi7.txt: der Alt-golden-Freeze der
+-/// Majors 4/5/6 (decl:47/:53) hing jeweils an einer BEWEGTEN binary_id -- hier bewegt sich keine. Was dieser
++/// Majors 4/5/6 (decl:48/:54) hing jeweils an einer BEWEGTEN binary_id -- hier bewegt sich keine. Was dieser
+ /// Major bewegt, ist die Lade-Akzeptanz und (ueber den Minor-Reset unten) der Objekt-Store-Bucket.
+ /// NAHT-1 (2026-08-09, Owner-KERN "der Ansatz mit den SIDECARS IST FALSCH") ABI-Bruch Major 8->9,
+ /// Minor->0: DIE MESS-NAHT AM GENUS-INTERFACE. IObservableTier erhaelt den vtable-Slot
+@@ -201,18 +202,25 @@ static_assert(alignof(AnatomyStampEntryV1) == 8, "AnatomyStampEntryV1: 8-Byte-Au
+ struct AnatomyVersionLines {
+     std::uint32_t stamp_layout_version; ///< == kAnatomyVersionLinesLayout (POD-Layout-Wache)
+     std::uint32_t reserved;             ///< 0 (Ausrichtung / kuenftige Flags)
+-    char const*   organ_line;           ///< kOrganAxisVersionLine (nullterminiert)
+-    std::uint64_t organ_len;            ///< organ_line-Laenge ohne '\0'
+-    char const*   system_line;          ///< kSystemAxisVersionLine (nullterminiert)
+-    std::uint64_t system_len;           ///< system_line-Laenge ohne '\0'
++    // -- S-6a (Layout 7): DIE DREI ZEILEN STEHEN AB HIER IN DER KATEGORIEN-ORDNUNG MESS, SYSTEM, ORGAN.
++    // Owner-Wort KON21-03 ("Ja genau, meint auch #87 und #78"): das SOLL gilt fuer ALLE DREI Aussen-Ebenen
++    // -- Makro-Argumentfolge, POD-FELDFOLGE (#78) und Preimage-Glieder. Die Begruendung ist die
++    // Traeger-Kette (Planer -> CEB -> Tier), kein Realm-Attribut. Vorher: organ, system, measurement.
++    // DAS IST DER ZWEITE EINGRIFF DIESES POD, DER NICHT APPEND-ONLY IST (der erste war der A13-M3-
++    // Feld-ENTFALL): die Offsets ALLER Zeilen-Felder wandern. Genau deshalb ist die Leser-Wache
++    // stamp_pod_has_entries eine GLEICHHEITS-Wache und keine Ordnung -- ein Layout-6-POD mit
++    // Layout-7-Offsets gelesen liefert stille Zeiger-Vertauschung, nicht einen Fehler.
+     // W12-A3 (Section 43, Section 47: Mess-Tooling == HAUPT): die einkompilierte kMeasurementAxisVersionLine traegt
+     // GENAU die gewaehlte Mess-Tooling-HAUPT-Wahl {wallclock/macro/micro} (collector-Achse, Plan-D1). NUR die
+     // Haupt-Achse (Section 43): Ablaufmethodik (run_methodology) und Workloads/Framework (UNTER-Achsen) sind NIE
+-    // Stempel-Bestandteil. APPEND-ONLY ans POD-Ende -> die Offsets von organ_/system_ bleiben stabil; nur
+-    // kAnatomyVersionLinesLayout bumpt (1 -> 2). Leerer Stempel (kein Tooling einkompiliert) -> Zeiger auf ""
+-    // (nie nullptr), measurement_len == 0.
++    // Stempel-Bestandteil. Leerer Stempel (kein Tooling einkompiliert) -> Zeiger auf "" (nie nullptr),
++    // measurement_len == 0.
+     char const*   measurement_line; ///< kMeasurementAxisVersionLine (nullterminiert; "" wenn kein Tooling gewaehlt)
+     std::uint64_t measurement_len;  ///< measurement_line-Laenge ohne '\0'
++    char const*   system_line;      ///< kSystemAxisVersionLine (nullterminiert)
++    std::uint64_t system_len;       ///< system_line-Laenge ohne '\0'
++    char const*   organ_line;       ///< kOrganAxisVersionLine (nullterminiert)
++    std::uint64_t organ_len;        ///< organ_line-Laenge ohne '\0'
+     // A13-M3 (Owner-E2 02.08.2026, "Merge Zeile kann daher nicht existieren"): die frueheren Felder
+     // merge_line/merge_len (K7a, der "dritte Tier-Binary-Stempel" = Merge-Kombination) sind HIER ERSATZLOS
+     // ENTFALLEN. Die Merge-DURCHFUEHRUNG bleibt (profile_facade/merge_plan.hpp, Owner-Q2) -- sie lebt im
+@@ -228,19 +236,50 @@ struct AnatomyVersionLines {
+     // {Zeiger,Count}-Paar von AnatomyStampEntryV1 (aus DENSELBEN Literalen INNEN im Makro consteval parst, keine zweite
+     // Wahrheit). Organ- und System-Array bleiben ZWEI getrennte Felder, NIE fusioniert (Layer-Doktrin). count==0 ->
+     // Zeiger auf kAnatomyStampNoEntries (nie nullptr, ""-Doktrin). KEIN binary_id-/CRC-Bruch (POD-Layout !=
+-    // binary_id). Ein Konsument liest diese Felder NUR bei stamp_layout_version == 6 (stamp_pod_has_entries) --
+-    // A13-M3 hat die Offsets um -16 verschoben, ein >=-Praedikat waere ab hier falsch (K-4, s.u.).
+-    AnatomyStampEntryV1 const* organ_entries;     ///< Organ-Array [g,h,i] (17 Haupt-Achsen)
+-    std::uint64_t              organ_entry_count; ///< Anzahl organ_entries
++    // binary_id). Ein Konsument liest diese Felder NUR bei stamp_layout_version == 7 (stamp_pod_has_entries) --
++    // A13-M3 hat die Offsets um -16 verschoben, S-6a hat sie zusaetzlich UMSORTIERT; ein >=-Praedikat waere
++    // ab hier doppelt falsch (K-4, s.u.).
++    // S-6a: die drei Arrays stehen in DERSELBEN Kategorien-Ordnung wie die drei Zeilen oben -- Mess,
++    // System, Organ. Zwei Ordnungen in EINEM POD waeren genau die Falle, gegen die die Positions-Konstanten
++    // im Fingerprint-Header gebaut sind.
++    AnatomyStampEntryV1 const* measurement_entries;     ///< Mess-Array {wallclock,macro,micro}; count==0 -> Sentinel
++    std::uint64_t              measurement_entry_count; ///< Anzahl measurement_entries
+     // K-6 (W10-C5): hier stand "(5 Achsen)" -- falsch seit der Achsen-Neuordnung und doppelt falsch seit
+     // A13-M2. IST: DREI System-Haupt-Achsen (kSystemAxisOrder: target_isa, operating_system, external_utils)
+     // + EIN geklammerter Meta-Meta-Anhang am Zeilen-ENDE ([simd=...]) = 4 Eintraege. Seit W10-C4 tragen die
+     // drei Haupt-Namen zusaetzlich den ZELLWERT als Namens-Anteil ("code" -> "code.<token>"); die Zahl der
+     // Eintraege aendert das nicht -- der Zellwert steht IN einem Eintrag, nie als eigenes Segment.
+-    AnatomyStampEntryV1 const* system_entries;          ///< System-Array [d,e,f] -- NIE mit Organ fusioniert
+-    std::uint64_t              system_entry_count;      ///< Anzahl system_entries
+-    AnatomyStampEntryV1 const* measurement_entries;     ///< Mess-Array {wallclock,macro,micro}; count==0 -> Sentinel
+-    std::uint64_t              measurement_entry_count; ///< Anzahl measurement_entries
++    AnatomyStampEntryV1 const* system_entries;     ///< System-Array [d,e,f] -- NIE mit Organ fusioniert
++    std::uint64_t              system_entry_count; ///< Anzahl system_entries
++    AnatomyStampEntryV1 const* organ_entries;      ///< Organ-Array [g,h,i] (18 Haupt-Achsen)
++    std::uint64_t              organ_entry_count;  ///< Anzahl organ_entries
++    // -- KON45-01 (Layout 7): DIE HYBRID-KOMPOSIT-MAP-ZEILE, APPEND-ONLY ANS POD-ENDE ---------------------
++    // Sie traegt die fuer alle BELEGTEN Pruefdocks konkatenierte Map {stufen_id -> Tier-SHA-256}, Dock-Index
++    // aufsteigend (Grammatik und Begruendung ausfuehrlich an kHybridKompositGlied, abi/anatomy_fingerprint.hpp).
++    // "Vorletzte Zeile" ist RENDER-Semantik (so liest sie ein Mensch im Stempel); PHYSISCH haengt das Feld
++    // hinten an, nach der Praezedenz measurement_line (W12-A3) -- ein Einschub in der Mitte waere ein
++    // Offset-Bruch ohne Gewinn.
++    // Ein plain Tier traegt "" (nie nullptr, ""-Doktrin) und komposit_len == 0: das Feld existiert fuer ALLE
++    // Binaries, nicht nur fuer Hybride (KON45-01/2).
++    // NP-07 AUFGELOEST (18.08.2026), und die Aufloesung ist lehrreich: die Ledger-Vorausrechnung nannte
++    // sizeof 120 -> 152; die Zwischenfassung landete bei 136 und hat die Differenz OFFEN benannt statt sie
++    // wegzurechnen. Die 152 ist jetzt erreicht -- aber NICHT durch das, was dort vermutet wurde (die
++    // ARRAY-Form der Komposit-Zeile), sondern durch name_line/name_len aus V-05R. Die Array-Form der
++    // Komposit-Zeile bleibt weiterhin AUS: sie waere ein EIGENER Layout-Bump und gehoert in den Schnitt,
++    // der auch den Parser dafuer baut. Zwei Wege zur selben Zahl -- deshalb ist eine sizeof-Vorausrechnung
++    // ohne Feldliste nie ein Beleg dafuer, dass die richtigen Felder da sind.
++    char const*   komposit_line; ///< Hybrid-Komposit-Map-Zeile (nullterminiert; "" bei plain Tier)
++    std::uint64_t komposit_len;  ///< komposit_line-Laenge ohne '\0'
++    // E-A/B-6 + V-05R ("Ja, integrieren", KON101): DER NAME. 64 Hex aus anatomy_name_hex -- EIGENER
++    // SHA-256 ueber DASSELBE Preimage, das den SHA-512-Fingerprint speist, ausdruecklich NICHT dessen
++    // erste 64 hex (die Ungleichheits-Wache in anatomy_fingerprint.hpp haelt das compile-hart fest).
++    // WARUM ER INS POD GEHOERT und nicht bloss in ein Symbol: der Name ist eine Eigenschaft DES
++    // BINARIES, so wie sein Fingerprint -- wer das Modul geladen hat, muss ihn ueber dieselbe eine
++    // Struktur lesen koennen wie alles andere, statt ihn aus einem zweiten Kanal zu holen. Ein Hybrid
++    // liest ihn ueber die Flaeche durch (V-04R-Durchreich-Linie), er wird nicht zweitgerechnet.
++    // Wie alle Zeilen hier: nie nullptr, ""-Doktrin -- ein Modul ohne Namen traegt "" und name_len 0.
++    char const*   name_line; ///< 64-Hex-Name (nullterminiert; EIGENER SHA-256, NICHT fingerprint[0:64])
++    std::uint64_t name_len;  ///< name_line-Laenge ohne '\0' (64 bei gesetztem Namen)
+ };
+ 
+ // -- S-1 (P2, hierher verlegt 12.08.2026): Baustein-Anbindung der beiden ABI-PODs DIREKT beim
+@@ -264,16 +303,32 @@ static_assert(StempelBaustein<AnatomyVersionLines>);
+ /// der Organ-/System-/Mess-Stempel-Zeilen; INNEN consteval aus denselben Literalen parst -> emitter-/golden-neutral).
+ /// A13-M3 (Owner-E2 02.08.2026): 5 -> 6 (merge_line/merge_len ERSATZLOS ENTFERNT). Das ist der ERSTE Feld-ENTFALL
+ /// dieses POD -- KEIN Append. Er verschiebt die Offsets von sha512_line/organ_entries/... um -16 Byte.
+-inline constexpr std::uint32_t kAnatomyVersionLinesLayout = 6;
+-
+-/// POD-Layout-Wache: AnatomyVersionLines ist ein POD aus 16 Feldern (2x uint32 + 4x {char const*, uint64} +
+-/// 3x {AnatomyStampEntryV1 const*, uint64}), 8-aligned -> 120 Byte auf x86_64 (8-Byte-Zeiger). Bricht dieser Wert, ist
++/// S-6a + KON45-01 (#15-Bump-Buendel, 18.08.2026): 6 -> 7. ZWEI Aenderungen in EINEM Layout-Schritt, weil
++/// jede fuer sich denselben Bump gekostet haette (KON5-04: "ein Bruch statt zwei"):
++///   (a) UMSORTIERUNG auf die Kategorien-Ordnung MESS, SYSTEM, ORGAN -- bei den drei ZEILEN-Paaren UND bei
++///       den drei ENTRY-Arrays. Das ist der ERSTE reine Feld-TAUSCH dieses POD; er bewegt keine Feldzahl
++///       und keinen sizeof, aber jeden Offset. Genau deshalb faengt ihn KEIN sizeof-Pin, sondern nur die
++///       Gleichheits-Wache unten plus die designierten Initialisierer (die bei falscher Reihenfolge
++///       compile-hart melden, "designator order does not match declaration order").
++///   (b) APPEND komposit_line/komposit_len ans POD-Ende (sizeof 120 -> 136).
++///   (c) APPEND name_line/name_len ans POD-Ende (sizeof 136 -> 152) -- E-A/B-6 + V-05R. Er faehrt im
++///       SELBEN Layout-Schritt wie (a)/(b) und bumpt die Konstante NICHT ein zweites Mal: alle drei
++///       gehoeren zu EINEM Bruch (KON5-04 "ein Bruch statt zwei"), und ein Modul, das (b) kennt, aber
++///       (c) nicht, hat es nie gegeben -- beide entstehen im selben Commit derselben Welle.
++inline constexpr std::uint32_t kAnatomyVersionLinesLayout = 7;
++
++/// POD-Layout-Wache: AnatomyVersionLines ist ein POD aus 20 Feldern (2x uint32 + 6x {char const*, uint64} +
++/// 3x {AnatomyStampEntryV1 const*, uint64}), 8-aligned -> 152 Byte auf x86_64 (8-Byte-Zeiger). Bricht dieser Wert, ist
+ /// das POD-Layout gewandert: dann kAnatomyVersionLinesLayout bumpen UND diesen erwarteten sizeof aktualisieren (die
+ /// COMDARE_ANATOMY_VERSION_STAMP-Materialisierung + jeder Modul-Rebau haengen daran). KLEINES ABI-Gate, KEIN
+ /// binary_id-/CRC-Bruch (das optionale Probe-Symbol ist nicht Loader-Pflicht, binary_id bleibt Organ-only).
+-static_assert(sizeof(AnatomyVersionLines) == 120,
++/// S-6a-WARNUNG AN DEN NAECHSTEN LESER: dieser Pin ist BLIND fuer die halbe Bewegung dieses Bumps. Ein
++/// reiner Feld-TAUSCH gleichtypiger Felder laesst sizeof unveraendert -- 120 blieb 120, als die drei Zeilen
++/// im Vorlauf probeweise vertauscht wurden. Was den Tausch faengt, sind die designierten Initialisierer
++/// (Deklarations-Reihenfolge) und die Gleichheits-Wache; der sizeof-Pin faengt nur Wachstum und Entfall.
++static_assert(sizeof(AnatomyVersionLines) == 152,
+               "AnatomyVersionLines-POD-Layout gewandert -- kAnatomyVersionLinesLayout bumpen + erwarteten "
+-              "sizeof (120 auf x86_64) aktualisieren.");
++              "sizeof (152 auf x86_64) aktualisieren.");
+ static_assert(alignof(AnatomyVersionLines) == 8, "AnatomyVersionLines: 8-Byte-Ausrichtung erwartet (Zeiger).");
+ 
+ /// VL-2 (i) -- DIE FELDZAHL-WACHE. Der sizeof-Pin darueber faengt jede Layout-Wanderung, aber genau EINEN
+@@ -282,19 +337,25 @@ static_assert(alignof(AnatomyVersionLines) == 8, "AnatomyVersionLines: 8-Byte-Au
+ /// Feld wert-initialisiert. Bei einem char const* heisst das nullptr, und das bricht die ""-Doktrin dieses
+ /// POD lautlos an einer Stelle, an der niemand mehr nachsieht.
+ ///
+-/// KEIN EIGENER #include <type_traits>, UND DAS IST ABSICHT: dieser Header ist zeilen-GEPINNT. Vier
+-/// Dokumente und libs/cache_engine/anatomy/observable_tier.hpp:31 nennen die #define-Zeilen unten als
+-/// ZEILEN-Anker, und die Wache hy_label_gate prueft das scharf -- eine einzige zusaetzliche Kopfzeile
+-/// verschiebt COMDARE_ANATOMY_ABI_MAJOR/MAGIC und reisst sie (am Objekt erlebt, 17.08.2026: +1 Zeile ->
+-/// 109/114 wandern auf 110/115 -> hy_label_gate FAILED). Der Anker in anatomy/observable_tier.hpp liegt
+-/// zudem in einer Verbotszone dieses Vorlaufs, also ist der Nachzug hier gar kein zulaessiger Weg.
+-/// <type_traits> kommt ueber den direkt eingebundenen stempel_baustein_trait.hpp (dessen Zeile 12) --
+-/// dieselbe Quelle, aus der die Trait-Spezialisierungen weiter unten schon heute leben.
++/// DER EIGENE #include <type_traits> STEHT SEIT DEM S-6a-BRUCH OBEN -- DIE SCHULD IST GETILGT.
++///
++/// WAS HIER BIS ZUM 17.08.2026 STAND, und warum es eine Schuld war: der Header trug KEINEN eigenen
++/// <type_traits>-Include, obwohl diese Wache ihn braucht. Er lieh ihn sich beim direkt eingebundenen
++/// stempel_baustein_trait.hpp. Grund war ein ZEILEN-PIN: vier Dokumente und
++/// libs/cache_engine/anatomy/observable_tier.hpp nennen die #define-Zeilen COMDARE_ANATOMY_ABI_MAJOR/
++/// MAGIC als ZEILEN-Anker, die Wache hy_label_gate prueft das scharf, und eine einzige zusaetzliche
++/// Kopfzeile verschiebt beide (am Objekt erlebt: +1 Zeile -> 109/114 wandern auf 110/115 ->
++/// hy_label_gate FAILED). Ein geliehener Include ist aber genau die Sorte stille Abhaengigkeit, die
++/// bricht, sobald die fremde Datei ihren eigenen Include aufraeumt -- deshalb stand die Zeile mit einer
++/// FAELLIGKEIT da und nicht als Dauerzustand.
+ ///
+-/// DAS IST EINE SCHULD MIT FAELLIGKEIT, kein Dauerzustand: NACHZUG im S-6a-Bruch (Layout 6->7), wo
+-/// anatomy/ ohnehin angefasst wird -- eigener #include <type_traits> + Anker-Nachzug in
+-/// anatomy/observable_tier.hpp:31 und den vier Dokumenten + hy_label_gate-Lauf, alles in EINEM Commit.
+-/// Ohne Faelligkeit laeuft so eine Zeile jahrelang mit; mit ihr hat der Bruch einen Posten.
++/// VOLLZUG (S-6a/#15-Bump-Buendel): eigener #include <type_traits> oben + Anker-Nachzug 109->110 und
++/// 114->115 in anatomy/observable_tier.hpp, libs/cache_engine/hybrid/README.md und den vier Dokumenten
++/// unter docs/architecture/ -- alles in EINEM Commit, mit hy_label_gate-Lauf als Abnahme. Der frueher
++/// genannte Hinderungsgrund "anatomy/observable_tier.hpp liegt in einer Verbotszone" galt fuer den
++/// VORLAUF; dieser Bruch fasst anatomy/ ohnehin an, also ist der Nachzug hier der zulaessige Weg.
++/// LEHRE FUER DEN NAECHSTEN, DER OBEN EINE ZEILE EINFUEGT: er zieht dieselben Anker mit, sonst faellt
++/// hy_label_gate -- der Pin ist nicht weg, er ist nur bezahlt.
+ ///
+ /// WIE SIE MISST -- UND WARUM DIE ERSTE FASSUNG DAS NICHT KONNTE (Lens-Fund 17.08.2026, am Objekt
+ /// nachvollzogen): die Wache zaehlt FELDER, nicht Typen. Die erste Fassung buchstabierte die 16 Feldtypen
+@@ -308,8 +369,8 @@ static_assert(alignof(AnatomyVersionLines) == 8, "AnatomyVersionLines: 8-Byte-Au
+ ///
+ /// DIE SONDE: AnyFeld konvertiert sich in JEDEN Typ, also passt es an jede Feldposition, ganz gleich
+ /// welchen Typ das Feld hat. N Stueck davon an T{...} gereicht sagt: "nimmt der Aggregat-Typ N Elemente?"
+-/// -- 16 muessen passen, 17 duerfen nicht. Damit haengt die Wache an kAnatomyVersionLinesFeldZahl statt an
+-/// einer Typ-Liste, und die Konstante ist tragend statt Dekoration.
++/// -- kAnatomyVersionLinesFeldZahl muessen passen, eines mehr darf nicht. Damit haengt die Wache an
++/// kAnatomyVersionLinesFeldZahl statt an einer Typ-Liste, und die Konstante ist tragend statt Dekoration.
+ ///
+ /// OHNE <utility>, UND DAS IST GEMESSEN, NICHT BEQUEM: die uebliche Bauform nimmt std::index_sequence.
+ /// std::make_index_sequence ist hier zwar erreichbar -- aber NUR ueber bits/utility.h, ein libstdc++-
+@@ -328,7 +389,7 @@ static_assert(alignof(AnatomyVersionLines) == 8, "AnatomyVersionLines: 8-Byte-Au
+ /// BEIDE Richtungen ab (am Objekt geprueft, 17.08.2026): ein Feld MEHR reisst das Negativ-Bein, ein Feld
+ /// WENIGER das Positiv-Bein -- beim probeweisen Entfall von measurement_entries feuerten Sonde, Typ-Folge
+ /// und sizeof-Pin gemeinsam. Arbeitsteilung also: Sonde = Feld-ZAHL, Typ-Folge = Feld-ART.
+-inline constexpr std::uint32_t kAnatomyVersionLinesFeldZahl = 16;
++inline constexpr std::uint32_t kAnatomyVersionLinesFeldZahl = 20; // E-A/B-6: +name_line/name_len
+ 
+ namespace detail {
+ /// Kurznamen NUR fuer die Typ-Folge-Wache -- die Liste steht sonst zweimal ueber je 16 Zeilen und waere
+@@ -371,16 +432,22 @@ static_assert(!detail::kNimmtFelder<AnatomyVersionLines, kAnatomyVersionLinesFel
+               "kAnatomyVersionLinesFeldZahl heben.");
+ 
+ /// Die TYP-FOLGE, als Ergaenzung zur Zahl darueber: sie faengt, was die Zaehl-Sonde nicht sehen kann --
+-/// einen Feld-ENTFALL (dann sind 16 Argumente zu viel) und den TYP-WECHSEL eines Feldes. Ein 17. Feld
++/// einen Feld-ENTFALL (dann sind 18 Argumente zu viel) und den TYP-WECHSEL eines Feldes. Ein 19. Feld
+ /// faengt sie ausdruecklich NICHT; das war der Lens-Fund und ist ab jetzt Sache der Sonde.
+-static_assert(detail::kVersionLinesNimmt<detail::FeldU32, detail::FeldU32, detail::FeldZgr, detail::FeldU64,
+-                                         detail::FeldZgr, detail::FeldU64, detail::FeldZgr, detail::FeldU64,
+-                                         detail::FeldZgr, detail::FeldU64, detail::FeldEintr, detail::FeldU64,
+-                                         detail::FeldEintr, detail::FeldU64, detail::FeldEintr, detail::FeldU64>,
+-              "VL-2: AnatomyVersionLines nimmt seine 16 Felder nicht mehr in der erwarteten Typ-Folge -- ein "
+-              "Feld ist ENTFALLEN oder hat seinen Typ gewechselt. kAnatomyVersionLinesFeldZahl und die vier "
+-              "Aggregat-Initialisierer (decl-Probe, Makro anatomy_module_abi_v1.hpp, test_d2 mach_pod, "
+-              "test_m_w12) im SELBEN Commit nachziehen.");
++///
++/// S-6a-EHRLICHKEIT: den FELD-TAUSCH dieses Bumps faengt sie ebenfalls nicht -- Mess-, System- und
++/// Organ-Paar sind typgleich ({char const*, uint64}), die Folge sieht vor und nach der Drehung identisch
++/// aus. Das ist kein Mangel dieser Wache, sondern ihre Grenze; die Drehung faengt die
++/// Designator-Reihenfolge in den vier Aggregat-Initialisierern (s. VL-2-Block unten).
++static_assert(
++    detail::kVersionLinesNimmt<detail::FeldU32, detail::FeldU32, detail::FeldZgr, detail::FeldU64, detail::FeldZgr,
++                               detail::FeldU64, detail::FeldZgr, detail::FeldU64, detail::FeldZgr, detail::FeldU64,
++                               detail::FeldEintr, detail::FeldU64, detail::FeldEintr, detail::FeldU64,
++                               detail::FeldEintr, detail::FeldU64, detail::FeldZgr, detail::FeldU64>,
++    "VL-2: AnatomyVersionLines nimmt seine 20 Felder nicht mehr in der erwarteten Typ-Folge -- ein "
++    "Feld ist ENTFALLEN oder hat seinen Typ gewechselt. kAnatomyVersionLinesFeldZahl und die vier "
++    "Aggregat-Initialisierer (decl-Probe, Makro anatomy_module_abi_v1.hpp, test_d2 mach_pod, "
++    "test_m_w12) im SELBEN Commit nachziehen.");
+ 
+ /// Loader-Gate (A4) -- A13-M3/K-4: GLEICHHEITS-Wache statt `>= 5`.
+ ///
+@@ -388,23 +455,30 @@ static_assert(detail::kVersionLinesNimmt<detail::FeldU32, detail::FeldU32, detai
+ /// `>=`-Praedikat korrekt -- ein neueres POD trug die alten Felder an denselben Offsets. Der A13-M3-Feld-ENTFALL
+ /// (merge_line/merge_len) bricht genau diese Voraussetzung: er verschiebt sha512_line/organ_entries/... um -16.
+ /// Ein `>= 5`-Leser wuerde ein v6-POD mit v5-Offsets lesen (und ein v5-POD mit v6-Offsets) -- er laege um zwei
+-/// Felder daneben und wuerde stille Zeiger-Muell liefern. Mit `== 6` faellt jedes fremde Layout hart durch.
++/// Felder daneben und wuerde stille Zeiger-Muell liefern. Mit Gleichheit faellt jedes fremde Layout hart durch.
++///
++/// S-6a (Layout 7) MACHT DIE GLEICHHEIT NOCH ZWINGENDER, und zwar aus einem NEUEN Grund: die Drehung auf
++/// MESS, SYSTEM, ORGAN tauscht TYPGLEICHE Felder. Ein Ordnungs-Praedikat wuerde ein Layout-6-POD
++/// akzeptieren und dann seine Organ-Zeile als Mess-Zeile lesen -- kein Muell, sondern etwas Schlimmeres:
++/// ein PLAUSIBLER falscher Wert, den keine Laengen- oder Nullpruefung verraet.
+ [[nodiscard]] constexpr bool stamp_pod_has_entries(AnatomyVersionLines const& v) noexcept {
+-    return v.stamp_layout_version == 6;
++    return v.stamp_layout_version == 7;
+ }
+ 
+ // -- VL-2: DIE POSITIONALEN POD-INITIALISIERER SIND LAUT GEMACHT ---------------------------------------
+ //
+ // ZWEI STILLE FALLEN, beide am Objekt belegt (17.08.2026), beide in demselben Aggregat-Initialisierer:
+ //
+-//   (i)  POD-APPEND. Waechst AnatomyVersionLines am Ende, initialisiert ein 16er-Aggregat die neuen
++//   (i)  POD-APPEND. Waechst AnatomyVersionLines am Ende, initialisiert ein zu kurzes Aggregat die neuen
+ //        Felder STILL wert-initialisiert -- ein char const* wird damit nullptr und bricht die
+ //        ""-Doktrin dieses POD, ohne dass irgendetwas rot wird.
+-//   (ii) FELD-TAUSCH. Der kuenftige S-6a-Umbau vertauscht gleichtypige Felder ({char const*, uint64}
+-//        bzw. die drei uint64-Zaehler). Positionale Initialisierer uebersetzen weiter und vertauschen
+-//        die WERTE. Gemessen: der Tausch organ_entry_count <-> measurement_entry_count uebersetzte mit
+-//        rc=0 und ohne Diagnose; rot wurde erst der LAUF (test_m_w12 A4AnatomyStampArraysRoundtripThroughPod).
++//   (ii) FELD-TAUSCH. Der S-6a-Umbau vertauscht gleichtypige Felder ({char const*, uint64} bzw. die drei
++//        uint64-Zaehler). Positionale Initialisierer uebersetzen weiter und vertauschen die WERTE.
++//        Gemessen: der Tausch organ_entry_count <-> measurement_entry_count uebersetzte mit rc=0 und ohne
++//        Diagnose; rot wurde erst der LAUF (test_m_w12 A4AnatomyStampArraysRoundtripThroughPod).
+ //        Ein Fehler, der erst zur Laufzeit auffaellt, faellt in einem Pfad ohne Test gar nicht auf.
++//        VOLLZUG 18.08.: dieser Umbau ist mit Layout 7 GEFAHREN -- die Designatoren haben getan, wofuer
++//        sie gebaut wurden, und den Nachzug an allen vier Stellen erzwungen statt ihn zu erlauben.
+ //
+ // DIE GEWAEHLTE FORM: DESIGNIERTE INITIALISIERER (.organ_line = ...), NICHT Feld-Traeger-Typen.
+ //
+@@ -415,14 +489,14 @@ static_assert(detail::kVersionLinesNimmt<detail::FeldU32, detail::FeldU32, detai
+ // "erst laute Compile-Fehler, dann verschieben" vor dem Bruch verlangt.
+ //
+ // WARUM NICHT FELD-TRAEGER-TYPEN (ehrlich verworfen statt verschwiegen): sie loesten (ii) ebenfalls,
+-// aendern aber den POD -- sizeof, Layout und die Loader-Sicht ueber die ABI-Grenze. Das ist Bruch-Materie
+-// und gehoert in den EINEN Bruch (Layout 6->7), nicht in eine Vorstufe, die per Auftrag layout-neutral
+-// bleibt. Designierte Initialisierer beruehren kein einziges Byte: kAnatomyVersionLinesLayout bleibt 6,
+-// sizeof bleibt 120, die Werte sind dieselben.
++// aendern aber den POD -- sizeof, Layout und die Loader-Sicht ueber die ABI-Grenze. Das war Bruch-Materie
++// und gehoerte in den EINEN Bruch (Layout 6->7), nicht in die Vorstufe, die per Auftrag layout-neutral
++// blieb. Designierte Initialisierer beruehrten dort kein einziges Byte: kAnatomyVersionLinesLayout blieb 6,
++// sizeof blieb 120, die Werte waren dieselben. IN DIESEM Bruch bewegt sich beides -- Layout 7, sizeof 136.
+ //
+ // WAS SIE NICHT LOESEN, UND WAS STATTDESSEN (i) TRAEGT: gegen den APPEND helfen Designatoren nicht --
+ // ein neues Feld ohne Designator bleibt still wert-initialisiert. Dafuer steht die Feldzahl-Wache unter
+-// dem sizeof-Pin oben (kAnatomyVersionLinesFeldZahl): sie bricht, sobald der POD ein 17. Feld bekommt,
++// dem sizeof-Pin oben (kAnatomyVersionLinesFeldZahl): sie bricht, sobald der POD ein Feld MEHR bekommt,
+ // und zwingt damit denselben Commit, der das Feld anhaengt, auch die vier Initialisierer anzufassen.
+ namespace detail {
+ /// CT-Probe-POD mit frei waehlbarer Layout-Version. Die Zeiger sind nullptr und werden NIE dereferenziert --
+@@ -430,33 +504,52 @@ namespace detail {
+ [[nodiscard]] constexpr AnatomyVersionLines stamp_pod_layout_probe(std::uint32_t layout) noexcept {
+     return AnatomyVersionLines{.stamp_layout_version    = layout,
+                                .reserved                = 0u,
+-                               .organ_line              = "",
+-                               .organ_len               = 0u,
+-                               .system_line             = "",
+-                               .system_len              = 0u,
+                                .measurement_line        = "",
+                                .measurement_len         = 0u,
++                               .system_line             = "",
++                               .system_len              = 0u,
++                               .organ_line              = "",
++                               .organ_len               = 0u,
+                                .sha512_line             = "",
+                                .sha512_len              = 0u,
+-                               .organ_entries           = nullptr,
+-                               .organ_entry_count       = 0u,
++                               .measurement_entries     = nullptr,
++                               .measurement_entry_count = 0u,
+                                .system_entries          = nullptr,
+                                .system_entry_count      = 0u,
+-                               .measurement_entries     = nullptr,
+-                               .measurement_entry_count = 0u};
++                               .organ_entries           = nullptr,
++                               .organ_entry_count       = 0u,
++                               .komposit_line           = "",
++                               .komposit_len            = 0u,
++                               // V-05R-NACHZUG (18.08.2026, R0): name_line/name_len sind mit der POD-Hebung
++                               // (sizeof 136 -> 152, Feldzahl 18 -> 20) ans Ende getreten, hier aber NICHT
++                               // nachgezogen worden. Der Compiler hat es gesagt -- 110x
++                               // -Wmissing-field-initializers ueber 55 TUs aus GENAU dieser Zeile, weil die
++                               // Probe in jeder TU instanziiert wird, die den Header sieht. Das ist die
++                               // Falle (i) (POD-APPEND) aus dem Kommentar oben, im Vollzug: Designatoren
++                               // schuetzen nur gegen den TAUSCH, gegen den APPEND schuetzt nichts ausser dem
++                               // Nachzug. Werte nach der ""-Doktrin -- die Probe liest ohnehin nur
++                               // stamp_layout_version, aber ein nullptr hier waere ein POD, den kein
++                               // Konsument je so sehen darf.
++                               .name_line               = "",
++                               .name_len                = 0u};
+ }
+ } // namespace detail
+ 
+ /// A13-M3/K-4 CT-NEGATIV-PROBE: der Alt-Wert 5 (und jede Zukunft) MUSS false liefern. Ohne diese Probe waere
+ /// ein versehentliches Zurueckdrehen auf `>=` gruen -- die Offset-Verschiebung ist unsichtbar, bis ein
+ /// Konsument Muell liest.
+-static_assert(stamp_pod_has_entries(detail::stamp_pod_layout_probe(6u)),
+-              "K-4: das EIGENE Layout 6 muss die Array-Form fuehren.");
++static_assert(stamp_pod_has_entries(detail::stamp_pod_layout_probe(7u)),
++              "K-4: das EIGENE Layout 7 muss die Array-Form fuehren.");
++static_assert(!stamp_pod_has_entries(detail::stamp_pod_layout_probe(6u)),
++              "K-4/S-6a: Layout 6 traegt die Zeilen in der ALTEN Kategorien-Ordnung (organ, system, "
++              "measurement) und kennt komposit_line/len nicht -- ein Layout-6-POD mit Layout-7-Offsets "
++              "gelesen liefert PLAUSIBLE falsche Zeilen, keinen Fehler. Es darf NIE als Array-Form-faehig "
++              "gelten.");
+ static_assert(!stamp_pod_has_entries(detail::stamp_pod_layout_probe(5u)),
+               "K-4: Layout 5 traegt merge_line/merge_len und hat damit ANDERE Offsets -- es darf NIE als "
+               "Array-Form-faehig gelten (das war der Fehler, den Append-only bisher ausschloss).");
+-static_assert(!stamp_pod_has_entries(detail::stamp_pod_layout_probe(7u)),
+-              "K-4: ein kuenftiges Layout 7 ist ebenfalls unbekannt -- Gleichheit, nicht Ordnung.");
++static_assert(!stamp_pod_has_entries(detail::stamp_pod_layout_probe(8u)),
++              "K-4: ein kuenftiges Layout 8 ist ebenfalls unbekannt -- Gleichheit, nicht Ordnung.");
+ 
+ // -- S-1 (P2, NACHGEZOGEN 12.08.2026 -- Zweitpass-Fix): die Baustein-Anbindung der beiden ABI-PODs
+ //    lebt seit dem Trait-Umzug DIREKT OBEN in dieser Datei (unter den POD-Definitionen), ueber den
+@@ -471,6 +564,29 @@ static_assert(!stamp_pod_has_entries(detail::stamp_pod_layout_probe(7u)),
+ 
+ extern "C" {
+ 
++/// comdare_anatomy_gattung() / comdare_anatomy_genus() -- Q2/V-06 + KON101-02 (18.08.2026): die ZWEI
++/// IDENTITAETS-SYMBOLE, seit diesem Bruch LOADER-PFLICHT (aus vier Pflicht-Symbolen sind sechs geworden).
++/// Sie beantworten "was BIST du" OHNE Instanz -- bisher ging das nur ueber create + genus(), also erst,
++/// nachdem ein Objekt gebaut war.
++///
++/// DIE NAMEN SIND GATTUNGS-AGNOSTISCH, DIE WERTE NICHT. Genau darin liegt der Nutzen: derselbe
++/// gattungs-agnostische Loader zieht bei JEDEM Modul dieselben zwei Namen und bekommt gattungs-
++/// SPEZIFISCHE Antworten. Haetten die Namen die Gattung getragen (comdare_set_genus o.ae.), muesste der
++/// Loader die Gattung kennen, bevor er sie erfragen kann -- dasselbe Henne-Ei-Problem, gegen das schon
++/// die Gleichheit der vier Ur-Symbolnamen gebaut ist.
++///
++/// RUECKGABE ist der uint8-WERT der jeweiligen Enum (AnatomyGattung / AnatomyGenus, beide
++/// : std::uint8_t): ueber die C-ABI-Grenze reist ein Zahlentyp, die Bedeutung liegt im gemeinsamen
++/// Header. Der Aufrufer castet zurueck -- der Loader tut genau das.
++///
++/// WARUM DIE GATTUNG TROTZDEM KEIN ZWEITES DATUM IST: die Modul-Makros materialisieren
++/// comdare_anatomy_gattung NICHT aus einem eigenen Literal, sondern aus gattung_of(<Genus>) -- total und
++/// constexpr. Es gibt also nur EINE gepflegte Quelle (den Genus); die Gattung ist ihre Ableitung. Der
++/// Loader rechnet dieselbe Ableitung nach und lehnt jede Abweichung fail-closed ab
++/// (status_identity_mismatch), zusammen mit der Gegenprobe Symbol-Wert == genus() der Instanz.
++COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept;
++COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept;
++
+ /// comdare_anatomy_version_lines() -- OPTIONALES Probe-Symbol: liefert die einkompilierten Stempel-Zeilen
+ /// eines Tier-Binary. NICHT Teil der 4 Loader-Pflicht-Symbole; ein ohne COMDARE_ANATOMY_VERSION_STAMP
+ /// gebautes Modul exportiert es gar nicht (dlsym liefert dann nullptr).
+@@ -509,7 +625,7 @@ struct AnatomyAbiVersion {
+ inline constexpr AnatomyAbiVersion kHostAnatomyAbiVersion{COMDARE_ANATOMY_ABI_MAJOR, COMDARE_ANATOMY_ABI_MINOR};
+ 
+ /// HISTORIEN-FREEZE Major 7 (E-24 C8, ADDITIV nach dem _abi4/_abi5/_abi6-Muster der Alt-golden-Dateien,
+-/// decl:47/:53). Der Freeze der frueheren Majors lief ueber Alt-golden-DATEIEN, weil dort jeweils die
++/// decl:48/:54). Der Freeze der frueheren Majors lief ueber Alt-golden-DATEIEN, weil dort jeweils die
+ /// binary_id wanderte; hier wandert sie NICHT (Golden-Bilanz oben), also friert dieser Major seine Werte
+ /// als BENANNTE KONSTANTEN neben den lebenden ein statt als Datei. WOFUER: die G5-Ablehnungs-Probe (ein
+ /// Major-7-Referenzmodul MUSS vom Loader per Major-Mismatch verworfen werden) und die Bucket-Diff-Beweise
+@@ -545,7 +661,8 @@ inline constexpr std::uint64_t     kAnatomyAbiMagicAbi7 = 0x434F4D444141372EULL;
+ ///   (M2)  Die Meta-Meta-Achsen haengen GEKLAMMERT ans ENDE ihrer Realm-Zeile (System- und Mess-Zeile), statt
+ ///         als weiteres Haupt-Achsen-Glied mitzulaufen -- damit wandern die gerenderten Stempel-Zeilen.
+ ///   (M3a) Der AnatomyVersionLines-POD steht auf Layout 6: merge_line/merge_len sind ERSATZLOS entfallen
+-///         (sizeof 136 -> 120) und das Leser-Gate ist auf die Gleichheits-Wache stamp_pod_has_entries == 6 gezogen.
++///         (sizeof 136 -> 120) und das Leser-Gate ist auf die Gleichheits-Wache stamp_pod_has_entries == 6
++///         gezogen (Stand 03.08.2026; LEBEND ist seit S-6a die 7 -- s. kAnatomyVersionLinesLayout oben).
+ ///   (M3b) anatomy_fingerprint_hex nimmt den Overlay-Hash als benannten Typ OverlayHash entgegen, weshalb jeder
+ ///         Alt-Aufruf der vierstelligen string_view-Form compile-hart bricht statt still ein Feld zu verrutschen.
+ ///   (M3c) Das Fingerprint-Preimage ist INJEKTIV: '\n'-Domain-Separator zwischen allen Gliedern, die Kennung
+@@ -648,17 +765,27 @@ inline constexpr std::uint64_t     kAnatomyAbiMagicAbi7 = 0x434F4D444141372EULL;
+ ///   tests/unit/test_v41_anatomy_module_abi.cpp      -- static_assert + 2x EXPECT_EQ (der Kontroll-Pin)
+ ///   tests/unit/test_e24_c10_g5_lade_wache.cpp       -- ceb_contract_version_text() + --version-Block
+ ///   tests/unit/test_e24_c10_g6_identitaets_bilanz.cpp -- +ceb=-Wert, Minor-Anteil, Objekt-Store-Key
++/// Diese Liste ist NICHT abschliessend (dreimal als unvollstaendig belegt, zuletzt 18.08.2026: 7 Stellen
++/// in 5 Dateien) -- die WAHRHEIT ist der ctest-Doppellauf nach jedem Bump; die Liste nennt nur die
++/// haeufigsten Treffer.
+ /// WER DIESE KONSTANTE DREHT, DREHT DIESE DREI DATEIEN MIT. Die drei Konsumenten-Tests
+ /// (test_g1_binary_version_stamp, test_s1_cache_key_prefix, test_s5_artifact_cache_bounded) leiten den
+ /// Wert weiterhin bewusst AB und wandern von selbst mit -- sie sind hier bewusst NICHT gelistet.
+-inline constexpr std::uint32_t kCebContractCodegenMinor = 1;
++// A-14/B-5b (18.08.2026, Lead-Freigabe "P3 nach Bauplan (1->2)"): 1 -> 2. DEKLARIERTE Bucket-
++// Invalidierung, kein Versions-Sturm -- der Bruch bewegt das POD-Layout (Append name_line/len) und die
++// Preimage-Grammatik, und genau dafuer ist dieser Minor da: er meldet der stale Binary, dass der Vertrag
++// sich erweitert hat. Praezedenz A13-M4/W10-M2/B14-NB4.
++// NICHT ZU VERWECHSELN mit kCebContractCodegenMinorAbi7 darunter: DAS ist ein eingefrorener Vorgaenger-
++// Wert unter Major 7 (7.2) und bleibt unangetastet. Der lebende Vertrag steht nach diesem Bump auf 8.2;
++// die beiden Bucket-Diff-Wachen (test_v41, test_w10_c4) vergleichen weiter 8.2 gegen 7.2 und halten.
++inline constexpr std::uint32_t kCebContractCodegenMinor = 2;
+ 
+ /// HISTORIEN-FREEZE des Vorgaenger-Minors (E-24 C8, additiv -- s. kHostAnatomyAbiVersionAbi7). Der Wert 2
+ /// ist der W10-M2-Stand unter Major 7; er wird von den Bucket-Diff-Beweisen als "Vorgaenger-Bucket" zitiert.
+ inline constexpr std::uint32_t kCebContractCodegenMinorAbi7 = 2;
+ 
+ /// ceb_contract_version als Tupel (Major = ABI-Major, Minor = codegen-Minor). host_compatible_with-Backstop des
+-/// Loaders (host_compatible_with, decl:305-308) lehnt Major-Mismatch-DLLs ohnehin ab -> +ceb= macht Bau-Skip +
++/// Loaders (host_compatible_with, decl:568-571) lehnt Major-Mismatch-DLLs ohnehin ab -> +ceb= macht Bau-Skip +
+ /// Lade-Akzeptanz konsistent.
+ inline constexpr AnatomyAbiVersion kCebContractVersion{COMDARE_ANATOMY_ABI_MAJOR, kCebContractCodegenMinor};
+ 
+diff --git a/libs/cache_engine/include/cache_engine/abi/mess_gates_glied.hpp b/libs/cache_engine/include/cache_engine/abi/mess_gates_glied.hpp
+index 614384f4..2d62964e 100644
+--- a/libs/cache_engine/include/cache_engine/abi/mess_gates_glied.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/mess_gates_glied.hpp
+@@ -153,6 +153,25 @@ namespace comdare::cache_engine::abi {
+ #define COMDARE_MESS_GATES_SEG_TMI "tmi0"
+ #endif
+ 
++// -- DIE HYBRID-EBENE (A-12/B-5e, 18.08.2026) ----------------------------------------------------
++// WARUM ZWEI WEITERE FELDER UND NICHT MEHR: der Owner-Verbatim in KON25-03 nennt die
++// Belegungen namentlich -- "Micro/Macro auf Tier-Binary und Hybrid jeweils 2x2=4, also 16 und
++// Wall-Clock-time auf CEB mit an/aus also 2". Die drei bestehenden Tooling-Felder decken davon die
++// CEB-Wallclock (tw) und das Tier-Paar (tm/tmi) ab; was fehlte, war das HYBRID-Paar. Der Hybrid ist
++// eine eigene Traeger-Stufe mit eigenen Achsen -- er faehrt sein Micro-Benchmarking fuer sich selbst
++// und sein Macro getrennt abschaltbar. Ohne eigene Felder truege sein Stempel die Gate-Lage der
++// Tier-Ebene und behauptete damit etwas ueber eine Stufe, die er nicht ist.
++#ifdef COMDARE_HYBRID_TOOLING_MACRO
++#define COMDARE_MESS_GATES_SEG_HM "hm1"
++#else
++#define COMDARE_MESS_GATES_SEG_HM "hm0"
++#endif
++#ifdef COMDARE_HYBRID_TOOLING_MICRO
++#define COMDARE_MESS_GATES_SEG_HMI "hmi1"
++#else
++#define COMDARE_MESS_GATES_SEG_HMI "hmi0"
++#endif
++
+ /// Das Praefix der Grammatik. Es traegt den nicht-leeren Schluessel, den die Format-Wache verlangt.
+ inline constexpr std::string_view kMessGatesGliedPraefix = "mg=";
+ 
+@@ -165,7 +184,13 @@ inline constexpr std::size_t kMessGatesFeldExperiment    = 3;
+ inline constexpr std::size_t kMessGatesFeldWallclock     = 4;
+ inline constexpr std::size_t kMessGatesFeldMacro         = 5;
+ inline constexpr std::size_t kMessGatesFeldMicro         = 6;
+-inline constexpr std::size_t kMessGatesFeldCount         = 7;
++// A-12/B-5e: die Hybrid-Ebene haengt HINTEN an. Die Position ist kein Geschmack -- ein Einschub in
++// der Mitte verschoebe die Felder aller bestehenden Gates und damit den Wert JEDER heute gebauten
++// Binary an Stellen, die mit dem Anbau nichts zu tun haben. Angehaengt bleibt die Lesart der ersten
++// sieben Felder unveraendert; nur die Zeichenkette wird laenger.
++inline constexpr std::size_t kMessGatesFeldHybridMacro = 7;
++inline constexpr std::size_t kMessGatesFeldHybridMicro = 8;
++inline constexpr std::size_t kMessGatesFeldCount       = 9;
+ 
+ /// Der Feld-TRENNER der Grammatik. Er steht hier als Konstante und nicht als Literal in der Bildung,
+ /// weil die Kapazitaets-Rechnung unten mit ihm rechnet.
+@@ -180,13 +205,27 @@ inline constexpr char kMessGatesFeldTrenner = ';';
+ /// sie MUSS, weil der Praeprozessor keine constexpr-Tabelle lesen kann. Genau diese unvermeidbare
+ /// Doppelung ist der Grund fuer den Binde-static_assert am Dateiende.
+ inline constexpr std::string_view kMessGatesSegmente[kMessGatesFeldCount][2] = {
+-    {"m0", "m1"}, {"s0", "s1"}, {"st0", "st1"}, {"x0", "x1"}, {"tw0", "tw1"}, {"tm0", "tm1"}, {"tmi0", "tmi1"},
++    {"m0", "m1"},
++    {"s0", "s1"},
++    {"st0", "st1"},
++    {"x0", "x1"},
++    {"tw0", "tw1"},
++    {"tm0", "tm1"},
++    {"tmi0", "tmi1"},
++    // A-12/B-5e: die Hybrid-Ebene. Die Kuerzel folgen der bestehenden Konvention (tm/tmi = Tier-
++    // Macro/Micro) mit dem Traeger-Praefix h statt t -- hm/hmi. Sie sind KEINE Erweiterung der
++    // Tier-Kuerzel, sondern eigene Felder auf eigener Position; die Wache am Dateiende haelt das fest.
++    {"hm0", "hm1"},
++    {"hmi0", "hmi1"},
+ };
+ 
+ /// kMessGatesGliedMaxLen -- die LAENGSTE Zeichenkette, die diese Grammatik bilden kann. GERECHNET
+ /// aus den Segmenten oben, nicht abgezaehlt: der Puffer darunter kann konstruktiv nicht zu klein
+-/// werden. Seit B2 sind es 28 Zeichen ("mg=m0;s0;st0;x0;tw0;tm0;tmi0"); die Wache am Dateiende
+-/// prueft alle 2^7 baubaren Formen dagegen, damit die Zahl nicht bloss behauptet ist.
++/// werden. Seit A-12/B-5e sind es 37 Zeichen ("mg=m0;s0;st0;x0;tw0;tm0;tmi0;hm0;hmi0" -- live gemessen,
++/// nicht gezaehlt; AN- und AUS-Form sind gleich lang, weil jedes Segmentpaar es ist); die Wache am
++/// Dateiende prueft alle 2^9 baubaren Formen dagegen, damit die Zahl nicht bloss behauptet ist.
++/// SIE RECHNET SICH SELBST: die Lambda liest kMessGatesSegmente, also hat der Anbau der Hybrid-Felder
++/// die Kapazitaet automatisch mitgenommen -- genau dafuer steht sie hier als Rechnung und nicht als Zahl.
+ inline constexpr std::size_t kMessGatesGliedMaxLen = [] {
+     std::size_t n = kMessGatesGliedPraefix.size() + (kMessGatesFeldCount - 1); // Praefix + Trenner
+     for (auto const& feld : kMessGatesSegmente) n += feld[0].size() > feld[1].size() ? feld[0].size() : feld[1].size();
+@@ -256,7 +295,8 @@ private:
+ [[nodiscard]] constexpr MessGatesGliedText mess_gates_glied_komponieren(bool measurement_on, bool statistics_on,
+                                                                         bool segment_timing_on, bool experiment_mode_on,
+                                                                         bool tooling_wallclock, bool tooling_macro,
+-                                                                        bool tooling_micro) {
++                                                                        bool tooling_micro, bool hybrid_macro,
++                                                                        bool hybrid_micro) {
+     // Die Zuordnung Argument -> Feld laeuft ueber die BENANNTEN Positionen, nicht ueber die
+     // Reihenfolge der Argumente: eine Umsortierung der Felder muss die Bildung mitnehmen, und die
+     // Wache am Dateiende faengt es, falls jemand nur die Segment-Tabelle umstellt.
+@@ -268,6 +308,8 @@ private:
+     an[kMessGatesFeldWallclock]     = tooling_wallclock;
+     an[kMessGatesFeldMacro]         = tooling_macro;
+     an[kMessGatesFeldMicro]         = tooling_micro;
++    an[kMessGatesFeldHybridMacro]   = hybrid_macro; // A-12/B-5e
++    an[kMessGatesFeldHybridMicro]   = hybrid_micro; // A-12/B-5e
+ 
+     MessGatesGliedText g;
+     g.anhaengen(kMessGatesGliedPraefix);
+@@ -324,6 +366,18 @@ constexpr bool kMessGatesTuToolingMicro =
+ #else
+     false;
+ #endif
++constexpr bool kMessGatesTuHybridMacro =
++#ifdef COMDARE_HYBRID_TOOLING_MACRO
++    true;
++#else
++    false;
++#endif
++constexpr bool kMessGatesTuHybridMicro =
++#ifdef COMDARE_HYBRID_TOOLING_MICRO
++    true;
++#else
++    false;
++#endif
+ 
+ /// kMessGatesTuGlied -- DER WERT DES NEUNTEN GLIEDS FUER **DIESE** UEBERSETZUNGSEINHEIT.
+ /// Er entsteht rein aus den Segment-Literalen oben, also aus dem Praeprozessor-Zustand, den der
+@@ -331,7 +385,7 @@ constexpr bool kMessGatesTuToolingMicro =
+ constexpr std::string_view kMessGatesTuGlied =
+     "mg=" COMDARE_MESS_GATES_SEG_M ";" COMDARE_MESS_GATES_SEG_S ";" COMDARE_MESS_GATES_SEG_ST
+     ";" COMDARE_MESS_GATES_SEG_X ";" COMDARE_MESS_GATES_SEG_TW ";" COMDARE_MESS_GATES_SEG_TM
+-    ";" COMDARE_MESS_GATES_SEG_TMI;
++    ";" COMDARE_MESS_GATES_SEG_TMI ";" COMDARE_MESS_GATES_SEG_HM ";" COMDARE_MESS_GATES_SEG_HMI;
+ // NOLINTEND(misc-definitions-in-headers)
+ 
+ // -- W3: DER SELBSTBEWEIS. DIE KONSTANTE KANN DEN TU-ZUSTAND NICHT VERFEHLEN ----------------------
+@@ -388,8 +442,23 @@ static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldMicro) == "tmi0",
+               "R-3/W3: COMDARE_MEASUREMENT_TOOLING_MICRO ist NICHT gesetzt, das Glied sagt aber 'tmi1'.");
+ #endif
+ 
++#ifdef COMDARE_HYBRID_TOOLING_MACRO
++static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldHybridMacro) == "hm1",
++              "A-12/B-5e: COMDARE_HYBRID_TOOLING_MACRO ist gesetzt, das Glied sagt aber 'hm0'.");
++#else
++static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldHybridMacro) == "hm0",
++              "A-12/B-5e: COMDARE_HYBRID_TOOLING_MACRO ist NICHT gesetzt, das Glied sagt aber 'hm1'.");
++#endif
++#ifdef COMDARE_HYBRID_TOOLING_MICRO
++static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldHybridMicro) == "hmi1",
++              "A-12/B-5e: COMDARE_HYBRID_TOOLING_MICRO ist gesetzt, das Glied sagt aber 'hmi0'.");
++#else
++static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldHybridMicro) == "hmi0",
++              "A-12/B-5e: COMDARE_HYBRID_TOOLING_MICRO ist NICHT gesetzt, das Glied sagt aber 'hmi1'.");
++#endif
++
+ /// EIN Feld mehr gibt es nicht -- sonst waere die Feld-Buchhaltung oben unvollstaendig und ein
+-/// kuenftiges siebtes Gate koennte still hinten anhaengen, ohne dass eine Wache es forderte.
++/// kuenftiges zehntes Gate koennte still hinten anhaengen, ohne dass eine Wache es forderte.
+ static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldCount).empty(),
+               "R-3/W3: das mess-gates-Glied traegt mehr Felder, als kMessGatesFeldCount kennt.");
+ 
+@@ -399,7 +468,7 @@ static_assert(mess_gates_feld(kMessGatesTuGlied, kMessGatesFeldCount).empty(),
+ static_assert(mess_gates_glied_komponieren(kMessGatesTuMeasurementOn, kMessGatesTuStatisticsOn,
+                                            kMessGatesTuSegmentTimingOn, kMessGatesTuExperimentModeOn,
+                                            kMessGatesTuToolingWallclock, kMessGatesTuToolingMacro,
+-                                           kMessGatesTuToolingMicro)
++                                           kMessGatesTuToolingMicro, kMessGatesTuHybridMacro, kMessGatesTuHybridMicro)
+                       .sv() == kMessGatesTuGlied,
+               "R-3: die Praeprozessor-Bildung des mess-gates-Glieds und mess_gates_glied_komponieren() "
+               "sind auseinandergelaufen -- es gibt dann ZWEI Grammatiken und die Host-Vorhersage ist wertlos.");
+@@ -409,16 +478,16 @@ static_assert(mess_gates_glied_komponieren(kMessGatesTuMeasurementOn, kMessGates
+ // und dass die Segment-Tabelle zu den benannten Feld-Positionen passt.
+ namespace detail {
+ 
+-/// Die groesste Laenge ueber ALLE 2^7 baubaren Grammatiken. Sie laeuft die Bildung wirklich durch --
++/// Die groesste Laenge ueber ALLE 2^kMessGatesFeldCount baubaren Grammatiken. Sie laeuft die Bildung wirklich durch --
+ /// laege eine Form ueber der Kapazitaet, braeche schon das .at() im Puffer, und zwar hier.
+ [[nodiscard]] constexpr std::size_t mess_gates_groesste_bildung() {
+     std::size_t groesste = 0;
+     for (unsigned maske = 0; maske < (1u << kMessGatesFeldCount); ++maske) {
+         auto const bit = [maske](std::size_t feld) { return ((maske >> feld) & 1u) != 0u; };
+-        auto const g   = mess_gates_glied_komponieren(bit(kMessGatesFeldMeasurement), bit(kMessGatesFeldStatistics),
+-                                                      bit(kMessGatesFeldSegmentTiming), bit(kMessGatesFeldExperiment),
+-                                                      bit(kMessGatesFeldWallclock), bit(kMessGatesFeldMacro),
+-                                                      bit(kMessGatesFeldMicro));
++        auto const g   = mess_gates_glied_komponieren(
++            bit(kMessGatesFeldMeasurement), bit(kMessGatesFeldStatistics), bit(kMessGatesFeldSegmentTiming),
++            bit(kMessGatesFeldExperiment), bit(kMessGatesFeldWallclock), bit(kMessGatesFeldMacro),
++            bit(kMessGatesFeldMicro), bit(kMessGatesFeldHybridMacro), bit(kMessGatesFeldHybridMicro));
+         if (g.size() > groesste) groesste = g.size();
+     }
+     return groesste;
+@@ -435,10 +504,10 @@ namespace detail {
+ [[nodiscard]] constexpr bool mess_gates_segmente_stehen_auf_ihrem_feld() {
+     for (std::size_t feld = 0; feld < kMessGatesFeldCount; ++feld) {
+         auto const bit = [feld](std::size_t f) { return f == feld; };
+-        auto const g   = mess_gates_glied_komponieren(bit(kMessGatesFeldMeasurement), bit(kMessGatesFeldStatistics),
+-                                                      bit(kMessGatesFeldSegmentTiming), bit(kMessGatesFeldExperiment),
+-                                                      bit(kMessGatesFeldWallclock), bit(kMessGatesFeldMacro),
+-                                                      bit(kMessGatesFeldMicro));
++        auto const g   = mess_gates_glied_komponieren(
++            bit(kMessGatesFeldMeasurement), bit(kMessGatesFeldStatistics), bit(kMessGatesFeldSegmentTiming),
++            bit(kMessGatesFeldExperiment), bit(kMessGatesFeldWallclock), bit(kMessGatesFeldMacro),
++            bit(kMessGatesFeldMicro), bit(kMessGatesFeldHybridMacro), bit(kMessGatesFeldHybridMicro));
+         for (std::size_t i = 0; i < kMessGatesFeldCount; ++i)
+             if (mess_gates_feld(g.sv(), i) != kMessGatesSegmente[i][i == feld ? 1 : 0]) return false;
+     }
+@@ -454,8 +523,8 @@ static_assert(detail::mess_gates_groesste_bildung() == kMessGatesGliedMaxLen,
+ static_assert(detail::mess_gates_segmente_stehen_auf_ihrem_feld(),
+               "R-3/08.08.: die Segment-Tabelle kMessGatesSegmente und die benannten kMessGatesFeld*-Positionen "
+               "sind auseinandergelaufen -- die Bildung schreibt ein Gate an die Stelle eines anderen.");
+-static_assert(mess_gates_glied_komponieren(false, false, false, false, false, false, false).sv() ==
+-                  "mg=m0;s0;st0;x0;tw0;tm0;tmi0",
++static_assert(mess_gates_glied_komponieren(false, false, false, false, false, false, false, false, false).sv() ==
++                  "mg=m0;s0;st0;x0;tw0;tm0;tmi0;hm0;hmi0",
+               "R-3/B2: der AUS-Zustand der Grammatik hat seine Form geaendert. Er ist an mehreren Stellen "
+               "als Text belegt (anatomy_fingerprint.hpp: 'NIEMALS leer'); wer ihn bewegt, zieht sie mit.");
+ 
+@@ -466,5 +535,7 @@ static_assert(mess_gates_glied_komponieren(false, false, false, false, false, fa
+ #undef COMDARE_MESS_GATES_SEG_TW
+ #undef COMDARE_MESS_GATES_SEG_TM
+ #undef COMDARE_MESS_GATES_SEG_TMI
++#undef COMDARE_MESS_GATES_SEG_HM
++#undef COMDARE_MESS_GATES_SEG_HMI
+ 
+ } // namespace comdare::cache_engine::abi
+diff --git a/libs/cache_engine/include/cache_engine/abi/sequence_module_abi_v1.hpp b/libs/cache_engine/include/cache_engine/abi/sequence_module_abi_v1.hpp
+index 96d301ee..df03c493 100644
+--- a/libs/cache_engine/include/cache_engine/abi/sequence_module_abi_v1.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/sequence_module_abi_v1.hpp
+@@ -28,4 +28,17 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        return static_cast<std::uint8_t>(                                                                              \
++            ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::Sequence));   \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::Sequence);                    \
+     }
+diff --git a/libs/cache_engine/include/cache_engine/abi/set_module_abi_v1.hpp b/libs/cache_engine/include/cache_engine/abi/set_module_abi_v1.hpp
+index b0166e89..65d56077 100644
+--- a/libs/cache_engine/include/cache_engine/abi/set_module_abi_v1.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/set_module_abi_v1.hpp
+@@ -27,4 +27,17 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        return static_cast<std::uint8_t>(                                                                              \
++            ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::Set));        \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::Set);                         \
+     }
+diff --git a/libs/cache_engine/include/cache_engine/abi/view_module_abi_v1.hpp b/libs/cache_engine/include/cache_engine/abi/view_module_abi_v1.hpp
+index ded23c87..eff9af21 100644
+--- a/libs/cache_engine/include/cache_engine/abi/view_module_abi_v1.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/view_module_abi_v1.hpp
+@@ -26,4 +26,17 @@
+     extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
+         ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
+         delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        return static_cast<std::uint8_t>(                                                                              \
++            ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::View));       \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::View);                        \
+     }
+[1m[33mwarning:[0m[0m Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+[35m[3mcodex[0m[0m
+Ich prüfe ausschließlich den hier eingebetteten Difftext. Im Fokus stehen die tatsächliche Feldzählung/-folge, die sieben Makrostellen samt Hybrid-Sonderfall und die drei unabhängigen Gate-Darstellungen; nicht belegbare Aussagen zu den zwei Tests kennzeichne ich ausdrücklich.
+[35m[3mcodex[0m[0m
+1. `anatomy_module_abi_v1.hpp:73,137` — **BLOCKER**  
+   Der Diff erweitert nur sechs Modulmakros (Adapter, zweimal Anatomy, Sequence, Set, View). Eine siebte Hybrid-Makrostelle mit `ZielGenusExpr` kommt nirgends vor. Damit fehlen dort mutmaßlich die zwei neuen Pflichtsymbole; außerdem ist die geforderte Ziel- statt Reroute-Identität unbelegt.  
+   **Fix:** Im Hybrid-Makro `comdare_anatomy_genus()` aus `ZielGenusExpr` und `comdare_anatomy_gattung()` ausschließlich aus `gattung_of(ZielGenusExpr)` erzeugen, mit exakt denselben Export-/`noexcept`-Signaturen wie an den übrigen sechs Stellen.
+
+2. `anatomy_module_abi_v1_decl.hpp:445` — **HOCH**  
+   Die Typ-Folge-Wache behauptet 20 Felder, enthält aber nur 18 Typen: 2×U32, vier Zeilenpaare, drei Entry-Paare und nur das Komposit-Paar. `name_line`/`name_len` fehlen. Eine verkürzte Aggregatinitialisierung ist erlaubt, daher bleibt der `static_assert` grün und Typänderungen der letzten beiden Felder bleiben unentdeckt.  
+   **Fix:** Am Ende `detail::FeldZgr, detail::FeldU64` ergänzen; die Kommentare „18 Argumente“/„19. Feld“ auf 20/21 korrigieren.
+
+3. `anatomy_module_abi_v1_decl.hpp:548` — **MITTEL**  
+   `stamp_pod_layout_probe(6u)` baut keinen Layout-6-POD. Es baut das aktuelle 20-Feld-Layout und ändert lediglich die Versionszahl auf 6. Die Probe beweist somit korrekt die numerische Gleichheitswache `== 7`, aber nicht die behaupteten abweichenden Layout-6-Offsets.  
+   **Fix:** Einen eingefrorenen Layout-6-Mirror mit `sizeof==120` und `offsetof`-Vergleichen für M/O-Zeilen und Entry-Felder ergänzen; alternativ die bestehende Probe ausdrücklich nur als numerischen Gleichheitsbeweis dokumentieren.
+
+4. `anatomy_module_abi_v1_decl.hpp:780,784` — **MITTEL**  
+   Live-Minor und Abi7-Freeze sind öffentlich, typgleich und aktuell beide `2`. Ein Konsument kann versehentlich `kCebContractCodegenMinorAbi7` verwenden; das ist heute in Werttests unsichtbar und wird erst beim nächsten Live-Bump zu einem stillen veralteten Bucket-Wert. Der gezeigte kanonische Live-Tupel verwendet allerdings die richtige Konstante.  
+   **Fix:** Den historischen Wert als unteilbares Abi7-Versionstupel kapseln und `_Abi7`-Verwendungen außerhalb der Freeze-/Ablehnungstests technisch begrenzen.
+
+5. `anatomy_module_abi_v1_decl.hpp:496,591` — **NIEDRIG**  
+   Zwei Kommentare sind veraltet: einmal steht weiterhin `sizeof 136` statt 152, einmal „4 Loader-Pflicht-Symbole“ statt sechs.  
+   **Fix:** Auf 152 beziehungsweise sechs korrigieren.
+
+Ohne weiteren Befund:
+
+- Das Struct hat tatsächlich 20 Felder und korrekt `8 + 9×16 = 152` Byte bei Alignment 8.
+- Die zwei sichtbaren designierten Initialisierer sind vollständig und exakt in MESS–SYSTEM–ORGAN-Reihenfolge. Die behaupteten zwei Testinitialisierer fehlen im bereitgestellten Difftext und sind daher nicht verifizierbar.
+- Die sechs sichtbaren Modulmakros haben identische C-Signaturen; ihre Fortsetzungszeilen sind im gelieferten Text syntaktisch intakt.
+- Die Gate-Grammatik ist über Tabelle, Komponierer und Präprozessor vollständig auf neun Felder synchron. `1u << 9` prüft 512 Formen; die AUS-Länge ist korrekt: `3 + 26 + 8 = 37`.
+
+NICHT_LANDBAR
+[2mtokens used[0m
+40,533
+1. `anatomy_module_abi_v1.hpp:73,137` — **BLOCKER**  
+   Der Diff erweitert nur sechs Modulmakros (Adapter, zweimal Anatomy, Sequence, Set, View). Eine siebte Hybrid-Makrostelle mit `ZielGenusExpr` kommt nirgends vor. Damit fehlen dort mutmaßlich die zwei neuen Pflichtsymbole; außerdem ist die geforderte Ziel- statt Reroute-Identität unbelegt.  
+   **Fix:** Im Hybrid-Makro `comdare_anatomy_genus()` aus `ZielGenusExpr` und `comdare_anatomy_gattung()` ausschließlich aus `gattung_of(ZielGenusExpr)` erzeugen, mit exakt denselben Export-/`noexcept`-Signaturen wie an den übrigen sechs Stellen.
+
+2. `anatomy_module_abi_v1_decl.hpp:445` — **HOCH**  
+   Die Typ-Folge-Wache behauptet 20 Felder, enthält aber nur 18 Typen: 2×U32, vier Zeilenpaare, drei Entry-Paare und nur das Komposit-Paar. `name_line`/`name_len` fehlen. Eine verkürzte Aggregatinitialisierung ist erlaubt, daher bleibt der `static_assert` grün und Typänderungen der letzten beiden Felder bleiben unentdeckt.  
+   **Fix:** Am Ende `detail::FeldZgr, detail::FeldU64` ergänzen; die Kommentare „18 Argumente“/„19. Feld“ auf 20/21 korrigieren.
+
+3. `anatomy_module_abi_v1_decl.hpp:548` — **MITTEL**  
+   `stamp_pod_layout_probe(6u)` baut keinen Layout-6-POD. Es baut das aktuelle 20-Feld-Layout und ändert lediglich die Versionszahl auf 6. Die Probe beweist somit korrekt die numerische Gleichheitswache `== 7`, aber nicht die behaupteten abweichenden Layout-6-Offsets.  
+   **Fix:** Einen eingefrorenen Layout-6-Mirror mit `sizeof==120` und `offsetof`-Vergleichen für M/O-Zeilen und Entry-Felder ergänzen; alternativ die bestehende Probe ausdrücklich nur als numerischen Gleichheitsbeweis dokumentieren.
+
+4. `anatomy_module_abi_v1_decl.hpp:780,784` — **MITTEL**  
+   Live-Minor und Abi7-Freeze sind öffentlich, typgleich und aktuell beide `2`. Ein Konsument kann versehentlich `kCebContractCodegenMinorAbi7` verwenden; das ist heute in Werttests unsichtbar und wird erst beim nächsten Live-Bump zu einem stillen veralteten Bucket-Wert. Der gezeigte kanonische Live-Tupel verwendet allerdings die richtige Konstante.  
+   **Fix:** Den historischen Wert als unteilbares Abi7-Versionstupel kapseln und `_Abi7`-Verwendungen außerhalb der Freeze-/Ablehnungstests technisch begrenzen.
+
+5. `anatomy_module_abi_v1_decl.hpp:496,591` — **NIEDRIG**  
+   Zwei Kommentare sind veraltet: einmal steht weiterhin `sizeof 136` statt 152, einmal „4 Loader-Pflicht-Symbole“ statt sechs.  
+   **Fix:** Auf 152 beziehungsweise sechs korrigieren.
+
+Ohne weiteren Befund:
+
+- Das Struct hat tatsächlich 20 Felder und korrekt `8 + 9×16 = 152` Byte bei Alignment 8.
+- Die zwei sichtbaren designierten Initialisierer sind vollständig und exakt in MESS–SYSTEM–ORGAN-Reihenfolge. Die behaupteten zwei Testinitialisierer fehlen im bereitgestellten Difftext und sind daher nicht verifizierbar.
+- Die sechs sichtbaren Modulmakros haben identische C-Signaturen; ihre Fortsetzungszeilen sind im gelieferten Text syntaktisch intakt.
+- Die Gate-Grammatik ist über Tabelle, Komponierer und Präprozessor vollständig auf neun Felder synchron. `1u << 9` prüft 512 Formen; die AUS-Länge ist korrekt: `3 + 26 + 8 = 37`.
+
+NICHT_LANDBAR

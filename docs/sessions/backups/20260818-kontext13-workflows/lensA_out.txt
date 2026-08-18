@@ -1,0 +1,758 @@
+Reading additional input from stdin...
+OpenAI Codex v0.146.0
+--------
+[1mworkdir:[0m /home/comdare/.claude/jobs/5a19728e/tmp/codex-lens
+[1mmodel:[0m gpt-5.6-sol
+[1mprovider:[0m openai
+[1mapproval:[0m never
+[1msandbox:[0m read-only
+[1mreasoning effort:[0m ultra
+[1mreasoning summaries:[0m none
+[1msession id:[0m 01a0154e-4f84-7b33-bff8-6f13b724c563
+--------
+[36muser[0m
+WICHTIG: Dateizugriff und Kommando-Ausfuehrung sind in dieser Umgebung DEFEKT (bwrap). Der KOMPLETTE Auftrag inkl. Diff-Volltext steht UNTEN in DIESER Nachricht. Lies NICHTS von Platte, fuehre KEINE Kommandos aus, antworte allein aus dem hier gegebenen Material. Wo der Text unten "Lies die Datei X" sagt, gilt: ihr Inhalt STEHT HIER.
+
+Code-Review LENS A (Kern-Neulogik) eines ungelandeten C++23-ABI-Bruchs (TU-Diplomarbeit Cache-Engine). Dein lokaler Dateizugriff ist defekt (bwrap) — der VOLLSTÄNDIGE Diff ist unten eingebettet; arbeite AUSSCHLIESSLICH auf ihm, führe KEINE Kommandos aus.
+
+SOLL-KONTEXT: (1) Loader anatomy_module_loader erweitert 4→6 Pflicht-Symbole: comdare_anatomy_gattung + comdare_anatomy_genus (uint8-Enum-Rückgaben), gezogen NACH Magic/Version-Prüfung, VOR der Factory; 3 neue Statuscodes 9=gattung_symbol_missing, 10=genus_symbol_missing, 11=identity_mismatch je mit status_name; KONSISTENZ-RIEGEL: Symbol-Wert==genus() der Instanz UND gattung_of(genus)==Gattungs-Symbol, fail-closed. Die 2 Alt-Major-Fixtures (genus_module_alt_major7/major7_neue_magic) MÜSSEN weiter an Magic/Major scheitern, NICHT an den neuen Symbolen. (2) HybridBinaryProxy = reine Delegation auf SearchAlgorithmAbiAdapter (kein eigener Lebenszyklus), genus() liefert das GEERBTE Ziel-Genus (nie den Reroute-Wert 5), CT-Sperre RerouteZiel<G> primär undefiniert + Negativ-Pins, genau 2 deklarierte Ziele (SearchAlgorithm, Set), kRerouteGenusCtSlotCount=32. (3) genus_build_admission: kGenusBuildSlotCounts 5→6 (6. Eintrag = CT-Konstante aus hybrid/, keine Handzahl), static_assert ==6, Include-Richtung builder→hybrid erlaubt.
+
+PRÜFE HART: (a) Fehlerpfad-Vollständigkeit im Loader — räumt JEDER frühe return auf (native_unload, kein Handle-Leak, create/destroy-Paarung bei identity_mismatch NACH create)? (b) Statuscode-Konsistenz (status_name deckt 9/10/11? Doku-Zeilen 'neun Codes' nachgezogen?), (c) Proxy-Delegation vollständig (fehlt eine virtuelle Methode? doppelter Zustand?), (d) CT-Sperren wasserdicht (kann ein nicht-deklariertes Ziel durch eine Lücke — z.B. über das Makro mit beliebigem ZielGenusExpr?), (e) ODR/Visibility der neuen extern-C-Symbole in den 2 Fixtures vs Makro, (f) Alt-Major-Fixtures: prüfe am Diff, dass deren Fehlerbild unverändert bleibt.
+
+AUSGABE: nummerierte Findings mit Datei:Zeile (aus den Diff-Hunks ablesbar), Schwere KRITISCH/ERNST/HINWEIS, Begründung + konkreter Fix. Ende: LANDBAR / LANDBAR_MIT_FIXES / NICHT_LANDBAR für diese Fläche.
+
+=== DIFF (development..HEAD, Flächen: loader + hybrid + admission + 2 Fixtures) ===
+diff --git a/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp b/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp
+index f36eb504..67123ebd 100644
+--- a/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp
++++ b/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp
+@@ -70,6 +70,10 @@ using PfnDestroy    = void (*)(ana::IAnatomyBase*);
+ // OHNE Deklaration messfaehig ist, faellt NICHT hier (der Loader ist ein reiner dlopen-Wrapper), sondern am
+ // Pruefdock (mess_konsistenz_gate.hpp) -- dort fail-closed.
+ using PfnVersionLines = abi::AnatomyVersionLines const* (*)();
++// Q2/V-06: die zwei Identitaets-Symbole liefern die uint8-Enum-WERTE, nicht die Enum-Typen -- ueber die
++// C-ABI-Grenze reist ein Zahlentyp, die Bedeutung liegt im Header, den beide Seiten teilen.
++using PfnGattung = std::uint8_t (*)();
++using PfnGenus   = std::uint8_t (*)();
+ 
+ } // anonymous namespace
+ 
+@@ -152,6 +156,29 @@ int AnatomyModuleLoader::load(std::filesystem::path const& dll_path, AnatomyModu
+                                                                            : status_abi_minor_too_new;
+     }
+ 
++    // Q2/V-06 (18.08.2026) -- DIE ZWEI IDENTITAETS-SYMBOLE, PFLICHT, an genau dieser Stelle.
++    // WARUM NACH MAGIC UND VERSION: erst wenn Magic und Major/Minor passen, ist dieses Modul
++    // ueberhaupt als unseres lesbar. Zoege der Loader die neuen Symbole VOR diesen Pruefungen, bekaeme
++    // ein echtes Alt-Modul ein Symbol-Fehlerbild statt seines Magic-/Major-Fehlerbildes -- die beiden
++    // Alt-Major-Fixtures (genus_module_alt_major7, genus_module_major7_neue_magic) pruefen genau diese
++    // beiden Schloesser, und sie muessen sie weiter EINZELN treffen.
++    // WARUM VOR DER FACTORY: hier ist noch kein Objekt gebaut. Nach pfn_create() muesste jeder
++    // Fehlerpfad das Objekt erst wieder zerstoeren -- ein Ausstieg, den man genau einmal vergisst.
++    // Und fachlich ist es der Punkt: diese beiden Symbole beantworten "was BIST du", und das gehoert
++    // VOR "gib mir eine Instanz", nicht danach.
++    auto* sym_gattung = native_symbol(native, "comdare_anatomy_gattung");
++    if (!sym_gattung) {
++        native_unload(native);
++        return status_gattung_symbol_missing;
++    }
++    auto* sym_genus = native_symbol(native, "comdare_anatomy_genus");
++    if (!sym_genus) {
++        native_unload(native);
++        return status_genus_symbol_missing;
++    }
++    auto const modul_gattung = static_cast<ana::AnatomyGattung>(reinterpret_cast<PfnGattung>(sym_gattung)());
++    auto const modul_genus   = static_cast<ana::AnatomyGenus>(reinterpret_cast<PfnGenus>(sym_genus)());
++
+     // Factory aufrufen
+     ana::IAnatomyBase* anatomy = pfn_create();
+     if (!anatomy) {
+@@ -159,6 +186,26 @@ int AnatomyModuleLoader::load(std::filesystem::path const& dll_path, AnatomyModu
+         return status_factory_returned_null;
+     }
+ 
++    // Q2/V-06 -- DER KONSISTENZ-RIEGEL, am GELADENEN Objekt und nicht am Symbolnamen.
++    // Das Modul hat zweimal geantwortet: einmal statisch ueber comdare_anatomy_genus (VOR der Factory)
++    // und einmal dynamisch ueber die Instanz, die seine Factory geliefert hat. Beide Antworten muessen
++    // dieselbe sein -- sonst traegt das Binary eine andere Identitaet, als es ausweist, und genau diese
++    // Luege wandert ungeprueft in Stempel, Lagerpfad und Messreihe.
++    // Die GATTUNG wird nicht verglichen, sondern GEPRUEFT: sie ist per gattung_of aus dem Genus
++    // ableitbar, also ist jede Abweichung ein Widerspruch in sich und keine zweite Meinung.
++    // Beim HYBRID melden beide Seiten den ZIEL-Genus (Weg C, nie FunctionInterfaceReroute) -- der
++    // Riegel gilt fuer ihn unveraendert, ohne Sonderfall.
++    if (anatomy->genus() != modul_genus || ana::gattung_of(modul_genus) != modul_gattung) {
++        std::cerr << "[anatomy_loader] identity_mismatch: Symbol comdare_anatomy_genus meldet "
++                  << static_cast<int>(modul_genus) << ", die Instanz meldet "
++                  << static_cast<int>(anatomy->genus()) << "; Symbol comdare_anatomy_gattung meldet "
++                  << static_cast<int>(modul_gattung) << ", gattung_of(genus) ergibt "
++                  << static_cast<int>(ana::gattung_of(modul_genus)) << " (" << dll_path.string() << ")\n";
++        pfn_destroy(anatomy);
++        native_unload(native);
++        return status_identity_mismatch;
++    }
++
+     // M-1/D-2: das OPTIONALE Stempel-Symbol NACH der Version-Validierung ziehen. Reihenfolge ist tragend:
+     // erst wenn Magic + Major/Minor passen, ist das POD-Layout dieses Moduls ueberhaupt als das unsere
+     // lesbar. Ein Fehlen ist KEIN Lade-Fehler (der Loader kennt nur 4 Pflicht-Symbole) -- der Zeiger bleibt
+diff --git a/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.hpp b/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.hpp
+index 1051000d..b3aed753 100644
+--- a/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.hpp
++++ b/libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.hpp
+@@ -41,6 +41,16 @@ inline constexpr int status_abi_major_mismatch    = 5;
+ inline constexpr int status_abi_minor_too_new     = 6;
+ inline constexpr int status_factory_returned_null = 7;
+ inline constexpr int status_null_module           = 8;
++// Q2/V-06 (18.08.2026) -- die zwei IDENTITAETS-SYMBOLE sind PFLICHT. ZWEI Codes statt einem, aus
++// demselben Grund, aus dem es zwei Alt-Major-Fixtures gibt: jedes Schloss muss EINZELN beobachtbar
++// sein. Ein Sammel-Code "identitaet_fehlt" haette gesagt, DASS etwas fehlt, nicht WAS -- und genau
++// diese Auskunft braucht der, der ein Modul baut und es nicht geladen bekommt.
++inline constexpr int status_gattung_symbol_missing = 9;
++inline constexpr int status_genus_symbol_missing   = 10;
++// Der KONSISTENZ-RIEGEL. Ein Modul, dessen Symbol-Wert nicht zu der Instanz passt, die seine eigene
++// Factory liefert, ist WIDERSPRUECHLICH -- und ein Widerspruch, den der Loader durchlaesst, wandert
++// als falsche Identitaet in Stempel, Lager und Messreihe. Deshalb fail-closed hier, nicht spaeter.
++inline constexpr int status_identity_mismatch      = 11;
+ 
+ [[nodiscard]] constexpr const char* status_name(int s) noexcept {
+     switch (s) {
+@@ -53,6 +63,9 @@ inline constexpr int status_null_module           = 8;
+         case status_abi_minor_too_new: return "abi_minor_too_new";
+         case status_factory_returned_null: return "factory_returned_null";
+         case status_null_module: return "null_module";
++        case status_gattung_symbol_missing: return "gattung_symbol_missing";
++        case status_genus_symbol_missing: return "genus_symbol_missing";
++        case status_identity_mismatch: return "identity_mismatch";
+         default: return "unknown";
+     }
+ }
+diff --git a/libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp b/libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp
+index 95463f2f..315316cc 100644
+--- a/libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp
++++ b/libs/cache_engine/builder/experiment_tree/genus_build_admission.hpp
+@@ -47,6 +47,11 @@
+ 
+ #include "genus_binding_traits.hpp" // GenusBindingTraits<G> (READ-ONLY, TABU) + GenusBound<G> + cea
+ 
++// HY-A3 (E-6/KON118): die CT-Slot-Zahl des Reroute-Genus kommt aus der Hybrid-Bindung selbst,
++// nicht aus einer Zahl an dieser Stelle. Die Kante builder/ -> hybrid/ ist die ERLAUBTE Richtung
++// (die Schicht-Wache lint_layer_includes.sh verbietet nur die Gegenrichtung).
++#include "hybrid/hybrid_binary_proxy.hpp" // hybrid::kRerouteGenusCtSlotCount
++
+ #include <cache_engine/measurement/axis_error.hpp> // CompilerCompilerErrorClass / BuildCellStatus / Etiketten
+ 
+ #include <array>
+@@ -62,12 +67,23 @@ namespace cem = ::comdare::cache_engine::measurement;
+ /// kGenusBuildSlotCounts -- die Slot-Zahl je Ebene-2-Gattung, COMPILE-TIME aus der Bau-Bindung gezogen.
+ /// Index == Enum-Wert (SearchAlgorithm=0 .. View=4). Handgepflegte Zahlen stuenden hier falsch: sie
+ /// wuerden beim naechsten Slot-Umbau still auseinanderlaufen, und genau das faengt der Cross-Pin unten.
+-inline constexpr std::array<std::size_t, 5> kGenusBuildSlotCounts = {
++/// HY-A3 (E-6/KON118, 18.08.2026): SECHSTER Eintrag -- der Reroute-Genus. Er zaehlt KEINE
++/// Kompositions-Slots (er hat keine Komposition), sondern DOCKS: seine Bau-Aritaet ist der
++/// Dock-Programm-Deckel (32, KON28-03). Die Zahl kommt aus der Hybrid-Bindung
++/// (hybrid::kRerouteGenusCtSlotCount) und nicht von Hand -- dieselbe Begruendung wie fuer die
++/// fuenf darueber. RT <= CT: eine konkrete Hybrid-Binary bestueckt weniger, nie mehr.
++///
++/// WAS DAS NICHT HEISST: der Reroute-Genus wird dadurch NICHT ABI-sichtbar. Die Dock-Registry
++/// bleibt bei FUENF (register_all_genus_docks), genus() liefert weiter das geerbte Ziel-Genus.
++/// Diese Tabelle beantwortet die BAU-Frage ("darf gebaut werden, mit welcher Aritaet"), nicht die
++/// Lade-Frage.
++inline constexpr std::array<std::size_t, 6> kGenusBuildSlotCounts = {
+     GenusBindingTraits<cea::AnatomyGenus::SearchAlgorithm>::slot_count,
+     GenusBindingTraits<cea::AnatomyGenus::Set>::slot_count,
+     GenusBindingTraits<cea::AnatomyGenus::Sequence>::slot_count,
+     GenusBindingTraits<cea::AnatomyGenus::Adapter>::slot_count,
+     GenusBindingTraits<cea::AnatomyGenus::View>::slot_count,
++    ::comdare::cache_engine::hybrid::kRerouteGenusCtSlotCount,
+ };
+ 
+ /// genus_is_build_bound(g) -- traegt die Gattung in DIESEM Bau eine Bau-Bindung? Am Ist: alle FUENF
+@@ -168,7 +184,14 @@ struct GenusBuildVerdict {
+ // ---------------------------------------------------------------------------------------------------
+ // CROSS-PINS: die Laufzeit-Tabelle IST die compile-time-Bindung (sie kann nicht daneben laufen).
+ // ---------------------------------------------------------------------------------------------------
+-static_assert(kGenusBuildSlotCounts.size() == 5, "Ebene 2 hat fuenf Tier-Unterklassen (anatomy_base.hpp:78-84).");
++static_assert(kGenusBuildSlotCounts.size() == 6, "Ebene 2: fuenf ABI-sichtbare Tier-Unterklassen + ein Reroute-Genus "
++                                                 "(anatomy_base.hpp:135-169).");
++static_assert(genus_build_slot_count(cea::AnatomyGenus::FunctionInterfaceReroute) ==
++                  ::comdare::cache_engine::hybrid::kRerouteGenusCtSlotCount,
++              "HY-A3: die Bau-Aritaet des Reroute-Genus IST der Dock-Deckel der Hybrid-Bindung.");
++static_assert(genus_is_build_bound(cea::AnatomyGenus::FunctionInterfaceReroute),
++              "HY-A3: der Reroute-Genus ist BAU-gebunden -- die Schleifen laufen ab hier ueber "
++              "Index 5. Das ist die BAU-Aussage; ABI-sichtbar wird er dadurch nicht.");
+ static_assert(genus_build_slot_count(cea::AnatomyGenus::SearchAlgorithm) ==
+               GenusBindingTraits<cea::AnatomyGenus::SearchAlgorithm>::slot_count);
+ static_assert(genus_build_slot_count(cea::AnatomyGenus::Set) == GenusBindingTraits<cea::AnatomyGenus::Set>::slot_count);
+diff --git a/libs/cache_engine/hybrid/README.md b/libs/cache_engine/hybrid/README.md
+index 9ed01a98..e21ddd50 100644
+--- a/libs/cache_engine/hybrid/README.md
++++ b/libs/cache_engine/hybrid/README.md
+@@ -131,8 +131,8 @@ Paket den Namen `hybrid` in `libs/cache_engine/` belegt.
+   hier bis zum 08.08.2026 eine Zahl, die inzwischen gewandert ist; sie bleibt als Historie stehen:
+   Stand 02.08.2026: "Major 7, `anatomy_module_abi_v1_decl.hpp:62`" -- ABI-HISTORIE gegen SHA 6b8eee0f
+   Stand 04.08.2026: "Major 8, Magic `.A8.` = `0x434F4D444141382EULL`" -- ABI-HISTORIE gegen SHA 0f08fab5
+-  **LEBENDER STAND seit NAHT-1 (09.08.2026, Mess-Naht am Genus-Interface): Major 9** -- Beleg `anatomy_module_abi_v1_decl.hpp:109`.
+-  **Magic `.A9.`** (`0x434F4D444141392EULL`) -- Beleg `anatomy_module_abi_v1_decl.hpp:114`.
++  **LEBENDER STAND seit NAHT-1 (09.08.2026, Mess-Naht am Genus-Interface): Major 9** -- Beleg `anatomy_module_abi_v1_decl.hpp:110`.
++  **Magic `.A9.`** (`0x434F4D444141392EULL`) -- Beleg `anatomy_module_abi_v1_decl.hpp:115`.
+ - Die Dock-Bestueckung ist Runtime-Konfiguration und gehoert in ein Sidecar-Manifest, NIE in die
+   binary_id. Das Sidecar-Format wird erst NACH der A13-Stempel-Regression fixiert.
+ - Offene Auflagen K1 (Lager-Identitaet der Hybrid-.so), K2 (Schichten-Entscheid Loader/Drive),
+@@ -162,8 +162,8 @@ Stand 02.08.2026, unveraendert stehengelassen (jede Zeile gegen ihren SHA nachge
+ Lebender Stand seit E-24 C8 (04.08.2026, ce `4f569051`):
+ 
+ - Stand 04.08.2026: "Major 8, Magic `.A8.` = `0x434F4D444141382EULL`" -- ABI-HISTORIE gegen SHA 0f08fab5
+-- **Major 9** -- Beleg `anatomy_module_abi_v1_decl.hpp:109`
+-- **Magic `.A9.`** = `0x434F4D444141392EULL` -- Beleg `anatomy_module_abi_v1_decl.hpp:114`
++- **Major 9** -- Beleg `anatomy_module_abi_v1_decl.hpp:110`
++- **Magic `.A9.`** = `0x434F4D444141392EULL` -- Beleg `anatomy_module_abi_v1_decl.hpp:115`
+ 
+ Die alten Zeilen-Anker sind nicht falsch geschrieben, sondern GEWANDERT: gegen SHA `6b8eee0f`
+ -- den Stand, den Abschnitt 11 des Design-Dokuments selbst als seine Basis nennt -- zeigen `:62`
+diff --git a/libs/cache_engine/hybrid/hybrid_binary_proxy.hpp b/libs/cache_engine/hybrid/hybrid_binary_proxy.hpp
+new file mode 100644
+index 00000000..9a04156d
+--- /dev/null
++++ b/libs/cache_engine/hybrid/hybrid_binary_proxy.hpp
+@@ -0,0 +1,283 @@
++#pragma once
++// hybrid/hybrid_binary_proxy.hpp -- HY-A2 (F8-MINIMAL-DoD): der PROXY einer Hybrid-Tier-Binary.
++//
++// WAS ER IST: die eine Klasse, die eine Hybrid-.so nach aussen zu einer ganz normalen Tier-Binary
++// macht. Sie erfuellt IAnatomyBase, haelt intern das Dock-Array (HY-A1) und leitet den Antrieb an
++// das Ziel durch, das an einem Dock steckt. Der Host merkt davon nichts -- und genau das ist die
++// Zusage.
++//
++// ============================================================================================
++// WEG C, UND WARUM genus() NICHT DEN REROUTE-GENUS LIEFERT
++// ============================================================================================
++// Owner-Entscheid E-1 final (09.08.2026), am Enum selbst ausformuliert (anatomy_base.hpp:135-169):
++//   KLASSIFIKATIONS-Ebene (Weg A) -- AnatomyGenus::FunctionInterfaceReroute. Sie sortiert die
++//     Hybrid-.so im Lagerbaum und benennt die ART des Reroutes. Eigenschaft des ARTEFAKTS.
++//   INTERFACE-Ebene (Weg C)       -- genus() liefert das GEERBTE ZIEL-Genus (z.B. SearchAlgorithm).
++//     Der Pass-through ist nach aussen transparent.
++// Der naheliegende Fehler waere, aus genus() den Reroute-Wert zurueckzugeben: dann suchte der Host
++// ein Pruef-Dock fuer einen Genus, der keines hat, und die Registry muesste von 5 auf 6 wachsen.
++// SIE BLEIBT 5. Diese Datei ist die Stelle, an der das entschieden wird, deshalb steht die
++// Begruendung hier und nicht nur im Ledger.
++//
++// ============================================================================================
++// DIE CT-SPERRE: EIN NICHT DEKLARIERTES ZIEL BRICHT LAUT
++// ============================================================================================
++// Ein Reroute-Ziel ist NICHT jeder Genus, den das Enum kennt. Zwei Klassen fallen weg:
++//   (a) Klassifikations-Genera (heute: FunctionInterfaceReroute selbst). Ein Hybrid, der auf einen
++//       Hybrid-Genus umleitet, haette kein ABI-Interface am Ende der Kette -- Gate S1,
++//       hybrid_status_kein_zielfaehiges_genus.
++//   (b) Genera, die dieser Bau nicht deklariert hat. Der F8-Minimal-Schnitt deklariert GENAU EINEN
++//       (SearchAlgorithm); ein zweiter kommt hinzu, indem jemand unten eine Spezialisierung
++//       schreibt -- nicht, indem er einen Enum-Wert einsetzt und hofft.
++// Beide Faelle brechen COMPILE-TIME mit benanntem Text. Das ist die Doktrin "erst laute
++// Compile-Fehler, dann verschieben": ein nicht deklariertes Ziel darf nicht erst zur Laufzeit als
++// leeres Dock auffallen, denn dort sieht es aus wie "noch nicht bestueckt" und nicht wie "falsch".
++
++#include "heuristik_adapter_klassifikation.hpp"  // ist_abi_sichtbares_genus / ist_klassifikations_genus
++#include "heuristik_adapter_synthese_matrix.hpp" // kHybridNodeObergrenzeDefault (Dock-Programm-Deckel)
++#include "hybrid_dock_array.hpp"                 // DockArray + StatischeDockArrayPolicy
++#include "hybrid_dock_contract.hpp"              // DockContractDescriptor + hybrid_status_*
++#include "hybrid_dock_factory.hpp"               // DockArray<Policy>::attach (Definition)
++#include "hybrid_pruef_dock.hpp"                 // StandardHybridDock
++
++#include "anatomy/observable_tier.hpp" // IObservableTier (der Antrieb am Dock)
++
++#include "anatomy/anatomy_base.hpp" // IAnatomyBase / AnatomyGenus / AnatomyGattung
++
++#include <cstddef>
++#include <cstdint>
++#include <string_view>
++
++namespace comdare::cache_engine::hybrid {
++
++// ------------------------------------------------------------------------------------------
++// (1) DIE ZIEL-DEKLARATION -- die CT-Sperre in ihrer positiven Form
++// ------------------------------------------------------------------------------------------
++
++/// RerouteZiel<G> -- primaer UNDEFINIERT. Wer ein Ziel-Genus benutzt, das hier keine
++/// Spezialisierung hat, bekommt einen Fehler an der Instanziierungsstelle. Die Sperre ist damit
++/// eine Eigenschaft des TYPSYSTEMS, nicht eines Laufzeit-if: sie kann nicht uebersprungen,
++/// vergessen oder mit einem Flag abgeschaltet werden.
++template <anatomy::AnatomyGenus G>
++struct RerouteZiel;
++
++/// DIE ZWEI deklarierten plain-Tier-Ziele des F8-Minimal-Schnitts. Jede Zeile ist der sichtbare
++/// Beleg, dass jemand die Zulaessigkeit GEPRUEFT hat, statt sie zu unterstellen.
++///
++/// WARUM ES ZWEI SIND UND NICHT EINS: mit nur einer Spezialisierung waere nicht unterscheidbar, ob
++/// die Sperre wirklich AUSWAEHLT oder ob der Bau schlicht nur einen einzigen Fall kennt. Erst das
++/// Paar zeigt, dass der Mechanismus eine ECHTE Teilmenge bildet -- zwei zulaessige Genera stehen
++/// drei unzulaessigen gegenueber (Sequence, Adapter, View).
++///
++/// WARUM GERADE DIESE ZWEI: SearchAlgorithm ist die Gattung Map (18 Organ-Achsen, das Haupt-Tier),
++/// Set die Container-Gattung. Ein Ziel-Paar aus VERSCHIEDENEN Gattungen belegt, dass der Reroute
++/// nicht an einer Gattung klebt -- ein Paar aus zwei Container-Genera haette das offen gelassen.
++template <>
++struct RerouteZiel<anatomy::AnatomyGenus::SearchAlgorithm> {
++    static constexpr anatomy::AnatomyGenus genus     = anatomy::AnatomyGenus::SearchAlgorithm;
++    static constexpr std::string_view      ziel_name = "SearchAlgorithm";
++};
++
++template <>
++struct RerouteZiel<anatomy::AnatomyGenus::Set> {
++    static constexpr anatomy::AnatomyGenus genus     = anatomy::AnatomyGenus::Set;
++    static constexpr std::string_view      ziel_name = "Set";
++};
++
++/// reroute_ziel_deklariert<G>() -- die LESBARE Fassung derselben Frage. Sie existiert, damit die
++/// Fehlermeldung des Proxys sagen kann, WAS fehlt; ohne sie meldete nur "incomplete type".
++template <anatomy::AnatomyGenus G>
++[[nodiscard]] consteval bool reroute_ziel_deklariert() noexcept {
++    return requires { RerouteZiel<G>::genus; };
++}
++
++// DIE ZWEI ZULAESSIGEN --------------------------------------------------------------------------
++static_assert(reroute_ziel_deklariert<anatomy::AnatomyGenus::SearchAlgorithm>(),
++              "HY-A2: SearchAlgorithm ist das erste deklarierte Ziel des F8-Minimal-Schnitts.");
++static_assert(reroute_ziel_deklariert<anatomy::AnatomyGenus::Set>(),
++              "HY-A2: Set ist das zweite deklarierte Ziel des F8-Minimal-Schnitts.");
++
++// DIE UNZULAESSIGEN -- vollzaehlig aufgezaehlt, damit die Sperre MESSBAR trennt ------------------
++// Ohne diese Zeilen bewiese der Bau nur, dass zwei Faelle gehen; er sagte nichts darueber, ob die
++// UEBRIGEN gesperrt sind. Ein Praedikat, das auf immer-wahr degeneriert, liesse jeden Enum-Wert
++// durch und faellt genau hier auf.
++static_assert(!reroute_ziel_deklariert<anatomy::AnatomyGenus::FunctionInterfaceReroute>(),
++              "HY-A2/Gate S1: der Reroute-Genus selbst ist NIE ein Ziel -- ein Hybrid auf einen "
++              "Hybrid haette am Ende der Kette kein ABI-Interface.");
++static_assert(!reroute_ziel_deklariert<anatomy::AnatomyGenus::View>(),
++              "HY-A2: die CT-Sperre unterscheidet noch -- View ist ABI-sichtbar, aber von DIESEM Bau "
++              "nicht als Reroute-Ziel deklariert.");
++static_assert(!reroute_ziel_deklariert<anatomy::AnatomyGenus::Sequence>(),
++              "HY-A2: Sequence ist ABI-sichtbar, aber nicht als Reroute-Ziel deklariert.");
++static_assert(!reroute_ziel_deklariert<anatomy::AnatomyGenus::Adapter>(),
++              "HY-A2: Adapter ist ABI-sichtbar, aber nicht als Reroute-Ziel deklariert.");
++
++/// kDeklarierteRerouteZiele -- die Abnahme-Zahl der Ziel-Deklaration, an EINER Stelle. Sie steht
++/// hier und nicht im Test, damit ein Ziel-Zuwachs am EIGENTUEMER auffaellt und nicht erst im Lauf.
++inline constexpr std::size_t kDeklarierteRerouteZiele = 2;
++
++static_assert(kDeklarierteRerouteZiele == 2,
++              "HY-A2/F8-DoD: GENAU ZWEI plain-Tier-Ziele sind deklariert. Wer ein drittes "
++              "aufnimmt, zieht diese Zahl UND den zugehoerigen Negativ-static_assert im selben "
++              "Commit nach -- sonst behauptet die Abnahme eine Trennung, die es nicht mehr gibt.");
++
++// ------------------------------------------------------------------------------------------
++// (2) DER CT-SLOT-DECKEL DES REROUTE-GENUS
++// ------------------------------------------------------------------------------------------
++
++/// kRerouteGenusCtSlotCount -- die COMPILE-ZEIT-Slot-Zahl der Gattung HeuristikAdapter/Genus
++/// FunctionInterfaceReroute, wie sie das Bau-Gate (builder/experiment_tree/genus_build_admission.hpp)
++/// konsumiert.
++///
++/// WARUM SIE DER DOCK-DECKEL IST UND KEINE ACHSEN-ZAHL: die fuenf ABI-sichtbaren Genera zaehlen hier
++/// ihre KOMPOSITIONS-Slots (SearchAlgorithm 18 Organ-Achsen, Set 13, ...). Ein Reroute-Genus hat
++/// keine eigene Komposition -- er hat DOCKS. Seine Bau-Aritaet ist deshalb die Zahl der Docks, die
++/// eine Hybrid-Binary tragen darf, und das ist der Programm-Deckel kHybridNodeObergrenzeDefault
++/// (32, KON28-03, Owner 12.08. "maximal 32").
++///
++/// RT <= CT, und das ist die Richtung, auf die es ankommt: diese Zahl ist die OBERGRENZE. Eine
++/// konkrete Hybrid-Binary bestueckt weniger (der F8-Minimal-Schnitt genau EINS); sie darf nie mehr.
++/// Die Laufzeit-Seite dieser Invariante wacht DockArray::attach mit hybrid_status_array_voll -- sie
++/// steht dort und nicht hier, weil nur dort beide Mengen zugleich sichtbar sind.
++inline constexpr std::size_t kRerouteGenusCtSlotCount = kHybridNodeObergrenzeDefault;
++
++static_assert(kRerouteGenusCtSlotCount == 32,
++              "HY-A3: die CT-Slot-Zahl des Reroute-Genus IST der Dock-Programm-Deckel. Wer ihn "
++              "bewegt, bewegt die Bau-Aritaet der Gattung mit -- und muss den Cross-Pin in "
++              "genus_build_admission.hpp im SELBEN Commit nachziehen.");
++
++// ------------------------------------------------------------------------------------------
++// (3) DER PROXY -- DELEGATION AUF DEN ADAPTER, NICHT NEBEN IHN
++// ------------------------------------------------------------------------------------------
++//
++// DER BEFUND, DER DIESEN SCHNITT ERZWUNGEN HAT (18.08.2026, am Compiler gemessen): eine Klasse, die
++// IAnatomyBase erbt, muss die VOLLE IExecutionEngine-Flaeche bedienen -- engine_name,
++// lifecycle_state, warm_up, run, reset, shutdown (execution_engine_base.hpp:103-118; engine_kind()
++// ist in IAnatomyBase final und faellt weg). Der erste Entwurf liess sie offen und war abstrakt.
++//
++// DIE FALSCHE HEILUNG WAERE, SIE HIER NACHZUBAUEN. Fuer plain Tiere beantwortet sie der
++// SearchAlgorithmAbiAdapter (abi_adapter.hpp:428-443), und zwar mit einer ausdruecklichen Zusage:
++// "die Lifecycle-Methoden setzen NUR state_ (kein eigener Preheat)" (:392). Ein zweiter, hier
++// geschriebener Lebenszyklus waere die ZWEITE WAHRHEIT, gegen die K2 gebaut ist: zwei Stellen, die
++// "warm_up" beantworten, laufen auseinander -- und an warm_up haengt die Mess-Semantik (E-WARMUP:
++// ausfuehren -> zurueckrollen -> warm wiederholen). Ein Hybrid, der seinen eigenen Warmup-Zustand
++// fuehrt, meldete "warm", waehrend sein Ziel kalt ist.
++//
++// DESHALB: DELEGATION. Der Proxy haelt das gebundene Ziel als IAnatomyBase* (dasselbe Objekt, das
++// auch am Dock als IObservableTier* haengt -- der Adapter erbt beide) und reicht JEDE Frage 1:1
++// durch. Seine EIGENLEISTUNG ist genau zweierlei und sonst nichts:
++//   (a) die Reroute-BUCHFUEHRUNG (welches Ziel steckt an welchem Dock),
++//   (b) die Identitaets-Antwort, die NICHT delegiert werden darf: composition_name/paper_id nennen
++//       den HYBRID, nicht sein Ziel -- sonst waere die Hybrid-Binary im Log ununterscheidbar von
++//       einem plain Tier, und genau diese Unterscheidbarkeit ist der Zweck der Gattung.
++// genus() dagegen WIRD delegiert: das ist Weg C. Die Antwort ist damit per Konstruktion das geerbte
++// Ziel-Genus und kann gar nicht der Reroute-Wert sein.
++//
++// DER UNGEBUNDENE ZUSTAND ist ein ehrlicher Zustand, kein Absturz: solange kein Ziel steckt, liefert
++// der Proxy benannte Sentinels ("hybrid_ungebunden", Idle, 0 Organe). Ein Proxy, der stattdessen
++// dereferenzierte, braeche zwischen attach und Bindung -- also in genau dem Fenster, das das
++// Dock-Design ausdruecklich vorsieht (StandardHybridDock::ist_bereit trennt "Slot belegt" von
++// "Ziel gebunden").
++
++template <anatomy::AnatomyGenus ZielGenus, std::size_t MaxDocks = 1>
++class HybridBinaryProxy final : public anatomy::IAnatomyBase {
++    static_assert(reroute_ziel_deklariert<ZielGenus>(),
++                  "HY-A2: dieses Reroute-Ziel ist NICHT deklariert. Zulaessig sind ausschliesslich "
++                  "Genera mit einer RerouteZiel<G>-Spezialisierung in diesem Header. Ein "
++                  "Klassifikations-Genus (FunctionInterfaceReroute) ist NIE zulaessig -- er haette "
++                  "am Ende der Reroute-Kette kein ABI-Interface (Gate S1). Wer ein neues Ziel "
++                  "braucht, schreibt die Spezialisierung; er setzt nicht den Enum-Wert ein.");
++    static_assert(MaxDocks >= 1 && MaxDocks <= kRerouteGenusCtSlotCount,
++                  "HY-A2: die Dock-Zahl liegt ausserhalb von [1, Programm-Deckel]. Null Docks waere "
++                  "eine Hybrid-Binary ohne Ziel -- eine Huelle, die sich wie ein Tier anfuehlt.");
++
++public:
++    using Policy = StatischeDockArrayPolicy<MaxDocks>;
++
++    HybridBinaryProxy() noexcept = default;
++
++    // -- IExecutionEngine: 1:1 DELEGATION, kein eigener Zustand --------------------------------
++
++    [[nodiscard]] std::string_view engine_name() const noexcept override {
++        return ziel_ == nullptr ? std::string_view{"hybrid_ungebunden"} : ziel_->engine_name();
++    }
++    [[nodiscard]] ::comdare::cache_engine::execution_engine::EngineLifecycleState
++    lifecycle_state() const noexcept override {
++        return ziel_ == nullptr ? ::comdare::cache_engine::execution_engine::EngineLifecycleState::Idle
++                                : ziel_->lifecycle_state();
++    }
++    void warm_up() override {
++        if (ziel_ != nullptr) ziel_->warm_up();
++    }
++    void run() override {
++        if (ziel_ != nullptr) ziel_->run();
++    }
++    void reset() override {
++        if (ziel_ != nullptr) ziel_->reset();
++    }
++    void shutdown() override {
++        if (ziel_ != nullptr) ziel_->shutdown();
++    }
++
++    // -- IAnatomyBase ---------------------------------------------------------------------------
++
++    /// WEG C: das GEERBTE Ziel-Genus -- delegiert, also per Konstruktion NIE der Reroute-Wert.
++    /// Ohne Ziel die CT-Deklaration: sie ist die Zusage dieses Bau-Typs, keine Erfindung.
++    [[nodiscard]] anatomy::AnatomyGenus genus() const noexcept override {
++        return ziel_ == nullptr ? ZielGenus : ziel_->genus();
++    }
++
++    /// NICHT delegiert (Begruendung im Kopf): der Hybrid nennt sich selbst.
++    [[nodiscard]] std::string_view composition_name() const noexcept override { return "HybridBinaryProxy"; }
++    [[nodiscard]] std::string_view paper_id() const noexcept override { return "HY-A2"; }
++
++    /// Die Organ-Zahl des ZIELS -- der Proxy hat keine eigene Anatomie. Ohne Ziel: 0, und das ist
++    /// die ehrliche Antwort. Die Zahl, die das Ziel HAETTE, waere eine Behauptung ueber etwas, das
++    /// nicht da ist.
++    [[nodiscard]] std::size_t organ_count() const noexcept override {
++        return ziel_ == nullptr ? std::size_t{0} : ziel_->organ_count();
++    }
++
++    // -- Die Reroute-Naht -----------------------------------------------------------------------
++
++    /// dock_anlegen() -- legt das Standard-Dock an. Rueckgabe: Slot-Index (>= 0) oder -status.
++    /// Der Deskriptor traegt den ZIEL-Genus, nicht den Reroute-Genus: das Dock nimmt plain Tiere auf.
++    [[nodiscard]] int dock_anlegen() noexcept {
++        DockContractDescriptor const desc{static_cast<std::uint8_t>(HybridDockContract::Standard), ZielGenus};
++        return docks_.attach(desc);
++    }
++
++    /// ziel_binden(slot, antrieb, basis) -- DER UMSCHALTPUNKT. Beide Zeiger zeigen auf DASSELBE
++    /// Objekt (der Adapter erbt IObservableTier UND IAnatomyBase); sie stehen getrennt in der
++    /// Signatur, weil der Aufrufer den Cross-Cast besitzt und nicht dieser Header.
++    ///
++    /// nullptr in BEIDEN heisst GELOEST, nicht Fehler -- der Slot muss seinen Zeiger verlieren,
++    /// BEVOR das Ziel-Modul entladen wird (destroy-vor-dlclose). Ein Dock, das einen Zeiger in ein
++    /// entladenes Modul behielte, waere ein use-after-dlclose mit voll plausiblem Verhalten bis zum
++    /// ersten Zugriff.
++    [[nodiscard]] int ziel_binden(std::size_t slot, anatomy::IObservableTier* antrieb,
++                                  anatomy::IAnatomyBase* basis) noexcept {
++        int const status = docks_.antrieb_binden(slot, antrieb);
++        if (status != hybrid_status_ok) return status;
++        ziel_ = basis;
++        return hybrid_status_ok;
++    }
++
++    /// antrieb(slot) -- der OP-PFAD. Ein Zeiger-Read, kein visit, kein Cast (HY-A1-Hotpath-Anker).
++    [[nodiscard]] anatomy::IObservableTier* antrieb(std::size_t slot) const noexcept {
++        return docks_.antrieb_von(slot);
++    }
++
++    [[nodiscard]] bool                              ist_gebunden() const noexcept { return ziel_ != nullptr; }
++    [[nodiscard]] std::size_t                       belegte_docks() const noexcept { return docks_.size(); }
++    [[nodiscard]] std::size_t                       dock_kapazitaet() const noexcept { return docks_.kapazitaet(); }
++    [[nodiscard]] static constexpr std::string_view reroute_ziel_name() noexcept {
++        return RerouteZiel<ZielGenus>::ziel_name;
++    }
++
++private:
++    DockArray<Policy>      docks_{};
++    anatomy::IAnatomyBase* ziel_ = nullptr;
++};
++
++} // namespace comdare::cache_engine::hybrid
+diff --git a/libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp b/libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp
+new file mode 100644
+index 00000000..cf6b5b34
+--- /dev/null
++++ b/libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp
+@@ -0,0 +1,105 @@
++#pragma once
++// HY-A2 (2026-08-18) -- Hybrid Module ABI v1 (Factory-Makro) -- MODUL-AUTOR-Seite der Gattung
++// HeuristikAdapter / Genus FunctionInterfaceReroute.
++//
++// Analog COMDARE_DEFINE_ANATOMY_MODULE (abi/anatomy_module_abi_v1.hpp) und
++// COMDARE_DEFINE_ADAPTER_MODULE (abi/adapter_module_abi_v1.hpp): eine Hybrid-Binary materialisiert
++// damit ihre .so-Export-Symbole. Die VIER extern-"C"-Pflicht-Symbole sind BUCHSTABENGLEICH zu
++// denen der plain Tiere -- comdare_anatomy_abi_version / comdare_anatomy_abi_magic /
++// comdare_create_anatomy / comdare_destroy_anatomy -- und genau das ist der Zweck:
++//
++//   DERSELBE gattungs-agnostische AnatomyModuleLoader laedt eine Hybrid-.so ohne jede Aenderung.
++//   Haette die Hybrid-Gattung eigene Symbolnamen, muesste der Loader die Gattung KENNEN, bevor er
++//   laedt -- er kann sie aber erst NACH dem Laden erfragen (anatomy()->genus()). Das waere ein
++//   Henne-Ei-Problem und haette eine zweite Ladestrecke erzwungen. Die Gleichheit der vier Namen
++//   ist deshalb keine Bequemlichkeit, sondern die Bedingung dafuer, dass es EINE Ladestrecke gibt
++//   (Doc 24 Abschnitt 8.8, dieselbe Begruendung wie bei der Container-Gattung).
++//
++// NACHTRAG Q2/V-06 + KON101-02 (18.08.2026) -- AUS VIER SYMBOLEN SIND SECHS GEWORDEN, UND DAS HAT DIE
++// OBIGE BEGRUENDUNG NICHT AUFGEWEICHT, SONDERN VOLLENDET. Neu sind comdare_anatomy_gattung und
++// comdare_anatomy_genus, ebenfalls buchstabengleich ueber alle Gattungen. Das oben beschriebene
++// Henne-Ei-Problem ("die Gattung ist erst NACH dem Laden erfragbar") war bis hierher nur DADURCH
++// entschaerft, dass der Loader sie gar nicht wissen musste; jetzt ist es aufgeloest: er kann sie
++// erfragen, BEVOR er eine Instanz baut -- ueber gattungs-agnostische NAMEN mit gattungs-spezifischen
++// WERTEN. Fuer den Hybrid gilt dabei unveraendert Weg C: comdare_anatomy_genus meldet den ZIEL-Genus
++// (das, was das Modul FUER den Aufrufer ist), niemals FunctionInterfaceReroute (das, was es INTERN
++// tut). Der Loader verriegelt beides gegeneinander (status_identity_mismatch).
++//
++// ------------------------------------------------------------------------------------------------
++// WARUM DIESER HEADER IN hybrid/ LIEGT UND NICHT IN abi/, WO DIE VIER ANDEREN MODUL-MAKROS STEHEN
++// ------------------------------------------------------------------------------------------------
++// set_/view_/sequence_/adapter_module_abi_v1.hpp liegen in abi/, weil ihre Genera ABI-SICHTBAR sind:
++// sie sind Werte, die genus() zurueckgibt, und gehoeren damit in die gattungs-agnostische
++// Vertragsschicht. FunctionInterfaceReroute ist genau das NICHT (anatomy_base.hpp:139-168, Owner-
++// Entscheid E-1 final): er ist ein KLASSIFIKATIONS-Wert, den genus() nie liefert. Ihn in die
++// ABI-Vertragsschicht zu legen, haette ihn optisch in die Reihe der ABI-sichtbaren Genera gestellt
++// -- also genau die Verwechslung nahegelegt, gegen die Weg A/Weg C getrennt wurden.
++//
++// DIE INCLUDE-RICHTUNG BESTAETIGT DEN SCHNITT: hybrid/ -> abi/ ist die Richtung "obere Gattung kennt
++// den Vertrag". Die Gegenrichtung abi/ -> hybrid/ waere "der Vertrag kennt eine einzelne Gattung"
++// und existiert im Baum an keiner Stelle (gemessen 18.08.2026: 0 Treffer fuer '#include.*hybrid/'
++// unter include/cache_engine/abi/). Dieser Header haelt das so.
++//
++// @doku docs/architecture/24 Abschnitt 8.8 (Pruef-Dock je Gattung) + anatomy_base.hpp:139-168 (Weg A/Weg C)
++
++#include "hybrid_binary_proxy.hpp" // HybridBinaryProxy + RerouteZiel-Deklarationen
++
++#include <cache_engine/abi/anatomy_module_abi_v1_decl.hpp> // ABI-Version/Magic/Export-Macro
++
++#include <new>
++
++// ------------------------------------------------------------------------------------------------
++// COMDARE_DEFINE_HYBRID_MODULE(ZielGenusExpr) -- die 4 Pflicht-extern-C-Symbole einer Hybrid-.so.
++//
++// EIN Argument, kein variadisches: eine Hybrid-Binary wird durch ihr REROUTE-ZIEL bestimmt, nicht
++// durch eine Achsen-Liste. Sie hat keine eigene Komposition (deshalb auch keine 12 oder 18 Achsen
++// im Makro) -- sie hat Docks, und deren Zahl ist der Programm-Deckel.
++//
++// GENAU EIN STANDARD-DOCK: der F8-Minimal-Schnitt legt MaxDocks = 1 fest und legt das Dock direkt
++// in der Factory an. Wuerde die Factory es NICHT anlegen, kaeme eine Hybrid-.so ohne jede
++// Aufnahmestelle aus dem Loader -- ein Objekt, das sich wie ein Tier anfuehlt und nichts
++// weiterreichen kann. Schlaegt das attach fehl, wird das halb gebaute Objekt WIEDER FREIGEGEBEN und
++// nullptr gemeldet: der Loader behandelt nullptr bereits als Ladefehler, waehrend ein Proxy ohne
++// Dock erst beim ersten Reroute-Versuch aufgefallen waere -- also weit weg von der Ursache.
++//
++// DIE CT-SPERRE GREIFT HIER, NICHT ERST IM TEST: ZielGenusExpr geht als Template-Argument in
++// HybridBinaryProxy, dessen static_assert ein nicht deklariertes Ziel als LESBAREN Compile-Fehler
++// meldet (hybrid_binary_proxy.hpp: RerouteZiel<G> primaer undefiniert). Eine Hybrid-.so auf ein
++// unzulaessiges Genus ist damit nicht baubar -- nicht "wird zur Laufzeit abgelehnt".
++// ------------------------------------------------------------------------------------------------
++#define COMDARE_DEFINE_HYBRID_MODULE(ZielGenusExpr)                                                                    \
++    using ComdareHybridModulProxy = ::comdare::cache_engine::hybrid::HybridBinaryProxy<(ZielGenusExpr), 1>;            \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint64_t comdare_anatomy_abi_version() noexcept {                       \
++        return (static_cast<std::uint64_t>(COMDARE_ANATOMY_ABI_MAJOR) << 32) |                                         \
++               static_cast<std::uint64_t>(COMDARE_ANATOMY_ABI_MINOR);                                                  \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint64_t comdare_anatomy_abi_magic() noexcept {                         \
++        return COMDARE_ANATOMY_ABI_MAGIC;                                                                              \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT ::comdare::cache_engine::anatomy::IAnatomyBase*                              \
++    comdare_create_anatomy() noexcept {                                                                                \
++        auto* proxy = new (::std::nothrow) ComdareHybridModulProxy{};                                                  \
++        if (proxy == nullptr) return nullptr;                                                                          \
++        if (proxy->dock_anlegen() < 0) {                                                                               \
++            delete proxy;                                                                                              \
++            return nullptr;                                                                                            \
++        }                                                                                                              \
++        return proxy;                                                                                                  \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT void comdare_destroy_anatomy(                                                \
++        ::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {                                                \
++        delete ptr;                                                                                                    \
++    }                                                                                                                  \
++    /* Q2/V-06 (18.08.2026): die ZWEI IDENTITAETS-SYMBOLE. Sie beantworten "was BIST du" VOR                           \
++       der Factory -- bisher ging das nur ueber create + genus(), also erst, nachdem ein Objekt                        \
++       gebaut war. Die NAMEN sind gattungs-agnostisch (jedes Modul jeder Gattung traegt genau                          \
++       diese zwei), die WERTE sind es nicht. Die Gattung wird NICHT getragen, sondern aus dem                          \
++       Genus abgeleitet (gattung_of, total + constexpr) -- zwei unabhaengig gepflegte Quellen                          \
++       koennten auseinanderlaufen, eine abgeleitete kann es nicht. */                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {                            \
++        return static_cast<std::uint8_t>(                                                                              \
++            ::comdare::cache_engine::anatomy::gattung_of((ZielGenusExpr)));                                            \
++    }                                                                                                                  \
++    extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {                              \
++        return static_cast<std::uint8_t>((ZielGenusExpr));                                                             \
++    }
+diff --git a/tests/unit/genus_module_alt_major7.cpp b/tests/unit/genus_module_alt_major7.cpp
+index 9e18f384..ab57125a 100644
+--- a/tests/unit/genus_module_alt_major7.cpp
++++ b/tests/unit/genus_module_alt_major7.cpp
+@@ -59,3 +59,15 @@ extern "C" COMDARE_ANATOMY_ABI_EXPORT void
+ comdare_destroy_anatomy(::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {
+     delete ptr;
+ }
++
++// Q2/V-06 (18.08.2026) -- die ZWEI IDENTITAETS-SYMBOLE auch an dieser NEGATIV-PROBE. Das ist kein
++// Selbstzweck: die Fixture soll an GENAU EINEM Schloss scheitern (Schloss 1: Alt-Magic + Alt-Version), nicht
++// zufaellig zusaetzlich an einem fehlenden Symbol. Traegt sie die Symbole, ist der Fehlerbild-Beleg
++// eindeutig -- fehlten sie, waere jede Ablehnung mehrdeutig und die Probe wertlos.
++extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {
++    return static_cast<std::uint8_t>(
++        ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::Set));
++}
++extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {
++    return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::Set);
++}
+diff --git a/tests/unit/genus_module_major7_neue_magic.cpp b/tests/unit/genus_module_major7_neue_magic.cpp
+index ecf32ac9..53ad69f5 100644
+--- a/tests/unit/genus_module_major7_neue_magic.cpp
++++ b/tests/unit/genus_module_major7_neue_magic.cpp
+@@ -57,3 +57,15 @@ extern "C" COMDARE_ANATOMY_ABI_EXPORT void
+ comdare_destroy_anatomy(::comdare::cache_engine::anatomy::IAnatomyBase* ptr) noexcept {
+     delete ptr;
+ }
++
++// Q2/V-06 (18.08.2026) -- die ZWEI IDENTITAETS-SYMBOLE auch an dieser NEGATIV-PROBE. Das ist kein
++// Selbstzweck: die Fixture soll an GENAU EINEM Schloss scheitern (Schloss 2: heutige Magic, Major-1), nicht
++// zufaellig zusaetzlich an einem fehlenden Symbol. Traegt sie die Symbole, ist der Fehlerbild-Beleg
++// eindeutig -- fehlten sie, waere jede Ablehnung mehrdeutig und die Probe wertlos.
++extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_gattung() noexcept {
++    return static_cast<std::uint8_t>(
++        ::comdare::cache_engine::anatomy::gattung_of(::comdare::cache_engine::anatomy::AnatomyGenus::Set));
++}
++extern "C" COMDARE_ANATOMY_ABI_EXPORT std::uint8_t comdare_anatomy_genus() noexcept {
++    return static_cast<std::uint8_t>(::comdare::cache_engine::anatomy::AnatomyGenus::Set);
++}
+[1m[33mwarning:[0m[0m Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+[35m[3mcodex[0m[0m
+Ich prüfe ausschließlich den eingebetteten Diff, ohne Datei- oder Kommandozugriff. Ich teile die Review parallel in Loader-Fehlerpfade, Proxy/CT-Sperren und ABI/Fixtures/Admission auf und gleiche die Ergebnisse anschließend am Soll-Kontext ab.
+[35m[3mcodex[0m[0m
+Es bestehen mehrere funktionale Landeblocker, insbesondere im Bindungszustand des Proxys.
+
+1. **KRITISCH — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:225-229,251-264,278-280`**
+
+   `ziel_binden()` übernimmt zwei unabhängige Zeiger, ohne gepaarte Nullheit, gemeinsame Objektidentität oder `basis->genus() == ZielGenus` zu prüfen. Dadurch können Operationspfad (`antrieb`) und Lifecycle/Identität (`ziel_`) auf verschiedene Objekte zeigen. Nach dem Loader-Gate kann `genus()` sogar auf `FunctionInterfaceReroute` wechseln.
+
+   **Fix:** Nur einen typisierten Adapter-/Binding-Handle annehmen, aus dem beide Basissichten entstehen. Alternativ Nullheit, Most-Derived-Identität und Ziel-Genus vor jeder Mutation prüfen und beide Zustände atomar setzen.
+
+2. **ERNST — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:183-193,258-280`**
+
+   `MaxDocks` erlaubt 1–32 Docks, aber der Proxy speichert nur ein globales `ziel_`. Bei zwei Slots delegieren Lifecycle und `genus()` an das zuletzt gebundene Ziel, während ältere `antrieb(slot)`-Zeiger bestehen bleiben. Das Lösen eines beliebigen Slots löscht zudem `ziel_`, obwohl andere Slots gebunden sein können.
+
+   **Fix:** Für den aktuellen Minimal-Schnitt zunächst `static_assert(MaxDocks == 1)`. Für Mehrfach-Docks braucht es slotbezogene Basiszeiger und eine explizite aktive Routingregel.
+
+3. **ERNST — `libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp:71-72,99-104`**
+
+   `ZielGenusExpr` wird einmal als Template-Argument und später erneut in normalen Funktionskontexten ausgewertet. Ein kontextabhängiger Ausdruck wie `std::is_constant_evaluated() ? SearchAlgorithm : View` besteht die CT-Sperre als `SearchAlgorithm`, exportiert zur Laufzeit aber `View`. Der Loader lehnt das zwar mit Status 11 ab, die geforderte Compile-Time-Sperre ist dennoch umgangen.
+
+   **Fix:** Ziel einmal als `constexpr AnatomyGenus` einfrieren oder `HybridBinaryProxy::ziel_genus` bereitstellen und Typ sowie beide Exports ausschließlich daraus ableiten.
+
+4. **ERNST — `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:199-205`**
+
+   Beim Identity-Mismatch erfolgt potenziell werfendes Logging – insbesondere `dll_path.string()` – vor `pfn_destroy()` und `native_unload()`. Bei einer Ausnahme lecken Instanz und Handle.
+
+   **Fix:** Native-Handle und Instanz ab Erwerb durch Scope-Guards schützen, sodass beim Unwinding zuerst `destroy`, dann `unload` erfolgt. Diagnosedaten einmal erfassen und erst nach dem Cleanup best-effort loggen.
+
+5. **ERNST — `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:179-180,198`**
+
+   Rohe `uint8_t`-Werte werden ungeprüft in Enums umgewandelt. Insbesondere kann ein Modul konsistent `FunctionInterfaceReroute` melden: Symbol, Instanz und `gattung_of()` stimmen dann überein, obwohl Genus 5 nie ABI-sichtbar sein soll. Unbekannte Bytewerte gelangen ebenfalls ungeprüft zu `gattung_of()`.
+
+   **Fix:** Zunächst die Rohwerte validieren und nur die fünf ABI-sichtbaren Ziel-Genera zulassen; erst danach casten und `gattung_of()` aufrufen. Ungültige Werte mit `status_identity_mismatch` und `native_unload()` ablehnen.
+
+6. **HINWEIS — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:86-121`**
+
+   `kDeklarierteRerouteZiele = 2` mit `static_assert(... == 2)` ist tautologisch. Die Negativ-Pins schließen die heutigen vier Gegenwerte, nicht aber spätere oder numerisch gecastete Spezialisierungen.
+
+   **Fix:** Eine geschlossene `constexpr std::array{SearchAlgorithm, Set}` als Whitelist verwenden und Prädikat sowie Anzahl daraus ableiten; undefiniertes Primärtemplate und Negativ-Pins können bestehen bleiben.
+
+7. **HINWEIS — Dokumentation**
+
+   Sichtbar veraltet sind:
+
+   - `anatomy_module_loader.cpp:211`: „4 Pflicht-Symbole“ → 6.
+   - `hybrid_module_abi_v1.hpp:7-10,52-56`: aktuelle Makro-Beschreibung nennt weiterhin vier → 6.
+   - `genus_build_admission.hpp:68,90`: Indexbereich endet bei `View=4` und „alle FUENF“ → `FunctionInterfaceReroute=5` beziehungsweise sechs Bau-Genera.
+
+   Der Statusblock `anatomy_module_loader.hpp:49-68` enthält nun zwölf Codes (`0..11`) und `status_name()` deckt 9/10/11 korrekt ab. Eine vom Auftrag erwähnte Bestandszeile „neun Codes“ wird im Diff nicht aktualisiert; deren Fundstelle ist im bereitgestellten Material nicht enthalten und muss auf „zwölf Codes“ beziehungsweise „elf Fehlercodes plus Erfolg“ nachgezogen werden.
+
+Die übrigen Prüfungen sind positiv: Alle neu eingefügten expliziten Returns entladen korrekt; beim Mismatch steht `destroy` vor `unload`. Die virtuelle Fläche ist vollständig delegiert und besitzt keinen eigenen Lifecycle-Zustand. Die sechs Exports haben korrekt `extern "C"` und Export-Visibility. Beide Alt-Major-Fixtures scheitern weiterhin vor den neuen Symbol-Lookups – die erste an Magic, die zweite am Major – und erzeugen als getrennte DSOs kein neues ODR-Problem. Admission nutzt korrekt die Hybrid-CT-Konstante, Größe 6 und den Cross-Pin.
+
+**NICHT_LANDBAR**
+[2mtokens used[0m
+39,408
+Es bestehen mehrere funktionale Landeblocker, insbesondere im Bindungszustand des Proxys.
+
+1. **KRITISCH — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:225-229,251-264,278-280`**
+
+   `ziel_binden()` übernimmt zwei unabhängige Zeiger, ohne gepaarte Nullheit, gemeinsame Objektidentität oder `basis->genus() == ZielGenus` zu prüfen. Dadurch können Operationspfad (`antrieb`) und Lifecycle/Identität (`ziel_`) auf verschiedene Objekte zeigen. Nach dem Loader-Gate kann `genus()` sogar auf `FunctionInterfaceReroute` wechseln.
+
+   **Fix:** Nur einen typisierten Adapter-/Binding-Handle annehmen, aus dem beide Basissichten entstehen. Alternativ Nullheit, Most-Derived-Identität und Ziel-Genus vor jeder Mutation prüfen und beide Zustände atomar setzen.
+
+2. **ERNST — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:183-193,258-280`**
+
+   `MaxDocks` erlaubt 1–32 Docks, aber der Proxy speichert nur ein globales `ziel_`. Bei zwei Slots delegieren Lifecycle und `genus()` an das zuletzt gebundene Ziel, während ältere `antrieb(slot)`-Zeiger bestehen bleiben. Das Lösen eines beliebigen Slots löscht zudem `ziel_`, obwohl andere Slots gebunden sein können.
+
+   **Fix:** Für den aktuellen Minimal-Schnitt zunächst `static_assert(MaxDocks == 1)`. Für Mehrfach-Docks braucht es slotbezogene Basiszeiger und eine explizite aktive Routingregel.
+
+3. **ERNST — `libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp:71-72,99-104`**
+
+   `ZielGenusExpr` wird einmal als Template-Argument und später erneut in normalen Funktionskontexten ausgewertet. Ein kontextabhängiger Ausdruck wie `std::is_constant_evaluated() ? SearchAlgorithm : View` besteht die CT-Sperre als `SearchAlgorithm`, exportiert zur Laufzeit aber `View`. Der Loader lehnt das zwar mit Status 11 ab, die geforderte Compile-Time-Sperre ist dennoch umgangen.
+
+   **Fix:** Ziel einmal als `constexpr AnatomyGenus` einfrieren oder `HybridBinaryProxy::ziel_genus` bereitstellen und Typ sowie beide Exports ausschließlich daraus ableiten.
+
+4. **ERNST — `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:199-205`**
+
+   Beim Identity-Mismatch erfolgt potenziell werfendes Logging – insbesondere `dll_path.string()` – vor `pfn_destroy()` und `native_unload()`. Bei einer Ausnahme lecken Instanz und Handle.
+
+   **Fix:** Native-Handle und Instanz ab Erwerb durch Scope-Guards schützen, sodass beim Unwinding zuerst `destroy`, dann `unload` erfolgt. Diagnosedaten einmal erfassen und erst nach dem Cleanup best-effort loggen.
+
+5. **ERNST — `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp:179-180,198`**
+
+   Rohe `uint8_t`-Werte werden ungeprüft in Enums umgewandelt. Insbesondere kann ein Modul konsistent `FunctionInterfaceReroute` melden: Symbol, Instanz und `gattung_of()` stimmen dann überein, obwohl Genus 5 nie ABI-sichtbar sein soll. Unbekannte Bytewerte gelangen ebenfalls ungeprüft zu `gattung_of()`.
+
+   **Fix:** Zunächst die Rohwerte validieren und nur die fünf ABI-sichtbaren Ziel-Genera zulassen; erst danach casten und `gattung_of()` aufrufen. Ungültige Werte mit `status_identity_mismatch` und `native_unload()` ablehnen.
+
+6. **HINWEIS — `libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:86-121`**
+
+   `kDeklarierteRerouteZiele = 2` mit `static_assert(... == 2)` ist tautologisch. Die Negativ-Pins schließen die heutigen vier Gegenwerte, nicht aber spätere oder numerisch gecastete Spezialisierungen.
+
+   **Fix:** Eine geschlossene `constexpr std::array{SearchAlgorithm, Set}` als Whitelist verwenden und Prädikat sowie Anzahl daraus ableiten; undefiniertes Primärtemplate und Negativ-Pins können bestehen bleiben.
+
+7. **HINWEIS — Dokumentation**
+
+   Sichtbar veraltet sind:
+
+   - `anatomy_module_loader.cpp:211`: „4 Pflicht-Symbole“ → 6.
+   - `hybrid_module_abi_v1.hpp:7-10,52-56`: aktuelle Makro-Beschreibung nennt weiterhin vier → 6.
+   - `genus_build_admission.hpp:68,90`: Indexbereich endet bei `View=4` und „alle FUENF“ → `FunctionInterfaceReroute=5` beziehungsweise sechs Bau-Genera.
+
+   Der Statusblock `anatomy_module_loader.hpp:49-68` enthält nun zwölf Codes (`0..11`) und `status_name()` deckt 9/10/11 korrekt ab. Eine vom Auftrag erwähnte Bestandszeile „neun Codes“ wird im Diff nicht aktualisiert; deren Fundstelle ist im bereitgestellten Material nicht enthalten und muss auf „zwölf Codes“ beziehungsweise „elf Fehlercodes plus Erfolg“ nachgezogen werden.
+
+Die übrigen Prüfungen sind positiv: Alle neu eingefügten expliziten Returns entladen korrekt; beim Mismatch steht `destroy` vor `unload`. Die virtuelle Fläche ist vollständig delegiert und besitzt keinen eigenen Lifecycle-Zustand. Die sechs Exports haben korrekt `extern "C"` und Export-Visibility. Beide Alt-Major-Fixtures scheitern weiterhin vor den neuen Symbol-Lookups – die erste an Magic, die zweite am Major – und erzeugen als getrennte DSOs kein neues ODR-Problem. Admission nutzt korrekt die Hybrid-CT-Konstante, Größe 6 und den Cross-Pin.
+
+**NICHT_LANDBAR**
