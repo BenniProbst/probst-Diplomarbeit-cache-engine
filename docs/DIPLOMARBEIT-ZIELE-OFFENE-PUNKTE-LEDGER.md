@@ -16,6 +16,45 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXVIII (KON118) -- 18.08.2026 frueh: E-6 VOLLZOGEN -- DIE 22 DER
+## HY-A3-FORMEL WAR EIN PHANTOM-NENNER (12W-ultracode wf_a706de82, 14 Agenten, 5 Arme
+## + 8 Tieflesen + Synthese; Kernbehauptungen am Objekt stichprobenverifiziert)
+
+- VERDIKT: "Registry 22->23" (Wellenplan :697/:857/:952, geboren in EINEM Commit
+  ffa4b836 am 08.08. ohne Objekt-Basis) meinte KEINE existierende Registry -- die 22
+  war zu keinem Zeitpunkt der Stand einer Registry. Zahl-Quelle: v1-Pauschale "22
+  Achsen" (selbst als Drift gefuehrt, v1:526); tiefere Wurzel toter Kommentar ce
+  axis_reflect.hpp:4 (02.06.). Einzige lebende 22 = AllStrategies der Organ-Achse 03a
+  (22 Such-Strategie-TYPEN) -- als Ziel VERWORFEN (Kategorienfehler: Hybrid ist per
+  K1/E-1 Gattung+Genus, keine 23. Such-Strategie; 03a bleibt 22). Ebenso verworfen:
+  system 3->4 (K4 superseded), organ 18->19 (das ist ORG-19-IO, Task #86).
+- BEREITS VOLLZOGEN (HY-A1, 09.08., von der Formel nie nachgefuehrt): Gattungen 3->4
+  (anatomy_base.hpp:89 HeuristikAdapter=3) + Genera 5->6 (:169 FunctionInterfaceReroute
+  =5; die frueher notierte ":141" war stale), Einzelquelle heuristik_adapter_
+  klassifikation.hpp:79-86 (kAlleGattungen=4 / kAlleGenera=6) -- 18.08. am Objekt
+  literal bestaetigt.
+- OFFENER REST = der reale HY-A3-Registry-Anteil im #15/HY-A2-Slot: genus_build_
+  admission.hpp:65 kGenusBuildSlotCounts std::array<std::size_t,5> -> 6 (6. Eintrag =
+  CT-Slot-Zahl des Reroute-Genus aus der HY-A2-Bindung, RT<=CT-Regel KON113-02;
+  CT-Deckel nach max_docks-Doktrin KON28-03/KON42-01/W12) + static_assert :171 ==5 ->
+  ==6 + Wachen-Nachzug test_e24_c4_genus_pruef_docks.cpp:363 (handgefuehrte
+  kAllGenera{5}-Kopie -> Einzelquellen-Konsum). Dock-Registry bleibt designfest 5
+  (Reroute-Genus NICHT ABI-sichtbar, Partition klassifikation.hpp:47-49). ABNAHME-
+  ERSATZ fuer W1-Formel :952: kGenusBuildSlotCounts.size() 5->6 + Paare 4/6, je
+  vorher/nachher gedruckt.
+- VERBUCHT: Wellenplan P.20.10 (Volltext-Verdikt) + UEBERHOLT-Marker an :697/:857/
+  :952; ce-seitige Doku-Nachzuege (hybrid_config_xml.hpp:52-55 Punkt (3), hybrid/
+  README.md:32-34, Konformitaetsregister teil2 :131) gehoeren als Doku-Teil in den
+  #15-Zug (Code-Repo-Beruehrung). BU: docs/sessions/backups/20260818-e6-explore-
+  hy-a3-registry/synthese-und-arme.json (1.5M Tokens, 211 Tool-Calls, 14/14 done).
+- OWNER-EIN-SATZ (naechstes Fenster, Melden nicht Warten -- KON113-02: Bau haengt
+  NICHT an einer Owner-Frage): "22->23 war Phantom-Nenner; Identitaet vollzogen 3->4
+  Gattungen + 5->6 Genera (HY-A1), Rest = Bau-Zulassungs-Zeile kGenusBuildSlotCounts
+  5->6 im #15 -- Einspruch?"
+- NAECHSTER SEQUENTIELLER SCHRITT: #15-Bump-Buendel (letzter Preimage-Schritt vor F2
+  Fr 21.08.) -- HY-A3-Anteil jetzt praezise, HY-A2 am decl-Slot, S-6a-POD + Format
+  4->5 + #38a2/#38d + golden-Nachposten + NP-19/NP-23 nach Board-#15.
+
 ## KONSOLIDIERUNG CXVII (KON117) -- 18.08.2026 frueh: #92 VOLLZOGEN -- mess/ = S-22
 ## (Register-Nachtrag + S-10-Naehe-Klaerung + Besitzkarten-Marker)
 

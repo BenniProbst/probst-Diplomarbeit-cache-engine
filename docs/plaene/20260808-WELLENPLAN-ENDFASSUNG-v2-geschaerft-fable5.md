@@ -694,7 +694,7 @@ Kern-Kette: **##08 zuerst** (`lazy_csv_header` EINMAL — Spaltenvertrag, Header
 
 ### W1 — STATISTIK-GLIED + MENGE + HY-A · Mo 17.08.–Fr 21.08. = **F2 = IDENTITÄTS-FREEZE**
 
-Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind), **D4d** (die EINE Spaltenänderung der Woche, danach Header-Freeze Stufe 2), D4e (nach ##07), D4f (nach OV-6-Lage), D5-3 → D5-2, D5-4, D5-5. Menge: ##10+##10b (`--check-size`, zwei Zahlenreihen + EIN gemessener Punkt bei working_set 8.388.608), ##11 (`<measure_selection>`), ##12, ##13 (G3-Split), ##14 (**Sperrlisten-Wache = Freeze-Gate**, maschinell aus `kAnatomyFingerprintGliedCount = 9`), ##15 (§59-SCHEMA als hartes W3-MESS-Vor-Gate; EMITTER/TEMPLATE bei Slack), ##16+##17 (nach OV-1), ##19, ##09 (nachrangig). **HY-A1–A3** (nach OV-13-Bestätigung + OV-12 + 4.-Ebenen-Entscheid Mi 19.08.): Gattung `HEURISTIK-ADAPTER`/Genus `Function-Interface-Reroute` — `hybrid_dock_contract` + `hybrid_pruef_dock` + factory/array (CT-Interface-Vererbung, `variant` NUR im DockSlot), `hybrid_binary_proxy` + `hybrid_tier_module.cpp` (4 ABI-Pflicht-Symbole) = **F8-Minimal-DoD** (genau 1 Standard-Dock, ctest-bewiesen, Reroute auf 2 plain-Tier-Ziele), `<hybrid_tier>`-Parser + Heuristik-Hybrid-Achse in die Registry (22→23, beide Zahlen) + Fehlerklassen. Abgabe-Vorlauf: ##42, ##43, ##44, ##45. **Entwicklung** (nicht Landung) der W2-Landepakete: ##32, ##33, ##35, ##36 (T-15+D4), ##37, ##38, ##39. **An F2:** OV-4-Deckel-Vorlage MIT beiden `--check-size`-Zahlenreihen beim Owner.
+Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind), **D4d** (die EINE Spaltenänderung der Woche, danach Header-Freeze Stufe 2), D4e (nach ##07), D4f (nach OV-6-Lage), D5-3 → D5-2, D5-4, D5-5. Menge: ##10+##10b (`--check-size`, zwei Zahlenreihen + EIN gemessener Punkt bei working_set 8.388.608), ##11 (`<measure_selection>`), ##12, ##13 (G3-Split), ##14 (**Sperrlisten-Wache = Freeze-Gate**, maschinell aus `kAnatomyFingerprintGliedCount = 9`), ##15 (§59-SCHEMA als hartes W3-MESS-Vor-Gate; EMITTER/TEMPLATE bei Slack), ##16+##17 (nach OV-1), ##19, ##09 (nachrangig). **HY-A1–A3** (nach OV-13-Bestätigung + OV-12 + 4.-Ebenen-Entscheid Mi 19.08.): Gattung `HEURISTIK-ADAPTER`/Genus `Function-Interface-Reroute` — `hybrid_dock_contract` + `hybrid_pruef_dock` + factory/array (CT-Interface-Vererbung, `variant` NUR im DockSlot), `hybrid_binary_proxy` + `hybrid_tier_module.cpp` (4 ABI-Pflicht-Symbole) = **F8-Minimal-DoD** (genau 1 Standard-Dock, ctest-bewiesen, Reroute auf 2 plain-Tier-Ziele), `<hybrid_tier>`-Parser + Heuristik-Hybrid-Achse in die Registry (22→23, beide Zahlen) *[ÜBERHOLT per E-6/P.20.10: 22 = Phantom-Nenner; real = kGenusBuildSlotCounts 5→6]* + Fehlerklassen. Abgabe-Vorlauf: ##42, ##43, ##44, ##45. **Entwicklung** (nicht Landung) der W2-Landepakete: ##32, ##33, ##35, ##36 (T-15+D4), ##37, ##38, ##39. **An F2:** OV-4-Deckel-Vorlage MIT beiden `--check-size`-Zahlenreihen beim Owner.
 **Sa 22./So 23.08. = benannte Entnahme-Option NUR für HY-A-Fertigstellung.**
 **Parallelität 2:** Statistik-Header + HY-A sind rein lokal (CT); Mengen-/CI-Pakete bündeln ihre Beweisläufe seriell.
 **Blockiert durch:** W0b (F1); OV-13/OV-12 (Owner); OV-1/OV-6 für ##16/##17/D4f.
@@ -854,7 +854,7 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
  19   [lok] LaTeX-Auswertungs-Emitter.       09 [lok, nachrangig] amd_l3-Teil.
  HY-A1[lok] Dock-Contract/Pruefdock/Factory/Array (CT, variant nur im DockSlot).
  HY-A2[lok] F8-MINIMAL-DoD: 1 Standard-Dock + Proxy + tier_module, ctest-bewiesen.
- HY-A3[lok] <hybrid_tier>-Parser + Achse in Registry (22->23) + Fehlerklassen.
+ HY-A3[lok] <hybrid_tier>-Parser + Achse in Registry (22->23 UEBERHOLT s. P.20.10) + Fehlerklassen.
  32/33/35/36/37/38/39 [lok] ENTWICKLUNG der W2-Landepakete (Landung erst Mo 24.).
  42/43/44/45 [lok] FF-Matrix anlegen, .ps1/.py-Abloesung, C5-Geruest, Thesis-Spur.
  Fr 21.08.: OV-4-VORLAGE mit beiden Zahlenreihen an den Owner. FREEZE.
@@ -949,7 +949,7 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 
 **W0b** (Nenner 17 + 5 Nachlauf): D3-1-Proben P1 (Kopfzeile, `$K` im Pfad der Fehlerzeile) rot / P2 (eine Datenzeile `koeder_$K`) grün mit `datenzeilen_gesamt=1` / P3 (leer) rot mit `csv_gesamt=0` — heute P1/P3 grün, Vorher-Läufe protokolliert *(Nachtrag 08.08. abends: **gefahren und gelandet** — `ci/tests/mess_ausbeute_bissprobe.sh` mit `--selbstbiss`, im CI als `test:mess-ausbeute-bissprobe` ohne `allow_failure`; die Köder werden je Lauf gewürfelt, nicht abgeschrieben. Offen bleibt allein die Marker-Auswertung aus D3-7.)* · ##26 in korrigierter Formel `N>=1 UND M==N UND Z>=1` · Marker: fehlend = rot, `provision_only` nicht fälschlich rot, gefälschter `modus=voll measured=0` rot · persist-Beweis am Git-Zustand · Testat-XOR: gewürfelte Fehl-Zelle → genau 1 `[FEHLER-TESTAT]`, C−1 `[MESS-TESTAT]`, Bilanz stimmt (heute C+1 Testate) · Frische-Zwei-Lauf-Köder · D3-6: P1 Produktions-Layout heute unsichtbar → danach im WIDE-Aggregat, P3 NO-OP mit `laufordner_geprueft=1 / mit_material=0` · ##23/##23b wie v1 (Zeilenzahl je Blatt gegen Eingangs-CSV; SKIP-Zweitlauf zwei Zahlen) · **##25 DURCHSTICH:** Submodul-Diff zeigt die Tabellenzeile mit dem gewürfelten Mini-Lauf-Token; PDF baut; jede Stufe hat ihren Nenner gedruckt.
 
-**W1** (Nenner 26): D4-Invarianz (identische `adjusted_p` 7-vs-9; benannter Kipp-Kandidat) · `win_rate` nur noch mit Nenner-Klammer · f15-Summenzeile nachgerechnet, Exit≠0 bei degeneriert (rc direkt hinter dem Aufruf, K11) · D4d: Spaltenzahl vorher/nachher, Null-Vektor ≠ success, Gegenprobe (31 Nullen + 1 echter Wert) · ##10 zwei Zahlenreihen + ##10b ein gemessener Punkt bei 8.388.608 · ##11 Deckelung liefert kleinere Zahl; nicht deklarierte Perm = Fehlerklasse · ##13 `nm` auf benannte micro-Symbole, Stempel-Region ausgenommen (v1-##13 bleibt) · ##14 Preimage-Wache: 10. Glied → rot · HY-A: F8-DoD grün in ctest (Zahl vorher/nachher), Reroute-Roundtrip-Köder (gewürfeltes Token durch das Dock zu 2 plain-Zielen und zurück), nicht deklariertes Ziel bricht compile-time laut, Registry 22→23 · Kreuz-Test Median (Bit-Gleichheit, gerade Länge) · Fr 21.08.: OV-4-Vorlage liegt MIT Zahlen beim Owner.
+**W1** (Nenner 26): D4-Invarianz (identische `adjusted_p` 7-vs-9; benannter Kipp-Kandidat) · `win_rate` nur noch mit Nenner-Klammer · f15-Summenzeile nachgerechnet, Exit≠0 bei degeneriert (rc direkt hinter dem Aufruf, K11) · D4d: Spaltenzahl vorher/nachher, Null-Vektor ≠ success, Gegenprobe (31 Nullen + 1 echter Wert) · ##10 zwei Zahlenreihen + ##10b ein gemessener Punkt bei 8.388.608 · ##11 Deckelung liefert kleinere Zahl; nicht deklarierte Perm = Fehlerklasse · ##13 `nm` auf benannte micro-Symbole, Stempel-Region ausgenommen (v1-##13 bleibt) · ##14 Preimage-Wache: 10. Glied → rot · HY-A: F8-DoD grün in ctest (Zahl vorher/nachher), Reroute-Roundtrip-Köder (gewürfeltes Token durch das Dock zu 2 plain-Zielen und zurück), nicht deklariertes Ziel bricht compile-time laut, Registry 22→23 *[ÜBERHOLT: Abnahme-Ersatz s. P.20.10 — kGenusBuildSlotCounts.size() 5→6 + Paare 4/6, je vorher/nachher]* · Kreuz-Test Median (Bit-Gleichheit, gerade Länge) · Fr 21.08.: OV-4-Vorlage liegt MIT Zahlen beim Owner.
 
 **W2** (Nenner 12): ##34 `git log -p`-Filter aufs ABI-Magic = **genau EIN** Wechsel im Gesamtfenster, **NULL nach Mo 24.08.** (Commit-Zahl als Nenner gedruckt) · ##35 zwei Zahlen (Abbruch nach 2 Batches, Neustart überspringt; heute Start bei 0 = rot) · ##36 **zwei degenerierte Zellarten getrennt**: Null-Fenster → `MESSUNG DEGENERIERT … unbestimmbar` (kein Rerun), echte Streuung → `reruns: n`; `ZeroMedianGuard` im selben Commit umgedreht; Zensus-Zähler Produktion ≥ 1 mit Dateiname · ##47 ETA gegen unabhängige Teilbaum-Auszählung, Abweichung > 50 % = Abbruch; Kalibrierlauf passiert alle W0b-Gates (das IST der U-02-Vollzug) + erhobene Rerun-Rate · ##48 5/5 mit Nenner + `benoetigt_GB`/`frei_GB` beide gedruckt · ##50 drei Zahlen · ##41b drei Job-IDs + ein absichtlicher Zell-Fehlschlag färbt den Grandchild rot · ##51 EINE Datei.
 
@@ -2714,3 +2714,34 @@ HANDLUNGEN: V8-GitHub-PAT | node6/node5/id56/id18.
   Gate KON100-02 ERFUELLT, die 2 Ein-Zeilen-Edits als Auflage in den Di-25-Zug.
   Vorstufen-Verify wf_100fa0b3 (2 MUSS: Arena-Ueberlauf-Semantik OWNER>PLAN +
   FJ-Posten-Luecken) ist durch F3+diesen Kurz-Verify konsumiert.
+
+## 20.10 E-6-VERDIKT (18.08. frueh, wf_a706de82: 5 Arme + 8 Tieflesen + Synthese, KON118):
+## DIE 22 DER HY-A3-FORMEL WAR EIN PHANTOM-NENNER
+
+- HERKUNFT: Formel "(22->23, beide Zahlen)" entstand in EINEM Commit (super ffa4b836,
+  08.08. 16:37, Wellenplan v2) an 3 Stellen (:697/:857/:952) OHNE Objekt-Basis --
+  Zahl-Quelle = v1-Pauschale "22 Achsen" (v1:52), die v1:526 selbst als Drift fuehrt;
+  tiefere Wurzel = toter Kommentar ce axis_reflect.hpp:4 (02.06.). Kein lebender
+  Zaehler stand am 08.08. oder steht heute auf 22 (Zensus: organ 18 · system 3 ·
+  mess 3/.hpp 16 · prt-art 5 · axes26=26 · kCatalogAxisCount=19 · AxisLibraryRegistry
+  34/15). Einzige lebende 22 = AllStrategies der Organ-Achse 03a (22 Such-Strategie-
+  TYPEN) -- als Ziel VERWORFEN (Kategorienfehler: Hybrid ist per K1/E-1 Gattung+Genus,
+  keine 23. Such-Strategie; 03a bleibt 22).
+- VOLLZOGEN IST DIE REGISTRIERUNG LAENGST (HY-A1, 09.08.): Gattungen 3->4
+  (anatomy_base.hpp:89 HeuristikAdapter=3) + Genera 5->6 (:169 FunctionInterfaceReroute
+  =5), Einzelquelle heuristik_adapter_klassifikation.hpp:79-86 (4/6, 256er-Wache) --
+  am Objekt stichprobenverifiziert 18.08.
+- OFFENER REST (der reale HY-A3-Registry-Anteil im #15/HY-A2-Slot):
+  genus_build_admission.hpp:65 kGenusBuildSlotCounts std::array 5->6 (6. Eintrag =
+  CT-Slot-Zahl des Reroute-Genus aus der HY-A2-Bindung, RT<=CT) + static_assert :171
+  ==5 -> ==6; Wachen-Nachzug test_e24_c4_genus_pruef_docks.cpp:363 (handgefuehrte
+  kAllGenera{5}-Kopie auf Einzelquelle umstellen); Dock-Registry bleibt designfest 5
+  (Reroute-Genus NICHT ABI-sichtbar).
+- ABNAHME-ERSATZ fuer die :952-Formel "Registry 22->23": ctest druckt vorher/nachher
+  kGenusBuildSlotCounts.size() 5->6 UND die Einzelquellen-Paare 4 Gattungen / 6 Genera
+  ("beide Zahlen" = beide Ebenen, je vorher/nachher).
+- MARKER: Die Stellen :697/:857/:952 gelten in ihrer 22->23-Haelfte als UEBERHOLT durch
+  DIESEN Abschnitt (Text bleibt stehen, Doku-Doktrin). Nebenfunde: ":121/:1026
+  AllFourteenAxesPopulated bei heute 22/18 Achsen" traegt dieselbe Phantom-22 (real 34
+  Zweige/15 Hauptachsen) -- bei R-4 korrigieren; stale "21 AllStrategies"-Kommentar
+  test_v41_topic_traversal.cpp:1278 bei naechster 03a-Beruehrung.
