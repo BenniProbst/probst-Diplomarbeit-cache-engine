@@ -6,6 +6,10 @@
 
 **Synthese-Entscheid, in zwei Sätzen:** Tragende Ordnung ist der Ketten-Entwurf („die Kette misst nur so wahr wie ihr schwächstes Glied"), weil er als einziger den bindenden Owner-KERN vom 08.08. (HYBRID = Gattung `HEURISTIK-ADAPTER`, „ALLES PFLICHT") nicht in die Streichliste schiebt und weil seine Reihenfolge — Waage → Nähte → Statistik-Glied → fehlendes Glied → einmal bauen → einmal messen — exakt die am Objekt gemessenen Abnahme-Abhängigkeiten der 35 Defekt-Posten abbildet. Aufgepfropft werden aus dem Frist-Entwurf die Defizit-Arithmetik, das Abgabefähigkeits-Minimum je Freitag und die Ein-Blech-Regel, aus dem Risiko-Entwurf der Durchstich (ein echter Mini-Messwert bis in den Thesis-Anhang am 14.08.), die Batch-Abend-Doktrin und das Sa-29.08.-Messfenster.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): Juengste Konsolidierung = par.21 (Kontext 13, KON118-Stand). KON119 ist
+> als Lande-Bericht des #15-Bruchs reserviert (par.21.1, super-Zug). Owner-Order 18.08.: NIE ausbuchen/verschieben
+> -- W7 ist KEIN Endlager mehr (par.21.0); Platzierungen: Wiederaufnahme-Register + par.21.3.
+
 ---
 
 ## 0. WAS DIESE FASSUNG GEGENÜBER DER VORLAGE ÄNDERT
@@ -33,6 +37,10 @@
 - **Einwand-36-Erklärung** („610 Tests = Folge von EXCLUDE_FROM_ALL") wird **nicht festgeschrieben**: super `Code/CMakeLists.txt:278 enable_testing()` steht ebenfalls NACH den `add_subdirectory`-Aufrufen (:211/:243) — dieselbe D2-G1-Konstellation; welche Ursache trägt, entscheidet die Messung in D1g, nicht der Plan.
 
 **(3) HYBRID kehrt ins Fenster zurück.** v1 führte Hybrid-Bau als Streichkaskade Position 2 / W7. Der Owner-KERN 08.08. („Volles GO. Alles Pflicht.", Gattung `HEURISTIK-ADAPTER`, Genus `Function-Interface-Reroute`, 4. Mess-Ebene DAZWISCHEN) verbietet das. Der Widerspruch wird **zerlegt statt glattgerechnet**, entlang des älteren, als bindend markierten Owner-E1-Designs (`hybrid/README.md`: „kein eigener ABI-Schritt", „Erster Meilenstein = F8-Minimal-DoD, genau 1 Standard-Dock", Router = Break-Even-Router, der Messkurven **konsumiert**): **HY-A** (Struktur+Dock+Achse+Parser) in die Freeze-Woche, **HY-B** (Overhead-Messung mit Stub-Heuristik, eigene kleine Teilmatrix) in die Mess-Welle, **HY-C** (Router aus echten Kurven) in die Auswertung. **Preis, offen ausgewiesen:** der W2-S-E-Restbau (##40: T-06…T-14, W-03, W-08, A14, A10) fällt nach W7 (Abschnitt 7).
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): der Preis-Satz oben ist nur
+> Historie -- die ##40-Reste sind neu platziert (T-13/T-14 vor W3, T-07/T-08 vor Trigger bzw. W2-Slots, Rest W4);
+> Wiederaufnahme-Register + par.21.3.
 
 **(4) Reihenfolge-Umkehrungen:** W0a wächst von 0,5 auf **2,5 Tage** (13 statt 2 Pakete — V-6 erzwingt den ehrlichen Nenner); **D5-1** (Perzentil-Kanon) rückt aus W1 in die W0a-Lokalspur vor, weil er als einziger Posten den Messtermin bewegt; **D2-G4 vor D2** (Textkorrektur vor Wachen-Bau, sonst entsteht ein Dauer-Rot); **D1e vor D1b** (sonst macht die Heilung `test:unit` rot — `ninja -t query comdare_tests`: 424 Test-Inputs, `comdare_f15_compare_cli` fehlt); **D3-7 vor allen D3-Gates** (Modus-Marker zuerst). Neu: der **DURCHSTICH** — F1 (14.08.) liefert nicht mehr „Anschluss an beiden Enden", sondern **einen echten, frisch gemessenen Mini-Messwert als Tabellenzeile im Thesis-Submodul**, durch die komplette Kette CSV → persist → xlsx → `anhang:forward` → PDF.
 
@@ -711,6 +719,10 @@ Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind),
 **Parallelität 1** (Messung hält das Blech exklusiv — fremde Last kontaminiert Latenzen, und kontaminierte Daten sind die unheilbare Klasse; menschliche Textspur via Overleaf).
 **Blockiert durch:** W2 (F3); **beide GOs bis Sa 29.08. 06:00** (OV-15; jeder Verzugstag frisst 1:1 Fenster).
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): die [lok]-Klasse der Batch-Pausen traegt die Band-B-Wiederaufnahme --
+> die Maschine misst, die Session baut lokal ohne CI-Last (vereinbar mit Parallelitaet 1 / null CI-Last);
+> Wiederaufnahme-Register + par.21.3.
+
 ### W4-AUSWERTUNG — ZAHLEN + TEXT + HY-C · Mo 07.09.–Mi 09.09. Kern; Do 10./Fr 11.09. Fangnetz; Fr 11.09. = **F5**
 
 ##57 (Break-Even auf dem D4f-Typ: „kein Break-Even bestimmbar" ≠ „bestimmt: keiner", zwei verschiedene Ausgaben — heute byte-gleich; Umfang gemäß OV-1/OV-6), **HY-C** (`hybrid_router` als Break-Even-CoR aus den HY-B/W3-Kurven + `hybrid_eviction`-Minimalstrategie + EIN belegter Routing-Fall im Text; Köder: nirgends kreuzende Kurven → `kein_schnittpunkt` + Rückfall auf direkten Tier-Aufbau, ungültige Kurve → `kurve_ungueltig`), ##58+##58b (Anhang-Wache: 28 **[NEUMESSUNG 13.08.2026, Korrektur daneben, kein stilles Ersetzen: real 10 unkommentierte Aufrufe = 10 eindeutige Ziele (roh 12); die 28 ist mit keiner Zaehlweise reproduzierbar, UNBELEGT -- s. Fussnote ##58-NENNER unten]** `\InputIfFileExists`-Ziele gegen wirklich gefundene Dateien, beide Zahlen; `\thesisfinal` macht Ersatztext zum LaTeX-Fehler; `|| echo honest-empty` fällt ersatzlos), ##59 (FF0–FF4, Nenner 5, leere Frage = rot), ##60 (Ergebniskapitel C5: Zahlen ins ##44-Gerüst, jede Tabelle mit Lauf-Provenance; DE führt, EN zieht für berührte Kapitel nach), ##61 (Backups sofort), **P-1** (Präsens-Zusagen-Wache: `geprueft 3 / erfuellt-oder-korrigiert 3` — Zwei-Maschinen KORRIGIERT per OV-5, Resume ERFÜLLT per ##35, Konformität ERFÜLLT per perm_runner/OV-8).
@@ -751,6 +763,11 @@ Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind),
 ### W7 — NACH DER ABGABE (Behälter)
 
 §75-Aufräumpass (104 offen) · ##40-Restbau (T-06…T-14, W-03, W-08, A14, A10) · HY-Vollausbau (Heuristik-Familie, Mehrfach-Aufbau, scharfe Eviction, Paper-gekoppelte Heuristikwahl) · `checkpoint_measure` (OV-2b bestätigt) · Record-and-Replay · Paper-Kopplung (OV-14) · prod2-Lane/pmc:intel/P-E-Trennung · D1c-Ausbau falls Floor-Rückfall gezogen wurde · B-Spline (je nach OV-1) · Voll-Messung als Kampagnen-Programm · PV-1 · Doku-Anker-Sanierung.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): W7 ist KEIN Endlager mehr -- jeder
+> Behaelter-Posten ohne Owner-Wort hat eine NEUE Platzierung im Wiederaufnahme-Register + par.21.3;
+> Owner-entschiedene Posten (prod2, Voll-Messung, Paper-Kopplung; checkpoint_measure laengst zurueck als B4)
+> bleiben per Owner-Wort (Register Teil C, par.21.6).
 
 ---
 
@@ -918,6 +935,11 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
 
 **Passt er?** **Nur unter vier Bedingungen**, und das ist die wichtigste Aussage dieses Dokuments: (1) der OV-4-Deckel fällt an F2 mit den ##10-Zahlen; (2) es gibt genau EINEN ABI-Bump (Mo 24.08.), danach null; (3) Messfehler werden je Batch am selben Abend sichtbar (W0b-Gates), sodass das Fangnetz einen TEIL-Nachlauf via Resume tragen kann; (4) beide GOs fallen bis Sa 29.08. 06:00. **Fällt eine der vier, reißt der Pfad.** Mit dem vollen v1-Programm PLUS Defekt-Pflicht PLUS HY läge das Ende rechnerisch **5–6 Werktage hinter dem 15.09.** — deshalb sind die Streichungen in Abschnitt 7 keine Kür, sondern die Rechnung. Der Bau-Start Mi 26.08. 06:00 ist der Kipp-Punkt: spätester tolerierbarer Start Fr 28.08. 06:00, dann fällt das W4-Fangnetz ersatzlos und wird als Zahl protokolliert, nicht als Hoffnung.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): die Deckungs-Streichungen F-07b,
+> ##40-Restbau, ##15-EMITTER/TEMPLATE und Register-Vollautomation sind wiederaufgenommen -- die Saldo-Rechnung
+> oben ist nur Historie, die Arithmetik-Korrektur traegt Task #98; NEUE Platzierung im Wiederaufnahme-Register +
+> par.21.3.
+
 ---
 
 ## 6. DER VERIFIKATIONSVERTRAG
@@ -938,6 +960,10 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 | **V-8 GEGENSTAND STATT ANKÜNDIGUNG** *(neu 09.08.; hebt §11.4-Prüffrage 2 in den operativen Vertrag)* | Zu **jeder** Formel gehört die Antwort auf: **„Was wäre der Zustand, in dem diese Ausgabe erscheint und die Sache trotzdem nicht existiert?"** Gibt es ihn, prüft die Formel am **Gegenstand** (Datei auf der Platte, Objekt im Store, Symbol im Binary), nie an der **Ankündigung** (Log-Zeile, YAML-Eintrag, `message()` zur Configure-Zeit). Zwei am Objekt gemessene Belege: **LAG-P1** — die Zeile `[bestandslog] aktiv: doc_key=…` fiel, der Schreibweg scheiterte **danach** (`fehlerklasse=reservierung_nicht_gespeichert`), und die Emission lief **ohne Abbruch** weiter; wer nur die aktiv-Zeile prüft, hält ein **leeres Lager für scharf**. **D3-2** — eine Null gilt erst nach einer **Gegenprobe im selben Lauf**. **V-4 genügt dafür ausdrücklich nicht:** seine zwei Zahlen werden zu **zwei verschiedenen Zeitpunkten** erhoben und belegen deshalb nichts darüber, ob das Werkzeug im Moment der Null überhaupt noch sucht. |
 
 **Wachen-Register (##31):** Grundmenge = alle ausführbaren Dateien unter `ci/`+`scripts/` beider Repos + alle verdiktdruckenden CI-Jobs **+ alle ctest-Einträge mit `PASS_REGULAR_EXPRESSION`** (Wachen, deren Verdikt ein Textmuster ist — dort ist der Nenner am leichtesten zu fälschen; D4-Querbefund). Nenner nach D3-1: super `scripts/`+`ci/` = **6** `.sh`. Abgleich beidseitig rot; Köder werden vom Job GEFAHREN. Rückfallstufe bei Zeitriss: manuell versioniertes Register + die je D-Posten ohnehin gefahrenen Köder-Protokolle (deklarierte Grenze: neu entstehende Wachen machen dann nichts rot — W7-Posten).
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): die Rueckfallstufe bleibt UNGEZOGEN (nur bei Riss); die Folge
+> "W7-Posten" ist Historie -- die ##31-Vollform ist W2-W-Posten, jeder Riss-Fall erhaelt eine gezaehlte
+> Platzierung im Wiederaufnahme-Register + par.21.3.
 
 **STELLVERTRETER-DURCHGANG 09.08. (V-8 auf den Bestand angewandt) — mit Nenner.** Geprüft wurden **56 Formeln**: die **51** Wellen-Formeln dieses Abschnitts (maschinell an ` · ` getrennt gezählt: W-1 5, W0a 7, W0b 9, W1 11, W2 8, W3-MESS 4, W4/W5 7) und die **5** Blöcke „Tragende Abnahme" aus Abschnitt 2. Ergebnis: **4 gehärtet, 52 halten.** Gehärtet sind ##02, D1d, der W0a-DLL-Zähler und ##56 — jeweils oben im Text, jeweils mit dem Zustand benannt, in dem die Ausgabe erscheint und die Sache trotzdem fehlt. **Zwei weitere Defekte lagen außerhalb dieses Nenners, in der Aufgabenkette (§4), und sind dort geheilt:** die D3-2-Zeile trug die `== 0`-Formel ohne `-F` und ohne Gegenprobe, Posten 21 prüfte Präsenz in der YAML statt des Stores. **Ausdrücklich gehalten haben** die köder-getriebenen Formeln (W0a-Bedingungstabelle mit 19. Registrierung auf beiden Wegen, D2-G6-Stash-Köder, D5-1-Mutations-Köder mit Seed, HY-A-Roundtrip mit gewürfeltem Token) sowie ##34 und ##53 — ##34 druckt seine Commit-Zahl als Nenner **zur selben Zeit** wie die Null, und ##53 benennt seinen eigenen Stellvertreter im Klartext (*„Zeilenzahl > 0 ist wertlos — der Bau-Fehler-Zweig schreibt formal vollständige CSVs"*). Beide sind die Musterform und wurden **nicht** angefasst.
 
@@ -984,6 +1010,31 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 > ⚠️ **MARKER 12.08.2026 (KON39):** *ÜBERHOLT 12.08. (checkpoint_measure-Zeile): Teil von System B → B4, ‚muss gebaut werden' (Owner-KERN 09.08.) — vor F2/Trigger, nicht W7 (§17.3).*
 
 > ⚠️ **FUSSNOTE T-15b (MARKER 13.08.2026, KON59):** *(T-15/D4-Streichung-Zeile)* die abgelehnte Streichung betrifft **T-15a** (Drift/D4). **T-15b** ist die davon verschiedene zweite Retry-Klammer: **je 5** für **Build UND Messung**, 3 Erfolgs-Werte einzeln persistiert (KON37-06, §17.4); ihr Umzug von der Drift-Achse ist **Task #13** (W2, KON26-04/KON28-02). Die Zeile bleibt stehen.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): *(##40-Zeile)* die Zeile bleibt als
+> Historie; die ##40-Reste sind NEU platziert -- T-13/T-14 vor W3 (C-12), T-07/T-08 vor Trigger falls
+> mengen-wirksam sonst W2-Slots, Rest W4; Wiederaufnahme-Register + par.21.3.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): *(HY-Vollausbau-Zeile)* der
+> HY-Vollausbau ist nicht mehr W7 -- Mehrfach-Dock = HY-B/W3-Design + W4-Bau nach HY-C-Kurven,
+> Heuristik-Familie/Eviction = W4 nach HY-C; Wiederaufnahme-Register + par.21.3.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): *(Aufraeumpass-Zeile)*
+> Aufraeumpass/Record-and-Replay/PV-1 sind nicht mehr W7-Endlager -- W4/W5-Randslots GEZAEHLT (Di-25.-Schnitt);
+> objektiv Nach-Abgabe nur per Owner-Satz. Wiederaufnahme-Register + par.21.3.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): *(##24/##15-EMITTER-Zeile)* die
+> Rutsch-Klassifizierung ist AUFGEHOBEN -- ##15-EMITTER/TEMPLATE = W2-Slot, ##24/A9-S5a = W4; die Zeile bleibt
+> Historie, Platzierung im Wiederaufnahme-Register + par.21.3.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): *(##31/D1c-Zeile)* die Rueckfallstufen bleiben UNGEZOGEN (nur bei
+> Riss); "W7-Nacharbeit" ist nur Historie -- die Vollformen (##31-Register, D1c) = W2-W-Posten;
+> Wiederaufnahme-Register + par.21.3.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE kuerzen/ausbuchen): *(Streichkaskade-Block)* die Kaskade
+> ist als Streich-Instrument stillgelegt -- Limit heisst pausieren/sequentialisieren + Register-Platzierung, nie
+> reduzieren; Pos.1 wiederaufgenommen (##40), Pos.2 Owner-Pflicht (F-07b/#98); die NICHT-streichbar-Liste gilt
+> fort. Wiederaufnahme-Register + par.21.3.
 
 ---
 
@@ -1068,6 +1119,10 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 7. **W4 (F5 11.09.):** Auswertung mit Nennern, **HY-C**-Router aus echten Kurven, Anhang gegen 28 Soll-Ziele, P-1 3/3. Do/Fr Fangnetz.
 8. **W5:** PDF, Spiegel, Abgabe Di 15.09. Keine Bau-Eingriffe.
 9. **Der Pfad füllt 26 von 27 Werktagen und passt NUR mit den Streichungen (##40→W7, prod2→Text, Vollmessung→Deckel) und den vier Bedingungen: Deckel an F2, ein Bump, Batch-Abend-Ehrlichkeit, GOs bis Sa 29.08. 06:00.** Ohne die Schnitte endet er 5–6 Werktage hinter der Frist — das ist die wichtigste Zahl dieses Dokuments.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): "##40->W7" in Zeile 9 ist nur
+> Historie (die Reste sind neu platziert, Wiederaufnahme-Register + par.21.3); prod2->Text und
+> Vollmessung->Deckel bleiben Owner-entschieden (Register Teil C, par.21.6).
 10. **Über allem:** jede Wache mit fremdem Nenner und gefahrenem Köder (rot UND grün); jeder Freitag eine für sich stehende, ehrliche Lieferung; die drei Präsens-Zusagen erfüllt oder korrigiert — still fallenlassen macht die Abgabe unwahr.
 ---
 
@@ -1160,6 +1215,10 @@ Sichtbares liefert, während ein Explore-Agent wie Fortschritt aussieht."*
 > steht die Frage: *liegt das, was ich gerade breit untersuche, auf dem Weg zum 15.09.?* Wenn nein,
 > gehört es in den W7-Behälter.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): "gehoert in den W7-Behaelter" ist kein Endlager-Weg mehr --
+> nicht-pfadkritische Gegenstaende erhalten eine gezaehlte Platzierung im Wiederaufnahme-Register + par.21.3,
+> nie stilles Ausbuchen; die Pfad-Frage selbst bleibt gueltig.
+
 ## 11.6 Ein Datum, kein Urteil — wo Fehler entstehen
 
 Die Lead-Prämissen waren häufiger falsch als die Arbeit der Agenten (5× bzw. 8× in zwei
@@ -1241,6 +1300,11 @@ Bänder: **A** = landet im Fenster · **B** = nur bei freiem Slot · **C** = W7.
 | **W5** | — | — | Keine Test-Eingriffe; nur Nachweise (Köder-Protokolle, Nenner-Zeilen) in die Abgabe-Doku. |
 | **W7** | Band C, 5 Posten, 13 h | + alles ungelandete B | **Als gezählte Warteliste** (Start: 59 Posten, 166,5 h) — nicht als stilles Vergessen. |
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): die Band-Semantik der Kopfzeile
+> ("B = nur bei freiem Slot, C = W7") und die W7-Warteliste-Zeile sind ueberholt -- Band B = konkrete Slots
+> (W2-Randslots Mo/Di 24./25., WE 22./23., W3-Batch-Pausen [lok], W4), Band C fahrbar (WinPCM: Runner online;
+> AmdL3 -> #87; Rest W4); die W7-Warteliste ist nur Historie. Wiederaufnahme-Register + par.21.3.
+
 **Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Kritik-Materials:**
 1. Die **Landung** eines Begleit-Tests folgt der **Bauwelle seines Gegenstands** (D4→W1, D3→W0b,
    D5-4→W1). Tests entstehen früher, landen atomar (T-8).
@@ -1270,6 +1334,10 @@ W0b ~18 · W1 ~24 · W2 ~10 · W3 ~4 · W4 ~24 · zwei Reserve-WE ~24 = **~118 h
 > **Konsequenz für die Fahrweise:** In W1 gilt Band B als **nicht eingeplant** (nicht „nachrangig").
 > Wird der Freeze eng, fallen zuerst die W1-Band-B-Posten (62 h) geschlossen nach W7 — **mit Zahl im
 > Protokoll**, nicht durch Weglassen.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): "nicht eingeplant" +
+> "geschlossen nach W7" sind nur Historie -- Band B/W1 (22 Posten, 62 h) ist NEU platziert: W2-Randslots
+> Mo/Di 24./25. + WE 22./23. nach S-19/T-15b + Rest W3-Batch-Pausen [lok]; Wiederaufnahme-Register + par.21.3.
 
 ## 12.6 Codex als stehender Kritiker — Einsatzregeln aus dem Befund
 
@@ -1309,6 +1377,11 @@ AG-Pakete (33 h) — Concept-Trennschärfe bleibt Konvention, ein gelockertes `r
 **leere CSV-Spalte** auf · XL-Härtung (31 h) — Vendor-Randfälle unbelegt, der Kern ist Band A ·
 AS-Block (17 h) — Registry-Drift wird nur von den W0a-Roundtrips gefangen, **nicht semantisch** ·
 PK-Folgeposten (19 h) — der Kanon gilt, Produzenten-Grenzen bleiben ungepinnt.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): Band C ist fahrbar geworden --
+> die PM-WinPCM-Begruendung ist ueberholt (Windows-Runner 4/4 online seit #60 -> W2/W4), PM-AmdL3 1-2 =
+> Talos-Lane #87, MT-L8/PM-PAPI/AG-PunktFixes -> W4; Band B (59 Posten) -> W3-Batch-Pausen [lok] + W4.
+> Wiederaufnahme-Register + par.21.3.
 
 **Bewusst nie getestet:** Holm/Bonferroni bei malformten p-Werten · `v32_orchestrator`-Stub ·
 alpha=1-Konstruktion · HDR-Histogramm (nur falls D5-5 „führen" entscheidet).
@@ -1456,6 +1529,10 @@ Owner-Fragen aus T-15 · **#42** blinde Wache · **#44** `-Werror` global · **#
 
 **Vierzehn Posten.** Sie gehen **mit Zähler** nach W7, nicht durch Weglassen.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): die 14 Posten gehen NICHT nach
+> W7 -- W4/W5-Randslots, GEZAEHLT, je Posten ein Slot beim Di-25.-Schnitt; W5 traegt nur Nicht-Bau-Anteile;
+> objektiv Nach-Abgabe nur per Owner-Satz. Wiederaufnahme-Register + par.21.3.
+
 ---
 
 ## 13.4 DIE DREI POSTEN, DIE IN KEINE WELLE PASSEN
@@ -1545,6 +1622,9 @@ Zahlen vorgelegt.**
     Scope-Entscheid, an F1 vorzulegen              :   1
        - Variante (A) / (B) / (C) zur Selbstkompilations-Strecke (13.4c)
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): die Bilanz-Zeile "W7-Behaelter, gezaehlt: 14" oben ist nur
+> Historie -- die 14 sind neu platziert (W4/W5-Randslots, Di-25.-Schnitt); Wiederaufnahme-Register + par.21.3.
+
 **Der kritische Pfad bleibt unverändert der aus §5** — er bekommt durch diese Konsolidierung
 **einen** neuen Vorläufer: die **Bump-Pflicht-Wache** in W0b, weil ohne sie jeder folgende Bau
 (einschließlich `##47` Kalibrierlauf) auf einem blinden Cache fährt.
@@ -1563,6 +1643,11 @@ Zahlen vorgelegt.**
 > Historie lesbar. Es gilt **(B)**: Stempel **und** Selbstkompilation im Fenster, Wellen und
 > Termine unverändert. Dieser Abschnitt ist die **Ausführungsordnung** dazu — er diskutiert nicht,
 > er gliedert.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): das Wiederaufnahme-Volumen (>200 h, par.21.3) faehrt auf GENAU
+> dieser "volles Risiko"-Praezedenz (Reserve null als Zahl, par.14.6) -- Deckung: Mehr-Kontingent-Parallelitaet
+> ab 19.08. (6+ disjunkte Straenge, Bau-Slots-Deckel 3 bleibt) + [lok]-Klasse in W3; Trigger-Pflichten fahren
+> ZUERST, Wiederaufnahme fuellt Slots und verdraengt nie; ALLE gezaehlt beim Di-25.-Schnitt (Task #96).
 
 ---
 
@@ -1760,6 +1845,11 @@ Abgabe.**
 
 **Nach dieser Gliederung ist die Reserve null.** Das ist die Bedeutung von *„volles Risiko"* — sie
 ist hier als Zahl ausgewiesen, nicht als Warnung.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): die Ziel-Spalte "W7, gezaehlt"
+> ist Historie -- Band B/W1 -> W2-Randslots Mo/Di + WE 22./23. + W3-[lok]; die 14 Posten par.13.3 ->
+> W4/W5-Randslots (Di-25.-Schnitt); die uebrigen Zeilen (Reserve-WE, Rest-Reserve) sind Kapazitaets-Fakten,
+> keine Ausbuchungen; Wiederaufnahme-Register + par.21.3.
 
 ---
 
@@ -2144,6 +2234,11 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
 | **#17** | G-2-Semantik-Nachzug in Achsen-Nummerierungs-Reihenfolge, NACH den Homes — schliesst die Strecke, gibt #7 frei | **(P)** | KON13-03 · KON27-04 P.8 · KON17-01 | #16 |
 | **#20** | Flaeche-3-Vereinigung: IMessVisitor == measurement-Durchstich; Deckungsluecken-Test CEB=AUS/Tier=AN erst NACH B2 | **(P)** | KON25-02 · Strecke P.30 | B2 (nur Test-Teil) |
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): *(#15-Zeile)* der #15-Bump-Bruch ist FIX-KOMPLETT, UNGELANDET --
+> Worktree wt-ce-bump15, Branch bau/bump15-preimage-bruch, End-Tip e285d316 (32 Commits auf 20c111c4); A2.5
+> formal beendet (43 BEHOBEN / 3 ENTLASTET / 4 VERTAGT), Review LANDBAR_MIT_FIXES; wartet auf Audit-Ruecklauf
+> -> Fix-Strecke 2 -> #93 -> Landung vor F2. Stand + Lande-Kette: par.21.1.
+
 **FREEZE-CHECK Fr 21.08., alle (P):** S-6a–d · S-7 · S-5 · S-3/#17 · ABI-Pflicht · CEB-Stempel · SOLL-Versionierung · HY-A · B1 · B2/B3/B5 · Umbenennung · **NEU: #38d + #38a2 (oder deklarierter Fall nach 18.6(3))**.
 
 ## 18.4 WE 22./23.08. (Reserve GEZOGEN, W2-Vorstaffel) + W2 bis Trigger Mi 26.08. 06:00 / F3 Fr 28.08.
@@ -2169,6 +2264,10 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
 * **W5/T-3** (~Sa 12.09.): MANUELLER RESET (Builds+Messdaten, GO zum Zeitpunkt) + ECHTE MESSUNG Sa 12.–Mo 14.09. (KON41-01) — harter Anker.
 * **W7, gezaehlt (Zugaenge dieser Zuordnung):** #38a3 voller Festplatten-IO-/Genus-Ausbau (KON47-03 "voll bauen wenn an der Reihe") · #29-Rest voller Monolith-Split (#88-Familie) · #21-P/E-Core-Cluster (KON27-04 P.12) · Thesis-Doppel-Submodul-Konsolidierung (#88/KON37-07). Bestand aus §13.3/Teil D unveraendert.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): #38a3 (IO-Vollausbau) und der
+> #21-P/E-Core-Cluster sind neu platziert (W4/W5-Randslots, gezaehlt, Di-25.-Schnitt); #29-Rest Monolith-Split
+> bleibt per Owner-Wort W7/#88 (Register Teil C, par.21.6). Wiederaufnahme-Register + par.21.3.
+
 ## 18.6 KAPAZITAET W1 — OFFEN AUSGEWIESEN (kein Glattrechnen)
 
     BESTAND §12.5: 99 h Band A auf voller Woche · Zweitslot ~24 h (ANNAHME, keine Messung)
@@ -2182,6 +2281,11 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
       (4) B1 -> W2-Anfang vor Trigger [Ableitung ohne Owner-Datum]
     NIE FALLEN: #87 #78 #86 · KON9-05-Stempelzeile · HY-A · #15 · #16/#17 · B3 (Owner-
     Datum KON34-04) · #38d (Pflicht-Buendel).
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21, Owner: NIE ausbuchen/verschieben): die FALL-REIHENFOLGE ist keine
+> Ausbuchung -- bei W1-Riss wird pausiert/sequentialisiert, jeder Fall-Posten behaelt seinen gezaehlten Platz
+> (die Zahl im Protokoll bleibt Pflicht); Wiederaufnahme-Register + par.21.3; die NIE-FALLEN-Liste bleibt
+> unveraendert.
 
 ## 18.7 DIE VIER FESSELN DER LANDE-ORDNUNG (aus dem Disjunktheits-Plan 13.08.; Plan-Dokument per #37 zu landen — die P-Namen sind am Objekt nur als Commit-Marker "Paket P1" belegt)
 
@@ -2277,6 +2381,13 @@ Owner-Frage G-5/C-7 (r1 A13, r4 C-7) · all_axes_golden.profile.xml nicht wohlge
 Ausnahme entfernen (r3 A12) · F5-Owner-Halbsatz: XML-Syntax/Semantik + Planer-Interpreter (r3
 A15) · telemetry-silent-Wiring golden-gebunden (r4 A-01) · stale Kommentar
 bestandslog_document.hpp:22-26 faellt (r1 A28).
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): Verdachtsfall seg1-44 -- nur der S-6a-Anker-Teil der
+> golden-Nachposten (E-B-CRC / K1-avx512-Filter / telemetry-silent) ist im #15-Bruch; die Linie dieses
+> Abschnitts ("E-B faehrt AUSDRUECKLICH im #15-golden-Ereignis") ist die juengere => Kandidat: VOR die Landung
+> in den Bruch; die SPANNUNG zur Kontext-13-Uebergabe ("E-B/A-11 = golden-gebundener FOLGEZUG, V-03R-Budget
+> frei") ist ausgewiesen, ENTLASTET-bestaetigt in A2.5-R2; Aufloesung durch Audit-Synthese + ggf. Owner-Satz
+> VOR der Landung (par.21.5).
 
 PRAEZISIERUNG 17.08.2026 (VL-5-Buchung, KON99/KON100; Belege BUENDEL-BAUPLAN-15.md Abs.8 +
 Zehn-Wochen-Explore wf_e129dbb8): Die vorstehende Zusatzliste traegt KARTEN-Staende, die am
@@ -2377,6 +2488,11 @@ Erbinnen-Bau. (6) G-5/run_methodology bleibt echte Owner-Frage (V-12 der Rest-Vo
     C-15  MinIO Ebene B: gueltiger Beweis = CI-SMOKE mit Beweiszeile + Gegenkoeder HART-ROT im
           Ein-Blech-Fenster; Falle COMDARE_RUN_MEASURE erzeugt measure:golden-320 (timeout 10d)
           (KON58-04/#10 + KON56-01) -> Betriebs-Task vor Kampagne
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): C-12/T-13/T-14 (Fehlerklassen) bleiben PFLICHT VOR W3 -- die
+> Rutsch-/W7-Vermerke anderswo sind Historie (par.21.3); C-13/C-14 tragen jetzt den Board-Task #97 (vor
+> Kampagne Sa 29.08.; der Traeger war vorher NUR T-NEU-11 im Rest-Register); T-07/T-08 VOR dem Trigger
+> Mi 26.08. falls mengen-wirksam, sonst W2-Slots (par.21.4 + Wiederaufnahme-Register).
 
 ## 19.4 KORB D → W2-TRIAGE (lebend ohne Frist-Anker; 24 Posten, neben #71)
 
@@ -2587,6 +2703,11 @@ Zusicherung abgeschwaecht). Kombibau 4/4 Zellen je "100% tests passed out of 499
 Floor PRUEFLING-Form 500/496/494 live + Restore-Beweis + Wache rc=0 (MASSGEBLICHE Form;
 499 = pruefling-los). ce-CI-Ergebnis ausstehend -> danach super-Zug.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): "Welle 1 KOMPLETT" galt NUR der Landung der 4 Straenge
+> (hy-a/vl12/vl3/k2) -- #17/g2 ist UNGELANDET: 1528f6fd ist NICHT Ancestor von ce/development 20c111c4
+> (merge-base-Beweis 18.08. ~15:15); #17 schliesst die Stempel-Strecke und gibt #7/S-19 frei (KON17-01)
+> => Lande-/Fertigstellungs-Pflicht VOR F2 (par.21.2).
+
 ## 20.2 !! VOR F2 (Fr 21.08.) — NEU ERKANNT/UNGEDECKT
 - HY-A2 + HY-A3-ACHSE NIE GEBAUT (Audit hy-a-bau): proxy/tier_module (4 ABI-Symbole) +
   test_hy_f8_reroute + Registry-"22->23" fehlen; W1-ABNAHMEFORMEL :952 NICHT erfuellt;
@@ -2609,6 +2730,10 @@ g2 1528f6fd -> xorf b8d6edab (golden-Ereignis: Filter-Zelle + algo_version
 20260817-w1-strang-artefakte/a11_super_patch.diff). Harmonisierungs-Flaechen je
 Bericht (tests/unit/CMakeLists.txt-Dateiende bei g2; f3v disjunkt). Danach Worktree-
 Abbau NUR gelandeter Baeume (Owner-Auflage: erst gruen+gemergt).
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (par.21): g2 war das ERSTE Glied dieser Lande-Liste; die KON116-Landung
+> nannte nur xorf+f3v+a11 -- g2 bleibt UNGELANDET (Beweis am P.20.1-Marker) und ist VOR F2 zu
+> landen/fertigzustellen (par.21.2).
 
 ## 20.4 SUPER-ZUG (nach ce-CI-gruen)
 k2-6-Schritt-Rezept (tests/CMakeLists.txt:348 -DFIXTURE + Gitlink ATOMAR;
@@ -2745,3 +2870,287 @@ HANDLUNGEN: V8-GitHub-PAT | node6/node5/id56/id18.
   AllFourteenAxesPopulated bei heute 22/18 Achsen" traegt dieselbe Phantom-22 (real 34
   Zweige/15 Hauptachsen) -- bei R-4 korrigieren; stale "21 AllStrategies"-Kommentar
   test_v41_topic_traversal.cpp:1278 bei naechster 03a-Beruehrung.
+
+---
+
+# 21. KONSOLIDIERUNG KONTEXT 13 (nachgetragen 18.08.2026 spaet) --
+# NIE AUSBUCHEN/VERSCHIEBEN + #15-FIX-STAND + WIEDERAUFNAHME
+
+> par.13-par.20 bleiben stehen; was hier steht, gilt vor. Quellen: Regressionen-Register
+> (docs/sessions/20260818-SESSION-REGRESSIONEN-bump15-codex-audit-review.md) + Wiederaufnahme-Register
+> (docs/sessions/20260818-SESSION-WIEDERAUFNAHME-REGISTER-nie-ausbuchen-alle-features.md) + Uebergabe Kontext 13
+> (docs/sessions/20260818-SESSION-UEBERGABE-kontext13-bump15-bruch-fertig-audit-laeuft.md); bei Widerspruch:
+> Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
+
+## 21.0 BETRIEBSREGEL (Owner 18.08.): NIE AUSBUCHEN/VERSCHIEBEN + BELEG-TAFEL + PROZESS-ERTRAEGE
+
+**Betriebsregel (Owner 18.08., verbatim-Kern):** "Es wird NIE etwas ausgebucht oder verschoben" +
+"NIE kuerzen, gesamte Kette voll, ALLE Features; morgen mit mehr Kontingent multiple Strecken parallel".
+Konsequenzen: (1) jeder vertagte/verschobene Posten erhaelt einen Platz VOR der Abgabe; (2) W7 ist KEIN
+Endlager mehr -- nur noch Nach-Abgabe-Kuer fuer ausdrueckliche Owner-Entscheide (Tafel par.21.6);
+(3) Limit = pausieren/sequentialisieren, NIE reduzieren; (4) "deklariert" schuetzt nicht mehr vor
+Wiederaufnahme -- alte Marker bleiben als Historie stehen, die neue Platzierung steht daneben;
+(5) die Feinplatzierung beim Di-25.-Schnitt nimmt JEDEN Posten namentlich auf (Task #96).
+Memory-Anker: feedback_nie_kuerzen_gesamte_kette_voll_alle_features.
+
+**Beleg-Tafel der 8 entdeckten + geheilten stillen Kuerzungen (Fork gab-es-denn):**
+
+    (1) Selektiver Rebuild geloescht (ce 813c3232, 27.07.) -> C-13 gebucht; Traeger jetzt Task #97 (par.21.4)
+    (2) checkpoint_measure -> W7 trotz Owner-KERN -> zurueck als B4/System B (#24/W2)
+    (3) F-07b-Diagramme -> W7 mit ERFUNDENER Autorisierung -> UEBERHOLT-Marker ff64fe0e steht;
+        Bau-Traeger jetzt Task #98 (par.21.4)
+    (4) "W1 KOMPLETT" galt nur den Straengen, HY-A2/A3 ungebaut -> im #15-Bruch nachgebaut (e285d316)
+    (5) #17/g2 ungelandet -> W1-V1/#93 (par.21.2)
+    (6) 06_evaluation_methodology still nicht eingebunden -> #67 (8/8 abgedeckt, DEPRECATED-Kopf)
+    (7) Audit-slice(0,14) + stille Limit-Filterung -> Voll-Umbau + Vollzaehligkeits-Gates
+    (8) Synthese-Dedup-Verlust -> per Verify-Rekursion R2 gefangen
+    Dazu 2 Prozess-Faelle + Abgrenzungsliste "deklariert" -- Details traegt das Regressionen-Register.
+
+**Prozess-Ertrag Codex/Plan-B:** bwrap DAUERHAFT defekt (7 Tode, nicht-deterministisch, "bwrap: loopback:
+Failed RTM_NEWADDR"; Root-Cause-Kandidat Linux 6.17 User-Namespace -- Infra-Notiz). Plan-B-Rezept =
+codex exec CLI mit Diff-VOLLTEXT im Prompt (einziger dateizugriffs-freier Weg) -- damit die ersten 4/4
+erfolgreichen Codex-Lenses (gpt-5.6-sol, reasoning ultra, Lauf-Header belegt); Ersatz-Lens-Klausel:
+je Anlass eine frische Defekt-Probe. Memory-Anker:
+reference_codex_lens_klein_schneiden_und_immer_zweiten_lens_parallel.
+
+**Prozess-Ertrag sequentieller Audit-Umbau + Vollzaehligkeits-Gates:** Audit wf_794b904b und Review
+wf_13b562e7 laufen als sequentielle Resumes (wg7df0h36 / w5swesjti) statt Neustarts; das Script traegt
+jetzt ein 11/11-Quellen-Gate, keinen slice-Deckel, und unverifizierte IDs bleiben im Ergebnis; der
+Synthese-Dedup-Verlust (C-F3) wurde durch die Verify-Rekursion R2 gefangen; Resume-Bilanz 5c: kein
+weiterer nicht-doppelter failed Workflow. Nebenbefund: Orchestrator-Bug Template-Literal-Interpolation
+(Heredoc-K11) -- der Verify rekonstruierte aus journal.jsonl (journal.jsonl = Wahrheit).
+
+## 21.1 #15-FIX-STAND (FIX-KOMPLETT, UNGELANDET) + LANDE-KETTE + super-ZUG/KON119 + FOLGEZUEGE
+
+**#15-Bump-Bruch FIX-KOMPLETT, UNGELANDET.** Worktree wt-ce-bump15, Branch bau/bump15-preimage-bruch,
+End-Tip e285d316 (32 Commits auf ce/development 20c111c4). A2.5-Rekursion formal beendet: 43 BEHOBEN /
+3 ENTLASTET / 4 VERTAGT ueber 2 Fix-Strecken (wf_a1b55606 + wf_b943361e), Verify R2 = NULL_NEUE_FUNDE.
+Review-Gesamt-Verdikt LANDBAR_MIT_FIXES (11/11 Agenten, 30er-Fix-Liste abgearbeitet). Abnahme am
+End-Tip neu gemessen: gcc-release 503/503 + clang-release 503/503 (Fix-21-Pflicht erfuellt, stale
+EXCLUDE_FROM_ALL-Binary per Relink geheilt) + gcc-debug 499/499 (Differenz 4 per comm erklaert);
+golden-Diff 67dafa46..e285d316 = 0 Byte, TABU-CRC 0x56F1B721C72DC10E unbewegt, Diff-Hygiene gruen,
+gitleaks-Koeder biss. Wartet NUR noch auf: Audit-Ruecklauf -> Fix-Strecke 2 -> W1-Audit #93 -> Landung
+(Kette: par.21.5). FRIST: Landung vor F2 (Fr 21.08.). Marker am #15-Task-Eintrag (par.18.3) gesetzt.
+
+**Lande-Kette ce (Rezept Kontext-13-Uebergabe Abschnitt 4), Schritte 1-4, FRIST vor F2:**
+
+    (1) .review-tmp/ loeschen; ggf. clang-Zelle wiederholen (Slot-Protokoll, Deckel 3)
+    (2) git checkout development && git merge --no-ff bau/bump15-preimage-bruch
+        (EIN Merge, 32 Commits als Historie)
+    (3) WELLEN-ENDE-GATES am ENDSTAND (KON116): Lock-Regen --check -> Drift erwartet -> --write-Regen
+        als eigener Commit mit Begruendung je Traeger. Endstand der Drift-Probe LITERAL PROTOKOLLIERT:
+        Exit 1 mit 4 versionslosen Traegern '(- -> -)' (anatomy_base, observable_tier, pruefling_merge,
+        target_isa_complex_axis) -- diese erhalten ihre Erst-Version (inhaltliche Entscheidung,
+        bump15-d-Hinweis). LS2-34-Audit-Verdikt deckungsgleich: der Regen ist Schritt 3 der
+        Lande-Kette, KEIN Vorab-Worktree-Fix. Dazu: kumulative Hygiene --bereich e114cabd HEAD |
+        clang-format-CI-Formel | gitleaks glpat-Koeder (Laenge 26, Assert) + Echt ueber git log -p |
+        Floor-Check
+    (4) EIN Push (origin+github) -> EINE CI -> Ergebnis direkt per API messen; dazu die
+        B-10-Anker-Faelligkeit beim Landen pruefen
+
+**super-Zug ATOMAR als EIN Lande-Ereignis (Schritt 5) -> KON119; FRIST vor F2, direkt nach der
+ce-Landung.** XSD-Patch super_xsd_golden_verbund.patch (113 Zeilen: XSD-Dreier-Enum Verbund1/2/3
+Z.253-255 + Prosa :39/:333-335 fulljoin->union + Kommentar :241-244 + experiment_golden_kern.xml
+7 Stellen + experiment_golden.xml 6 Stellen; per-Achse-@merge ist xs:string, Wertpruefung allein
+validate_profile.hpp:665; die Subset-Wache koppelt Fixture+XSD => MUSS ein Lande-Ereignis MIT Gitlink
+sein) + Gitlink -> Merge-SHA + PZW-Anker LIVE neu messen (Nenner steigt um neue Test-.cpp:
+test_hy_f8_reroute + test_q2_identitaets_riegel + ggf. weitere -- ZAEHLEN, nicht raten) + KON119 =
+Lande-Bericht MIT Namensnennung bump15-a/b/c/d + TABU-CRC literal + Audit-/Review-Verdikte +
+seg1-04-super-Haelfte (6 stale E-6-Stellen im Hybrid-Bauplan, per A2.5-R2 dem KON119-super-Zug
+zugewiesen) + Koeder + Dual-Push + CI-gruen. KON119-Marker im Wellenplan-Kopf gesetzt.
+
+**Bauplan-Folgezuege NACH der Landung (BUENDEL-BAUPLAN-15.md = juengste Quelle, K15):**
+B-7-Stempel-Haelfte (E-B Emitter-Name + Stempel-Pflicht in Makros -- golden-Ereignis; das
+V-03R-Budget deckt es und ist UNVERBRAUCHT) | B-10-Anker (frozen kFrozenFingerprintV1, test_d4:194,
+e24-Leer-Digest-Pins, w10-Hex-Pins -- "NOCH NICHT setzen" galt fuer den Bau, beim Landen die
+Faelligkeit pruefen) | B-8 (RT-Dock-Haelfte A-12) | N-1..N-6 | VL-5/VL-6-Doku | KORB-A-12 (B3
+Schalter-Hoheit, Owner-Datum noetig -> par.21.2). Golden-Teile als golden-Ereignis im F2-Umfeld.
+
+## 21.2 W1-LUECKEN: g2 UNGELANDET (KRITISCH) + B3 OHNE BAU-SPUR (ERNST) + W1-AUDIT #93
+
+**W1-V1 KRITISCH: #17/g2-Strang UNGELANDET.** Commit 1528f6fd ('feat(measurement): #17 G-2-Semantik --
+Redundanz-Wache der Flag-Menge als B12-Term (e)') ist NICHT Ancestor von ce/development 20c111c4
+(merge-base-Beweis 18.08. ~15:15). P.20.1 "Welle 1 KOMPLETT" galt nur der Landung der 4 Straenge
+(hy-a/vl12/vl3/k2); P.20.3 fuehrte g2 als ERSTES Glied der Welle-2-Lande-Liste, die KON116-Landung
+nannte aber nur xorf+f3v+a11. #17 schliesst die Stempel-Strecke und gibt #7/S-19 frei (KON17-01)
+=> Lande-/Fertigstellungs-PFLICHT VOR F2 (Fr 21.08.). Marker an P.20.1 + P.20.3 gesetzt.
+
+**W1-V2 ERNST: B3 Schalter-Hoheits-Umzug OHNE Bau-Spur.** Owner-Datum "VOR F2" (KON34-04; KON37-01:
+der Tier-Pflicht-Wurf abi_adapter.hpp:476-491 faellt); im Bruch-Worktree KEINE B3-Aenderung an
+abi_adapter.hpp (Treffer dort sind B14-Altbestand). Praezise Bau-Stands-Messung + Frist-Einordnung =
+W1-Audit Gruppe D (#93). FRIST: Owner-Datum vor F2.
+
+**W1-Vollstaendigkeits-Audit Task #93** (Owner-Zweifel 18.08.: "W1 offiziell abgeschlossen -- stimmt
+das vollstaendig?"): 8 sequentielle Pruefgruppen (Straenge+VL-3-Fixes | Stempel-Strecke
+S-1..S-7/S-6a-d | HY-A | B-Schalter | #17/g2 | Statistik/Menge D4/D5/##10-19 |
+Designplan-par.4-W1-Testlast | Freeze-Check-Liste par.18.3) + Synthese mit Frist-Dreiteilung
+(offen-vor-F2 / gebaut-ungelandet / W2-deklariert / gestrichen-deklariert / unklar). Script
+workflows/scripts/w1-vollstaendigkeit-wf.js; Start NACH Review-/Audit-Ruecklauf (Limit-Doktrin);
+das Ergebnis wird Abschnitt 9 des Regressionen-Registers und traegt danach einen Nachtrag HIER.
+
+## 21.3 WIEDERAUFNAHME-PLATZIERUNGEN (Register Teil B): JEDER VERTAGTE POSTEN MIT NEUEM PLATZ
+
+**Band B/W1 (22 Posten, 62 h; der D-2-Marker "geschlossen gestrichen" ist Historie):**
+AG-Concepts11/IsComposition/Noexcept, XL-L3/L5, ST-RankingTie/DriftBestwahl, PK-Folgeposten,
+AS-Katalog/ORG18/Aritaet/NameClean, LG-Kollision/NoThrow/CommitAtom/Zeilenlimit,
+PM-m3v2Spalten/Outcome/CTZweig/OffZwilling, MT-L9, PE-JobBindung/Startgate. NEUE Platzierung =
+W2-Randslots Mo/Di 24./25. (parallel zu S-12/S-13 als disjunkte Test-Straenge,
+Mehr-Kontingent-Parallelitaet) + WE 22./23. nach S-19/T-15b-Kern + Rest W3-Batch-Pausen [lok]
+(par.3-W3 erlaubt lokale Arbeit ausdruecklich). Der D-2-Marker bleibt als Historie stehen, die neue
+Platzierung steht daneben (Designplan Abschnitt 8 + Abschnitt 10 markiert).
+FRIST: WE 22./23. + Mo/Di 24./25.; Feinplatzierung Di 25.08.
+
+**Band-B-Rest (37 weitere der 59 Posten, ~104,5 h):** W3-Batch-Pausen [lok] (5,75 Maschinentage
+Kampagne = die Maschine misst, die Session baut lokal ohne CI-Last -- VEREINBAR mit "null CI-Last",
+[lok]-Klasse ohne Pipeline) + W4 Mo-Mi + W4-Fangnetz Do/Fr. Marker an par.3-W3 gesetzt.
+
+**Band C (5 Posten, 13 h) -- Begruendungen TEILS UEBERHOLT:** PM-WinPCM: Windows-Runner seit #60
+ONLINE (4/4) => W2/W4 fahrbar (die alte Begruendung "kein Windows-Runner im Fristpfad" ist UEBERHOLT
+AM OBJEKT) | PM-AmdL3 1-2: CAP_PERFMON = Talos-Lane #87 (Infra-gebunden, sobald v1.13.x) | MT-L8 +
+PM-PAPI + AG-PunktFixes => W4. FRIST: W2/W4; AmdL3 Talos-abhaengig (#87).
+
+**##40-Restbau (T-06 KF-6/60, T-07 RAM-Spool, T-08 Dual-ccache, T-09, T-10, T-12 Cross-Genus,
+T-13/T-14 FK-Walk, W-03, W-08, A14, A10; ~10-11 WT-Anteil):** T-13/T-14 (Fehlerklassen!) =
+C-12-PFLICHT VOR W3 (par.19.3 fuehrt sie schon; vor Sa 29.08.) | Cacheline-/Spool-Achsen T-07/T-08
+VOR dem Trigger Mi 26.08. falls mengen-wirksam, sonst W2-Slots | Rest W4. Marker an par.19.3 gesetzt.
+
+**HY-Vollausbau (Heuristik-Familie, Mehrfach-Dock>1, scharfe Eviction):** Mehrfach-Dock =
+HY-B/W3-Design -- der MaxDocks==1-static_assert aus der A2.5 (A-F2) ist der EHRLICHE Minimal-Pin,
+KEIN Verzicht; slotbezogene Basiszeiger + explizite Routing-Regel = HY-B/W3-Design, dann W4-Bau nach
+den HY-C-Kurven | Heuristik-Familie/Eviction W4 nach HY-C.
+
+**14 W7-Posten par.13.3 (#29-Rest #30 #32 #34 #42 #44 #48 #50 #63 #64 #69 #71 #72 #26) + P/E-Core
+(#21) + IO-Vollausbau (#38a3) + par.75-Pass + Record-and-Replay + PV-1:** NEUE Platzierung =
+W4/W5-Randslots, GEZAEHLT -- je Posten beim W2-Planungs-Schnitt (Di 25.) ein konkreter Slot; W5
+traegt nur Nicht-Bau-Anteile (Doku/Registrierung); was OBJEKTIV nach der Abgabe liegen MUSS, braucht
+einen Owner-Satz (Kategorie C, par.21.6) -- sonst faellt NICHTS. Marker an par.13.3 gesetzt.
+
+**##15-EMITTER/TEMPLATE + ##24/A9-S5a ("rutschfaehig", klein):** die Rutsch-Klassifizierung ist
+AUFGEHOBEN -> ##15-EMITTER/TEMPLATE = W2-Slot, ##24/A9-S5a = W4. Marker an den Rutsch-Vermerken
+(par.7) gesetzt.
+
+**Register-Vollautomation ##31 + D1c-Vollausbau (Rueckfallstufen):** die Rueckfallstufen bleiben
+UNGEZOGEN (nur bei Riss); die Vollformen werden W2-W-Posten. FRIST: W2.
+
+**Kapazitaets-Ehrlichkeit (Zahl, KEINE Streichung):** Wiederaufnahme-Volumen grob 62 h (B/W1) +
+~104,5 h (B-Rest) + 13 h (C) + ##40-Reste + W7-Liste = >200 h zusaetzlich auf 19 Kalendertage bis
+T-3. Deckung per Owner-Entscheid: (1) "volles Risiko" (par.14-Praezedenz: Reserve null als Zahl,
+kein Veto), (2) Mehr-Kontingent-Parallelitaet ab 19.08. (6+ disjunkte Straenge; Bau-Slots-Deckel 3
+bleibt), (3) die [lok]-Klasse traegt W3 mit. Engpass EHRLICH: W2 traegt die Trigger-Pflichten ZUERST
+(S-19-Zahl, S-13-Buendel, VOLLBAU-GATE); Wiederaufnahme-Posten fuellen Slots, verdraengen NIE
+Trigger-Pflichten; Reihenfolge je Slot beim Di-25.-Schnitt, ALLE gezaehlt. Marker an par.14 gesetzt.
+FRIST: Di 25.08. (Schnitt); Vollzug + Feinplatzierung = Task #96 (par.21.4).
+
+## 21.4 NEUE TASKS #94-#98 + B-5f-TRAEGER-LUECKE
+
+**Task #94 (NEU, aus A2.5 VERTAGT), W2:** C-F4 -- der Abi7-Freeze ist verwechselbar mit dem lebenden
+Minor (decl.hpp ~:780/:784, beide oeffentlich, typgleich, aktuell wertgleich 2 -- ein Konsument kann
+den Freeze-Wert ziehen, unsichtbar bis zum naechsten Live-Bump). Kapselung als unteilbares
+Abi7-Tupel bzw. technische Begrenzung auf Freeze-/Ablehnungstests. (decl.hpp:797-Rest: par.21.6,
+mit dieser Flaeche koppelbar.)
+
+**Task #95 (NEU, seg1-40 VERTAGT), vor F2:** V-08R nur zur NAME-Haelfte im Bruch --
+planner_version.hpp:78-84 fingerprint_sha() weiter bewusst leer (kFingerprintShaBewusstLeer=true).
+V-08R ist seit KON101 BUENDEL-SOLL (B-6-Rest), aber die Owner-Form SHA-256/64-Hex kollidiert
+GEMESSEN mit dem 128-Hex-S-1-Vertrag stempel_basis.hpp:378-387 -- eigener Bau noetig; der
+Frist-/Form-Entscheid ist F2-Vorlagen-Punkt 5 (par.21.6).
+
+**Task #96 (NEU), Di 25.08.:** Wiederaufnahme-Register-Vollzug + Feinplatzierung (Stunden je Slot)
+NACH Audit- und #93-Ruecklauf; die W2-Feinplatzierung (Di-25.-Schnitt) nimmt JEDEN Posten des
+Registers namentlich auf; die Posten-ZUORDNUNG des Registers ist bereits vollstaendig (par.21.3).
+
+**Task #97 (NEU), vor Kampagne Sa 29.08.:** C-13+C-14 Selektiver-Rebuild-Wiederherstellung (stille
+Kuerzung ce 813c3232 vom 27.07.; C-13 war in par.19.3 gebucht, aber der Traeger war NUR T-NEU-11 im
+Rest-Register, kein Board-Task) -- VOR der Kampagne. Marker an par.19.3 gesetzt.
+
+**Task #98 (NEU), Bau W4:** F-07b-Diagramm-Bau in W4 mit ##60 (Owner-KERN 06.08.: 2D+3D SOTA; die
+W7-Verschiebung trug eine ERFUNDENE Autorisierung, der UEBERHOLT-Marker ff64fe0e steht) +
+ZUSATZFUND: die par.5-Defizit-Arithmetik zaehlt F-07b NOCH als Deckungs-Streichung -- die Rechnung
+ist um diesen Posten zu korrigieren (docs-Zug; Korrektur-Marker an par.5 gesetzt).
+
+**B-5f-Bau-Posten: TASK-TRAEGER FEHLT (ausgewiesener Befund dieser Extraktion).**
+Tooling-Ordnungs-Validierung (wallclock/macro/micro) an ALLEN DREI Stellen per KON106-02/NP-18 --
+V-13 ist per KON101 BEANTWORTET (A2.5-R2-Praezisierung zu seg1-43: "deklariert-ungedeckt";
+ceb_tooling_list wirft heute nur bei unbekannter id/Deckel/leer; owner-vorlagen-Gegenprobe: kein
+stale Vorlagen-Punkt). B-5f hing an KEINEM Board-Task (#93-#98 decken es nicht, das
+Wiederaufnahme-Register nennt es nicht) -- Traeger ANGELEGT: Task #99 (18.08., diese
+Konsolidierung), hier gefuehrt, kein stiller Bau. Kein Owner-Datum -- beim Di-25.-Schnitt
+slotten (W2).
+
+## 21.5 VERDACHTSFAELLE (Aufloesung via Audit/#93) + LANDE-VORBEDINGUNGS-KETTE
+
+**Verdachtsfall golden-Nachposten E-B-CRC / K1-avx512-Filter / telemetry-silent (seg1-44):** nur der
+S-6a-Anker-Teil ist im Bruch; der Task-#15-Text sagt "3 golden-Nachposten im Bruch", die
+Kontext-13-Uebergabe deklariert "E-B/A-11 = golden-gebundener FOLGEZUG (V-03R-Budget frei)" --
+SPANNUNG AUSGEWIESEN, ENTLASTET-bestaetigt in A2.5-R2; die juengere 19.1-Linie: E-B faehrt IM
+#15-golden-Ereignis => Kandidat: VOR die Landung in den Bruch. Aufloesung durch Audit-Synthese +
+ggf. Owner-Satz (par.21.6 Punkt 6), VOR der Landung. Marker an par.19.1 gesetzt.
+
+**Verdachtsfall V-06 Lesart A:** Stempel-Pflicht GEWEITET (comdare_anatomy_version_lines PFLICHT +
+Emitter-Integration) vs. 2 Symbole; per R2-Commit 7bc997a2 als LESART A festgeschrieben, aber
+golden-gebunden -> Folgezug (B-7-Haelfte, V-03R-Budget frei). Aufloesung laeuft (Voll-Audit + #93).
+
+**Verdachtsfall B1 (W1-Ende):** Aufloesung durch #93; das Ergebnis fliesst ins
+Wiederaufnahme-Register Teil D und in die par.21.2-Frist-Dreiteilung.
+
+**Verdachtsfall A1-Durchzug 9-vs-18 (LS2-33):** simd_organ_requirement 9x kRequiredNone gegen
+Registry 18; die Kette ist verdrahtet, der Durchzug fehlt; in A2.5-R2 VERTAGT -> #44-Rest
+(git-log-Beweis: der Bruch beruehrt die Flaeche nicht); bekannter W1-Posten, Aufloesung Voll-Audit +
+#93 (W1-Rest, Einordnung via #93).
+
+**Verdachtsfall 23 Band-A-Testposten aus Designplan par.4-W1:** den Ist-Stand misst #93 Gruppe G;
+das Ergebnis fliesst in die Frist-Dreiteilung.
+
+**Laufende Audits als Lande-Vorbedingung (Kette aus par.21.1):** Voll-Audit wf_794b904b (688
+Zusagen, sequentieller Resume, Vollzaehligkeits-Gates; erwartet ~47 Verif-Pakete + 3 Kontext-Lenses
++ Synthese mit Lande-Freigabe-Urteil -> Regressionen-Register Abschnitt 6; die 36 Fruehverdikte
+werden gegen die Vollmenge abgeglichen) -> danach Fix-Strecke 2 (A2.5 ueber die Audit-Funde,
+dreiwertige Quittung, Rekursion bis 0 neue Funde) -> W1-Audit #93 -> Landung. Die Review-Haelfte ist
+ZURUECK und abgearbeitet (LANDBAR_MIT_FIXES). FRIST: vor Landung/F2.
+
+## 21.6 OWNER-ZEILEN-TAFEL (Kategorie C) + OFFENE RESTE + F2-VORLAGEN-FENSTER
+
+**Owner-Zeilen-Tafel (bleiben per Owner-Wort; Revision NUR per Owner-Satz, transparent gelistet,
+NICHT eigenmaechtig gekippt):**
+
+    OV-4    Vollmessung -> Deckel (Owner-Wort: Deckel-Doktrin + S-19 rechnet; F2-Vorlage "ja"
+            empfohlen+angenommen). Neubewertungs-Fakt NUR MELDUNG: physikalisch >=143 Tage
+            einthreadig -- der Deckel ist Mess-AUSWAHL, keine Feature-Kuerzung.
+    OV-5(b) prod2-Lane -> Textkorrektur (Owner "ja" 09.08.; damalige Begruendung "prod2 existiert
+            nicht", rc 2). UEBERHOLT AM OBJEKT: prod2 ist seit #60 online (id=17, Gen-2-Kapazitaet
+            34,4 h gerechnet); soll die pmc:intel-/P-E-Lane zurueckkommen, genuegt EIN Owner-Satz,
+            der Bau-Platz W2/W3 existiert. Transparent gemeldet, nicht gekippt.
+    OV-14   Paper-Kopplung -> nach Abgabe (Owner-Wort 17.08.-Runde + LEDGER:11128 Ruecksprache);
+            bleibt, ausser der Owner dreht.
+    W7/#88  Monolith-Split (Owner-B3 woertlich "beim Aufraeumen"); bleibt -- einer der
+            ausdruecklich Owner-entschiedenen W7-Posten (vereinbar mit par.21.0: W7 nur per
+            Owner-Entscheid).
+    Resttafel (Vollzaehligkeit): OV-2 checkpoint_measure (KON34 "muss gebaut werden") ist BEREITS
+            ZURUECK als B4/System B (#24/W2) | KON29-01 Debug-Ergebnisse-Loeschung bleibt die
+            einzige Messdaten-Ausnahme (kein Feature).
+
+**Offene Reste (benannt, KEINE Lande-Blocker):**
+- clang-debug-Zelle ROT -- PIE/HDR-Link (libcomdare_hdr_histogram_wrapper.a R_X86_64_32S),
+  vorbestehend/neu-sichtbar (HDR+libs/common in 0 Bruch-Commits beruehrt); in der A2.5-Abnahme
+  deklariert nicht gefahren; die Synthese-Entlastung "vorbestehend" liegt vor. Eigener Posten,
+  Behebung als W2-Slot (kein Lande-Blocker).
+- clang-format-22-Anomalie 122-vs-120 -- der lokale Formatter alignt Makro-Escapes auf 122, der
+  Datei-Standard ist 120; manuell normiert; CI-lint:format faellt das Urteil (Praezedenz: der
+  set-Kopf verletzt den lokalen dry-run AUCH und ist CI-gruen). Beobachten am Lande-CI-Lauf.
+- decl.hpp:797 stale Referenz -- benannter Doku-/Kommentar-Nachzug im Abi7-Umfeld; mit der
+  Task-#94-Flaeche koppelbar (par.21.4).
+- C-3a (#38a1): EINZIGE offene Owner-FRAGE dieses Standes, FRIST Mi 19.08.; laeuft im
+  F2-Owner-Vorlagen-Fenster als Punkt 4 mit.
+
+**F2-Owner-Vorlagen-Fenster (Ein-Satz-Vorlagen, aus Task-#15-Metadata owner_vorlagen_fenster, nach
+der Landung; Verweis par.21.1 Schritt 5/6). FRIST: mit der Landung, vor F2 (Fr 21.08.):**
+
+    (1) AxisKind-Ordnung im Bruch mitdrehen? (seg1-37; KON5-04: AxisKind war immer Owner-VORLAGE,
+        nie festgelegt; ohne GO kostet die spaetere Drehung einen weiteren Preimage-Bruch)
+    (2) E-6-Satz: "22->23 war Phantom-Nenner, Rest = kGenusBuildSlotCounts 5->6 ist gebaut --
+        Einspruch?" (KON118)
+    (3) KON60-04-Spannung S-6 (stale, blockiert nicht)
+    (4) C-3a-Frist (Mi 19.08.)
+    (5) V-08R-Form-/Frist-Entscheid (#95: Owner-Form 64-Hex vs. 128-Hex-S-1-Vertrag)
+    (6) ggf. golden-Nachposten-Satz (seg1-44) und Owner-Saetze fuer objektiv-nach-Abgabe-Posten
+        (Kategorie C der W7-Liste, par.21.3)

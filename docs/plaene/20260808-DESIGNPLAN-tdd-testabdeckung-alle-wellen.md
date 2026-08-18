@@ -86,6 +86,10 @@ Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Materials (`*` im Regis
 
 **W1 (Mo–Fr 17.–21.08., F2 = Freeze) — A: 23 Posten, 99 h; B: 22, 62 h. Engpass des gesamten Plans (§8).** Reihenfolge hart: **MT-L3-Schema-Orakel VOR D4d** (der einen Spaltenänderung der Woche — sonst entsteht die neue Spalte am Orakel vorbei). PK-KanonWert/PK-Kreuztest/PK-KlemmJson auf dem D5-1-Kanon (liegt seit W0a-Lokalspur), PK-DeleteP99 mit D5-4. Statistik-Trio landet mit D4a–D4c; ST-CLITestat ersetzt die `PASS_REGULAR_EXPRESSION`-Wache (Wachen-Register ##31 kennt die Klasse). **HY-Reroute-Vertrag zuerst** (Concept, `gattung_of`-Pin, `kGenusCount` — definiert HY-A), dann HY-ModulGrenze atomar mit HY-A2 (F8-DoD), HY-Ebene4a nach dem 4.-Ebenen-Entscheid Mi 19.08. Lager-Kette: LG-HostBinder → LG-SkipCallback → LG-E2Exlsx + LG-WritebackXlsx (= Definition-of-done des Task-63-Strangs), LG-XlsxAlt, LG-LoadWache, LG-Idempotenz. PM-Naht, XL-L2, XL-L4. **Abnahme F2:** Invarianz-Beweis der Statistik grün NACH Heilung, HY-Verträge compile-hart, SKIP-Zweitlauf ruft den Mess-Callback 0-mal.
 
+> WIEDERAUFNAHME-MARKER 18.08.2026 (Wellenplan par.21, Owner: NIE ausbuchen/verschieben): W1-Band-B (22 Posten,
+> 62 h) ist nicht mehr gestrichen -- NEUE Platzierung W2-Randslots Mo/Di 24./25. + WE 22./23. +
+> W3-Batch-Pausen [lok]; Wiederaufnahme-Register + Wellenplan par.21.3.
+
 > ⚠️ **MARKER 12.08.2026 (KON39):** [D-1 → §10]: Bestand nicht null — 4 Header/943 Z., Genus sechswertig; der Vertrag PINNT, definiert nicht grundauf.
 
 **W2 (Mo–Fr 24.–28.08., F3) — A: 8 Posten, 21 h; B: 23, 67 h.** Nur Mo/Di/Fr tragen Slots (Bau-Fenster Mi–Do ist exklusiv). Band A = Kampagnen-Wahrheit, Landung bis F3 als Teil der GO-Vorlage: MT-L1 (measured zählt Messung, Marker-Erhalt), MT-L2 (Token statt 0.000, Snapshot-Teil 3), MT-L6/L7, PM-m3v2Zero, PM-RAPL, PM-Scaled, PM-NichtGelesen-Seam. Band B (xlsx-Härtung, Perzentil-Folgeposten, AG-Pakete) nur bei freiem Slot Mo/Di.
@@ -97,6 +101,10 @@ Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Materials (`*` im Regis
 **W5 (12.–15.09.):** keine Test-Eingriffe; nur Nachweise (Köder-Protokolle, Nenner-Zeilen) in die Abgabe-Doku.
 
 **W7 (Behälter):** Band C (5 Posten, 13 h: MT-L8, PM-PAPI, PM-WinPCM, PM-AmdL3 Teile 1–2, AG-PunktFixes, plus PM-NichtGelesen-HW) und alles aus Band B, was im Fenster nicht landete — als **gezählte Warteliste** (Start: 59 Posten, 166.5 h), nicht als stilles Vergessen.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (Wellenplan par.21, Owner: NIE ausbuchen/verschieben): der W7-Behaelter ist
+> KEIN Endlager mehr -- Band C fahrbar (WinPCM: Windows-Runner online; AmdL3 -> #87; Rest W4), Band B ->
+> W2-Randslots / W3-[lok] / W4; Wiederaufnahme-Register + Wellenplan par.21.3.
 
 ## 5. Die sequentielle Kette (eine Instanz)
 
@@ -112,6 +120,13 @@ Befund aus diesem Lauf, mit Nenner: Codex lieferte die Rohbreite über 10 Teilge
 
 - **Band C, W7 (5 Posten, 13 h):** MT-L8 (env-gegateter, stillgelegter Legacy-Pfad; die Sach-Aussage deckt MT-L6 am Host — Kosten: 0, solange niemand reaktiviert) · PM-PAPI (toter Zweitpfad, Owner-Entscheid behalten/löschen steht aus; Kosten: ein nie übersetzter Pfad bleibt divergent) · PM-WinPCM (kein Windows-Runner im Fristpfad; Kosten: Windows-Zweig bleibt vertragslos) · PM-AmdL3 Teile 1–2 (braucht CAP_PERFMON-Lane; **Teil 0, Kommentar-Richtigstellung 0,2 h, sofort** — dokumentierter Widerspruch ist Defekt) · AG-PunktFixes (2 h Kosmetik ohne Fristbezug). Dazu PM-NichtGelesen-HW (prod2 gestrichen per OV-5(b); Kosten: die Klebrigkeits-Heilung bleibt hardwareseitig unbewiesen, der Seam-Test trägt allein).
 - **Band B, planmäßig nur bei freiem Slot (59 Posten, 166.5 h):** vollständig registriert, geht ungelandet mit Zählern nach W7. Kosten je Block, ehrlich: AG-Pakete (33 h) — Concept-Trennschärfe und Layouts bleiben Konvention, ein gelockertes `requires` fällt erst als leere CSV-Spalte auf; XL-Härtung jenseits von Token/NA/Alt-Datensatz (31 h) — Vendor-Randfälle unbelegt, der Kern (zellgenaue Wahrheit, kein stilles Vernichten) ist Band A; AS-Block (17 h) — Registry-Drift wird nur von den W0a-Roundtrips gefangen, nicht semantisch; PK-Folgeposten (19 h) — der Kanon gilt, aber Produzenten-Grenzen (p999, super-Fixtures) bleiben ungepinnt.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (Wellenplan par.21, Owner: NIE ausbuchen/verschieben): beide Bloecke oben
+> sind nur Historie -- die PM-WinPCM-Begruendung ist ueberholt (Windows-Runner 4/4 online seit #60 -> W2/W4
+> fahrbar), PM-AmdL3 1-2 = Talos-Lane #87 (CAP_PERFMON, sobald v1.13.x), MT-L8/PM-PAPI/AG-PunktFixes -> W4;
+> Band B (59 Posten, 166.5 h) geht nicht mehr "ungelandet nach W7", sondern W3-Batch-Pausen [lok] +
+> W4/W4-Fangnetz; der Punkt "Bewusst nie getestet" bleibt unberuehrt. Wiederaufnahme-Register + Wellenplan
+> par.21.3.
 - **Bewusst nie getestet:** Holm/Bonferroni bei malformten p-Werten (Erzeuger liefern [0,1]; Methoden-Drift dokumentiert) · `v32_orchestrator`-Stub (dokumentiertes Soll auf totem Pfad) · alpha=1-Konstruktion (kein realer Eingang) · HDR-Histogramm (D5-5 entscheidet entfernen/führen; Test nur falls geführt).
 
 ## 8. Aufwand gegen Zeit
@@ -125,6 +140,11 @@ Befund aus diesem Lauf, mit Nenner: Codex lieferte die Rohbreite über 10 Teilge
 **Kapazität (Annahme, keine Messung — zweiter [lok]-Slot der Ein-Blech-Regel):** W-1 ~6 h · W0a ~8 h · W0b+Nachlauf ~18 h · W1 ~24 h · W2 ~10 h · W3 ~4 h (Batch-Pausen) · W4 ~24 h · zwei benannte Reserve-WE ~24 h = **~118 h**. Die ~75 h eigenständiges Band A passen hinein; die verbleibenden ~100 h Paket-Testseite erhöhen aber die erste Spur, die der Wellenplan bereits mit 26 von 27 Werktagen füllt.
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** [D-2 → §10]: die Stempel-Strecke (P-Posten) kommt ZUSÄTZLICH und fällt NIE; Band B/W1 (62 h) geschlossen gestrichen — §8-Bedingung (2) entschieden.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (Wellenplan par.21, Owner: NIE ausbuchen/verschieben): der D-2-Satz
+> "Band B/W1 (62 h) geschlossen gestrichen" ist Historie -- die 22 Posten sind wiederaufgenommen und NEU
+> platziert (W2-Randslots Mo/Di 24./25. + WE 22./23. nach S-19/T-15b + Rest W3-Batch-Pausen [lok]); der
+> D-2-Marker bleibt stehen. Wiederaufnahme-Register + Wellenplan par.21.3.
 
 **Die wichtigste Aussage: es passt NICHT alles — und der Engpass hat einen Namen: W1.** W1 trägt 99 h Band-A-Testarbeit in einer Woche, die schon D4/D5-Rest, Menge, HY-A und die Entwicklung der W2-Pakete enthält. W1 hält nur unter vier Bedingungen: (1) Vorziehen alles Lokalen in den W0b-Nachlauf (bis Di 18.08.), (2) die Reserve-WE 15./16.08. für die Testspur und 22./23.08. für HY-A **samt seiner Verträge** — der Wellenplan benennt letzteres nur für HY-A; dass die HY-Testverträge mitgemeint sein müssen, ist ein offener Konflikt und wird dem Owner so vorgelegt, nicht glattgerechnet; (3) Band B landet im Fenster planmäßig **gar nicht** (0 von 166.5 h eingeplant; jede gelandete B-Stunde ist Beifang eines frei gewordenen Slots); (4) TDD wird als Ersatz, nicht als Zusatz gebucht — der Test ist die Abnahme des Pakets, keine zweite Abnahme daneben. Reißt eine der vier Bedingungen, fällt zuerst Band A/W2-Randwerk (MT-L6/L7), dann XL-L1-Stufe-B auf W2 — **nie** fallen: ST-CTestWache, MT-L4, die Statistik-Begleittests, PK-KanonWert, LG-XlsxAlt/LG-CsvAlt (Messdaten nie löschen), die HY-Verträge (Owner: ALLES PFLICHT). Von 386 h Bedarf landen im Fenster somit planmäßig 206 h in 53 Posten; 179.5 h in 64 Posten gehen begründet und gezählt nach W7 — diese Zahl steht ab F1 als Zähler in jeder Wellen-Abnahme.
 ---
@@ -589,6 +609,10 @@ Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-w
 
 **D-1 — Hybrid-Bestand nicht null** (§4/Regel 3, W1-Absatz „definiert HY-A"): KON9-02: `hybrid/` trägt **4 Header/943 Z.**, 0 Konsumenten; `AnatomyGattung::HeuristikAdapter=3` existiert, `AnatomyGenus` **sechswertig** — der HY-Reroute-Vertrag **PINNT** `kGenusCount`, definiert nicht grundauf. TDD-Charakter bleibt: Tests vor dem ANSCHLUSS.
 **D-2 — Kapazität** (§8, „~118 h"): #87/#78/#86/KON9-05/HY-A sind **(P), MÜSSEN vor F2, fallen NIE** (§13.3); Reserve-WE 22./23.08. dafür gezogen; **Band B/W1 (62 h) „geschlossen gestrichen"**. §8-Bedingung (2) damit entschieden.
+
+> WIEDERAUFNAHME-MARKER 18.08.2026 (Wellenplan par.21, Owner: NIE ausbuchen/verschieben): dito D-2 --
+> "geschlossen gestrichen" ist Historie, die Band-B/W1-Posten (22 Posten, 62 h) sind neu platziert
+> (s. Marker bei Abschnitt 8/D-2); Wiederaufnahme-Register + Wellenplan par.21.3.
 **D-3 — Shell-Bissproben sind Alt-Last** (§9.3 `mess_ausbeute_bissprobe.sh`, **§9.5 (Z.338)** `plan_zahlen_probe.sh`): KON6-05: `ci/tests/*.sh` müssen Google Tests werden, KEINE Ausnahme; Teil der stehenden Regression **S-16** (14 Dateien/8.528 Z., 0 retired; Skip-Verbot KON22). MECHANIK vorbildlich, FORM zu migrieren; **KON37-08s TEST-KONSOLIDIERUNG dockt hier an** (Ziel-Testmodule = Zielstruktur auch für S-16).
 **D-4 — S-Strecke hat KEINE Testposten** (Lücke, als GEZÄHLTE Warteliste): S-6, S-13, S-14, S-17…S-21 fehlen im 117er-Katalog; T-9 läuft für den größten Baublock leer. Neu: **S-21 Kategorien-Ordnungs-Wache** (=S-6c, Owner-GO, Vorbild `organ_gruppen_decken_die_komposition`, KON21-03). S-6-Umfang erst nach Layout-Bump-Lösung (`decl.hpp:293`) schätzbar.
 **D-5 — xlsx-Nenner** (§2/K7 „null Aufrufer"): KON4-07/R1+KON36-02/H: **8 von 9** `thesis_profiles` xlsx-blind — Kampagnen-Blocker; fehlender T-3-Klasse-Posten mit Profil-Nenner. Lehre L-4: jede „existiert nicht"-Aussage trägt ein Verfallsdatum. *R1-Neuauszählung 15.08.2026 (ce `04f76b65`, zehnter Gitlink-Zug): Nenner **11**, xlsx-blind **0 von 11** (alle mit aktivem `<method value="xlsx"/>`, KF #24) — der Kampagnen-Blocker ist auf Profil-Ebene aufgelöst; der T-3-Klasse-Posten mit Profil-Nenner bleibt als Wache-Lücke offen.*
