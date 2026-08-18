@@ -169,6 +169,25 @@ Diff-Zuschnitts und sind am Objekt ENTLASTET (transparent in Abschnitt 4).
   Kill-Switch when:never + docs-only-changes (D-2-Kandidat, W2-Triage).
 - **9x UEBERHOLT** sind korrekt (der Bruch ueberholt dev-Staende -- Soll-Karten waren aelter).
 
+### 3b. W1-VOLLSTAENDIGKEITS-VORBEFUND (Owner-Zweifel 18.08. "W1 offiziell abgeschlossen -- stimmt
+### das vollstaendig?"; 2 Objekt-Messungen VOR dem vollen W1-Audit, Task #93)
+
+- **[W1-V1] KRITISCH-PLAN: #17/g2-Strang ist UNGELANDET** -- Commit 1528f6fd ("feat(measurement):
+  #17 G-2-Semantik -- Redundanz-Wache der Flag-Menge als B12-Term (e)") ist NICHT Ancestor von
+  ce/development 20c111c4 (merge-base-Beweis 18.08. ~15:15). P.20.1 "Welle 1 KOMPLETT" galt nur
+  der Landung der 4 STRAENGE (hy-a/vl12/vl3/k2); P.20.3 fuehrte g2 als ERSTES Glied der
+  Welle-2-Lande-Liste, die KON116-Landung nennt aber nur xorf+f3v+a11. #17 schliesst die
+  Stempel-Strecke und gibt #7/S-19 frei (KON17-01) => Lande-/Fertigstellungs-Pflicht VOR F2.
+- **[W1-V2] ERNST-PLAN: B3 Schalter-Hoheits-Umzug ohne Bau-Spur** -- OWNER-DATUM "VOR F2"
+  (KON34-04; KON37-01: der Tier-Pflicht-Wurf abi_adapter.hpp:476-491 faellt): im Bruch-Worktree
+  keine B3-Aenderung an abi_adapter.hpp (Treffer dort sind B14-Altbestand). Praezise Bau-Stands-
+  Messung + Frist-Einordnung = W1-Audit Gruppe D.
+- **VOLLES W1-AUDIT ANGESETZT (Task #93):** 8 sequentielle Pruefgruppen (Straenge+VL-3-Fixes ·
+  Stempel-Strecke S-1..S-7/S-6a-d · HY-A · B-Schalter · #17/g2 · Statistik/Menge D4/D5/##10-19 ·
+  Designplan-§4-W1-Testlast · Freeze-Check-Liste §18.3) + Synthese mit Frist-Dreiteilung --
+  Script workflows/scripts/w1-vollstaendigkeit-wf.js, Start NACH Review- und Audit-Ruecklauf
+  (Limit-Doktrin). Ergebnis wird Abschnitt 9 dieses Registers.
+
 ## 4. ENTLASTETE CODEX-BLOCKER (Scope-Artefakte des Flaechen-Zuschnitts; am Objekt gemessen)
 
 - **[C-F1]** "7. Hybrid-Makrostelle fehlt" -- hybrid_module_abi_v1.hpp:70 EXISTIERT mit beiden
@@ -215,10 +234,59 @@ OBJEKT-VERSTAERKUNGEN bestehender Funde (kein neuer Posten, Beleg-Zellen):
   Arbeitsteilung (Designatoren/Sonde/Typ-Folge/sizeof/Gleichheits-Gate) dokumentiert · 2-arg-
   Kurzform (system, organ) mit ""-Mess-Zeile = DEKLARIERTER golden-Bruch (Lande-Notiz).
 
-### 5b. [NACHTRAG AUSSTEHEND] BEWERTER + SYNTHESE
+### 5b. BEWERTER + SYNTHESE ZURUECK (18.08. ~15:20; 11/11 Agenten, 0 Fehler, 980k Tokens)
 
-Wird nach Ruecklauf hier konsolidiert (5 Flaechen-Verdikte + Gesamt-Verdikt + Findings-Delta
-gegen Abschnitt 1-2).
+**GESAMT-VERDIKT: LANDBAR_MIT_FIXES** — alle 5 Flaechen-Verdikte konvergieren unabhaengig
+(loader-hybrid, fingerprint-name, pod-makros-gates, semantik-kern, tests: je LANDBAR_MIT_FIXES).
+33 Findings (1 KRITISCH / 23 ERNST / 9 HINWEIS), Synthese-Fix-Liste **30 Posten**
+(maschinenlesbar: ~/backups-workflow/20260818-bump15-review-audit/review-synthese-w5swesjti.json;
+die Synthese hat selbst gegen die Codex-Funde DEDUPLIZIERT und Kopplungen benannt).
+Kern-Begruendung: kein Fund stellt die BRUCH-SUBSTANZ in Frage (Layout 7/Format 5/GliedCount 10/
+S-6a/6-Symbole+Riegel/POD 152/Budget/HY-A2+A3/work_mode/V-11R von allen Flaechen als richtig
+gebaut befunden); der eine KRITISCH ist eine BEWEIS-Luecke (K13 am Kern), kein nachgewiesener
+Produktionsdefekt.
+
+**Die tragenden NEUEN/PRAEZISIERTEN Posten der 30er-Fix-Liste (Delta zu Abschnitt 1-2):**
+- **KRITISCH (deckt E-1, praezisiert):** Der namensgebende Identitaets-Riegel wird von KEINEM Test
+  AUSGELOEST — 3 Negativ-Fixtures als echte .so-Targets bauen (Luegner-Modul -> 11, ohne-gattung ->
+  9, ohne-genus -> 10), durch den ECHTEN dlopen-Weg, mit destroy-vor-dlclose-Zaehler.
+- **Fix 2 (praezisiert A-F5, Objekt-verifiziert):** gattung_of:206 defaultet unbekannte Bytes
+  STILL auf Container => ZWEI Wertklassen noetig: genus_bekannt() (weist Byte 250 ab) +
+  ist_abi_sichtbares_genus() (weist die verbotene 5 ab); eine allein genuegt NICHT.
+- **Fix 3 (NEU):** dritte Alt-Fixture (Alt-Magic OHNE Identitaets-Symbole) pinnt die
+  Loader-Reihenfolge (Magic VOR Symbol-Lookups).
+- **Fix 5 (praezisiert D-F5, Objekt):** der F8-Test bindet real `(slot, nullptr, &ziel)` — der
+  ANTRIEB ist nullptr gebunden, Roundtrip laeuft ueber lokalen Stack-Zeiger; toter ASSERT :134.
+  Fix koppelt ZWINGEND mit dem ziel_binden-Nullpaarungs-Gate (sonst roter Zwischenstand).
+- **Fix 8 (NEU):** Q2-Selbstvergleichs-Tautologie — gattung_of wird gegen sich selbst geprueft;
+  unabhaengige erwartete_gattung-Spalte in die Fixture-Tabelle.
+- **Fix 11 (verschaerft B-F1):** '1=x;2=y' ist als Ein- UND Zwei-Segment-Map byte-identisch =
+  ZWEITE Digest-Kollisionsklasse (neben der Key-Trunkierung) => constexpr-Grammatik-Pruefer.
+- **Fix 12 (NEU):** KompositMapGlied-Laengen-Wache — der Laufzeit-Weg waechst heute unbegrenzt,
+  die Budget-Zusage ist am Parameter-Eingang unwahr.
+- **Fix 14 (NEU):** Offset-Pins 136/144 fuer name_line/name_len in der Stamp-Tafel (die einzige
+  Wache gegen gleichtypigen Feld-Tausch deckt die 2 neuen Felder nicht).
+- **Fix 15+16 (praezisiert D-F3/D-F4b):** validate-Gate fuer "merge" (Verbund2_Hybrid nicht
+  materialisiert) + merge_mode_to_strategy fail-closed (der Rest-Kollektor invertiert heute still
+  die Semantik-Klasse von Alt-Token "fulljoin": Union -> Replace).
+- **Fix 17 (NEU):** debug-Restbestaende in run_methodology_registry-Doku; profile_run_entry:956
+  empfiehlt woertlich den WERFENDEN Fehlerpfad als Beispiel.
+- **Fix 18 (NEU, nicht kosmetisch):** 3 stale Vor-S-6a-Ordnungs-Saetze (fingerprint:1154/:577/
+  :130) — die 2-/3-arg-Ebene nimmt rohe Literale, der stale Satz ist die ANLEITUNG, nach der eine
+  vierte Stelle falsch gebaut wuerde.
+- **Fix 20 (NEU):** lint_layer_includes.sh deckt hybrid/ nicht — die Wache, mit der der Kommentar
+  die neue Kante builder/->hybrid/ begruendet, existiert fuer diese Kante nicht.
+- **Fix 21 (bestaetigt Rest):** clang-release-Vollbau+ctest am Tip VOR der Landung ist PFLICHT
+  (R1 heilt einen NUR-clang-ab-O2-Fehler; genau diese Zelle ist am Tip ungemessen).
+- Fix 13 (=C-F2 Typ-Folge 18->20) · Fix 6 (=A-F2 MaxDocks-static_assert) · Fix 7 (=D-F6 Set-Cast-
+  else-EXPECT) · Fix 9 (=B-F2 Bereichs-Wurf) · Fix 10 (=B-F4 Deckel-Wurf) · Fixes 22-30 HINWEISE
+  (Cross-Pins HeuristikAdapter/Reroute-Aritaet, Budget-Prosa maschinell, ~4600->4416,
+  Test-Umbenennung At120->At152, stale Anker, Mengen-Kommentare, Overflow-Gate, (d)-Anker,
+  Klassifikations-Historie).
+- **9 ENTLASTUNGEN der Synthese** (deklarierte Reste bestaetigt): clang-debug-PIE vorbestehend ·
+  Lock-Regen=Lande-Schritt · Stempel-Pflicht=golden-Folgezug · TABU-CRC haelt · Kern-Substanz
+  richtig gebaut · (d)-prozessual-gedeckt · Overflow dormant · F8-Delegations-Proben echt ·
+  V-11R-K13 vorbildlich.
 
 ### 5c. RESUME-BILANZ "failed/unvollstaendig" dieses Kontexts (Owner-Frage, gemessen 18.08. ~15:05)
 
@@ -249,10 +317,17 @@ getrennt, kein ODR-Problem · Admission: Groesse 6 + Hybrid-CT-Konstante + Cross
 3 implementierte Verbund-Strategien altsemantik-treu · 4 work_modes nutzen Release · B4-Paare
 4/6 direkt geprueft.
 
-## 8. KONSEQUENZ
+## 8. KONSEQUENZ (Kette, Stand 18.08. nachmittags)
 
-Alle Abschnitt-1/2-Posten + die A2.5-faehigen Abschnitt-3-Posten gehen als EINE Fund-Liste in die
-A2.5-FIX-STUFE (Fable max, T-1 je Fund, dreiwertige Quittung, Rekursion bis 0 neue Funde) im
-Worktree wt-ce-bump15 -- Start nach Ruecklauf der Review-Synthese; Audit-Reste speisen die
-Fix-Runde 2 bzw. die Lande-Triage. Danach Landung nach dem Rezept der Kontext-13-Uebergabe
-(5e0b7f95, Abschnitt 4).
+(1) Review-Synthese + Audit-Synthese abwarten (laufen sequentiell) -> Abschnitte 5b/6 nachziehen.
+(2) **W1-VOLLSTAENDIGKEITS-AUDIT (#93)** als drittes Glied fahren (Owner-Erweiterung 18.08.;
+    Vorbefunde 3b) -> Abschnitt 9.
+(3) A2.5-FIX-STUFE (Fable max) im Worktree mit der GESAMTEN Fund-Liste (Abschnitte 1-3b + 5-6 + 9):
+    T-1 je Fund, dreiwertige Quittung, Rekursion bis 0 neue Funde -- inkl. der W1-Rest-Posten,
+    die vor F2 gehoeren (#17/g2-Landeweg, B3-Einordnung).
+(4) Landung nach dem Rezept der Kontext-13-Uebergabe (5e0b7f95, Abschnitt 4) + F2-Owner-Vorlagen.
+
+## 9. [NACHTRAG AUSSTEHEND] W1-VOLLSTAENDIGKEITS-AUDIT (Task #93)
+
+Wird nach dem Lauf hier konsolidiert (Gesamturteil "war W1 KOMPLETT korrekt?" + Frist-Dreiteilung
+offen-vor-F2 / gebaut-ungelandet / W2-deklariert / gestrichen-deklariert / unklar).
