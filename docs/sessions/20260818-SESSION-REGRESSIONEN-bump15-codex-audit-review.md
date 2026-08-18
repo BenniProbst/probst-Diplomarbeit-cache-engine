@@ -331,3 +331,37 @@ getrennt, kein ODR-Problem · Admission: Groesse 6 + Hybrid-CT-Konstante + Cross
 
 Wird nach dem Lauf hier konsolidiert (Gesamturteil "war W1 KOMPLETT korrekt?" + Frist-Dreiteilung
 offen-vor-F2 / gebaut-ungelandet / W2-deklariert / gestrichen-deklariert / unklar).
+
+## 10. A2.5-FIX-STRECKE 1 VOLLZOGEN (18.08. abends, wf_a1b55606, 7/7 Agenten, 0 Fehler)
+
+**BILANZ: 42 BEHOBEN · 0 ENTLASTET · 1 VERTAGT (C-F4 -> W2-Task) ueber 5 Schreiber-Gruppen;
+Worktree-Tip 67dafa46 -> 19e7951a (6 Commits: 35ab0c46 g1-fingerprint · cc243c8c g2-loader ·
+9378e463 g3-hybrid · 7ccf7002 g4-tests · cdec6079 g5-semantik · 19e7951a abnahme-format).**
+Volle Quittungs-Liste mit Rot-zuerst-Belegen:
+~/backups-workflow/20260818-bump15-review-audit/fixstrecke1-ergebnis-wiq9ihup1.json.
+
+**Highlights der Rot-zuerst-Belege:** B-F2-Kollisions-Zeile REAL erzeugt (100000001/200000001 ->
+derselbe Key, Streng-Wache blieb gruen) vor dem Deckel-Fix · CT-Koeder -DCOMDARE_HYBRID_KOMPOSIT_
+GLIED="1=x;2=y" kompilierte VORHER rc=0, NACHHER static-assert-Fehler literal · Budget-
+Kompensations-Mutation (768->767 + 256->257, Summe 6057 unveraendert) feuerte NUR die neue
+Reihen-Wache · Fix-2-Gate-Flip-Mutation bewies den echten dlopen-Pfad · 4 neue .so-Negativ-
+Fixtures (Luegner->11, ohne-gattung->9, ohne-genus->10, alt-magic-ohne-symbole->magic_mismatch).
+
+**ABNAHME GRUEN (alle Zellen am End-Tip 19e7951a neu gemessen):** gcc-release 503/503 ·
+**clang-release 503/503 (Fix-21-Pflicht erfuellt — die R1/ENABLE_EXPORTS-Zelle ist am Tip
+GEMESSEN; die fruehere 503-vs-502-Differenz war das stale EXCLUDE_FROM_ALL-Binary, in der
+Abnahme per Relink bewiesen und geheilt)** · gcc-debug 499/499 (Differenz 4 = gemessen erklaert
+per comm ueber ctest -N) · clang-debug NICHT gefahren (vorbestehender PIE/HDR-Rest, deklariert)
+· Abdeckungs-Wache GUARD_EXIT=0 literal '503 von 503' · Floor avx512f 503==Anker · Lock-Drift
+Exit 1 mit 4 versionslosen Traegern LITERAL PROTOKOLLIERT = deklarierter Lande-Schritt ·
+Diff-Hygiene GRUEN (5165 Zusatzzeilen, 0 Nicht-ASCII, 0 >120) · clang-format-Nachzug als
+19e7951a (reine Whitespace, alle Zellen DANACH neu gemessen) · gitleaks Koeder biss/Echt clean ·
+TABU-CRC 0x56F1B721C72DC10E unbewegt (Anker-Test in beiden Release-Zellen Passed) ·
+golden-Diff 67dafa46..HEAD = 0 Byte.
+
+**VERIFY RUNDE 1: FUNDE (3 kleine Luecken) -> REKURSION RUNDE 2 LAEUFT (wf_b943361e):**
+(1) C-F3 (Layout-6-Probe) in der Synthese-Dedup verloren, nie bearbeitet; (2) 4 Triage-Posten
+(seg1-40/43/45, LS2-33) ohne formale dreiwertige Quittung, seg1-44 nur klassenweise;
+(3) Nachzug-Pflichten (C-F4-W2-Task anlegen, seg1-04-super-Haelfte dem super-Zug zuweisen).
+Verify bestaetigt zugleich: ALLE 21 KRITISCH/ERNST-Diffs tragen ihre Anweisung, KEINE neue
+Code-Regression, Kopplung g3<->g4 konsistent.
