@@ -359,9 +359,32 @@ Diff-Hygiene GRUEN (5165 Zusatzzeilen, 0 Nicht-ASCII, 0 >120) · clang-format-Na
 TABU-CRC 0x56F1B721C72DC10E unbewegt (Anker-Test in beiden Release-Zellen Passed) ·
 golden-Diff 67dafa46..HEAD = 0 Byte.
 
-**VERIFY RUNDE 1: FUNDE (3 kleine Luecken) -> REKURSION RUNDE 2 LAEUFT (wf_b943361e):**
+**VERIFY RUNDE 1: FUNDE (3 kleine Luecken) -> REKURSION RUNDE 2 (wf_b943361e):**
 (1) C-F3 (Layout-6-Probe) in der Synthese-Dedup verloren, nie bearbeitet; (2) 4 Triage-Posten
 (seg1-40/43/45, LS2-33) ohne formale dreiwertige Quittung, seg1-44 nur klassenweise;
 (3) Nachzug-Pflichten (C-F4-W2-Task anlegen, seg1-04-super-Haelfte dem super-Zug zuweisen).
 Verify bestaetigt zugleich: ALLE 21 KRITISCH/ERNST-Diffs tragen ihre Anweisung, KEINE neue
 Code-Regression, Kopplung g3<->g4 konsistent.
+
+### 10b. RUNDE 2 VOLLZOGEN + VERIFY: NULL_NEUE_FUNDE — A2.5-REKURSION #15 FORMAL BEENDET
+### (18.08. spaetabends; End-Tip **e285d316** auf 19e7951a)
+
+Quittungen der 3 Luecken (alle mit Messung): **C-F3 BEHOBEN** @ e285d316 (Variante a
+Kommentar-Ehrlichkeit, 15 ///-Zeilen; Mirror-Variante mit Signatur-Beweis verworfen) ·
+**seg1-40 VERTAGT -> Task #95** (V-08R ist seit KON101 BUENDEL-SOLL, aber die Owner-Form
+SHA-256/64-Hex kollidiert GEMESSEN mit dem 128-Hex-S-1-Vertrag stempel_basis.hpp:378-387 —
+eigener Bau; Frist-Entscheid = F2-Vorlagen-Punkt) · **seg1-43 ENTLASTET** (deklariert-ungedeckt;
+PRAEZISIERUNG: V-13 ist per KON101 BEANTWORTET, offen ist nur BAU B-5f an ALLEN DREI Stellen
+per KON106-02/NP-18; owner-vorlagen-Gegenprobe: kein stale Vorlagen-Punkt) · **seg1-45 VERTAGT
+-> #83** + **LS2-33 VERTAGT -> #44-Rest** (je git-log-Beweis: Bruch beruehrt die Flaeche nicht)
+· **seg1-44 ENTLASTET-bestaetigt** (Spannung ausgewiesen, Aufloesung Audit-Synthese+Owner).
+Tasks #94 (C-F4-Kapselung W2) + #95 (V-08R) angelegt; super-Doku-Posten (6 stale E-6-Stellen
+im Hybrid-Bauplan) im KON119-super-Zug verankert.
+
+**Verify R2 (unabhaengig nachgemessen): NULL_NEUE_FUNDE** — C-F3-Block-Fakten am Objekt geprueft
+(stamp_pod_layout_probe setzt nur die Zahl; has_entries liest nur stamp_layout_version), golden-
+Diff 19e7951a..e285d316 = 0 Byte, TABU-Traeger 0 Diff-Byte, clang-format rc=0 selbst nachgemessen,
+ctest m_w12 gruen in beiden Zellen. (Prozess-Notiz: die Prompt-Interpolation der Quittungen
+scheiterte erneut am Template-Literal — bekannter Orchestrator-Bug, Verify rekonstruierte aus dem
+journal.jsonl; kein Fund am Gegenstand.) **Der Bruch steht damit fix-komplett bei e285d316 und
+wartet nur noch auf: Audit-Ruecklauf -> Fix-Strecke 2 -> W1-Audit #93 -> Landung.**
