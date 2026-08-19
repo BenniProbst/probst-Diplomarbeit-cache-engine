@@ -297,7 +297,68 @@ verwaister 0-Byte-Doppelstart des Review-Runs 04:52 (gleiche Run-ID, tot, kein R
 4 MCP-Codex-Tasks durch Plan-B-CLI ersetzt und KOMPLETT; uebrige = abgeschlossene Bash-Tasks
 (Ergebnisse konsumiert). ES GIBT KEINEN weiteren nicht-doppelten failed Workflow/Agenten.
 
-## 6. [NACHTRAG AUSSTEHEND] VOLL-AUDIT-SYNTHESE (wf_794b904b, 688 Zusagen)
+## 6. VOLL-AUDIT-SYNTHESE (wf_794b904b, NACHGETRAGEN 19.08. -- 65/65 Agenten, 688/688 verifiziert, 0 unverifiziert)
+
+> Lauf: >14 h sequentiell (18.08. 14:47 - 19.08. 05:13, Limit-Riss) + Resume 19.08. (2 Kontext-
+> Lenses + Synthese aus dem Cache-Resume). VERDIKTE ueber die Vollmenge: **502 ERFUELLT /
+> 74 UEBERHOLT / 85 ABWEICHUNG / 22 FEHLT**. GESAMTURTEIL "wurde korrekt gearbeitet?":
+> UEBERWIEGEND JA (Soll-Erfuellung TEILWEISE · Doktrin-Treue JA, Verstoesse selbst gefunden+
+> geheilt · Beweis-Vollstaendigkeit TEILWEISE · Owner-Wort-Treue TEILWEISE, EIN Rangfolge-
+> Verstoss). **LANDE-FREIGABE: LANDBAR_MIT_FIXES (F1-F9)** -- F1/F2/F3 sind PUSH-SPERREN.
+
+**KRITISCH (3):**
+- **K1 = F1 (PUSH-SPERRE): V-01R AxisKind-Dreh + CT-Zuordnung NICHT gebaut, Gegenteil-Entscheid
+  mit doppelt ueberholtem KON5-04 dokumentiert** (anatomy_fingerprint.hpp:891-914; topics/axis.hpp
+  in 0 Bruch-Commits; Owner-Verbatim KON101-01/02 'definitiv mit drehen', 'Owner ueberstimmt die
+  Lead-Empfehlung'; KON5-04 doppelt ueberholt per KON21-03+V-01R). Der 6->7-Bump IST gefahren --
+  spaetere Drehung = zweiter Preimage-Bruch. FIX: bauen ODER Owner-Satz VOR Merge + KON119-
+  Revision; KON5-04-Fehl-Deckung (auch die K13-Entlastung dieser Session, A2.3a-NEIN-Probe!)
+  hiermit datiert KORRIGIERT: die NEIN-Probe las die Fehl-Deckung als Entscheid -- V-01R gilt.
+- **K2 = F6: golden-gebundene Bauplan-Reste ohne terminierten EINEN Zug** -- telemetry-silent/B-9
+  (build_version-wirksam! Nachzug nach F2 = zweiter Flotten-Bruch, C7-Warnung), CRC-Anker-Zug
+  B-10.3 + Bissprobe B-11.2 offen, A-11-Stempel-Pflicht TRAEGERLOS vertagt; Task-#15-Zusage
+  '3 golden-Nachposten im Bruch' unerfuellt. ENTLASTUNG darin: K1-avx512 korrekt NICHT vorgezogen,
+  id-CRC [MATCH]; seg1-81-'NP-19-fehlt' = Token-Grep-Falsch-Null (Trennung substanziell da).
+  FIX: EIN golden-Ereignis mit EINEM Re-Anker VOR F2 terminieren, A-11 Task+T-1-Abnahme.
+- **K3: W1-Push ohne eigene Lande-Gate-Kette (KON114-02, 15971-Rot als Quittung) -- GEHEILT,
+  Lehre verankert.** FIX-Rest: Lande-Gate-Kette als EIN Pre-Push-Script MECHANISIEREN
+  ('Werkzeug schlaegt Disziplin', GOAL-IV.2; gilt auch fuer E13/KON116-01).
+
+**ERNST (13, verdichtet):** E1 clang-debug-Kombibau-Viertel OHNE gruenen Volllauf; 'PIE
+vorbestehend'-Entlastung = V11-Stellvertreter (Datei-Diff statt Basis-Messung); Verdacht:
+Bruch-Commit 0d0ad521 ENABLE_EXPORTS ist link-wirksam -> **F2 (PUSH-SPERRE): Basis-Probe am
+20c111c4 + Volllauf am Tip** · E2 Endstand ungedeckt: realer Tip e285d316 = **30** Commits
+(Uebergaben nannten 25/32 -- nie literal gemessen); Hygiene deckt nur bis 67dafa46, ctest bis
+19e7951a; 7 A2.5-Commits ungedeckt -> **F3 (PUSH-SPERRE)** · E3 tragende LastTest.log-Beweisorte
+im Worktree durch 0-Test-Laeufe zu FALSCH-NULLEN ueberschrieben (Belege leben nur in .review-tmp/
+g6_* + jobs-tmp) -> Beweisorte umschreiben, kuenftig ctest --no-tests=error · E4 KON91-02-Paket
+(Comp-Gate/aggregate_required je COMP, organ_stamp_line, Disk-Suffix) fehlt trotz Buchung 'IM
+EINEN W1-BUMP-BUENDEL'; CEB-LAGER-REGISTRY-HASH-MAP nirgends -> **F4** (deckt sich mit
+C-3a/#38a2 -- die heutige Owner-Nachfrage traegt die Entscheidung) · E5 NP-23/24 PMC-Snapshot-
+Flags: POD-Wirksamkeit KLAEREN -> **F5** · E6 E-6-Doku 0/3 -> F8 · E7 V-06-Stempel-Pflicht-
+Haelfte (A-11) traegerlos -> in F6 · E8 V-08R-SHA-Haelfte = #95 (Bau laeuft, K14) · E9 V-13 =
+#99 · E10 PMC-fail-loud = #83 (vor Trigger 26.08.) · E11 TSan-Beleg + F-9 fehlen im Bruch-Anker
+(F-9 = Basis-Altbestand, HY-A2-Traeger) · E12 **Thesis-Remote traegt wieder 1 Co-Authored-By-
+Commit 09cc728 auf ALLEN Refs beider Remotes** (vermutlich via Owner-Overleaf-Linie
+zurueckgeflossen) + lokale Klone stale -- Owner-gated (Rewrite = Remote-Loeschung), NICHT
+#15-blockierend · E13 W2-Gates nicht am Endstand (KON116-01, 15978-Rot) -- GEHEILT, Rest in F9.
+
+**FEHLT/ABWEICHUNG-TAFEL:** P1-P14 spiegeln K1/K2/E4-E12 je seg-Anker; P14 ENTLASTET
+(bestandslog-Posten korrekt Di-25-faellig, NP-19-Trennung vorhanden).
+
+**HINWEISE (7):** H1 Root-Duplikat ./system_axis_registry.xml (12285 B, Generator-Default
+out_path=CWD) -> **F7** · H2 Abdeckungs-Wache lief WEICH (COMDARE_WACHE_STRIKT ungesetzt; GRUEN-
+Text zitieren, fuer Lande-Gates STRIKT=1) · H3 unquittierter Flake test_seg_coverage (03:51
+Failed -> 03:52 Passed ohne Commit) -> Findings-Register + vor Kampagne klaeren · H4 K16-
+Kollisions-Heilung vorbildlich; KON119 mit bump15-a/b/c/d-Namensnennung (F9) · H5
+klassifikation.hpp:28 '==5'-Historienzitat (mit F8) · H6 Muster: ALLE Verstoesse Disziplin-,
+keine Mechanik-Fehler -> Pre-Push-Script (K3/E13) · H7 Audit-Anker 67dafa46=23 Commits,
+realer Tip e285d316=30 -- KON119 fuehrt den literalen Endstand.
+
+**KONSEQUENZ:** Fix-Strecke 2 = F1-F9 + Register-11-Zusaetze (T-2 Positions-Beweise, T-10
+V-02R-Verkettung -- beide NICHT im Audit, eigenstaendig) + Register-G-L21 (F-9/TSan-Triage);
+Reihenfolge: F1 (V-01R-Entscheid: KON101-gedeckt -> BAUEN) und F2/F3 VOR jedem Push; F4 haengt
+an der heutigen C-3a-Antwort; F6 als golden-Ereignis-Zug vor F2 terminieren.
 
 Wird nach Ruecklauf hier konsolidiert (Gesamturteil je Dimension, FEHLT/ABWEICHUNG-Liste
 vollstaendig, Lande-Freigabe-Urteil); die 36 Fruehverdikte aus Abschnitt 3 werden dann gegen die
