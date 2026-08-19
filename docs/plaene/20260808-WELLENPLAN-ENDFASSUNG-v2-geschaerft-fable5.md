@@ -3447,3 +3447,109 @@ haben einen Vor-Abgabe-Platz.
 (Standard-Push-Sequenz, docs-Zug) + Task-Anlagen/-Updates laut 22.4; #96 zaehlt 22.4 namentlich
 gegen; die 13.7-K16-Pflicht prueft WF-Quittungen kuenftig AUCH gegen diesen Abschnitt. Stirbt ein
 Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr.
+
+---
+
+# 23. KONSOLIDIERUNG K15-SCHLUSS (19.08.2026 spaet) -- #93-BEFUNDLAGE AM OBJEKT,
+# LANDE-STAND, DIE OFFENE F2-LISTE (Owner-Order: offene Liste + alle vergessenen
+# Aufgaben des gesamten Kontextes in den Wellenplan)
+
+> par.22 bleibt stehen (Traeger-Abgleich 195->120); DIESER Abschnitt traegt die JUENGEREN
+> Objekt-Befunde des #93-W1-Audits (7/8 Gruppen komplett gelesen; Gruppe F + Synthese im
+> Resume wf_ca507b8f) + den Lande-Stand nach der #17/g2-Landung. Bei Widerspruch: dieser
+> Abschnitt vor par.22 vor par.21. Quellen: w93-teilstand-widkey76e.json (B.3-gesichert),
+> g2-formatfix-landung-endergebnis-wx001l49o.json, Register 13/13.8.
+
+## 23.0 STAND-ANKER (19.08. ~20:05)
+
+    GELANDET:   #17/g2 = dev ba33b9ac (Merge von 6af6a415, dual gepusht; Baum-CI 16029
+                SUCCESS 27 Jobs; dev-CI 16031 running mit 0 roten Jobs, Poller laeuft;
+                W1-V1-Buchung folgt mit Terminal-SUCCESS). Stempel-Strecke damit bis auf
+                #15-Landung geschlossen; #7/S-19-Freigabe wird mit #15-Landung wirksam.
+    FIX-KOMPLETT UNGELANDET: #15-Bruch @ 79171599 (= Abnahme-Endtip 8cd32a0d + #100/#101);
+                Fix-Strecke 2 NULL_NEUE_FUNDE; VOLL-ABNAHME 4 Zellen @ 79171599 LAEUFT
+                (Owner-Eskalation 19.08.: 'VOLLSTAENDIGE Abnahme, auch wenn sie die
+                deadline reisst' -- Memory-Dauerregel, Kurznachweise nie wieder Default).
+    PARALLEL:   g2-Rest-Zellen-Vollabnahme am formatierten Tip laeuft (T-11b buchstaeblich
+                am Tip; dev-CI liefert die CI-4-Zellen zusaetzlich).
+
+## 23.1 DIE OFFENE F2-LISTE (aus #93 B-H am Objekt; je Posten: BAUEN bis Fr / FALL
+## DEKLARIEREN mit Zahl / OWNER-FENSTER — NIE-KUERZEN: jeder Posten behaelt den Platz)
+
+    F2-1  B1 XML-Konsum je Stufe (Registry-NEUBAU <measurement_tooling> + Stufen-Dimension):
+          NICHT GEBAUT (Objekt: Registry ohne Stufen-Dimension, XSD:88 ohne, 0 Commits
+          beide Baeume). Freeze-Check-Element (P). Fallweg 18.6(4) EXISTIERT (B1 -> W2-
+          Anfang vor Trigger) aber NICHT deklariert. ENTSCHEID: Registry-Neubau bis Fr ist
+          unrealistisch neben den Landungen -> 18.6(4)-FALL JETZT DEKLARIEREN (Zahl im
+          Protokoll; Freeze-Check bucht) + W2-Anfang-Slot VOR Trigger Mi 26. [Traeger #24]
+    F2-2  CEB-STEMPEL system_zeile-Fuellung (KON8-03): bewusst leer in dev UND Bruch,
+          Bauplan-B-6 sah Fuellung vor, KEINE Fall-Deklaration. Freeze-Check-Element.
+          ENTSCEID: in den #15-NACHLANDESCHRITT aufnehmen (klein, KON8-03-Bauauftrag ist
+          praezise) ODER 18.6-Fall deklarieren. [#15-Lande-Notiz + Freeze-Check]
+    F2-3  S-5-ERBINNEN-REST: Tier-/HybridStempel-Erbinnen nach P4/P5-Muster = 0 Treffer in
+          beiden Baeumen (Komposita-Traeger liegen im Bruch); B-8b/B5 haengen daran.
+          ENTSCHEID: mit F2-2 buendeln (ein kleiner Stempel-Nachlande-Zug nach der
+          #15-Landung, VOR Freeze-Check) ODER Fall deklarieren. [B-6-Rest]
+    F2-4  B5 Stempel-Pflicht je Schalter: haengt an F2-3 + B5-VORPOSTEN aus B3-Spez-
+          Abweichung (wallclock@Version als CEB-Glied, Zwillings-Wache); (P) ohne
+          Owner-Datum. Kein Fall deklariert. -> Fall-Deklaration mit F2-3-Kopplung; der
+          KON64-B5-Anteil haengt an P4. [#24/B5]
+    F2-5  ACHT BAND-A-TESTPOSTEN Designplan par.4-W1 ungebaut (Objekt-Messung je 0 Treffer):
+          PK-KlemmJson n-Spalten · HY-Ebene4a Label+Datensatz (4.-Ebenen-Entscheid war fuer
+          Mi 19. terminiert!) · LG-HostBinder 3 Felder · LG-SkipCallback==0 (WOERTLICHES
+          F2-Abnahmekriterium!) · LG-E2Exlsx Facade · LG-XlsxAlt nie vernichten (NIE-fallen-
+          Klasse!) · PM-Naht perm_runner->CSV · XL-L4 n/a-Konkurrenz. Dazu 2 UNKLAR:
+          LG-LoadWache beide-Genera-Beleg + LG-Idempotenz 2x3-Matrix.
+          ENTSCHEID: die 2 NIE-fallen-nahen (LG-XlsxAlt + LG-SkipCallback) bis Fr BAUEN
+          (klein, Test-only); die uebrigen 6+2 als deklarierten 18.6-Fall in die
+          W2-Randslots (Zahl: 8 Posten ~33h) -- Feinplatzierung Di 25. [#96 zaehlt gegen]
+    F2-6  UMBENENNUNGS-REST: E-Label (KON37-05) + Flag-f-Kollision FPGA/AVX-512 = 0
+          Objekt-Treffer, nicht im Bauplan -> platzieren (W2-Slot) oder deklarieren.
+    F2-7  SOLL-VERSIONIERUNGS-REST: Genus-CT-Komposition ungebaut (algo_semver.hpp:290-298)
+          + Planer-SHA owner-gated P5 (#95 gebaut @ 0f0742aa, Form-Frage offen) ->
+          Teilstueck-Deklaration im Freeze-Check; P5 im Vorlagen-Fenster.
+    F2-8  N-1 (S-6c Zwei-Welten-Wache) + N-2 (S-6d-Rest, real 23 Familien-Dateien statt
+          '142') = deklarierte Nachlaeufe NACH der #15-Landung, VOR Freeze-Check faellig
+          (Bauplan par.6). [#15-Nachlandeschritt]
+
+## 23.2 FREEZE-CHECK-DEKLARATIONS-TAFEL (Fr 21.08. — damit NICHTS als Falsch-Rot faellt)
+
+    DEKLARIERT-W2 (Quelle je Posten gemessen): A8/A12 clang-Warnungs-Review (P.20.9+F-D;
+    Quellen-Differenz W2-1 vs W2-2/#3 MITFUEHREN) · A9/A11/A13 --debug-Matrix+N5 (M-5-
+    Buendel W2-1) · #38a2/P4 = 18.6(3) DEKLARIERT (KON119-T-A-Buchung PFLICHT) · D-2-Band-B
+    22 Posten (par.21.3-Platzierung) · B4/OF-1 (W2-Tabelle) · S-2/G-1 (benannte Leerstelle,
+    Owner-Fragen 9/12 offen — NICHT Freeze-pflichtig) · Wstringop (Di-25-Feinplatzierung).
+    ENTLASTET AM OBJEKT: A10 Windows-_pclose (statischer Blick 19.08.: _pclose liefert auf
+    Windows direkt den Exit-Code -> l.rc=status KORREKT; POSIX-Zweig sauber; P.20.2(c)-
+    Pflicht vollzogen, KEIN Fix noetig). GEBAUT_UNGELANDET (landet mit #15): S-6a-d ·
+    HY-A2/A3 + P.20.10-Abnahmeformel (fahrbar dokumentiert, 4/6/5/1/32-Pins in 3 Logs) ·
+    B3 (Spez-Abweichung deklariert) · #38d (Budget 8192 GERECHNET, Summe 6057) ·
+    ABI-Pflicht 6 Symbole (V-06 Lesart A; Emitter-Haelfte = golden-Folgezug #102) ·
+    A-06/A-08/A-09-Umbenennungen. ERFUELLT: S-1 S-3 S-7 B2 HY-A1 SOLL-Vers.-Kern
+    MT-L3 PK-Kanon/Kreuz/DeleteP99 ST-Trio(5) HY-Reroute LG-WritebackXlsx XL-L2.
+
+## 23.3 LANDE-NACHLAEUFE (aus dem g2-Lande-Verify R1-R6 + Verify-Bestand)
+
+    L-N1  CI-TERMINAL: 16029 SUCCESS (bewiesen 20:04); 16031 running 0 rot -> Poller
+          b1uvq3cwn; nach SUCCESS: W1-V1-Buchung (Task #17 completed + Ledger) +
+          clang:debug-N literal + coverage-guard-Quittung. [R1/R3/R6]
+    L-N2  wt-ce-g2-Loeschung NUR nach Doktrin (gruen+gemergt+Submodul-Branch-Check),
+          eigener Schritt NACH L-N1; build-g2 ENTFAELLT als Lande-Referenz erst danach.
+    L-N3  Platte VOR dem naechsten grossen Vollbau raeumen (97%/8.6G zum Verify-Zeitpunkt;
+          Voll-Abnahmen raeumen je Zelle selbst); root-Anteil = par.22-Owner-Punkt. [R4]
+    L-N4  Sequentialitaets-Befund (Push waehrend 16029 running; Runner-Queue
+          sequentialisierte faktisch) -> Ledger-Notiz im KON119-Umfeld. [R5]
+    L-N5  bump15-Lande-Vorbehalte UNVERAENDERT: T-B Lock-Erst-Versionen (Lande-Schritt 3)
+          + T-C 4 XML-Wohlform-Vorbestandsfehler + pre_push_lande_gates am 79171599
+          (laeuft in der Voll-Abnahme mit) + F-A-Komplex-Fix-Deklaration + KON119-Pflichten
+          (13.8 A4: T-A C-3a-Buchung, A2.5-Bilanz maschinenlesbar, B3-Spez-Vermerk,
+          Sequentialitaet, Vertagten-Bilanz).
+
+## 23.4 VERGESSENS-SCHUTZ-BILANZ K15 (was dieser Kontext an Traegern erzeugt hat)
+
+    Register 13/13.8 (0962be43/e320beb4) · Uebergabe 0-11 (98520201) · par.22 (6104e897) ·
+    DIESER par.23 · Tasks NEU #102(F6, Do 20.!) #103(TSan) #104(prt-art-Pin) #105(Sammel)
+    · ROT-Auflage in #18 (s13:1384) · Memory NEU: Vertagt-Zwischenzustand + Vollstaendig-
+    keits-Verschaerfung + comdare_gen_golden_fullpilot-Fix · completed #100/#101.
+    K16-EINLESE-PFLICHT: Register VOLL (inkl. 13) + Uebergabe 0-11 + par.21-23 + #93-
+    Synthese (nach Resume) + die 4 /goal-Dokumente (Kippen-Ritual, Sonnet-5-max-Analyse).
