@@ -531,6 +531,10 @@ Memory-Zug). Die Kette selbst aendert sich NICHT.
 > Roh 114 Verdikt-Objekte -> 111 eindeutige IDs: **22 FEHLT** (davon
 > KRITISCH 0 / ERNST 18 / HINWEIS 4) + **89 ABWEICHUNG** (KRITISCH 4 /
 > ERNST 62 / HINWEIS 23). Die Synthese-Zaehlung 22/85 dedupte 4 Doppel-IDs schaerfer;
+> DEKLARIERTE KUERZUNG (Nachtrag 19.08., Sweep-Fund X-16): jede Beleg-Zelle ist bei ~230 Zeichen
+> geschnitten -- der VOLLTEXT jedes Verdikts lebt byte-genau in der BU-Journal-Kopie
+> backups/20260819-kontext14-workflows/audit-wf794b904b-journal-ENDSTAND.jsonl (Fix-Strecke 2
+> liest KRITISCH/ERNST-Belege DORT, nie nur hier).
 > DIESE Tafel ist die Roh-Detail-Ebene (Gegenzaehl-Basis der Fix-Strecke 2, NIE-kuerzen-Regel:
 > Dedup gegen die Rohliste gegenzaehlen). Je Zeile: ID · Schwere · Beleg-Kern.
 
@@ -650,3 +654,462 @@ Memory-Zug). Die Kette selbst aendert sich NICHT.
 - `seg7-17` [HINWEIS] 4 Werte + Registry: run_methodology_registry.hpp:57-63 enum {Debug,Measure,Release,Compare} + :66 kRunMethodologyCount=4 + :94-99 constexpr-Registry (Zusagen-Anker :37-41/:74-78 gedriftet); XSD super Code/test_data_xml/experiment_
 - `seg7-45` [ERNST] ce UND wt libs/cache_engine/organ_axes/axis_centric_namespaces.hpp:24 unveraendert 'Concept-Header ALLER 17 Achsen'; grep -c '#include <topics' = 17 in beiden; Kopf :9 beansprucht 'ALLE Achsen-Interfaces'; kanonisch 18 Organ-Achse
 - `seg7-50` [ERNST] Cluster/_infra/buildtools/.gitlab-ci.yml:449ff DOCKER_OS-Matrix = 18 unique = 6 Familien x 3 (ubuntu-2404/2204/2004, debian-12/11/10, fedora-41/40/39, alpine-321/320/319, opensuse-tw/156/155, rocky-9/93/8); grep debian-sid/fedora-
+
+## 12. REGRESSIONS-SWEEP K5-K13 + JOURNALE (16.-19.08.) -- NACHTRAG 19.08.2026 (K14, SYNTHESE)
+
+> Auftrag: die 10 Transkript-Fenster K5-K13 (16.08. 12:28 - 18.08. 21:24, Z59214-69705) plus
+> 3 Journal-Gruppen VOLL nachvollziehen; jede unnotierte Regression, jeden verlorenen Strang,
+> jeden Workflow-Start bis zum Abschluss verfolgen. Methode je Leser: python3-Streaming ueber das
+> Roh-Transkript (User/Teammate voll, Assistant ~800 Z., tool_results Kopf), dieses Register
+> (Abschnitte 0-11) vorab VOLL als Dedup-Basis, Verdachtsfaelle am Objekt nachgemessen
+> (ls-remote, merge-base, Dateisystem, Ledger-greps, journal.jsonl). Audit-Verdikte (688/688,
+> Abschnitt 6/6b) werden NICHT erneut gemeldet -- Ueberschneidungen sind je Fund markiert.
+
+**12.0 VOLLZAEHLIGKEIT + GEGENZAEHLUNG (Vollzaehligkeits-Gate bestanden)**
+
+- Leser 10/10 Fenster: K5 Z59214-60174 (961 Z.) · K6 Z60174-61035 (862) · K7a Z61035-61635 (601)
+  · K7b Z61635-62209 (575) · K8 Z62209-63511 (1303) · K9 Z63511-64616 (1106) · K10 Z64616-65944
+  (1329) · K11 Z65944-66960 (1017) · K12 Z66960-68514 (1555) · K13 Z68514-69705 (1192).
+  Summe 10501 gescannte Zeilen, Bereich Z59214-69705 LUECKENLOS (Grenzzeilen doppelt).
+- Journal-Gruppen 3/3: (a) 38 Workflow-Journale 16.-19.08. komplett kartiert (35 FERTIG+Ernte
+  belegt, 3 live, 0 abgebrochen-ungeerntet, 0 journallos) · (b) ~/backups-workflow-Sweep
+  20260816*-20260819* (22+2 Ordner inventarisiert, je gegen Register/Ledger/Tasks gegrept) ·
+  (c) Ernte-/Output-Gegenproben (V-02R-Ernte, super-Wache, k2-Vollbau-Outputs in /tmp).
+- GEGENZAEHLUNG REGRESSIONEN: **103 Roh-Eintraege -> 80 NEUE nach Dedup.** Abzug: 11 Zeilen
+  im_register=true (nur Ueberschneidung markiert: 4x T-10, 3x K3/E13-Umfeld 15971/15978,
+  1x K1, 2x 5c, 1x bwrap-Klasse Abschn. 0) + 1 Zeile zu 12.1 umklassiert (T-10-Korrektur) +
+  11 Zeilen in 8 Merge-Gruppen konsumiert (M-1 15941-Ripple 3->1 · M-2 super-Wache 4->1 ·
+  M-3 Floor-Anker 2->1 · M-4 RCU-Test 2->1 · M-5 main.cpp:515/:717 2->1 · M-6 clang-Warnungs-
+  Review 2->1 · M-7 clang-format-Drift 2->1 · M-8 Audit-WF-Orchestrator 2->1). 72 Einzel + 8
+  Gruppen = 80; kein Roh-Eintrag verworfen.
+- GEGENZAEHLUNG STRAENGE: **40 Roh-Kandidaten -> 33 nach Dedup** (6 Gruppen/13 Zeilen gleichen
+  Gegenstands zusammengelegt, 27 einzeln): **16 GEERNTET / 17 REKONSTRUIERBAR / 0 VERLOREN**
+  (Tafel 12.3). Register-5c-Bilanz am Objekt BESTAETIGT und bis 19.08. frueh fortgeschrieben.
+
+**12.1 KORREKTUREN AN DIESEM REGISTER (Funde AM Dokument selbst):**
+
+- **[T-10 GESCHLOSSEN zur Ernte-Haelfte]** 11.1 behauptet "0 Register-Treffer, Ernte-Beleg
+  fehlt ... Explore-Ernte finden ODER neu fahren" -- FALSCH: die V-02R-Explore-Ernte EXISTIERT
+  und wurde konsumiert. Beweise (5 Leser unabhaengig, 19.08. objektbestaetigt): wf_969b3bba
+  'v02r-hybrid-grammatik-explore' (17.08. 10:29-10:41, 2/2 Agenten), Ernte 10:45-10:54 ->
+  Ledger KON103-03 (:1548/:1587) + ~/backups-workflow/20260817-v02r-hybrid-grammatik/
+  (explorer1-plan-ledger.md 15493 B, explorer2-objekt.md 18500 B, wf-result-roh.json 37620 B);
+  der Lead hatte sie 18.08. 01:56 selbst wiedergefunden (Z67647-67652, Antwort an bump15-a).
+  NEU-FAHREN ENTFAELLT. T-10 reduziert sich auf (a) BAU-Haelfte: SHA256-Verkettung/Wert-
+  Befuellung NICHT gebaut (bump15-a C3; Map landet K-1-leer) -> Fix-Strecke 2 + #93-C, und
+  (b) Hash-Laengen-Spannung SHA-256 (Owner KON101-01) vs. SHA-512/128 (Objekt/PLAN/KON45-01,
+  stempel_basis.hpp:378-387) = F2-Vorlagen-Punkt (deckungsgleich seg1-40/#95).
+- **[5c-KORREKTUR]** w78hb9hii war KEIN "verwaister 0-Byte-Doppelstart des Review-Runs":
+  Tool-Error Z68280 belegt literal "Workflow wf_794b904b-d1c is still running (task w78hb9hii)"
+  = AUDIT-Run. Kosmetisch, Zuordnung hiermit korrigiert.
+- **[6b-TRUNKIERUNG, ERNST]** Alle 111 Verdikt-Zeilen der Detail-Tafel sind mechanisch bei
+  ~250 Zeichen abgeschnitten (mid-word "addie"/"anh"/"bei"), UNDEKLARIERT -- beim KRITISCH
+  seg1-81 fehlt dadurch die Schritt-zu-Commit-Deckungs-Matrix der 23 Bauplan-Schritte
+  (f3559e7a S-6a/Format5 · 5c0c3a5e POD7 · d866bd3d Anker · 1984e417 HY-A3 · 6c979a99+c59840f8
+  HY-A2 · 345c1d1e Gate-Grammatik · 1a780041 E-A · 7bc997a2 6-Symbole · d89250d1 Floor) samt
+  FEHLT-Liste (B-9/B-10.3/B-11.2/NP-23 -- via K2=F6/F5 bereits verdiktiert, KEINE Neumeldung).
+  Volltext lebt NUR im Audit-Journal (Z.144) -- Sicherung + Reparatur: 12.3/X-16, X-17.
+- **[W1-V2-ANKER-DISKREPANZ]** g5-Karte des Buendel-Explores (Z61339): B3-Pflicht-Wurf sitzt in
+  mess_achsen_naht.hpp:477-517 (:509 throw), NICHT abi_adapter.hpp:476-491 (Karten-Fehlbuchung);
+  3b/[W1-V2] misst am abi_adapter-Anker. VOR der #93-Gruppe-D-Messung BEIDE Anker abgleichen,
+  sonst droht Falsch-Null/Falsch-Altbestand.
+- **[5c-FORTSCHREIBUNG]** journal-Sweep 19.08.: 0 abgebrochene UND ungeerntete Runs 16.-19.08.,
+  kein wf-Verzeichnis ohne journal.jsonl; einzige Runs ohne Endzeile = 3 LIVE-Laeufe
+  (Lebendprobe Log-Wachstum, nie pgrep). "Kein weiterer failed Workflow" BESTAETIGT.
+
+**12.2 NEUE REGRESSIONEN (80 nach Dedup; Verbleib je Zeile; Audit-Ueberschneidung markiert)**
+
+*12.2a OFFENE POSTEN / OFFENE RESTE (14 -- Traeger-Zuweisung in 12.4):*
+
+- **[K7b-3] prt-art build:registry-roundtrip NICHT-DETERMINISTISCH:** Regenerat laeuft gegen den
+  ce-GESCHWISTER-Checkout des Runner-Slots, den der Job weder pinnt noch aktualisiert (nur
+  Existenz-Test .gitlab-ci.yml:115) -- 15944 rot/15945 gruen je nach zufaelligem Runner-Stand
+  (Schein-Gruen-/Schein-Rot-Klasse). 19.08. am Objekt UNVERAENDERT. -> W2-Task (SHA-Pin).
+- **[K7a-3]** = W1-V2-Anker-Diskrepanz (s. 12.1) -- OFFEN bis zum #93-D-Abgleich.
+- **[K10-4] vl3-Restposten ohne Bau:** ROT-3 "--debug x plan dump|ci|cmake" ausgelassen (einzige
+  planer_block-bindende Zweige, Exit 6) + Windows-_pclose-Posten (test:87-92, l.rc ohne
+  WEXITSTATUS). Nur in Audit-BU notiert, keine Task-/Register-Spur. -> #93 Gruppe A.
+- **[K10-12] vl3-Verlustliste F2-Rest:** -Wstringop-overflow-VORBESTAND (A-13/Komplex-Fix) ohne
+  Verbleibs-Quittung (F1 in Landung beruecksichtigt, F3 = EXCLUDE_FROM_ALL-Erklaerung par.10,
+  F4 via HY-A erledigt). -> #93 Gruppe A / Komplex-Fix-Flaeche.
+- **[M-6] clang-Haelfte des WARNUNGS-Reviews (vl3) nie gefahren** (Hausregel 2x gcc->clang);
+  gruene ctest-clang-Zellen ersetzen das Review nicht; als W2-2 vertagt (S-12-Dual-CI #3), im
+  Register fehlte der Posten. (Ueberschneidung: E1 betrifft clang-DEBUG-Volllauf, anderes Bein.)
+- **[M-5] Unbelegte Determinismus-Zusicherungen im GELANDETEN Code:** experiment_planner/
+  main.cpp:717 ("byte-gleich") in 6cdcf1c9 abgeschwaecht, :515 ("zwei Laeufe byte-gleich") NIE
+  gemessen und stehen geblieben -- vertagt als W2-1 (Bytevergleich-MESSUNG + --debug-Matrix als
+  EIN Pruefposten). Hier registriert, damit W2-1 einen Register-Anker hat.
+- **[K11-5-Rest] tools-3-Format-Altbestand ohne Traeger:** axis_registry_gen/main.cpp,
+  gen_golden_fullpilot/main.cpp, p27_bundle_finder/.../bundle_finder.hpp clang-format-rot
+  AUSSERHALB der CI-Pruefmenge; bewusst zurueckgesetzt statt formatiert, kein Posten. -> W2.
+- **[M-7] clang-format-22-Umgebungs-Drift lokal-vs-CI UNGEKLAERT:** lokales 22.1.8 alignt
+  Makro-Escape-Bloecke auf Spalte 122 und meldet dry-run-ROT, derselbe Stand ist CI-GRUEN
+  (set_module_abi_v1.hpp:13, K12; hybrid_module_abi_v1.hpp:71-114 33 Meldungen, K13-Rest,
+  par.21.6 "CI entscheidet"). Workaround committet; Werkzeug-Paritaets-Pruefung OFFEN. -> W2.
+- **[K12-2] Methodik-Override emissionsseitig UNBEOBACHTBAR (Architektur-Spannung):** nach V-12
+  tragen alle 4 work_modes cmake_build_type Release; measurement_on/single_thread haben im
+  Emitter NULL Leser -- die smoke=>debug-Entkopplung kann die Emission nicht mehr bewegen. Nur
+  in Task-#22-Metadata (s8_erbstuecke) geparkt; hiermit als Abschnitt-2-Klasse registriert.
+  -> S-8/W2-Entscheid (#22).
+- **[K7b-5] KON74-04 ohne Superseded-Vermerk** auf KON80-01/V3; Fassungshistorie ohne
+  "Fassung 4" (Klasse wie seg3-kon28-01, ANDERER Marker). -> Docs-Zug.
+- **[JB-4] KON99-03-Inventar-Drift:** deklariert 11 Dateien fuer 20260817-buendel15-und-wf10,
+  Ordner traegt 14 -- die 3 VL-6-Ergebnis-Karten (vl6a/b/c) unsichtbar (Folge: X-15). -> Docs-Zug.
+- **[JB-2] BU-Spiegel-Luecke kontext11:** 20260817-w1-strang-artefakte (8 Dateien, u.a.
+  ct_w1-Gruen-/Rotprobe-Logs = W1-Beweis-Logs NUR lokal, a11_super_patch.diff) fehlt KOMPLETT im
+  Repo-Spiegel (21/22 Ordner); dazu f45e995b-tsan-Patch nur lokal (pause-sicherung 8 vs 7).
+  Audit P-10 zaehlte nur die Repo-Seite. -> naechster Folge-BU-Zug.
+- **[JB-3] hy-a-Folge-Lens-Funde GEFIXT+GELANDET, aber UNVERBUCHT** (Meldungs-Luecke T-3-Klasse):
+  wf_750d2441 TRAEGT_MIT_FIXES, Fund 1 EXPECT_GT-Tautologie -> Fortschritts-Beweis
+  (test_rcu_concurrency.cpp:197/:236), Fund 2 lint_layer_includes.sh Allowlist datei-weit+stale
+  -> ALLOWLIST_SOLL-Gegenzaehlung (:144-146); Ledger traegt nur den Start. -> Quittungs-Nachtrag
+  (loest die halbe X-4-Frage; Rest s. 12.3/X-4).
+- **[K9-3] tail-Fallen-Eintrag ZUGESAGT, NIE GESCHRIEBEN:** Lead 17.08. 11:18 "Fallen-Eintrag
+  wird tail-Fenster" -- 19.08.: 0 Treffer 'tail' im Fallen-Register. Inhalt: ctest-Bilanz kann
+  in diesem Repo NIE in tail -60 stehen (Label-Summary allein 243 Z., Bilanz 245 Z. von unten);
+  Fix tail -260 oder grep 'tests passed|tests failed out of'. -> Memory-Zug (mit T-5/T-6, 11.5).
+
+*12.2b IM FENSTER BEHOBEN/AUFGEKLAERT -- HIER ERSTMALS REGISTRIERT (Quittungszeilen):*
+
+- **[M-1] super 15941 + prt-art 15944 ROT, F5-Rename-Ripple** (K7a/K7b): golden-F5-Rename
+  axes/->organ_axes/ ohne prt-art-MASTER-Nachzug (prt_art_axis_registry.xml Z.24); Fixture-
+  Sync-Wache biss KORREKT; Zweitfehler Hand-Edit der GENERIERTEN Registry-XML liess Generator-
+  Include main.cpp:36 zurueck (Roundtrip-Gate rot). GEHEILT 7ed4a7e+d11781f+super c926efdc,
+  15945/15946 SUCCESS (Ueberschneidung: #79/KON99-01). LEHRE unverankert: repo-uebergreifender
+  Rename braucht Master-Nachzug (Fallen-Klasse, 12.2c).
+- **[M-2] super-Fixture-Subset-Wache STILL-SKIP nach K2-Rename** (k2-bau KRITISCH 17.08. 10:14
+  Z63194; k2-Lens ERNST "R1 nicht umgesetzt, Commit-Text erklaerte Auflage fuer gegenstandslos";
+  K11-Sweep B-1 "prueft seit W1-Landung NICHTS"): Code/tests/CMakeLists.txt:348 zeigte ins
+  Leere, FIXTURE-SYNC-SKIP + SKIP_REGULAR_EXPRESSION liessen die Zelle GRUEN ohne Gegenstand
+  (stille-Wachen-Abschaltung). GEHEILT f4b01ab3: Repoint auf experiment_kern_seam_fixture.xml,
+  B-1-HAERTUNG Verdrahtungsfehler=FATAL (:105-118), 3-seitige Mutationsprobe OK/FATAL/SKIP,
+  super 15976 SUCCESS, KON115. (Nachbar-Ereignis K3; eigener Gegenstand.)
+- **[M-3] Floor-Anker-Fehlkalibrierungs-Komplex 16./17.08.:** Nachzug fbe898be schrieb 494/490/
+  488 + FALSCHE Doktrin "CI-Floor-Baum baut OHNE Pruefling" (Kontrollmessung nach cmake -U;
+  CI setzt -DCOMDARE_CE_PRUEFLINGE) -> 15936 ROT (test:coverage-guard, avx2 491>490); Rueck-
+  kalibrierung 495/491/489 @ 04ac26fa, CI 15937 SUCCESS (Ueberschneidung: KON98/#78). Floor-
+  Semantik-Lehre: zur Testzahl gehoert der BAU-ZUSTAND inkl. Pruefling-Schalter.
+- **[M-4] test_rcu_concurrency-Komplex:** roter Erstlauf clang 1/498 unter Doppel-Start-Last
+  (pgrep-Falle als Ausloeser); FIX-1-Abnahme 21/25 rot deckte auf: der Churn-Test prueft seinen
+  Gegenstand nie (Reader tot vor erster Writer-Generation; alte Fassung verlangte nur "es gab
+  Reads") -- Umbau Reader-an-Generationen-Fortschritt, gelandet via #80/f45e995b-Kette.
+  (Ueberschneidung: H3 fuehrt NUR den ANDEREN Flake test_seg_coverage; G-L21 nur F-9/TSan.)
+- **[M-8] Audit-WF-Orchestrator-Doppelbug:** .then-Crash "undefined is not an object
+  (k.zusagen.map)" (Limit-tote Agenten als undefined) -- der Fix haette 4 Ledger-Segmente STILL
+  gefiltert; Original-Design deckelte Ist-Verifikation auf slice(0,14); Owner-Nachfrage ->
+  Vollzaehligkeits-Gate 11/11 + Deckel entfernt, Endlauf 65/65, 688/688. Beinahe-stille-
+  Reduktion hiermit registriert (Quelle der NIE-KUERZEN-Memory 18.08.).
+- **[K5-1]** Falsch-ROTER ctest auf unGEBAUTEM Baum (487/495) + LastTest.log durch 0-Test-Lauf
+  zu 3-Zeilen-Falsch-Beleg ueberschrieben (golden-rettung 16.08.) -- Re-Bau + CI-Form 494/494
+  (bju8vd1ll), Kombibau bwscuj3yh 4 Zellen. KLASSEN-VORLAEUFER von [E3] (dort nur bump15 18.08.).
+- **[K5-2]** prt_art-Piloten-Compile-Bruch: stale Generat referenzierte prt_art_composition_
+  demo.hpp (Fixture traegt es nicht), PASS-3 rc=1; tail-25 verschluckte den Fehler zunaechst.
+  Geraeumt, Re-Configure OHNE Pruefling (CI-Form); Diskrepanz scope-treu an #65 (Ueberschneidung:
+  #65 in_progress).
+- **[K5-3]** golden-Nachstufe 3 MUSS-Funde (wf_a0e17d5d): F1 4 Ueberlaengen, F2 131 Ueberlaengen
+  (83 in generierter TABU-XML = erste Wachen-Beruehrung seit 10.08.) MIT Zusatzbefund Push
+  bau/golden-homes @ 5fa37f36 = Pipeline 15895 FAILED (Push->gruen-Doktrin verletzt); F3 =
+  Falsch-Beleg [K5-1]. A2.5 komplett -> c0b28670 (f4e29eab Wachen-Regel *.xml-NUR-Breite +
+  Selbsttest 16/17, 7f4710f6); Branch-Rest s. 12.3/X-1.
+- **[K5-4]** Dual-Review golden (3 Stellen): CMakeLists:1391 >120 · consteval-switch
+  overlay_source_set.hpp OHNE fail-closed default · Selbsttest-Luecke Fall 18. Alle in d44008c5
+  MIT T-1-Mutationsbeweis (17/18 rot -> 18/18), in 90ee6809 gelandet.
+- **[K5-6]** Eigener Buchungsfehler KON93-02 (6GB-Arena als ABLOESUNG statt SCHICHTUNG der
+  KON51-Warnschwelle); 10W-Explore bewies 3 Schichten/2 Speicher + fehlenden Bau-Posten E11.
+  Korrigiert als KON94 (fe6439ea), E11 -> S-13-Buendel (#18).
+- **[K5-8]** TaskCreate in Subagent-Umgebung nicht verfuegbar -- Hilfsagent scheiterte
+  kontrolliert; Haupt-Agent lud per ToolSearch selbst, Task #77 direkt. Werkzeug-Falle (12.2c).
+- **[K6-3]** Workflow-Ergebnis-Verluste (Owner-geruegt "Du tendierst dazu Ergebnisse
+  abzuschneiden"): Task-Notification kappte 4 Felder mid-Satz, Verify -3008 Zeichen, 1 Ergebnis
+  nur als Dotfile. GEHEILT: journal_extrakt.py, 21/21 Ergebnisse + 17 Dateien voll, persistiert
+  (super 4901f808). Verwandt Register-10b-Template-Literal-Bug; DIESER Vorfall war unregistriert.
+- **[K6-4]** Rohdaten-Sicherungs-Luecke der 7GB-Raeumung: Floor-Mess-ROHDATEN lagen nur im
+  rotierenden Job-tmp, Loeschpruefung war nur "getrackt=0"; Owner-Nachfrage loeste Nachsicherung
+  aus (docs/sessions/backups/.../floor-messung-rohdaten). ZWEITER Vorfall der T-8-/B.3-Klasse.
+- **[K6-6]** Objekt-Luecken WritebackMethod/XSD/Sink: Profil-Validierung NUR im --validate-Pfad
+  (Bogus-Werte laufen im MESSLAUF durch), XSD ohne Enum-Wache (writeback_methods freier String,
+  xlsx fehlt in Prosa), publish-Element 0 Treffer, E-18 ce-seitig unimplementiert
+  (xml_config_parser.hpp:342/:493). Als Design-Input in S-13 (#18/#57) konsumiert -- beim
+  S-13-Bau verdrahten oder fail-loud (stille-Null-Klasse); vgl. X-15.
+- **[K6-7]** Plan-/Karten-Drift-Sammelbefund (Wellenplan-hybrid/-Stand stale, A43 ohne Xlsx,
+  measurement_sink dreifach gegatet statt "unbedingt", A9-Kette weiter als Karten, LagerBaum-
+  Writer ohne Konsument #57) -- von Strang-Designs konsumiert. (Ueberschneidung: Klasse =
+  9x-UEBERHOLT, Abschn. 3; die konkreten K6-Befunde standen nirgends.)
+- **[K6-5]** CI-Poller-Skript-Defekt (eingebetteter python3-Dump, Syntaxfehler) -> b56k1d2uy
+  exit 1 nach TERMINAL; Dump in ci_jobs_dump.py ausgelagert. (Poller-Werkzeug-Serie, 12.2c.)
+- **[K7a-2]** Wellenplan-Plan-Regression par.19.1: "VS-A..VS-F STOPP-Gates offen" als
+  Entscheid-Aussage FALSCH (alle 6 seit 07.08. entschieden, Ledger :27970-27979); auch im
+  Owner-Vorlagen-Kopf. Geheilt: Kopf harmonisiert, Fortschreibungs-Marker Wellenplan Z.2394.
+- **[K7a-4]** prt-art-Submodul detached HEAD + development stale (32e8ffa8 hinter 3077e102) --
+  Klone-in-Sync-Luecke, behoben (checkout+ff-only). Register 6/E12 fuehrte nur Thesis-Klone.
+- **[K7a-5]** Poller mit sh statt bash gestartet (mapfile/Bad substitution, exit 2) -- trivial,
+  sofort bash-Neustart.
+- **[K7b-4]** curl "--header @file" liest keine Datei -- auf curl-Config-Muster (mapfile blind
+  -> curl -K) umgestellt; kein Klartext-Token nach stdout. Werkzeug-Rezept (12.2c).
+- **[K8-1]** s13-Design-Lens 13 Funde (4 MUSS: u.a. Arena-Ueberlauf gegen juengste Owner-Linie,
+  xlsx-Zeilenlimit-Wurf gegen KON88-P2, result.csv-Resume-Blindheit) -- 2 Fix-Runden + Verify
+  TRAEGT_MIT_FIXES, gelandet dfb8ba09+e9c74abf. (Ueberschneidung: s13-Zusagen im 688-Audit.)
+- **[K8-2]** HY-A-Dual-Lens F-1..F-11: Zweig waere CI-rot gewesen (F-1 Floor-Nachzug fehlt,
+  Guard Exit 4; F-2 CMake-No-Op ce_anatomy_drive 0 Konsumenten); Meta: Opus-Erheber-Fixzahl 498
+  haette die 16.08.-Fehlkalibrierung wiederholt, Fable-Bewerter korrigierte auf Live-Messung.
+  Behoben c979d1c0+374c1d12, F-11 gcc 499/clang 498. (Ueberschneidung: HY-A-Zusagen im Audit.)
+- **[K8-3]** F-12 Eigenfund: latenter CI-VERDECKTER Bau-Bruch (perms-DLL-Ziele setzen
+  prt_art/slots/...demo.hpp voraus; CI sieht es nie, weil 'make inventar' die all-Runde VOR dem
+  Reconf faehrt) -- behoben 374c1d12.
+- **[K8-5]** K2-Drift: D1 Plan "Sonstige Leser KEINE" falsch (test_s3_ordnung_freigabe, 6 TESTs
+  mit-entflochten) · D3 Gate G7 "~100%" real 63% (C14N-SHA256-Direktbeweis statt Proxy) ·
+  Schritt 3/R4 gegenstandslos (Wurzelschnitt 06.08.). In 44a909c1 eingearbeitet, #81.
+- **[K8-7]+[K9-12] Arbeitsweise-Verstoss-Serie (2x Owner-Ruege 17.08.):** 13 V-Fragen ohne
+  dedizierten Explore (Nachholung: V-07 laengst entschieden, 7 Frage-Haelften ueberfluessig,
+  V-10a-Empfehlung FALSCH HERUM gegen Owner-KERN 26.07.); Selbstmessung KON106-08: 38 Fragen
+  ohne Vorlauf-Explore, 45-50% bereits entschieden, 5,31M Explore-Tokens NACH statt VOR den
+  Vorlagen. Korrigiert (KON100-Zug, 12-Wochen-Memory-Schaerfung). (Ueberschneidung: Klasse =
+  Audit-Gesamturteil "Owner-Wort-Treue TEILWEISE"/H6; Vorfaelle standen nirgends.)
+- **[K8-9]** Platte 2x kritisch (95%/13G, 97%/8G) waehrend Kombibauten; Raeumung 8G->14G nach
+  git-ls-files=0-Beleg, Mess-CSV unangetastet (rm-build-CSV-Regel gehalten).
+- **[K9-2]** Lead-Wiederanlauf-Skript doppelt defekt: Bau-Verzeichnis geraten (vl3 baut rel/dbg)
+  + "No tests were found!!!" mit CTEST_RC=0 = gruen lesbares FALSCH-NULL. Von vl3-bau gemeldet,
+  quittiert; sauber neu gefahren. ZWEITER E3-Klassen-Vorfall (ctest --no-tests=error-Lehre).
+- **[K9-5]** VL-2-Feldzahl-Wache (P0960) BLIND fuer Zeiger-Appends: 17. Feld char const* liess
+  beide Wachen-Beine schweigen; Fix typ-agnostische Zaehl-Sonde (AnyFeld+FeldSonde) @ cd011e60.
+  (Ueberschneidung: Klassen-Naehe C-F2/Fix 13/14 an derselben decl.hpp, bump15-Stand.)
+- **[K9-7]** k2-Lens ERNST 2 + Kommentar-Unwahrheit: 6 Zeilenbelege des XML-Kopfblocks ALLE +1
+  daneben; Test-Kommentar behauptete Byte-Gleichheit zur super-Master-Fixture, real ABSICHTLICHE
+  Divergenz. Lead uebernahm verwaisten k2-Worktree (Ein-Schreiber), fixte selbst; C14N-
+  Neutralitaet gemessen; gelandet 6a8cdc65.
+- **[K9-8]** vl3-Lens ERNST: K9b-Koeder biss nicht -- Nadel "8 " schon vom --debug-Hilfeblock
+  DESSELBEN Commits erfuellt (main.cpp:582 vs :592); Wache-die-nie-beisst, 2. Mal im File.
+  Fix gelandet (7bf66ddd->c8d7295e). (Ueberschneidung: T-6-Koeder-Reichweiten-Klasse.)
+- **[K9-9]** Floor-Erwartungs-Rechenfehler des Leads (496/492/490 in sich widerspruechlich; F-1
+  +4 fehlte) -- von hy-a-bau gestoppt (500/496/494), von vl12-bau um Pruefling-Form praezisiert;
+  Auflage: Schalter-Zustand literal ins Lande-Protokoll.
+- **[K9-10]** Doppellauf-Kollision build-vl12 (Lead-Wiederanlauf 33 s parallel zu vl12s Lauf im
+  SELBEN Bau-Verzeichnis -> spiegelbildliche Einzel-Ausfaelle). Ein-Schreiber-Klasse, aufgeklaert.
+- **[K9-13]** Auftrags-Karten-Fehler des Leads, von vl12-bau korrigiert: "47 in 12" real 42 in
+  11 · "drei" positionale POD-Initialisierer real VIER (produktiver Makro-Initialisierer
+  anatomy_module_abi_v1.hpp:186 fehlte) · Emitter nicht byte-reproduzierbar ("Generated
+  Timestamp" wandert je Configure -> naiver sha256-Vergleich = Schein-Differenz; Falle 12.2c).
+- **[K10-1]** HY-A2 KOMPLETT + HY-A3-ACHSE in W1 NIE BEGONNEN (W1-Abnahmeformel :952 unerfuellt);
+  Ursachen-Klasse: decl.hpp-SPERRE als ERLEDIGUNG behandelt statt als Zustaendigkeits-Luecke
+  gemeldet; Auftragstext enger als Wellenplan :855-857. KON113; Bau im Bruch nachgeholt.
+  (Ueberschneidung: 5b "HY-A2+A3 richtig gebaut"; W1-Rest = #93. Die URSPRUNGS-Regression samt
+  Ursachen-Klasse stand nirgends.)
+- **[K10-5]** N7-Luecke REAL: add_dependencies fehlte (literal rc=127 "comdare-experiment-
+  planner: not found" bei --target comdare_tests; test_profile_roundtrip "Not Run" faerbt falsch
+  rot). Behoben in W1-Landung (2 Kanten); comdare_tests-PFLICHT-Falle -> 12.2c.
+- **[K10-6]** TSan-Kopfzeilen-Uebertreibung test_rcu_concurrency ("race-frei unter TSan" --
+  atomic_thread_fence rcu.hpp:125 ist fuer TSan GRUNDSAETZLICH unmodellierbar). Behoben
+  f45e995b (TSAN-GRENZE-Block). (Ueberschneidung: E11 = TSan-Beleg im Bruch-Anker, anderes
+  Bein; "TSan-AUSBAU lebt nirgends" bleibt offener Traeger dort.)
+- **[K10-7]** LEAD-FEHLBUCHUNG (Owner-Ruege 20:34): limit-tote Teammates als "erledigt" gebucht,
+  weil sie die PAUSE akzeptierten -- Zusage-ohne-Deckung auf Prozessebene. Korrigiert per
+  Doppel-Audit -> KON113. (Ueberschneidung: H6 generisch; konkreter Vorfall unregistriert.)
+- **[K10-8]** DOPPEL-INKARNATION des Lande-Agenten nach Workflow-Stop/Resume (alte Inkarnation
+  mergte 4 Commits weiter; neue erkannte+deduplizierte selbst). NEUE Ausloese-Mechanik:
+  Stop/Resume erzeugt Agent-Duplikate -> 12.2c. (Ueberschneidung: H4 kennt nur K16-Instanz.)
+- **[K10-9]** Koordinations-Widerspruch am selben Objekt: Lead versprach vl3-build-Baeume
+  stehen zu lassen, Lande-Agent hatte sie Minuten zuvor loeschen lassen -- transparent
+  aufgeloest (Verifikation via Vier-Zellen-Kombibau statt Neubau).
+- **[K10-10]** Workflow-Synthese-Tod wf_e06c7f73 (synthese:null am Limit) + wqxyzoh3q-Output
+  um 88 KB gekappt -- beides aus journal.jsonl rekonstruiert (Resume w8tz2815j lieferte P20).
+  Klasse "journal=Wahrheit" bekannt; Vorfaelle standen nirgends.
+- **[K10-11]** KON107-Poller-FALSCH-NULL: mapfile-Header-Rezept lieferte leere Statuszeilen,
+  beide GitLab-Hosts 404 -- Pipelines real SUCCESS (Falsch-Rot am Poller). Geheilt
+  (glhdr.curlrc + curl -sk). -> 12.2c.
+- **[K10-13]** Talos-Plan-Regression: "Debug-Messung OHNE PMC" beruhte auf v1.12-Stand; Owner-
+  Einspruch bestaetigt -- v1.13.0 liefert statisches perf + Debug-Container; Cluster faehrt
+  v1.12.4, paranoid=3; v1.14-GA 27.08. = 1 Tag nach Bau-Trigger. Korrigiert+getrackt #87.
+  (Ueberschneidung: D-5-Zusagen im Audit moeglich.)
+- **[K10-14]** Cluster-Repo-Verlustbestand: 20 helm-1014-Schrittskripte + ci-templates-Gitlink
+  UNCOMMITTED (#73 landete nur das Handout); Erst-Push ans falsche Remote. Behoben ee2f933.
+- **[K11-3]** Lead-Fehlbuchung + Message-Verlust: Audit-Teammate-Bericht als "vollstaendig
+  verbucht" quittiert, obwohl der Erstversand NIE ankam (Owner-Ruege); Nachreichung -> dreifach
+  verbucht. Buchung-ohne-Beleg-Klasse + verlorene Teammate-Nachricht.
+- **[K11-4]** Falsches Gruen im CI-Fix-Bau: CTEST_RC=0 bei 496/500 -- 4 AVX-512-Tests nie
+  gebaut (EXCLUDE_FROM_ALL-Werkzeuge ohne comdare_-Praefix in der ersten Bau-Treppe unbekannt);
+  nur die Abdeckungs-Wache biss. Korrekte J-1-Treppe -> 500/500. ZWEITE EXCLUDE_FROM_ALL-
+  Instanz (par.10 fuehrt nur 503-vs-502).
+- **[K11-5]** lint:format-Fix Runde 1 unvollstaendig (CI prueft 1906 Dateien, Fix nur die 3 aus
+  dem Log-Tail -> 15973 erneut rot); Rest s. 12.2a tools-3. Geheilt 965b121a, 15974 SUCCESS.
+- **[K11-9]** Inverse Fehlbuchungen: N3 offen-gebucht ohne Gegenstand · #80 in_progress obwohl
+  gelandet · N1/N5/N6 "beim toten Steward" nirgends persistiert. S-4-Bereinigung im Fenster;
+  N1/N5/N6-Messung s. X-9.
+- **[K11-11]** Beinahe-Verfaelschung des Floor-Historienblocks durch blinden Replace -- am Diff
+  selbst gefangen, praezise nachgezogen. Werkzeug-Disziplin-HINWEIS.
+- **[K11-12]** Zwei CI-Poller STUMM gestorben (bxiwgzwli Quoting; b8kgvg39c ohne Ergebniszeile)
+  -- je per Direkt-API ersetzt (15976/15979 SUCCESS literal). Monitor-Doktrin-Klasse; die
+  Poller-Skript-Klasse selbst blieb unbehoben -> 12.2c.
+- **[K12-3]** Koeder-(iii)-Nebenfund: test_m_w12:772-775 prueft Format 5 korrekt, der Assert-
+  MELDUNGSTEXT erklaerte "3->4"/9-Glieder (zwei Bumps zurueck). Behoben 98f05b04. Lehre
+  "Koeder-Meldungen LESEN" -> 12.2c.
+- **[K12-4]** P9-Neufunde: anatomy_fingerprint.hpp:10-11 -- der KOPF der Preimage-Datei selbst
+  beschrieb die eigene Glied-Zahl falsch (seit R-3) + test_m_w12:727. Behoben cd15dd05.
+  (Abgrenzung: 5b/Fix 18 betrifft ANDERE stale Saetze :1154/:577/:130.)
+- **[K12-6]** Kumulative Diff-Hygiene fand 4 >120-Zeilen aus Bruch-Commits, die ALLE push-
+  lokalen Vorgaenger-Gates passiert hatten -- behoben 5f269555+Fixup; bestaetigt KON116-Lehre
+  "kumulative Gates ans WELLEN-Ende".
+- **[K12-7]** Lead-Fehldiagnose 500-vs-501: Ursache war der nicht gesetzte Configure-Schalter
+  -DCOMDARE_CE_PRUEFLINGE (CI setzt ihn .gitlab-ci.yml:547, cmake --preset nicht) = CI-
+  PARITAETS-LUECKE der lokalen J-1-Treppe; von bump15-a am Objekt widerlegt (Configure-Log Z.85
+  literal). Rezept ergaenzt; J-1-Memory kennt den Schalter noch nicht -> 12.2c.
+- **[K12-10]** Beleg-Sicherungs-Luecke: 3 bump15-b-PATCHES (Vorgaenger-Setter, Kollisionsstand,
+  Decorator) weiter NUR im rotierenden Job-tmp (T-8 sicherte nur die 4 Probe-TUs); Substanz in
+  git konserviert, Beleg-Wert gefaehrdet -> optionaler B.3-Nachzug (mit X-16-BU-Zug).
+- **[K13-2]** GitLab-Push-Auth-Transient (HTTP Basic denied, Retry rc=0, K11-sauber
+  nachgemessen) -- Infra-HINWEIS.
+- **[K13-3]** Mini-Verify-Agent-Tod (wf_b943361e, API-Abriss ~19:06) -- Cache-Resume wrlfi8rec
+  NULL_NEUE_FUNDE 19:15. Der Verify-TOD fehlte in 10b (dort nur Ergebnis+Template-Bug).
+- **[K13-4]** Orchestrator-Prompt-Trunkierung wgmt22mio: Schreiber sah 23/25 Stellen-Karten-
+  Eintraege (Abbruch mid-Eintrag); 2 rekonstruiert, Verify 72/72. ZWEITE Instanz der Prompt-
+  Verlust-Klasse (neben Template-Literal 10b) -> 12.2c.
+- **[K13-5]** Stale Prosa-Referenz decl.hpp:797 (zitiert "decl:568-571", vorbestehend) --
+  deklarierter HINWEIS, Traeger par.21.6/Doku-Zug; hier registriert.
+- **[K13-7]** Wellenplan-par.5-Defizit-Arithmetik zaehlt F-07b als Deckungs-Streichung, obwohl
+  F-07b per Owner-KERN 06.08. PFLICHT ist -- Task #98 + par.5-Marker (super 9015a0de).
+- **[K13-8]** Fork gab-es-denn: C-13 selektiver Rebuild STILL geloescht seit 27.07. (ce
+  813c3232; seither Vollflotten-Neubau je System-Aenderung) + C-14 SKIP-Wache nur T-NEU-11 +
+  F-07b-W7-Verschiebung mit ERFUNDENER Agent-Autorisierung ("Streichkaskade bestaetigt",
+  0 Owner-Treffer; Altbefund #49-C2) -- Traeger #97/#98 + Wiederaufnahme-Register 0f569c8b +
+  par.21.0-Beleg-Tafel; hier als Register-Querverweis.
+- **[JB-1]** = 6b-Trunkierung, s. 12.1 (dort verdiktiert; Sicherung/Reparatur X-16/X-17).
+
+*12.2c FALLEN-/WERKZEUG-KLASSEN fuer den naechsten Memory-/Fallen-Zug (buendelt aus 12.2a/b):*
+
+tail-Fenster (K9-3, ZUGESAGT-offen) · ctest -N sed-Muster verliert Tests #1-#99 durch Padding
+(K6-2; Zaehlbasis "Total Tests: N") · ctest --no-tests=error als Pflicht-Flag (K5-1/K9-2, E3-
+Klasse) · -DCOMDARE_CE_PRUEFLINGE in JEDER lokalen J-1-Treppe (K12-7) · comdare_tests-Target
+ist PFLICHT sonst "Not Run"-Falschrot (K10-5) · Emitter-Timestamp macht sha256-Vergleich zur
+Schein-Differenz (K9-13) · Cross-Repo-Rename braucht Master-Nachzug in Geschwister-Repos (M-1)
+· Stop/Resume erzeugt Agent-Duplikate (K10-8) · Koeder-MELDUNGSTEXTE mitlesen (K12-3) ·
+Poller-Rezepte: kein eingebetteter python3 (K6-5), bash statt sh (K7a-5), curl -K statt
+--header @file (K7b-4), glhdr.curlrc+curl -sk gegen 404-Falsch-Null (K10-11), Poller nie stumm
+(K11-12) · docker auf prod1 ENTFERNT -> gitleaks lokal 8.30.1 (K5-7, Koeder biss rc=1) ·
+TaskCreate fehlt Subagenten -> ToolSearch im Hauptagenten (K5-8).
+
+*12.2d CHRONOLOGIE LIMIT-/ABRISS-RISSE (fehlten als Fakten; Register fuehrte nur K13-Risse):*
+
+- **[K5-9]** 3 Risse 16.08. (13:14 Monats-Limit wtsautqlp 3/3 + Synthese; 15:47 Session-Limit
+  w8oovcd6x 11/15; 21:38 Session-Limit) -- 15 Agenten tot, Luecken ~11 h, ALLE per Resume-Kette
+  geheilt (wsw7bnx76->wxmetyvp5, w5nfwp05x, wt0v91pcx->w3ebg280l).
+- **[K8-10]** K8-Tode 17.08.: Kurz-Verify verdict:null am Session-Limit; hy-a-bau 2x Limit +
+  1x 529; vl12/vl3 529 -- alle resumed; dabei pgrep-Falle bestaetigt (3 Akteure hielten lebende
+  nohup-Laeufe fuer tot; Ausloeser des M-4-Doppelstarts). Memory-Eintrag existiert seit 19.08.
+- **[K9-11]** Spend-Riss 17.08. 11:35-15:39 (~4 h): vl3/hy-a idle=failed; wf_a2e443f0 12/12
+  Agenten leer (bericht:null) -- nach /login Resume wy7btb713 komplett (Cache-Replay), KON105.
+
+**12.3 STRANG-REKONSTRUKTIONS-TAFEL (33 Straenge: 16 GEERNTET / 17 REKONSTRUIERBAR / 0 VERLOREN)**
+
+GEERNTET (nur Zaehler, je mit belegter Ernte; keine Aktion): S-13-Design+Lens+Landung (#18,
+dfb8ba09) · hy-a-bau komplett (#80/#81, a4366cb8 Ancestor) · goal-drift wf_9819fde6 (#78,
+KON97/98) · Buendel-Explore w4uz2itsx (BUENDEL-BAUPLAN-15) · super-Poller d152ba93 (via #79) ·
+15946-Beweis+#79 · KON99+OWNER-VORAB-15 (KON101) · ovs13-Explore (KON102) · 19-Fragen-Runde
+(KON103/104, Tasks #82-#86) · wf_7f847de1 F-Fragen (KON105/106, #86/#99) · vl3-Fix-Runde
+(7bf66ddd Ancestor) · W1-Lande-Strang wf_b5b4ac36 (KON114, par.20; Push-vor-Gate=K3 GEHEILT) ·
+audit-hya-vl3-Subagent (KON113) · K10-Schlussauftraege par.20+Uebergabe (in K11 nachgeholt;
+Restnotiz: #85(A)-Text noch stale, s. X-3) · super-Zug 2 Welle 2 (KON116, #20/#70; a11-Patch-
+Vorpruefung = Register-G L9 beim KON119-Zug) · E-6-Explore (per KON118 Phantom-Nenner ueberholt;
+Doku-Rest = seg1-04/F8, KEINE Neumeldung).
+
+REKONSTRUIERBAR (17, je: letzter Stand am Objekt 19.08. -> REZEPT):
+
+- **[X-1] golden-Rest-Refs:** origin bau/golden-homes @5fa37f36 (letzte Branch-CI 15895 FAILED,
+  nie am Branch geheilt) + refs/rescue/golden-fenster-20260817 @fbe898be + lokaler Worktree
+  wt-ce-golden-rettung; BEIDE Refs Ancestor von development (Substanz enthalten), 0 Traeger.
+  -> In den L20-Aufraeum-Block: D12-Muster (Bundle+SHA256+Owner-GO je Ref; Remote-Loeschung =
+  Owner-GO), rote 15895 als ausgebucht dokumentieren, Worktree nach Liste-C-Doktrin.
+- **[X-2] k2-Vollbau-Abnahme:** bg-Outputs bl5ldht9z/bb3upsvgg NIE gelesen, zugesagter
+  G3/G4-Endbericht kam nie; Outputs existieren NOCH in /tmp/claude-1001/.../tasks/ (ROTATIONS-
+  RISIKO). k2 selbst gelandet (#81, CI gruen) -- Berichts-SOLL nie ausgebucht. -> Outputs
+  SOFORT nach ~/backups-workflow (B.3), G3/G4-Literale in #93 Gruppe Straenge nachbuchen.
+- **[X-3] Owner-Voll-Lese-Auftraege 17.08.:** Morgen-Klasse via #78 gedeckt; Neugruendungs-
+  Haelfte via wf_6c904e28 vollzogen; #85 (pending) traegt das Nachzugs-Paket, dessen Text die
+  17:45-ZUSAETZE nicht nennt (/goal-Kernbestandteile + Volllesung Ledger-Konsolidierungs-WF)
+  und "par.20 einbauen" ist dort stale (par.20 steht seit K11). -> Beim #85-Vollzug die
+  17:45-Zusaetze explizit abhaken + synthese-p20-roh.json nur als DELTA gegen stehenden par.20.
+- **[X-4] HY-A-Zweit-Lens-Deckung:** SPANNUNG AUFGELOEST -- der Folge-Lens LIEF (wf_750d2441,
+  Start 10:58/Ernte 11:11, TRAEGT_MIT_FIXES 2 ERNST, BU 20260817-hy-a-folge-lens/lens-funde.md;
+  Fixes am Objekt gelandet, s. [JB-3]); die Rekonstruktions-These "Landung ohne Zweit-Lens"
+  gilt nur fuer die FIX-RUNDE-2-Flaeche (RCU-Umbau nach 21/25-rot, GO 11:23 = NACH dem Lens).
+  -> Quittungs-Nachtrag (JB-3) + im #93-C nur noch die Runde-2-Flaeche (RCU-Umbau/F-12) auf
+  Lens-Deckung pruefen ODER Abweichung "Nach-Fix ohne Zweit-Lens" ausweisen.
+- **[X-5] rcu-Nachmess-Serien (50/30/20 + A/B-Paarlauf):** Endquittungen nie angekommen,
+  Rohwerte nirgends persistiert (grep-Beweis); Zweck objektseitig gedeckt (f45e995b Ancestor,
+  502/502). -> #93-C: am gelandeten Stand reproduzieren ODER explizit ausweisen "Serien-
+  Rohquittungen nicht persistiert, Fix anderweitig bewiesen" -- kein stilles Weglassen.
+- **[X-6] tail-Fallen-Eintrag:** s. [K9-3]. -> EIN-Zeilen-Nachzug im T-5/T-6-Memory-Zug (11.5).
+- **[X-7] wf_cd301f28 Schwester-Sweep K8-K13:** lebte 19.08. 07:35 (14 started/13 results);
+  seine R1-R10 sind INHALTLICH IN DIESEM ABSCHNITT konsolidiert (R1=M-3, R2=K5-1, R3=K11-1/K3,
+  R4/R6=M-1, R5=K1-Korrektur Abschn. 6, R7/R10=T-10/12.1, R8=K8-1, R9=K10-1). -> Nur noch:
+  Journal nach B.3 sichern + Endzeile quittieren; KEINE Doppel-Ernte.
+- **[X-8] wf_6ce0675e #95 V-08R-Bau:** wt-ce-v08r @0f0742aa (b973dd9f -> 434d24c6 -> A2.5-R1-
+  Fix), dirty=0, Journal lebt; Branch bau/v08r-fingerprint-sha NUR LOKAL. Spannung: Task-Text
+  "KON101-gedeckt" vs par.21.4 "Frist-/Form-Entscheid = F2-Vorlagen-Punkt". -> Branch auf
+  origin sichern; Bau+Verify abschliessen; Form-/Frist-Satz VOR Landung als F2-Vorlagen-Punkt
+  dokumentieren (deckungsgleich 10b/seg1-40).
+- **[X-9] vl3-Nachposten N1/N5/N6:** Quelle doppelt gesichert (audit-ergebnisse-beide-
+  straenge.md, lokal+Repo-BU), Register 0 Treffer; vl3 gelandet. -> In #93 Gruppe A aus der
+  Audit-BU aufschluesseln, je Posten am gelandeten Stand BEHOBEN/OFFEN messen -> Abschnitt 9.
+- **[X-10] g2/#17-Strang:** 1528f6fd NICHT Ancestor; Branch bau/g2-semantik NUR LOKAL (ls-remote
+  0 Treffer = Einzelkopie-Risiko!); wt-ce-g2 @9aa9b9df clean; Abschlussbericht GESICHERT in
+  wf_b5b4ac36-583/agent-a360aaac04706de1f.jsonl (17.08. 18:48, 6383 Z.); Lokalisierungs-WF
+  wf_5dd12e19 lebt. -> (1) Branch SOFORT auf origin sichern, (2) Bericht ernten, (3) Lande-/
+  Fertigstellungs-Kette per [W1-V1] VOR F2 (gibt #7/S-19 frei). (Ueberschneidung: W1-V1/3b --
+  hier nur Strang-Status+Rezept, keine Neumeldung.)
+- **[X-11] Nested-Worktree wf_e22d25ef-71c-7 @7f3901fb, dirty=17 (D2-Strang 10.08.):** 19.08.
+  bestaetigt; Tip "test(d2): sieben Google Tests ..." NICHT Ancestor; Eltern-Journal tot seit
+  10.08.; NEBENBEFUND 3 weitere nested Baeume wf_5834b706 (p2/p3/p6, dirty=0). Einziger ganz
+  unverbuchter Arbeitsprodukt-Fund des Sweeps. -> 17 Aenderungen als Diff-BU sichern, dev-
+  Enthaltensein pruefen (#62-Muster d2-floor-Zwilling), dann Liste-C/D-Ausbuchung MIT Beleg
+  ODER D2c-Wiederaufnahme (Register-G L3-Umfeld); die 3 5834b706-Baeume im selben Zug (p2 war
+  D12-"WIEDERVERWENDBAR").
+- **[X-12] V-02R Wert-Befuellung (Laufzeit-Haelfte B-8/A-12):** Bausteine im Bruch da (P5
+  9c17765f Compose+3 fail-loud-Wachen; P3/P4 name_line/len+SHA-256; Map landet K-1-leer);
+  Ernte-Frage per 12.1 GESCHLOSSEN. -> Laufzeit-Befuellung (je Pruefdock-Tier-Binary EIGENER
+  SHA-256 beim attach) nach C-3a-/F4-Entscheid als eigenen Board-Task; Hash-Laenge = F2-Punkt.
+- **[X-13] B-8-Folgeposten Gate-Define-Emission + hat()-Paar:** Kommentar-Anker bestaetigt
+  (mess_achsen_naht.hpp:593); par.21.1-Folgezug-Liste + Bauplan tragen B-8, aber KEIN
+  Board-Task; K2=F6 deckt B-8 NICHT. -> Beim Di-25.-Schnitt (#96) als Task slotten.
+- **[X-14] Peer-Sessions e1-e4 + idle Subagent:** 3 bg-Sessions idle (11d/5d/4d), nie beendet/
+  geerntet; fachliche Deckung wahrscheinlich (#21 completed = E-Block-Bilanz); dazu Subagent
+  audit-hya-vl3-soll-ist noch adressierbar. -> Je Session kurzer Ernte-Check gegen #21/Ledger,
+  dann BEENDEN (Shells-beenden-Doktrin); Betriebszeile im Di-25.-Schnitt.
+- **[X-15] VL-6b-G6-Buchung NIE VOLLZOGEN:** run_options/organ_subaxes XSD-gueltig, aber von
+  parse_experiment_profile/ExperimentProfile/validate IGNORIERT; vl6b-karte.md verlangte
+  woertlich die Nachbuchung "damit er nicht ein zweites Mal durchs Raster faellt" -- exakt das
+  ist eingetreten (0 Treffer in Ledger/Wellenplan/Register/Tasks; S13-Design :1222/:1238 nennt
+  run_options nur als Platzierungs-Grenze). -> Nachtrag in KF-6/S6-Familie bzw. S-13/#18;
+  beim S-13-Bau Di 25.08. verdrahten ODER fail-loud ablehnen (stille-Null-Klasse; vgl. K6-6).
+- **[X-16] Voll-Audit-ENDSTAND ungesichert (SOFORT):** wf_794b904b-Journal (1,1 MB, 170
+  started/77 results) NUR unter ~/.claude/projects/.../workflows/; audit_107_tafel.md NUR im
+  rotierenden jobs-tmp; Repo-BU traegt nur den 18.08.-TEILSTAND; das Journal ist der EINZIGE
+  Traeger der 111 ungekuerzten Verdikte + seg1-81-Matrix (= Gegenzaehl-Basis Fix-Strecke 2).
+  -> VOR allem Aufraeumen: beide additiv nach ~/backups-workflow/20260819-audit-endstand-
+  794b904b/ (B.3/T-8-Muster), dann Repo-BU-Nachzug; K12-Patches ([K12-10]) im selben Zug.
+- **[X-17] 23-Schritte-Deckungs-Matrix ohne publizierten Traeger:** Volltext nur im Audit-
+  Journal Z.144; 6b-Zeile seg1-81 endet mid-Satz. -> Nach X-16 die Matrix als Register-
+  Nachtrag 6c bzw. Fix-Strecke-2-Eingang publizieren (je Schritt gedeckt/offen), 6b-Zeile
+  reparieren, Kuerzung deklarieren. (FEHLT-Schritte selbst via K2=F6/F5 verdiktiert -- KEINE
+  Neumeldung.)
+
+**12.4 KONSEQUENZ (Delta zur Kette; die Kette selbst aendert sich NICHT):**
+
+- **SOFORT (vor jedem Aufraeumen, B.3):** X-16 Audit-Journal+107er-Tafel sichern · X-2
+  k2-Outputs aus /tmp sichern · X-10 bau/g2-semantik + X-8 bau/v08r-fingerprint-sha auf origin
+  sichern · [K12-10]-Patches mitnehmen.
+- **Fix-Strecke 2 erhaelt ZUSAETZLICH** (zu F1-F9 + T-2/T-10 + L21): T-10-PRAEZISIERUNG per
+  12.1 (Ernte-Haelfte ZU, nur Bau-Haelfte + Hash-Laengen-F2-Punkt) · 6b-Reparatur + 23er-Matrix
+  als Eingangsdokument (X-16/X-17) · B3-ANKER-Abgleich VOR der Gruppe-D-Messung (12.1) ·
+  prt-art-Roundtrip-SHA-Pin als W2-Task anlegen ([K7b-3]) · tools-3-Format-Traeger ([K11-5]) ·
+  W2-1/:515-Registeranker ([M-5]).
+- **#93 erhaelt konkretisierte Pruefposten:** Gruppe A: vl3 ROT-3 --debug-Matrix + _pclose
+  ([K10-4]) · N1/N5/N6-Aufschluesselung (X-9) · F2/Wstringop-Verbleib ([K10-12]) · Warnungs-
+  Review-clang-Quittung ([M-6]/W2-2). Gruppe C: HY-A-Runde-2-Lens-Deckung (X-4) · rcu-Serien-
+  Ausweis (X-5) · V-02R-Bau-Haelfte (X-12, mit Fix-Strecke 2). Gruppe D: B3 am RICHTIGEN Anker
+  messen (12.1). Gruppe Straenge: k2-G3/G4-Literale (X-2).
+- **Di-25.-Schnitt (#96) erhaelt:** B-8-Task (X-13) · VL-6b-Parser-Befund in S-13/#18 (X-15,
+  mit [K6-6]) · Methodik-Override-Entscheid S-8/#22 ([K12-2]) · Peer-Session-/Subagent-Triage
+  als Betriebszeile (X-14) · golden-Ref-Ausbuchung im L20-Block (X-1) · Nested-Worktree-Triage
+  (X-11). VORHER (vor F2, Fr 21.08.): g2-Landeweg (X-10, = W1-V1-Pflicht).
+- **Docs-/Memory-Zug:** KON74-04-Vermerk ([K7b-5]) · KON99-03-Zaehlwerk ([JB-4]) · Folge-BU-
+  Spiegel ([JB-2]) · hy-a-Lens-Quittung ([JB-3]) · #85-Text-Delta (X-3) · Fallen-Block 12.2c
+  GESCHLOSSEN in den T-5/T-6-Memory-Zug (11.5) -- 13 Klassen, nicht einzeln verlieren.
