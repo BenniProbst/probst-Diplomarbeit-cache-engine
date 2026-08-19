@@ -1,0 +1,507 @@
+{
+  "summary": "ultracode-Sweep: letzte 10 Kontexte + Workflow-Journale auf unnotierte Regressionen + verlorene/abgebrochene Straenge; Synthese = Abschnitt-12-Text fuers Regressionen-Register",
+  "agentCount": 15,
+  "logs": [
+    "Rekonstruktions-Input: 40 Strang-Kandidaten (roh)"
+  ],
+  "result": {
+    "synthese": {
+      "abschnitt_12_markdown": "## 12. REGRESSIONS-SWEEP K5-K13 + JOURNALE (16.-19.08.) -- NACHTRAG 19.08.2026 (K14, SYNTHESE)\n\n> Auftrag: die 10 Transkript-Fenster K5-K13 (16.08. 12:28 - 18.08. 21:24, Z59214-69705) plus\n> 3 Journal-Gruppen VOLL nachvollziehen; jede unnotierte Regression, jeden verlorenen Strang,\n> jeden Workflow-Start bis zum Abschluss verfolgen. Methode je Leser: python3-Streaming ueber das\n> Roh-Transkript (User/Teammate voll, Assistant ~800 Z., tool_results Kopf), dieses Register\n> (Abschnitte 0-11) vorab VOLL als Dedup-Basis, Verdachtsfaelle am Objekt nachgemessen\n> (ls-remote, merge-base, Dateisystem, Ledger-greps, journal.jsonl). Audit-Verdikte (688/688,\n> Abschnitt 6/6b) werden NICHT erneut gemeldet -- Ueberschneidungen sind je Fund markiert.\n\n**12.0 VOLLZAEHLIGKEIT + GEGENZAEHLUNG (Vollzaehligkeits-Gate bestanden)**\n\n- Leser 10/10 Fenster: K5 Z59214-60174 (961 Z.) · K6 Z60174-61035 (862) · K7a Z61035-61635 (601)\n  · K7b Z61635-62209 (575) · K8 Z62209-63511 (1303) · K9 Z63511-64616 (1106) · K10 Z64616-65944\n  (1329) · K11 Z65944-66960 (1017) · K12 Z66960-68514 (1555) · K13 Z68514-69705 (1192).\n  Summe 10501 gescannte Zeilen, Bereich Z59214-69705 LUECKENLOS (Grenzzeilen doppelt).\n- Journal-Gruppen 3/3: (a) 38 Workflow-Journale 16.-19.08. komplett kartiert (35 FERTIG+Ernte\n  belegt, 3 live, 0 abgebrochen-ungeerntet, 0 journallos) · (b) ~/backups-workflow-Sweep\n  20260816*-20260819* (22+2 Ordner inventarisiert, je gegen Register/Ledger/Tasks gegrept) ·\n  (c) Ernte-/Output-Gegenproben (V-02R-Ernte, super-Wache, k2-Vollbau-Outputs in /tmp).\n- GEGENZAEHLUNG REGRESSIONEN: **103 Roh-Eintraege -> 80 NEUE nach Dedup.** Abzug: 11 Zeilen\n  im_register=true (nur Ueberschneidung markiert: 4x T-10, 3x K3/E13-Umfeld 15971/15978,\n  1x K1, 2x 5c, 1x bwrap-Klasse Abschn. 0) + 1 Zeile zu 12.1 umklassiert (T-10-Korrektur) +\n  11 Zeilen in 8 Merge-Gruppen konsumiert (M-1 15941-Ripple 3->1 · M-2 super-Wache 4->1 ·\n  M-3 Floor-Anker 2->1 · M-4 RCU-Test 2->1 · M-5 main.cpp:515/:717 2->1 · M-6 clang-Warnungs-\n  Review 2->1 · M-7 clang-format-Drift 2->1 · M-8 Audit-WF-Orchestrator 2->1). 72 Einzel + 8\n  Gruppen = 80; kein Roh-Eintrag verworfen.\n- GEGENZAEHLUNG STRAENGE: **40 Roh-Kandidaten -> 33 nach Dedup** (6 Gruppen/13 Zeilen gleichen\n  Gegenstands zusammengelegt, 27 einzeln): **16 GEERNTET / 17 REKONSTRUIERBAR / 0 VERLOREN**\n  (Tafel 12.3). Register-5c-Bilanz am Objekt BESTAETIGT und bis 19.08. frueh fortgeschrieben.\n\n**12.1 KORREKTUREN AN DIESEM REGISTER (Funde AM Dokument selbst):**\n\n- **[T-10 GESCHLOSSEN zur Ernte-Haelfte]** 11.1 behauptet \"0 Register-Treffer, Ernte-Beleg\n  fehlt ... Explore-Ernte finden ODER neu fahren\" -- FALSCH: die V-02R-Explore-Ernte EXISTIERT\n  und wurde konsumiert. Beweise (5 Leser unabhaengig, 19.08. objektbestaetigt): wf_969b3bba\n  'v02r-hybrid-grammatik-explore' (17.08. 10:29-10:41, 2/2 Agenten), Ernte 10:45-10:54 ->\n  Ledger KON103-03 (:1548/:1587) + ~/backups-workflow/20260817-v02r-hybrid-grammatik/\n  (explorer1-plan-ledger.md 15493 B, explorer2-objekt.md 18500 B, wf-result-roh.json 37620 B);\n  der Lead hatte sie 18.08. 01:56 selbst wiedergefunden (Z67647-67652, Antwort an bump15-a).\n  NEU-FAHREN ENTFAELLT. T-10 reduziert sich auf (a) BAU-Haelfte: SHA256-Verkettung/Wert-\n  Befuellung NICHT gebaut (bump15-a C3; Map landet K-1-leer) -> Fix-Strecke 2 + #93-C, und\n  (b) Hash-Laengen-Spannung SHA-256 (Owner KON101-01) vs. SHA-512/128 (Objekt/PLAN/KON45-01,\n  stempel_basis.hpp:378-387) = F2-Vorlagen-Punkt (deckungsgleich seg1-40/#95).\n- **[5c-KORREKTUR]** w78hb9hii war KEIN \"verwaister 0-Byte-Doppelstart des Review-Runs\":\n  Tool-Error Z68280 belegt literal \"Workflow wf_794b904b-d1c is still running (task w78hb9hii)\"\n  = AUDIT-Run. Kosmetisch, Zuordnung hiermit korrigiert.\n- **[6b-TRUNKIERUNG, ERNST]** Alle 111 Verdikt-Zeilen der Detail-Tafel sind mechanisch bei\n  ~250 Zeichen abgeschnitten (mid-word \"addie\"/\"anh\"/\"bei\"), UNDEKLARIERT -- beim KRITISCH\n  seg1-81 fehlt dadurch die Schritt-zu-Commit-Deckungs-Matrix der 23 Bauplan-Schritte\n  (f3559e7a S-6a/Format5 · 5c0c3a5e POD7 · d866bd3d Anker · 1984e417 HY-A3 · 6c979a99+c59840f8\n  HY-A2 · 345c1d1e Gate-Grammatik · 1a780041 E-A · 7bc997a2 6-Symbole · d89250d1 Floor) samt\n  FEHLT-Liste (B-9/B-10.3/B-11.2/NP-23 -- via K2=F6/F5 bereits verdiktiert, KEINE Neumeldung).\n  Volltext lebt NUR im Audit-Journal (Z.144) -- Sicherung + Reparatur: 12.3/X-16, X-17.\n- **[W1-V2-ANKER-DISKREPANZ]** g5-Karte des Buendel-Explores (Z61339): B3-Pflicht-Wurf sitzt in\n  mess_achsen_naht.hpp:477-517 (:509 throw), NICHT abi_adapter.hpp:476-491 (Karten-Fehlbuchung);\n  3b/[W1-V2] misst am abi_adapter-Anker. VOR der #93-Gruppe-D-Messung BEIDE Anker abgleichen,\n  sonst droht Falsch-Null/Falsch-Altbestand.\n- **[5c-FORTSCHREIBUNG]** journal-Sweep 19.08.: 0 abgebrochene UND ungeerntete Runs 16.-19.08.,\n  kein wf-Verzeichnis ohne journal.jsonl; einzige Runs ohne Endzeile = 3 LIVE-Laeufe\n  (Lebendprobe Log-Wachstum, nie pgrep). \"Kein weiterer failed Workflow\" BESTAETIGT.\n\n**12.2 NEUE REGRESSIONEN (80 nach Dedup; Verbleib je Zeile; Audit-Ueberschneidung markiert)**\n\n*12.2a OFFENE POSTEN / OFFENE RESTE (14 -- Traeger-Zuweisung in 12.4):*\n\n- **[K7b-3] prt-art build:registry-roundtrip NICHT-DETERMINISTISCH:** Regenerat laeuft gegen den\n  ce-GESCHWISTER-Checkout des Runner-Slots, den der Job weder pinnt noch aktualisiert (nur\n  Existenz-Test .gitlab-ci.yml:115) -- 15944 rot/15945 gruen je nach zufaelligem Runner-Stand\n  (Schein-Gruen-/Schein-Rot-Klasse). 19.08. am Objekt UNVERAENDERT. -> W2-Task (SHA-Pin).\n- **[K7a-3]** = W1-V2-Anker-Diskrepanz (s. 12.1) -- OFFEN bis zum #93-D-Abgleich.\n- **[K10-4] vl3-Restposten ohne Bau:** ROT-3 \"--debug x plan dump|ci|cmake\" ausgelassen (einzige\n  planer_block-bindende Zweige, Exit 6) + Windows-_pclose-Posten (test:87-92, l.rc ohne\n  WEXITSTATUS). Nur in Audit-BU notiert, keine Task-/Register-Spur. -> #93 Gruppe A.\n- **[K10-12] vl3-Verlustliste F2-Rest:** -Wstringop-overflow-VORBESTAND (A-13/Komplex-Fix) ohne\n  Verbleibs-Quittung (F1 in Landung beruecksichtigt, F3 = EXCLUDE_FROM_ALL-Erklaerung par.10,\n  F4 via HY-A erledigt). -> #93 Gruppe A / Komplex-Fix-Flaeche.\n- **[M-6] clang-Haelfte des WARNUNGS-Reviews (vl3) nie gefahren** (Hausregel 2x gcc->clang);\n  gruene ctest-clang-Zellen ersetzen das Review nicht; als W2-2 vertagt (S-12-Dual-CI #3), im\n  Register fehlte der Posten. (Ueberschneidung: E1 betrifft clang-DEBUG-Volllauf, anderes Bein.)\n- **[M-5] Unbelegte Determinismus-Zusicherungen im GELANDETEN Code:** experiment_planner/\n  main.cpp:717 (\"byte-gleich\") in 6cdcf1c9 abgeschwaecht, :515 (\"zwei Laeufe byte-gleich\") NIE\n  gemessen und stehen geblieben -- vertagt als W2-1 (Bytevergleich-MESSUNG + --debug-Matrix als\n  EIN Pruefposten). Hier registriert, damit W2-1 einen Register-Anker hat.\n- **[K11-5-Rest] tools-3-Format-Altbestand ohne Traeger:** axis_registry_gen/main.cpp,\n  gen_golden_fullpilot/main.cpp, p27_bundle_finder/.../bundle_finder.hpp clang-format-rot\n  AUSSERHALB der CI-Pruefmenge; bewusst zurueckgesetzt statt formatiert, kein Posten. -> W2.\n- **[M-7] clang-format-22-Umgebungs-Drift lokal-vs-CI UNGEKLAERT:** lokales 22.1.8 alignt\n  Makro-Escape-Bloecke auf Spalte 122 und meldet dry-run-ROT, derselbe Stand ist CI-GRUEN\n  (set_module_abi_v1.hpp:13, K12; hybrid_module_abi_v1.hpp:71-114 33 Meldungen, K13-Rest,\n  par.21.6 \"CI entscheidet\"). Workaround committet; Werkzeug-Paritaets-Pruefung OFFEN. -> W2.\n- **[K12-2] Methodik-Override emissionsseitig UNBEOBACHTBAR (Architektur-Spannung):** nach V-12\n  tragen alle 4 work_modes cmake_build_type Release; measurement_on/single_thread haben im\n  Emitter NULL Leser -- die smoke=>debug-Entkopplung kann die Emission nicht mehr bewegen. Nur\n  in Task-#22-Metadata (s8_erbstuecke) geparkt; hiermit als Abschnitt-2-Klasse registriert.\n  -> S-8/W2-Entscheid (#22).\n- **[K7b-5] KON74-04 ohne Superseded-Vermerk** auf KON80-01/V3; Fassungshistorie ohne\n  \"Fassung 4\" (Klasse wie seg3-kon28-01, ANDERER Marker). -> Docs-Zug.\n- **[JB-4] KON99-03-Inventar-Drift:** deklariert 11 Dateien fuer 20260817-buendel15-und-wf10,\n  Ordner traegt 14 -- die 3 VL-6-Ergebnis-Karten (vl6a/b/c) unsichtbar (Folge: X-15). -> Docs-Zug.\n- **[JB-2] BU-Spiegel-Luecke kontext11:** 20260817-w1-strang-artefakte (8 Dateien, u.a.\n  ct_w1-Gruen-/Rotprobe-Logs = W1-Beweis-Logs NUR lokal, a11_super_patch.diff) fehlt KOMPLETT im\n  Repo-Spiegel (21/22 Ordner); dazu f45e995b-tsan-Patch nur lokal (pause-sicherung 8 vs 7).\n  Audit P-10 zaehlte nur die Repo-Seite. -> naechster Folge-BU-Zug.\n- **[JB-3] hy-a-Folge-Lens-Funde GEFIXT+GELANDET, aber UNVERBUCHT** (Meldungs-Luecke T-3-Klasse):\n  wf_750d2441 TRAEGT_MIT_FIXES, Fund 1 EXPECT_GT-Tautologie -> Fortschritts-Beweis\n  (test_rcu_concurrency.cpp:197/:236), Fund 2 lint_layer_includes.sh Allowlist datei-weit+stale\n  -> ALLOWLIST_SOLL-Gegenzaehlung (:144-146); Ledger traegt nur den Start. -> Quittungs-Nachtrag\n  (loest die halbe X-4-Frage; Rest s. 12.3/X-4).\n- **[K9-3] tail-Fallen-Eintrag ZUGESAGT, NIE GESCHRIEBEN:** Lead 17.08. 11:18 \"Fallen-Eintrag\n  wird tail-Fenster\" -- 19.08.: 0 Treffer 'tail' im Fallen-Register. Inhalt: ctest-Bilanz kann\n  in diesem Repo NIE in tail -60 stehen (Label-Summary allein 243 Z., Bilanz 245 Z. von unten);\n  Fix tail -260 oder grep 'tests passed|tests failed out of'. -> Memory-Zug (mit T-5/T-6, 11.5).\n\n*12.2b IM FENSTER BEHOBEN/AUFGEKLAERT -- HIER ERSTMALS REGISTRIERT (Quittungszeilen):*\n\n- **[M-1] super 15941 + prt-art 15944 ROT, F5-Rename-Ripple** (K7a/K7b): golden-F5-Rename\n  axes/->organ_axes/ ohne prt-art-MASTER-Nachzug (prt_art_axis_registry.xml Z.24); Fixture-\n  Sync-Wache biss KORREKT; Zweitfehler Hand-Edit der GENERIERTEN Registry-XML liess Generator-\n  Include main.cpp:36 zurueck (Roundtrip-Gate rot). GEHEILT 7ed4a7e+d11781f+super c926efdc,\n  15945/15946 SUCCESS (Ueberschneidung: #79/KON99-01). LEHRE unverankert: repo-uebergreifender\n  Rename braucht Master-Nachzug (Fallen-Klasse, 12.2c).\n- **[M-2] super-Fixture-Subset-Wache STILL-SKIP nach K2-Rename** (k2-bau KRITISCH 17.08. 10:14\n  Z63194; k2-Lens ERNST \"R1 nicht umgesetzt, Commit-Text erklaerte Auflage fuer gegenstandslos\";\n  K11-Sweep B-1 \"prueft seit W1-Landung NICHTS\"): Code/tests/CMakeLists.txt:348 zeigte ins\n  Leere, FIXTURE-SYNC-SKIP + SKIP_REGULAR_EXPRESSION liessen die Zelle GRUEN ohne Gegenstand\n  (stille-Wachen-Abschaltung). GEHEILT f4b01ab3: Repoint auf experiment_kern_seam_fixture.xml,\n  B-1-HAERTUNG Verdrahtungsfehler=FATAL (:105-118), 3-seitige Mutationsprobe OK/FATAL/SKIP,\n  super 15976 SUCCESS, KON115. (Nachbar-Ereignis K3; eigener Gegenstand.)\n- **[M-3] Floor-Anker-Fehlkalibrierungs-Komplex 16./17.08.:** Nachzug fbe898be schrieb 494/490/\n  488 + FALSCHE Doktrin \"CI-Floor-Baum baut OHNE Pruefling\" (Kontrollmessung nach cmake -U;\n  CI setzt -DCOMDARE_CE_PRUEFLINGE) -> 15936 ROT (test:coverage-guard, avx2 491>490); Rueck-\n  kalibrierung 495/491/489 @ 04ac26fa, CI 15937 SUCCESS (Ueberschneidung: KON98/#78). Floor-\n  Semantik-Lehre: zur Testzahl gehoert der BAU-ZUSTAND inkl. Pruefling-Schalter.\n- **[M-4] test_rcu_concurrency-Komplex:** roter Erstlauf clang 1/498 unter Doppel-Start-Last\n  (pgrep-Falle als Ausloeser); FIX-1-Abnahme 21/25 rot deckte auf: der Churn-Test prueft seinen\n  Gegenstand nie (Reader tot vor erster Writer-Generation; alte Fassung verlangte nur \"es gab\n  Reads\") -- Umbau Reader-an-Generationen-Fortschritt, gelandet via #80/f45e995b-Kette.\n  (Ueberschneidung: H3 fuehrt NUR den ANDEREN Flake test_seg_coverage; G-L21 nur F-9/TSan.)\n- **[M-8] Audit-WF-Orchestrator-Doppelbug:** .then-Crash \"undefined is not an object\n  (k.zusagen.map)\" (Limit-tote Agenten als undefined) -- der Fix haette 4 Ledger-Segmente STILL\n  gefiltert; Original-Design deckelte Ist-Verifikation auf slice(0,14); Owner-Nachfrage ->\n  Vollzaehligkeits-Gate 11/11 + Deckel entfernt, Endlauf 65/65, 688/688. Beinahe-stille-\n  Reduktion hiermit registriert (Quelle der NIE-KUERZEN-Memory 18.08.).\n- **[K5-1]** Falsch-ROTER ctest auf unGEBAUTEM Baum (487/495) + LastTest.log durch 0-Test-Lauf\n  zu 3-Zeilen-Falsch-Beleg ueberschrieben (golden-rettung 16.08.) -- Re-Bau + CI-Form 494/494\n  (bju8vd1ll), Kombibau bwscuj3yh 4 Zellen. KLASSEN-VORLAEUFER von [E3] (dort nur bump15 18.08.).\n- **[K5-2]** prt_art-Piloten-Compile-Bruch: stale Generat referenzierte prt_art_composition_\n  demo.hpp (Fixture traegt es nicht), PASS-3 rc=1; tail-25 verschluckte den Fehler zunaechst.\n  Geraeumt, Re-Configure OHNE Pruefling (CI-Form); Diskrepanz scope-treu an #65 (Ueberschneidung:\n  #65 in_progress).\n- **[K5-3]** golden-Nachstufe 3 MUSS-Funde (wf_a0e17d5d): F1 4 Ueberlaengen, F2 131 Ueberlaengen\n  (83 in generierter TABU-XML = erste Wachen-Beruehrung seit 10.08.) MIT Zusatzbefund Push\n  bau/golden-homes @ 5fa37f36 = Pipeline 15895 FAILED (Push->gruen-Doktrin verletzt); F3 =\n  Falsch-Beleg [K5-1]. A2.5 komplett -> c0b28670 (f4e29eab Wachen-Regel *.xml-NUR-Breite +\n  Selbsttest 16/17, 7f4710f6); Branch-Rest s. 12.3/X-1.\n- **[K5-4]** Dual-Review golden (3 Stellen): CMakeLists:1391 >120 · consteval-switch\n  overlay_source_set.hpp OHNE fail-closed default · Selbsttest-Luecke Fall 18. Alle in d44008c5\n  MIT T-1-Mutationsbeweis (17/18 rot -> 18/18), in 90ee6809 gelandet.\n- **[K5-6]** Eigener Buchungsfehler KON93-02 (6GB-Arena als ABLOESUNG statt SCHICHTUNG der\n  KON51-Warnschwelle); 10W-Explore bewies 3 Schichten/2 Speicher + fehlenden Bau-Posten E11.\n  Korrigiert als KON94 (fe6439ea), E11 -> S-13-Buendel (#18).\n- **[K5-8]** TaskCreate in Subagent-Umgebung nicht verfuegbar -- Hilfsagent scheiterte\n  kontrolliert; Haupt-Agent lud per ToolSearch selbst, Task #77 direkt. Werkzeug-Falle (12.2c).\n- **[K6-3]** Workflow-Ergebnis-Verluste (Owner-geruegt \"Du tendierst dazu Ergebnisse\n  abzuschneiden\"): Task-Notification kappte 4 Felder mid-Satz, Verify -3008 Zeichen, 1 Ergebnis\n  nur als Dotfile. GEHEILT: journal_extrakt.py, 21/21 Ergebnisse + 17 Dateien voll, persistiert\n  (super 4901f808). Verwandt Register-10b-Template-Literal-Bug; DIESER Vorfall war unregistriert.\n- **[K6-4]** Rohdaten-Sicherungs-Luecke der 7GB-Raeumung: Floor-Mess-ROHDATEN lagen nur im\n  rotierenden Job-tmp, Loeschpruefung war nur \"getrackt=0\"; Owner-Nachfrage loeste Nachsicherung\n  aus (docs/sessions/backups/.../floor-messung-rohdaten). ZWEITER Vorfall der T-8-/B.3-Klasse.\n- **[K6-6]** Objekt-Luecken WritebackMethod/XSD/Sink: Profil-Validierung NUR im --validate-Pfad\n  (Bogus-Werte laufen im MESSLAUF durch), XSD ohne Enum-Wache (writeback_methods freier String,\n  xlsx fehlt in Prosa), publish-Element 0 Treffer, E-18 ce-seitig unimplementiert\n  (xml_config_parser.hpp:342/:493). Als Design-Input in S-13 (#18/#57) konsumiert -- beim\n  S-13-Bau verdrahten oder fail-loud (stille-Null-Klasse); vgl. X-15.\n- **[K6-7]** Plan-/Karten-Drift-Sammelbefund (Wellenplan-hybrid/-Stand stale, A43 ohne Xlsx,\n  measurement_sink dreifach gegatet statt \"unbedingt\", A9-Kette weiter als Karten, LagerBaum-\n  Writer ohne Konsument #57) -- von Strang-Designs konsumiert. (Ueberschneidung: Klasse =\n  9x-UEBERHOLT, Abschn. 3; die konkreten K6-Befunde standen nirgends.)\n- **[K6-5]** CI-Poller-Skript-Defekt (eingebetteter python3-Dump, Syntaxfehler) -> b56k1d2uy\n  exit 1 nach TERMINAL; Dump in ci_jobs_dump.py ausgelagert. (Poller-Werkzeug-Serie, 12.2c.)\n- **[K7a-2]** Wellenplan-Plan-Regression par.19.1: \"VS-A..VS-F STOPP-Gates offen\" als\n  Entscheid-Aussage FALSCH (alle 6 seit 07.08. entschieden, Ledger :27970-27979); auch im\n  Owner-Vorlagen-Kopf. Geheilt: Kopf harmonisiert, Fortschreibungs-Marker Wellenplan Z.2394.\n- **[K7a-4]** prt-art-Submodul detached HEAD + development stale (32e8ffa8 hinter 3077e102) --\n  Klone-in-Sync-Luecke, behoben (checkout+ff-only). Register 6/E12 fuehrte nur Thesis-Klone.\n- **[K7a-5]** Poller mit sh statt bash gestartet (mapfile/Bad substitution, exit 2) -- trivial,\n  sofort bash-Neustart.\n- **[K7b-4]** curl \"--header @file\" liest keine Datei -- auf curl-Config-Muster (mapfile blind\n  -> curl -K) umgestellt; kein Klartext-Token nach stdout. Werkzeug-Rezept (12.2c).\n- **[K8-1]** s13-Design-Lens 13 Funde (4 MUSS: u.a. Arena-Ueberlauf gegen juengste Owner-Linie,\n  xlsx-Zeilenlimit-Wurf gegen KON88-P2, result.csv-Resume-Blindheit) -- 2 Fix-Runden + Verify\n  TRAEGT_MIT_FIXES, gelandet dfb8ba09+e9c74abf. (Ueberschneidung: s13-Zusagen im 688-Audit.)\n- **[K8-2]** HY-A-Dual-Lens F-1..F-11: Zweig waere CI-rot gewesen (F-1 Floor-Nachzug fehlt,\n  Guard Exit 4; F-2 CMake-No-Op ce_anatomy_drive 0 Konsumenten); Meta: Opus-Erheber-Fixzahl 498\n  haette die 16.08.-Fehlkalibrierung wiederholt, Fable-Bewerter korrigierte auf Live-Messung.\n  Behoben c979d1c0+374c1d12, F-11 gcc 499/clang 498. (Ueberschneidung: HY-A-Zusagen im Audit.)\n- **[K8-3]** F-12 Eigenfund: latenter CI-VERDECKTER Bau-Bruch (perms-DLL-Ziele setzen\n  prt_art/slots/...demo.hpp voraus; CI sieht es nie, weil 'make inventar' die all-Runde VOR dem\n  Reconf faehrt) -- behoben 374c1d12.\n- **[K8-5]** K2-Drift: D1 Plan \"Sonstige Leser KEINE\" falsch (test_s3_ordnung_freigabe, 6 TESTs\n  mit-entflochten) · D3 Gate G7 \"~100%\" real 63% (C14N-SHA256-Direktbeweis statt Proxy) ·\n  Schritt 3/R4 gegenstandslos (Wurzelschnitt 06.08.). In 44a909c1 eingearbeitet, #81.\n- **[K8-7]+[K9-12] Arbeitsweise-Verstoss-Serie (2x Owner-Ruege 17.08.):** 13 V-Fragen ohne\n  dedizierten Explore (Nachholung: V-07 laengst entschieden, 7 Frage-Haelften ueberfluessig,\n  V-10a-Empfehlung FALSCH HERUM gegen Owner-KERN 26.07.); Selbstmessung KON106-08: 38 Fragen\n  ohne Vorlauf-Explore, 45-50% bereits entschieden, 5,31M Explore-Tokens NACH statt VOR den\n  Vorlagen. Korrigiert (KON100-Zug, 12-Wochen-Memory-Schaerfung). (Ueberschneidung: Klasse =\n  Audit-Gesamturteil \"Owner-Wort-Treue TEILWEISE\"/H6; Vorfaelle standen nirgends.)\n- **[K8-9]** Platte 2x kritisch (95%/13G, 97%/8G) waehrend Kombibauten; Raeumung 8G->14G nach\n  git-ls-files=0-Beleg, Mess-CSV unangetastet (rm-build-CSV-Regel gehalten).\n- **[K9-2]** Lead-Wiederanlauf-Skript doppelt defekt: Bau-Verzeichnis geraten (vl3 baut rel/dbg)\n  + \"No tests were found!!!\" mit CTEST_RC=0 = gruen lesbares FALSCH-NULL. Von vl3-bau gemeldet,\n  quittiert; sauber neu gefahren. ZWEITER E3-Klassen-Vorfall (ctest --no-tests=error-Lehre).\n- **[K9-5]** VL-2-Feldzahl-Wache (P0960) BLIND fuer Zeiger-Appends: 17. Feld char const* liess\n  beide Wachen-Beine schweigen; Fix typ-agnostische Zaehl-Sonde (AnyFeld+FeldSonde) @ cd011e60.\n  (Ueberschneidung: Klassen-Naehe C-F2/Fix 13/14 an derselben decl.hpp, bump15-Stand.)\n- **[K9-7]** k2-Lens ERNST 2 + Kommentar-Unwahrheit: 6 Zeilenbelege des XML-Kopfblocks ALLE +1\n  daneben; Test-Kommentar behauptete Byte-Gleichheit zur super-Master-Fixture, real ABSICHTLICHE\n  Divergenz. Lead uebernahm verwaisten k2-Worktree (Ein-Schreiber), fixte selbst; C14N-\n  Neutralitaet gemessen; gelandet 6a8cdc65.\n- **[K9-8]** vl3-Lens ERNST: K9b-Koeder biss nicht -- Nadel \"8 \" schon vom --debug-Hilfeblock\n  DESSELBEN Commits erfuellt (main.cpp:582 vs :592); Wache-die-nie-beisst, 2. Mal im File.\n  Fix gelandet (7bf66ddd->c8d7295e). (Ueberschneidung: T-6-Koeder-Reichweiten-Klasse.)\n- **[K9-9]** Floor-Erwartungs-Rechenfehler des Leads (496/492/490 in sich widerspruechlich; F-1\n  +4 fehlte) -- von hy-a-bau gestoppt (500/496/494), von vl12-bau um Pruefling-Form praezisiert;\n  Auflage: Schalter-Zustand literal ins Lande-Protokoll.\n- **[K9-10]** Doppellauf-Kollision build-vl12 (Lead-Wiederanlauf 33 s parallel zu vl12s Lauf im\n  SELBEN Bau-Verzeichnis -> spiegelbildliche Einzel-Ausfaelle). Ein-Schreiber-Klasse, aufgeklaert.\n- **[K9-13]** Auftrags-Karten-Fehler des Leads, von vl12-bau korrigiert: \"47 in 12\" real 42 in\n  11 · \"drei\" positionale POD-Initialisierer real VIER (produktiver Makro-Initialisierer\n  anatomy_module_abi_v1.hpp:186 fehlte) · Emitter nicht byte-reproduzierbar (\"Generated\n  Timestamp\" wandert je Configure -> naiver sha256-Vergleich = Schein-Differenz; Falle 12.2c).\n- **[K10-1]** HY-A2 KOMPLETT + HY-A3-ACHSE in W1 NIE BEGONNEN (W1-Abnahmeformel :952 unerfuellt);\n  Ursachen-Klasse: decl.hpp-SPERRE als ERLEDIGUNG behandelt statt als Zustaendigkeits-Luecke\n  gemeldet; Auftragstext enger als Wellenplan :855-857. KON113; Bau im Bruch nachgeholt.\n  (Ueberschneidung: 5b \"HY-A2+A3 richtig gebaut\"; W1-Rest = #93. Die URSPRUNGS-Regression samt\n  Ursachen-Klasse stand nirgends.)\n- **[K10-5]** N7-Luecke REAL: add_dependencies fehlte (literal rc=127 \"comdare-experiment-\n  planner: not found\" bei --target comdare_tests; test_profile_roundtrip \"Not Run\" faerbt falsch\n  rot). Behoben in W1-Landung (2 Kanten); comdare_tests-PFLICHT-Falle -> 12.2c.\n- **[K10-6]** TSan-Kopfzeilen-Uebertreibung test_rcu_concurrency (\"race-frei unter TSan\" --\n  atomic_thread_fence rcu.hpp:125 ist fuer TSan GRUNDSAETZLICH unmodellierbar). Behoben\n  f45e995b (TSAN-GRENZE-Block). (Ueberschneidung: E11 = TSan-Beleg im Bruch-Anker, anderes\n  Bein; \"TSan-AUSBAU lebt nirgends\" bleibt offener Traeger dort.)\n- **[K10-7]** LEAD-FEHLBUCHUNG (Owner-Ruege 20:34): limit-tote Teammates als \"erledigt\" gebucht,\n  weil sie die PAUSE akzeptierten -- Zusage-ohne-Deckung auf Prozessebene. Korrigiert per\n  Doppel-Audit -> KON113. (Ueberschneidung: H6 generisch; konkreter Vorfall unregistriert.)\n- **[K10-8]** DOPPEL-INKARNATION des Lande-Agenten nach Workflow-Stop/Resume (alte Inkarnation\n  mergte 4 Commits weiter; neue erkannte+deduplizierte selbst). NEUE Ausloese-Mechanik:\n  Stop/Resume erzeugt Agent-Duplikate -> 12.2c. (Ueberschneidung: H4 kennt nur K16-Instanz.)\n- **[K10-9]** Koordinations-Widerspruch am selben Objekt: Lead versprach vl3-build-Baeume\n  stehen zu lassen, Lande-Agent hatte sie Minuten zuvor loeschen lassen -- transparent\n  aufgeloest (Verifikation via Vier-Zellen-Kombibau statt Neubau).\n- **[K10-10]** Workflow-Synthese-Tod wf_e06c7f73 (synthese:null am Limit) + wqxyzoh3q-Output\n  um 88 KB gekappt -- beides aus journal.jsonl rekonstruiert (Resume w8tz2815j lieferte P20).\n  Klasse \"journal=Wahrheit\" bekannt; Vorfaelle standen nirgends.\n- **[K10-11]** KON107-Poller-FALSCH-NULL: mapfile-Header-Rezept lieferte leere Statuszeilen,\n  beide GitLab-Hosts 404 -- Pipelines real SUCCESS (Falsch-Rot am Poller). Geheilt\n  (glhdr.curlrc + curl -sk). -> 12.2c.\n- **[K10-13]** Talos-Plan-Regression: \"Debug-Messung OHNE PMC\" beruhte auf v1.12-Stand; Owner-\n  Einspruch bestaetigt -- v1.13.0 liefert statisches perf + Debug-Container; Cluster faehrt\n  v1.12.4, paranoid=3; v1.14-GA 27.08. = 1 Tag nach Bau-Trigger. Korrigiert+getrackt #87.\n  (Ueberschneidung: D-5-Zusagen im Audit moeglich.)\n- **[K10-14]** Cluster-Repo-Verlustbestand: 20 helm-1014-Schrittskripte + ci-templates-Gitlink\n  UNCOMMITTED (#73 landete nur das Handout); Erst-Push ans falsche Remote. Behoben ee2f933.\n- **[K11-3]** Lead-Fehlbuchung + Message-Verlust: Audit-Teammate-Bericht als \"vollstaendig\n  verbucht\" quittiert, obwohl der Erstversand NIE ankam (Owner-Ruege); Nachreichung -> dreifach\n  verbucht. Buchung-ohne-Beleg-Klasse + verlorene Teammate-Nachricht.\n- **[K11-4]** Falsches Gruen im CI-Fix-Bau: CTEST_RC=0 bei 496/500 -- 4 AVX-512-Tests nie\n  gebaut (EXCLUDE_FROM_ALL-Werkzeuge ohne comdare_-Praefix in der ersten Bau-Treppe unbekannt);\n  nur die Abdeckungs-Wache biss. Korrekte J-1-Treppe -> 500/500. ZWEITE EXCLUDE_FROM_ALL-\n  Instanz (par.10 fuehrt nur 503-vs-502).\n- **[K11-5]** lint:format-Fix Runde 1 unvollstaendig (CI prueft 1906 Dateien, Fix nur die 3 aus\n  dem Log-Tail -> 15973 erneut rot); Rest s. 12.2a tools-3. Geheilt 965b121a, 15974 SUCCESS.\n- **[K11-9]** Inverse Fehlbuchungen: N3 offen-gebucht ohne Gegenstand · #80 in_progress obwohl\n  gelandet · N1/N5/N6 \"beim toten Steward\" nirgends persistiert. S-4-Bereinigung im Fenster;\n  N1/N5/N6-Messung s. X-9.\n- **[K11-11]** Beinahe-Verfaelschung des Floor-Historienblocks durch blinden Replace -- am Diff\n  selbst gefangen, praezise nachgezogen. Werkzeug-Disziplin-HINWEIS.\n- **[K11-12]** Zwei CI-Poller STUMM gestorben (bxiwgzwli Quoting; b8kgvg39c ohne Ergebniszeile)\n  -- je per Direkt-API ersetzt (15976/15979 SUCCESS literal). Monitor-Doktrin-Klasse; die\n  Poller-Skript-Klasse selbst blieb unbehoben -> 12.2c.\n- **[K12-3]** Koeder-(iii)-Nebenfund: test_m_w12:772-775 prueft Format 5 korrekt, der Assert-\n  MELDUNGSTEXT erklaerte \"3->4\"/9-Glieder (zwei Bumps zurueck). Behoben 98f05b04. Lehre\n  \"Koeder-Meldungen LESEN\" -> 12.2c.\n- **[K12-4]** P9-Neufunde: anatomy_fingerprint.hpp:10-11 -- der KOPF der Preimage-Datei selbst\n  beschrieb die eigene Glied-Zahl falsch (seit R-3) + test_m_w12:727. Behoben cd15dd05.\n  (Abgrenzung: 5b/Fix 18 betrifft ANDERE stale Saetze :1154/:577/:130.)\n- **[K12-6]** Kumulative Diff-Hygiene fand 4 >120-Zeilen aus Bruch-Commits, die ALLE push-\n  lokalen Vorgaenger-Gates passiert hatten -- behoben 5f269555+Fixup; bestaetigt KON116-Lehre\n  \"kumulative Gates ans WELLEN-Ende\".\n- **[K12-7]** Lead-Fehldiagnose 500-vs-501: Ursache war der nicht gesetzte Configure-Schalter\n  -DCOMDARE_CE_PRUEFLINGE (CI setzt ihn .gitlab-ci.yml:547, cmake --preset nicht) = CI-\n  PARITAETS-LUECKE der lokalen J-1-Treppe; von bump15-a am Objekt widerlegt (Configure-Log Z.85\n  literal). Rezept ergaenzt; J-1-Memory kennt den Schalter noch nicht -> 12.2c.\n- **[K12-10]** Beleg-Sicherungs-Luecke: 3 bump15-b-PATCHES (Vorgaenger-Setter, Kollisionsstand,\n  Decorator) weiter NUR im rotierenden Job-tmp (T-8 sicherte nur die 4 Probe-TUs); Substanz in\n  git konserviert, Beleg-Wert gefaehrdet -> optionaler B.3-Nachzug (mit X-16-BU-Zug).\n- **[K13-2]** GitLab-Push-Auth-Transient (HTTP Basic denied, Retry rc=0, K11-sauber\n  nachgemessen) -- Infra-HINWEIS.\n- **[K13-3]** Mini-Verify-Agent-Tod (wf_b943361e, API-Abriss ~19:06) -- Cache-Resume wrlfi8rec\n  NULL_NEUE_FUNDE 19:15. Der Verify-TOD fehlte in 10b (dort nur Ergebnis+Template-Bug).\n- **[K13-4]** Orchestrator-Prompt-Trunkierung wgmt22mio: Schreiber sah 23/25 Stellen-Karten-\n  Eintraege (Abbruch mid-Eintrag); 2 rekonstruiert, Verify 72/72. ZWEITE Instanz der Prompt-\n  Verlust-Klasse (neben Template-Literal 10b) -> 12.2c.\n- **[K13-5]** Stale Prosa-Referenz decl.hpp:797 (zitiert \"decl:568-571\", vorbestehend) --\n  deklarierter HINWEIS, Traeger par.21.6/Doku-Zug; hier registriert.\n- **[K13-7]** Wellenplan-par.5-Defizit-Arithmetik zaehlt F-07b als Deckungs-Streichung, obwohl\n  F-07b per Owner-KERN 06.08. PFLICHT ist -- Task #98 + par.5-Marker (super 9015a0de).\n- **[K13-8]** Fork gab-es-denn: C-13 selektiver Rebuild STILL geloescht seit 27.07. (ce\n  813c3232; seither Vollflotten-Neubau je System-Aenderung) + C-14 SKIP-Wache nur T-NEU-11 +\n  F-07b-W7-Verschiebung mit ERFUNDENER Agent-Autorisierung (\"Streichkaskade bestaetigt\",\n  0 Owner-Treffer; Altbefund #49-C2) -- Traeger #97/#98 + Wiederaufnahme-Register 0f569c8b +\n  par.21.0-Beleg-Tafel; hier als Register-Querverweis.\n- **[JB-1]** = 6b-Trunkierung, s. 12.1 (dort verdiktiert; Sicherung/Reparatur X-16/X-17).\n\n*12.2c FALLEN-/WERKZEUG-KLASSEN fuer den naechsten Memory-/Fallen-Zug (buendelt aus 12.2a/b):*\n\ntail-Fenster (K9-3, ZUGESAGT-offen) · ctest -N sed-Muster verliert Tests #1-#99 durch Padding\n(K6-2; Zaehlbasis \"Total Tests: N\") · ctest --no-tests=error als Pflicht-Flag (K5-1/K9-2, E3-\nKlasse) · -DCOMDARE_CE_PRUEFLINGE in JEDER lokalen J-1-Treppe (K12-7) · comdare_tests-Target\nist PFLICHT sonst \"Not Run\"-Falschrot (K10-5) · Emitter-Timestamp macht sha256-Vergleich zur\nSchein-Differenz (K9-13) · Cross-Repo-Rename braucht Master-Nachzug in Geschwister-Repos (M-1)\n· Stop/Resume erzeugt Agent-Duplikate (K10-8) · Koeder-MELDUNGSTEXTE mitlesen (K12-3) ·\nPoller-Rezepte: kein eingebetteter python3 (K6-5), bash statt sh (K7a-5), curl -K statt\n--header @file (K7b-4), glhdr.curlrc+curl -sk gegen 404-Falsch-Null (K10-11), Poller nie stumm\n(K11-12) · docker auf prod1 ENTFERNT -> gitleaks lokal 8.30.1 (K5-7, Koeder biss rc=1) ·\nTaskCreate fehlt Subagenten -> ToolSearch im Hauptagenten (K5-8).\n\n*12.2d CHRONOLOGIE LIMIT-/ABRISS-RISSE (fehlten als Fakten; Register fuehrte nur K13-Risse):*\n\n- **[K5-9]** 3 Risse 16.08. (13:14 Monats-Limit wtsautqlp 3/3 + Synthese; 15:47 Session-Limit\n  w8oovcd6x 11/15; 21:38 Session-Limit) -- 15 Agenten tot, Luecken ~11 h, ALLE per Resume-Kette\n  geheilt (wsw7bnx76->wxmetyvp5, w5nfwp05x, wt0v91pcx->w3ebg280l).\n- **[K8-10]** K8-Tode 17.08.: Kurz-Verify verdict:null am Session-Limit; hy-a-bau 2x Limit +\n  1x 529; vl12/vl3 529 -- alle resumed; dabei pgrep-Falle bestaetigt (3 Akteure hielten lebende\n  nohup-Laeufe fuer tot; Ausloeser des M-4-Doppelstarts). Memory-Eintrag existiert seit 19.08.\n- **[K9-11]** Spend-Riss 17.08. 11:35-15:39 (~4 h): vl3/hy-a idle=failed; wf_a2e443f0 12/12\n  Agenten leer (bericht:null) -- nach /login Resume wy7btb713 komplett (Cache-Replay), KON105.\n\n**12.3 STRANG-REKONSTRUKTIONS-TAFEL (33 Straenge: 16 GEERNTET / 17 REKONSTRUIERBAR / 0 VERLOREN)**\n\nGEERNTET (nur Zaehler, je mit belegter Ernte; keine Aktion): S-13-Design+Lens+Landung (#18,\ndfb8ba09) · hy-a-bau komplett (#80/#81, a4366cb8 Ancestor) · goal-drift wf_9819fde6 (#78,\nKON97/98) · Buendel-Explore w4uz2itsx (BUENDEL-BAUPLAN-15) · super-Poller d152ba93 (via #79) ·\n15946-Beweis+#79 · KON99+OWNER-VORAB-15 (KON101) · ovs13-Explore (KON102) · 19-Fragen-Runde\n(KON103/104, Tasks #82-#86) · wf_7f847de1 F-Fragen (KON105/106, #86/#99) · vl3-Fix-Runde\n(7bf66ddd Ancestor) · W1-Lande-Strang wf_b5b4ac36 (KON114, par.20; Push-vor-Gate=K3 GEHEILT) ·\naudit-hya-vl3-Subagent (KON113) · K10-Schlussauftraege par.20+Uebergabe (in K11 nachgeholt;\nRestnotiz: #85(A)-Text noch stale, s. X-3) · super-Zug 2 Welle 2 (KON116, #20/#70; a11-Patch-\nVorpruefung = Register-G L9 beim KON119-Zug) · E-6-Explore (per KON118 Phantom-Nenner ueberholt;\nDoku-Rest = seg1-04/F8, KEINE Neumeldung).\n\nREKONSTRUIERBAR (17, je: letzter Stand am Objekt 19.08. -> REZEPT):\n\n- **[X-1] golden-Rest-Refs:** origin bau/golden-homes @5fa37f36 (letzte Branch-CI 15895 FAILED,\n  nie am Branch geheilt) + refs/rescue/golden-fenster-20260817 @fbe898be + lokaler Worktree\n  wt-ce-golden-rettung; BEIDE Refs Ancestor von development (Substanz enthalten), 0 Traeger.\n  -> In den L20-Aufraeum-Block: D12-Muster (Bundle+SHA256+Owner-GO je Ref; Remote-Loeschung =\n  Owner-GO), rote 15895 als ausgebucht dokumentieren, Worktree nach Liste-C-Doktrin.\n- **[X-2] k2-Vollbau-Abnahme:** bg-Outputs bl5ldht9z/bb3upsvgg NIE gelesen, zugesagter\n  G3/G4-Endbericht kam nie; Outputs existieren NOCH in /tmp/claude-1001/.../tasks/ (ROTATIONS-\n  RISIKO). k2 selbst gelandet (#81, CI gruen) -- Berichts-SOLL nie ausgebucht. -> Outputs\n  SOFORT nach ~/backups-workflow (B.3), G3/G4-Literale in #93 Gruppe Straenge nachbuchen.\n- **[X-3] Owner-Voll-Lese-Auftraege 17.08.:** Morgen-Klasse via #78 gedeckt; Neugruendungs-\n  Haelfte via wf_6c904e28 vollzogen; #85 (pending) traegt das Nachzugs-Paket, dessen Text die\n  17:45-ZUSAETZE nicht nennt (/goal-Kernbestandteile + Volllesung Ledger-Konsolidierungs-WF)\n  und \"par.20 einbauen\" ist dort stale (par.20 steht seit K11). -> Beim #85-Vollzug die\n  17:45-Zusaetze explizit abhaken + synthese-p20-roh.json nur als DELTA gegen stehenden par.20.\n- **[X-4] HY-A-Zweit-Lens-Deckung:** SPANNUNG AUFGELOEST -- der Folge-Lens LIEF (wf_750d2441,\n  Start 10:58/Ernte 11:11, TRAEGT_MIT_FIXES 2 ERNST, BU 20260817-hy-a-folge-lens/lens-funde.md;\n  Fixes am Objekt gelandet, s. [JB-3]); die Rekonstruktions-These \"Landung ohne Zweit-Lens\"\n  gilt nur fuer die FIX-RUNDE-2-Flaeche (RCU-Umbau nach 21/25-rot, GO 11:23 = NACH dem Lens).\n  -> Quittungs-Nachtrag (JB-3) + im #93-C nur noch die Runde-2-Flaeche (RCU-Umbau/F-12) auf\n  Lens-Deckung pruefen ODER Abweichung \"Nach-Fix ohne Zweit-Lens\" ausweisen.\n- **[X-5] rcu-Nachmess-Serien (50/30/20 + A/B-Paarlauf):** Endquittungen nie angekommen,\n  Rohwerte nirgends persistiert (grep-Beweis); Zweck objektseitig gedeckt (f45e995b Ancestor,\n  502/502). -> #93-C: am gelandeten Stand reproduzieren ODER explizit ausweisen \"Serien-\n  Rohquittungen nicht persistiert, Fix anderweitig bewiesen\" -- kein stilles Weglassen.\n- **[X-6] tail-Fallen-Eintrag:** s. [K9-3]. -> EIN-Zeilen-Nachzug im T-5/T-6-Memory-Zug (11.5).\n- **[X-7] wf_cd301f28 Schwester-Sweep K8-K13:** lebte 19.08. 07:35 (14 started/13 results);\n  seine R1-R10 sind INHALTLICH IN DIESEM ABSCHNITT konsolidiert (R1=M-3, R2=K5-1, R3=K11-1/K3,\n  R4/R6=M-1, R5=K1-Korrektur Abschn. 6, R7/R10=T-10/12.1, R8=K8-1, R9=K10-1). -> Nur noch:\n  Journal nach B.3 sichern + Endzeile quittieren; KEINE Doppel-Ernte.\n- **[X-8] wf_6ce0675e #95 V-08R-Bau:** wt-ce-v08r @0f0742aa (b973dd9f -> 434d24c6 -> A2.5-R1-\n  Fix), dirty=0, Journal lebt; Branch bau/v08r-fingerprint-sha NUR LOKAL. Spannung: Task-Text\n  \"KON101-gedeckt\" vs par.21.4 \"Frist-/Form-Entscheid = F2-Vorlagen-Punkt\". -> Branch auf\n  origin sichern; Bau+Verify abschliessen; Form-/Frist-Satz VOR Landung als F2-Vorlagen-Punkt\n  dokumentieren (deckungsgleich 10b/seg1-40).\n- **[X-9] vl3-Nachposten N1/N5/N6:** Quelle doppelt gesichert (audit-ergebnisse-beide-\n  straenge.md, lokal+Repo-BU), Register 0 Treffer; vl3 gelandet. -> In #93 Gruppe A aus der\n  Audit-BU aufschluesseln, je Posten am gelandeten Stand BEHOBEN/OFFEN messen -> Abschnitt 9.\n- **[X-10] g2/#17-Strang:** 1528f6fd NICHT Ancestor; Branch bau/g2-semantik NUR LOKAL (ls-remote\n  0 Treffer = Einzelkopie-Risiko!); wt-ce-g2 @9aa9b9df clean; Abschlussbericht GESICHERT in\n  wf_b5b4ac36-583/agent-a360aaac04706de1f.jsonl (17.08. 18:48, 6383 Z.); Lokalisierungs-WF\n  wf_5dd12e19 lebt. -> (1) Branch SOFORT auf origin sichern, (2) Bericht ernten, (3) Lande-/\n  Fertigstellungs-Kette per [W1-V1] VOR F2 (gibt #7/S-19 frei). (Ueberschneidung: W1-V1/3b --\n  hier nur Strang-Status+Rezept, keine Neumeldung.)\n- **[X-11] Nested-Worktree wf_e22d25ef-71c-7 @7f3901fb, dirty=17 (D2-Strang 10.08.):** 19.08.\n  bestaetigt; Tip \"test(d2): sieben Google Tests ...\" NICHT Ancestor; Eltern-Journal tot seit\n  10.08.; NEBENBEFUND 3 weitere nested Baeume wf_5834b706 (p2/p3/p6, dirty=0). Einziger ganz\n  unverbuchter Arbeitsprodukt-Fund des Sweeps. -> 17 Aenderungen als Diff-BU sichern, dev-\n  Enthaltensein pruefen (#62-Muster d2-floor-Zwilling), dann Liste-C/D-Ausbuchung MIT Beleg\n  ODER D2c-Wiederaufnahme (Register-G L3-Umfeld); die 3 5834b706-Baeume im selben Zug (p2 war\n  D12-\"WIEDERVERWENDBAR\").\n- **[X-12] V-02R Wert-Befuellung (Laufzeit-Haelfte B-8/A-12):** Bausteine im Bruch da (P5\n  9c17765f Compose+3 fail-loud-Wachen; P3/P4 name_line/len+SHA-256; Map landet K-1-leer);\n  Ernte-Frage per 12.1 GESCHLOSSEN. -> Laufzeit-Befuellung (je Pruefdock-Tier-Binary EIGENER\n  SHA-256 beim attach) nach C-3a-/F4-Entscheid als eigenen Board-Task; Hash-Laenge = F2-Punkt.\n- **[X-13] B-8-Folgeposten Gate-Define-Emission + hat()-Paar:** Kommentar-Anker bestaetigt\n  (mess_achsen_naht.hpp:593); par.21.1-Folgezug-Liste + Bauplan tragen B-8, aber KEIN\n  Board-Task; K2=F6 deckt B-8 NICHT. -> Beim Di-25.-Schnitt (#96) als Task slotten.\n- **[X-14] Peer-Sessions e1-e4 + idle Subagent:** 3 bg-Sessions idle (11d/5d/4d), nie beendet/\n  geerntet; fachliche Deckung wahrscheinlich (#21 completed = E-Block-Bilanz); dazu Subagent\n  audit-hya-vl3-soll-ist noch adressierbar. -> Je Session kurzer Ernte-Check gegen #21/Ledger,\n  dann BEENDEN (Shells-beenden-Doktrin); Betriebszeile im Di-25.-Schnitt.\n- **[X-15] VL-6b-G6-Buchung NIE VOLLZOGEN:** run_options/organ_subaxes XSD-gueltig, aber von\n  parse_experiment_profile/ExperimentProfile/validate IGNORIERT; vl6b-karte.md verlangte\n  woertlich die Nachbuchung \"damit er nicht ein zweites Mal durchs Raster faellt\" -- exakt das\n  ist eingetreten (0 Treffer in Ledger/Wellenplan/Register/Tasks; S13-Design :1222/:1238 nennt\n  run_options nur als Platzierungs-Grenze). -> Nachtrag in KF-6/S6-Familie bzw. S-13/#18;\n  beim S-13-Bau Di 25.08. verdrahten ODER fail-loud ablehnen (stille-Null-Klasse; vgl. K6-6).\n- **[X-16] Voll-Audit-ENDSTAND ungesichert (SOFORT):** wf_794b904b-Journal (1,1 MB, 170\n  started/77 results) NUR unter ~/.claude/projects/.../workflows/; audit_107_tafel.md NUR im\n  rotierenden jobs-tmp; Repo-BU traegt nur den 18.08.-TEILSTAND; das Journal ist der EINZIGE\n  Traeger der 111 ungekuerzten Verdikte + seg1-81-Matrix (= Gegenzaehl-Basis Fix-Strecke 2).\n  -> VOR allem Aufraeumen: beide additiv nach ~/backups-workflow/20260819-audit-endstand-\n  794b904b/ (B.3/T-8-Muster), dann Repo-BU-Nachzug; K12-Patches ([K12-10]) im selben Zug.\n- **[X-17] 23-Schritte-Deckungs-Matrix ohne publizierten Traeger:** Volltext nur im Audit-\n  Journal Z.144; 6b-Zeile seg1-81 endet mid-Satz. -> Nach X-16 die Matrix als Register-\n  Nachtrag 6c bzw. Fix-Strecke-2-Eingang publizieren (je Schritt gedeckt/offen), 6b-Zeile\n  reparieren, Kuerzung deklarieren. (FEHLT-Schritte selbst via K2=F6/F5 verdiktiert -- KEINE\n  Neumeldung.)\n\n**12.4 KONSEQUENZ (Delta zur Kette; die Kette selbst aendert sich NICHT):**\n\n- **SOFORT (vor jedem Aufraeumen, B.3):** X-16 Audit-Journal+107er-Tafel sichern · X-2\n  k2-Outputs aus /tmp sichern · X-10 bau/g2-semantik + X-8 bau/v08r-fingerprint-sha auf origin\n  sichern · [K12-10]-Patches mitnehmen.\n- **Fix-Strecke 2 erhaelt ZUSAETZLICH** (zu F1-F9 + T-2/T-10 + L21): T-10-PRAEZISIERUNG per\n  12.1 (Ernte-Haelfte ZU, nur Bau-Haelfte + Hash-Laengen-F2-Punkt) · 6b-Reparatur + 23er-Matrix\n  als Eingangsdokument (X-16/X-17) · B3-ANKER-Abgleich VOR der Gruppe-D-Messung (12.1) ·\n  prt-art-Roundtrip-SHA-Pin als W2-Task anlegen ([K7b-3]) · tools-3-Format-Traeger ([K11-5]) ·\n  W2-1/:515-Registeranker ([M-5]).\n- **#93 erhaelt konkretisierte Pruefposten:** Gruppe A: vl3 ROT-3 --debug-Matrix + _pclose\n  ([K10-4]) · N1/N5/N6-Aufschluesselung (X-9) · F2/Wstringop-Verbleib ([K10-12]) · Warnungs-\n  Review-clang-Quittung ([M-6]/W2-2). Gruppe C: HY-A-Runde-2-Lens-Deckung (X-4) · rcu-Serien-\n  Ausweis (X-5) · V-02R-Bau-Haelfte (X-12, mit Fix-Strecke 2). Gruppe D: B3 am RICHTIGEN Anker\n  messen (12.1). Gruppe Straenge: k2-G3/G4-Literale (X-2).\n- **Di-25.-Schnitt (#96) erhaelt:** B-8-Task (X-13) · VL-6b-Parser-Befund in S-13/#18 (X-15,\n  mit [K6-6]) · Methodik-Override-Entscheid S-8/#22 ([K12-2]) · Peer-Session-/Subagent-Triage\n  als Betriebszeile (X-14) · golden-Ref-Ausbuchung im L20-Block (X-1) · Nested-Worktree-Triage\n  (X-11). VORHER (vor F2, Fr 21.08.): g2-Landeweg (X-10, = W1-V1-Pflicht).\n- **Docs-/Memory-Zug:** KON74-04-Vermerk ([K7b-5]) · KON99-03-Zaehlwerk ([JB-4]) · Folge-BU-\n  Spiegel ([JB-2]) · hy-a-Lens-Quittung ([JB-3]) · #85-Text-Delta (X-3) · Fallen-Block 12.2c\n  GESCHLOSSEN in den T-5/T-6-Memory-Zug (11.5) -- 13 Klassen, nicht einzeln verlieren.",
+      "kurz_bilanz": "Sweep vollzaehlig: 10/10 Fenster (Z59214-69705, 10501 Zeilen lueckenlos) + 3/3 Journal-Gruppen (38 wf-Journale, 24 BU-Ordner, Output-Gegenproben). GEGENZAEHLUNG: 103 rohe Regressions-Eintraege -> 80 NEUE nach Dedup (8 Merge-Gruppen konsumieren 11 Zeilen; 11 im_register-Zeilen nur als Ueberschneidung markiert, 1 zu Register-Korrekturen umklassiert; kein Eintrag verworfen). Straenge: 40 roh -> 33 dedup = 16 GEERNTET / 17 REKONSTRUIERBAR mit Rezept / 0 VERLOREN. Wichtigste Register-Korrekturen: T-10-Ernte-Haelfte GESCHLOSSEN (V-02R-Ernte existiert dreifach belegt, Neu-Fahren entfaellt; offen nur Bau-Haelfte + SHA-256-vs-512/128 als F2-Punkt), 6b-Tafel bei ~250 Z. abgeschnitten (seg1-81-Matrix nur im ungesicherten Audit-Journal), 5c-w78hb9hii-Zuordnung, B3-Anker-Diskrepanz (mess_achsen_naht:477-517 vs abi_adapter) vor #93-D. Zwei Leser-Spannungen aufgeloest: HY-A-Folge-Lens LIEF nachweislich (nur Quittung + Runde-2-Flaeche offen); V-02R-Explore braucht keinen Neustart. Schaerfste offene Posten: prt-art-Roundtrip-Nichtdeterminismus (unbehandelt), vl3 ROT-3/--debug-Matrix, VL-6b-Parser-Befund (vorhergesagtes zweites Durchfallen eingetreten), Nested-Worktree dirty=17, g2- und v08r-Branches NUR LOKAL. SOFORT-Rezepte: Audit-Journal+107er-Tafel, k2-Outputs, beide Nur-lokal-Branches sichern (B.3/Rotations-Risiko). Konsequenzen sind auf Fix-Strecke 2 / #93-Gruppen A,C,D / Di-25.-Schnitt (#96) / Docs-Memory-Zug verteilt; 13 Fallen-Klassen gebuendelt fuer den T-5/T-6-Memory-Zug. Text ist ASCII, <=100 Z. Breite, landefertig fuer den Lead (EIN Schreiber)."
+    },
+    "rekonstruktion": {
+      "dedup_zaehlung": "40 rohe Kandidaten -> 33 Einzelstraenge nach Dedup (Gegenzaehlung: 13 Roh-Eintraege in 6 Gruppen gleichen Gegenstands zusammengelegt: [K5] golden-Refs 2->1 · [K6+K7b] S-13-Design/Lens/Landung 2->1 · [K6+K7b+K9] hy-a-bau 3->1 · [K7b+journale-c] k2-Vollbau-Abnahme 2->1 · [K7b+K9] Owner-Voll-Lese-Auftraege 17.08. 2->1 · [K11+journale-a] g2/#17 inkl. Bericht-Lokalisierung 2->1; 27 Kandidaten blieben einzeln, 27+6=33; kein Roh-Kandidat verworfen). Status-Bilanz: 16 GEERNTET / 17 REKONSTRUIERBAR / 0 VERLOREN. Alle Messungen 19.08. am Objekt (ls-remote, merge-base, worktree list, Dateisystem, Ledger-greps, ListAgents).",
+      "straenge": [
+        {
+          "strang": "Golden-Fenster-Rest-Refs: origin bau/golden-homes @5fa37f36 (letzte Branch-CI 15895 FAILED) + origin refs/rescue/golden-fenster-20260817 @fbe898be + lokaler Worktree wt-ce-golden-rettung [K5 #1+#2, dedupliziert]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08. ls-remote: BEIDE Refs existieren auf origin; 5fa37f36 UND fbe898be sind Ancestor von origin/development (Inhalt enthalten, kein Substanz-Verlust); zusaetzlich steht /home/comdare/wt-ce-golden-rettung @fbe898be [Branch golden-rettung, nur lokal].",
+          "traeger": "KEINER: 0 Treffer in Register/Task-Board; Wiederaufnahme-G/L20 deckt nur wt-ce-vl12/k2/hy-a/vl3. Verfahrens-Muster existiert: #50/#62 (D12: Bundle-Archiv + Owner-GO-Loeschung), V9 (rescue-Ref = Owner-Entscheid).",
+          "rezept": "In den L20-Aufraeum-Block aufnehmen: D12-Muster (Bundle + SHA256 + Owner-GO je Ref; Remote-Loeschung = Owner-GO-Doktrin), dabei die rote Branch-Pipeline 15895 als ausgebucht dokumentieren; wt-ce-golden-rettung nach Liste-C-Doktrin entfernen."
+        },
+        {
+          "strang": "S-13-Buendel-Design: Design-Dokument -> Review-Lens wy93thdy5 (13 Funde, 2 Fix-Runden, TRAEGT) -> Landung [K6 #4 + K7b #9, dedupliziert]",
+          "status": "GEERNTET",
+          "objekt_messung": "docs/plaene/20260817-DESIGN-s13-buendel-di25.md existiert (123931 B, mtime 17.08. 09:52 = Lande-Zeitpunkt dfb8ba09+e9c74abf); Register-6b seg3-kon27-02 zitiert das Design als lebenden Entscheid.",
+          "traeger": "Bau-Traeger #18 (pending, Landung Di 25.08., engster Slot); Design ist Quelle fuer #48/#57/#89.",
+          "rezept": "Nichts offen am Strang; Bau laeuft ueber #18. (VL-6b-Parser-Befund ist ein EIGENER Strang, s. dort.)"
+        },
+        {
+          "strang": "hy-a-bau Baustrang komplett: K6-Bau + K7b-ungeprueft + K9-Fix-Runde-2/RCU-Umbau nach Spend-Limit-Tod [K6 #6 + K7b #10 + K9 #21, dedupliziert]",
+          "status": "GEERNTET",
+          "objekt_messung": "19.08. merge-base: a4366cb8 ANCESTOR von origin/development; RCU-Doku-Nachzug f45e995b in der Kette (Audit seg1-66 ERFUELLT); wt-ce-hy-a steht clean.",
+          "traeger": "#80 + #81 completed (KON113-116); Worktree-Verbleib = Wiederaufnahme-G L20 (Aufraeum-Block nach Landungen).",
+          "rezept": "Keiner noetig; nur L20-Aufraeumblock nach Doktrin fahren."
+        },
+        {
+          "strang": "k2-Vollbau-Abnahme: bg-Task-Outputs bl5ldht9z (Vollbau) + bb3upsvgg (Warten) nie gelesen; zugesagter Teammate-Endbericht mit G3/G4-Literalen (15/15+6/6+Fixture-Wache, #error-Negativprobe, ctest-V) kam NIE [K7b #11 + journale-c #40, dedupliziert]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: BEIDE Outputs existieren NOCH auf /tmp/claude-1001/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/tasks/{bl5ldht9z,bb3upsvgg}.output (Rotations-Risiko!); k2 selbst gelandet (#81: a43ea18f/965b121a, wt-ce-k2 @7a5ed464 steht, CI 15974/15979 gruen) — Objekt-Schaden kompensiert (Lead-Eigenmessung k2-494), Berichts-SOLL nie formal ausgebucht.",
+          "traeger": "#93 Pruefgruppe 1 'Straenge' (Register 3b) — die G3/G4-Literale dort aber nicht namentlich; kein eigener Task.",
+          "rezept": "Outputs SOFORT nach ~/backups-workflow sichern (B.3-/tmp-Rotationsregel), dann im #93-Gruppe-Straenge die G3/G4-Abnahme-Literale aus den Outputs nachbuchen und das Berichts-SOLL formal quittieren."
+        },
+        {
+          "strang": "Owner-Voll-Lese-Auftraege 17.08.: Queue-Orders 08:49/08:50 (Workflows der letzten 2 Kontexte + letzte 6 Kontexte) + Voll-Lese-Protokoll 17:41 + ERWEITERTE Order 17:45 (beide Fragen-WFs voll + /goal-Kernbestandteile + Ledger-Konsolidierungs-WF + Neugruendung) [K7b #13 + K9 #20, dedupliziert]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "#78 completed (KON97/98 'Voll-Einlesung') deckt die Morgen-Klasse; Wiederaufnahme-G belegt K14-Neugruendung wf_6c904e28 (ultracode ueber die letzten 5 Kontexte = Neugruendungs-Haelfte der 17:45-Order vollzogen, 231->90 Posten gegengezaehlt); #85 pending traegt das Nachzugs-Paket, dessen Text die '/goal-Kernbestandteile'-Lesung NICHT nennt.",
+          "traeger": "#78 (zu) + #85 (offen) + Register G; Order-Wortlaut liegt im K9-Transkript Z64609.",
+          "rezept": "Beim #85-Vollzug die 17:45-Zusaetze explizit abhaken (/goal-Kernbestandteile + Volllesung des Ledger-Konsolidierungs-WF); als Zeile in #85 nachtragen, damit die erweiterte Fassung nicht erneut durchs Raster faellt."
+        },
+        {
+          "strang": "goal-drift-konsolidierung wf_9819fde6 (3. Anlauf w3ebg280l) [K5 #3]",
+          "status": "GEERNTET",
+          "objekt_messung": "Journal komplett vorhanden (472057 B, Ende 17.08. 07:15, 41 started/22 results); KON97+KON98 im Ledger (grep-Treffer >0).",
+          "traeger": "#78 completed (Drift-Konsolidierung + Voll-Einlesung + Floor-Rueckkalibrierung).",
+          "rezept": "Keiner — post-window vollstaendig geerntet; nur Fenster-Offenheit, kein Verlust."
+        },
+        {
+          "strang": "Buendel-Explore w4uz2itsx/wf_afe22f0b: #15-Objekt-Kartierung + Owner-Vorab-Dossier [K6 #5]",
+          "status": "GEERNTET",
+          "objekt_messung": "Ernte in Task-#15/#16-Texten ('Buendel-Explore G6 kartiert', KON98); Folgeprodukt BUENDEL-BAUPLAN-15.md (406 Z., 23 Schritte) existiert und ist juengste Bauplan-Quelle (par.21.1/K15).",
+          "traeger": "#15 in_progress + par.21.1.",
+          "rezept": "Keiner."
+        },
+        {
+          "strang": "super-CI-Poller bkfqbi6dk fuer Gitlink-Zug d152ba93 [K6 #7]",
+          "status": "GEERNTET",
+          "objekt_messung": "Folgezustand aufgeloest: super-Rot 15941 als #79 geheilt (prt-art-F5-Nachzug, super c926efdc -> 15946 TERMINAL SUCCESS).",
+          "traeger": "#79 completed.",
+          "rezept": "Keiner."
+        },
+        {
+          "strang": "super-CI-Gruen-Beweis 15946 + Task-#79-Abschluss (Auto-Compact riss vor der Job-Listen-Bestaetigung) [K7b #8]",
+          "status": "GEERNTET",
+          "objekt_messung": "#79-Task-Text literal '15946 TERMINAL SUCCESS alle 36 Jobs' inkl. Job-Nummern; KON99 im Ledger (9 Treffer).",
+          "traeger": "#79 completed + Ledger KON99-01.",
+          "rezept": "Keiner — fuer K14 abgehakt."
+        },
+        {
+          "strang": "Ledger-Nachtrag KON99 + OWNER-VORAB-15-Praesentation (13 V-Fragen + 20 Fragen) [K7b #12]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON99 im Ledger; docs/sessions/20260817-OWNER-VORAB-15-restfragen.md existiert; Owner-Antworten als KON101 (15 Ledger-Treffer) verbucht.",
+          "traeger": "Ledger KON99/KON101.",
+          "rezept": "Keiner."
+        },
+        {
+          "strang": "HY-A Folge-Lens (Voll-Bilanz F-1..F-12 inkl. rcu-Serien; 'Code-Klasse = 2 Lenses') — bewusst nicht gestartet, danach nie gefahren [K8 #14]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Kein Lens-Beleg auffindbar: Task #80 ohne Lens-Nennung, Register 0 Treffer 'Folge-Lens'; HY-A ist gelandet (a4366cb8 heute Ancestor-gemessen) — Landung erfolgte faktisch OHNE Zweit-Lens.",
+          "traeger": "#93 Pruefgruppe 'HY-A' (Register 3b); Register 11.1/T-10 routet HY-Pruefposten ebenfalls nach #93-C.",
+          "rezept": "Im #93-C entweder Lens-Ernte finden oder Zweit-Lens am gelandeten HY-A-Stand (inkl. F-12/rcu-Flaeche) nachfahren; alternativ Abweichung 'Landung ohne Zweit-Lens' explizit ausweisen (Dual-Review-Doktrin)."
+        },
+        {
+          "strang": "rcu-Nachmess-Serien (50x ohne Last / 30x unter Last / 20x ulimit + A/B-Paarlauf zu test_rcu_concurrency) — Endquittungen nie angekommen [K8 #15]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Serien-Quittungen (n gruen von N) in keinem Register/Task/BU: grep 'rcu' in ~/backups-workflow trifft nur hy-a-f1-protokolle (ctest-Listen), jobs-tmp nur generische ctest-Logs — Rohwerte nicht persistiert. Zweck objektseitig gedeckt: f45e995b (TSan-Grenze+Terminierungs-Doku) Ancestor, CI gruen, 502/502.",
+          "traeger": "#80 traegt nur den Doku-Nachzug; Messwerte selbst traegerlos.",
+          "rezept": "Falls Beleg gebraucht: Serien am gelandeten Stand reproduzieren (Test existiert) im #93-C; sonst dort als 'Serien-Rohquittungen nicht persistiert, Fix anderweitig bewiesen' ausweisen — kein stilles Weglassen."
+        },
+        {
+          "strang": "ovs13-eta-uebertragbarkeit-explore (OV-S13-2b + OV-S13-4, Owner-Auftrag 17.08. 10:37) [K8 #16]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON102 im Ledger (11 Treffer); BU doppelt: ~/backups-workflow/20260817-ovs13-eta-uebertragbarkeit/ + 20260817-rueckwaerts-konsolidierung/kon102-ovs13.md; /tmp-Rohoutput w4ahxjmhy.output existiert sogar noch.",
+          "traeger": "Ledger KON102.",
+          "rezept": "Keiner — B.3-Sicherung bereits erfolgt, Restrisiko /tmp-Rotation gegenstandslos."
+        },
+        {
+          "strang": "19-Fragen-Owner-Runde (Gruppen A-E der 20er-Vorlage; Compact schnitt vor den Antworten) [K8 #17]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON104 im Ledger (19 Treffer; Register 6b zitiert KON104-01/02 woertlich zu D-6/D-7); Audit-Verdikt F-M1 bestaetigt 20 Fragen + vollstaendigen BU-Ordner 20260817-drift-konsolidierung-rohdaten; Antworten leben als Tasks #82/#83/#84/#85/#86 + B-1-Frist -> #38a1 (C-3a, Owner-Nachfrage-Dokument 19.08. liegt).",
+          "traeger": "Ledger KON103/104 + Task-Board. UEBERSCHNEIDUNG: F-D6/F-D7 (Audit-FEHLT zur UMSETZUNG zweier D-Antworten) sind audit-verdiktiert + via Register-G L7/L8 getragen — nicht neu melden.",
+          "rezept": "Keiner."
+        },
+        {
+          "strang": "Zugesagter Fallen-Register-Eintrag 'tail-Fenster' (ctest-Bilanz nie in tail -60; Fix tail -260 bzw. gezieltes grep) [K9 #18]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: memory reference_fallen_register_werkzeuge_und_ci.md = 0 Treffer 'tail'; Register 11.5 bucht fuer den naechsten Memory-Zug NUR T-5/T-6 — tail-Fenster fehlt dort. Echte unnotierte Luecke; Inhalt vollstaendig rekonstruierbar (K9-Transkript Z63953 + Kandidatentext).",
+          "traeger": "KEINER.",
+          "rezept": "Beim anstehenden T-5/T-6-Memory-Zug (Register 11.5) die dritte Fallen-Klasse 'tail-Fenster' mitschreiben — Ein-Zeilen-Nachzug ins Fallen-Register."
+        },
+        {
+          "strang": "wf_7f847de1 'zwoelf-wochen-explore-f-fragen' (6 finale F-Fragen, gestartet nach Owner-Ruege) [K9 #19]",
+          "status": "GEERNTET",
+          "objekt_messung": "Workflow KOMPLETT: Journal 98923 B, Ende 17.08. 17:55, 7 started/7 results; KON105 (13 Treffer) + KON106 (15 Treffer) im Ledger; Folgen materialisiert als #86 (Owner-GO 17.08. abends: ORG-19-IO/T19/E-1) + #99 (KON106-02/NP-18).",
+          "traeger": "Ledger KON105/106 + Tasks #86/#99.",
+          "rezept": "Keiner."
+        },
+        {
+          "strang": "vl3-bau Fix-Runde (5 Lens-Posten; Spend-Limit-Tod mit uncommitteter Arbeit, Weckruf 15:40) [K9 #22]",
+          "status": "GEERNTET",
+          "objekt_messung": "19.08. merge-base: 7bf66ddd ANCESTOR von origin/development (als c8d7295e-Kette gelandet); wt-ce-vl3 steht clean.",
+          "traeger": "#80/#81 completed; Worktree-Verbleib = L20.",
+          "rezept": "Keiner; N1/N5/N6-Pruefbeleg ist ein EIGENER Strang (s. dort)."
+        },
+        {
+          "strang": "Lande-Strang wf_b5b4ac36 (12. Agent, Erbe des toten Einzel-Stewards; W1-Push 6cdcf1c9 vor Gate-Abschluss) [K10 #23]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON114 im Ledger (6 Treffer); Wellenplan par.20 existiert (Z.2685, 'KON107-KON113'); Journal komplett (238769 B, 23/19). Push-vor-Gate = Audit-K3 (15971-Rot) GEHEILT und im Register verbucht.",
+          "traeger": "Register Abschnitt 6/K3 + par.20.9. UEBERSCHNEIDUNG: K3 audit-verdiktiert — nicht neu melden.",
+          "rezept": "Nur der K3-FIX-Rest (Lande-Gate-Kette als EIN Pre-Push-Script mechanisieren) — laeuft bereits als Fix-Strecke-2-Posten."
+        },
+        {
+          "strang": "vl3-Nachposten N1/N5/N6 ('in Arbeit' beim toten Steward; Pruefauftrag an Nachfolger-Bericht) [K10 #24]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Quelle existiert doppelt: ~/backups-workflow/20260817-audit-hya-vl3/audit-ergebnisse-beide-straenge.md + Repo-BU docs/sessions/backups/20260817-folge-bu-kontext11/...; Register 0 Treffer N1/N5/N6; vl3 gelandet (7bf66ddd Ancestor).",
+          "traeger": "#93 Pruefgruppe 'Straenge+VL-3-Fixes' (namentlich im Register 3b) — die drei Posten dort nicht aufgeschluesselt.",
+          "rezept": "Im #93 die drei Posten aus der Audit-BU aufschluesseln und am gelandeten vl3-Stand je BEHOBEN/OFFEN messen; Ergebnis in Register-Abschnitt 9."
+        },
+        {
+          "strang": "Objekt-Audit-Subagent audit-hya-vl3-soll-ist (spawned 20:36, read-only SOLL-vs-IST) [K10 #25]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON113 im Ledger (7 Treffer) = Verbuchung der Teammate-Antworten; Transkript lief bis 21:11 und wurde in der KON114-Nachtstrecke geerntet.",
+          "traeger": "Ledger KON113/114.",
+          "rezept": "Nur Betrieb: der Subagent ist in dieser Session noch idle-adressierbar — mit dem Peer-Session-Triage-Zug beenden."
+        },
+        {
+          "strang": "Owner-Schlussauftraege K10: Wellenplan-par.20-Einbau (Erst-Append Exit 1) + Kontextuebergabe — beide vom Auto-Compact angerissen [K10 #26]",
+          "status": "GEERNTET",
+          "objekt_messung": "19.08. gemessen: par.20 steht (Wellenplan Z.2685 '# 20. NACHHOLARBEIT + LIEGENGEBLIEBENES DER KONTEXTE 10-11, KON107-KON113'); Uebergabe-Dokument 20260817-SESSION-UEBERGABE-kontext12-w1-gepusht-neugruendung-p20.md existiert.",
+          "traeger": "Erledigt (K11-Nachholung, Kette bis 376bb7f2). RESTNOTIZ: Task-#85(A)-Text fuehrt weiterhin 'Wellenplan-par.20 einbauen' (synthese-p20-roh.json) — stale bzw. Delta.",
+          "rezept": "Beim #85-Vollzug synthese-p20-roh.json gegen den stehenden par.20 diffen und nur das Delta einarbeiten; #85(A) danach als erledigt markieren."
+        },
+        {
+          "strang": "super-Zug 2 der Welle-2-Verbuchung (Gitlink -> 20c111c4 + a11-super-Patch + KON116 + #70/#20) — Compact riss mitten im Zug [K11 #27]",
+          "status": "GEERNTET",
+          "objekt_messung": "KON116 im Ledger (4 Treffer); #20 + #70 completed mit super-Haelfte 05680d4e; wt-ce-a11 @ec048560 steht clean.",
+          "traeger": "Erledigt (K12). Folge-Posten a11_super_patch.diff-Pruefung = Register-G L9 (super-Zug-VORSTUFE, 'nie blind einspielen').",
+          "rezept": "L9 beim KON119-super-Zug fahren: vorher am Objekt pruefen, was die gelandete ce-Haelfte (ec048560) droppte."
+        },
+        {
+          "strang": "g2/#17-Strang: G-2-Semantik gebaut aber ungelandet + K14-Bericht-Lokalisierung (wf_5dd12e19) [K11 #28 + journale-a #36, dedupliziert]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: 1528f6fd NICHT Ancestor von origin/development; Branch bau/g2-semantik NUR LOKAL (ls-remote origin: 0 Treffer!); wt-ce-g2 @9aa9b9df (Merge dev in g2) clean; Abschlussbericht GESICHERT in wf_b5b4ac36-583/agent-a360aaac04706de1f.jsonl (574021 B, 17.08. 18:48); Lokalisierungs-WF LEBT (Journal+Agenten wachsen 07:42, 5 started/3 results).",
+          "traeger": "#17 in_progress + Register [W1-V1]/Z-11 + par.21.2 (Lande-PFLICHT vor F2 Fr 21.08.) + Wiederaufnahme-A. UEBERSCHNEIDUNG: [W1-V1]/Z-11 bereits register-+audit-gefuehrt — hier nur Strang-Status, keine Neumeldung.",
+          "rezept": "(1) Branch bau/g2-semantik auf origin sichern (Nur-lokal = Einzelkopie-Risiko), (2) Bericht aus agent-a360aaac ernten (K14-WF liefert die Fundstelle), (3) Lande-/Fertigstellungs-Kette per W1-V1 vor F2; gibt #7/S-19 frei."
+        },
+        {
+          "strang": "Nested-Workflow-Worktree wf_e22d25ef-71c-7 @7f3901fb mit dirty=17 (D2-Strang vom 10.08.) [K11 #29]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08. BESTAETIGT: dirty=17; Tip 7f3901fb 'test(d2): sieben Google Tests fuer Untergrenze, Partition und Werkzeug-Defekt' + 816bee99 'fix(d2-g3): die Wache vergleicht wieder'; 7f3901fb NICHT Ancestor von development; Eltern-Journal wf_e22d25ef tot seit 10.08. 16:06. NEBENBEFUND: 3 weitere nested Worktrees wf_5834b706 (p2/p3/p6, je dirty=0) stehen ebenfalls noch.",
+          "traeger": "KEINER (0 Register-/Task-Treffer; L20 deckt nur die 4 W1-Worktrees).",
+          "rezept": "17 Aenderungen als Diff-BU sichern, dann Enthaltensein in dev pruefen (#62-Muster: d2-floor hatte eine dev-Zwillingslinie) und per Liste-C/D-Doktrin mit Beleg ausbuchen ODER als D2c-Wiederaufnahme-Strang (Register-G L3-Umfeld) ernten; die 3 wf_5834b706-Baeume im selben Aufraeum-Zug behandeln (p2 war D12-'WIEDERVERWENDBAR')."
+        },
+        {
+          "strang": "E-6-12W-Explore fuer HY-A3 (deklarierter Start, nie vollzogen) [K11 #30]",
+          "status": "GEERNTET",
+          "objekt_messung": "Durch KON118 ueberholt (Ledger-Treffer vorhanden): E-6/22->23 = Phantom-Nenner; #15-Task-Text traegt die praezisierte Fassung (kGenusBuildSlotCounts 5->6) und der Bruch baute sie (e285d316); Doku-Rest = 3 stale E-6-Stellen.",
+          "traeger": "F8 (A2.5-Doku-Fix) + super-Haelfte im KON119-Zug (A2.5-R2-Zuweisung). UEBERSCHNEIDUNG: seg1-04 audit-verdiktiert — nicht neu melden.",
+          "rezept": "Keiner — der deklarierte Explore-Start ist gegenstandslos geworden; nur F8/KON119-Doku-Zug laufen lassen."
+        },
+        {
+          "strang": "V-02R WERT-BEFUELLUNG der Hybrid-Komposit-Map (Laufzeit-Haelfte: je Pruefdock-Tier-Binary eigener SHA-256 beim attach) + T-10-Explore 'hybrid-grammatik-dokumentiert' [K12 #31]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Bausteine im Bruch vorhanden (P5 9c17765f Compose+3 fail-loud-Wachen, P3/P4 name_line/len-POD + SHA-256; Map landet K-1-leer); die unter EXPLORE-PFLICHT gestartete Ernte 'hybrid-grammatik-dokumentiert' ist 19.08. NICHT auffindbar (0 Treffer in ~/backups-workflow UND jobs-tmp).",
+          "traeger": "Register 11.1 T-10 (Fix-Strecke 2 + #93-C) + Audit F4/E4 (CEB-LAGER-REGISTRY-HASH-MAP; C-3a-Owner-Nachfrage 19.08. liegt als Session-Dokument). UEBERSCHNEIDUNG: T-10 register-gefuehrt, E4/F4+LS2-07 audit-verdiktiert — NEU ist nur der Objekt-Nachweis 'Explore-Ernte fehlt'.",
+          "rezept": "T-10-Pruefposten in Fix-Strecke 2 konkretisieren: Explore neu fahren (Ernte verschollen, Aufwand klein); Laufzeit-Befuellung nach C-3a-/F4-Entscheid als eigenen Board-Task anlegen."
+        },
+        {
+          "strang": "B-8/A-12-Folgeposten: Hybrid-Bau emittiert eigene Gate-Defines (hm/hmi) + hat()-Paar der Host-Vorhersage [K12 #32]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Kommentar-Anker 19.08. bestaetigt: wt-ce-bump15/libs/cache_engine/profile_facade/mess_achsen_naht.hpp:593 'sobald der Hybrid-Bau eigene Defines emittiert (B-8/A-12), gehoert HIER sein hat(...)-Paar'.",
+          "traeger": "Wellenplan par.21.1 Folgezug-Liste nennt B-8 (RT-Dock-Haelfte A-12) namentlich als Zug NACH der Landung + BUENDEL-BAUPLAN-15 — aber KEIN Board-Task; K2=F6 deckt B-8 NICHT (nur telemetry/B-9, B-10.3, B-11.2, A-11). Kandidaten-Behauptung 'kein Traeger' damit HALB entkraeftet.",
+          "rezept": "Beim Di-25.-Schnitt (#96) B-8 als eigenen Task slotten; Bau-Anker = :593-Kommentar + Bauplan-Schritt B-8; keine Neumeldung als Regression noetig, nur Task-Traeger nachziehen."
+        },
+        {
+          "strang": "Peer-Sessions 'e1-e4-ebenen-konsolidierung' (mehrere bg, seit Tagen idle, nie beendet/geerntet) [K13 #33]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "ListAgents 19.08.: 3x bg idle (a758ec 11d, 34a0ff 5d, 530d74 4d) + e32772 interactive 1h (vermutlich Owner-Terminal) + neu bf5404 bg 53m; in keinem Register/Task gefuehrt. Fachliche Deckung wahrscheinlich: #21 completed buchte die E-Block-Bilanz (E-1..E-4c) komplett.",
+          "traeger": "KEINER (Betriebs-Doktrin Shells/Monitore-beenden).",
+          "rezept": "Je bg-Session kurzer Ernte-Check des Transkripts gegen #21/Ledger (E-Block), dann beenden; den idle Subagenten audit-hya-vl3-soll-ist im selben Triage-Zug schliessen; als Betriebszeile im Di-25.-Schnitt notieren."
+        },
+        {
+          "strang": "wf_cd301f28 K14-Regressions-Sweep K8-K13 (R1-R10 + laufende Agenten) [journale-a #34]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08. 07:35: Journal 131693 B, 14 started/13 results (gewachsen: 10->13 seit Kandidaten-Stand 07:25) — LEBT bzw. terminal; alle Ergebnisse journaliert (journal.jsonl = Wahrheit).",
+          "traeger": "Dieser K14-Auftrag; Ernte-Ziel = Regressionen-Register (lebendes Dokument, 'wird je Workflow-Ruecklauf fortgeschrieben').",
+          "rezept": "Result-Zeilen ins Register konsolidieren MIT Dedup-Markierung: R3/R4 ~ K3/E13 (GEHEILT-Buchungen), R5 ~ K1-Korrektur (A2.3a-NEIN-Probe in Abschnitt 6 bereits datiert KORRIGIERT), R7/R10 ~ T-10, R8 ~ s13-Lens, R9 ~ Wiederaufnahme-A(4) — Ueberschneidungen markieren, nicht doppeln."
+        },
+        {
+          "strang": "wf_6ce0675e #95 V-08R-Bau (wt-ce-v08r, bau/v08r-fingerprint-sha) [journale-a #35]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: Worktree @0f0742aa (b973dd9f -> 434d24c6 -> A2.5-R1-Fix '3x Kommentar-Drift + tote ist_sha512_hex_128-Huelle entfernt'), dirty=0; Branch NUR LOKAL (nicht auf origin); Journal lebt (07:27, 5 started/3 results); Task #95 in_progress.",
+          "traeger": "#95 + Register E8 ('Bau laeuft, K14') + par.21.4-Task-Text.",
+          "rezept": "Bau abschliessen + Verify; VOR der Landung den Form-/Frist-Satz als F2-Vorlagen-Punkt 5 (par.21.6) dokumentieren — die Spannung 'Task: KON101-gedeckt, KEIN Owner-Entscheid' vs. 'par.21.4: Frist-/Form-Entscheid = F2-Vorlagen-Punkt' explizit aufloesen; Branch auf origin sichern."
+        },
+        {
+          "strang": "VL-6b-G6-Buchung: run_options/organ_subaxes XSD-gueltig, aber von parse_experiment_profile/ExperimentProfile/validate ignoriert — verlangte Nachbuchung in KF-6/S6-Familie [journale-b #37]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: vl6b-karte.md existiert (~/backups-workflow/20260817-buendel15-und-wf10/, 12565 B); der PARSER-Befund steht in KEINEM Traeger-Dokument (Ledger/Wellenplan/Register/Tasks: 0 Treffer); S13-Design :1222/:1238 nennt run_options nur als Platzierungs-Grenze ('NICHT an run_options'), bucht den Ignoriert-Befund nicht — das vorhergesagte zweite Durchfallen ist eingetreten.",
+          "traeger": "KEINER (echte unnotierte Luecke).",
+          "rezept": "Nachtrag in die KF-6/S6-Posten-Familie bzw. ins S-13/#18-Umfeld (S13-05/B-03): Befund-Zeile aus vl6b-karte.md uebernehmen; beim S-13-Bau Di 25.08. die Elemente entweder verdrahten oder fail-loud ablehnen (stille-Null-Klasse)."
+        },
+        {
+          "strang": "Voll-Audit-ENDSTAND-Sicherung wf_794b904b (Journal = einziger Traeger der 111 ungekuerzten Verdikte + seg1-81-Matrix; audit_107_tafel.md nur im rotierenden jobs-tmp) [journale-b #38]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "19.08.: Journal existiert NUR unter ~/.claude/projects/-home-comdare/5a19728e-.../workflows/wf_794b904b-d1c/journal.jsonl (1100464 B, mtime 07:09, 170 started/77 results); audit_107_tafel.md nur in ~/.claude/jobs/5a19728e/tmp/ (18628 B, mtime 07:15); Repo-BU traegt nur den TEILSTAND 18.08. ('laeuft-noch'); ~/backups-workflow: 0 Treffer 794b904b.",
+          "traeger": "B.3-/tmp-Rotations-Regel + T-8-Muster (Register 11.4) — kein expliziter Posten.",
+          "rezept": "SOFORT (vor allem anderen Aufraeumen): journal.jsonl + audit_107_tafel.md additiv nach ~/backups-workflow/20260819-audit-endstand-794b904b/ kopieren; damit ist die Gegenzaehl-Basis der Fix-Strecke 2 gesichert; danach Repo-BU-Nachzug im naechsten Folge-BU-Zug."
+        },
+        {
+          "strang": "Deckungs-Nachweis der 23 BUENDEL-BAUPLAN-15-Schritte als publiziertes Dokument (seg1-81-Forderung) [journale-b #39]",
+          "status": "REKONSTRUIERBAR",
+          "objekt_messung": "Vollstaendige Schritt-zu-Commit-Matrix nur im ungesicherten Audit-Journal (Z.144); die Register-6b-Zeile seg1-81 ist am Objekt mitten im Satz abgeschnitten (Z.627 endet '...nie als Delta addie'); kontext13-Uebergabe traegt nur Prosa-Teiltracking.",
+          "traeger": "Fix-Strecke 2 (6b = deklarierte Gegenzaehl-Basis) — ein referenzierbarer publizierter Traeger fehlt. UEBERSCHNEIDUNG: seg1-81-Verdikt selbst + FEHLT-Schritte B-9/B-10.3/B-11.2/NP-19/NP-23 sind via K2=F6/F5 audit-verdiktiert — KEINE Neumeldung der Schritte.",
+          "rezept": "Nach der #38-BU die 23-Zeilen-Matrix als Register-Nachtrag (z.B. 6c) oder als Fix-Strecke-2-Eingangsdokument publizieren und die abgeschnittene seg1-81-Zeile reparieren; je Schritt gedeckt/offen ausweisen."
+        }
+      ]
+    },
+    "leser_ok": 10,
+    "journal_ok": 3,
+    "ausgefallen": []
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Transkript"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Journale"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Rekonstruktion"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "sweep-K5",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a7c21efa0534bbb93",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102240,
+      "lastProgressAt": 1787139102240,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"Falsch-ROTER ctest-Lauf 10:04 (487/495 rot): ctest auf frisch konfiguriertem, UNGEBAUTEM Baum im golden-Rettungs-Worktree — kein gueltiges Ergebnis (Falsch-Beleg-Klasse). Spaeter im selben Fenster als Verify-F3 erneut: LastTest.log durch 0-Test-Lauf zu 3-Zeilen-Falsch-Beleg ueberschrieben, 494/494-Behauptung am Objekt unbelegt.\",\"fundort\":\"Transkript K5 Z59520-59545 + Z598…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "sweep-K6",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a2297047c3b322a5d",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102240,
+      "lastProgressAt": 1787139102240,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"Floor-Anker-Fehlkalibrierung: Nachzug fbe898be (16.08.) schrieb 494/490/488 + die falsche Doktrin 'CI-Floor-Baum baut OHNE Pruefling' (Kontrollmessung war nach cmake -U COMDARE_CE_PRUEFLINGE gefahren; CI konfiguriert build-covguard MIT -DCOMDARE_CE_PRUEFLINGE) -> Pipeline 15936 @ 90ee6809 ROT, einziger roter Job test:coverage-guard 'FLOOR-NACHZUG FEHLT' (avx2 gemessen 491 …",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "sweep-K7a",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "ab33a5b30bcdf3355",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102240,
+      "lastProgressAt": 1787139102240,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"super-Pipeline 15941 ROT @ d152ba93: test:unit (Job 380340, Test #892 test_fixture_sync_prt_registry ***Failed) + test:unit:clang (380342) rot, Debug-Zellen skipped. Ursache: F5-Rename-Ripple des golden-Fensters (ce 04ac26fa) NICHT in den prt-art-MASTER nachgezogen — prt_art_axis_registry.xml Z.24 trug weiter header=\\\"axes/path_compression/...\\\" statt organ_axes/; die Fixt…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "sweep-K7b",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a02df0c5393d77891",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102240,
+      "lastProgressAt": 1787139102240,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"super-CI 15941 ROT: test_fixture_sync_prt_registry DRIFT -- golden-Fenster-F5-Rename (axes/ -> organ_axes/) ohne synchronen prt-art-Nachzug = A2.1b-Harmonisierungsluecke der #16-Landung (von der W-A/W-B-Karte vorhergesagter Fall)\",\"fundort\":\"K7b Z61635 (Resume-Stand) + Z61719ff; Trace jobs/5a19728e/tmp/trace_380340.log; prt_art/algorithm_profiles/prt_art_axis_registry.xml …",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "sweep-K8",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "aff7156fb089e29e4",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102240,
+      "lastProgressAt": 1787139102240,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"s13-Design-Lens: 13 Funde (4 MUSS + 8 SOLL + 1 KANN), u.a. Arena-Ueberlauf-Semantik gegen juengste Owner-Linie (S13-05/S13-07 Z.466-524), fehlende FJ-Posten, xlsx-Zeilenlimit-Wurf gegen KON88-P2, result.csv-Resume-Blindheit\",\"fundort\":\"Transkript Z62556 (wf_100fa0b3/Task wy93thdy5, 09:09); Fix-Runden Z62576/62666, Kurz-Verify Z62885\",\"verbleib\":\"BEHOBEN im Fenster: A2.5-Ru…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "sweep-K9",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a9d113980c3da15c2",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102241,
+      "lastProgressAt": 1787139102241,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"T-10-AUFKLAERUNG: Die im Register als 'Ernte-Beleg fehlt' gefuehrte V-02R-Explore-Ernte (SHA256-Verkettung Hybrid-Stempel) EXISTIERT — K9 erntete sie 17.08. 10:45-10:54: Backup ~/backups-workflow/20260817-v02r-hybrid-grammatik/ (3 Dateien, mtime 10:46) + Ledger KON103-03 'V-02R-EXPLORE-ERGEBNIS (wf 969b3bba, 2 Explorer Sonnet max, 671k Tokens)' im Zug 421bbb2f (CI 15955 SU…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "sweep-K10",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "ac0660ae105f78f54",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102241,
+      "lastProgressAt": 1787139102241,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"HY-A2 KOMPLETT NIE BEGONNEN + HY-A3-ACHSE NIE BEGONNEN in W1 (hybrid_binary_proxy.hpp fehlte, hybrid_tier_module.cpp mit 4 ABI-Pflicht-Symbolen fehlte, test_hy_f8_reroute fehlte; Registry stand auf 22); W1-Abnahmeformel Wellenplan :952 NICHT erfuellt (F8-DoD/Roundtrip-Koeder/CT-Bruch/Registry 22->23: KEINES gebaut) = F2-Risiko. Ursachen-Klasse: decl.hpp-Sperre wurde als ER…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "sweep-K11",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a9533d50e1b6625a0",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102241,
+      "lastProgressAt": 1787139102241,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"ce-CI 15971 ROT nach W1-Landungs-Push (3 Familien: lint:format 3 Testdateien aus 3 Straengen; Diff-Hygiene 27 Nicht-ASCII pruef_dock.hpp als Altbestand durch k2-Beruehrung in den Push-Messbereich gezogen + 8x >120; contract:axis-version-lock target_isa_complex_axis.hpp Digest-Drift ohne Lock-Regen durch k2-Commit 44a909c1)\",\"fundort\":\"Transkript Z66272-66296 (Jobliste/Logs…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "sweep-K12",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a3621d2ac22194895",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102241,
+      "lastProgressAt": 1787139102241,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"Register-11.1/[T-10] traegt eine FALSCHE Tatsachenbehauptung: 'V-02R-Explore-Ernte fehlt, 0 Register-Treffer'. In K12 wurde die Ernte GEFUNDEN und KONSUMIERT: super-Ledger ~Z.1545-1592 (KON103-03-Umfeld) + ~/backups-workflow/20260817-v02r-hybrid-grammatik/ (explorer1-plan-ledger.md, explorer2-objekt.md, wf-result-roh.json — heute am Objekt bestaetigt); Kern (key=value ';'-…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "sweep-K13",
+      "phaseIndex": 1,
+      "phaseTitle": "Transkript",
+      "agentId": "a2fdad32cf698b9a1",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102241,
+      "lastProgressAt": 1787139102241,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"K13-Fehlurteil der A2.3a-NEIN-Probe: AxisKind-Entlastung (seg1-37 als 'stale Karten-Lesung' verworfen, 19:26 am Objekt anatomy_fingerprint.hpp:1029ff 'ENTSCHIEDEN UND NICHT GEDREHT') — vom Voll-Audit als K1/F1-PUSH-SPERRE korrigiert (NEIN-Probe las die KON5-04-Fehl-Deckung als Entscheid; V-01R gilt)\",\"fundort\":\"Transkript Z69481-69500 (18.08. 19:26-19:27)\",\"im_register\":tr…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "journale-a",
+      "phaseIndex": 2,
+      "phaseTitle": "Journale",
+      "agentId": "aeb0ba84e379cad81",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102245,
+      "lastProgressAt": 1787139102245,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"Register-11.1/[T-10] traegt eine FALSCHE Tatsachenbehauptung: 'V-02R-Explore-Ernte fehlt, 0 Register-Treffer, Ernte-Beleg fehlt'. Unabhaengig gemessen: der V-02R-Explore ist wf_969b3bba (17.08. 10:40, 2/2 Agenten FERTIG, Explorer 1 Plan/Ledger + Explorer 2 Objekt/Analogie); die Ernte EXISTIERT und wurde konsumiert -- Ledger-Treffer (KON103-03-Umfeld) + ~/backups-workflow/2…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "journale-b",
+      "phaseIndex": 2,
+      "phaseTitle": "Journale",
+      "agentId": "aef859bd9ef140e3c",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102245,
+      "lastProgressAt": 1787139102245,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"Register-6b-Detail-Tafel: alle 111 Verdikt-Zeilen mechanisch bei ~250 Zeichen abgeschnitten (mid-word: 'addie'/'anh'/'bei'); beim KRITISCH seg1-81 fehlt dadurch im Register der eigentliche Inhalt — die Schritt-zu-Commit-Deckungs-Matrix der 23 Bauplan-Schritte (f3559e7a S-6a/Format5, 5c0c3a5e POD7, d866bd3d Anker, 1984e417 HY-A3, 6c979a99+c59840f8 HY-A2, 345c1d1e Gate-Gramm…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "journale-c",
+      "phaseIndex": 2,
+      "phaseTitle": "Journale",
+      "agentId": "a9946cbaa8398ce94",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102245,
+      "lastProgressAt": 1787139102245,
+      "cached": true,
+      "resultPreview": "{\"regressionen\":[{\"was\":\"T-10-Kernaussage 'Ernte-Beleg fehlt, Explore-Ernte finden ODER neu fahren' ist UEBERHOLT: die V-02R-Explore-Ernte (wf-Explore 'hybrid-grammatik-dokumentiert') existiert vollstaendig und war vom Lead am 18.08. 01:56 (Z67647-67652, Antwort an bump15-a: 'Der Explore-Ruecklauf EXISTIERT -- Ledger:1587') bereits selbst wiedergefunden; der Register-11-Nachtrag (19.08.) uebersah …",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "rekonstruktion",
+      "phaseIndex": 3,
+      "phaseTitle": "Rekonstruktion",
+      "agentId": "a14c53b7b226fbc41",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787139102246,
+      "lastProgressAt": 1787139102246,
+      "cached": true,
+      "resultPreview": "{\"dedup_zaehlung\":\"40 rohe Kandidaten -> 33 Einzelstraenge nach Dedup (Gegenzaehlung: 13 Roh-Eintraege in 6 Gruppen gleichen Gegenstands zusammengelegt: [K5] golden-Refs 2->1 · [K6+K7b] S-13-Design/Lens/Landung 2->1 · [K6+K7b+K9] hy-a-bau 3->1 · [K7b+journale-c] k2-Vollbau-Abnahme 2->1 · [K7b+K9] Owner-Voll-Lese-Auftraege 17.08. 2->1 · [K11+journale-a] g2/#17 inkl. Bericht-Lokalisierung 2->1; 27 K…",
+      "promptPreview": "REGRESSIONS-SWEEP (Diplomarbeit Cache-Engine, K14, 19.08.2026). AUFTRAG: unnotierte Regressionen + VERLORENE/ABGEBROCHENE STRAENGE finden. Ein \"verlorener Strang\" = gestartete Arbeit (Workflow, Agent, Bau-Zusage, \"als naechstes mache ich X\") OHNE sichtbaren Abschluss/Ernte. Eine \"unnotierte Regression\" = gefundener Defekt/Fehler/Abweichung (auch spaeter behobene), der im Register /home/comdare/Pro…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "synthese",
+      "phaseIndex": 4,
+      "phaseTitle": "Synthese",
+      "agentId": "a2c24a80723785fd6",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787139102251,
+      "queuedAt": 1787139102246,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "## 12. REGRESSIONS-SWEEP K5-K13 + JOURNALE (16.-19.08.) -- …",
+      "promptPreview": "SYNTHESE (Fable max) des Regressions-Sweeps. Baue den fertigen ABSCHNITT-12-TEXT fuer das Register /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260818-SESSION-REGRESSIONEN-bump15-codex-audit-review.md (Stil der Abschnitte 10/11: ASCII, <=100 Z. Breite, praezise Anker). INHALT: (a) NEUE Regressionen (im_register=false, nach Dedup -- GEGENZAEHLUNG roh/dedup nennen…",
+      "lastProgressAt": 1787140710516,
+      "tokens": 170598,
+      "toolCalls": 5,
+      "durationMs": 1608265,
+      "resultPreview": "{\"abschnitt_12_markdown\":\"## 12. REGRESSIONS-SWEEP K5-K13 + JOURNALE (16.-19.08.) -- NACHTRAG 19.08.2026 (K14, SYNTHESE)\\n\\n> Auftrag: die 10 Transkript-Fenster K5-K13 (16.08. 12:28 - 18.08. 21:24, Z59214-69705) plus\\n> 3 Journal-Gruppen VOLL nachvollziehen; jede unnotierte Regression, jeden verlorenen Strang,\\n> jeden Workflow-Start bis zum Abschluss verfolgen. Methode je Leser: python3-Streaming…"
+    }
+  ],
+  "totalTokens": 170598,
+  "totalToolCalls": 5
+}
