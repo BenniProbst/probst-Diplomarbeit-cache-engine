@@ -440,10 +440,31 @@ Trigger) · B4 (haengt OF-1) · MESS-dreiphasig=#53 · D5-5-Rest (#105, Frist vo
 ANRECHNEN — F2-5-Protokoll trug eine FALSCH-NULL) · D-2-Band-B (nie mehr GESTRICHEN buchen) ·
 #38a2 (18.6(3) deklariert).
 
-**9.4 UNKLAR (3, je Mess-Rezept — kleine read-only-Messungen VOR Freeze-Check):** ##15-K6-
-Auto-Phasen-Einzelbeleg (+ Ledger:22951-Marker-Pruefung) · LG-LoadWache beide-Genera-
-Auszaehlung (test_e24_c10_g5_lade_wache.cpp) · LG-Idempotenz 2x3-Matrix-Auszaehlung (beide
-a9s3-Tests) — je: belegt = ERFUELLT nachbuchen, sonst W2-Randslot Di 25. (in 6+2 enthalten).
+**9.4 UNKLAR (3) — AM OBJEKT AUSGEMESSEN (wf_b0742259, 19.08. ~20:55; B.3:
+20260819-w93-endstand/w93-unklar-messungen-wd9sxq7oh.json; damit 0 UNKLAR-Rest):**
+- **##15-K6 = ERFUELLT NACHGEBUCHT.** Namens-Falle: der Mechanismus heisst
+  derive_default_experiment_phases() (grep auto_phase = 0 Treffer!). GEBAUT+GETESTET:
+  sota_catalog.hpp:634 (3 derived_-Stufen bei leerem <phases>) + Konsum :675; Produktions-
+  pfade experiment_run_entry.hpp:181 + experiment_plan_director.hpp:2232; Test
+  EmptyPhasesDerivesThreeDefaultStufen (test_experiment_projection.cpp:181, registriert
+  CMakeLists:4021, 7+6+6=19 Paesse gegen explizite Golden). ZUSATZBEFUND: der Ledger-Marker
+  :22951 ('[par.59-SCHEMA] K1..K4+K6 OFFEN, kritisch', 20.07.) ist AM OBJEKT UEBERHOLT —
+  alle 5 K-Posten GEBAUT (K1 POD xml_config_parser.hpp:467 + Parser produktiv · K2 XSD
+  Single-Source + ce-Schema-Bein · K3 validate_profile.hpp:945-1140 · K4 merge_plan:79/:95
+  + test_merge_plan_directive · K6 s.o.). UEBERHOLT-Buchung faehrt im KON119-Zug (loest
+  zugleich die W18/seg1-71-Austragungs-Haelfte fuer diesen Marker-Block an).
+- **LG-LoadWache = W2-RANDSLOT BESTAETIGT.** test_e24_c10_g5_lade_wache prueft NUR das
+  Set-Genus (main()-Programm :95, 3 feste CLI-Fixtures, Lebend-Modul perm_set_d9 =
+  genus_module_set.cpp; einziger Genus-Durchstich ISetTier :184; auch beide Ablehnungs-
+  Fixtures Set). Kontrast: Nachbar test_e24_c10_genus_dll_roundtrip faehrt VIER Genera
+  (CMakeLists:4315-4318) — die Lade-Wache selbst nicht. Bleibt in der 6+2-Deklaration.
+- **LG-Idempotenz = W2-RANDSLOT, PRAEZISIERT AUF EINE ZELLE.** Genannte Dateien decken 2/6,
+  OBJEKTWEIT 5/6 Zellen ([beide x Erstlauf] = test_a9s5_ergebnis_mappe_naht:335/:132;
+  [xlsx x WDH] + [csv x WDH] = test_a9s4_skip_manifest:113/:83/:97). Strukturbefund:
+  'beide' ist KEIN Enum-Wert (ErgebnisFormat{xlsx,csv} :76; die Beide-Wahl lebt in der Naht,
+  Stamm=xlsx :449 + Kind=csv :465). FEHLT objektweit NUR [beide x Wiederholungslauf] als
+  Kombiprobe — der Di-25-Slot verengt sich auf DIESE eine Zelle (Deklaration statt 'Matrix
+  unbelegt').
 
 **9.5 OWNER-VORLAGE-KANDIDATEN (7; in das F2-Fenster P1-P7 einarbeiten):** OV-1 Break-Even-
 Kanon (mit ##19-Konsequenz-Bild ERNEUT vorlegen) · OV-4-Deckel (##10b-Messung liefern wir) ·
