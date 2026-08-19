@@ -388,3 +388,76 @@ ctest m_w12 gruen in beiden Zellen. (Prozess-Notiz: die Prompt-Interpolation der
 scheiterte erneut am Template-Literal — bekannter Orchestrator-Bug, Verify rekonstruierte aus dem
 journal.jsonl; kein Fund am Gegenstand.) **Der Bruch steht damit fix-komplett bei e285d316 und
 wartet nur noch auf: Audit-Ruecklauf -> Fix-Strecke 2 -> W1-Audit #93 -> Landung.**
+
+## 11. NACHTRAG 19.08.2026 (K14) -- TRANSKRIPT-VOLLNACHVOLLZUG K13: LUECKEN, DIE HIER FEHLTEN
+
+> Owner-Auftrag 19.08.: den K13-Session-Log VOLLSTAENDIG nachvollziehen (Roh-Transkript
+> Z68514-69705 + K12-Endphase Z67336-68514 mit den bump15-a/b/c/d-Teammate-Berichten) und alle
+> noch nicht gefuehrten Luecken HIER dokumentieren. Methode: User-/Teammate-Messages voll
+> extrahiert, Kandidaten gegen dieses Register gegrept, Verdachtsfaelle am Objekt gemessen.
+
+**11.0 VERLAUFS-REKONSTRUKTION (bestaetigt die Owner-These).** K13 (18.08. 09:13-21:24 UTC)
+diente dem AUSGLEICH: (1) Owner-Audit 688 Zusagen = vergessene/abweichende Arbeit finden ·
+(2) Dual-Review = Fehler im #15-Bruch · (3) #93 = W1-Luecken ("offiziell abgeschlossen" vs
+Wellenplan) · (4) Fork gab-es-denn = still vertagte Features · (5) par.21-Konsolidierung =
+Wiedereinordnung. Chronologie-Fakt: K13 verlor ~5,5 h durch ZWEI ZUSAETZLICHE Limit-Risse
+(Resume-Bitten 09:13-Anfang, 12:32, 14:35; Vollbetrieb erst ab 14:43); die Landung-mit-Fixes
+(Owner 15:43) kam deshalb nicht mehr zum Audit-Ruecklauf. WIE ES WEITERGEHT ist unveraendert
+die Kette aus Abschnitt 8/par.21.5: Audit-Synthese (laeuft als Resume) -> VOLLERNTE (502/22/85/74
+ueber 688) -> Fix-Strecke 2 -> #93 -> Landung -> super-Zug/KON119 -> F2-Vorlagen.
+
+**11.1 NEUE ERNST-POSTEN (fehlten; Traeger = Fix-Strecke 2 bzw. #93):**
+- **[T-2] Fingerprint-Positions-Beweise :609-627 FORTGESCHRIEBEN statt am Objekt neu bewiesen.**
+  bump15-a (Z67631) deklarierte "Prioritaet (iv) OFFEN": der Bauplan verlangt "am Objekt beweisen,
+  nicht abschreiben" (Kartendissens gruppe1 vs gruppe5); keine Quittung in A2.5-R1/R2 auffindbar.
+  -> Fix-Strecke-2-Posten: Positions-Beweise der komposit_line/Glied-FOLGE am End-Tip e285d316
+  frisch messen (nicht fortschreiben).
+- **[T-10] V-02R SHA256-VERKETTUNG der Hybrid-Pruefdock-Tier-Binaries: VERBLEIB UNGEKLAERT.**
+  bump15-a (Z67560): C3 "KONFLIKT, NICHT GEBAUT" -- Tiefen-Feld per V-04R entfallen (Ebenen-Wrap,
+  KON101-02), aber die stattdessen zu bauende SHA256-Verkettung stand unter EXPLORE-PFLICHT vor
+  B-5 ("gestartet: wf-Explore hybrid-grammatik-dokumentiert"). 0 Register-Treffer, Ernte-Beleg
+  fehlt. -> Pruef-Posten Fix-Strecke 2 + #93-Gruppe C (HY): Explore-Ernte finden ODER neu fahren;
+  ist die Verkettungs-Haelfte des Hybrid-Stempels gebaut oder ein ungebauter Rest?
+
+**11.2 MITTEL/MELDUNG:**
+- **[T-3] Bewusste Namens-Abweichung ohne Meldung:** algorithm_baustein.hpp:57 full_join ->
+  axis_cross_product statt verbund_union (bump15-c Z67953, Begruendung: Kreuzprodukt-Mechanik,
+  keine Union; 0 Konsumenten; "wenn verbund_union gewollt: Ein-Zeilen-Nachzug"). Fachlich sauber,
+  aber nie gemeldet -> Meldungs-Tafel-Punkt (kein Entscheid noetig; Transparenz par.21.6-Klasse).
+
+**11.3 NEUE FALLEN-/LEHR-KLASSEN (fuer Fallen-Register + T-11c-Praxis):**
+- **[T-5] clang-22-Falle -fassume-unique-vtables (Default AN):** dynamic_cast auf eine
+  FINAL-Klasse wird ab -O2 zum vtable-Zeigervergleich; ein Executable OHNE ENABLE_EXPORTS stellt
+  seine Symbole nicht in dynsym -> .so und Executable tragen je eine vtable-Kopie -> Cast liefert
+  nullptr NUR unter clang -O2/-O3 (gcc + clang -O0 gruen). FIX-MUSTER (bump15-d, Z67993):
+  ENABLE_EXPORTS ON am Test-Target = "die Annahme WAHR machen"; -fno-assume-unique-vtables
+  erwogen und VERWORFEN (wuerde korrekte Optimierung abschalten, um die eigene Verletzung zu
+  kaschieren). Reichweite gemessen: 0 weitere Stellen (alle anderen Casts zielen auf Interfaces).
+- **[T-6] Koeder-Reichweiten-Lehre (K13-Verschaerfung):** Koeder B (merge="Stufe2_PrueflingReplace"
+  in all_axes_golden:95) biss NICHT -- nicht weil die Wache fehlte, sondern weil der Koeder
+  AUSSERHALB JEDER PRUEFMENGE lag (RealFixedProfiles fuhr nur 2 der 11 Profile). Heilung
+  (b54311f0): is_bekannter_verbund_strategie_name an der Namens-Naht + Sammel-Test ueber ALLE
+  *.profile.xml MIT Nenner-Assert >=8. LEHRE: zum Koeder-Beweis gehoert der Nachweis, dass die
+  Pruefmenge den Koder-ORT deckt -- ein Koeder in ungepruefter Flaeche beweist nichts.
+
+**11.4 AUFKLAERUNGEN + ENTLASTUNGEN (Faeden geschlossen, die sonst offen wirkten):**
+- **[T-9] "Q2/Q3 GESTOPPT (K16)" (bump15-c) IST AUFGELOEST:** Q2/Q3 = P8 + Endabnahme; bump15-d
+  baute P8 komplett als R2 (7bc997a2: 2 extern-C-Symbole in 7 Makro-Stellen, Loader-Pflicht mit
+  Status 9/10/11 + Konsistenz-Riegel, test_q2_identitaets_riegel, decl-Selbstzusage :715-717 im
+  vorgegebenen Owner-Wortlaut GESETZT) + R0 (110->0 Warnungen) + R1 (T-5-Fix); die Endabnahme
+  lief in den A2.5-Strecken (Abschnitt 10/10b). KEIN offener Faden.
+- **[T-1] j3/work_mode-Eingang: KEINE stille Streichung.** Am Objekt gemessen (Director-Test
+  thesis_tiere/test_experiment_plan_director.cpp:3460-3540): der DebugSemantikInjektor-Decorator
+  (P1/A-05, bump15-b) testet die (j3)-Mechanik state-direkt; S-8-Grenze EXPLIZIT dokumentiert
+  (":3465 eigener W2-Posten Board #22/OD-7, S-8"). REST: Task-#22-Text um die
+  j3-Direktor-Test-Haelfte ergaenzt (Metadata-Nachtrag 19.08.), damit S-8 beide Haelften kennt.
+- **[T-4] Verbund2_Hybrid: BEREITS GEDECKT** als D-F4b (Abschnitt 1) + Fix 15/16 -- die
+  bump15-c-Abweichung 2 wurde vom Review unabhaengig gefunden und behoben. Entlastung.
+- **[T-8] bump15-b-Probe-TUs GESICHERT (B.3-/tmp-Rotations-Regel):** name_probe/komposit_probe/
+  maxlen_probe/kp_koeder.cpp aus dem Job-tmp nach ~/backups-workflow/20260819-bump15b-probe-tus/
+  kopiert (19.08.; vorher NUR im rotierenden Job-tmp).
+
+**11.5 KONSEQUENZ-DELTA:** Fix-Strecke 2 erhaelt ZWEI Zusatz-Posten (T-2, T-10) VOR ihrer
+Triage-Liste (neben L21/F-9+TSan aus dem Wiederaufnahme-Register G); die Meldungs-Tafel einen
+Punkt (T-3); das Fallen-Register zwei Klassen (T-5, T-6; Memory-Nachzug beim naechsten
+Memory-Zug). Die Kette selbst aendert sich NICHT.
