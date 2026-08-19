@@ -156,3 +156,164 @@ gruen+gemergt+gepusht+Submodul+nested-Check · 286er-Mess-Pipeline NIE pollen ·
 clang-format-22 (CI entscheidet, M-7-Drift offen) · ctest kuenftig --no-tests=error ·
 Kombibau 'all'+comdare_tests · NUR-FABLE-5-MAX bis Widerruf · 🔴 NIE kuerzen/ausbuchen/
 verschieben (Dauerregel 18.08.).
+
+## 8. HANDREICHUNG (ADDITIV, Owner-Order 19.08. spaet): VERHALTENSMUSTER + PUSH-SEQUENZ
+## JE SCHRITT DES RUECKWEGS — vom heissen Pfad (g2-Rueckkehr) ueber 9 Schritte zum Hauptstrang
+
+### 8.0 DIE STANDARD-PUSH-SEQUENZ (in K14 zehnfach gefahren; gilt fuer JEDEN super-docs-Push)
+
+    (1) git -C <repo> add <EXPLIZITE PFADE>            # NIE add -A
+    (2) git commit -m "<typ>(<scope>): <was> -- <kern>" # + Leerzeile + Co-Authored-By:
+        Claude Fable 5 <noreply@anthropic.com>          # AUSSER Thesis-Repo: OHNE Trailer!
+    (3) KOEDER-GATE:  K=$(head -c 40 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 20)
+        KOEDER="glpat-$K"; [ ${#KOEDER} -eq 26 ] || ABBRUCH   # Laengen-Assert PFLICHT
+        printf 'x %s x\n' "$KOEDER" > $TMPD/kp.txt
+        gitleaks stdin --config <repo>/.gitleaks.toml --no-banner < $TMPD/kp.txt; BISS=$?
+        [ $BISS -eq 1 ] || ABBRUCH (Wache beisst nicht!)   # rm kp.txt danach
+    (4) ECHT-SCAN:    git log -p origin/development..HEAD > $TMPD/pi.txt
+        gitleaks stdin --config ... < $TMPD/pi.txt; ECHT=$?
+        [ $ECHT -eq 0 ] || STOPP (Fund! NIE pushen)        # rm pi.txt danach
+    (5) push origin development && push github development  # BEIDE rc pruefen
+    (6) PIPELINE-GRUEN per API: curl -sk -K $TMPD/glhdr.curlrc
+        .../projects/288/pipelines?sha=<VOLLE-SHA>  -> status==success
+        ("KEINE" beim Erst-Poll = Pipeline noch nicht angelegt -> 20-30s Retry, NIE als
+        kein-Pipeline-Verhalten fehldeuten; Praezedenz d8b27633)
+    ce-Pushes (Landungen): identisch, aber projects/286 + die F9-Wellen-Ende-Gates VOR (5).
+
+### 8.1 SCHRITT 1 — g2-RUECKKEHR (der heisse Pfad; Verhaltensmuster bei Task-Notification)
+
+    (a) Output VOLL lesen: Notification-Result ist oft TRUNKIERT -> python3 auf
+        /tmp/claude-1001/.../tasks/<taskid>.output (json.loads ab erstem '{'), ALLE Felder
+        inkl. Rest ab Trunkierungs-Grenze; bei Unklarheit journal.jsonl (= Wahrheit).
+    (b) BU-NACHZUG: Output -> BU-Ordner als g2-endergebnis-<taskid>.json; Journal-ENDSTAND
+        kopieren, TEILSTAND-gestoppt-Kopie ERSETZEN (rm der alten, Namens-Klarheit).
+    (c) TIP MESSEN + NACHSICHERN: git -C /home/comdare/wt-ce-g2 log --oneline -3 + status
+        --porcelain; neuen Tip (Stand K14-Ende: cb856212, kann weiter gewachsen sein) DUAL
+        sichern: push origin bau/g2-semantik && push github bau/g2-semantik (Ref-Sicherung,
+        KEIN Landen). ls-remote-Gegenprobe.
+    (d) Task-#17-Metadata um Endstand ergaenzen (Verify-Urteil, letzte Funde/Quittungen).
+    (e) FALLS der Workflow stattdessen STIRBT (Limit/Abriss): Journal-Stand sichern, Resume
+        per scriptPath+resumeFromRunId NUR wenn Verify-Urteil noch fehlt; die SUBSTANZ ist
+        committet — im Zweifel Verify-Rest der Lande-Stufe zuschlagen und weitergehen.
+
+### 8.2 SCHRITT 2 — EINE REDAKTION (Muster K13/wf_a9be8ee1; Script-Vorlage liegt)
+
+    Script workflows/scripts/bu-redaktion-kontext14-wf_e8c90d63-0f8.js EDITIEREN:
+    G1/G2-Dateilisten um ALLE Nachzuegler erweitern (g2-endergebnis + g2-journal-ENDSTAND +
+    sweep-ergebnis + sweep-journal-ENDSTAND — Ist-Stand des Ordners per ls erheben, Soll =
+    JEDE Datei); dann Workflow NEU starten (kein resume — Prompts aendern sich).
+    Regeln im Script: je Datei gitleaks stdin --config + Muster-Sweep (glpat-LITERAL vs
+    Prosa-Erwaehnung!, PRIVATE KEY, sk-ant-, ghp_, AKIA, glrt-, Bearer, user:pass@,
+    Base64>=60 [Hex-Digests/CRC = KEIN Fund]) + Journal-Feldscan (key=v2:<64hex> = Cache-
+    Hash, usage-Zaehler = KEIN Fund) + thinking-signature-Klasse -> [REDACTED-thinking-
+    signature] byte-genau, JSONL-Validitaet danach pruefen. Redakteur: Gesamt-Gegenprobe
+    ueber ALLE Dateien + EIN beissender Wegwerf-Koeder (rc=1) + REDAKTIONS-NOTIZ.md +
+    Urteil. K13-REGEL: die Freigabe deckt NUR den Schnappschuss — waechst der Ordner
+    danach, braucht der Zuwachs eigene Pruefung.
+
+### 8.3 SCHRITT 3 — BU-PUSH (nach FREIGEGEBEN)
+
+    Standard-Push-Sequenz 8.0 mit: add docs/sessions/backups/20260819-kontext14-workflows/
+    (ganzer Ordner inkl. REDAKTIONS-NOTIZ.md). Bei GESPERRT: gesperrte Dateien nachredigieren
+    (Redakteurs-Liste), DANN committen. Faellt der Workflow: manuelle Redaktion je Datei
+    (gitleaks + Muster-Sweep), NIE ungeprueft pushen. Commit-Text: Koeder-Klassen-Woerter
+    maskieren (Regel: Koeder-Literale auch in Commit-Texten maskieren).
+
+### 8.4 SCHRITT 4 — FIX-STRECKE 2 (A2.5; Script NEU schreiben nach Muster bump15-a25-*.js)
+
+    RAHMEN: EIN Workflow, Fable max, Bau-Slot 3 (bauslots/slot3-fixstrecke2 setzen; df-Gate:
+    unter 5G NICHT bauen; Platte war 13G/95%), Worktree wt-ce-bump15 = EIN Schreiber (der
+    Workflow; Lead fasst den Baum NICHT an). PHASEN: Triage (Eingangsmenge Uebergabe 4.4
+    dedupliziert GEGENGEZAEHLT; KRITISCH/ERNST-Volltexte aus BU-Journal audit-wf794b904b-
+    journal-ENDSTAND.jsonl lesen, NIE nur 6b) -> Fix-Gruppen sequentiell (T-1 ROT ZUERST je
+    Fund, kleine Commits mit expliziten Pfaden, 'fix(a25-f2): <fund> -- <kern>') -> je
+    Gruppe inkrementell bauen + gezielte ctests -> Abnahme (Kombibau-Zellen NUR wo beruehrt;
+    Regel 'all'+comdare_tests, ctest --no-tests=error) -> VERIFY adversarial -> FIX-Rekursion
+    bis NULL_NEUE_FUNDE. QUITTUNG dreiwertig JE Fund (BEHOBEN+Beleg / ENTLASTET+Messung /
+    VERTAGT+Grund+Platz+Task). SONDERFAELLE: F2-Basis-Probe = EIGENES Build-Verzeichnis am
+    ce-Hauptklon @ 20c111c4 (NICHT im bump15-Baum; Rezept aus ct_g2rest_clang_debug.log-Kopf)
+    · F4 ohne C-3a-Antwort = 18.6(3)-Fall DEKLARIERT fahren (Freeze-Nachbuchung notieren,
+    KON119-Ausweis vormerken) · F6 golden-Zug als EIGENES golden-Ereignis IM Bruch
+    terminieren (EIN Re-Anker; neuer TABU-CRC wird bei der Landungs-Meldung literal
+    vorgelegt) · X-17: 23er-Matrix aus BU-Journal Z.144 als Register-6c publizieren.
+    ERGEBNIS-Sicherung SOFORT nach Rueckkehr (Output+Journal -> backups-workflow + BU).
+
+### 8.5 SCHRITT 5 — #93 W1-AUDIT
+
+    Script workflows/scripts/w1-vollstaendigkeit-wf.js VOR Start pruefen/anpassen:
+    (a) Gruppe E/#17: g2 = LANDEREIF @ <End-Tip> eintragen (nicht mehr 'ungelandet+unfertig');
+    (b) Gruppe D/B3: BEIDE Anker messen (mess_achsen_naht.hpp:477-517 PRIMAER, abi_adapter
+    :476-491 GEGENPROBE — 12.1-Diskrepanz!); (c) Gruppe A um vl3-ROT-3/_pclose/N1-N5-N6/
+    Wstringop, Gruppe C um HY-A-R2-Lens/rcu-Serien/V-02R-Bau, Straenge um k2-G3/G4 ergaenzen
+    (12.4-Zugaenge). Ergebnis -> Register Abschnitt 9 + Frist-Dreiteilung; Vor-F2-Posten
+    SOFORT ziehen (ggf. in die noch offene Fix-Rekursion einspeisen).
+
+### 8.6 SCHRITT 6 — SERIELLE LANDUNGEN L1-L4 (die PUSH-SEQUENZ der Landungen)
+
+    L1 #15 (ce):
+      (1) rm -rf wt-ce-bump15/.review-tmp (dirty=1-Eintrag; vorher reinschauen)
+      (2) Im ce-HAUPTKLON: git checkout development (MUSS auf 20c111c4+x stehen; fetch
+          vorher) -> git merge --no-ff bau/bump15-preimage-bruch  # EIN Merge, 30+ Commits
+      (3) WELLEN-ENDE-GATES AM ENDSTAND (F9, Reihenfolge):
+          Lock-REGEN --check (Exit 1 mit 4 versionslosen Traegern ERWARTET) -> Erst-Versionen
+          je Traeger vergeben (anatomy_base/observable_tier/pruefling_merge/
+          target_isa_complex_axis; inhaltliche Entscheidung, bump15-d-Hinweis) -> --write-
+          Regen als EIGENER Commit · kumulative Diff-Hygiene e114cabd..HEAD (Vorab-Lauf war
+          GRUEN bis e285d316; nach Merge+Regen NEU fahren) · clang-format MIT DER CI-FORMEL
+          (Job-Variablen einsetzen; M-7: CI entscheidet) · Koeder-Gate + Echt-Scan (8.0/3-4,
+          Bereich origin/development..HEAD) · Floor GEMESSEN (PRUEFLING-Form! Schalter-
+          Zustand literal ins Protokoll) · Vollbau all + --target comdare_tests + voller
+          ctest · B-10-Anker-Faelligkeit pruefen (kFrozenFingerprintV1, test_d4:194,
+          e24-/w10-Pins) · Beweisorte auf gesicherte Logs zeigen lassen (E3!)
+      (4) EIN PUSH dual -> EINE CI (API projects/286, volle SHA, JOBLISTE lesen nie nur
+          Gesamtstatus) -> Task-Notification abwarten, NICHT pollen waehrend Mess-Jobs.
+    L2 g2: merge --no-ff bau/g2-semantik NACH L1-Gruen. HARMONISIERUNG (A2.1b): CMakeLists-
+      Tail-Append pruefen · algo_semver Term (e) bricht #15-Literale der Form
+      x.y.z.<flag-doppelt> COMPILE-TIME -> Kombibau des ZUSAMMENGESETZTEN Stands ist der
+      Beweis · 5 Text-Meldungsflaechen · Floor-Nachzug (g2 hatte N=500-Basis, der
+      Gesamtstand zaehlt NEU). Gates verkuerzt (Hygiene ueber den g2-Bereich, Format,
+      Koeder, Floor) -> Push dual -> CI.
+    L3 v08r: merge --no-ff bau/v08r-fingerprint-sha NACH L2. Vorher: finaler Verify
+      (NULL_NEUE_FUNDE-Rest) + --dump-plan-Byte-Ereignis (' sha256='-Schlussfeld) als
+      DEKLARIERTES Ereignis in der Merge-Botschaft. Gates -> Push -> CI.
+    L4 super-Zug ATOMAR (EIN Lande-Ereignis, EIN Push):
+      a11_super_patch.diff NUR nach D-9-Abgleich (L9: was drpppte die gelandete ce-Haelfte?)
+      · XSD-Patch super_xsd_golden_verbund.patch (BU; Subset-Wache koppelt Fixture+XSD =>
+      MUSS mit Gitlink in EINEM Commit) · Gitlink -> ce-Merge-SHA · PZW-Anker LIVE neu
+      zaehlen (neue Test-.cpp: test_hy_f8_reroute, test_q2_identitaets_riegel, g2-/v08r-
+      Tests — ZAEHLEN, nie raten) · seg1-04: 6 stale E-6-Stellen im Hybrid-Bauplan datiert
+      ANNOTIEREN · KON119 per scripts/ledger_nachtrag.sh (bump15-a/b/c/d-Namensnennung +
+      K16-Vorfallskern + A2.5-Bilanz + TABU-CRC literal + Audit-/Review-Verdikte + F4-/
+      18.6(3)-Ausweis + literaler Endstand rev-list --count) · Standard-Push-Sequenz 8.0
+      -> super-CI + PZW-Job gruen -> DANN Task #15 completed (NUR wenn golden-Zusage per
+      F6 aufgeloest — sonst bleibt #15 in_progress mit benanntem Rest!).
+
+### 8.7 SCHRITTE 7-10 — F2-FENSTER, WE, DI-25, DOCS (Kurz-Handreichung)
+
+    S7 F2-VORLAGEN: EIN Dokument docs/sessions/ (A2.3a-NEIN-Probe je Punkt VOR Versand!);
+       P5 V-08R-Form traegt die GEMESSENE Kollision (64-hex gebaut, drehbar); Freeze-Check
+       Fr = par.18.3-Liste AM ORIGINAL + #93-Ist, jede Fallregel-Buchung DEKLARIERT.
+    S8 WE: S-19 zuerst (produziert die B-4-Zahl = Trigger-Nenner), dann T-15b + I-PMC;
+       Bau-Slots beachten; Infra-Fenster je Owner-Antwort.
+    S9 DI-25-SCHNITT: Wiederaufnahme-Register A-G + 12.4-Zugaenge + L19 (#3/#19) JE Posten
+       namentlich mit Stunden-Slot; VORHER 🔴 s13-design Z.1384 J-1-Rezept-Fix (Ein-Zeiler
+       oder JOIN-CHECKLISTE-Verweis; erst pruefen ob der s13-Strang die Datei noch haelt).
+    S10 DOCS-/MEMORY-ZUG: 13 Fallen-Klassen 12.2c + T-5/T-6 als Fallen-Register-Memory;
+       Quittungs-Nachtraege (KON74-04, KON99-03, JB-2/JB-3, X-3, Ledger:4501,
+       seg3-kon28-01); Pre-Push-Script scripts/ (K3/H6: Lande-Gate-Kette mechanisieren,
+       Muster ledger_nachtrag.sh — 'Werkzeug schlaegt Disziplin').
+
+### 8.8 QUERSCHNITTS-VERHALTENSMUSTER (in K14 bewaehrt; bei JEDEM Schritt)
+
+    LIMIT-NAEHE (>90%): NICHT weiterlaufen lassen — TaskStop KONTROLLIERT je Workflow,
+      Journal-Teilstaende in den BU sichern, Pause-Nachtrag in die lebende Pause-/Uebergabe-
+      Doku, Standard-Push. Resume spaeter per scriptPath+resumeFromRunId (Cache traegt
+      Fertiges; bei geaenderten Prompts NEU starten).
+    LEBENDPROBE: journal.jsonl-Wachstum + results-Zaehler, NIE pgrep; agent-*.jsonl-mtime
+      als Zweitprobe.
+    RUECKKEHRER: Output IMMER voll lesen (Trunkierung!), SOFORT sichern (B.3: /tmp rotiert),
+      dreiwertig verbuchen, Task-Metadata nachziehen.
+    EIN SCHREIBER: bump15=Fix-Strecke-2-Workflow · g2=sein Workflow bis Rueckkehr · super-
+      docs=Lead · NIE in fremden Baeumen committen; Merges macht der Lead im ce-HAUPTKLON.
+    FEHLER AUF DEM RUECKWEG: Pipeline rot -> Befund VOR Fix benennen (Job, Paket, Datei);
+      Heilung im QUELL-Worktree, neuer Merge — nie direkt auf development flicken.
