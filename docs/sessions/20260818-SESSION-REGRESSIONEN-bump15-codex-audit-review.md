@@ -391,10 +391,70 @@ getrennt, kein ODR-Problem · Admission: Groesse 6 + Hybrid-CT-Konstante + Cross
     die vor F2 gehoeren (#17/g2-Landeweg, B3-Einordnung).
 (4) Landung nach dem Rezept der Kontext-13-Uebergabe (5e0b7f95, Abschnitt 4) + F2-Owner-Vorlagen.
 
-## 9. [NACHTRAG AUSSTEHEND] W1-VOLLSTAENDIGKEITS-AUDIT (Task #93)
+## 9. W1-VOLLSTAENDIGKEITS-AUDIT KOMPLETT (Task #93; wf_ca507b8f-Resume, 9/9 Agenten, 19.08. ~21:00)
 
-Wird nach dem Lauf hier konsolidiert (Gesamturteil "war W1 KOMPLETT korrekt?" + Frist-Dreiteilung
-offen-vor-F2 / gebaut-ungelandet / W2-deklariert / gestrichen-deklariert / unklar).
+> Volltext (ungekuerzt, B.3): ~/backups-workflow/20260819-w93-endstand/ (w93-synthese-endstand-
+> ww7zqfc2a.json + w93-journal-ENDSTAND.jsonl + Teilstand w93-teilstand-widkey76e.json in
+> 20260819-fixstrecke2-logs/). Gruppen A-H alle am Objekt; Gruppe F via Cache-Resume.
+
+**9.0 GESAMTURTEIL:** "NEIN auf Posten-/Formel-Ebene, JA auf Strang-Ebene" — die 4 Straenge +
+Nachzuege sind Ancestors, #17/g2 gelandet+gepusht (ba33b9ac); als Vollzaehligkeits-Aussage war
+"W1 abgeschlossen" falsch. **ZAEHLER (91 Verdikte roh):** 39 ERFUELLT · 13 GEBAUT_UNGELANDET
+(= #15-Bruch, zaehlen als gebaut) · 16 OFFEN_VOR_F2 · 20 W2-DEKLARIERT (je mit Quelle) ·
+0 GESTRICHEN (einzige Kandidatin D-2-Band-B ist per Wiederaufnahme-Marker Historie) · 3 UNKLAR.
+W1 wird komplett durch: #15-Landung (traegt B3/Owner-Datum + alle 13 GEBAUT_UNGELANDET) ->
+Stempel-Nachlande-Zug (F2-2/F2-3/B5) -> F2-5-Kleinbauten (LG-SkipCallback + LG-XlsxAlt) ->
+##10b/OV-4-Vorlage -> Freeze-Check-Deklarations-Buchungen.
+
+**9.1 OFFEN_VOR_F2 (16, Kurzform; Volltext B.3):** (1) #15-LANDUNG (einziger Erfuellungsweg fuer
+B3 + die 13 GEBAUT_UNGELANDET; Voll-Abnahme @ 79171599 ist inzwischen KOMPLETT 4x507/507) ·
+(2) g2-Schlussstueck 16031-Terminal (INZWISCHEN VOLLZOGEN: TERMINAL SUCCESS 20:23Z, #17
+completed) · (3) KON17-01-Freigabe #7/S-19 wirksam erst mit #15-Landung (S-19 Sa-Mo!) ·
+(4) #102 golden-Zug Do 20.08. (LAEUFT als wf_77867329) · (5) Stempel-Nachlande-Zug F2-2+F2-3
+(CEB-system_zeile KON8-03 + S-5-Erbinnen) · (6) B5/B5-VORPOSTEN (F2-4, Fable max) ·
+(7) LG-SkipCallback (WOERTLICHES F2-Abnahmekriterium) · (8) LG-XlsxAlt (NIE-fallen-Klasse) ·
+(9) ##10b working_set-8388608-Messpunkt + beide --check-size-Reihen in die OV-4-Vorlage ·
+(10) D4f Break-Even-Statusraum-Typ ("jetzt, solange 0 Konsumenten"; OV-6=ja; KEINE
+W2-Deklaration existiert — bauen oder am Freeze-Check deklarieren) · (11) ##16/##17 an OV-1
+(deklarierter Fallback par.7:1002 greift sonst) · (12) ##19 LaTeX-/Ranking-Emitter (bei
+OV-1-Fallback bleibt 'beste je Last/beste 5' UNADRESSIERT — bauen oder am Freeze-Check
+platzieren) · (13) A10/VL-3(c) _pclose: der statische Blick IST vollzogen (par.23.2 ENTLASTET
+19.08., l.rc=status korrekt) — Rest ist DEKLARATIONS-Buchung, kein Bau · (14) S-6d/#67
+Vier-Familien-Benennung (29 Include-Wanderungen ungebaut; bauen ODER deklarieren) + N-1/N-2
+(F2-8) · (15) F2-6 Umbenennungs-Rest E-Label + Flag-f (platzieren oder deklarieren) ·
+(16) FREEZE-CHECK-Buchungen (B1-18.6(4)-Zahl! + #38a2-T-A + N1/N5-DEKLARIERT-Ausweis +
+F2-7-Teilstuecke).
+
+**9.2 GEBAUT_UNGELANDET (13+1):** S-6a · #38d · S-6b-Fortschreibung · S-6c/S-21 (94095eda) ·
+S-6d-Anteil (V-11R+A-06/A-08) · S-5-Bildungs-Haelfte · B3 (f4e88786+4cb16334, Spez-Abweichung
+deklariert) · HY-A2 · HY-A3 · ABI-Pflicht 6 Symbole (Emitter-Haelfte = #102) · HY-ModulGrenze-
+Testlast · P.20.10-Abnahmeformel (3 gefahrene Logs) · A14/M-5-Messung · clang-debug-Heilung
+4x507/507 (ersetzt NICHT das N1-Warnungs-Review).
+
+**9.3 W2-DEKLARIERT (20, je Quelle; 3 PRAEZISIERUNGEN):** N1-Warnungs-Review (Quellen-Differenz
+W2-1 vs W2-2 MITFUEHREN) · N5-Matrix (Bruch-Vorstoss 6fdad80c REVERTIERT ca26044e 'gehoert an
+S-8/W2' — saubere Selbstkorrektur) · A15/Wstringop (praezise W4/W5-RANDSLOT, nicht W2) ·
+S-2/G-1 ('Bau nach Owner-Antworten', kein woertliches W2) · B1 (18.6(4), #24, W2-Anfang vor
+Trigger) · B4 (haengt OF-1) · MESS-dreiphasig=#53 · D5-5-Rest (#105, Frist vor Sa 29.08.) ·
+##11 measure_selection (#18) · 6 F2-5-Randslot-Posten (PM-Naht: Vorbestand m3v2_pmc_smoke
+ANRECHNEN — F2-5-Protokoll trug eine FALSCH-NULL) · D-2-Band-B (nie mehr GESTRICHEN buchen) ·
+#38a2 (18.6(3) deklariert).
+
+**9.4 UNKLAR (3, je Mess-Rezept — kleine read-only-Messungen VOR Freeze-Check):** ##15-K6-
+Auto-Phasen-Einzelbeleg (+ Ledger:22951-Marker-Pruefung) · LG-LoadWache beide-Genera-
+Auszaehlung (test_e24_c10_g5_lade_wache.cpp) · LG-Idempotenz 2x3-Matrix-Auszaehlung (beide
+a9s3-Tests) — je: belegt = ERFUELLT nachbuchen, sonst W2-Randslot Di 25. (in 6+2 enthalten).
+
+**9.5 OWNER-VORLAGE-KANDIDATEN (7; in das F2-Fenster P1-P7 einarbeiten):** OV-1 Break-Even-
+Kanon (mit ##19-Konsequenz-Bild ERNEUT vorlegen) · OV-4-Deckel (##10b-Messung liefern wir) ·
+HY-Ebene4a-Entscheid (war Mi 19. terminiert) · G-1 9/12 Fragen · P5 fingerprint_sha-Form ·
+OF-1 (B4 haengt daran, war Mi 19. faellig) · #38a2/P4-Paket-Entscheid (Tripwire).
+
+**9.6 KONSEQUENZ-DELTA gegen par.23.1 (nur ZUGAENGE; par.23.1 haelt):** NEU ohne Traeger waren
+##10b, D4f, ##19-Mitfall-Ausweis, S-6d-Benennungs-Entscheid — hiermit getragen (9.1) und in
+den Freeze-Check-/Vorlagen-Zug uebernommen. PM-Naht-Falsch-Null korrigiert (9.3). A10 =
+Deklaration statt Bau (9.1/13). Die 3 UNKLAR-Messungen laufen als Mini-Posten vor dem
+Freeze-Check.
 
 ## 10. A2.5-FIX-STRECKE 1 VOLLZOGEN (18.08. abends, wf_a1b55606, 7/7 Agenten, 0 Fehler)
 
