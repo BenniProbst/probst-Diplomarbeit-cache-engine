@@ -44,3 +44,14 @@ letzten 5 Kontexte, 7/7 Agenten). Das grosse Audit laeuft (Journal waechst, 71 r
 Parallel ab heute: g2/#17-Fertigstellung (Bau-Slot 1) + #95 V-08R-Bau (Bau-Slot 2);
 Slot 3 bleibt fuer Fix-Strecke 2 nach dem Audit-Ruecklauf reserviert. Landungen strikt
 seriell nach #15 (@ e285d316). F2-Freeze Fr 21.08. haelt nach heutigem Stand.
+
+## 5. NACHTRAG (19.08. vormittags, aus dem Voll-Audit): E12 THESIS-TRAILER-RUECKKEHR (Owner-gated)
+
+Das Voll-Audit fand: die Thesis traegt WIEDER einen Commit mit `Co-Authored-By: Claude Opus 4.8`
+im Body — `09cc728` (18.06.), erreichbar von ALLEN Remote-Refs BEIDER Remotes (inkl. main;
+vermutlich ueber die Owner-Overleaf-Linie `d2f51ca`/KON77 zurueckgeflossen — der #61-Rewrite vom
+15.08. war zum Zeitpunkt sauber, 0/372). Dazu stehen lokale Thesis-Klone stale auf der
+Vor-Rewrite-Linie. **Entscheid noetig (kein Handeln ohne GO — Remote-Loeschung):**
+(a) erneuter gezielter Rewrite dieses einen Commits (beide Remotes, main-Protection-Zyklus wie
+#61) — ODER (b) dokumentierte Ausnahme im Ledger (ein historischer Commit bleibt). Kein
+#15-Bezug, keine Frist-Kopplung; die lokalen Klone ziehe ich nach deinem Entscheid nach.
