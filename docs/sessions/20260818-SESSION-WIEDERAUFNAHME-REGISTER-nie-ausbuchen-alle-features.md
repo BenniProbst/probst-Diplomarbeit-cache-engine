@@ -72,3 +72,38 @@ Task #96 (Register-Vollzug + Feinplatzierung nach Audit/#93) · Task #97 (C-13+C
 · Task #98 (F-07b-Diagramm-Bau W4 + §5-Arithmetik-Korrektur) angelegt. Naechster Schritt: Audit-
 Ruecklauf → Fix-Strecke 2 → #93 → Landung; die W2-Feinplatzierung (Di-25.-Schnitt) nimmt JEDEN
 Posten dieses Registers namentlich auf.
+
+## G. NACHTRAG 19.08.2026 (K14-Neugruendung, wf_6c904e28) — 23 LUECKEN/PRUEF-POSTEN MIT TRAEGER
+> Quelle: ultracode-Analyse der letzten 5 Kontexte (6 Leser + Synthese, Gegenzaehlung 231 Roh-
+> Nennungen → 90 Einzelposten = 68 mit Traeger + 22 Luecken + 1 Gate-Fehler). Jeder Posten hier
+> erhaelt seinen Traeger — KEIN Posten bleibt unbesessen (NIE-AUSBUCHEN-Ordnung, Teil A-F gelten).
+
+| # | Posten (Kurzform) | TRAEGER (neu gebucht) |
+|---|---|---|
+| L1 | Vollzaehligkeits-GATE-Fehler der Analyse selbst: Wellenplan-Leser las nur Z.2738-3156 (par.21); Alt-Paragraphen (18.3-Langliste, 19.3, Slots) ungesichtet | Freeze-Check Fr 21.08. + Di-25.-Schnitt lesen die betroffenen Paragraphen AM ORIGINAL nach (Lead-Pflicht, kein Agent) |
+| L2 | FB20-C-3: 6-Zeilen-Richtungs-Liste best_binary-Metriken (hart Minimize vs Katalog 17 MAX/28 MIN) beim Owner abhaken | naechste Vorlagen-Runde (mit NP-46/NP-48, Traeger P.20.8) |
+| L3 | D2-TRIAS D2c-Bau-Rest (je-Last-Sieger + Front-Ausgabe + REV-DATA-12) | Band-B-ST-Posten/W2 (Teil B); Ist misst #93-F |
+| L4 | FB20-D-1: XML-Wache 2 unbeobachtbare Zweighaelften — deklarierte Grenze bauen | W2-Triage #71-Umfeld; vorab Ledger-Gegenprobe KON107-113 |
+| L5 | FB20-D-4: bestandslog last_update_utc (Syntax-Bump) + avg_size_bytes — wird mit periodischen Updates STILL scharf | #97-Umfeld/S-13-Design, Klaerung VOR Kampagne Sa 29.08. |
+| L6 | FB20-D-5: Talos-Doppel-Regime-FALSCHAUSSAGE (ADR-12 + 2 Kapitel) zuruecknehmen | W4-THESIS-BLOCK (mit #77) |
+| L7 | FB20-D-6: alte p50/p95/p99-Zahlen als ueberholt markieren + HDR-Binnendifferenz | W4-THESIS-BLOCK |
+| L8 | FB20-D-7: Anhang-A-Entscheid Weg 1 (16/44 + ehrliche Luecken-Zeile DE+EN) | W4-THESIS-BLOCK (koppelt F5-Anhang-Gate/##58) |
+| L9 | FB20-D-9: a11-Plan-Posten-Rueckzug — VORHER am Objekt pruefen was die gelandete ce-Haelfte (ec048560) drpppte; a11_super_patch.diff NIE blind einspielen | super-Zug-VORSTUFE (K-4b, Abweichung A7) |
+| L10 | FB20-D-10: A12/E-14 ausbuchen → COMDARE_NFS_DROP_TOKEN-Posten (Ebene C) | Infra-Alt-Tafel (#84-Umfeld), Traeger-Verifikation dort |
+| L11 | FB20-E-2: BAUSTEINE_BEWERTUNG.md je SOTA-Quelle (Habich-Format, Sign-Off NIE autonom) | W4-THESIS-BLOCK |
+| L12 | FB20-E-3-Restsatz: Einleitungs-Einschraenkung wegen PV-4-nach-Abgabe | W4-THESIS-BLOCK (VOR W4-Redaktion) |
+| L13 | FB20-E-4: FF0-Reichweiten-Zeile (x86 voll, ARM/RISC-V/macOS Debug-Nachweis) | W4-THESIS-BLOCK |
+| L14 | FB20-K-2: NOTICE:336 + LICENSE_AUDIT_EXT.md:39 A03 → LGPL-2.1-or-later (Objekt-Probe zuerst) | kleiner autonomer docs-Zug (naechster docs-Slot) |
+| L15 | VORAB15-K6: KON96/97-V-01-Stale-Buchung | NP/M-Marker-docs-Zug (T-UPD-Familie, P.20.8) |
+| L16 | V-10b: Cross-Maschinen-SKIP Bau-JA/Mess-NEIN (platform-Tag) — Vollzugs-Status unklar | #7/S-19-Vorstaffel WE 22./23.; Status am Objekt pruefen |
+| L17 | wf_a2e443f0 (12-Fragen-Explore K12): Ernte-Status ohne K13-Beleg | Zug-1-Audit-Ernte prueft das Journal mit |
+| L18 | #54: Token id=99 rotiert sich 01.09. SELBST → lokaler Vault-Nachzug faellig | W3-Betriebsfenster (Betriebs-Task, Vormerkung) |
+| L19 | #3/S-12 + #19/main-FF fehlen in der K13-Reihenfolge namentlich | Di-25.-Schnitt (#96) zaehlt beide ZWINGEND |
+| L20 | Verbleib wt-ce-vl12 / wt-ce-k2 ungeklaert | Aufraeum-Block NACH den Landungen (Liste-C-Doktrin, mit wt-ce-hy-a/vl3) |
+| L21 | M-1 F-9-Sentinel + M-2 TSan: par.21 routet ins #15/HY-A2-Paket, Bruch ist aber fix-komplett OHNE Beleg und OHNE VERTAGT-Buchung (Abweichung A6 — NICHT glattrechnen) | FIX-STRECKE-2-TRIAGE (erster Posten der Triage-Liste) |
+| L22 | A-1-Rest: 387 Fremdprojekt-Token der Leck-Menge bleiben unbehandelt (nur 286/288/289 rotieren) | Infra-Alt-Tafel: EIGENER benannter Punkt (#84) |
+| L23 | VS-A..VS-F-Praezisierung par.19.1 (alle 6 entschieden, offen nur AUSFUEHRUNG) — deckt par.21 das? | docs-Zug: Pruefung + ggf. Marker (mit L15 buendelbar) |
+
+**Bilanz G:** 23/23 mit Traeger — 5x W4-Thesis-Block (L6/L7/L8/L11/L12/L13 = 6 Posten, einer
+gedoppelt gezaehlt: L12+L13 je eigener) · 3x docs-Zug (L14/L15/L23) · 2x Infra-Alt-Tafel
+(L10/L22) · Rest einzeln wie tabelliert. Der Di-25.-Schnitt (#96) prueft diese Tafel MIT.

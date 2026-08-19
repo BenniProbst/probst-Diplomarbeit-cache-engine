@@ -131,6 +131,12 @@ FRAGE: Kanonisierung in #15 falten oder Doppel-Schluessel dauerhaft tragen?
 EMPFEHLUNG: In #15 falten — letztes kostenloses Fenster; dauerhafte Zwillinge werden zur stillen
 Cache-Miss-Quelle.
 
+> UEBERHOLT-MARKER 19.08.2026 (K14, Zug-5-Pruefung): V-13 ist per KON101 BEANTWORTET — die
+> Tooling-Ordnungs-Validierung ist "deklariert-ungedeckt" quittiert (A2.5-R2 zu seg1-43), die
+> owner-vorlagen-Quittung (msg 22c82b86: "V-13 kommt im Vorlagen-Dokument nicht vor") bestaetigt:
+> KEIN offener Vorlagen-Punkt mehr. Der BAU-Traeger ist Task #99 (B-5f, W2/Di-25.-Schnitt,
+> Wellenplan par.21.4). Die Zeile Z.10 ("V-12/V-13 sind ...") liest sich entsprechend als Historie.
+
 ## AUS DEN STREICHUNGEN ENTSTANDENE AUTONOME POSTEN (kein Owner-Wort noetig; K1-K6 in KON100)
 K1 golden-XML-avx512-Filter-Korrektur (2 stale XML-Stellen; Wirksamkeits-Pruefung VOR Edit —
 wirksamer Filter = golden-Inhalt = V-03R-Buendel) · K2 Weg-a-Plan umsetzen (Koordination mit K1,
