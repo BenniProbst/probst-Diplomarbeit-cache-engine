@@ -3553,3 +3553,75 @@ Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr
     keits-Verschaerfung + comdare_gen_golden_fullpilot-Fix · completed #100/#101.
     K16-EINLESE-PFLICHT: Register VOLL (inkl. 13) + Uebergabe 0-11 + par.21-23 + #93-
     Synthese (nach Resume) + die 4 /goal-Dokumente (Kippen-Ritual, Sonnet-5-max-Analyse).
+
+## 23.5 K16-NEUGRUENDUNGS-ANALYSE (19.08. spaet, wf_a1d3fafe: 8 Sonnet-max-Transkript-Leser
+## K11-K15 + Traeger-Abgleich + Fable-max-Synthese; Owner-Order 19.08. vollzogen)
+
+> Quittungen: 8/8 Fenster LUECKENLOS (8249/8249 Zeilen, Z.63511-71759, je N/N; 390 Owner-
+> Texte ueber die DREI Extraktions-Pfade), Abgleich 137 Posten gegen T1-T6, 0 Ausfaelle.
+> B.3: ~/backups-workflow/20260819-neugruendung-k16/ (Endergebnis + Journal + 8 Fenster-
+> Berichte + abgleich-k16.md + neugruendungs-karte-k16.md). Verortung: Kette K1-K11
+> BESTAETIGT, 13/13 Stichproben-Gegenlesungen trafen.
+
+**23.5.1 ECHTE LUECKEN — HIERMIT GETRAGEN (12 geprueft, 2 nach Objekt-Gegenpruefung
+korrigiert):**
+    L10 (DRINGENDST, Vorposten am K6/L4-Zug): seg4-58 snmalloc -Werror=pedantic blockt
+        comdare_tests im super-Vollbau (37 Not Run, Eichlinie blind) — beheben ODER
+        deklarieren VOR dem super-Lande-Vollbau; sonst #96/Di-25.
+    L7  Talos-Kernel-Fixes namentlich: perf_event_paranoid 3->0/1 + nmi_watchdog 1->0 —
+        in Task #87 ergaenzt + Agenda-Punkt Infra-Fenster Do 20.08. abends (mit U-2).
+    L1+L4 KON106 (a290dbaa) + KON109 (892e33aa) ohne CI-SUCCESS-Beleg — EIN API-Probe-Zug
+        im KON119-Umfeld (K6) bzw. K11-Docs-Zug.
+    L2  KOEDER_RC=124 der 4. RCU-Endabnahme (Z64387) unerklaert (124=timeout-Signatur) —
+        K11-Fallen-/Memory-Zug (RC-Semantik je Koeder-Wrapper). Kein Lande-Blocker.
+    L3  PRAEZISIERT AM OBJEKT (19.08.): der stale i9-14900KS/raptor-Kommentar
+        machine_simd_signature.hpp:91 ist im BRUCH BEREITS GEHEILT (NP-11-KORREKTUR
+        765ee421, landet mit K3); dev 33 RaptorLake-Treffer/7 Dateien -> nach K3-Landung
+        bleiben GENAU 2 Kommentar-Treffer experiment_plan_director.hpp:752 = Mini-Posten
+        Di-25-Sammelzeile (22.4-Z-4-Muster).
+    L5  ENTLASTET AM ORIGINAL: s13-Kurz-Verify-Verdikt LIEGT (par.20.9 T-NEU-1 Z.2836-2840:
+        wf_0e1f240b TRAEGT_MIT_FIXES, Gate KON100-02 ERFUELLT; der Abgleich las par.20
+        nicht). Lebender Rest: die 2 Ein-Zeilen-KANN-Edits als Di-25-Auflage — an Task #18
+        als zweite Auflagen-Zeile angehaengt.
+    L6  wf_e13d73bf (namenloser W0a-Agent 10.08., T-NEU-3) — Drei-Pfade-Extraktor-Kleinlauf
+        im K11-Docs-Zug, Ergebnis als Register-Fussnote. Niedrig.
+    L8  Hybrid-Parser fail-closed OHNE fehlerklasse=-Traeger (K12-Teammate-Audit) — an
+        T-13/T-14-Fehlerklassen-Posten angedockt (par.21.3 ##40-Restbau, C-12-PFLICHT vor
+        Sa 29.08.); #96 zaehlt gegen.
+    L9  'N8' nirgends definiert (nur K12-Abschlusstabelle 'N8 erledigt'; N-Posten enden
+        bei N-7) — K11-Docs-Zug: Gegenstand im K12-Rohtranskript nachschlagen, Fussnote.
+    L11 Owner-Rueckfrage Kipp-Kartierer-Konstruktion — explizite Antwort-Zeile im
+        F2-Vorlagen-Fenster (K8; Antwort: Kippen macht der Lead SELBST, Agenten liefern
+        nur Karte/Abgleich — seit K15 so vollzogen).
+    L12 HERABGESTUFT nach Gegenlesen: #93-Erstlauf-Verdacht (0872967d) materiell
+        entschaerft (finale Synthese lief als Resume NACH ba33b9ac; 9.4 frisch gemessen);
+        Ein-Satz-Fussnote im KON119-Zug (Erstlauf-Teilbefund S-2/G-1 war gegen 0872967d).
+
+**23.5.2 ABWEICHUNGS-KLARSTELLUNGEN (A1-A8, Kurzform; Volltext B.3):** A1 Zitierpraezision
+par.22.3/23.3 = WELLENPLAN (nicht Uebergabe) · A2 taskboard_kompakt_k15.txt endet bei #101
+— fuer #102-#105 NIE den Snapshot zitieren, Live-Board/par.23.4 · A3 EINLESE-REGEL: Register
+Abschnitt 9 VOR Uebergabe-Abschnitt 2 (dort '16031 RUNNING' bereits ueberholt) · A4 clang-
+debug-ROT GEHEILT (Mischbau-Wurzel; Rest = PIC-Hausnorm T-4) · A5 HY-A2/A3 + g2 in aelteren
+Fenstern als offen gefuehrt = Historie, Abgleich korrekt · A6 ZWEI Zaehlbasen (688/85-roh-89
+vs. 107 offene) — bei Zitat Basis mitnennen · A7 #102 faehrt VOR K3, Lock-Regen bleibt
+Lande-Schritt 3 · A8 Task-Board ist im Landefenster kein Fortschritts-Signal (0 Status-
+wechsel an 99 Alt-Tasks trotz massiver Arbeit) — Fortschritt lebt in Register-/Uebergabe-
+Commits.
+
+**23.5.3 VL12-UNTERSUCHUNG + VL-FAMILIEN-VOLLZAEHLIGKEIT (Owner-Zweifel 19.08. 'vl12 ist
+nicht stale' — BESTAETIGT; wf_d9d83069, B.3: 20260819-w93-endstand/vl12-untersuchung-*.json):**
+    BEFUND: wt-ce-vl12 = bau/vl12-s6b-pod-vorstufe @ cd011e60, 5 Commits = Bauplan-Schritte
+    VL-1 (S-6b-Transpositions-Sperre: OrganZeile/SystemZeile/MessZeile benannte Traeger,
+    CT-Negativ-Probe) + VL-2 (laute POD-Vorstufe: designierte Initialisierer + Feldzahl-
+    Wache; K9-5-Zaehl-Sonde AnyFeld/FeldSonde) — die VORLEISTUNG, auf der B-5 des #15-Bruchs
+    aufsetzt. NIE substanz-stale: KOMPLETT GELANDET (Merge be724cb5, Ancestor von ba33b9ac,
+    Kombibau 4x499 + CI), porcelain 0, stash 0, alle 6 Lens-Funde eingeloest (F4-IWYU-Vollzug
+    im bump15 decl.hpp:24/:342); 'stale' traf NUR build-vl12 (693M, Belegpruefung 0 getrackt/
+    0 csv-xlsx = als Build raeumbar). VL-FAMILIE 8/8 GETRAGEN: VL-1/2 gelandet+bump15-Fort-
+    schreibung · VL-3 gelandet+#101 · VL-4 Owner-beantwortet (V-09R), Code=765ee421 landet
+    mit #15 · VL-5(a)-(e) VOLLZOGEN (KON100-04; Di-25-Gegenzaehlung steht) · VL-6a-Rest=N-2/
+    F2-8 (#15-Nachlandeschritt, VOR Freeze-Check!) · VL-6b=Di-25-Liste · VL-6c bestaetigt+
+    bump15 (f4e88786/4cb16334). KEIN neuer Task noetig — einziger docs-Kleinposten: F4b-
+    Formabweichung als 'am Objekt getilgt' vermerken (HIERMIT vollzogen). Worktree nach
+    Doktrin AUFRAEUMBAR (alle Bedingungen gemessen; kein Remote-Branch mehr, Submodul
+    uninitialisiert) — Abbau bleibt im Aufraeum-Block nach den Landungen.
