@@ -317,3 +317,33 @@ verschieben (Dauerregel 18.08.).
       docs=Lead · NIE in fremden Baeumen committen; Merges macht der Lead im ce-HAUPTKLON.
     FEHLER AUF DEM RUECKWEG: Pipeline rot -> Befund VOR Fix benennen (Job, Paket, Datei);
       Heilung im QUELL-Worktree, neuer Merge — nie direkt auf development flicken.
+
+## 9. NACHTRAG K15 (19.08. nachmittags): 5 LIEGENGEBLIEBENE AUS DEM 3-UEBERGABEN-ABGLEICH
+## + 2 WARNUNGEN + WIDERSPRUCHS-KLAERUNGEN (Quelle: uebergaben-leser-Vollabgleich)
+
+**ECHT LIEGENGEBLIEBEN (ausserhalb des K15-Leserasters; hiermit getragen — Aufnahme in
+Di-25.-Schnitt #96 bzw. Owner-Punkte-Liste):**
+    L-A  OF-4-PAT-AKTIVIERUNGSKETTE (completed-#54 traegt sie allein): Bot-PAT id=54 kann sich
+         NICHT selbst rotieren -> A1 id=54-Abloesung per Owner-Ein-Satz -> A2 ROTATE_TOKEN @ 290
+         -> A3 Schedule active=true. TRAEGER NEU: Owner-Punkte-Liste + #96/Di-25.
+    L-B  V8 GitHub-PAT-Rotation (Credential-Store-Fund aus #61; par.20 Z.2769): sicherheitsnah,
+         TRAEGER NEU: Infra-Tafel/#84-Umfeld + Owner-Punkte-Liste.
+    L-C  V9 rescue-Ref w3-thesis-c (95 Alt-Trailer-Commits leben als Ref; par.20 Z.2801):
+         Trailer-Rewrite-RESTLOCH — gehoert in DENSELBEN Owner-Entscheid wie E12 (Thesis a/b)!
+    L-D  node6-Remote-Login + id56-Herkunft + id18-Duplikat (completed-#60, par.20 Z.2769):
+         Owner-Kenntnisnahme-/Handout-Reste. TRAEGER NEU: Owner-Punkte-Liste.
+    L-E  VL-5(b)-(e) super-Doku-Buchungen (Bauplan Z.67-75, Z.346: "im SELBEN super-Zug" wie
+         XSD) — die K14-L4-Liste nannte sie NICHT. TRAEGER NEU: in L4-Checkliste aufgenommen;
+         Gegenprobe via X-17-23er-Matrix (6c) VOR L4.
+
+**2 WARNUNGEN fuer K15 (Namens-/Geltungs-Fallen):**
+    W-A  "N1-N5-N6" in Abschnitt 8.5(c) = vl3-Posten (X-9) — NICHT der Bauplan-Nachlauf
+         N-1..N-6 (der laeuft ueber die X-17-Matrix/6c). Beim #93 BEIDE Mengen getrennt zaehlen.
+    W-B  Die Parallel-Order (K13-ENDE: mehrere disjunkte Strecken parallel, Bau-Deckel 3,
+         Landung seriell) gilt per Memory WEITER, auch wo diese Uebergabe sie nicht wiederholt.
+
+**WIDERSPRUCHS-KLAERUNGEN (K14 gilt):** #15-completed NUR wenn golden-Zusage per F6 aufgeloest ·
+Commit-Zahl 25/32 -> 30 GEMESSEN (F3-Nachtrag) · clang-release-Raetsel AUFGEKLAERT (kein Rest) ·
+g2-Serialisierung nach K14-L-Liste · "~47 Verif-Pakete" war Planzahl (nie weiterzitieren) ·
+OF-4-NAMENSKOLLISION: Wellenplan-OF-4 (Festplatten-IO, GESCHLOSSEN) != #54-OF-4-KERN (Bot-PAT,
+LEBT als L-A) · Redaktions-Verfahren: EINE Redaktion NACH allen Rueckkehrern (K14-Owner-Korrektur).
