@@ -1113,3 +1113,54 @@ REKONSTRUIERBAR (17, je: letzter Stand am Objekt 19.08. -> REZEPT):
 - **Docs-/Memory-Zug:** KON74-04-Vermerk ([K7b-5]) · KON99-03-Zaehlwerk ([JB-4]) · Folge-BU-
   Spiegel ([JB-2]) · hy-a-Lens-Quittung ([JB-3]) · #85-Text-Delta (X-3) · Fallen-Block 12.2c
   GESCHLOSSEN in den T-5/T-6-Memory-Zug (11.5) -- 13 Klassen, nicht einzeln verlieren.
+
+## 13. K15-KONSOLIDIERUNG (19.08. nachmittags) — NEUZUGAENGE FUER FIX-STRECKE/93/LANDUNGEN
+## (Quellen: uebergaben-leser + kipp-kartierer + workflow-leser + sessionlog-leser, alle 4 komplett)
+
+**13.1 VERDIKT-PRAEZISIERUNG (Auflage fuer die 6c-Publikation/X-17):** Die 111er-Tafel (6b) ist
+ZWISCHENSTAND. Audit-ENDSTAND: 502 ERFUELLT / 74 UEBERHOLT / 85 ABWEICHUNG / 22 FEHLT /
+5 NICHT_PRUEFBAR = 107 offene. 4 spaeter entlastete IDs: LS2-33, LS2-41, seg3-kon8-11 -> ERFUELLT;
+LS2-34 -> UEBERHOLT. 6c uebernimmt die ENDSTAND-Zahlen + Volltexte aus dem BU-Journal (jetzt
+committed @ 9052a56b).
+
+**13.2 KIPP-KARTEN-FUNDE F-A..F-G (Plan-Abgleich der K15-Kette):** F-A Komplex-Fix-Rolle (v4.3)
+DEKLARIEREN in KON119/Merge-Botschaft (Fix-Strecke 2 + L2/L3-Kombibau am zusammengesetzten Stand
+uebernehmen sie; Pushes je L-Glied per par.21.1/20.3 juenger) · F-B B3-Bau-Slot -> in Fix-Strecke 2
+aufgenommen (M1-Messung beide Anker + G5-Bau) · F-C B-8 + VL-5/VL-6-Doku beim Di-25.-Schnitt
+NAMENTLICH gegenzaehlen (nur implizit im Wiederaufnahme-Register) · F-D VL-3(a) clang-Warnungs-
+Review = W2-1-Buchung (Sweep B-6), in #93-A DEKLARIERT ausweisen (sonst Freeze-Check-Falsch-Rot) ·
+F-E B-1-Kern GEBAUT (fixture_schema_subset_check.cmake haertet, CMakeLists:349 -DFIXTURE) — L4 nur
+Rest: Mutationsprobe ROT-statt-SKIPPED, Kopf-Nachzuege, SCHEMA.md:48 · F-F P2/P3-Vorlagen aus
+par.21.6 AM ORIGINAL bauen · F-G clang-debug-ENTLASTET-Deklaration beim Freeze-Check mitfuehren;
+waehrend der Fix-Strecke gehoert wt-ce-bump15 dem Workflow (Lead-Session-cwd beachten!).
+
+**13.3 UEBERGABEN-ABGLEICH — 5 LIEGENGEBLIEBENE + 2 WARNUNGEN (Volltext Uebergabe Abschnitt 9):**
+L-A OF-4-PAT-Kette A1->A2->A3 (completed-#54) · L-B V8 GitHub-PAT · L-C V9 rescue-Ref w3-thesis-c
+(-> an E12-Owner-Entscheid gekoppelt) · L-D node6/id56/id18 · L-E VL-5(b)-(e) in L4 (+X-17-
+Gegenprobe). WARNUNGEN: N1-N5-N6 (vl3/X-9) != N-1..N-6 (Bauplan via X-17); Parallel-Order gilt
+per Memory.
+
+**13.4 NACHGETRAGENE EINZELVERDIKTE (workflow-leser, Journal-Volltexte):** seg4-58 super-Vollbau:
+snmalloc-'-Werror=pedantic' blockt comdare_tests -> 37 Not Run, Eichlinie dort BLIND (L4-/W2-
+Posten) · INF-03 allow_runner_registration_token weiter True (Infra-Fenster) · INF-05
+Rotationsliste ohne samba · seg3-kon32-02 alle 12 glpat-Kandidaten HTTP 401 (PAT-Sicht 18.08.
+tot) · K-07 #90/#91 nie angeworfen (naechste Parallel-Kandidaten nach dem Rueckweg; #91-Frist
+Identitaets-Entscheide vor Mi 26.08.) · SEG5-16 measure_to_latex 0 Treffer (S13-17, Di-25) ·
+P-12 wt-ce-vl12/build-vl12 880M stale (Aufraeum-Block) · H3 Flake test_seg_coverage unquittiert
+(vor Kampagne) · Z-21 Mirrors owner-gated.
+
+**13.5 v08r-L3-AUFLAGE:** 4-Zellen-Bilanz gilt fuer 434d24c6; Fix-Tip 0f0742aa OHNE dokumentierte
+Abnahme -> L3 faehrt Kurznachweis an 0f0742aa ODER landet auf 434d24c6 + deklarierter Nachzug
+(Task-#95-Metadata traegt es).
+
+**13.6 K15-BETRIEBSEREIGNISSE:** ENOSPC-Ausgang + Queue-Verfall-Lehre + Pipeline-16020-Heilung
+verbucht (Uebergabe Abschnitt 10) · g2-ENDSTAND cb856212 (Rest-Kategorien LEERE MENGE; 4/4 Zellen
+@ 9aa9b9df; g2-Funde 2-4 vertagt -> L2-Optionen A/B) · Memory-Z.73-Fix ERLEDIGT · BU-Ordner
+GELANDET 9052a56b (Redaktion wf_279c39c0 FREIGEGEBEN 18/18 SAUBER, CI SUCCESS) · super porcelain 0.
+
+**13.7 FIX-STRECKEN-DECKUNGS-TAFEL (laufender WF wf_46805ad8 vs. DIESER Abschnitt):** Der WF
+traegt: F1-F9, T-2, T-10-Bau, L21, B3 (13.2/F-B), tools-3, M-5, 18.6(3)-Deklaration. Er traegt
+NICHT (Zuweisung): 13.1/6c-Publikation = Lead-docs-Zug NACH WF-Rueckkehr · 13.2 F-A/F-E/F-F =
+Lande-Zuege · 13.3 = Di-25/Owner-Liste/L4 · 13.4 = L4/W2/Infra/Di-25 wie je vermerkt · 13.5 = L3.
+K16-PFLICHT: WF-Quittungen GEGEN diesen Abschnitt auf Vollzaehligkeit pruefen; bump15-wirksame
+Reste in eine Rekursions-Runde (Resume wf_46805ad8), alles andere je Traeger.
