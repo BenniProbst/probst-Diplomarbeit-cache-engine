@@ -3154,3 +3154,296 @@ der Landung; Verweis par.21.1 Schritt 5/6). FRIST: mit der Landung, vor F2 (Fr 2
     (5) V-08R-Form-/Frist-Entscheid (#95: Owner-Form 64-Hex vs. 128-Hex-S-1-Vertrag)
     (6) ggf. golden-Nachposten-Satz (seg1-44) und Owner-Saetze fuer objektiv-nach-Abgabe-Posten
         (Kategorie C der W7-Liste, par.21.3)
+
+
+# 22. KONSOLIDIERUNG KONTEXT 15 (nachgetragen 19.08.2026 abends) --
+# LIEGENGEBLIEBENE + SPAETER FAELLIGE POSTEN (Owner-Order: nichts darf verloren gehen)
+
+> par.13-par.21 bleiben stehen; was hier steht, gilt vor. Owner-Order 19.08. (verbatim-Kern): "Ich
+> sehe hier viele Aufgaben, die zu einem spaeteren Zeitpunkt relevant werden und noch gebaut werden
+> muessen - diese duerfen nicht verloren gehen." Quelle: Liegengebliebenen-Sweep K14+K15
+> (wf_d42115cb) ueber das K15-Transkript; Traeger-Abgleich gegen DREI Quellen komplett:
+> (1) Task-Board 103 Tasks (Dump taskboard_kompakt_k15.txt + Live-Board; #102 F6-golden-Zug Frist
+> Do 20.08. und #103 TSan-Vollausbau EXISTIEREN bereits, #100/#101 completed), (2) Wellenplan
+> par.18.1-21.6 komplett (Z.2195-3156), (3) Regressionen-Register 12.4 (Z.1094-1116) + Abschnitt
+> 13/13.8 (Z.1117-1213) + Wiederaufnahme-Register G-Tafel (Z.76-109, 23/23 L-Posten mit Traeger,
+> "#96 prueft diese Tafel MIT"). Objekt-Gegenproben: TaskGet #15/#17, G-Tafel, Memory
+> reference_lokale_vollbau Z.70-78 (Z.75-Fix bereits korrekt am Objekt), s13-Design Z.1382-1390
+> (Defekt BESTAETIGT), apps/-CMakeLists (Target-Namen literal).
+> GEGENZAEHLUNG: 195 rohe Kandidaten (Nr. 195 'ccache 1837 Hits' trunciert, per Register 13.8 A16
+> identifiziert) -> 120 deduplizierte Posten = 96 GETRAGEN (davon ~12 bereits ERLEDIGT am Objekt)
+> / 19 TEIL-GETRAGEN (22.2) / 5 UNGETRAGEN (22.1). NIE-KUERZEN angewandt: bei Zweifel
+> TEIL-GETRAGEN. Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
+
+## 22.0 KERN-ERTRAEGE K15 (5 Zeilen)
+
+    (1) FIX-STRECKE 2 KOMPLETT: Verify NULL_NEUE_FUNDE; Abnahme/R2 @ 8cd32a0d, End-Tip 79171599
+        (Delta +3 tools-Format-Dateien +1 Kommentarzeile ausserhalb der CI-Pruefmenge, 13.8 A13);
+        Commit-Tafel e285d316..79171599 = 20 Commits, Eingangsmenge 15/15 GEDECKT (13.8).
+    (2) g2-HARMONISIERUNG + KOMBISTAND-ABNAHME @ b02b7523 (#17-Lande-Zug laeuft; Vorstufe
+        g2-ENDSTAND cb856212, Rest-Kategorien leere Menge, 4/4 Zellen @ 9aa9b9df -- 13.6).
+    (3) clang-debug-Zelle GEHEILT: der par.21.6-Offene-Rest "PIE/HDR-Link" ist ZU -- Wurzel war
+        Zellen-MISCHBAU (CMAKE_C_COMPILER=/usr/bin/cc -> gcc-15.3 ohne PIE-Default bei
+        CXX=clang++, prod1-Maschinen-Falle; 13.8 A10); Rest-Haelfte PIC-Hausnorm = W2-Mini
+        (22.2 T-4).
+    (4) VERTAGT-DAUERREGEL (Owner 19.08.): vertagt ist NUR Zwischenzustand -- landen, dann
+        Vertagte durchziehen, NACHLANDEN; nie ueber Landungen tragen. Memory-Anker:
+        feedback_vertagt_ist_nur_zwischenzustand_vor_landung_durchziehen.
+    (5) BU-ORDNER GELANDET @ 9052a56b (Redaktion wf_279c39c0 FREIGEGEBEN 18/18 SAUBER,
+        CI SUCCESS -- 13.6); Folge-BU-Nachzug des NEUEN Schnappschusses = 22.2 T-17.
+
+## 22.1 UNGETRAGENE POSTEN (5) -- HIERMIT VERANKERT (je Faelligkeit + neuer Traeger)
+
+**U-1 ROT: s13-design-J-1-REZEPTFIX (Faelligkeit: vor Di 25.08., VOR dem S-13-Buendel-Bau #18;
+Traeger NEU: ROT-Auflage am Task #18 + Ein-Zeiler-Fix im naechsten docs-Zug + Ledger:4501).**
+docs/plaene/20260817-DESIGN-s13-buendel-di25.md:1384-1385 traegt praefixlose Target-Namen
+'adhoc_emitter_cli' / 'anatomy_codegen_cli' -- die realen Targets heissen comdare_adhoc_emitter_cli
+(apps/adhoc_emitter) und comdare_anatomy_codegen_cli (apps/anatomy_codegen_tool); am Objekt 19.08.
+per add_executable-Zeilen NEU verifiziert. Woertliches Fahren des Di-25-Buendels kostet
+ninja-unknown-target + die 'Not Run'-Klasse; dem Block fehlt zudem die J-4-Stufe
+'--target comdare_tests' (Memory-JOIN-CHECKLISTE J-1..J-4). Dazu Ledger:4501-Mikro-Korrektur
+(KON61-13-Apps-Zensus) im selben Zug. 0 Treffer in Board / par.18-21 / Register 12.4+13; die im
+Sweep behauptete Verankerung an Task #17 ist per TaskGet WIDERLEGT (#17-Beschreibung traegt sie
+NICHT); der s13-design-Agent lebt nur fluechtig als Session-Agent. 22.4-Zeile Z-1 zaehlt gegen.
+
+**U-2 PLATTEN-RAEUMUNG prod1, ROOT-SEITIG (Faelligkeit: Owner-gebunden -- root noetig; VOR den
+Vollbau-Wellen WE 22./23., die S-19 + T-15b + I-PMC tragen; Traeger NEU: Owner-Betriebs-Punkt im
+Infra-Fenster Do 20.08. abends + Di-25-Betriebszeile in #96 = 22.4 Z-14).** /tmp/comdare e2e-b-ci
+~8G + comdare-gcc-build-65450/-192499 ~1.5G gehoeren USER gitlab-runner (eigenes rm scheiterte
+literal 'Permission denied', Transkript Z70795) + ~1.24G geloescht-offene Dateien an 4
+Alt-claude-Binaries (Freigabe nur per Prozess-Neustart; PIDs 210282/875273/2178939/2760805).
+Platte pendelte in K15 zwischen 100% belegt (1.4M frei) und 12-18G frei (Z70786/Z71350); 13.6
+verbucht nur das ENOSPC-EREIGNIS, nicht die Raeum-Handlung; 0 Treffer in allen drei
+Traeger-Quellen. Memory-Anker: volle Platte toetet auch Hooks.
+
+**U-3 T-3-OWNER-MELDUNG axis_cross_product (Faelligkeit: F2-Vorlagen-Fenster, mit der Landung vor
+Fr 21.08.; Traeger NEU: Kenntnisnahme-Zeile im F2-Vorlagen-Dokument neben P2-P7, Muster der
+OV-5b/OV-4-Meldungszeilen -> 22.3).** Bewusste, nie gemeldete Namens-Abweichung axis_cross_product
+statt verbund_union (0 Konsumenten; Ein-Zeilen-Nachzug, falls der Owner verbund_union will). Der
+FAKT steht im Regressionen-Register Abschnitt 11 (Z.488); die MELDUNGS-Handlung steht in KEINER
+Owner-Liste (weder Board-Zeile 'OFFEN BEIM OWNER' noch par.21.6-Fenster P1-P7 noch 13.3).
+
+**U-4 K16-STOPP-BAUSTEIN -> SESSION-VORLAGE B.0 (Faelligkeit: W2-docs-Zug nach den Landungen;
+Traeger NEU: benannter Punkt der 12.4-Docs-/Memory-Zug-Liste, buendelbar mit den
+K15-Memory-Neuzugaengen 22.2 T-14).** Audit-H4-OFFEN-Teil (Transkript Z70284): der
+K16-Stopp-Baustein (Schreiberwechsel-Protokoll) fehlt in der Session-Vorlage B.0; 0 Treffer in
+Board, par.18-21 und Register 12.4+13 (weder 'Stopp-Baustein' noch 'Session-Vorlage'/'B.0').
+
+**U-5 WERKZEUG-WUNSCH JOURNAL-AGENT-LABELS (Faelligkeit: nach Abgabe / W7, unverbindlich;
+Traeger NEU: 22.5 C-1, Kategorie C -- nur per Owner-Satz).** Das Workflow-Journal traegt keine
+Agent-Labels (nur v2:-Step-Key-Hashes; meta.json nur agentType/spawnDepth) -- Label-Feld fuer
+kuenftige Forensik (nachverify-r4, forensik.journal.luecken[3] = Transkript-Kandidat 194).
+Objektiv-nach-Abgabe-Klasse; in keiner der drei Quellen.
+
+## 22.2 TEIL-GETRAGENE POSTEN (19) -- JE MIT DEM FEHLENDEN STUECK + NACHZUG
+
+**T-1 KON119-MASCHINENLESBARKEITS-AUFLAGE (KON119/A11):** A2.5-Bilanz aus den maschinenlesbaren
+Quittungslisten zitieren (fixstrecke1-ergebnis-wiq9ihup1.json + a25-runde2-ergebnis.json), nie aus
+Prosa-Summen. GETRAGEN: der KON119-Zug selbst (par.21.1 Schritt 5 + 13.8 A4). FEHLT: die
+Maschinenlesbarkeits-Auflage nennt keine der drei Quellen -- Verlustrisiko beim KON119-Schreiben.
+NACHZUG: in die L4-/KON119-Checkliste (Task-#15-Lande-Notiz), zusammen mit F4-/F-A-/T-A (13.8 A4).
+
+**T-2 S-17/B5-TRAEGER FUER CEB-LAGER-REGISTRY-HASH-MAP (KON64):** haengt am C-3a/F4-Entscheid
+(P4). GETRAGEN: der F4/18.6(3)-Fallweg (#38a2 + 13.8 A4). FEHLT: die Traeger-BENENNUNG des
+KON64-Postens steht nirgends. NACHZUG: beim P4-Ruecklauf bzw. Di-25.-Schnitt in #24/B5 oder #57
+einbuchen; im Freeze-Check als deklarierten Rest fuehren (22.4 Z-13).
+
+**T-3 NP-24-BAUPUNKT (lazy_csv_header-Folgehaelfte nach NP-23):** GETRAGEN: NP-23 GEBAUT mit Zahl
+7 (13.8 A8; Voll-CSV 25->32 Spalten, Commit 78cc75e6). FEHLT: NP-24 ist nur 'benannt' -- kein
+Board-Task, kein Slot. NACHZUG: W2-Task/Slot beim Di-25.-Schnitt anlegen (#96 namentlich,
+22.4 Z-3).
+
+**T-4 13.8-KLEINPOSTEN-TRIO A9/A10/A11:** (a) F7-Generator-out_path
+system_axis_registry_gen/main.cpp:625 ('kleiner W2-Posten/Falle') + (b) PIC-Hausnorm
+comdare_hdr_histogram_wrapper POSITION_INDEPENDENT_CODE ON ('W2-Mini-Posten', ersetzt den alten
+clang-debug-Altbestands-Slot) + (c) optionale T-2-Haertung 2 static_asserts
+anatomy_fingerprint.hpp:1207 ('W2-klein'). GETRAGEN: in 13.8 mit Platz benannt. FEHLT: das
+#96-Mandat (par.21.4) deckt formal nur das WIEDERAUFNAHME-Register -- kein Board-/Di-25-Anker fuer
+diese drei Regressionen-Register-Posten. NACHZUG: Di-25-Sammelzeile (22.4 Z-4); 13.7-K16 prueft
+gegen.
+
+**T-5 F8-super-STELLE Konformitaetsregister teil2:**
+20260809-KONFORMITAETS-REGISTER-teil2-stationen-5-bis-8.md, S7-HY-A-PAKETE '(22->23)' + 'HY-A3
+toter Kommentar' -- UEBERHOLT-Marker per KON118 faellig. GETRAGEN: die ce-Haelfte der
+F8-Nachzuege ist in Fix-Strecke 2 behoben (15/15-Deckung). FEHLT: die super-Stelle lebt nur als
+WF-Quittung VERTAGT 'Platz: Docs-Zug' -- die 12.4-Docs-Zug-Liste nennt sie nicht. NACHZUG: an
+#85/super-Docs-Zug anhaengen (Muster der ce-Nachzuege 9378e463); L4-Umfeld oder W2-docs-Slot
+(22.4 Z-12).
+
+**T-6 prt-art-ROUNDTRIP-SHA-PIN (K7b-3):** build:registry-roundtrip nicht-deterministisch gegen
+ungepinnten ce-Geschwister-Checkout (.gitlab-ci.yml:115). GETRAGEN: 12.4 wies die Task-ANLAGE der
+Fix-Strecke 2 zu. FEHLT: die 15er-Eingangs-/Verify-Liste des WF trug prt-art NICHT und kein
+Board-Task entstand (#100/#101 decken nur tools-3/M-5) -- die Anweisung ist DURCHGERUTSCHT.
+NACHZUG: 13.7-Vollzaehligkeits-Gegenprobe dokumentieren + W2-Board-Task SOFORT anlegen,
+spaetestens Di 25. (#96; 22.4 Z-2).
+
+**T-7 X-12/V-02R-LAUFZEIT-BEFUELLUNG:** je Pruefdock-Tier-Binary EIGENER SHA-256 beim attach (Map
+landet K-1-leer; B-8/A-12-Haelfte). GETRAGEN: die Messung (12.4 -> #93 Gruppe C). FEHLT: der
+Folge-BAU-Task existiert nicht -- wartet deklariert auf den P4/P5-Owner-Entscheid. NACHZUG:
+Task-Anlage beim Di-25.-Schnitt mit Vermerk 'nach P4/P5' (22.4 Z-5); die Hash-Laengen-Spannung
+laeuft bereits als P5.
+
+**T-8 HYBRID-STEMPEL-EXPORT ENDE-ZU-ENDE (HY-B-Folgezug):** Stempel-ABI-Symbol im
+COMDARE_DEFINE_HYBRID_MODULE (heute 6 Symbole OHNE Stempel) + Emitter fuer
+COMDARE_HYBRID_KOMPOSIT_GLIED mit echten anatomy_name_hex + stempel_binden je Dock +
+rt_ct_invariante. GETRAGEN: die P5-Vorlage (Board-Owner-Zeile + par.21.4/#95). FEHLT:
+par.21.3-HY-B deckt nur Mehrfach-Dock/Heuristik/Eviction -- der Stempel-Export-BAU hat keinen
+Task. NACHZUG: eigener HY-B/W3-Task beim Di-25.-Schnitt (nach P5-Antwort + A-11-Pflicht aus #102;
+22.4 Z-6).
+
+**T-9 FB20-K-1 IM #24/B4-UMFELD:** beide Break-Even-Implementierungen ZUSAMMENFUEHREN,
+Bereichs-Erkennung statt Hysterese (Owner-Wort); die Datenquellen-Luecke (CSV ohne
+Checkpoint-Spalte) GETRENNT vorlegen. GETRAGEN: B4/System B voll (#24 + par.21.6 OV-2 + par.21.0
+Beleg-Tafel (2)). FEHLT: Zusammenfuehrungs-Auflage und CSV-Spalten-Luecke stehen nicht namentlich
+in den drei Quellen. NACHZUG: #24-B4-Text beim Di-25.-Schnitt nachschaerfen (22.4 Z-7); CSV-Luecke
+als Vorlage-Punkt in die naechste Owner-Runde (22.3).
+
+**T-10 g2-NEBENBEFUNDE FUER WARNUNGS-RUNDE 2:** gcc-Release-Warnung
+axis_03a_search_algo_interpolation.hpp:256 (TU test_v41_topic_traversal) + clang-22-Warnung
+vendored googletest gtest-printers.h:524 + 12 Non-ASCII-Altbestand axis_variant_version_table.hpp.
+GETRAGEN: Wstringop-Verbleib (12.4 -> #93-A [K10-12]). FEHLT: die drei g2-Nebenbefunde nennt keine
+Quelle. NACHZUG: namentlich in #93-A/W2-2 aufnehmen (Hausregel 2x gcc->clang; 22.4 Z-8).
+
+**T-11 seg4-15 S-16-REGRESSIONS-MESSPUNKT:** ci/tests 13->14 Shell-Skripte
+(guard_basis_bissprobe.sh, 8656 Zeilen); der Eindeutigkeits-Riegel ist weiter NUR Shell
+(KON37-08). GETRAGEN: S-16/Test-Konsolidierung als Dauerposten (#28). FEHLT: der konkrete
+Regressions-Befund ist nirgends verbucht. NACHZUG: als Messpunkt/Startzahl in den #28-W2-Slot
+schreiben (Inventur-Beginn; 22.4 Z-9).
+
+**T-12 D5-5 HDR-VERDRAHTUNG ALS BAU VOR DER KAMPAGNE (NP-43):** HDR-Header heute 0
+Produktions-Konsumenten; Altzahlen-Markierung = Owner-Pflicht 17.08. GETRAGEN: die MESSUNG
+(par.21.2 #93-Gruppe Statistik/Menge D4/D5/##10-19 + Frist-Dreiteilung). FEHLT: ein BAU-Traeger
+mit Kampagnen-Frist (vor Sa 29.08.) existiert nicht -- kein Task, kein Korb-C-Punkt. NACHZUG: nach
+#93-F-Ruecklauf beim Di-25.-Schnitt mit Frist vor 29.08. slotten (22.4 Z-10); den
+L7-Thesis-Altzahlen-Posten (G-Tafel) daneben ausweisen.
+
+**T-13 REGISTER-3b-HINWEIS-BUENDEL:** seg3-kon28-01 Ledger-Marker 'prod1=24 Worker' (par.69.6,
+real 16 Kerne/32 Threads; runner-mode.sh-Haelfte bereits ERFUELLT) + SHA-Zuordnungs-Detail
+9f8e2be8-vs-3ba0f7b3 (3 von 4 stimmen; seg3-kon8-11 in 13.1 entlastet) + super build:clang
+Kill-Switch when:never/docs-only (D-2-Kandidat). GETRAGEN: nur Register Abschnitt 3b (Z.166-169)
+mit 'W2-Triage'-Vermerk. FEHLT: ausserhalb der Traeger-Abschnitte 12.4+13; kein Task-/Di-25-Slot,
+nicht in der 12.4-Docs-Zug-Liste. NACHZUG: die 3b-Zeile beim Di-25/#96 in den Docs-Zug
+uebernehmen (Ledger-Marker + D-2-Entscheid; 22.4 Z-11).
+
+**T-14 DOCS-/MEMORY-ZUG K15-NEUZUGAENGE:** gitlab.comdare.local-Host-Regel (.de =
+404/JSONDecodeError-Falle) + Rot-Lauf-Logs-IMMER-persistieren-Pflicht + Transkript-Z45-signature-
+Artefakt als bekannt vermerken (NICHT reparieren) + F5-Edit-Wortlaut-Gegenprobe (Objekt Z.70-78
+sieht korrekt aus, nur die formale Gegenprobe ist offen) + Queue-Verfall-Lehre (nur via
+13.6-Verweis auf Uebergabe Abschnitt 10). GETRAGEN: der Memory-/Fallen-Zug selbst (12.4 + 13.8
+A16-A18, inkl. ccache-1837/tail-Fallen). FEHLT: diese K15-Neuzugaenge stehen dort nicht
+namentlich. NACHZUG: beim Memory-Zug aus Uebergabe Abschnitt 10 + 13.6 ziehen und namentlich
+abhaken (T-5/T-6-Zug); U-4 buendeln.
+
+**T-15 PRE-PUSH-GATE-DOKTRIN-REST:** Memory-Eintrag zum Script (K3/H6 'Werkzeug schlaegt
+Disziplin') + Regel 'Komplex-Fix-Stufe auch bei kleinen Wellen namentlich besetzen' (GOAL-IV.2).
+GETRAGEN: die Mechanisierung ist GEBAUT (scripts/pre_push_lande_gates.sh seit G6; Lauf-Pflicht am
+neuen Tip = 13.8 A13; Gate 4/6 blockt mechanisch). FEHLT: die Memory-/Doktrin-Haelfte nennt keine
+Quelle namentlich. NACHZUG: in den Memory-Zug (Fallen-Register) + ARBEITSWEISE-/GOAL-Nachtrag beim
+Docs-Zug.
+
+**T-16 E3-FOLGEN + H2-AUFLAGE:** Beweisorte der Landungs-Doku auf gesicherte G6-/tmp-Logs
+umschreiben ODER frische Vollaeufe je Baum; Abdeckungs-Wache kuenftig COMDARE_WACHE_STRIKT=1 +
+Exit ins gesicherte Log. GETRAGEN: ctest --no-tests=error als Fallen-Klasse (12.2c ->
+12.4-Memory-Zug). FEHLT: Beweisort-Umschrieb und WACHE_STRIKT-Doktrin stehen in keiner der drei
+Quellen (H3 ja, H2 nein). NACHZUG: in die L1-Lande-Checkliste (Beweisorte) + Memory-Zug
+(WACHE_STRIKT-Doktrin).
+
+**T-17 FIX-STRECKE-2-RUECKKEHR: BU-NACHZUG DES NEUEN SCHNAPPSCHUSSES:** Output+Journal aus
+~/backups-workflow/20260819-fixstrecke2-logs/ nach docs/sessions/backups/20260819-kontext14-
+workflows/ mit NEUER Redaktions-Pruefung (K13-Regel: die Freigabe 18/18 deckt nur den ALTEN
+Schnappschuss). GETRAGEN: Quittungs-Vollzaehligkeits-Check + Rekursions-Runde (13.7 K16-PFLICHT,
+Resume wf_46805ad8). FEHLT: die BU-Nachzug-+Neu-Redaktions-Haelfte traegt nur die Uebergabe
+8.2/11(4) -- keine der drei Quellen. NACHZUG: mit dem naechsten Folge-BU-Zug fahren (JB-2-Spiegel,
+12.4-Docs-Zug) und dort als Zeile ergaenzen.
+
+**T-18 SWEEP-ERGEBNIS LANDEN (DIESER NACHTRAG):** par.22 committen (Standard-Push-Sequenz) +
+vorgeschlagene Tasks anlegen (22.4 = namentliche Di-25-Liste fuer #96; 22.5 = Nach-Abgabe nur per
+Owner-Satz). GETRAGEN: bisher NUR durch den laufenden wf_d42115cb + Owner-Order 19.08. FEHLT: in
+Wellenplan (endete bei par.21.6), Board und Register war bis zu diesem Commit NICHTS persistiert
+-- stirbt der WF, war der Bericht der einzige Traeger. NACHZUG: dieser Abschnitt vollzieht die
+Persistierung; die Task-Anlagen/-Updates laut 22.4 sind der zweite Teil (Anlage-Liste liegt der
+Lead-Session vor).
+
+**T-19 L21/F-9-SENTINEL + M-2-TSan-FENCE-NAHT: EINZELBELEG:** F-9-Sentinel
+(hybrid_dock_array.hpp:206-219) + M-2-fence-Naht brauchen den expliziten Einzel-BEHOBEN/VERTAGT-
+Beleg der Fix-Strecke 2. GETRAGEN: Eingangs-Deckung 15/15 bestaetigt (13.8 Commit-Tafel) + G-Tafel
+L21 (Triage-Erstposten) + M-2 via #103. FEHLT: weder 13.8 noch 12.4 nennen F-9 im ERGEBNIS
+namentlich -- ohne Einzelbeleg droht die dritte stille Weiterreichung (A6-Warnung: nicht
+glattrechnen). NACHZUG: im 13.7-K16-Check gegen fixr1_endquittung_fixstrecke2_vollstaendig.md
+konkret nachschlagen; falls VERTAGT: HY-B-Task beim Di-25. anlegen (22.4 Z-15).
+
+## 22.3 OWNER-FENSTER-STAND (P1-P7 + L-A..L-D + Einzelposten; Stand 19.08. abends)
+
+**F2-Vorlagenfenster P1-P7 (Ein-Satz-Vorlagen MIT der Landung, vor Fr 21.08.; par.21.6 +
+Board-Owner-Zeile; F-F/13.2: P2/P3 AM ORIGINAL bauen):**
+
+    P1  AxisKind-Ordnung im Bruch mitdrehen? (seg1-37; KON5-04: immer Owner-VORLAGE)
+    P2  E-6-Satz: "22->23 war Phantom-Nenner, kGenusBuildSlotCounts 5->6 ist gebaut --
+        Einspruch?" (KON118)
+    P3  KON60-04-Spannung S-6 (stale, blockiert nicht)
+    P4  C-3a-Frist (Mi 19.08.) -- 18.6(3)-Fallweg DEKLARIERT (#38a2; KON119-Pflicht T-A
+        Ledger-Buchung, 13.8 A4); EINZIGE offene Owner-FRAGE; S-17/B5-Traeger-Benennung
+        haengt daran (22.2 T-2)
+    P5  V-08R-Form 64-Hex vs 128-Hex-S-1-Vertrag (#95 gebaut @ 0f0742aa, L3-Auflage 13.5);
+        V-02R-Bau (22.2 T-7) und HY-B-Stempel-Export (22.2 T-8) warten auf die Antwort
+    P6  golden-Nachposten-Satz seg1-44 + Owner-Saetze fuer objektiv-nach-Abgabe (Kategorie C)
+    P7  NP-02 (axis_category_of = Andockpunkt, 13.8 A19)
+    NEU in dieses Fenster (aus diesem Sweep): T-3-Kenntnisnahme-Zeile
+        axis_cross_product/verbund_union (22.1 U-3; Muster OV-5b/OV-4) | CSV-Checkpoint-
+        Spalten-Luecke GETRENNT vorlegen (22.2 T-9)
+
+**Liegengebliebene Owner-Posten L-A..L-D (Register 13.3; Volltext Uebergabe Abschnitt 9):**
+
+    L-A OF-4-PAT-Kette A1->A2->A3 (completed-#54: id=54-Abloesung per Owner-Ein-Satz ->
+        ROTATE_TOKEN @ 290 -> Schedule active=true)
+    L-B V8 GitHub-PAT-Rotation (Credential-Store-Fund, #61)
+    L-C V9 rescue-Ref w3-thesis-c (95 Alt-Trailer) -- an den E12-Owner-Entscheid gekoppelt
+    L-D node6 Remote-Login / id56-Herkunft / id18-Duplikat (#60)
+
+**Einzelposten (Board-Owner-Zeile + 13.4):** C-3a (= P4) | Infra-Termin/Wartungsfenster (#84:
+Meldung LIEGT, Owner traegt sie an Infra; dazu INF-03 allow_runner_registration_token weiter True
++ INF-05 Rotationsliste ohne samba, beide Infra-Fenster) | E12+V9-Thesis (L-C-Kopplung) | Z-21
+Mirrors owner-gated (13.4) | NEU: Betriebs-Punkt PLATTEN-RAEUMUNG prod1 (22.1 U-2, root noetig;
+ins Infra-Fenster Do 20.08. abends packen).
+
+## 22.4 DI-25.-SCHNITT-ZUGAENGE (namentliche Liste fuer #96; JEDE Zeile wird abgehakt)
+
+Bereits gebucht beim Schnitt (Bestand, zaehlt weiter): die 12.4-Zugaenge (B-8/X-13 |
+VL-6b/X-15+[K6-6] | S-8-Methodik-Override/[K12-2] | Peer-Session-Triage/X-14 |
+L20-golden-Ref-Ausbuchung/X-1 | Nested-Worktree-Triage/X-11) + G-Tafel MIT (L1-L23; L19 zaehlt
+#3/S-12 + #19/main-FF ZWINGEND) + F-C-Gegenzaehlung (B-8 + VL-5/VL-6-Doku namentlich).
+NEU AUS DIESEM SWEEP (Z-1..Z-15):
+
+    Z-1  s13-J-1-Rezeptfix als ROT-Vorbedingung VOR #18 (22.1 U-1; der Fix selbst laeuft FRUEHER
+         im docs-Zug -- Di-25 prueft nur, dass er drin ist)
+    Z-2  prt-art-Roundtrip-SHA-Pin-Task (22.2 T-6; Anlage SOFORT, Di-25 = Kontrolle)
+    Z-3  NP-24-Slot (22.2 T-3)
+    Z-4  W2-Miniposten-Trio 13.8 A9/A10/A11 als Sammelzeile (22.2 T-4)
+    Z-5  V-02R-Bau-Task mit Vermerk "nach P4/P5" (22.2 T-7)
+    Z-6  HY-B-Stempel-Export-Task W3, "nach P5 + A-11/#102" (22.2 T-8)
+    Z-7  #24/B4-Text-Nachschaerfung FB20-K-1 (22.2 T-9)
+    Z-8  g2-Nebenbefunde namentlich in #93-A/W2-2 (22.2 T-10)
+    Z-9  seg4-15-Messpunkt als #28-Inventur-Startzahl (22.2 T-11)
+    Z-10 D5-5-HDR-Verdrahtungs-BAU, Frist vor Sa 29.08. (22.2 T-12; nach #93-F-Ruecklauf)
+    Z-11 Register-3b-HINWEIS-Buendel in den Docs-Zug (22.2 T-13; Ledger-Marker prod1=24 +
+         D-2-Entscheid)
+    Z-12 F8-super-Stelle an #85/super-Docs-Zug (22.2 T-5)
+    Z-13 S-17/B5-Traeger-Benennung KON64 nach P4-Ruecklauf (22.2 T-2)
+    Z-14 Betriebszeile Platten-Raeumung prod1 (22.1 U-2; root/Owner)
+    Z-15 L21/F-9-Sentinel + M-2-Einzelbeleg-Nachschlag; falls VERTAGT -> HY-B-Task (22.2 T-19)
+
+## 22.5 NACH-ABGABE-KANDIDATEN NUR MIT OWNER-SATZ (Kategorie C)
+
+    C-1 Workflow-Journal-AGENT-LABELS: journal.jsonl traegt keine Agent-Labels (nur v2:-Step-Key-
+        Hashes; meta.json nur agentType/spawnDepth) -- Label-Feld fuer kuenftige Forensik
+        (Orchestrator-/Workflow-Tooling; 22.1 U-5, nachverify-r4). W7/unverbindlich; Aktivierung
+        NUR per Owner-Satz (vereinbar mit par.21.0: W7 nur per Owner-Entscheid).
+
+Bestandstafel UNVERAENDERT: par.21.6 (OV-4 | OV-5b | OV-14 | W7/#88) + par.21.3-Kategorie-C-Regel.
+Dieser Sweep fuegt KEINEN weiteren Nach-Abgabe-Posten hinzu -- alle uebrigen 119 der 120 Posten
+haben einen Vor-Abgabe-Platz.
+
+**VOLLZUG DIESES NACHTRAGS (= 22.2 T-18, erster Teil hiermit):** par.22 committen
+(Standard-Push-Sequenz, docs-Zug) + Task-Anlagen/-Updates laut 22.4; #96 zaehlt 22.4 namentlich
+gegen; die 13.7-K16-Pflicht prueft WF-Quittungen kuenftig AUCH gegen diesen Abschnitt. Stirbt ein
+Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr.
