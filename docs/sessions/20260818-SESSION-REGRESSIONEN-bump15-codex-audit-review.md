@@ -1164,3 +1164,50 @@ NICHT (Zuweisung): 13.1/6c-Publikation = Lead-docs-Zug NACH WF-Rueckkehr · 13.2
 Lande-Zuege · 13.3 = Di-25/Owner-Liste/L4 · 13.4 = L4/W2/Infra/Di-25 wie je vermerkt · 13.5 = L3.
 K16-PFLICHT: WF-Quittungen GEGEN diesen Abschnitt auf Vollzaehligkeit pruefen; bump15-wirksame
 Reste in eine Rekursions-Runde (Resume wf_46805ad8), alles andere je Traeger.
+
+## 13.8 SCHATZ-LESUNG FIX-STRECKE 2 + NACH-VERIFY (19.08. abends; Quelle: schatz-leser ueber
+## Endergebnis 106KB + Journal 26/26 + R4-Volltext — Deltas zur bekannten Bilanz)
+
+**HANDLUNGS-SPITZEN (je Traeger):**
+- A1 🔴 F6-TRAEGER BENANNT = Task #102 (Frist Do 20.08. lt. Terminierungs-Notiz 6fe69057):
+  EIN golden-Zug B-9+A-11+B-10.3+B-11.2; ZWEI Anker-Klassen (TABU 0x56F1B721C72DC10E +
+  Emissions-CRC 0xF1C1F26A1232073B); Lock-Regen gehoert NICHT hinein.
+- A2 LANDE-VORBEHALTE L1: (a) Gate-4-Lock-Rot 4 Traeger -> T-B = Lande-Schritt 3 (Erst-Versionen
+  + Regen-Commit + pre_push_lande_gates voll gruen); (b) T-C: 4 XML-Wohlform-Vorbestandsfehler
+  ('--' im Kommentar: m3_smoke_coverage:170, m3v2_sota_pilot:8, wdk_fairness_example:73,
+  measurement_axis_registry:61) im Lande-Zug heilen — sonst ci_xml_wellformed_guard 4/160 rot.
+- A13 TIP-DELTA-DECKUNG: Abnahme/R2 galten @ 8cd32a0d; HEAD ist 79171599 (+3 tools-Format-Dateien
+  +1 Kommentarzeile, ausserhalb CI-Pruefmenge) -> vor L1 pre_push_lande_gates.sh am NEUEN Tip
+  fahren + M-7-Werkzeug-Paritaetsfrage (#100, lokal 22.1.8 vs CI) kurz klaeren.
+- A4 KON119-PFLICHTEN: F4/18.6(3)-Deklaration (wortlaut-persistiert in
+  fixr1_endquittung_fixstrecke2_vollstaendig.md Abschnitt 0) + F-A-Komplex-Fix-Deklaration +
+  T-A Ledger-Buchung C-3a.
+- A7 B3-SPEZ-ABWEICHUNG (deklariert, kein Defekt): G5 baute Legenden-ERBE (w vorn in der
+  Tier-Legende, CT-Beweis Glied [3]) statt des m1-vorgesehenen neuen CEB-Stempel-Glieds ->
+  golden-NEUTRAL (kein anatomy/-Byte, kein Lock-Record); der m1-F2-Schutz-Gedanke (wallclock@
+  Version als CEB-Glied) lebt als B5-VORPOSTEN in #24 ('vor die erste real w-lose
+  CEB-Konfiguration', Zwillings-Wache CEB-Zeile==Tier-Zeile). KON119-Vermerk.
+- A8 NP-23 GEBAUT MIT ZAHL 7 (nicht 5/6): Voll-CSV 25->32 Spalten am Zeilenende, 16er-Pipeline-
+  Vertrag unberuehrt, schema_freeze.hpp im selben Commit (78cc75e6); NP-24-Baupunkt benannt.
+- A9 F7-WURZEL SCHARF: Generator-Default out_path='system_axis_registry.xml' im CWD
+  (system_axis_registry_gen/main.cpp:625) — nur die Datei geloescht; kleiner W2-Posten/Falle.
+- A10 PIC-LATENZ: C3-Rot war Zellen-MISCHBAU (CMAKE_C_COMPILER=/usr/bin/cc -> gcc-15.3 OHNE
+  PIE-Default bei CXX=clang++, prod1-Maschinen-Falle!); m3-Fix-Spez liegt ungenutzt
+  (comdare_hdr_histogram_wrapper = einzige Haus-Lib ohne POSITION_INDEPENDENT_CODE ON) ->
+  W2-Mini-Posten PIC-Hausnorm; 'W2-Slot-Posten Altbestand' entfaellt in alter Form.
+- A11 T2-Haertung optional: [0]/[4]-Vertauschung nur Test-TU-gedeckt -> 2 static_asserts unter
+  anatomy_fingerprint.hpp:1207 (W2-klein).
+- A12 -> Task #103 (TSan-Vollausbau, eigene Objektklasse; 87fa9473 aendert CI-Verhalten mit L1!).
+- A5 VERIFY-R1-VOLLTEXT geborgen (nur im Journal): 6 Funde (2 MITTEL/4 NIEDRIG), alle in fix-r1
+  BEHOBEN — inkl. der Korrektur 'F3 = Endstand decken' (R1-Kandidat decl.hpp war falsch).
+- A16-A18 FALLEN/BETRIEB (Memory-Zug): LastTestsFailed.log = Altrest bei gruenem Lauf ·
+  CMakeCache-mtime kein Halbschreib-Indiz · Basename-GLEICHHEIT statt Substring (clang++ endet
+  auf g++!) · ctest-Nummern rechtsbuendig ('Test *#'-Muster) · 'ccache 1837 Hits' nie zitieren ·
+  ninja-Endzeile [N-1/N] normal · Werkzeug-Targets am bump15: comdare_adhoc_emitter_cli +
+  comdare_catalog_codegen_cli.
+- A19 ZITIERFUNDUS: G1-Dreh wire-/preimage-neutral BELEGT; Ordinale 0-5 blockweise;
+  axis_category_of = NP-02-Andockpunkt; Status-Codes 13-15 in hybrid_dock_contract.hpp;
+  Floor-Endstand 507/503/501; Hygiene 34174 Zusatzzeilen 0/0.
+**COMMIT-TAFEL e285d316..79171599 (20 Commits) + Vollzaehligkeits-Urteil: Eingangsmenge 15/15
+GEDECKT, kein Posten still verschwunden — Volltext beim schatz-leser-Bericht (Transkript) +**
+**Referenz-Anker: ~/backups-workflow/20260819-fixstrecke2-logs/fixr1_endquittung_*.md.**
