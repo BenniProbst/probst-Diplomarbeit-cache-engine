@@ -77,3 +77,29 @@ loeschen · Drei-Bauten-Deckel (Slot 2 belegt durch v08r!) · Ein Schreiber je W
 Fix-Strecke 2, g2/v08r = UNGELANDET halten) · 286er-Mess-Pipeline nie pollen · NUR-FABLE-5-MAX
 bis Widerruf · NIE kuerzen/ausbuchen (Dauerregel) · build-g2 (7.1G) NICHT loeschen (Lande-
 Verifikation) · Platte 95%/13G -- vor jedem Vollbau df-Gate.
+
+## 6. NACHTRAG 2 (19.08. ~07:55): LIMIT-97%-STOPP -- ALLE WORKFLOWS KONTROLLIERT PAUSIERT
+
+Owner-Order (5h-Limit 97%): beide Rest-Workflows per TaskStop KONTROLLIERT gestoppt (kein
+Limit-Tod mitten im Agenten; Journale = Cache, nichts verloren):
+- **g2 wf_5dd12e19-e73** gestoppt in der Verify-Rekursion NACH Fix-R1 (1 Fund BEHOBEN als
+  Bilanz-Nachtrag; Tip 9aa9b9df UNVERAENDERT, porcelain 0 -- der Baum ist komplett committed,
+  LANDEREIF-Stand gilt). Resume: Workflow({scriptPath:'<session>/workflows/scripts/
+  g2-fertigstellung-slot1-wf_5dd12e19-e73.js', resumeFromRunId:'wf_5dd12e19-e73'}) -- ODER
+  nur den Verify-R2-Rest der Lande-Stufe ueberlassen (Substanz fertig).
+  🔴 LEAD-POSTEN aus Fix-R1 (Task-#17-Metadata): s13-design Z.1384 falsches J-1-Rezept --
+  Fix VOR Di-25.-Schnitt; Ledger:4501 Mikro-Korrektur im docs-Zug.
+- **Sweep wf_cd301f28-e11** gestoppt (Teilstand-Journal gesichert). Resume:
+  Workflow({scriptPath:'/home/comdare/.claude/jobs/5a19728e/tmp/regression-sweep-10k.js',
+  resumeFromRunId:'wf_cd301f28-e11'}) -- fertige Leser kommen aus dem Cache; BU-Kopie des
+  Scripts liegt im K14-BU-Ordner.
+- **Redaktion wf_e8c90d63** war bereits VOR den Stopps beendet (Owner-Reihenfolge-Korrektur:
+  EINE Redaktion erst NACH allen Rueckkehrern ueber den VOLLSTAENDIGEN BU-Ordner).
+
+**WIEDERANLAUF-REIHENFOLGE (fixiert):** (1) g2 + Sweep resumen -> vollstaendig lesen ->
+Rohdaten/Journale im BU-Ordner FINALISIEREN (Teilstand-Kopien ersetzen) -> Sweep-Abschnitt 12
+ins Regressionen-Register landen. (2) DANN EINE Redaktion ueber den vollstaendigen BU-Ordner
+(Script-Vorlage: workflows/scripts/bu-redaktion-kontext14-wf_e8c90d63-0f8.js, Dateiliste um
+Nachzuegler erweitern). (3) Nach FREIGEGEBEN: BU-Ordner committen + dual pushen (Koeder-Gate).
+(4) Fix-Strecke 2 (Eingangsmenge Abschnitt 3 der Pause-Doku) -> #93 -> serielle Landungen.
+**BU-Ordner-Stand bei Pause: 17 Dateien lokal, UNCOMMITTED (Owner-Order: Redaktion vor Push).**
