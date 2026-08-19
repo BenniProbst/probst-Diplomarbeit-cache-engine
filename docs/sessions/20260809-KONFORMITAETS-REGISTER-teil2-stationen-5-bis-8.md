@@ -128,6 +128,14 @@ Nenner 49 Soll-Aussagen, alle am Objekt gemessen: ERFUELLT 8/49 (16 %) - TEILWEI
 
 - [s7-release-hybrid] S7-HY-WELLENPLAN-FENSTER: HYBRID kehrt ins Fenster vor der Abgabe zurueck: HY-A in W1 (17.-21.08.), HY-B in W3-MESS (bis 04.09.), HY-C in W4 (bis 11.09.) -- alle drei VOR dem 15.09. — Der Plan traegt die Kette, der Bau hat nicht begonnen. Kritisch ist die REIHENFOLGE-Abhaengigkeit: HY-C konsumiert die HY-B-Kurven, HY-B braucht ein lauffaehiges Pruefdock aus HY-A. Rutscht HY-A ueber F2 (21.08.), faellt HY-C mechanisch aus dem Fenster. Empfehlung fuer den naechsten Wellen-Check: HY-A2 (F8-DoD) als hartes F2-Abnahmekriterium mit ctest-Namen benennen, nicht als Prosa-Posten.
 
+> UEBERHOLT-MARKER 19.08.2026 (Fix-Strecke 2/F8, KON118/E-6-Verdikt): die '(22->23)'-Formel in der
+> HY-A3-Zeile darunter war ein PHANTOM-NENNER (kein lebender Zaehler stand je auf 22; Herkunft toter
+> Kommentar axis_reflect.hpp:4 vom 02.06.). Realer HY-A3-Registry-Anteil = kGenusBuildSlotCounts
+> 5->6 (genus_build_admission.hpp) + Gattungen 3->4/Genera 5->6 (anatomy_base.hpp) -- im #15-Bruch
+> GEBAUT; Abnahme = size() 5->6 + Einzelquellen-Paare 4/6 je vorher/nachher. Der Text darunter
+> bleibt als Historie stehen (Doku-Doktrin); Z.203-Analyse dieses Registers hatte den toten Nenner
+> bereits selbst diagnostiziert.
+
 - [s7-release-hybrid] S7-HY-A-PAKETE: HY-A1 Dock-Contract/Pruefdock/Factory/Array; HY-A2 F8-Minimal-DoD (ctest-bewiesen, Reroute auf 2 plain-Tier-Ziele); HY-A3 <hybrid_tier>-Parser + Heuristik-Hybrid-Achse in der Registry (22->23) + Fehlerklassen. — HY-A3 ist heute nicht abnehmbar, weil sein Kriterium auf einen toten Kommentar zeigt. Vor dem Bau: den echten Achsen-Zaehler benennen (Kandidaten am Objekt: cache_engine_axis_registry.xml 18 <axis>, kCatalogAxisCount 19, 27 push_static_axis-Aufrufe ueber 17 topics/-Verzeichnisse) und die Abnahme darauf umschreiben. Danach: Parser in libs/common/serialization/xml_config_parser/ + Fehlerklassen nach dem Muster measurement/axis_error.hpp.
 
 - [s7-release-hybrid] S7-HY-B-PAKET: HY-B = Hybrid-Overhead-Kampagne: Stub-Heuristik am Hybrid-Pruefdock, Reroute-Overhead zu multiplen Tier-Zielen, eigene kleine Teilmatrix; die 4. Mess-Ebene liefert ihre Pflicht-Zahlen; Overhead-Kurve je Zielanzahl mit n je Zelle. — HY-B kann erst nach HY-A2 starten. Vorbereitbar OHNE Hybrid-Code: die Spalten-Erweiterung der Mess-CSV um `n_targets` durch das Schema-Orakel ziehen (MT-L3, laut Designplan die eine Spaltenaenderung der Woche) -- sonst entsteht die Spalte spaeter am Orakel vorbei. Danach: Stub-Heuristik (fester Index) + Teilmatrix-Profil + Overhead-Kurve mit n je Zelle.
