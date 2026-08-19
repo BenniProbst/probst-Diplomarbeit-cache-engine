@@ -347,3 +347,34 @@ Commit-Zahl 25/32 -> 30 GEMESSEN (F3-Nachtrag) · clang-release-Raetsel AUFGEKLA
 g2-Serialisierung nach K14-L-Liste · "~47 Verif-Pakete" war Planzahl (nie weiterzitieren) ·
 OF-4-NAMENSKOLLISION: Wellenplan-OF-4 (Festplatten-IO, GESCHLOSSEN) != #54-OF-4-KERN (Bot-PAT,
 LEBT als L-A) · Redaktions-Verfahren: EINE Redaktion NACH allen Rueckkehrern (K14-Owner-Korrektur).
+
+## 10. NACHTRAG K15 (19.08. nachmittags): ENOSPC-AUSGANG VERBUCHT + UEBERHOLT-MARKER
+## (Quelle: sessionlog-leser-Vollbericht Z69758-70767 + eigene Heilungs-Messungen)
+
+**ENOSPC-CHRONOLOGIE-KERN (12:26-12:48):** f6bb0d59 gepusht 12:26 -> Compact 12:27 -> Platte /
+lief voll (Transkriptzeile riss ab, Turn starb 12:43) -> Owner-Eingriff 12:44 (find-delete
+/tmp/claude-1001 + Diagnose) -> Hooks wieder ok 12:45 -> Bergung 12:46-12:48 (g2-Output+Journal
+-> BU, Tip cb856212 dual). Der g2-Workflow wt0a9rbks starb NICHT — nur seine Erst-Zustellung
+verfiel in der Queue (12:28 eingereiht, 12:32 entfernt); die Notification kam nach der
+Platz-Freigabe erneut. LEHRE: Queue-Zustellungen koennen im toten Turn verfallen — nach jedem
+Ausfall Task-Outputs/Journale DIREKT pruefen, nie auf die Notification warten.
+
+**PIPELINE-ROT 16020 (f6bb0d59) — BEFUND + HEILUNG (8.8-Pflicht, nachverbucht):** EIN roter Job
+test:host-klassen-bericht; Ursache LITERAL im Trace 12:24: 'unable to write file thesis/...pdf'
++ 'fatal: ... Out of diskspace' beim get_sources-Checkout (Runner auf prod1 waehrend der
+Vollfuellung) — reiner Infra-Transient, kein Code-Bezug (Commit war docs-only). HEILUNG: Job
+382030 Retry nach Raeumung (18G frei) -> Pipeline 16020 SUCCESS. Beide Uebergabe-Commits gruen
+(16019+16020); Abschnitt-9-Commit fa66a32e ebenfalls SUCCESS.
+
+**HOST-REGEL PIPELINE-API (ergaenzt 8.0(6)):** Die API antwortet auf gitlab.comdare.LOCAL
+(HTTP 200); gitlab.comdare.de liefert 404 (JSONDecodeError-Falle bei leerem Body). Polls IMMER
+gegen gitlab.comdare.local fahren.
+
+**UEBERHOLT-MARKER an dieser Uebergabe (Stand 13:05):** Abschnitt 3 g2-Resume-Rezept UEBERHOLT
+(Workflow komplett zurueck, 8/8; Endstand vollstaendig gelesen) · Abschnitt 2/L2 'origin noch
+9aa9b9df' UEBERHOLT (cb856212 dual, ls-remote-bewiesen; g2-Worktree-Besitz zurueck beim Lead) ·
+'BU 17 Dateien' -> 18 Dateien (Endstand ersetzt Teilstand) · Die EINE Redaktion LAEUFT
+(wf_279c39c0, 2 Pruefer + Redakteur; Schnappschuss = 18 Dateien — Zuwachs danach braeuchte
+eigene Pruefung) · Memory-Z.73-Fix (g2-Fund 5) ERLEDIGT · Kipp-Protokoll K15 SELBST vollzogen
+(GOAL 816/816 + Designplan 703/703 + ARBEITSWEISE 1264/1264 + Wellenplan par.18-21 komplett +
+3 Vorgaenger-Uebergaben; Wellenplan par.1-17 = Agenten-Karte, Nachlese-Kandidat).
