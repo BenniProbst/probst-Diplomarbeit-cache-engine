@@ -8,7 +8,7 @@
 
 #include "experiment_phase_strategy.hpp"
 
-#include <anatomy/pruefling_merge.hpp> // ce-Single-Source MergeStrategy (Discriminator)
+#include <anatomy/pruefling_merge.hpp> // ce-Single-Source PrueflingVerbundStrategy (Discriminator, bis ce-V-11R: MergeStrategy)
 
 #include <cstdio>
 #include <string_view>
@@ -35,16 +35,16 @@ static_assert(!strat::ExperimentPhaseStrategy<NotAStrategy>);
 static_assert(!strat::ExperimentPhaseStrategy<int>);
 
 // (3) select_merge() liefert compile-time die korrekte MergeStrategy je Phase.
-static_assert(strat::Stufe1CeOnlyStrategy::select_merge() == pm::MergeStrategy::Stufe1_CeOnly);
-static_assert(strat::Stufe2PrueflingReplaceStrategy::select_merge() == pm::MergeStrategy::Stufe2_PrueflingReplace);
-static_assert(strat::Stufe3FullJoinStrategy::select_merge() == pm::MergeStrategy::Stufe3_FullJoin);
+static_assert(strat::Stufe1CeOnlyStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund1_CeOnly);
+static_assert(strat::Stufe2PrueflingReplaceStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund2_Replace);
+static_assert(strat::Stufe3FullJoinStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund3_Union);
 
 // (4) Policy-Based Auswahl (Discriminator -> konkrete Strategy) ist typ-korrekt.
-static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::MergeStrategy::Stufe1_CeOnly>, strat::Stufe1CeOnlyStrategy>);
-static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::MergeStrategy::Stufe2_PrueflingReplace>,
+static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>, strat::Stufe1CeOnlyStrategy>);
+static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund2_Replace>,
                              strat::Stufe2PrueflingReplaceStrategy>);
 static_assert(
-    std::is_same_v<strat::PhaseStrategyFor<pm::MergeStrategy::Stufe3_FullJoin>, strat::Stufe3FullJoinStrategy>);
+    std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund3_Union>, strat::Stufe3FullJoinStrategy>);
 
 // (5) KEIN vtable / kein Runtime-Polymorphismus (statischer Dispatch, zero-cost).
 static_assert(!std::is_polymorphic_v<strat::Stufe1CeOnlyStrategy>);
@@ -53,7 +53,7 @@ static_assert(!std::is_polymorphic_v<strat::Stufe3FullJoinStrategy>);
 static_assert(std::is_empty_v<strat::Stufe1CeOnlyStrategy>);
 
 // (6) CRTP-Basis leitet static-polymorph korrekt weiter.
-static_assert(strat::Stufe1CeOnlyStrategy::resolved_merge() == pm::MergeStrategy::Stufe1_CeOnly);
+static_assert(strat::Stufe1CeOnlyStrategy::resolved_merge() == pm::PrueflingVerbundStrategy::Verbund1_CeOnly);
 static_assert(strat::Stufe1CeOnlyStrategy::is_ce_only());
 static_assert(strat::Stufe2PrueflingReplaceStrategy::involves_pruefling());
 static_assert(strat::Stufe3FullJoinStrategy::involves_pruefling());
@@ -75,14 +75,15 @@ int main() {
     (void)s2;
     (void)s3;
 
-    check(strat::Stufe1CeOnlyStrategy::select_merge() == pm::MergeStrategy::Stufe1_CeOnly,
-          "Stufe1CeOnlyStrategy::select_merge() == Stufe1_CeOnly");
-    check(strat::Stufe2PrueflingReplaceStrategy::select_merge() == pm::MergeStrategy::Stufe2_PrueflingReplace,
-          "Stufe2PrueflingReplaceStrategy::select_merge() == Stufe2_PrueflingReplace");
-    check(strat::Stufe3FullJoinStrategy::select_merge() == pm::MergeStrategy::Stufe3_FullJoin,
-          "Stufe3FullJoinStrategy::select_merge() == Stufe3_FullJoin");
+    check(strat::Stufe1CeOnlyStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund1_CeOnly,
+          "Stufe1CeOnlyStrategy::select_merge() == Verbund1_CeOnly");
+    check(strat::Stufe2PrueflingReplaceStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund2_Replace,
+          "Stufe2PrueflingReplaceStrategy::select_merge() == Verbund2_Replace");
+    check(strat::Stufe3FullJoinStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund3_Union,
+          "Stufe3FullJoinStrategy::select_merge() == Verbund3_Union");
 
-    // phase_name() == MergeStrategy-Name (stabile Phasen-Identitaet).
+    // phase_name() == historisches Stufe-Vokabular (super-lokale Phasen-Identitaet; seit
+    // ce-V-11R bewusst NICHT der ce-Enumerator-Name -- XML-/Profil-Vokabular haengt daran).
     check(strat::Stufe1CeOnlyStrategy::phase_name() == "Stufe1_CeOnly", "Stufe1 phase_name() == 'Stufe1_CeOnly'");
     check(strat::Stufe2PrueflingReplaceStrategy::phase_name() == "Stufe2_PrueflingReplace",
           "Stufe2 phase_name() == 'Stufe2_PrueflingReplace'");
@@ -94,14 +95,14 @@ int main() {
     check(!strat::Stufe3FullJoinStrategy::describe().empty(), "Stufe3 describe() nicht leer");
 
     // Policy-Based Auswahl: Discriminator -> konkrete Strategy -> gleiche MergeStrategy.
-    check(strat::PhaseStrategyFor<pm::MergeStrategy::Stufe1_CeOnly>::select_merge() == pm::MergeStrategy::Stufe1_CeOnly,
-          "PhaseStrategyFor<Stufe1_CeOnly> -> Stufe1_CeOnly");
-    check(strat::PhaseStrategyFor<pm::MergeStrategy::Stufe2_PrueflingReplace>::select_merge() ==
-              pm::MergeStrategy::Stufe2_PrueflingReplace,
-          "PhaseStrategyFor<Stufe2_PrueflingReplace> -> Stufe2_PrueflingReplace");
-    check(strat::PhaseStrategyFor<pm::MergeStrategy::Stufe3_FullJoin>::select_merge() ==
-              pm::MergeStrategy::Stufe3_FullJoin,
-          "PhaseStrategyFor<Stufe3_FullJoin> -> Stufe3_FullJoin");
+    check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>::select_merge() == pm::PrueflingVerbundStrategy::Verbund1_CeOnly,
+          "PhaseStrategyFor<Verbund1_CeOnly> -> Verbund1_CeOnly");
+    check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund2_Replace>::select_merge() ==
+              pm::PrueflingVerbundStrategy::Verbund2_Replace,
+          "PhaseStrategyFor<Verbund2_Replace> -> Verbund2_Replace");
+    check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund3_Union>::select_merge() ==
+              pm::PrueflingVerbundStrategy::Verbund3_Union,
+          "PhaseStrategyFor<Verbund3_Union> -> Verbund3_Union");
 
     // CRTP-Basis: is_ce_only()/involves_pruefling() static-polymorph korrekt.
     check(strat::Stufe1CeOnlyStrategy::is_ce_only(), "Stufe1 is_ce_only() == true");

@@ -1,7 +1,7 @@
 #pragma once
 // INC-E (2026-07-14) -- Experiment-Phase-Strategy-Pattern: die 3 Experiment-Phasen
 // (Kompositionale Joins Stufe 1/2/3) als benannte Strategy-Familie ueber dem ce-
-// MergeStrategy-Discriminator. HEADER-ONLY, INERT: KEIN Konsument -- die Verdrahtung
+// PrueflingVerbundStrategy-Discriminator (bis ce-V-11R: MergeStrategy). HEADER-ONLY, INERT: KEIN Konsument -- die Verdrahtung
 // in V32Orchestrator::execute_messreihe (v32_orchestrator.hpp) bleibt Stufe G, NICHT hier.
 // Hier NUR die Strategy-Huelle mit klarer API select_merge()/phase_name()/describe();
 // der reale MergeAxis-Aufruf + CEB-Antrieb ist ebenfalls G.
@@ -34,16 +34,18 @@
 //     7(2) 1995, S.24-27; Gregor/Jaervi/Siek/Stroustrup u.a., "Concepts: Linguistic
 //     Support for Generic Programming in C++", OOPSLA 2006, S.291-310.
 //
-// Discriminator = comdare::cache_engine::anatomy::pruefling::MergeStrategy (Single-
-// Source der 3 Stufen, anatomy/pruefling_merge.hpp:130-134) -- KEIN dupliziertes Enum.
+// Discriminator = comdare::cache_engine::anatomy::pruefling::PrueflingVerbundStrategy
+// (Single-Source der 3 Verbunde, anatomy/pruefling_merge.hpp:144-148; ce-V-11R:
+// MergeStrategy -> PrueflingVerbundStrategy, Stufe*-Enumeratoren -> Verbund*) --
+// KEIN dupliziertes Enum.
 //
 // @task INC-E (A-E-Welle: Strategy-Pattern der Experiment-Configs)
-// @related anatomy/pruefling_merge.hpp (MergeStrategy/MergeAxis/detail::MergeImpl)
+// @related anatomy/pruefling_merge.hpp (PrueflingVerbundStrategy/MergeAxis/detail::MergeImpl)
 // @related builder/commands/compare_engine_command.hpp (@command_pattern-Nachbarmuster)
 // @related topics/axis_base.hpp (CRTP+Concept-Guard-Achsen -- Muster-Vorlage)
 // @related reference_meta_driven_concept_hardening_pattern (Pattern-Fach-Benennung + Primaerquellen)
 
-#include <anatomy/pruefling_merge.hpp> // MergeStrategy (Discriminator, Single-Source der 3 Stufen)
+#include <anatomy/pruefling_merge.hpp> // PrueflingVerbundStrategy (Discriminator, Single-Source der 3 Verbunde)
 
 #include <concepts>
 #include <string_view>
@@ -52,8 +54,10 @@
 namespace comdare::diplomarbeit::messung_driver::v32::strategy {
 
 /// MergeStrategy-Alias auf die ce-Single-Source (anatomy/pruefling_merge.hpp) -- kein
-/// eigenes Enum. Die 3 Werte: Stufe1_CeOnly / Stufe2_PrueflingReplace / Stufe3_FullJoin.
-using MergeStrategy = ::comdare::cache_engine::anatomy::pruefling::MergeStrategy;
+/// eigenes Enum. Die 3 Werte seit ce-V-11R: Verbund1_CeOnly / Verbund2_Replace / Verbund3_Union.
+/// Der super-lokale Alias-NAME MergeStrategy bleibt bewusst stehen (der Alias entkoppelt
+/// die super-Seite vom ce-Namen; ce-Name seit V-11R: PrueflingVerbundStrategy).
+using MergeStrategy = ::comdare::cache_engine::anatomy::pruefling::PrueflingVerbundStrategy;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // (1) Concept-Guard -- die Pflicht-API jeder Experiment-Phasen-Strategy
@@ -63,7 +67,9 @@ using MergeStrategy = ::comdare::cache_engine::anatomy::pruefling::MergeStrategy
 ///
 /// Jede konkrete Strategy MUSS statisch (compile-time, kein vtable) liefern:
 ///   - select_merge() -> MergeStrategy : WELCHE der 3 Kompositionalen Joins die Phase waehlt.
-///   - phase_name()   -> string_view   : stabile Identitaet der Phase (== MergeStrategy-Name).
+///   - phase_name()   -> string_view   : stabile Identitaet der Phase (historisches Stufe-Vokabular;
+///     seit ce-V-11R bewusst NICHT der ce-Enumerator-Name -- das XML-/Profil-Vokabular
+///     der v32-Welt haengt an den Stufe-Strings, s. merge_strategy_from_name/sota_module_for).
 ///   - describe()     -> string_view   : Kurzbeschreibung der Kompositions-Semantik.
 ///
 /// Bei Verletzung: klare Concept-Diagnose statt "missing method" (analog AxisBaseConcept).
@@ -91,12 +97,12 @@ struct PhaseStrategyBase {
 
     /// true, wenn die Phase KEINE Pruefling-Beteiligung hat (Stufe 1, CE-only Baseline).
     [[nodiscard]] static constexpr bool is_ce_only() noexcept {
-        return Derived::select_merge() == MergeStrategy::Stufe1_CeOnly;
+        return Derived::select_merge() == MergeStrategy::Verbund1_CeOnly;
     }
 
     /// true, wenn die Phase den Pruefling einbezieht (Stufe 2 ERSETZT oder Stufe 3 FullJoin).
     [[nodiscard]] static constexpr bool involves_pruefling() noexcept {
-        return Derived::select_merge() != MergeStrategy::Stufe1_CeOnly;
+        return Derived::select_merge() != MergeStrategy::Verbund1_CeOnly;
     }
 };
 
@@ -105,35 +111,35 @@ struct PhaseStrategyBase {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Stufe 1 -- CE-only Baseline: KEINE Pruefling-Beteiligung.
-/// Kompositions-Semantik: Achsenliste == ce-DefaultList (StufeOneAxis, pruefling_merge.hpp).
+/// Kompositions-Semantik: Achsenliste == ce-DefaultList (Verbund1Axis, pruefling_merge.hpp).
 struct Stufe1CeOnlyStrategy final : PhaseStrategyBase<Stufe1CeOnlyStrategy> {
-    [[nodiscard]] static constexpr MergeStrategy    select_merge() noexcept { return MergeStrategy::Stufe1_CeOnly; }
+    [[nodiscard]] static constexpr MergeStrategy    select_merge() noexcept { return MergeStrategy::Verbund1_CeOnly; }
     [[nodiscard]] static constexpr std::string_view phase_name() noexcept { return "Stufe1_CeOnly"; }
     [[nodiscard]] static constexpr std::string_view describe() noexcept {
-        return "CE-only Baseline -- keine Pruefling-Beteiligung; Achsenliste == ce-DefaultList (StufeOneAxis).";
+        return "CE-only Baseline -- keine Pruefling-Beteiligung; Achsenliste == ce-DefaultList (Verbund1Axis).";
     }
 };
 
 /// Stufe 2 -- ERSETZT-mit-Fallback: die Pruefling-Varianten ERSETZEN die ce-DefaultList
 /// pro Achse (Fallback = DefaultList, wenn der Pruefling-Slot leer ist).
-/// Kompositions-Semantik: StufeTwoAxis via HasPruefling_v<Slot> (pruefling_merge.hpp).
+/// Kompositions-Semantik: Verbund2Axis via HasPruefling_v<Slot> (pruefling_merge.hpp).
 struct Stufe2PrueflingReplaceStrategy final : PhaseStrategyBase<Stufe2PrueflingReplaceStrategy> {
     [[nodiscard]] static constexpr MergeStrategy select_merge() noexcept {
-        return MergeStrategy::Stufe2_PrueflingReplace;
+        return MergeStrategy::Verbund2_Replace;
     }
     [[nodiscard]] static constexpr std::string_view phase_name() noexcept { return "Stufe2_PrueflingReplace"; }
     [[nodiscard]] static constexpr std::string_view describe() noexcept {
-        return "ERSETZT-mit-Fallback -- Pruefling-Varianten ersetzen die ce-DefaultList pro Achse (StufeTwoAxis).";
+        return "ERSETZT-mit-Fallback -- Pruefling-Varianten ersetzen die ce-DefaultList pro Achse (Verbund2Axis).";
     }
 };
 
 /// Stufe 3 -- FullJoin: Union aller Default- + Pruefling-Varianten, dedupliziert.
-/// Kompositions-Semantik: StufeThreeAxis == mp_unique<mp_append<...>> (pruefling_merge.hpp).
+/// Kompositions-Semantik: Verbund3Axis == mp_unique<mp_append<...>> (pruefling_merge.hpp).
 struct Stufe3FullJoinStrategy final : PhaseStrategyBase<Stufe3FullJoinStrategy> {
-    [[nodiscard]] static constexpr MergeStrategy    select_merge() noexcept { return MergeStrategy::Stufe3_FullJoin; }
+    [[nodiscard]] static constexpr MergeStrategy    select_merge() noexcept { return MergeStrategy::Verbund3_Union; }
     [[nodiscard]] static constexpr std::string_view phase_name() noexcept { return "Stufe3_FullJoin"; }
     [[nodiscard]] static constexpr std::string_view describe() noexcept {
-        return "FullJoin -- non-redundante Union aller Default- + Pruefling-Varianten (StufeThreeAxis, mp_unique).";
+        return "FullJoin -- non-redundante Union aller Default- + Pruefling-Varianten (Verbund3Axis, mp_unique).";
     }
 };
 
@@ -148,23 +154,23 @@ template <MergeStrategy S>
 struct PhaseStrategySelector;
 
 template <>
-struct PhaseStrategySelector<MergeStrategy::Stufe1_CeOnly> {
+struct PhaseStrategySelector<MergeStrategy::Verbund1_CeOnly> {
     using type = Stufe1CeOnlyStrategy;
 };
 
 template <>
-struct PhaseStrategySelector<MergeStrategy::Stufe2_PrueflingReplace> {
+struct PhaseStrategySelector<MergeStrategy::Verbund2_Replace> {
     using type = Stufe2PrueflingReplaceStrategy;
 };
 
 template <>
-struct PhaseStrategySelector<MergeStrategy::Stufe3_FullJoin> {
+struct PhaseStrategySelector<MergeStrategy::Verbund3_Union> {
     using type = Stufe3FullJoinStrategy;
 };
 } // namespace detail
 
 /// PhaseStrategyFor<S> -- die konkrete Strategy zum Discriminator S (Policy-Based Design).
-/// Beispiel: PhaseStrategyFor<MergeStrategy::Stufe3_FullJoin> == Stufe3FullJoinStrategy.
+/// Beispiel: PhaseStrategyFor<MergeStrategy::Verbund3_Union> == Stufe3FullJoinStrategy.
 template <MergeStrategy S>
 using PhaseStrategyFor = typename detail::PhaseStrategySelector<S>::type;
 
@@ -178,13 +184,13 @@ static_assert(ExperimentPhaseStrategy<Stufe2PrueflingReplaceStrategy>);
 static_assert(ExperimentPhaseStrategy<Stufe3FullJoinStrategy>);
 
 // Discriminator-Roundtrip: die Policy-Auswahl liefert die zur MergeStrategy passende Strategy.
-static_assert(PhaseStrategyFor<MergeStrategy::Stufe1_CeOnly>::select_merge() == MergeStrategy::Stufe1_CeOnly);
-static_assert(PhaseStrategyFor<MergeStrategy::Stufe2_PrueflingReplace>::select_merge() ==
-              MergeStrategy::Stufe2_PrueflingReplace);
-static_assert(PhaseStrategyFor<MergeStrategy::Stufe3_FullJoin>::select_merge() == MergeStrategy::Stufe3_FullJoin);
+static_assert(PhaseStrategyFor<MergeStrategy::Verbund1_CeOnly>::select_merge() == MergeStrategy::Verbund1_CeOnly);
+static_assert(PhaseStrategyFor<MergeStrategy::Verbund2_Replace>::select_merge() ==
+              MergeStrategy::Verbund2_Replace);
+static_assert(PhaseStrategyFor<MergeStrategy::Verbund3_Union>::select_merge() == MergeStrategy::Verbund3_Union);
 
 // CRTP-Basis leitet static-polymorph korrekt weiter.
-static_assert(Stufe1CeOnlyStrategy::resolved_merge() == MergeStrategy::Stufe1_CeOnly);
+static_assert(Stufe1CeOnlyStrategy::resolved_merge() == MergeStrategy::Verbund1_CeOnly);
 static_assert(Stufe1CeOnlyStrategy::is_ce_only());
 static_assert(Stufe2PrueflingReplaceStrategy::involves_pruefling());
 static_assert(Stufe3FullJoinStrategy::involves_pruefling());
