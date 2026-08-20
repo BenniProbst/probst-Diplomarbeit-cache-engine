@@ -8,7 +8,8 @@
 
 #include "experiment_phase_strategy.hpp"
 
-#include <anatomy/pruefling_merge.hpp> // ce-Single-Source PrueflingVerbundStrategy (Discriminator, bis ce-V-11R: MergeStrategy)
+// ce-Single-Source PrueflingVerbundStrategy (Discriminator, bis ce-V-11R: MergeStrategy)
+#include <anatomy/pruefling_merge.hpp>
 
 #include <cstdio>
 #include <string_view>
@@ -40,11 +41,12 @@ static_assert(strat::Stufe2PrueflingReplaceStrategy::select_merge() == pm::Pruef
 static_assert(strat::Stufe3FullJoinStrategy::select_merge() == pm::PrueflingVerbundStrategy::Verbund3_Union);
 
 // (4) Policy-Based Auswahl (Discriminator -> konkrete Strategy) ist typ-korrekt.
-static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>, strat::Stufe1CeOnlyStrategy>);
+static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>,
+                             strat::Stufe1CeOnlyStrategy>);
 static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund2_Replace>,
                              strat::Stufe2PrueflingReplaceStrategy>);
-static_assert(
-    std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund3_Union>, strat::Stufe3FullJoinStrategy>);
+static_assert(std::is_same_v<strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund3_Union>,
+                             strat::Stufe3FullJoinStrategy>);
 
 // (5) KEIN vtable / kein Runtime-Polymorphismus (statischer Dispatch, zero-cost).
 static_assert(!std::is_polymorphic_v<strat::Stufe1CeOnlyStrategy>);
@@ -95,7 +97,8 @@ int main() {
     check(!strat::Stufe3FullJoinStrategy::describe().empty(), "Stufe3 describe() nicht leer");
 
     // Policy-Based Auswahl: Discriminator -> konkrete Strategy -> gleiche MergeStrategy.
-    check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>::select_merge() == pm::PrueflingVerbundStrategy::Verbund1_CeOnly,
+    check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund1_CeOnly>::select_merge() ==
+              pm::PrueflingVerbundStrategy::Verbund1_CeOnly,
           "PhaseStrategyFor<Verbund1_CeOnly> -> Verbund1_CeOnly");
     check(strat::PhaseStrategyFor<pm::PrueflingVerbundStrategy::Verbund2_Replace>::select_merge() ==
               pm::PrueflingVerbundStrategy::Verbund2_Replace,

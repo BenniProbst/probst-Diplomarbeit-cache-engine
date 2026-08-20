@@ -1,7 +1,8 @@
 #pragma once
 // INC-E (2026-07-14) -- Experiment-Phase-Strategy-Pattern: die 3 Experiment-Phasen
 // (Kompositionale Joins Stufe 1/2/3) als benannte Strategy-Familie ueber dem ce-
-// PrueflingVerbundStrategy-Discriminator (bis ce-V-11R: MergeStrategy). HEADER-ONLY, INERT: KEIN Konsument -- die Verdrahtung
+// PrueflingVerbundStrategy-Discriminator (bis ce-V-11R: MergeStrategy).
+// HEADER-ONLY, INERT: KEIN Konsument -- die Verdrahtung
 // in V32Orchestrator::execute_messreihe (v32_orchestrator.hpp) bleibt Stufe G, NICHT hier.
 // Hier NUR die Strategy-Huelle mit klarer API select_merge()/phase_name()/describe();
 // der reale MergeAxis-Aufruf + CEB-Antrieb ist ebenfalls G.
@@ -124,9 +125,7 @@ struct Stufe1CeOnlyStrategy final : PhaseStrategyBase<Stufe1CeOnlyStrategy> {
 /// pro Achse (Fallback = DefaultList, wenn der Pruefling-Slot leer ist).
 /// Kompositions-Semantik: Verbund2Axis via HasPruefling_v<Slot> (pruefling_merge.hpp).
 struct Stufe2PrueflingReplaceStrategy final : PhaseStrategyBase<Stufe2PrueflingReplaceStrategy> {
-    [[nodiscard]] static constexpr MergeStrategy select_merge() noexcept {
-        return MergeStrategy::Verbund2_Replace;
-    }
+    [[nodiscard]] static constexpr MergeStrategy    select_merge() noexcept { return MergeStrategy::Verbund2_Replace; }
     [[nodiscard]] static constexpr std::string_view phase_name() noexcept { return "Stufe2_PrueflingReplace"; }
     [[nodiscard]] static constexpr std::string_view describe() noexcept {
         return "ERSETZT-mit-Fallback -- Pruefling-Varianten ersetzen die ce-DefaultList pro Achse (Verbund2Axis).";
@@ -185,8 +184,7 @@ static_assert(ExperimentPhaseStrategy<Stufe3FullJoinStrategy>);
 
 // Discriminator-Roundtrip: die Policy-Auswahl liefert die zur MergeStrategy passende Strategy.
 static_assert(PhaseStrategyFor<MergeStrategy::Verbund1_CeOnly>::select_merge() == MergeStrategy::Verbund1_CeOnly);
-static_assert(PhaseStrategyFor<MergeStrategy::Verbund2_Replace>::select_merge() ==
-              MergeStrategy::Verbund2_Replace);
+static_assert(PhaseStrategyFor<MergeStrategy::Verbund2_Replace>::select_merge() == MergeStrategy::Verbund2_Replace);
 static_assert(PhaseStrategyFor<MergeStrategy::Verbund3_Union>::select_merge() == MergeStrategy::Verbund3_Union);
 
 // CRTP-Basis leitet static-polymorph korrekt weiter.
