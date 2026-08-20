@@ -36,7 +36,7 @@
         <xs:element name="machines"             type="MachinesType" minOccurs="0"/>
         <xs:element name="lebewesen"            type="LebewesenType"/>
         <!-- KERN-A (S4 Mess-Schema, 2026-07-20): phases jetzt OPTIONAL (minOccurs=0). Abwesenheit/leer =>
-             der Planer LEITET die 3 Default-Stufen ab (Stufe1_CeOnly . je Pruefling Stufe2 . Stufe3_FullJoin);
+             der Planer LEITET die 3 Default-Stufen ab (Verbund1_CeOnly . je Pruefling Verbund2 . Verbund3_Union);
              explizite <phases> = Override (byte-identisch zum Ist). -->
         <xs:element name="phases"               type="PhasesType" minOccurs="0"/>
         <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
@@ -238,7 +238,7 @@
     </xs:sequence>
   </xs:complexType>
 
-  <!-- phases: die Phasen. merge = MergeStrategy-Enum (Stufe1/2/3). KEIN baustein.
+  <!-- phases: die Phasen. merge = PrueflingVerbundStrategy-Enum (Verbund1/2/3). KEIN baustein.
        KERN-A (S4, 2026-07-20): <phases> ist OPTIONAL (Element minOccurs=0 in comdare_experiment) - Abwesenheit =>
        der Planer LEITET die 3 Default-Stufen ab. Ist <phases> PRAESENT, traegt es 1..unbounded <phase> (vorher genau
        3); explizite Phasen sind der Override (byte-identisch zum Ist). -->
@@ -250,9 +250,9 @@
           <xs:attribute name="merge" use="required">
             <xs:simpleType>
               <xs:restriction base="xs:string">
-                <xs:enumeration value="Stufe1_CeOnly"/>
-                <xs:enumeration value="Stufe2_PrueflingReplace"/>
-                <xs:enumeration value="Stufe3_FullJoin"/>
+                <xs:enumeration value="Verbund1_CeOnly"/>
+                <xs:enumeration value="Verbund2_Replace"/>
+                <xs:enumeration value="Verbund3_Union"/>
               </xs:restriction>
             </xs:simpleType>
           </xs:attribute>
@@ -330,9 +330,9 @@
           <xs:attribute name="ref"              type="xs:string" use="required"/>
           <xs:attribute name="allowed_variants" type="xs:string" use="optional"/>
           <!-- KERN-A (S4) + KERN #48-S4/S5: per-Achse Merge-Modus fuer die Pruefling-Komposition. Abwesend/leer =
-               replace-Default (byte-identisch); "merge" = additiver Zusammenschluss; "fulljoin" = die EXPLIZITE,
-               Phase-3-gebundene Union (Verdikt V-a). Der Code-Parser prueft {replace,merge,fulljoin} + die
-               fulljoin-Phase-3-Bindung (validate_profile); die XSD ist nur strukturell. -->
+               replace-Default (byte-identisch); "merge" = additiver Zusammenschluss; "union" = die EXPLIZITE,
+               Phase-3-gebundene Union (Verdikt V-a). Der Code-Parser prueft {replace,merge,union} + die
+               union-Phase-3-Bindung (validate_profile); die XSD ist nur strukturell. -->
           <xs:attribute name="merge"            type="xs:string" use="optional"/>
           <!-- KERN #48-S4 (Section 59-C/D): per-Achse Pruefling-Wahl (engine-id / lebewesen-id / self-Marker).
                Optional; leer = Fallback auf die Phasen-Identitaet. -->

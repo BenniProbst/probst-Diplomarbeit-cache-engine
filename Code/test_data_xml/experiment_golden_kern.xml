@@ -19,7 +19,7 @@
      Code/tests/fixture_schema_subset_check.cmake). Ein Byte-Sync auf das
      Neu-Paar ist NICHT moeglich und war nie gemeint: die ce-Datei gleichen
      Namens ist laut ihrem eigenen Kopf eine eigenstaendige Parser-Naht-
-     Fixture mit absichtlich abweichenden Werten (fulljoin, storage=minio,
+     Fixture mit absichtlich abweichenden Werten (union, storage=minio,
      dritter mapping-Override) und ist in test_experiment_kern_seam.cpp
      literal verdrahtet. Die Wache setzt deshalb die Auflage aus
      docs/plaene/20260722-AUDIT-nacht-abweichungen-VERDIKT.md Zeile 58 um
@@ -124,9 +124,9 @@
        (Sektion 59-C): der CRC-131072-Satz bleibt unberuehrt. Der self-Marker
        laeuft ueber das phase-Attribut identity (kein Top-Level-Element). -->
   <phases>
-    <phase name="Stufe1_CeOnly"           merge="Stufe1_CeOnly"           engine="ee_ce"/>
-    <phase name="Stufe2_PrueflingReplace" merge="Stufe2_PrueflingReplace" engine="ee_prt"        pruefling="prt_art" id_namespace="merge_prt_v1"/>
-    <phase name="Stufe3_FullJoin"         merge="Stufe3_FullJoin"         engines="ee_ce ee_prt" pruefling="prt_art" id_namespace="join_prt_v1"/>
+    <phase name="Verbund1_CeOnly"           merge="Verbund1_CeOnly"           engine="ee_ce"/>
+    <phase name="Verbund2_Replace" merge="Verbund2_Replace" engine="ee_prt"        pruefling="prt_art" id_namespace="merge_prt_v1"/>
+    <phase name="Verbund3_Union"         merge="Verbund3_Union"         engines="ee_ce ee_prt" pruefling="prt_art" id_namespace="join_prt_v1"/>
   </phases>
 
   <!-- Negatives Blacklisting ist ein reines LIMIT: eine UNGENANNTE Achse
@@ -208,7 +208,7 @@
        merge-Token je Achse:
          replace  = der Default wird durch den Pruefling ersetzt.
          merge    = CE plus Pruefling als Hybrid, nur Override.
-         fulljoin = NUR in der Phase-3-Bindung gueltig (Stufe3_FullJoin);
+         union = NUR in der Phase-3-Bindung gueltig (Verbund3_Union);
                     validate erzwingt diese Bindung. Der Fork-4-Entscheid
                     trennt so den Sektion-59-A(2)-Hybrid vom A(3)-FullJoin.
        pruefling je Achse benennt, von welchem Pruefling die Achse stammt
