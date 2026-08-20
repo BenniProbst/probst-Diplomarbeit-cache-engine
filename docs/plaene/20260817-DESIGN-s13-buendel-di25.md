@@ -1383,6 +1383,13 @@ UND Release, gcc UND clang.
   zaehlt** (M-F2-Lehre: 63-statt-64-Zeichen biss aus dem falschen Grund).
 - **Vollbau-Luecken:** Werkzeuge zuerst (`adhoc_emitter_cli`, `anatomy_codegen_cli`, alle
   `*_registry_gen`), dann RE-CONFIGURE, dann Vollbau -- sonst ist das Gruen falsch.
+  > U-1-REZEPTFIX 20.08.2026 (Wellenplan par.22.1, ROT-Vorbedingung vor #18; am Baum 66de5c09
+  > per add_executable-Zeilen verifiziert): die realen TARGET-Namen tragen das comdare_-Praefix
+  > -- `comdare_adhoc_emitter_cli` (apps/adhoc_emitter) und `comdare_anatomy_codegen_cli`
+  > (apps/anatomy_codegen_tool); praefixlose ninja-Aufrufe = unknown target + 'Not Run'-Klasse.
+  > Dazu gehoert die J-4-Stufe `--target comdare_tests` VOR dem ctest (JOIN-CHECKLISTE J-1..J-4);
+  > die J-1-SIEBEN-Werkzeuge-Liste und das Treppen-Rezept traegt das Memory
+  > reference_lokale_vollbau_luecken_falsches_gruen. Die Zeile oben bleibt als Historie stehen.
 - **Warnungs-Review zweimal:** GCC, dann aufraeumen und clang-Bau, dann clang.
 - **Bauweg:** `configure.sh` / `make` / `make install` / `make check` im WURZELORDNER beider Repos.
   Keine Shell-Proben statt Google-Tests; Debug UND Release.

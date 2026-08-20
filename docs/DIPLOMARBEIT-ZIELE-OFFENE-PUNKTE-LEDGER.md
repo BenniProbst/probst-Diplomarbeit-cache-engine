@@ -4715,6 +4715,13 @@ KON60 = 25 Treffer); KON35 bleibt nie vergeben (Praezedenz: nie doppelt, nie Lue
     f15_compare_cli, is_original_validator, experiment_planner, adhoc_emitter_cli,
     h2_score_akte_cli, cache_engine_builder, perm_runner). Korrektur: apps = 9; wer eine
     10. Binary behauptet, benennt sie am Objekt.
+    > U-1-MARKER 20.08.2026 (Wellenplan par.22.1, am Baum 66de5c09 verifiziert): die Liste
+    > oben nennt VERZEICHNIS-Kurznamen; die realen CMake-TARGET-Namen tragen bei 7 von 9 das
+    > comdare_-Praefix (comdare_adhoc_emitter_cli, comdare_anatomy_codegen_cli, comdare_
+    > catalog_codegen_cli, comdare_experiment_planner, comdare_f15_compare_cli,
+    > comdare_h2_score_akte_cli, comdare_perm_runner; OHNE Praefix nur cache_engine_builder
+    > + is_original_validator). Bau-Rezepte zitieren TARGET-Namen, nie diese Kurzliste
+    > (U-1-Fehlerklasse: ninja unknown target + 'Not Run').
 
 ### KON61-14 -- TASK #16 ENTFESSELT (#96)
 
