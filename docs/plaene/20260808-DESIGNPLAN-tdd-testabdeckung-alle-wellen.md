@@ -226,14 +226,26 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7
-PZW-SCHEMA-STELLEN = 41
-PZW-SCHEMA-DATEIEN = 22
+PZW-CE-SHA         = 66de5c0972290ec1ae3d219988ecc207d8f5de6b
+PZW-SCHEMA-STELLEN = 42
+PZW-SCHEMA-DATEIEN = 23
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
+> NACHZUG 20.08.2026 mittags (L4-super-Zug/KON119; Gitlink-Ziel ce `66de5c09` -- der Bump
+> faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug; WIE GEMESSEN, nicht gerechnet):
+> SCHEMA-STELLEN 41 -> **42**, SCHEMA-DATEIEN 22 -> **23** -- die neue Stelle traegt
+> `tests/unit/test_lg_skip_callback_null.cpp` (F2-5-Kleinbau). Nenner 513 -> **530** Test-.cpp
+> (+17 neue Test-.cpp der Kette 196a621a..66de5c09, 91 Commits: q2-/a11-Modul-Fixturen,
+> hy_f8/hy_a1/hy_a2, hybrid_tier_module(+_set), g2-, b3-, #102-axis_kind-, F2-5-, s6c-Klassen);
+> 61 Rohzeilen, Kommentar abgezogen. LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 @ 2945 Z.
+> .gitlab-ci.yml. LIVE gemessen mit den Formeln der Wache selbst (git grep -F gegen den Baum
+> `66de5c09`); Gegenprobe ueber den Bissproben-Kanal COMDARE_GITLINK_SHA nach dem Nachzug:
+> '5 von 5 Ankern decken sich mit dem Objekt'. Vorher-Beleg: Wache regulaer am HEAD-Gitlink
+> `20c111c4` rc=0 (41/22/2/2/0, Nenner 513/60). Beleg-Log: ~/backups-workflow/
+> 20260820-l4-super-kon119/pzw_zaehlung.log. Vorheriger Nachzug darunter.
 > NACHZUG 18.08.2026 frueh (Gitlink ce `20c111c4`, Welle-2-Landung xorf+f3v+a11 + 2 CI-Fixes):
 > Zahlen am neuen Baum LIVE gemessen (Wache-Formeln). Vorheriger Nachzug darunter.
 > NACHZUG 17.08.2026 spaetnachts (Gitlink ce `965b121a`, W1-Landung + 2 CI-Fix-Zuege,

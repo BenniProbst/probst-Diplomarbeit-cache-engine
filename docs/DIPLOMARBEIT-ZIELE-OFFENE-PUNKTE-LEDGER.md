@@ -16,6 +16,219 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KONSOLIDIERUNG CXIX (KON119) -- 20.08.2026 mittags: L4-SUPER-ZUG GEBUCHT -- #15-LANDE-
+## KETTE KOMPLETT AM OBJEKT (L1 -> CI-Heilung -> Nachlande -> L3/v08r -> Fixture-Spiegel),
+## R4-PFLICHTLITERALE + L4-VOLLBAU-BEFUNDE + K17/#104/#106 (Buchung ist der Ledger-Teil des
+## ATOMAREN super-Zugs; ce-CI 16049 lief zum Buchungszeitpunkt, Terminal-Urteil wird beim
+## super-Push verifiziert)
+
+### KON119-01 -- DIE HEUTIGE LANDE-KETTE MIT CI-BELEGEN (ce/development, 20.08.)
+- L1 196a621a (Merge ea7df79b + T-B Lock-Regen: 4 Erst-Versionen 1.0.0.c als algo_version-
+  String-Literal fuer anatomy_base/observable_tier/pruefling_merge/target_isa_complex_axis;
+  ctest 510/510; Gates 6/6; dualer Push) -> CI 16040 ROT (3 Jobs: test:unit mp11-Namespace
+  legacy_original_code_strategy_concept.hpp:33 + lint:static 10x cppcheck unknownMacro +
+  test:coverage-guard Folgerot).
+- HEILUNG d79354ea (3 Commits: 6779f6bc Boost::mp11+is_original-Codegen-Kante fuer ALLE 16
+  Stempel-DLLs + 28e62851 10 unknownMacro-Suppressions nach Haus-Praezedenz + b791d3e2
+  Fall-Tabellen Default-Init) + L10-VORPOSTEN 6e29f3e3 (snmalloc-Vendor-Pfad als SYSTEM-
+  Include, 14a7d0c4, liburing-Muster) -> CI 16042 TERMINAL SUCCESS: 26 success + 1 manual
+  (is_original:relock = deklarierte Ausnahme), 0 failed. 16043 (reine Branch-Sicherung)
+  failed = BEWIESENES Basis-Artefakt der Basis 196a621a (V6-Regel: kuenftig push -o ci.skip).
+- NACHLANDE c2da9d1a (F2-2 CEB-system_zeile KON8-03 NUR-ANZEIGE, Fingerprint byte-identisch
+  + F2-3 Tier-/Hybrid-Erbinnen + name()-Vertrag + N-1 S-6c/S-21-Zwei-Welten-Wache Floor
+  511/507/505 LIVE + N-2 S-6d-Deklaration 23/20-Zaehlweise + A2.5-Fix e9d035f6) -> CI 16044
+  SUCCESS.
+- L3/v08r 4cc3aa0f (V-08R fingerprint_sha SHA-256 je Traeger-Bein, KON101; Format-Vollmenge
+  23->0/1907 sha256-format-only; #95 VOLLZOGEN. KONFLIKT-DEKLARATION test_s1: UNION-
+  Harmonisierung per Lead-Entscheid E1-E4 -- dev-F2-2-Asserts + Planer-64-Assert
+  aufgenommen, ueberholter Alt-Assert entfernt; Beweiskette harmonisierung.log) -> CI 16045
+  SUCCESS.
+- FIXTURE-SPIEGEL 66de5c09 (Arm A: tests/unit/thesis_tiere/experiment_golden.xml auf
+  Master-Substanz gespiegelt, sha256 beidseitig 8234286c6c01..., Alt-Drift-Substanz war
+  d6a418c8...; TABU-Pruefung: Datei NICHT auf der 5er-TABU-Liste; fixture_sync-Wache RC=0;
+  ce build-l1 ctest 511/511) -- dual gepusht, CI 16049 running zum Buchungszeitpunkt.
+- rev-list-ENDSTAND LITERAL (Audit-H7-Auflage): git rev-list --count 20c111c4..66de5c09
+  = 91; Gesamtstand git rev-list --count 66de5c09 = 2386. Gitlink-Ziel des atomaren
+  super-Zugs: 66de5c0972290ec1ae3d219988ecc207d8f5de6b (Kopplung XSD-Patch +
+  Fixture-Spiegel + Gitlink = EIN Lande-Ereignis; fixture_sync-/Subset-Wache erzwingen es).
+
+### KON119-02 -- R4-PFLICHTLITERALE (bump15/#102/Fix-Strecken; Quellen: K15-/K16-/K17-18-
+### Uebergaben, L1-KON119-CHECKLISTE, Regressionen-Register 11-13.8)
+- bump15-a/b/c/d-NAMENSNENNUNG (Audit-H4/F9): der #15-Preimage-Bruch wurde von den vier
+  Bau-Teammates bump15-a, bump15-b, bump15-c, bump15-d gebaut (ABI 6->7, Format 4->5,
+  HY-A2/A3, work_mode, V-11R, ENABLE_EXPORTS, Q2-Riegel; u.a. bump15-b P1/A-05-Injektor,
+  bump15-c Q2/Q3-Stopp nach K16-Vorfall, bump15-d P8/Q2-Riegel 7bc997a2 + R0 110->0
+  Warnungen, bump15-a C3-Konflikt-Deklaration; der bump15-d-Hinweis trug die T-B-Erst-
+  Versionen der L1-Landung).
+- K16-VORFALLSKERN (Arbeitsfehler-Klasse K16, 18.08.): bump15-a meldete Kontext-Ende und
+  uebergab; der Start von bump15-b im SELBEN Worktree traf auf ZWEI ungelesene Mailbox-
+  Auftraege von bump15-a -- die Zustellung liess ihn WIEDER ANLAUFEN: zwei Schreiber,
+  derselbe Header, zwei inkompatible Wege. bump15-b fing den Fremdprozess per lsof;
+  Kollisions-Heilung vorbildlich (Stopp, Patch-Sicherung, disjunkte Flaechen, KEIN
+  Misch-Commit). Regel seither: Worktree-Schreiberwechsel ist ein PROTOKOLL
+  (Stopp -> Bestaetigung -> Start), kein Spawn.
+- TABU-CRC LITERAL: ids-CRC 0x56F1B721C72DC10E [MATCH unveraendert] -- R-1-Kern: die
+  #102-Format-6-Welle bewegte KEINEN ids-Wert (TABU-Endprobe + Gate 6 nur-bei-Bewegung).
+- FROZEN-ANKER NEU (#102 = 5. Einfrieren; Format-6-Welle, GliedCount 10->11 mit
+  build_version = Glied [10], Budget 6186, A-11 Status 13 am dlopen-Weg):
+  kFrozenFingerprintV1 = 3be4af04...124800e05, kRef = a6ae8f31..., kLeer = e4a7d613...
+  (Vollwerte im Code + BU 20260819-golden-zug-102/).
+- R-2-VERMERK (Lead-Entscheid): KEIN +ceb=-Codegen-Minor-Bump -- kein Emissions-Text-
+  Delta; ein kuenftiger echter Emissions-Eingriff traegt den Minor dann selbst.
+- A2.5-BILANZ MASCHINENLESBAR: Fix-Strecke 1 + Rekursions-Runde 2 ueber den #15-Bruch =
+  43 BEHOBEN / 3 ENTLASTET / 4 VERTAGT, R2 = NULL_NEUE_FUNDE; Nachlande-A2.5 e9d035f6 =
+  1 BEHOBEN / 2 ENTLASTET. Maschinenlesbare Quellen: fixstrecke1-ergebnis-wiq9ihup1.json
+  + a25-runde2-ergebnis.json (docs/sessions/backups/20260818-kontext13-workflows/) +
+  fixr1_endquittung_fixstrecke2_vollstaendig.md (~/backups-workflow/
+  20260819-fixstrecke2-logs/).
+- T-A C-3a-18.6(3)-BUCHUNG: die C-3a-Antwortfrist (Mi 19.08., Nachfrage d8b27633)
+  verstrich ohne Owner-Antwort -> der 18.6(3)-Fall wurde DEKLARIERT gefahren (F4-Wortlaut
+  persistiert in fixr1_endquittung_fixstrecke2_vollstaendig.md Abschnitt 0); #38a2/P4
+  steht in der 23.2-Freeze-Tafel als 18.6(3) DEKLARIERT. Eine spaetere Owner-Antwort
+  aendert nur kuenftige Zuege.
+- B3-SPEZ-ABWEICHUNGS-VERMERK (deklariert, kein Defekt): G5 baute das Legenden-ERBE
+  (w vorn in der Tier-Legende, CT-Beweis Glied [3]) statt des m1-vorgesehenen neuen
+  CEB-Stempel-Glieds -> golden-NEUTRAL (kein anatomy/-Byte, kein Lock-Record); der
+  m1-F2-Schutzgedanke (wallclock@Version als CEB-Glied) lebt als B5-VORPOSTEN in #24
+  (Zwillings-Wache CEB-Zeile == Tier-Zeile, 'vor die erste real w-lose
+  CEB-Konfiguration').
+- L-N4-SEQUENTIALITAETS-NOTIZ: der g2-Lande-Push lief, waehrend CI 16029 noch running
+  war -- die Runner-Queue sequentialisierte faktisch (die Doktrin 'Pipelines streng
+  sequentiell' hielt am Objekt); verschaerft durch V5: die Pipeline-Lage wird seither VOR
+  jedem lokalen Bau-START gemessen, Nachhol-/Vollbauten warten auf das CI-Terminal.
+- VERTAGTEN-BILANZ (Owner-Regel 'VERTAGT = nur Zwischenzustand' -- alle durchgezogen):
+  K15-Vertagten-Runden: F8-super 012a6087 + tools-3/#100 15b26ff1 + M-5/#101
+  byte-identisch GEMESSEN (79171599) + Lock-Regen = Lande-Schritt (T-B 196a621a
+  VOLLZOGEN). A2.5-Vertagte: seg1-40 -> #95 (MIT 4cc3aa0f VOLLZOGEN) + seg1-45 -> #83 +
+  A-LS2-33 -> #44-Rest/W1 + seg1-04-super-Haelfte -> DIESER ZUG (6 UEBERHOLT-Marker,
+  s. KON119-07). g2-Funde 2-4 -> L2-Optionen A/B (getragen).
+- W1-V1-LEDGER-ZEILE: #17/g2 completed -- dev-CI 16031 SUCCESS 20:23Z; W1-V1 GESCHLOSSEN,
+  Freigabe #7/S-19 damit WIRKSAM (KON17-01).
+- Ledger:22951-UEBERHOLT: ##15-K6 derive_default_experiment_phases() IST GEBAUT (K1-K4+K6
+  alle GEBAUT) -- der :22951-Marker ('ersetzt SPAETER') ist am Objekt UEBERHOLT; Belege
+  w93-unklar-Messungen (Register 9.4, gelandet bbab80fd, CI success).
+- D83-FUSSNOTE (Neugruendung 23.5.1/L12): der #93-Erstlauf-Teilbefund S-2/G-1 war gegen
+  den Stand 0872967d erhoben -- materiell entschaerft: die finale #93-Synthese lief als
+  Resume NACH ba33b9ac, Register 9.4 wurde frisch gemessen.
+- CI-PROBEN-BUCHUNG (Neugruendungs-Luecke L1+L4): KON106 = a290dbaa -> Pipeline 15958
+  SUCCESS; KON109 = 892e33aa -> Pipeline 15966 SUCCESS (API-direkt geprobt 19.08. 21:47Z;
+  BU 20260819-golden-zug-102/ci-proben-l1-l4.txt).
+- F4b-vl12-VERMERK: die F4-IWYU-Formabweichung ist am Objekt getilgt (bump15
+  decl.hpp:24/:342); vl12 war NIE substanz-stale (5/5 Commits gelandet via be724cb5,
+  VL-Familie 8/8 getragen; 23.5.3).
+- AUDIT-/REVIEW-VERDIKTE (13.1-Praezisierung; Auflage fuer die 6c-Publikation/X-17):
+  Owner-Audit wf_794b904b ENDSTAND = 502 ERFUELLT / 74 UEBERHOLT / 85 ABWEICHUNG /
+  22 FEHLT / 5 NICHT_PRUEFBAR (= 107 offene; 4 spaeter entlastete IDs: LS2-33, LS2-41,
+  seg3-kon8-11 -> ERFUELLT, LS2-34 -> UEBERHOLT); Review-Gesamt-Verdikt LANDBAR_MIT_FIXES
+  (11/11 Agenten); die 111er-Tafel (6b) war ZWISCHENSTAND -- 6c uebernimmt die
+  ENDSTAND-Zahlen (BU-Journal @ 9052a56b).
+
+### KON119-03 -- ARBEITSFEHLER-KLASSE K17 + NACHHOL-KOMBIBAU (SCHULD GETILGT)
+- OWNER-RUEGE (20.08. ~09:30, verbatim): "Ich sehe beim Build schon wieder
+  Nachlaessigkeit und nicht parallel einen gcc und einen clang build wie gefordert."
+  Verstoss mit Nenner: Lande-Merges OHNE T-11b-4-Zellen-Kombibau am ZUSAMMENGESETZTEN
+  Stand -- l1fix-Branch 1/4, l10 0/4, Merge 6e29f3e3 0/4, Merge c2da9d1a 0/4 (der
+  Nachlande-BRANCH hatte 4/4); CI als Erstpruefung missbraucht. Klasse K17 im
+  Fehlerklassen-Memory verankert (+V5 Pipeline-Lage vor Bau-Start, +V6 push -o ci.skip
+  fuer reine Ref-Sicherungen).
+- NACHHOL-KOMBIBAU 10:36-11:04Z am dev-Tip c2da9d1a: 4x '100% tests passed, 0 tests
+  failed out of 511' LITERAL (clang-release/clang-debug/gcc-debug/gcc-release, je
+  Frisch-Configure J-0b + J-1-SIEBEN Werkzeuge + volle Treppe), Verify unabhaengig
+  TRAEGT -- K17-Schuld am Stand c2da9d1a GETILGT (BU 20260820-nachhol-kombibau/;
+  FINDINGS-SAMMELLISTE #24; dazu #21 Warnungs-Review gcc->clang gefahren, #26
+  Endstand-Jagd KOLLISIONSFREI + Floor-MATCH 511==511 live, #29 cppcheck CI-Pin 2.21.0
+  RC=0).
+
+### KON119-04 -- #104/K7b-3 PRT-ART-PIN (Schein-Gruen-Klasse geschlossen)
+- prt-art bau/roundtrip-sha-pin @ 777fff7: COMDARE_CE_PIN_SHA=196a621a... + job-lokaler
+  Klon via CI_JOB_TOKEN; Branch-CI 16048 SUCCESS 9/9 Jobs. Job-Token-Allowlist 287->ce
+  per API gesetzt (HTTP 201). SCHEIN-GRUEN DREIFACH BEWIESEN: der Roundtrip-Job
+  konfigurierte vorher den ZUFALLS-Stand des Runner-Geschwister-Verzeichnisses
+  (Belegkette im #104-Strang). Gleiche Fehlerklasse build:standalone/
+  COMDARE_CACHE_ENGINE_DIR bleibt Di-25-Posten (FINDINGS #12).
+
+### KON119-05 -- OWNER-KERN CI-DUAL-COMPILER (#106) + OWNER-ENTSCHEID VOLL-KIPPEN
+- OWNER-KERN 20.08. (~10:25, verbatim-Kern): doppelter Compile-Test gcc+clang ist
+  PFLICHT fuer ALLE Bereiche ("das sehen wir nur durch einen doppelten compile test
+  fuer ALLE Bereiche"). ERHEBUNGS-STAND (alle Pipelines ce 286 / super 288 / prt-art /
+  ci-templates): 9/41 Bau-/Test-Jobs unbedingt dual; 13/23 Konfigurationen sehen NIE
+  clang; super-Kill-Switch build:clang when:never (.gitlab-ci.yml:275-277) BESTAETIGT.
+  Fix-Design + Landung im S-12-Umfeld (#3, Di 25.08.; kein when:never-/changes:-Skip);
+  Task #106; Memory feedback_ci_dual_compiler_alle_bereiche_pflicht.
+- OWNER-ENTSCHEID VOLL-KIPPEN (20.08. ~11:45, D7, verbatim): "Nein, wir sollten auch in
+  Zukunft vollstaendig kippen, sonst bitte weiter wie gehabt." -- VOLL-KIPPEN bleibt
+  nach JEDEM Compact Pflicht, Redundanz ist GEWOLLT; keine Summary-Quittungs-Abkuerzung.
+
+### KON119-06 -- L4-VOLLBAU-BEFUNDE (super build-l4 am uncommitted L4-Stand; Belege
+### ~/backups-workflow/20260820-l4-super-kon119/)
+- 911er-NENNER: der volle super-ctest zaehlt 911 Tests (seg4-58-Eichlinie war 866; +45).
+  Erstlauf LITERAL '99% tests passed, 7 tests failed out of 911' (l4-ctest.log); nach der
+  Fixrunde (Arm A Fixture-Spiegel + Arm B Rename-Nachzug) LITERAL '99% tests passed,
+  5 tests failed out of 911' = exakt die 5 deklarierten Roten (super-rename-nachzug.log).
+  Das L10-Abnahme-Rezept 'Failed 40->3' traf fuer die Dauerroten; dazu kamen die 2
+  KON-36-Alt-Roten WIEDER SICHTBAR (naechster Punkt).
+- L10-WIRKUNG: die snmalloc-pedantic-Klasse 'Unable to find executable' fiel 37 -> 0.
+  Der EINE Unable-Treffer des Erstlaufs war #516 test_experiment_phase_strategy
+  (Rename-Kante, Not Run) -- durch den Arm-B-Nachzug BEHOBEN (TU baut, Test Passed).
+- V-11R-RENAME-NACHZUG super (M-1-Klasse ce->super, ce-b54311f0-Vokabular): 2 Dateien
+  Code/02_messung_driver/experiment_phase_strategy.hpp + tests/test_experiment_phase_
+  strategy.cpp auf PrueflingVerbundStrategy + Verbund1_CeOnly/Verbund2_Replace/
+  Verbund3_Union nachgezogen; rc_ninja=0; die 2 Dateien fahren UNCOMMITTED im atomaren
+  super-Zug mit (der deterministische Compile-Fehler war exakt 1 TU, l4-build.log:237ff;
+  Ketten-RC literal in l4-rc.txt: rc_configure=0, rc_all Versuch 1-4 = 2, Fortsetzung
+  seg4-58-Stil rc_all_k0=1 / rc_comdare_tests_k0=0 / rc_reconfigure=0 / rc_ctest=8).
+- KON-36-WIEDER-SICHTBARKEIT: test_v31_adapters (SEGFAULT) + test_v41_topic_allocator_
+  axis_06 (Subprocess aborted) = ALT-Laufzeit-Rot, im vollen lokalen Lauf wieder
+  sichtbar. CI-Deckung erfolgt allein ueber da_unit-POSITIV-SELEKTION (ctest -N -L
+  da_unit = 405/911; beide Tests OHNE da_unit-Label, comdare_add_test ce
+  tests/unit/CMakeLists.txt:392/:428) -- KEIN allow_failure im Spiel, KEIN Exclude,
+  KEINE Known-Failures-Datei; die naechste super-CI bleibt davon gruen
+  (Mechanismus-Beweis super-rename-nachzug.log Teil 3).
+- 3 DAUERROTE DEKLARIERT OFFEN (Achse-06-/CRC-Anker-Drift-Klasse, 0xBD364E29...-Befund;
+  FINDINGS #10 -> owner-koordinierter Nachzug, R-1-Meldung im F2-Fenster):
+  test_limits_entkopplung_vorstufe [e4 limits] + test_lazy_adhoc_source_gen [e4 inc-g6
+  limits] + test_axis_registry_roundtrip [contract registry roundtrip] -- alle ohne
+  da_unit-Label, laufen in test:unit NIE ('gruen durch NICHT-AUSWAHL', 15946-Klasse);
+  zusaetzlich haengt die ce-Suite nicht am super-ALL (EXCLUDE_FROM_ALL,
+  .gitlab-ci.yml:1185-1190 + Code/CMakeLists.txt:211).
+- fixture_sync-KOPPLUNG BEWIESEN + GEHEILT: test_fixture_sync_experiment_golden war am
+  Alt-Spiegel rot (Drift-Substanz d6a418c8...); der ce-Fixture-Spiegel 66de5c09 stellt
+  Byte-Identitaet her (Substanz-sha256 8234286c... beidseitig, Wache RC=0, ce-ctest
+  511/511) -- der Gitlink des super-Zugs MUSS deshalb exakt auf 66de5c09 schneiden.
+- v32_messreihe_antrieb-ALTBESTAND: der Enumeratoren-Altstand (v32_messreihe_antrieb.hpp
+  Z.121/126/131/213-220) liegt hinter dem TU-Gate COMDARE_V32_DRIVER_ENABLE
+  (02_messung_driver/CMakeLists.txt:114), das KEINE Pipeline setzt (grep V32_DRIVER = 0
+  in .gitlab-ci.yml/configure.sh/Makefile) = CI-dormant; bricht erst beim ersten
+  Flag-ON-Bau (W4-Gate) -> DEKLARIERTER Di-25-POSTEN inkl. Stufe-String-Vokabular-
+  Entscheidung (merge_strategy_from_name/sota_module_for-Keys).
+
+### KON119-07 -- PZW-ANKER LIVE + seg1-04-SUPER-HAELFTE + STATUS
+- PZW-ANKER LIVE GEZAEHLT (mit den EIGENEN Formeln der Wache am Baum 66de5c09):
+  SCHEMA-STELLEN 41 -> 42 / SCHEMA-DATEIEN 22 -> 23 (neue Stelle:
+  tests/unit/test_lg_skip_callback_null.cpp, F2-5); Nenner 513 -> 530 Test-.cpp (+17
+  neue: q2-/a11-Modul-Fixturen, hy_f8/hy_a1/hy_a2, hybrid_tier_module(+_set), g2-, b3-,
+  #102-axis_kind-, F2-5-, s6c-Klassen; 91 Commits); LITERAL/AUFRUFE/ALTMUSTER
+  unveraendert 2/2/0 @ 2945 Z. Designplan-9.5-Anker NACHGEZOGEN (PZW-CE-SHA ->
+  66de5c09...); Gegenprobe Bissproben-Kanal COMDARE_GITLINK_SHA: '5 von 5 Ankern decken
+  sich mit dem Objekt'; regulaerer Wache-Lauf bindet erst mit dem ATOMAREN Gitlink-Bump
+  (erwarteter Vorzustand ABBRUCH Plan!=Gitlink rc=2 -- exakt die Zeitrichtungs-Falle,
+  die die Wache erzwingt). Beleg: pzw_zaehlung.log.
+- seg1-04-SUPER-HAELFTE VOLLZOGEN (A2.5-R2-Zuweisung an diesen Zug): 6 datierte
+  UEBERHOLT-Marker ADDITIV im Hybrid-Bauplan 20260809-HYBRID-bauplan-und-
+  entscheidungsvorlage.md (:129 Restschuld-Posten 12, :157 HY-A3-Kopf, :159 Bauschritte,
+  :160 Abnahme, :225 Owner-Frage E-6, :252 kritischer Pfad) -- NICHTS geloescht,
+  Zeilenzahl 251 unveraendert; Objekt-Beweis am Baum 66de5c09: genus_build_admission.hpp
+  :81 array<std::size_t,6> + :190 static_assert ==6. Die ce-Haelften
+  (hybrid_config_xml.hpp:52-55, hybrid/README.md:33) waren seit R1 nachgefuehrt.
+  Beleg: seg104.log.
+- STATUS: Task #15 completed MIT dem super-Push-Gruen (diese Buchung ist der Ledger-Teil
+  des atomaren Zugs; XSD-Patch 3 Dateien + Gitlink-Drift + 2 Rename-Dateien fahren im
+  Lande-Commit, 16049-Terminal wird beim Push verifiziert). Naechste Schritte: super-Push
+  + super-CI/PZW-Job gruen -> Freeze-Check Fr 21.08. (R5) -> F2-Vorlagen-Fenster (R6) ->
+  WE-/Di-25-Posten (R7). Belege dieses Zugs: ~/backups-workflow/20260820-l4-super-kon119/
+  (l4-configure/l4-build/l4-ctest.log, ce-fixture-spiegel(.ctest).log,
+  super-rename-nachzug.log, l4-rc.txt, pzw_zaehlung.log, seg104.log, kon119_extrakt.txt).
+
 ## KONSOLIDIERUNG CXVIII (KON118) -- 18.08.2026 frueh: E-6 VOLLZOGEN -- DIE 22 DER
 ## HY-A3-FORMEL WAR EIN PHANTOM-NENNER (12W-ultracode wf_a706de82, 14 Agenten, 5 Arme
 ## + 8 Tieflesen + Synthese; Kernbehauptungen am Objekt stichprobenverifiziert)
