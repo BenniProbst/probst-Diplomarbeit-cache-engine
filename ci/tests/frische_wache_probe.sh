@@ -174,6 +174,38 @@ zelle_leerzeilen() {   # $1=verzeichnis $2=lauf_kennung $3=modus
         echo "lauf_kennung=$2"
     } > "$1/LAUF_MARKER.txt"
 }
+# KON44-02 / #38c-Rest (20.08.2026): ;-Schema-Zelle. Der ECHTE measurements.csv-Kopf
+# traegt ';' als Trenner, n_ops/total_ns/ns_per_op sind die Felder 4/5/6 (ce
+# cache_engine_builder_iterator.hpp:594, lazy_csv_header). Die Zelle schreibt ERST
+# $4 reine n/a-Zeilen (provisioniert, kein Messwert), DANN $5 echte Zeilen --
+# Kopf und Zeilenform wortgleich zu ci/tests/mess_ausbeute_bissprobe.sh
+# (KOPF_SEMI / mit_na_zeilen / mit_echten_semi). Die ','-Zellen oben bleiben
+# unveraendert: mit FS=';' sind sie EIN Feld, ihre n/a-Zaehlung ist 0.
+KOPF_SEMI='binary_id;setting;repetition;n_ops;total_ns;ns_per_op;quality_flag'
+zelle_semi() {   # $1=verzeichnis $2=lauf_kennung $3=modus $4=anzahl-n/a-zeilen $5=anzahl-echte-zeilen
+    mkdir -p "$1"
+    printf '%s\n' "$KOPF_SEMI" > "$1/measurements.csv"
+    _i=1
+    while [ "$_i" -le "$4" ]; do
+        printf 'perm-%s;lauf;%s;n/a;n/a;n/a;n/a\n' "$(token)" "$_i" >> "$1/measurements.csv"
+        _i=$((_i + 1))
+    done
+    _i=1
+    while [ "$_i" -le "$5" ]; do
+        printf 'perm-%s;lauf;%s;%s;%s;12\n' "$(token)" "$_i" "$((100 + _i))" "$((9000 + _i))" \
+            >> "$1/measurements.csv"
+        _i=$((_i + 1))
+    done
+    {
+        echo "quelle=RUN_PROFILE"
+        echo "modus=$3"
+        echo "measured=$5"
+        echo "resumed=0"
+        echo "provisioned=$4"
+        echo "csv_ok=1"
+        echo "lauf_kennung=$2"
+    } > "$1/LAUF_MARKER.txt"
+}
 
 echo "============================================================================="
 echo "PROBE FRISCHE-WACHE"
@@ -341,6 +373,70 @@ fordere_literal "$OUT" "datenzeilen_dieser_lauf=0"
 fordere_literal "$OUT" "datenzeilen_altbestand=$ZA"
 fordere_literal "$OUT" "datenzeilen_verworfen=3"
 fordere_literal "$ERR" "aus FREMDEN Laeufen liegen im selben Verzeichnis"
+fall_ende
+
+# =============================================================================
+# F6c KON44-02 / #38c-Rest -- DIESELBE MASKIERUNG DURCH EIGENE n/a-ZEILEN.
+#     F6 deckt die leere, F6b die leerzeilige Neuzelle. Schreibt die frische
+#     Zelle NUR provisionierte n/a-Zeilen (echtes ;-Schema), war der Befund bis
+#     zu dieser Heilung unsichtbar: datenzeilen_dieser_lauf zaehlte die
+#     n/a-Zeilen mit (> 0), das Maskierungs-Gate haengt an == 0 -- und die
+#     Ausbeute-Wache deckt ihre ECHT-Summe aus den FREMDEN Zeilen der Altzelle
+#     (ihr KON44-02-Gate rechnet ueber ALLE Dateien, N_LEER=0). ROT-ZUERST am
+#     Objekt gemessen (21.08.2026, Beleg in der Strang-Ergebnisdatei): gegen
+#     die Fassung vor der Heilung meldet dieser Fall rc=0 statt rc=1.
+# =============================================================================
+KA="$(wuerfel 1000 49999)-$(wuerfel 1000 49999)"
+KN="$(wuerfel 50000 99999)-$(wuerfel 50000 99999)"
+ZA=$(wuerfel 1 6); NNA=$(wuerfel 1 6)
+fall "F6c Alt($ZA Zeilen) + Neu(NUR $NNA n/a-Zeilen, modus=voll) -> rc=1"
+D="$WERK/f6c"; zelle "$D/altzelle" "$KA" voll "$ZA"
+zelle_semi "$D/neuzelle" "$KN" voll "$NNA" 0
+lauf pruefen "$D" "$KN"
+fordere_rc 1
+fordere_literal "$OUT" "datenzeilen_dieser_lauf=$NNA"
+fordere_literal "$OUT" "na_dieser_lauf=$NNA"
+fordere_literal "$OUT" "echte_dieser_lauf=0"
+fordere_literal "$ERR" "0 echte Datenzeile(n) erzeugt"
+fordere_literal "$ERR" "aus FREMDEN Laeufen liegen im selben Verzeichnis"
+fall_ende
+
+# =============================================================================
+# F6d GEGENRICHTUNG (K13): n/a-Zeilen NEBEN echten in der frischen Zelle ->
+#     GRUEN, und die Nenner trennen die beiden Mengen. Ohne diesen Fall waere
+#     nur belegt, dass etwas strenger wurde -- nicht, dass GENAU die n/a-Zeilen
+#     und nichts sonst aus dem Gate-Nenner fallen.
+# =============================================================================
+KA="$(wuerfel 1000 49999)-$(wuerfel 1000 49999)"
+KN="$(wuerfel 50000 99999)-$(wuerfel 50000 99999)"
+ZA=$(wuerfel 1 6); NNA=$(wuerfel 1 6); ZE=$(wuerfel 1 6)
+fall "F6d Alt($ZA) + Neu($NNA n/a + $ZE echte ;-Zeilen, voll) -> rc=0 mit Nennern"
+D="$WERK/f6d"; zelle "$D/altzelle" "$KA" voll "$ZA"
+zelle_semi "$D/neuzelle" "$KN" voll "$NNA" "$ZE"
+lauf pruefen "$D" "$KN"
+fordere_rc 0
+fordere_literal "$OUT" "datenzeilen_dieser_lauf=$((NNA + ZE))"
+fordere_literal "$OUT" "na_dieser_lauf=$NNA"
+fordere_literal "$OUT" "echte_dieser_lauf=$ZE"
+fordere_literal "$OUT" "FRISCHE-WACHE: OK"
+fall_ende
+
+# =============================================================================
+# F6e WEICHE MODI BLEIBEN WEICH (Gegeneingang T-4): NUR-n/a-Neuzelle mit
+#     modus=provision_only -> rc=0. Ein provisionierender Lauf SCHREIBT per
+#     Bauart n/a-Zeilen -- sie sind sein SOLL, nicht sein Leerlauf.
+# =============================================================================
+KA="$(wuerfel 1000 49999)-$(wuerfel 1000 49999)"
+KN="$(wuerfel 50000 99999)-$(wuerfel 50000 99999)"
+ZA=$(wuerfel 1 6); NNA=$(wuerfel 1 6)
+fall "F6e wie F6c, aber modus=provision_only -> rc=0 (misst per Bauart nicht)"
+D="$WERK/f6e"; zelle "$D/altzelle" "$KA" voll "$ZA"
+zelle_semi "$D/neuzelle" "$KN" provision_only "$NNA" 0
+lauf pruefen "$D" "$KN"
+fordere_rc 0
+fordere_literal "$OUT" "davon 0 Datei(en) dieses Laufs mit modus=voll"
+fordere_literal "$OUT" "na_dieser_lauf=$NNA"
+fordere_literal "$OUT" "FRISCHE-WACHE: OK"
 fall_ende
 
 # =============================================================================
@@ -577,13 +673,16 @@ awk '
 mutant_fahren "M1  ohne exit 1 im Altbestands-Gate (F2/F3 muessen beissen)" "$MU"
 
 # M2: das Maskierungs-Gate verliert sein rot -- der eigentliche Befund.
+# [KON44-02/#38c] Muster NACHGEZOGEN: die Fehlerzeile heisst seit der n/a-Heilung
+# "0 echte Datenzeile(n) erzeugt". mutant_fahren bricht mit rc=2 ab, wenn das
+# Muster nichts mehr trifft (byte-gleicher Mutant) -- ein Drift faellt also auf.
 MU="$WERK/mut_maskierung.sh"
 awk '
-    /^        echo "FEHLER: dieser Lauf hat 0 Datenzeile\(n\) erzeugt/ { drin = 1 }
+    /^        echo "FEHLER: dieser Lauf hat 0 echte Datenzeile\(n\) erzeugt/ { drin = 1 }
     drin && /^        exit 1$/ { drin = 0; next }
     { print }
 ' "$WACHE" > "$MU"
-mutant_fahren "M2  ohne exit 1 im Maskierungs-Gate (nur F6 toetet ihn)" "$MU"
+mutant_fahren "M2  ohne exit 1 im Maskierungs-Gate (nur F6-Familie toetet ihn)" "$MU"
 
 # M3: die Kennung wird nicht mehr verglichen -- alles gilt als "dieser Lauf".
 MU="$WERK/mut_kennung.sh"
@@ -598,6 +697,26 @@ mutant_fahren "M3  ohne Kennungs-Vergleich (jede CSV gilt als frisch)" "$MU"
 MU="$WERK/mut_zeilen.sh"
 sed 's|^        _daten=${_paar##\* }$|        _daten=1|' "$WACHE" > "$MU"
 mutant_fahren "M4  Datenzeilen konstant 1 (Maskierung wird unsichtbar)" "$MU"
+
+# M5 (T-11c zu F6c): die n/a-Zaehlung stirbt -- der Feldvergleich trifft nie
+# ("NIE" statt "n/a" im 4. Feld), _na bleibt 0, ECHT_DIESER == Z_DIESER, das
+# n/a-Phantom maskiert wieder. Nur die F6c/F6e-Nenner-Literale fangen ihn.
+MU="$WERK/mut_na_tot.sh"
+sed 's|\$4=="n/a"|\$4=="NIE"|' "$WACHE" > "$MU"
+mutant_fahren "M5  n/a-Zaehlung tot (F6c muss beissen)" "$MU"
+
+# M6 (T-11c zu F6d): JEDE Datenzeile zaehlt als n/a (Bedingung konstant wahr) --
+# die Gegenrichtung: echte Zeilen fallen faelschlich aus dem Gate-Nenner,
+# F6d (echte_dieser_lauf=$ZE) und F5 (Gate feuert auf echte Zellen) reissen.
+MU="$WERK/mut_na_alles.sh"
+sed 's|\$4=="n/a" && \$5=="n/a" && \$6=="n/a"|1 == 1|' "$WACHE" > "$MU"
+mutant_fahren "M6  jede Datenzeile gilt als n/a (F6d/F5 muessen beissen)" "$MU"
+
+# M7 (T-11c zu F6e): der modus=voll-Riegel faellt aus dem Gate -- provisionierende
+# Laeufe stuerben an ihrem eigenen SOLL. F6e und F7 reissen (rc=1 statt rc=0).
+MU="$WERK/mut_voll_riegel.sh"
+sed 's| && \[ "\$N_DIESER_VOLL" -gt 0 \]||' "$WACHE" > "$MU"
+mutant_fahren "M7  ohne modus=voll-Riegel (F6e/F7 muessen beissen)" "$MU"
 
 echo ""
 echo "============================================================================="

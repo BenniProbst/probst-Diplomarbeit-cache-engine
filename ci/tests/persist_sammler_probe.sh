@@ -175,6 +175,27 @@ mit_xlsx() {          # $1 = Zieldatei (relativ), $2 = Token
     mkdir -p "$(dirname "$KLON/$1")"
     printf 'PK\003\004xlsx-koeder_%s-ende\n' "$2" > "$KLON/$1"
 }
+# KON44-02 / #38c-Rest (21.08.2026): ;-Schema-Fixture. Der ECHTE measurements.csv-Kopf traegt ';'
+# als Trenner, n_ops/total_ns/ns_per_op sind die Felder 4/5/6 (ce cache_engine_builder_iterator.hpp:594,
+# lazy_csv_header). ERST $2 reine n/a-Zeilen (provisioniert, kein Messwert), DANN $3 echte Zeilen --
+# Kopf und Zeilenform wortgleich zu ci/tests/mess_ausbeute_bissprobe.sh (KOPF_SEMI / mit_na_zeilen /
+# mit_echten_semi); der Token wandert ins binary_id-Feld, damit der Blob-Beweis (P17) greift.
+# Die ','-Fixtures oben bleiben unveraendert: mit FS=';' sind sie EIN Feld, ihre n/a-Zaehlung ist 0.
+KOPF_SEMI='binary_id;setting;repetition;n_ops;total_ns;ns_per_op;quality_flag'
+mit_semi() {          # $1 = Zieldatei (relativ), $2 = n/a-Zeilen, $3 = echte Zeilen, $4 = Token
+    mkdir -p "$(dirname "$KLON/$1")"
+    printf '%s\n' "$KOPF_SEMI" > "$KLON/$1"
+    _i=1
+    while [ "$_i" -le "$2" ]; do
+        printf 'perm-koeder_%s;lauf;%s;n/a;n/a;n/a;n/a\n' "$4" "$_i" >> "$KLON/$1"
+        _i=$((_i + 1))
+    done
+    _i=1
+    while [ "$_i" -le "$3" ]; do
+        printf 'perm-koeder_%s;lauf;%s;%s;%s;12\n' "$4" "$_i" "$((100 + _i))" "$((9000 + _i))" >> "$KLON/$1"
+        _i=$((_i + 1))
+    done
+}
 
 # --- .gitignore als eigenes Orakel (P5-Forderung 4) --------------------------
 # `git check-ignore -v` statt Augenschein: die Frage "verschluckt ein Ignore den
@@ -709,6 +730,100 @@ fordere_zahl "Rohzeilen im committeten Blob (Kopf + 3 Leer + $N15)" \
 fall_ende
 
 # =============================================================================
+# P16 KON44-02 / #38c-Rest -- EINE n/a-ZEILE OEFFNET DAS COMMIT-GATE NICHT.
+#     P1/P14 decken Kopfzeile und Leerzeilen; ein Fenster aus NUR
+#     provisionierten n/a-Zeilen (echtes ;-Schema) hatte datenzeilen_gesamt > 0
+#     und committete -- ein Laufordner OHNE einen einzigen Messwert waere unter
+#     der Nie-loeschen-Doktrin IRREVERSIBEL im Mess-Archiv gelandet. ROT-ZUERST
+#     am Objekt gemessen (21.08.2026, Beleg in der Strang-Ergebnisdatei): gegen
+#     die Fassung vor der Heilung committet dieser Fall. Beweis wie P1 an GIT.
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS16="20260821-000017-p$PIPE_ID"
+N16=$(wuerfel 1 6)
+K16=$(token)
+fall "P16 NUR $N16 n/a-Zeilen (;-Schema) -> echt_zeilen_gesamt=0, KEIN Commit"
+sandbox p16
+mit_semi "Code/measure_out/perm-0001/measurements.csv" "$N16" 0 "$K16"
+sammle "$TS16"
+fordere_rc 0
+fordere_literal "$OUT" "csv_gesamt=1"
+fordere_literal "$OUT" "datenzeilen_gesamt=$N16"
+fordere_literal "$OUT" "na_zeilen_gesamt=$N16"
+fordere_literal "$OUT" "echt_zeilen_gesamt=0"
+fordere_literal "$KLON/measurement/$TS16/PROVENANCE.txt" "na_zeilen_gesamt=$N16"
+fordere_literal "$KLON/measurement/$TS16/PROVENANCE.txt" "echt_zeilen_gesamt=0"
+gate "$TS16"
+fordere_rc 10
+fordere_literal "$OUT" "KEIN COMMIT"
+fordere_literal "$OUT" "na_zeilen_gesamt=$N16"
+fordere_zahl "Dateien im INDEX unter measurement/" "$(g_indexzahl)" 0
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$BASIS_N"
+g_status_ohne_untracked "$WERK/p16_status"
+fordere_leer "git status --porcelain -uno" "$WERK/p16_status"
+fall_ende
+
+# =============================================================================
+# P17 DIE GEGENRICHTUNG (K13): n/a-Zeilen NEBEN echten ;-Zeilen -> Commit MIT
+#     den getrennten Nennern, und der Token steht im COMMITTETEN BLOB. Ohne
+#     diesen Fall belegte P16 nur Strenge -- er belegt, dass GENAU die
+#     n/a-Zeilen und nichts sonst aus dem Gate-Nenner fallen.
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS17="20260821-000018-p$PIPE_ID"
+N17A=$(wuerfel 1 5); N17B=$(wuerfel 1 5); S17=$((N17A + N17B))
+K17=$(token)
+fall "P17 $N17A n/a + $N17B echte ;-Zeilen -> Commit, Nenner getrennt, Token im Blob"
+sandbox p17
+mit_semi "Code/measure_out/perm-0001/measurements.csv" "$N17A" "$N17B" "$K17"
+sammle "$TS17"
+fordere_rc 0
+fordere_literal "$OUT" "datenzeilen_gesamt=$S17"
+fordere_literal "$OUT" "na_zeilen_gesamt=$N17A"
+fordere_literal "$OUT" "echt_zeilen_gesamt=$N17B"
+gate "$TS17"
+fordere_rc 0
+fordere_literal "$OUT" "COMMIT-GATE OK: $S17 Datenzeile(n) ($N17B echte, $N17A n/a-/provisionierte)"
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$((BASIS_N + 1))"
+git -C "$KLON" show "HEAD:measurement/$TS17/measure_out/perm-0001/measurements.csv" \
+    > "$WERK/p17_blob" 2>/dev/null || : > "$WERK/p17_blob"
+fordere_literal "$WERK/p17_blob" "koeder_$K17"
+fordere_zahl "Rohzeilen im committeten Blob (Kopf + $N17A n/a + $N17B echte)" \
+    "$(awk 'END{print NR+0}' "$WERK/p17_blob")" "$((S17 + 1))"
+fall_ende
+
+# =============================================================================
+# P18 VERSIONS-SKEW sammeln/gate (im YAML laeuft `gate` NACH einem checkout auf
+#     origin/development und kann eine NEUERE Fassung sein als das `sammeln`,
+#     das die PROVENANCE schrieb): FEHLT das neue Feld na_zeilen_gesamt= in der
+#     PROVENANCE, ist das ein LAUTER HINWEIS und KEIN rc=2 -- die Entscheidung
+#     haengt an der eigenen Nachzaehlung des Gates, nie an der Textdatei. Das
+#     Alt-Feld datenzeilen_gesamt= bleibt harte Gegenprobe (unveraendert).
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS18="20260821-000019-p$PIPE_ID"
+N18=$(wuerfel 1 5)
+K18=$(token)
+fall "P18 PROVENANCE ohne na_zeilen_gesamt= (Alt-sammeln) -> HINWEIS + Commit, kein rc=2"
+sandbox p18
+mit_daten "Code/measure_out/perm-0001/measurements.csv" "$N18" "$K18"
+sammle "$TS18"
+fordere_rc 0
+PROV18="$KLON/measurement/$TS18/PROVENANCE.txt"
+# Die Probe simuliert das ALTE sammeln: sie entfernt GENAU die zwei neuen Felder wieder.
+# KOEDER ZUERST: beide Felder muessen VOR der Entfernung dringestanden haben, sonst
+# simulierte die Entfernung nichts und der Fall waere trivial gruen.
+fordere_literal "$PROV18" "na_zeilen_gesamt="
+fordere_literal "$PROV18" "echt_zeilen_gesamt="
+grep -vE '^(na_zeilen_gesamt|echt_zeilen_gesamt)=' "$PROV18" > "$PROV18.alt" && mv "$PROV18.alt" "$PROV18"
+gate "$TS18"
+fordere_rc 0
+fordere_literal "$OUT" "traegt kein Feld na_zeilen_gesamt="
+fordere_literal "$OUT" "COMMIT-GATE OK: $N18 Datenzeile(n)"
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# =============================================================================
 # P10 ABNAHME + REGISTRIERUNG (T-7): der Job ruft den gehobenen Sammler, und
 #     diese Probe hat ihren eigenen CI-Job. Eine Probe, die nur lokal existiert,
 #     ist ab dem naechsten Commit unsichtbar.
@@ -822,6 +937,18 @@ if [ "$MODUS" = --selbstbiss ]; then
         '/measure_out -type f/s/ -o -name .\*\.xlsx.//'
     mutant m6_xlsx_weg_smoke "xlsx faellt aus dem Sammel-Selektor der smoke-Wurzel" \
         '/measure_out_smoke -type f/s/ -o -name .\*\.xlsx.//'
+    # m7/m8/m9 (KON44-02/#38c, T-11c je neuem Fall): m7 toetet die n/a-Zaehlung (Feldvergleich
+    # trifft nie -> echt==daten, das n/a-Phantom committet wieder; P16 beisst). m8 zaehlt jede
+    # ;-GESPALTENE Datenzeile als n/a (NF>1; die ','-Faelle mit NF==1 bleiben absichtlich
+    # unberuehrt, sonst risse schon P2 und die Probe braeche an dessen HEAD~1-Orakel hart ab,
+    # BEVOR der adressierte Fall laeuft) -> echte ;-Zeilen fallen aus dem Gate-Nenner, GENAU
+    # P17 beisst. m9 verstummt den Versions-Skew-HINWEIS (P18 beisst: Loudness ist Vertrag).
+    mutant m7_na_tot "n/a-Zaehlung tot -- das n/a-Phantom committet wieder (P16)" \
+        's|\$4=="n/a"|\$4=="NIE"|'
+    mutant m8_na_alles "jede ;-Datenzeile gilt als n/a -- echtes ;-Fenster verweigert (P17)" \
+        's|\$4=="n/a" && \$5=="n/a" && \$6=="n/a"|NF > 1|'
+    mutant m9_hinweis_stumm "der Versions-Skew-HINWEIS verstummt (P18)" \
+        '/traegt kein Feld na_zeilen_gesamt=/d'
 
     echo "-----------------------------------------------------------------------------"
     echo "SELBSTBISS-NENNER: $N_GEBISSEN von $N_MUT Mutanten haben die Probe rot gemacht."
