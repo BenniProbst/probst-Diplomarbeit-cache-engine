@@ -62,6 +62,11 @@ aus 20260817-OWNER-VORAB-15-restfragen.md; Antwort erbeten."
 Muster erweitern?) — beide Fristen Mi 12.08. verstrichen; sie blockieren die D3-4/D3-6-
 Nachzuege (Flaeche super/ci -> Lande-Zug). Entscheide erbeten."
 
+### D-12 · R-1/OV-10 Steuerdock-Zahl (Synthese-Dedup-Pruefung, s8-Strang F-17) [ENTSCHEID]
+„Der S-8-Traegerbau hat SECHS Steuerdocks gebaut (C-6-Mandat/B-14, steuerdock.hpp); die aeltere
+OV-10-Lesart sagte ‚max. 4 erreichbar' — Bestaetigung der SECHS erbeten (genau EINE Code-Stelle,
+Registry-Aufzaehlung; Wortlaut-Vorlage in traegerbau-s8-ergebnis.md §6.3)."
+
 ### D-11 · Sammel: K2-P/E-Core-Platz + Alt-Owner-Posten (G20+G22) [KENNTNISNAHME/DISPOSITION]
 „(a) ICpuCore/CoreClass/CPUID-0x1A ohne Wellen-Posten — Platz-Entscheid erbeten.
 (b) Alt-Sammel zur Disposition: PA-3 (3 PRT-ART-Quelldateien) · ETA-avg_size_bytes ungenutzt ·
