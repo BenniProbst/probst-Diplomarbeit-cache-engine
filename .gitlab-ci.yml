@@ -120,7 +120,10 @@ cache:
 variables:
   CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
   CCACHE_MAXSIZE: "3G"
-  COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
+  # #273-Schalter COMDARE_CLANG_MATRIX GESTRICHEN (#106 CI-DUAL R1, Owner-KERN 20.08., KON22-01/8):
+  # build:clang laeuft unbedingt (rules dort), kein Leser mehr in dieser Datei, den Modul-Pipelines
+  # (alle 3 Trigger forwarden yaml_variables:false) oder in Skripten -- ein toter Schalter, der stehen
+  # bliebe, waere die naechste stille Wiederbelebungs-Flaeche.
   GIT_STRATEGY: fetch                      # (REV 16, path a) natives Repo-Setup -> get_sources injiziert CI_JOB_TOKEN via extraheader
   GIT_SUBMODULE_STRATEGY: recursive        # (REV 16, path a) nativer rekursiver Submodul-Fetch mit CI_JOB_TOKEN (ersetzt den manuellen Deploy-Token-Klon)
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
@@ -165,6 +168,10 @@ variables:
 # => nie gaten. lint:secrets bleibt UNGEGATET (Token-Risiko je Commit); thesis:pdf ist docs-Konsument.
 # Doktrin-Auslegung (V2): "gesamte Pipeline hart gruen" bezieht sich auf den CODE-Stand -- ein docs-only-
 # Commit aendert keinen Code, der Beweis der Vorwelle bleibt gueltig (Skip != gelb, Job existiert nicht).
+# #106 CI-DUAL R2 (Owner-KERN 20.08., KON22-01/8: beide Compiler Pflicht, KEIN changes:-Skip): die fuenf
+# Dual-Compile-Zellen build:clang + test:unit + test:unit:debug + test:unit:clang + test:unit:clang:debug
+# sind KEINE Konsumenten dieser Vorlage mehr -- sie laufen unbedingt in JEDER Welle, auch docs-only.
+# verify:submodules ebenso (Wachen-Doktrin + harte needs-Kante der Zellen, Begruendung am Job).
 .code-rules:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -191,11 +198,16 @@ variables:
           # configure.sh und Makefile weiter oben: sie entscheiden, WIE STRENG geprueft wird.
           # Befund, der sie erzwang (Paket r7-wachen-divergenz, 10.08.2026): die Diff-Hygiene-
           # Wache liegt in zwei Fassungen (hier und im ce) und war unbemerkt auseinandergelaufen.
-          # ci/wachen_paritaet.sh haelt sie zusammen und laeuft in verify:submodules -- also in
-          # einem Job unter DIESEN Regeln. Ohne diese zwei Zeilen waere er ausgerechnet fuer die
-          # Aenderung blind, die er bewacht: wer die super-eigene Fassung anfasst, aendert nichts
-          # unter Code/** und weckte den Job auf einem Feature-Zweig nicht. Der ce-Gitlink ist
+          # ci/wachen_paritaet.sh haelt sie zusammen und laeuft in verify:submodules -- damals
+          # ein Job unter DIESEN Regeln. Ohne diese zwei Zeilen waere er ausgerechnet fuer die
+          # Aenderung blind gewesen, die er bewacht: wer die super-eigene Fassung anfasst, aendert
+          # nichts unter Code/** und weckte den Job auf einem Feature-Zweig nicht. Der ce-Gitlink ist
           # ueber "Code/external/*" schon gedeckt; das hier ist die andere Haelfte.
+          # #106 CI-DUAL R2 (20.08.): verify:submodules laeuft seit R2 unbedingt (rules am Job);
+          # die zwei Pfade bleiben in der Allowlist stehen -- sie wecken weiterhin die 8 uebrigen
+          # .code-rules-Konsumenten (toolchain:probe, lint:format/static, analyse, visibility,
+          # integration, manifest, prebackup); eine Allowlist irrt nur in die sichere Richtung
+          # (mehr Jobs, nie weniger).
           - "scripts/ci_diff_ascii_width_guard.sh"
           - "ci/wachen_paritaet.sh"
     - when: never
@@ -245,24 +257,27 @@ toolchain:probe:
   cache:
     paths: []                                # #53: Probe kompiliert nicht -> kein ccache-Zip-Transfer
 
-# #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
+# #273/#106: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang -- seit CI-DUAL R1 (Owner-KERN
+# 20.08., KON22-01/8) UNBEDINGT in jeder Welle. Der alte COMDARE_CLANG_MATRIX-Kill-Switch (when:never bei
+# !="1") und die globale Schalter-Variable sind GESTRICHEN: ein Ausschalter fuer eine Pflicht ist keine
+# zulaessige Konstruktion (ce-Muster "Ein Gate, das nie aufgeht, ist kein Gate", ce:148-161; ce:171-172
+# ueberschreibt dieselbe Vorlage seit jeher unbedingt -- super zieht hiermit nach).
 # #258-Fix (2026-07-06, Pipeline 8048/Job 213091): Template-Default cmake -S "." fand kein CMakeLists —
 # super-Quelle liegt unter Code/. Scope = Sammel-Target comdare_da_tools (Code/CMakeLists.txt, super-eigene
 # Werkzeugflaeche analog analyse+integration; Konfiguration spiegelt analyse:thesis-data: Ninja/Release/V32).
 build:clang:
-  # #53: docs-only-Gate als EXPLIZITE kombinierte rules (NICHT .code-rules-extends), damit der #273-CLANG_MATRIX-
-  # Ausschalter erhalten bleibt (architekturkonform, nicht nur heute-identisch): CLANG_MATRIX!=1 => never (Bestand
-  # der neueste-clang-Pflicht), DANN die V2-Allowlist (docs-only skippt; main/Code/Gitlink laufen). .ccache-pull
-  # bleibt (Konsument, pull-only).
+  # #106 CI-DUAL R1+R2: rules = unbedingt (when:on_success). Ueberschreibt BEIDE alten Drosseln zugleich --
+  # (1) das COMDARE_CLANG_MATRIX-Gate der Vorlage .build-clang-latest (base-pipeline.yml) und (2) die
+  # docs-only-Pfadkopie der .code-rules (Lens-Fund 14.08.; sie war nur noetig, damit dieser Job in exakt
+  # denselben Wellen existiert wie sein needs-Abhaengiger test:unit:clang -- seit R2 laufen alle vier
+  # test:unit*-Zellen ebenfalls unbedingt, die Pfadliste ist gegenstandslos).
+  # KEIN changes:-Skip, KEIN Schalter, KEIN allow_failure (KON22-01/8 + Doktrin 06.07.).
   # P2/D3.1 (27.07.; INFRA-AN-DIPLOM Punkt 1 SUPERSEDET das alte "needs UNVERAENDERT (Verdikt V4)"):
   # ohne needs war der Job stage-blockiert (stage: analyse) und wartete hinter der Stage orchestrate
   # auf die 3 strategy:depend-Bridges -- Slot-Fresser und Mit-Ursache der 286-Echo-Kaskade. Mit
   # needs: ["verify:submodules"] laeuft er per DAG los, sobald die Submodul-Verifikation steht.
-  # EXISTENZ-SICHER in der TRAGENDEN Richtung: die rules 2-4 unten sind eine echte Teilmenge der
-  # .code-rules (Vorlage oben), also existiert verify:submodules in JEDER Welle, in der build:clang
-  # existiert => das needs haengt nie. Die Gegenrichtung gilt bewusst NICHT: mit
-  # COMDARE_CLANG_MATRIX != "1" existiert verify:submodules OHNE build:clang -- fuer die
-  # needs-Validitaet harmlos (nur die tragende Richtung zaehlt).
+  # EXISTENZ-SICHER in BEIDEN Richtungen: verify:submodules laeuft seit #106 R2 ebenfalls unbedingt
+  # (Wachen-Doktrin + harte needs-Kante, Begruendung dort) => das needs haengt nie.
   # CI-DUAL 14.08.: Cache-Wechsel -- weg vom gcc-Release-Key (.ccache-pull), pull auf den clang-Key.
   # Der WRITER des clang-Keys ist test:unit:clang (Voll-Suite = maximale Objekt-Abdeckung, ce-Muster);
   # dieser Werkzeug-Bau-Gate-Job ist Konsument. Ein Key, GENAU EIN Writer (#53-ccache-Hygiene).
@@ -273,28 +288,7 @@ build:clang:
     policy: pull
   needs: ["verify:submodules"]
   rules:
-    - if: '$COMDARE_CLANG_MATRIX != "1"'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - changes:
-        # CI-DUAL Lens-Fund 14.08.: die Pfadliste MUSS mit .code-rules IDENTISCH sein (vorher fehlten
-        # configure.sh, Makefile und die zwei Wachen-Dateien). Grund: test:unit:clang (extends
-        # .code-rules) haengt per needs an DIESEM Job -- eine Welle, die nur configure.sh anfasst,
-        # existierte sonst MIT test:unit:clang aber OHNE build:clang => GitLab lehnte die Pipeline-
-        # Erzeugung ab. Die alte Teilmengen-Begruendung galt nur, solange build:clang ausschliesslich
-        # ABHAENGIGER (von verify:submodules) war, nie ABHAENGIGKEIT.
-        paths:
-          - "configure.sh"
-          - "Makefile"
-          - "Code/**/*"
-          - "Code/external/*"
-          - "thesis/diplomarbeit"
-          - ".gitmodules"
-          - ".gitlab-ci.yml"
-          - "scripts/ci_diff_ascii_width_guard.sh"
-          - "ci/wachen_paritaet.sh"
-    - when: never
+    - when: on_success
   stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
   variables:
@@ -1166,15 +1160,19 @@ test:abnahme06-zusicherung:
 # bewusst NICHT Target "all": das zöge die komplette ce-Suite (888 Targets) doppelt, die ihr EIGENES
 # test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
 test:unit:
-  extends: [.test, .code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
+  extends: [.test, .ccache-pull]   # ccache pull-only (Konsument)
+  # #106 CI-DUAL R2 (Owner-KERN 20.08., KON22-01/8): .code-rules GESTRICHEN -- die Dual-Compile-Zelle
+  # laeuft unbedingt in JEDER Welle, auch docs-only. KEIN changes:-Skip, KEIN allow_failure.
+  rules:
+    - when: on_success
   # OP-2 (D3-Plan, 27.07.; Herleitung korrigiert nach CiCheck-Messung 13570): die Vorlage .test aus
   # den zentralen ci-templates (base-pipeline.yml) bringt needs:[] mit -- test:unit war dadurch
   # stage-frei und startete in 4/4 gemessenen Voll-Wellen VOR verify:submodules (bis 37s Vorsprung),
   # d.h. die Unit-Suite baute los, bevor die Submodul-Verifikation ueberhaupt lief. Das needs hier
   # ueberschreibt das geerbte needs:[] und garantiert die Reihenfolge (Korrektheits-Fix, kein
   # Scheduling-Fix; test:unit liegt nicht auf dem kritischen Pfad der Welle).
-  # EXISTENZ-SICHER in BEIDEN Richtungen: test:unit und verify:submodules ziehen ihre rules identisch
-  # aus .code-rules => beide existieren in exakt denselben Wellen, das needs haengt nie.
+  # EXISTENZ-SICHER in BEIDEN Richtungen: test:unit und verify:submodules laufen seit #106 R2 beide
+  # unbedingt => beide existieren in exakt denselben (naemlich allen) Wellen, das needs haengt nie.
   needs: ["verify:submodules"]
   tags: [baremetal]
   # -- GNU-BAUWEG (08.08.2026, Owner-Ansage; Ledger docs/DIPLOMARBEIT-...-LEDGER.md:11370-11391) --
@@ -1234,12 +1232,15 @@ test:unit:
 # KEIN allow_failure (Doktrin seit 06.07.: ZELLE = Warnung, JOB = hart rot).
 # CI-DUAL 14.08. (Owner verbatim; KON22-01/8, T-11b): Kette GCC -- test:unit -> test:unit:debug
 # seriell via needs (bisher liefen BEIDE Vollbauten parallel hinter verify:submodules; die Kette
-# SENKT die gleichzeitige Vollbau-Spitze). EXISTENZ-SICHER: beide ziehen ihre rules identisch aus
-# .code-rules => existieren in denselben Wellen. Eigener ccache-Key gcc-dbg mit DIESEM Job als
-# einzigem Writer -- bisher pull-only auf dem gcc-RELEASE-Key (Fehlpassung: Debug-Objekte treffen
-# dort nie einen Cache-Eintrag).
+# SENKT die gleichzeitige Vollbau-Spitze). EXISTENZ-SICHER: beide Zellen laufen seit #106 R2
+# unbedingt (rules when:on_success statt .code-rules) => existieren in denselben (allen) Wellen.
+# Eigener ccache-Key gcc-dbg mit DIESEM Job als einzigem Writer -- bisher pull-only auf dem
+# gcc-RELEASE-Key (Fehlpassung: Debug-Objekte treffen dort nie einen Cache-Eintrag).
 test:unit:debug:
-  extends: [.test, .code-rules]
+  extends: [.test]
+  # #106 CI-DUAL R2: unbedingt -- KEIN changes:-Skip (Owner-KERN 20.08., KON22-01/8).
+  rules:
+    - when: on_success
   cache:
     key: "ccache-$CI_PROJECT_NAME-gcc-dbg"
     paths: [".ccache"]
@@ -1275,14 +1276,17 @@ test:unit:debug:
 # ist der 2-Compiler-Beweis DURCH AUSFUEHRUNG -- dieselbe Suite unter clang, Release UND Debug.
 # Kette CLANG: build:clang (Werkzeug-Bau-Gate) -> test:unit:clang -> test:unit:clang:debug, strikt
 # seriell via needs (OOM-Doktrin: nie 4 parallele Vollbauten; Spitze bleibt 3 == prod1-Deckel).
-# docs-only-Symmetrie: .code-rules wie die gcc-Zwillinge -- eine Zelle skippt nur, wenn alle vier
-# skippen. KEIN allow_failure, KEIN COMDARE_*-Abschalt-Gate an den Zellen selbst; wird build:clang
-# per COMDARE_CLANG_MATRIX abgeschaltet, bricht die Pipeline-ERZEUGUNG laut (needs auf einen nicht
-# existierenden Job) statt still eine Zelle zu verlieren.
+# #106 CI-DUAL R1+R2 (20.08.): ALLE Zellen der Kette laufen unbedingt (rules when:on_success) -- die
+# fruehere docs-only-Symmetrie ueber .code-rules und der COMDARE_CLANG_MATRIX-Abschalt-Mechanismus
+# an build:clang sind GESTRICHEN (KON22-01/8: kein changes:-Skip, kein Schalter an einer Pflicht).
+# KEIN allow_failure, KEIN COMDARE_*-Abschalt-Gate an den Zellen (Doktrin 06.07. unveraendert).
 # ccache: eigener Key je Compiler x BuildType, GENAU EIN Writer (#53-Hygiene); test:unit:clang ist
 # der Writer des clang-Keys (Voll-Suite = maximale Objekt-Abdeckung), build:clang zieht pull-only.
 test:unit:clang:
-  extends: [.test, .code-rules]
+  extends: [.test]
+  # #106 CI-DUAL R2: unbedingt -- KEIN changes:-Skip (Owner-KERN 20.08., KON22-01/8).
+  rules:
+    - when: on_success
   stage: test
   needs:   # Lens-Fund 14.08.: Ordnungs-Kante, artifacts:false (s. test:unit:debug)
     - job: "build:clang"
@@ -1316,7 +1320,10 @@ test:unit:clang:
 # CI-DUAL 14.08.: Zelle clang x Debug -- identischer Body, drei Abweichungen (needs-Kette,
 # Debug-BuildType, eigenes Bauverzeichnis) plus eigener ccache-Key (Writer dieser Job).
 test:unit:clang:debug:
-  extends: [.test, .code-rules]
+  extends: [.test]
+  # #106 CI-DUAL R2: unbedingt -- KEIN changes:-Skip (Owner-KERN 20.08., KON22-01/8).
+  rules:
+    - when: on_success
   stage: test
   needs:   # Lens-Fund 14.08.: Ordnungs-Kante, artifacts:false (s. test:unit:debug)
     - job: "test:unit:clang"
@@ -1407,11 +1414,21 @@ trigger:thesis:
       pipeline_variables: false
 
 # ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
+# #106 CI-DUAL R2-Folge (20.08., am Objekt hergeleitet): .code-rules GESTRICHEN, der Job laeuft in JEDER
+# Welle. Zwei Gruende: (1) DAG-Validitaet -- build:clang und test:unit haengen HART per needs an diesem
+# Job; seit R1/R2 existieren sie in jeder Welle, existierte verify:submodules in einer docs-only-Welle
+# nicht, lehnte GitLab die Pipeline-ERZEUGUNG ab (undefined need; dieselbe Fehlerklasse wie der
+# Lens-Fund 14.08. an build:clang, nur in Gegenrichtung). (2) Wachen-Doktrin dieser Datei (KEIN
+# .code-rules an Wachen): die Zellen bauen Submodul-Code (ce via add_subdirectory) jetzt in JEDER
+# Welle, also muss die REV-CI-04-Gitlink-Determinismus-Pruefung ihnen in JEDER Pipeline vorausgehen
+# (OP-2-Ordnungs-Kante an test:unit). Kostenseite: reine git-Statuspruefung, kein Compile.
+# Die alte Begruendung "faellt mit allen Code-Dependents; DAG bleibt gueltig" ist seit R1/R2 hinfaellig.
 verify:submodules:
-  extends: [.code-rules]   # #53: docs-only-Gate (faellt mit allen Code-Dependents; DAG bleibt gueltig)
   stage: submodules
   tags: [baremetal]
   needs: ["lint:secrets"]   # Codex-Review 06-27: hart auf den Secrets-Gate warten
+  rules:
+    - when: on_success
   cache:
     paths: []               # #53: reine Submodul-Verifikation, kein Compile -> kein ccache-Zip
   script:
@@ -1927,7 +1944,9 @@ measure:smoke:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
     COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
     COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
-  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
+  # #53: docs-only-DAG-sicher. Seit #106 CI-DUAL R2 (20.08.) laeuft verify:submodules in JEDER Welle;
+  # optional:true bleibt als harmloser Gurt stehen (haelt die Pipeline auch bei kuenftigen rules-Aenderungen valide).
+  needs: [{job: "verify:submodules", optional: true}]
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
@@ -2179,8 +2198,10 @@ measure:golden-320:
     COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
   needs:
     - job: "verify:submodules"
-      optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
-                                   # Pipeline valide, wenn verify:submodules bei docs-only-Push nicht existiert (leer-failed 12012/12045)
+      optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); hielt die
+                                   # Pipeline valide, wenn verify:submodules bei docs-only-Push nicht existierte
+                                   # (leer-failed 12012/12045). Seit #106 CI-DUAL R2 (20.08.) existiert
+                                   # verify:submodules in JEDER Welle; der Gurt bleibt harmlos.
     # #26/GO-5 (2026-07-12): erst Smoke, DANN Voll-Lauf (User-Ablauf-Doktrin). optional:true haelt die
     # Pipeline valide, falls der Smoke-Job (andere rules-Variante) nicht existiert; existieren beide
     # (COMDARE_RUN_MEASURE=true), erzwingt needs die Sequenz. artifacts:false — der Voll-Lauf braucht
@@ -2779,7 +2800,9 @@ planer:delegate:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/golden-Profil)
     COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
-  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher (Job kann bei docs-Wellen fehlen)
+  # #53: docs-only-DAG-sicher (der Job konnte bei docs-Wellen fehlen). Seit #106 CI-DUAL R2 (20.08.) laeuft
+  # verify:submodules in JEDER Welle; optional:true bleibt als harmloser Gurt stehen.
+  needs: [{job: "verify:submodules", optional: true}]
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
       when: never
