@@ -418,3 +418,16 @@ set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_r
                      test_golden_n_consistency
     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
     SKIP_REGULAR_EXPRESSION "(^|\n)-- COMDARE-XML-WACHE-SKIP\r?(\n|$)")
+
+# =============================================================================
+# B11/F-E-Rest (bau/w1luecken-super, 2026-08-21): die MUTATIONSPROBE "ROT statt
+# SKIPPED" des B4-Ankers -- ans DATEIENDE (Kollisionsschutz gegen andere
+# Straenge). Der Ausdruck reist aus der LIVE-Property der fuenf Wachen (keine
+# zweite Regex-Kopie); die Probe prueft beide Klassifikations-Richtungen.
+get_test_property(test_golden_n_consistency SKIP_REGULAR_EXPRESSION _comdare_skip_regex)
+add_test(NAME test_fixture_skip_anker_biss
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSKIP_REGEX=${_comdare_skip_regex}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/skip_anker_bissprobe.cmake")
+set_tests_properties(test_fixture_skip_anker_biss PROPERTIES
+    LABELS "da_unit;fixture_sync" TIMEOUT 60)
