@@ -286,9 +286,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <!-- A9.1 (S4-Delta B9 Mess-Schema-Kern, 2026-07-20): run_methodology = die Run-Methodik-UNTER-Achse
-       {debug/measure/release}. Je <method value=".."/> EINE Methode. Der Code-Parser validiert die ids gegen
-       kRunMethodologyRegistry (die XSD ist nur strukturell; Single-Source im Code). Leer/abwesend = Default. -->
+  <!-- A9.1 (S4-Delta B9 Mess-Schema-Kern, 2026-07-20): run_methodology = die Run-Methodik-UNTER-Achse.
+       Je <method value=".."/> EINE Methode. X-6 (S-13-Schema-Zug, 2026-08-21): die REGISTRY ist die
+       SINGLE-SOURCE der gueltigen ids (kRunMethodologyRegistry); diese XSD zaehlt sie mit Absicht NICHT
+       auf (eine hier gepflegte Zweitliste veraltete still, wie es dem Nachbar-Kommentar unten mit dem
+       Dreier-Trio geschah). Die XSD bleibt strukturell; die HAERTE (unbekannte id => ERROR mit Zaehler)
+       liegt im VALIDATOR (validate_profile.hpp, check_measurement_sub_axis; erreicht ueber den
+       validate-CLI-Zweig der Fassade). Leer/abwesend = Default. -->
   <xs:complexType name="RunMethodologyType">
     <xs:sequence>
       <xs:element name="method" minOccurs="0" maxOccurs="unbounded">
@@ -305,9 +309,16 @@
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
-  <!-- A9.1: writeback_methods = die Rueckschrieb-Methoden-UNTER-Achse {csv/latex_table/comparison_metrics}
-       (ehrliche Formalisierung des <output>-Trios; KEIN pdf). Je <method value=".."/> EIN Kanal. Der Code-Parser
-       validiert die ids gegen kWritebackMethodRegistry (XSD nur strukturell). Leer/abwesend = Default. -->
+  <!-- A9.1: writeback_methods = die Rueckschrieb-Methoden-UNTER-Achse (ehrliche Formalisierung des
+       <output>-Trios; KEIN pdf). Je <method value=".."/> EIN Kanal. X-6 (S-13-Schema-Zug, 2026-08-21):
+       die REGISTRY ist die SINGLE-SOURCE der gueltigen ids (kWritebackMethodRegistry; seit A9-S3 traegt
+       sie AUCH xlsx, Count=4); die frueher HIER aufgezaehlte Dreier-Liste {csv/latex_table/
+       comparison_metrics} war genau deshalb stale und ist gestrichen: eine XSD-Zweitliste veraltete
+       still gegen die Registry. Die XSD bleibt strukturell; die HAERTE (unbekannte id => ERROR mit
+       Zaehler writeback_methods_checked) liegt im VALIDATOR (validate_profile.hpp,
+       check_measurement_sub_axis; erreicht ueber den validate-CLI-Zweig der Fassade). SEMANTIK der FORMAT-Token
+       seit S13-02 (KON32-01): {csv,xlsx} steuern die PERSISTENZ (was auf die Platte geht); die Mappe im
+       Speicher entsteht IMMER; leer/abwesend = Default xlsx (Owner-KERN 26.07.). -->
   <xs:complexType name="WritebackMethodsType">
     <xs:sequence>
       <xs:element name="method" minOccurs="0" maxOccurs="unbounded">
