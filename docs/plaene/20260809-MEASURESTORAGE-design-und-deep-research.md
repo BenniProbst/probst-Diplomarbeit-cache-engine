@@ -156,6 +156,22 @@ Jeder Befund selbst am Objekt gelesen, nicht aus den Linsen übernommen. Ergebni
 - **golden = 1-Thread [LAEUFT]:** `run_methodology_registry.hpp:56` „Measure … 1-Thread/deterministisch, die golden-Messung".
 - **ErgebnisMappe [LAEUFT als Code, 0 Produktions-Konsumenten]:** Fassung 3 komplett (`MessEbene` Z.196, `Checkpoint::In/Out` Z.208, 8-Spalten-Präzisierung Z.157–159, Sheet-Präfixe C_/M_/X_ Z.310–322, CSV-Strategie `<stamm>__<label>.csv` + tmp+rename Z.495–580); Kopfkommentar Z.178–185: Prozess/Thread-Identität erreicht den Writer heute an KEINER Stelle, checkpoint_measure ist „die dafuer zustaendige, NOCH NICHT gebaute Spezifikation".
 
+> FASSUNGS-VERMERK 20.08.2026 (W2-docs-Zug K7b-5): Die Blattform-Fassungshistorie traegt seit
+> 16.08. eine FASSUNG 4 -- KON80-01/V3 (Owner woertlich): S001..Snnn-Sheet-Namen ABGELEHNT
+> ("Holzweg"); stattdessen Hierarchisierung der Sheets aus der w/ma/mi-Mess-HIERARCHIE,
+> Sheet-Schnitt = Traeger-Stufe x erhobene Messebene, ALLE Parameter stehen im Blatt, xlsx
+> SPARSE als Lagereinordnung in einer Kette benannt, Sheets SPARSE gegen ihre Funktion im
+> Sheet-System benannt. Detail-Design KOMPLETT per KON87 (16.08., wf_8a193a8c 13/13,
+> design_sheet_hierarchie_v3.md): Blatt-Schnitt = TRAEGER-STUFE x ERHOBENE MESSEBENE (real nur
+> b*w, t*ma, t*mi + h*ma/h*mi), SHEET-EBNF "INFO" | ebene[.traeger].gegenstand, 31-Beweis
+> (laengster Name 23 <= 31), RT-Ueberlauf deterministisch <ebene>.h16.<sha512-hex16>;
+> V-A9-6 ENTSCHIEDEN, S001..Snnn ENTFAELLT. Der Sheet-Namen-Teil von KON74-04 (15.08.,
+> S001..Snnn mixed-radix) ist damit SUPERSEDED; der zugehoerige Superseded-Vermerk im Ledger
+> ist als ENTWURF an den Lead uebergeben (Ledger ist Lead-only). Die ce-seitige Fassung-1/2/3-
+> Kommentarhistorie in builder/lager_ablage/ergebnis_mappe.hpp traegt den Fassung-4-Vermerk
+> noch NICHT (Code-Repo, eigener ce-docs-Nachzug). Fassung 3 (08.08., "Sheets je FUNKTION bzw.
+> je ACHSE") bleibt als Historie stehen (Doku-Doktrin).
+
 **Korrekturen an den Linsen:**
 - **K-a (Zählung):** Die „11 nearest_rank_median-Aufrufe" (Ledger heute Z.359) sind **6 Aufrufe in csv_to_latex.cpp** (Z.216,411,513,1245,1367,1414) **+ 5 in diagram_generator.cpp** (Z.735,1205,1548,1783,1784) = 11 über **zwei** Module; dazu **2 separate Definitionen** (Z.48 bzw. Z.653) und 1 Kommentar (Z.289). Linse 1 („8 Fundstellen") zählte nur csv_to_latex.cpp und ohne Modul-Trennung.
 - **K-b (tier_observe):** nicht „8 push_back in 3 Vektoren", sondern 6 in die 3 ns-Vektoren + 2 in den 4. Vektor `trace.checkpoints` (Z.185,274).

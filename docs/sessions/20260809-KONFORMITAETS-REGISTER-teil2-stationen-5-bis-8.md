@@ -208,6 +208,15 @@ Nenner 49 Soll-Aussagen, alle am Objekt gemessen: ERFUELLT 8/49 (16 %) - TEILWEI
 
 - ZWEI VERSCHIEDENE FRAGEN HEISSEN OV-13, beide am 08.08. geschrieben: `20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md:641` = HYBRID-Ketten-Zerlegung (Frist Mo 10.08.), `20260808-WELLENPLAN-ENDFASSUNG-369-soll-211-ist.md:773` = 'Paper-Kopplung (neu, ersetzt OV-7)'. Ein Owner-'ja' auf 'OV-13' wuerde heute zwei unvereinbare Dinge gleichzeitig beantworten -- und weil die HYBRID-Fassung bereits als 'bestaetigt' ins Register gewandert ist, ist die Verwechslung schon einmal passiert.
 
+> UEBERHOLT-MARKER 20.08.2026 (W2-docs-Zug T-5/Z-12, KON118/E-6-Verdikt): Diagnose dieses
+> Absatzes BESTAETIGT und per KON118 (18.08.) ENTSCHIEDEN -- die 22 war ein PHANTOM-NENNER
+> (geboren in Commit ffa4b836 vom 08.08. ohne Objekt-Basis; tiefste Wurzel = der hier
+> diagnostizierte tote Kommentar axis_reflect.hpp:4 vom 02.06.). Realer HY-A3-Registry-Anteil
+> = kGenusBuildSlotCounts 5->6 (genus_build_admission.hpp) + static_assert ==5 -> ==6 +
+> Wachen-Nachzug -- im #15-Bruch GEBAUT; Gattungen 3->4 / Genera 5->6 bereits HY-A1 (09.08.).
+> Abnahme-Ersatz = kGenusBuildSlotCounts.size() 5->6 + Einzelquellen-Paare 4/6 je
+> vorher/nachher. Der Absatz darunter bleibt als Historie stehen (Doku-Doktrin).
+
 - DIE ABNAHMEZAHL 'REGISTRY 22->23' HAT KEINEN LEBENDEN NENNER. Sie stammt aus einem Kommentar vom 02.06.2026: `builder/experiment_tree/axis_reflect.hpp:4` 'die ConfigSets aller 22 Achsen (15 Topics)'. Am Objekt gezaehlt: `grep -c 'push_static_axis<' registry_to_axis_levels.hpp` -> **27**, T-Nummern laufen bis T26, `find libs/cache_engine/topics -maxdepth 1 -type d` -> **17** Verzeichnisse (nicht 15). Kein einziger lebender Zaehler zeigt 22 (Kandidaten: cache_engine_axis_registry.xml 18 <axis>, kCatalogAxisCount 19, kOrganAxisCount 18, kMeasurementAxisCount 3). Das HY-A3-Abnahmekriterium ist damit heute unmessbar formuliert.
 
 - ZWEI UNABHAENGIGE 'DREI MESS-EBENEN' MIT VERSCHIEDENEM ERSTEN GLIED: `measurement_tooling_registry.hpp:27` enum MeasurementTooling {WallClock, Macro, Micro} gegen `builder/lager_ablage/ergebnis_mappe.hpp:196` enum MessEbene {**Compare**, Macro, Micro}. Ersteres hat einen Anzahl-Anker (kMeasurementToolingCount = 3), letzteres **keinen** -- und genau letzteres bestimmt die xlsx-Blattsorte (Test #465). Ein 'dazwischengeschobener' vierter Wert renummeriert dort Macro/Micro als uint8_t still um. Die Owner-Formulierung 'dazwischen, nicht angehaengt' ist damit heute die gefaehrlichste denkbare Aenderung an der Ausgabe-Schicht.
