@@ -16,6 +16,36 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON120-07 (22.08. frueh, Lead): Vollpruefungs-Order vollzogen — Zwischendoku + C3-Sichtung
+
+Owner-Order "gesamten Kontext pruefen, vergessene und offene Arbeit in reicher
+Zwischendoku notieren" VOLLZOGEN: docs/sessions/20260822-SESSION-zwischendoku-
+vollpruefung-offene-und-vergessene-arbeit.md @ 8ed8b268+eebbba33 (dual gepusht,
+CI 16079 SUCCESS, 16080 Poller). KERNE:
+1. VF-A1/VF-A2 als Lead-Fix VOLLZOGEN: Delta-Zaehler 11->12 an 4 Stellen +
+   D-12-Ordnungsnotiz in beiden F2-Dokumenten; Harmonisierungs-Auflage gegen
+   fix/vorlagenfenster-r1 (wt-super-vorlagenfix) an den Lande-Zug.
+2. Traegerlose SITZT-KLEIN-Funde der 6 SITZT-Straenge -> Board #122
+   (kanalwerk KW-A1, cidual A1, trigfix KLEIN-1, ph89 A-1, pmcpaket AUD-1,
+   s8kopf K-1 + pinduo-A2/A3-Lead-Posten).
+3. #19 main-FF beider Repos ENTBLOCKT seit #31-Abschluss — eingeordnet als
+   Schlussglied des S1+S2-Lande-Zugs (mit Diff-Hygiene-Wache, volle SHA).
+4. #91 (Unifikations-Designplan, Frist Mi 26.) + #86 (ORG-19-IO, Owner-GO
+   17.08.) OHNE Traeger benannt — Buendel-Strang nach D-08-Explore-Rueckkehr.
+5. C3-VORPOSTEN VOLLZOGEN: Thesis github/main=246eff9 ("Alles bis FF3
+   kommentiert"), 15 Commits neuer als origin/main (c2d21fa), 40 neuer als
+   lokal main (993d28f, 0 voraus); 25 Owner-Kommentar-Commits. Diff-Sichtung
+   728fc74: bestaetigt o2-umbau-Zuschnitt (O3 waehlbar unter Warnung) + NEU
+   Default-Workload = Permutation ueber ALLE Workloads + NEU Planer-CLI-
+   XML-Wizard mit HW-Verfuegbarkeits-Filter + Deep-Research Master-Thesis-
+   Evaluations-Strategie. cc04be1: M0-M3-Taxonomie (Meta-Meta = M3, Indirektion
+   einer Beschreibung) + checkpoint_measure-Abschaltungsstufen 1+2 = SOLL fuer
+   B4. Explore-Folgezuege (C1/D-01/D-04/A4/B4) MUESSEN die Thesis-Kommentare
+   als Owner-Primaerquelle einspeisen; #121-Vorspann liest alle 25 VOLL.
+6. #113-Traegerwechsel verbucht (wf_95033571 im Riss gestorben;
+   cifix-vl3-debug traegt die W1L-Landung).
+7. W2-Audit-Erstlauf-Endbericht VOLL gelesen (1286 Z., Owner-Vollleseregel);
+   Resume w1pdbskqz laeuft, Verdikte treffen ein.
 ## KON120 (22.08.2026 frueh) — OWNER-ANTWORTEN TRANCHE 1+2 KOMPLETT VERBUCHT + RESUME NACH CREDITS-RISS + V8-prod1-VOLLZUG + A3-HANDOUT
 
 **KON120-01 TRANCHE 1 (21.08. abends):** A1 Kalibrierlauf MIT std::variant-Tier-Audit ERTEILT
