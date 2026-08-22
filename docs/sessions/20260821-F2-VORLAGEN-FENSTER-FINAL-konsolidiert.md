@@ -14,7 +14,7 @@ G03=V-05 (P5) · G04=V-04 (P4/C-3a) · G06=V-01 (P1) · G07=V-02 (P2) · G08=V-0
 G09=V-06 (P6) · G10=V-07 (P7) · G12=E-9+V-10/O4 (OV-4 prozedural entschieden) ·
 G19=V-16 (E12-Thesis) · G21 = das Freeze-Check-Testat selbst (Protokoll liegt bei, s.u.).
 
-DELTAS (nur in der BAULISTE; hiermit ins Fenster gehoben — D-01..D-11):
+DELTAS (nur in der BAULISTE; hiermit ins Fenster gehoben — D-01..D-12 (D-12 nachgetragen 8aae5cd2)):
 
 ### D-01 · HY-Ebene4a / 4.-Ebenen-Entscheid (G01; OV-3-Nachfassung) [ENTSCHEID]
 „Der 4.-Ebenen-Entscheid (hybrid-lokal vs. globales Glied; OV-3-Empfehlung hybrid-lokal)
@@ -62,16 +62,16 @@ aus 20260817-OWNER-VORAB-15-restfragen.md; Antwort erbeten."
 Muster erweitern?) — beide Fristen Mi 12.08. verstrichen; sie blockieren die D3-4/D3-6-
 Nachzuege (Flaeche super/ci -> Lande-Zug). Entscheide erbeten."
 
-### D-12 · R-1/OV-10 Steuerdock-Zahl (Synthese-Dedup-Pruefung, s8-Strang F-17) [ENTSCHEID]
-„Der S-8-Traegerbau hat SECHS Steuerdocks gebaut (C-6-Mandat/B-14, steuerdock.hpp); die aeltere
-OV-10-Lesart sagte ‚max. 4 erreichbar' — Bestaetigung der SECHS erbeten (genau EINE Code-Stelle,
-Registry-Aufzaehlung; Wortlaut-Vorlage in traegerbau-s8-ergebnis.md §6.3)."
-
 ### D-11 · Sammel: K2-P/E-Core-Platz + Alt-Owner-Posten (G20+G22) [KENNTNISNAHME/DISPOSITION]
 „(a) ICpuCore/CoreClass/CPUID-0x1A ohne Wellen-Posten — Platz-Entscheid erbeten.
 (b) Alt-Sammel zur Disposition: PA-3 (3 PRT-ART-Quelldateien) · ETA-avg_size_bytes ungenutzt ·
 'G13'-Kuerzel unzuordenbar · 2 unbenannte Owner-GOs (Roh-Transkript Z36292/Z42737) ·
 K-5-Dateien mit Teammate-Berichten trotz Owner-only · OD1-OD4 (§68d, seit 26.07.)."
+
+### D-12 · R-1/OV-10 Steuerdock-Zahl (Synthese-Dedup-Pruefung, s8-Strang F-17) [ENTSCHEID]
+„Der S-8-Traegerbau hat SECHS Steuerdocks gebaut (C-6-Mandat/B-14, steuerdock.hpp); die aeltere
+OV-10-Lesart sagte ‚max. 4 erreichbar' — Bestaetigung der SECHS erbeten (genau EINE Code-Stelle,
+Registry-Aufzaehlung; Wortlaut-Vorlage in traegerbau-s8-ergebnis.md §6.3)."
 
 ## SOFORT-ZEILEN (aus dem ENTWURF, unveraendert dringend)
 1. V-04: C-3a-Nachfassung d8b27633 (haertester Blocker, Frist 19.08. verstrichen).
@@ -83,6 +83,6 @@ K-5-Dateien mit Teammate-Berichten trotz Owner-only · OD1-OD4 (§68d, seit 26.0
    Herabstufung; Zeit-Deckel bleibt fail-closed unbestimmbar).
 
 ## ABNAHME
-B-4 erfuellt: das Fenster (ENTWURF V-01..V-20 + Z-01..Z-03 + DIESE 11 Deltas) liegt der
+B-4 erfuellt: das Fenster (ENTWURF V-01..V-20 + Z-01..Z-03 + DIESE 12 Deltas) liegt der
 Landung bei; ENTSCHIEDEN-Tabelle E-1..E-10 verhindert Bereits-Entschiedenes (A2.3a).
 Freeze-Check-Protokoll: docs/sessions/20260821-F2-FREEZE-CHECK-PROTOKOLL.md (Schwester-Dokument).

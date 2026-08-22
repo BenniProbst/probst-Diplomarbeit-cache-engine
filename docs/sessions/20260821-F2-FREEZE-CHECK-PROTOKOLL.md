@@ -76,8 +76,8 @@ kGenusBuildSlotCounts` (HY-A3 5->6).
 ## B-4 — VORLAGEN-FENSTER
 
 Vorgelegt als ZWEI Dokumente (EIN Fenster): F2-VORLAGEN-FENSTER-ENTWURF.md (V-01..V-20 +
-Z-01..Z-03 + E-1..E-10) + 20260821-F2-VORLAGEN-FENSTER-FINAL-konsolidiert.md (11 Deltas
-D-01..D-11 aus der W1L-BAULISTE; A2.3a-Dopplungs-Protokoll). SOFORT-Zeilen: V-04 (C-3a),
+Z-01..Z-03 + E-1..E-10) + 20260821-F2-VORLAGEN-FENSTER-FINAL-konsolidiert.md (12 Deltas
+D-01..D-12 aus der W1L-BAULISTE; A2.3a-Dopplungs-Protokoll). SOFORT-Zeilen: V-04 (C-3a),
 V-14 (root-Platte UEBERFAELLIG), V-18 (Infra-Termin), V-10/O4 (Kalibrierlauf vor Sa).
 
 ## B-5 — W1-NACHLANDE-POINTER (Sichtvermerk; als W1 gefuehrt)
@@ -104,4 +104,4 @@ Ledger-Nachtrag (KON120-ENTWURF, Lead schreibt nach Staffel-Synthese):
 „F2-FREEZE-CHECK VOLLZOGEN 21.08. (Protokoll docs/sessions/20260821-F2-FREEZE-CHECK-
 PROTOKOLL.md): 15/18 (P) GELANDET + 3 Fall-Deklarationen (B1-18.6(4)->#24, B5-Freigabe
 erbeten, #38a2-18.6(3) T-A) · §23.1 8/8 getragen (5 im W1L-Bau) · §23.2 0 Falsch-Rot ·
-Fenster R6 vorgelegt (20+3 Bloecke + 11 Deltas; SOFORT: C-3a, root-Platte, Infra-Termin, O4)."
+Fenster R6 vorgelegt (20+3 Bloecke + 12 Deltas; SOFORT: C-3a, root-Platte, Infra-Termin, O4)."
