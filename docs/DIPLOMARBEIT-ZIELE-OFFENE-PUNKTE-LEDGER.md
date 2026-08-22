@@ -16,6 +16,51 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON121 (22.08. vormittags, Lead): Owner-Ruege "Faden verloren" — Volllesung, Explore-Verbuchung, Restfragen
+
+Owner-Order verbatim: "Bitte lies den gesamten letzten Kontext und vorletzten Kontext
+gruendlich ein [...] weder meine Antworten verbucht, noch die restlichen Fragen erneut
+gestellt, noch ist die liegengebliebene Arbeit aus dem letzten Kontext verbucht noch
+bearbeitet, bitte lies erstmal die Rueckkehrer Workflows aus den letzten 2 Workflows
+vollstaendig, du hast voellig den Faden verloren." VOLLZUG:
+
+1. VOLLLESUNG: Alle 9 Explore-Ergebnisse wf_bc7303ab KOMPLETT gelesen (3678 Zeilen
+   gesamt; Dateien unter ~/backups-workflow/20260822-explore-buendel-t2/). K23 (Z.79413-
+   80573) + K24 (Z.80574-81679) alle 12 Owner-Nachrichten im VOLLEN Wortlaut extrahiert
+   und gegen KON120 gehalten; 80368-Praesentation erneut voll gelesen. W2-Audit-Resume:
+   3 lande-auflagen.md voll gelesen; Rest folgt MIT den Synthesen beim Terminal.
+2. EXPLORE-KERNE (Detail: Zwischendoku par.8.2): A4 = R-34 beantwortet, Multi-OS nie
+   gebaut (W10-00 leer, id56 ungebunden, os_realm 0 Treffer) · B1 = #38a2 NIE gebaut
+   (150+ Refs vollhistorisch), "Wurde schon gebaut" = Tripwire-Infrastruktur acf237b0;
+   BAU-Rezept 7 Schritte, gekoppelt an #86/ORG-19 · C1 = 10 CT-Bedingungen, PMC komplett
+   ausserhalb der Concepts-Maschinerie, Bauliste B1-B8 · C2 = Rename Item B sicher
+   (2 Leitplanken), Item A NUR mit realm_axis_version_stamp.hpp · C4 = 3 Halbsatz-
+   Kandidaten A/B/C fertig formuliert · D-01 = Verbatim-Kette 19.07.-22.08., 4.-Ebene-
+   Position NUR Ableitung (E2<->E1), S-20 ungebaut · D-04 = Kette C.1 ist die "4 bis 5
+   compare Komponenten", OV-1 nie vollzogen, V-09a-1..8 traegerlos, Fehler-Entropie
+   genuin neu, Design-Skelett+Command-Pattern-Schnitt liegen; PRAEZISIERUNG zu
+   KON120-02: der 21.08.-Hermite-Ratifikationsvorschlag ist durch D-04 UEBERHOLT
+   (nicht vollzogen) · D-08 = Emitter-Luecke L1-L7 (nur SearchAlgorithm hat Emitter;
+   "FEHLT: Steuerung->Compile"), Fable-Designplanung folgt, Entscheid vor Mi 26.
+   · D-10 = 241->189 GETRAGEN -> GENAU 2 UNGETRAGEN: OV-16+OV-17 BEIDE SEIT 09.08.
+   GEBAUT (ce a558e87c Test #278 CMake-verdrahtet Ancestor dev; super 6d2e3dce
+   AF_RESULT_NAMEN beide Formen Ancestor HEAD) — Ledger-Fussende-Alt-Zeile (32272,
+   "D3-4+D3-5 (OV-16)"/"##20+D3-6 (OV-17)") ist damit UEBERHOLT; par.24-Wellenplan-
+   Entwurf liegt WORTFERTIG in d10-liegengebliebenes.md Abschnitt 5; Kleinst-Fix
+   ci/anhang_forward_core.sh:250 stale Kommentar.
+3. RESTFRAGEN (aus dem Voll-Abgleich; als Tafel R1-R8 direkt in der Shell vorgelegt):
+   R1 Infra-Fenster-TERMIN + OF-4/id54-Satz + id18 · R2 C2-Rename-Freigabe mit
+   korrigiertem Zielnamen · R3 C4-Halbsatz A/B/C · R4 OS-Matrix-Scope (RISC-V/Pi5;
+   formal-Beweis vor oder nach Abgabe) · R5 D-01 4.-Ebene-Position + Testform
+   Label/Datensatz · R6 D-06 Ja/Nein · R7 D-09 (a)/(b) · R8 V7 aus #49. G-1-Restfragen
+   (D-05) folgen nach Audit-Terminal aus der W2-Tabelle.
+4. LIEGENGEBLIEBENE ARBEIT IN BEARBEITUNG: W1-Lande-Zug LAEUFT (cifix 899645ef committet
+   + variant-Wache 9c74f553 gemergt, Test #519; K17-Kombibau 4 Zellen im Hintergrund;
+   danach Dual-Push+CI+prt-art#107+super) · o2-umbau NACHGESTOSSEN (war unvollstaendig:
+   nur rot-zuerst-Test, kein Umbau/Commit — Objekt-Befund wt-ce-o2std) · B-Block #120
+   startet je frei werdendem Bauslot · AB-02 (Par.59-MERGE-STEMPEL-Austragung, ZEITKRITISCH
+   vor Mi 26.) + AB-03..AB-10 + OV-16/17-Buchung + par.24 = naechster dedizierter docs-Zug
+   (Entwuerfe wortfertig in ablock/lande-auflagen.md + d10-Ergebnis).
 ## KON120-07 (22.08. frueh, Lead): Vollpruefungs-Order vollzogen — Zwischendoku + C3-Sichtung
 
 Owner-Order "gesamten Kontext pruefen, vergessene und offene Arbeit in reicher

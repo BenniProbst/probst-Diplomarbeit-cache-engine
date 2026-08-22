@@ -263,4 +263,90 @@ Vorlagen-Runde (nicht dringend: Staffelungs-Design ist W4-Vorlauf).
   Beweise nur als gesicherte Kopien nach ~/backups-workflow bzw. docs/sessions/backups/.
 
 ---
-ENDE der Zwischendoku. Naechste Fortschreibung: an der S1+S2-Landung (KON121-Umfeld).
+
+## §8 NACHTRAG 22.08. vormittags — Owner-Ruege "Faden verloren": Volllesung + Restfragen
+
+Owner-Order (verbatim): "Bitte lies den gesamten letzten Kontext und vorletzten Kontext
+gruendlich ein [...] weder meine Antworten verbucht, noch die restlichen Fragen erneut
+gestellt, noch ist die liegengebliebene Arbeit [...] verbucht noch bearbeitet, bitte lies
+erstmal die Rueckkehrer Workflows aus den letzten 2 Workflows vollstaendig".
+
+### 8.1 Volllesungs-Quittung (alle mit Fundstellen-Protokoll in diesem Fenster)
+- EXPLORE-BUENDEL wf_bc7303ab: ALLE NEUN Ergebnisse VOLL gelesen (a4-osmatrix 476 Z. ·
+  b1-c3a 302 Z. · c1-metameta 565 Z. · c2-piloten 438 Z. · c4-halbsatz 314 Z. ·
+  d01-hybrid 201 Z. · d04-mathe 538 Z. · d08-stempel 489 Z. · d10-liegengebliebenes 355 Z.).
+- W2-AUDIT-RESUME wf_98cabd77: laeuft noch (Fix-Runden erzeugen Commits, z.B. skip97 ->
+  1c9f58a5; RE-VERIFYs SITZT); die 3 fertigen lande-auflagen.md (vorlagenfenster/a19/ablock)
+  VOLL gelesen; die uebrigen Strang-Dateien werden MIT den Synthesen beim Terminal VOLL
+  gelesen (offener Lese-Posten, nicht vergessen).
+- K23 (Z.79413-80573) + K24 (Z.80574-81679): alle Owner-Nachrichten im VOLLEN Wortlaut
+  extrahiert und gegen die Verbuchung gehalten (12 Nachrichten, inkl. 80103 W1-Lande-Order,
+  80358 "ich antworte direkt", 80595/80777/80788/80798/80809/80820 Tranchen, 80831 Ritual,
+  81560 Vollleseregel); die 80368-Praesentation (97 Z.) erneut voll gelesen.
+
+### 8.2 Kernbefunde der 9 Explores (je 1-2 Zeilen; Volltexte unter
+~/backups-workflow/20260822-explore-buendel-t2/)
+- A4: Multi-OS-Sequenz mehrfach owner-verankert (21 Images = 7 OS x 3; OS-REALM-Doktrin;
+  Pilot-Staffelung "Rest nach der Abgabe"); R-34 beantwortet (existiert, NIE gebaut);
+  W10-00-Gate leer, id56 ungebunden, os_realm 0 Code-Treffer; BAU-Task fuer Schritt 2+3
+  fehlt (bewusst nach der Abgabe — Owner-Satz 22.08. koennte Vorziehen bedeuten -> Frage R4).
+- B1: #38a2 NIE gebaut (150+ Refs vollhistorisch geprueft); "Wurde schon gebaut" = die
+  Tripwire-INFRASTRUKTUR (acf237b0, 26.07.) + SS70.9; statt Landung: 7-Schritte-BAU-Rezept,
+  gekoppelt an #86/ORG-19-IO (Schritt 1) — Traeger #120/B1+#86, Ziel W2-Bump-Buendel.
+- C1: 10 CT-Bau-Bedingungen destilliert; Maschinerie gebaut, aber SIMD nicht scharf
+  (axis_kind noch system_config), IO-Realm leer, PMC KOMPLETT ausserhalb (SystemAxis statt
+  MeasurementMetaMetaAxis; AND-Freigabe F-P8 = 0 Code-Treffer); Bauliste B1-B8 mit
+  Aufwandsklassen; passt zur M3-Taxonomie aus Thesis-Kommentar cc04be1.
+- C2: Rename-Urteil — Item B (3 Fulljoin-Testnamen) SICHER mit 2 Leitplanken
+  (test_merge_plan_directive-Negativ-String + comdare_perms_full_join*-CMake NICHT anfassen);
+  Item A NUR mit korrigiertem Zielnamen realm_axis_version_stamp.hpp (das vorgeschlagene
+  measurement_-Praefix waere Kategorie-Fehlbenennung) -> Owner-Frage R2.
+- C4: Halbsatz "Die Frage ist welcher" — 3 Kandidaten A/B/C fertig formuliert (A = "welcher
+  der 17 Punkte traegt seinen Sinn schon in K19-K22", staerkste Textnaehe) -> Owner-Frage R3.
+- D-01: Verbatim-Kette 19.07.-22.08. steht; OFFEN: exakte Position der 4. Mess-Ebene ist
+  ABLEITUNG (zwischen E2 und E1), "vor dem Bau zu bestaetigen" -> Owner-Frage R5; S-20
+  (Sync-Kanal) seit 12.08. Neubau-Vormerkung ohne Bauspur; Opus-breit+Fable-tief-Nachlese
+  laut D-01-Order steht noch aus (nach dieser Verbuchung).
+- D-04: "Komponente 1 bis 4" = keine woertliche Fundstelle, sondern die 4-(6)-Ketten-Stufen
+  (Messung->Synthese->SCHNITT-KURVEN->Konfiguration->Hybrid->Release, Plandokumente 06.08.);
+  OV-1-Konsolidierung NIE vollzogen (3 Stacks leben); V-09a-1..8 fertig formuliert, NIE
+  eingebucht; Fehler-Entropie = genuin neuer Begriff (0 Bestand); Design-Skelett F.1-F.3 +
+  Command-Pattern-Schnitt (Teil G) liegen fuer die Design-Runde; 21.08.-Hermite-
+  Ratifikationsvorschlag durch D-04 UEBERHOLT (nicht vollzogen — Praezisierung zur
+  KON120-Buchung).
+- D-08: Loader-Pflicht (Status 13) GEBAUT; Emitter-Luecke = NUR SearchAlgorithm/Map hat
+  einen produktiven Emitter; Set/Sequence/View/Adapter/Hybrid = 0 Compile-Pfad
+  ("FEHLT: Steuerung->Compile", DESIGN-91); Luecken-Tafel L1-L7; Fable-max-Designplanung
+  = naechster Schritt, Design-Entscheid am besten VOR Mi 26.08. (Bau selbst
+  identitaetsneutral nach Trigger).
+- D-10: 241 Kandidaten K15-K24 -> 189 GETRAGEN -> GENAU 2 UNGETRAGEN: OV-16 + OV-17,
+  BEIDE seit 09.08. GEBAUT (a558e87c Test #278; 6d2e3dce AF_RESULT_NAMEN), nur nie
+  verbucht; Wellenplan-par.24-Entwurf liegt WORTFERTIG im Ergebnis (Abschnitt 5);
+  Kleinst-Fix anhang_forward_core.sh:250 (stale "OV-17 offen"-Kommentar).
+
+### 8.3 Owner-Antwort-Abgleich: was BEANTWORTET ist und was OFFEN blieb
+Alle A1-A4/B1-B5/C1-C4/D-01..D-11-KERNE sind beantwortet und in KON120-01/-02 + der
+Zuordnungs-Session verbucht. OFFEN blieben aus der 80368-Praesentation die TEILFRAGEN:
+Infra-Fenster-TERMIN + OF-4/id54-Abloesungs-Satz (A3) · id18 austragen/behalten (A4) ·
+C4-Halbsatz-Vervollstaendigung · D-01-Testform (Label/Datensatz) · D-06 Ja/Nein (Erklaerung
+geliefert) · D-09 a/b (Erklaerung geliefert) · G-1-Restfragen 9/12 (D-05: Owner bot an,
+sie DIREKT zu beantworten — Vorlage folgt nach Audit-Terminal aus der W2-Tabelle) ·
+V7 aus #49. NEU aus den Exploren: R2 (Rename-Zielname) · R4 (OS-Matrix-Scope) · R5
+(4.-Ebene-Position). -> Alle als Fragen-Tafel R1-R8 direkt in der Shell vorgelegt
+(Owner-Wunsch 80358: "ich antworte direkt").
+
+### 8.4 Bearbeitungsstand der liegengebliebenen Arbeit
+- W1-Lande-Order (80103): cifix-Fix COMMITTET (899645ef) + variant-Wache GEMERGT (9c74f553,
+  Test #519); K17-Kombibau (4 Zellen) LAEUFT im Hintergrund; danach Dual-Push + CI +
+  prt-art-#107-Zug (mit pinduo-A1-Auflage) + super.
+- B-Block (#120): B1 ist per b1-Explore als BAU-Auftrag (nicht Lande-Fall) geklaert —
+  Paket #38a2+#86 als W2-Bump-Strang; B3-Rest/B5-VOLLNACHZUG/B4/B5-golden/D-02/D-07/D-11
+  starten, sobald Bauslots frei (aktuell: o2-umbau [nachgestossen — war unvollstaendig,
+  nur rot-zuerst-Test ohne Umbau/Commit] + Kombibau belegen 2).
+- AB-02 (ZEITKRITISCH vor Mi 26.): Par.59-MERGE-STEMPEL-Austragungs-Marker + die uebrigen
+  ablock-Auflagen (AB-03..AB-10, 12-W-Marker-Tafel) = naechster dedizierter docs-Zug
+  nach diesem Bericht (Entwuerfe wortfertig in ablock/lande-auflagen.md).
+- OV-16/OV-17-Buchung + par.24-Nachtrag + VF-Harmonisierung (fix/vorlagenfenster-r1 traegt
+  den besseren D-11/D-12-Block-Tausch — beim Merge uebernehmen): in den S1+S2-Lande-/docs-Zug.
+
+ENDE §8. Naechste Fortschreibung: an der S1+S2-Landung (KON121/122-Umfeld).
