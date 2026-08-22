@@ -16,6 +16,68 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON120 (22.08.2026 frueh) — OWNER-ANTWORTEN TRANCHE 1+2 KOMPLETT VERBUCHT + RESUME NACH CREDITS-RISS + V8-prod1-VOLLZUG + A3-HANDOUT
+
+**KON120-01 TRANCHE 1 (21.08. abends):** A1 Kalibrierlauf MIT std::variant-Tier-Audit ERTEILT
+("Es zaehlen nur direkte Implementierungen mit direkter meta-Programmierung"); NEUER Entscheid
+"O2 ist Standard fuer alle builds, O3 wird unter Warnung angeboten" (Ist: compiler_flags.cmake:62
+Release=-O3 -> Drehung vor Kalibrierlauf, Traeger #117). A2: Raeumungs-Auskunft erteilt (12
+/tmp-Sonden-Dirs ~6G, KEINE Sessions); DAUERREGEL "Sessions duerfen nie geraeumt werden"
+(Memory); 11 Alt-Prozesse gekillt (Owner-GO), Gegenprobe leer; Root-Neustart vertagt
+(Talos-Quorum), Vormerkung 22.08.
+
+**KON120-02 TRANCHE 2 (22.08. frueh), Kerne:** B1 C-3a-Doppel-JA GILT + "gerissenes reparieren
+... Wurde schon gebaut, bitte finde den workflow und lande" (Tripwire-Entschaerfung + Bestands-
+Suche #119/#120) · B2/B3/D-03 B3-Rest+B5-VOLLNACHZUG "ALLER fehlender Teile" sofort-parallel
+(#120/#24) · B4 checkpoint-Ratifizierung JA · B5 golden-Folge-Zug VOLLES GO (telemetry-silent +
+B-10 + B-7 + Kampagnen-Bump; C-1-Labels angenommen) · C1 Meta-Meta = Haupt-Achsen BESTAETIGT,
+aber concepts-getriebene CT-Bau-Bedingungen = ERWEITERUNGS-Pflicht, 12W-Explore "Meta-Meta"
+(#119) · C2 R-2-Rename ERST nach Piloten-Audit (multiple Stempelzeilen, je Kategorie eigene
+Zeile + eigene Versionierung tw. samt Syntax) · C3 = THESIS-GROSSZUG (meine E12-Deutung
+verworfen): github/main-Owner-Kommentare, Update EINZELN JE ABSATZ (Sonnet-max-Explore ->
+Fable-max-Designer -> Opus-4.8-max-Schreiber), FORCE-PUSH+REBASE VERBOTEN, Plan als Ist-Zustand
+im Praesens (#121) · C4 Halbsatz-Explore mit gezielten Fragen (#119) · D-01 Hybrid = globales
+CEB-Glied, Mess-Kette w/ma/ma-hy/mi, 12W-Explore + Opus-breit + Fable-tief (#119) · D-02/D-11
+GO · D-04 "mathematisches Definitions-Bereich Command pattern" VOLLES GO ALLE Familien
+(Hermite/Splines/B-Splines/Linien/quadratisch<=3/Log/Wurzel; Entropie-Filter 1, Fehlerrate-
+Filter 2; eigene Matlab-aehnliche Definitions-Sprache, Lager-Ablage; 12W-Explore + "Komponente
+1 bis 4" suchen) · D-05 G-1-Ruecklauf zur W2-Tabelle PFLICHT (nach Audit; Owner erinnert G1
+beantwortet) · D-07 cp==c{p}/ce==c{e}, KLAMMER-FORM DOMINANT (OF-1-F1 zu) · D-08 Stempel-System-
+12W-Explore + Fable-Designplanung (gesamte Emitter-Integration) · D-09/D-06 = Owner-RUECKFRAGEN,
+Erklaerungen geliefert (Session-Dok Abschn. 3) · D-10 OV-16+OV-17 beide JA, Bau OBERSTE
+PRIORITAET + Owner-Ruege (Memory-Doktrin-Verstoesse) -> 10-Kontexte-Nachhol-Sweep (#119) +
+Wellenplan-Nachtrag.
+
+**KON120-03 RESUME (Owner: "resume alle ... die credits sind wieder frisch"):** W2-Audit
+wf_98cabd77 als DERSELBE Run resumed (31/47 Cache/idempotent, 16 Riss-Opfer live nach) —
+KEIN Doppellauf; variant-audit-a1 fortgesetzt; Einlese-Ritual VOLL (4 Referenzen komplett);
+Original-Fragen aus K24-Transkript Z.80368 extrahiert + B.3-gesichert; Zuordnungs-Session:
+docs/sessions/20260822-SESSION-owner-antworten-tranche-1-2-zuordnung-und-vollzug.md.
+
+**KON120-04 W1L-ZWISCHENSTAND:** CI 16073 @ ed9f1a3c terminal FAILED mit GENAU EINEM roten Test
+(509 test_vl3_debug_stdout_bytegleich, Debug-Zelle; die drei 16069-Klassen sind GEHEILT-bewiesen
+gruen). Klasse: Vollbau-Luecke (lokale 12er-Debug-Auswahl trug #509 nicht). Fix-Strang laeuft
+(Repro build-dbg, sauberste Loesung, kein Skip); W1L-Terminal-Zeile folgt als KON121 (prt-art
+#107-Rezept + super-Vorbereitung unveraendert dahinter).
+
+**KON120-05 V8-prod1-VOLLZUG (K166-§7c, prod1 = Session-Zustaendigkeit):** Store 3 tote
+github-Zeilen -> 1 neue (Vault-Z.83, md5-8 4d59cf4b verifiziert; GitLab-Zeilen unangetastet;
+Backup additiv; kein Vorher-ls-remote/§8c) · Lese-Beweis ls-remote HEAD e114cabd RC=0 ·
+Schreib-Beweis probe/k166-20260822-prod1 gepusht+belegt+entfernt (Gegenprobe 0) · 374
+GitHub-Spiegel prod1 wieder zweiseitig. **A3-VOLLFASSUNGS-HANDOUT GELANDET** (Owner-Frist "bis
+Samstag frueh" ERFUELLT): Cluster 1a51ab4, gitleaks eigener Commit "no leaks found", Push
+gitlab/development; Cluster-Poller aktiv (Infra-Restarbeit: #197-Laptop-De-Embed, Alt-PAT-
+Revokes, GitLab-Rotation OF-4-Kette, U-2-root, node6, id56/id18).
+
+**KON120-06 TAFEL-KORREKTUREN (aus KON120-ENTWURF-SAMMLUNG §3, Explore 21.08.):** (1) Die
+KON119-02/T-A-Buchung "C-3a-Frist verstrich -> 18.6(3)" beruhte auf uebersehenem DOPPEL-JA
+(KON91-02 + KON103-01; KON106-04 "als EIN GO fuehren") — durch B1-Antwort 22.08. bestaetigt;
+#38a2 = exakt der von KON91-02 vorgesehene Weg. (2) seg1-37/V-01: AxisKind-Drehung owner-
+angeordnet+gebaut+gelandet (94095eda, Ancestor 66de5c09) — Entwurfs-Text V-01/BAULISTE-G06
+stale. (3) D-12: Dock-Zahl SECHS doppelt owner-gesetzt; "max. 4" war Session-Vorschlag ohne
+Owner-Deckung — OFFEN-OWNER-Fuehrung in s8/F-17/FINAL-D-12 stale. (4) K-16-VOLLLISTE
+"SHA-512/128-Hex gebaut" vermischte die Beine — Planer real 64-hex (planner_version.hpp:199),
+Owner-Wort KON101-01 "SHA256".
 ## KONSOLIDIERUNG CXIX (KON119) -- 20.08.2026 mittags: L4-SUPER-ZUG GEBUCHT -- #15-LANDE-
 ## KETTE KOMPLETT AM OBJEKT (L1 -> CI-Heilung -> Nachlande -> L3/v08r -> Fixture-Spiegel),
 ## R4-PFLICHTLITERALE + L4-VOLLBAU-BEFUNDE + K17/#104/#106 (Buchung ist der Ledger-Teil des
