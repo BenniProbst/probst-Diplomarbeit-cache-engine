@@ -16,6 +16,27 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG zu KON120-02 (22.08.2026 nachmittags, Lead) -- A4-ANTWORT ALS EIGENE LEDGER-POSITION NACHGEBUCHT (Verbuchungs-Pruefung auf Owner-Order)
+
+**Anlass:** Owner-Order 22.08. ("stelle sicher, dass meine Antworten trotz Kontextbruch der
+A/B/C/D-Bloecke aus dem Session log dennoch ins ledger verbucht worden sind"). Pruefergebnis
+der Vollpruefung: A1/A2 = KON120-01 GEDECKT · A3 = KON120-05 GEDECKT (V8-prod1 + A3-Handout) ·
+B1-B5/C1-C4/D-01-D-11 = KON120-02 GEDECKT · **A4 stand nur in der Zuordnungs-Session
+(docs/sessions/20260822-SESSION-owner-antworten-tranche-1-2-zuordnung-und-vollzug.md par.2),
+nicht als eigene Ledger-Position** -- hiermit nachgebucht:
+
+**A4 (id56/id18/OS-Matrix), Owner verbatim-Kern (Tranche 2, 22.08. frueh):** "Ist bekannt ...
+alle 7 oder 8 Linux OS und Windows/ubuntu/macOS ... alle uebrigen linux OS (wie geplant) in
+Docker containern auf bare metal sequentiell ... nachdem das Lager schon vollstaendig auf bare
+metal gebaut wurde ... Gesamtfunktionalitaet auf jeder verfuegbaren Rekombination der
+System-Achsen" -- dokumentiert im comdare-Buildsystem bzw. super-/ce-Sessions; ultracode-Explore
+Sonnet 5 max ANGEORDNET und VOLLZOGEN (#119/a4-osmatrix.md, 475 Z.: 21 Images = 7 OS x 3
+Versionen owner-verankert 07.08. [R-16-Anker]; R-34 beantwortet: Sequenz existiert, NIE gebaut
+[W10-00 0x in YAML, os_realm 0 Code-Treffer]; Pilot "Rest nach der Abgabe"). id56
+"prod-baremetal-docker" = exakt die beschriebene Docker-auf-bare-metal-Lane -> BEHALTEN
+(A3-Handout Cluster 1a51ab4 par.6); id18-Duplikat bleibt Infra-Posten derselben Stelle.
+Offene Owner-Frage daraus = R4 der R-Tafel (RISC-V/Pi5 im Umfang? Formal-Beweis vor/nach
+Abgabe?) -- R-Tafel-Wiedervorlage laeuft (Owner-Order 22.08. nachmittags).
 ## KON121 (22.08. vormittags, Lead): Owner-Ruege "Faden verloren" — Volllesung, Explore-Verbuchung, Restfragen
 
 Owner-Order verbatim: "Bitte lies den gesamten letzten Kontext und vorletzten Kontext
