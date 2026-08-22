@@ -121,13 +121,46 @@ Explore-Buendel (D-04-Design-Phase), als Vorspann der D-04-Bau-Planung.
   belegt. PRUEFPOSTEN beim S1+S2-Lande-Zug: s8kopf-Ergebnis auf --debug-CLI pruefen,
   sonst als W2-Restposten neu traegern.
 
-### 3.9 C3-Vorposten github-fetch — noch nicht gefahren
-Fuer den Thesis-Grosszug #121 war die fruehe Lage-Sichtung (git fetch github; welche neuen
-Owner-Kommentar-Pushes liegen auf github/main?) vorgesehen — noch nicht geschehen. Kann
-JETZT vor den Bau-Zuegen laufen (read-only, 1 Minute); der Grosszug selbst bleibt nach den
-zeitkritischen Bau-Zuegen. #77 (Thesis-Audit-Einarbeitung Runde 1, Owner-Commit c2d21fa)
-wird in #121 AUFGENOMMEN (gleicher Gegenstand: Owner-Kommentare einarbeiten) — beim
-#121-Start beide Quellen zusammen ziehen, #77 dann mit Beleg schliessen.
+### 3.9 C3-Vorposten github-fetch — VOLLZOGEN 22.08. (Befund unten) 🔴 REICHER FUND
+Thesis-Klon = /home/comdare/Projekte/Research/20260931-overleaf-diplomarbeit. Lage nach
+Fetch: **github/main = 246eff9** ("Alles bis FF3 kommentiert") — **15 Owner-Commits neuer
+als origin/main (c2d21fa)** und 40 neuer als der lokale main (993d28f, 0 voraus). Die
+Owner-Kommentar-Serie (25 Commits seit "Korrektur bis 3.6") traegt u.a.: Evaluation (3x,
+inkl. "Evaluation Thema verfehlt"), -O3, Abbildungen, "Hardware Erweiterungen permutieren",
+System-Achse, "Flaechen fuer Messung entfallen fuer release", checkpoint_measure-
+Abschaltungsstufen, Meta-Meta-Achsen-Definition, "contract tests sind zu lasch", neue
+Achsen-Typen, Fussnoten-Delegation, vier Repositories, 2x correcting measurement, Filter on
+compare internal state, 4er-Auswertungskette, "How to curve", Code review on plan, Hybrid
+switch point / State sync / live Algorithmus, Workload-Clusterung.
+
+**Zwei Commits im Diff gesichtet (pfadwirksam fuer LAUFENDE Arbeit):**
+- **728fc74 (05_evaluation.tex)**: (a) O3-Kommentar bestaetigt den laufenden o2-umbau-
+  Zuschnitt woertlich ("Maximale Optimierung muss waehlbar bleiben" = O3 als Opt-in unter
+  Warnung — KEIN Konflikt, Thesis-Text-Nachzug noetig); (b) 🔴 NEUER CODE-AUFTRAG:
+  "Der globale default Workload ist die Permutation ueber ALLE verfuegbaren workloads";
+  (c) 🔴 NEUER CODE-AUFTRAG: Planer-CLI-/Filesystem-Pruefweg fuer Hardwareeigenschaften +
+  CLI-gefuehrte XML-Erstellung mit HW-Verfuegbarkeits-Filter (optionaler Modus; "fehlt
+  auch noch im Code"); (d) NEUER RESEARCH-AUFTRAG: Deep-Research "wie ist eine
+  Master-Thesis-Evaluation aufgebaut" + alle Evaluations-Mechaniken der Planung
+  ("vollautomatische Experiment-Evaluation aus XML") additiv beleuchten.
+- **cc04be1 (04_implementierung.tex)**: (a) 🔴 M0-M3-TAXONOMIE-KLARSTELLUNG: Owner meint
+  mit Meta-Meta-Achsen M3 (Indirektion einer Beschreibung); M2 = Meta-Achsen als literale
+  Klassifizierung der Haupt-/Unter-Achsen, M1 = Laufzeit-Implementierung/Konzeption,
+  M0 = Binaercode; je Absatz Erklaerung fremder Taxonomie + Bild je Konzept — DIREKT-INPUT
+  fuer den laufenden C1-Meta-Meta-Explore-Folgezug; (b) 🔴 CODE-AUFTRAG checkpoint_measure-
+  SCHICHTUNG: wallclock = parameter-leeres Minimum-Messgeraet; bei aktivem Makro/Micro
+  vollzieht das wallclock-checkpoint_measure eine Parameter-Klammer (Compile-Time-
+  Sonderfall); Abschaltungsstufe 1 = Parameter-Messung in ma/mi aus (wallclock fuer
+  measure+compare bleibt); Abschaltungsstufe 2 (permutativ, Release) = entfaellt ganz.
+  "Das muss also im Code und hier nachgezogen werden." → praezisierte SOLL-Spezifikation
+  fuer B4-checkpoint (#120/B4) VOR dessen Bau.
+
+KONSEQUENZ: Die uebrigen 23 Kommentar-Commits werden im #121-Sichtungs-Vorspann VOLL
+gelesen, BEVOR die Absatz-Pipeline startet; die Explore-Folgezuege (C1, D-01, D-04, A4, B4)
+MUESSEN die jeweiligen Thesis-Kommentare als Owner-Primaerquelle einbeziehen (die laufenden
+Explores kennen sie nicht). Remote-Konsolidierung github→origin/lokal = #121-Zug (Merge,
+NIE rebase/force). #77 (Lesestand bis c2d21fa) wird in #121 AUFGENOMMEN und mit Beleg
+geschlossen.
 
 ### 3.10 B2-Order "alles direkt und parallel bauen und landen" — Bauten noch NICHT gestartet
 Ehrliche Meldung: Die B-Block-Bauten (#120: B3-Rest + B5-VOLLNACHZUG, B4-checkpoint,
