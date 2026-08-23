@@ -248,6 +248,25 @@ Z13-Z27 credits-tot (super-Phase s13schema/cidual/vorlagenfenster/w1luecken/
 kampvor + docs-Sammel + prt-Phase + Gitlink + KON122 + BU + Raeumung ALLE
 OFFEN). Result-Kopie: wyln30o5c-resume2-result-KOPIE.json.
 
+KORREKTUR 9c-K (24.08.-Rekonstruktion, Result-Kopie 108551 B VOLL gelesen):
+"Z11-Klasse teilweise" war UNTERERFASST — **Z11 ist KOMPLETT GELANDET**:
+alle 8 Strang-Worktrees GELOESCHT (wt-ce-s8kopf/s13schema/pmcpaket/vollzug91/
+ph89/trigfix/skip97/kampvor; je git worktree remove OHNE --force rc=0, Guard
+HEAD==Tip + porcelain 0, keine nested, untracked-Messdateien 0/8, ph89-build
+23M nach Doppel-Bedingung geraeumt, worktree list 34->26, df 25G->27G; Beweise
+20260822-lande-zug/Z11/). Z11-RESTPOSTEN (leben weiter): (1) 8 bau/*-Branches
+lokal+origin STEHEN — Loeschung NUR mit Lead-GO je Branch (gruen+gemergt-Beweis
+liegt: 8/8 ancestor-rc=0 + CI 16101); (2) wt-ce-s19 + wt-ce-messfenster gleiche
+Raeum-Klasse (Tips ancestor-bewiesen), Traeger Lead/Folge-Ziel; (3) 4 K17-
+Endstand-Baeume (build-l1 3.8G/l1-clang/dbg 8.1G/dbg-clang) + ccache stehen
+BIS W2-Vollaudit-BU; (4) wt-ce-lande @ 53c5524e bis Z27; (5) super build-l4/
+3.4G = super-eigener Bau, Doppel-Bedingung dort. Z10-Restposten: CI 16101
+traegt 1 manual-Job (relock, Kenntnisnahme). Z12-Z27-Fehlerform einheitlich
+"agent null" (credits). sollist-Schwanz traegt Phase-2-Inventurmenge (ce 177 /
+super 68 / wt-prt-pinduo 8 lokale Branches) + 5 Traeger-KANDIDATEN (bau/d55-hdr
+· lagp1-object-stat · rettung/bau/d3-7b-pruef-only-bilanz · bau/measure-
+selection-xsd · b-graph-2d3d) fuer die Zug-Phase 2.
+
 ### 9d. W2-Audit TERMINAL-Tafel (wg4nfrsb1, 50/54): 18/19 SITZT + ph89 FIX_AUSFALL
 
 S1 10/10 SITZT · S2 8/9 SITZT; ph89 = FIX_AUSFALL (Fix-Agent credits-tot) mit
@@ -269,6 +288,35 @@ Vollzogen: 5 fluechtige Task-Outputs in Beweisorte kopiert · f3f75b60-Volltexte
 risikolos wiederholbar): ARBEITSWEISE-GESAMT voll (Kipp-Ritual-Versaeumnis) ·
 3-Tage-Memories voll · Ledger-Kopf (juengste KON) · EINPLANUNGS-REGISTER.md
 365 Z. + VERIFY-BERICHT par.1-5.
+
+## 10. NACHTRAG 4 (24.08. frueh): COMPACT-VERLUST GEHEILT — Rekonstruktion +
+## Memory-Updates + Lueckenpruefung KOMPLETT
+
+Owner-Ordern nach dem Compact (verbatim-Kerne): Ruege "nur reagiert statt
+vollstaendig gelesen; Rueckkehrer unterbrachen" + "zu allererst alle memories
+... immer erst 3 lesen und ueberarbeiten, dann naechste Tranche" + "rekonstruiere
+den letzten Kontext von vorn nach hinten, lies zuerst den session log" + "Nie
+alles sofort in den Kontext kippen, sondern lesen->update und wiederholung" +
+"Du hast den gesamten Kontext jetzt im compact verloren" + "Bitte heile das".
+
+VOLLZUG (Details + Nenner in der neuen Schwester-Doku
+20260823-SESSION-REKONSTRUKTION-kontext-nach-compact-verlust.md):
+(1) Transkript-Fenster 87321-88311 in 8 Tranchen von vorn nach hinten
+rekonstruiert, je Tranche sofort verbucht; Verbuchungs-Abgleich gegen Abschn.
+1-9 dieser Doku: T-1..T-8 KEINE Luecke ausser 9c ("Z11 teilweise" war
+untererfasst -> KORREKTUR 9c-K oben + #131-Metadata: Z11 KOMPLETT, 8 Worktrees
+geloescht, 5 Restposten). (2) Beide Credits-Riss-Result-Kopien VOLL gelesen
+(wyln30o5c 108551 B: Z10/Z11-Volltexte + sollist-Traeger-Kandidaten;
+wg4nfrsb1 73674 B: 9d TRAEGT). (3) a745560 = Z12-Lande-Agent (777 KB,
+failed credits) — Schwanz voll gelesen, Bergung 9b deckt alles. (4) 4-Quellen-
+UNION der Owner-Messages: VOLLSTAENDIG, nichts uebersehen. (5) Memory-Updates
+in 3er-Tranchen: 10 ueberarbeitet (aufraeum+Tranchen-Regel · agenten_ergebnisse
++Regeln-5-7 · stumme_workflow+Regel-6 · pause_resume+Spend-Limit-3-Ebenen ·
+K-Register+K20 · fallen_register+Result-Fallen · kipp_ritual 1264/v4.4+Tranchen
+· extraktor-description 4-QUELLEN · MEMORY.md 2 Zeilen) + 14 geprueft-aktuell.
+(6) EINPLANUNGS-REGISTER 365/365 + VERIFY-BERICHT 111/111 fertig gelesen —
+damit ALLE 9e-Posten ZU. WARTELAGE unveraendert: Fable-Credits = einziger
+Owner-Blocker (9a); Resume-Ziele Z12-Z27 finden b3dc3e93 vor.
 
 ### 7d/8d. Peer-Lage
 
