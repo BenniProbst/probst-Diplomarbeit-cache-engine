@@ -163,7 +163,56 @@ Gate TRAEGT_MIT_FIXES: GG2-1 (S1-Quellen-Deckung 53->52, reiner Zaehlfehler,
 durch den Lauf. Beweisort: 20260821-w2-audit-fixverify/GEGENLESE-GATE.md (Teil I
 neu + Erst-Gate 22.08. wortgleich als Teil II).
 
-### 7d. Peer-Lage
+## 8. NACHTRAG 2 (23.08. ~21:00): Volllesungs-Nachholung + Wellenplan-Rueckkehrer + K20
+
+### 8a. f3f75b60-Volllesung NACHGEHOLT (Owner-Kontrollfrage deckte die Luecke auf)
+
+Beim ersten Verbuchen hatte ich nur das Result gelesen, nicht die referenzierten
+Volltraeger — jetzt VOLL: SYNTHESE-S1-AUDIT.md ZWEITFASSUNG (361 Z.; L-01..L-20-
+Fahrplan: L-01 AKUT NP-34-Patch IM SELBEN Commit-Zug wie Gitlink-Bump vor Mi 26
+06:00; L-02 VF-Harmonisierung "Lead-Fassung fuehrt, Block-Tausch uebernehmen, KEIN
+einfacher Merge"; L-05 K17-Endstand mit EXCLUDE_FROM_ALL-Warnung der 3
+*_registry_gen; L-06 Warnungs-Review zweimal — gruene clang-Zellen ersetzen es
+NICHT; L-08 a-j Ledger-Bank; L-18 Doppel-Einbau-SPERREN) + SYNTHESE-S2-AUDIT.md
+(280 Z.; T9 pinduo-ERNST-Auflage voll ausformuliert, T9b ECHTE Branch-CI +
+SPANNUNG-5-Allowlist-CAVE, T11-T17, Lande-Reihenfolge 0-5) + GEGENLESE-GATE.md
+(297 Z., Teil I Gate-Doppel + Teil II Erst-Gate mit F-1..F-12-Fundliste) +
+Explore-KORR-GG2-Vermerk. Board-Vollzug daraus: #24 (+FB20-K-1) + #28 (+seg4-15-
+Startzahl) = L-10(2)/(3); L-10(1)=#123 existierte. Die L-Auflagen sind Eingaenge
+des laufenden Lande-Zugs (Ziele 11-27); Lead prueft L-01/L-05/L-06 bei dessen
+Rueckkehr.
+
+### 8b. Wellenplan-Rueckkehrer wf_c745729a TERMINAL 6/6 (Journal-Volltexte gelesen)
+
+Einplaner: par.24 "EINPLANUNGS-NACHTRAG 23.08." RN-01..RN-92 in Fenstern A-J +
+13 Marker AM ORT + par.25 fuer OV-16/17 reserviert; Branch
+bau/wellenplan-offene-punkte @ fdfb5d9d (Basis 38428099; ci.skip-gesichert;
+KEINE dev-Landung). Verify TRAEGT_MIT_FIXES (4 Fixes ausgefuehrt: 18.4-
+Tabellenkopf restauriert; RN-27+E-38/E-39 6K-Sweep-Sichtung; RN-05 Thesis-
+Trailer-Entscheid; RN-36 W17-Backup-Ref); V-5: dev beruehrt die Wellenplan-Datei
+im FF-Bereich nicht — Lead-Merge konfliktarm, SEQUENTIELL HINTER dem Lande-Zug;
+bei der Landung N-33(b)-(e) gegen den RN-Katalog GEGENLESEN (#136-Metadata).
+Beweisorte: 20260823-wellenplan-update/{EINPLANUNGS-REGISTER.md 365 Z.,
+VERIFY-BERICHT.md 111 Z. — Abschn. 6 Kleinbefunde gelesen}. CAVE Methodik: die
+Task-Result-Felder waren Script-seitig auf 1500 Zeichen GEKUERZT — Journal-
+results sind die Volltexte (Regel: bei Result-Feldern immer Laenge gegen Journal
+pruefen).
+
+### 8c. K20 — eigener Arbeitsfehler (Owner-Ruege, sofort verankert)
+
+Bei der autonomen N-45-Aufloesung habe ich die Owner-SSH-Sitzung fuer eine
+verwaiste Respawn-Automatik gehalten (w-IDLE 7h10m + Respawn 30 s nach Kill) und
+zweimal gekappt — es war der Owner selbst ("Du hast mich gerade raus
+geschmissen ... das war ich"). Keine Daten verloren (Transkript 46375cdc intakt;
+Rueckweg: claude --resume). Lehre als Memory K20 verankert: TTY-idle beweist
+keine Menschen-Abwesenheit; Respawn nach Kill = STOPP-Signal; Kills an
+interaktiven Sessions/SSH NIE ohne gegenstands-genaues Owner-GO — "loese das
+autonom" deckt Diagnose, nie Kills an Interaktivem. Sach-Befund der Diagnose
+bleibt gueltig: Session 46375cdc = 06.08.-Kontext, am 11.08. neu gegruendet +
+geerntet + pausiert, letzter Eintrag 16.08. — kein offenes Werk; N-45 damit
+AUFGEKLAERT (Prozess-Haelfte), die Session gehoert dem Owner.
+
+### 7d/8d. Peer-Lage
 
 ListAgents: einziger lebender Peer = e1-e4-ebenen-konsolidierung (interactive,
 idle, ~7h — in KEINER Uebergabe verzeichnet). Status-Ping gesendet; Zustellung
