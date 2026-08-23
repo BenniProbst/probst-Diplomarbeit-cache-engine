@@ -12,7 +12,7 @@
 
 > EINPLANUNGS-MARKER 23.08.2026 (par.24): Juengste Konsolidierung = par.24 (Einplanungs-Nachtrag, Owner-Order
 > 23.08. "keine zurueckgestellten/unbearbeiteten Posten, alles der Reihe nach"). KON119-Reservierung blieb gewahrt
-> (vollzogen); par.25 ist fuer die OV-16/17-Buchung reserviert (RN-27). Der-Reihe-nach-Ordnung: par.24.1 RN-01..RN-76.
+> (vollzogen); par.25 ist fuer die OV-16/17-Buchung reserviert (RN-27). Der-Reihe-nach-Ordnung: par.24.1 RN-01..RN-84.
 
 ---
 
@@ -3731,7 +3731,7 @@ Register-Spiegel mit Vollzaehligkeits-Gegenzaehlung:
     F2-Freeze-Check    = vollzogen per #108 (vorlagen-fenster 3e9ec644/8aae5cd2);
                          Deklarations-Tafel 23.2 gilt mit den par.24-Korrekturen (P1).
 
-## 24.1 DER-REIHE-NACH-GESAMTORDNUNG (RN-01..RN-76; Owner-Order: nichts zurueckgestellt)
+## 24.1 DER-REIHE-NACH-GESAMTORDNUNG (RN-01..RN-84; Owner-Order: nichts zurueckgestellt)
 
 Form je Zeile: RN-Nr | Posten/Kennungen | Traeger | Abhaengigkeit. Fenster-Etiketten
 sind SPAETESTE Fristen (Owner 20.08.); Abarbeitung sequentiell in dieser Reihenfolge,
@@ -4105,6 +4105,40 @@ Betriebs-Kollisionen: s. 24.5.
            Kontrolle (bewusst-nie-Liste bleibt deklariert; Wiederaufnahme nur per
            Entscheid). Traeger VOLLLISTE-1.5-Zeilen.
 
+### ERGAENZUNGS-STAFFEL RN-77..RN-84 (gleicher Stand 23.08.; aus der Gegenzaehlung
+### der Quell-Tafeln — je Zeile mit eigenem Fenster-Etikett)
+
+    RN-77  [Mo 24.-Di 25., je freiem Bauslot] #120-B-BLOCK-Bau-Starts (H-24, zweimal
+           verfallene Zusage — jetzt terminiert): B3-Rest · B4-checkpoint-Anschluss
+           (SOLL cc04be1, Abschaltungsstufen 1+2; OF-1-Gate; #24/B4-Kern 9+8; L4-
+           Andock-Flaeche faehrt MIT B4) · B5-VOLLNACHZUG + B5-VORPOSTEN (Zwillings-
+           Wache CEB==Tier-Zeile; KON64-Anteil nach Doppel-JA klar) · B1/F2-1-
+           Registry-NEUBAU <measurement_tooling> (W2-Anfang VOR Trigger, #24) ·
+           D-02-Rename · D-03 · D-11-K2. Landungen HINTER dem S1+S2-Zug, sequentiell.
+           Traeger #120/#24. | Abh.: RN-01; identitaetswirksame Anteile vor Mi 26.
+    RN-78  [nach #15/B5-golden-GO, vor Trigger] golden-FOLGEZUG: B-7-Stempel-Haelfte/
+           E-B/A-11-Emitter-Haelfte + B-10-Anker-Faelligkeit + Kampagnen-Bump
+           (telemetry-silent; V-03R-Budget UNVERBRAUCHT; par.21.1-Folgezuege B-7/
+           B-10/B-8/VL-5/VL-6-Doku/KORB-A-12). Traeger #120/B5-golden. | Abh.: RN-77.
+    RN-79  [Di 25.] ##46 Anker-3-Spiegel + ##48 Paragraph-66-Platten-Budget + ##41b
+           Kaskade (W2-Di-Slots aus par.3/par.7). Traeger W2-Di/#96.
+    RN-80  [W2-Slot, vor Trigger-Naehe] S-2/G-1-GRAMMATIK-BAU (D-05-PFLICHT,
+           KON120-02; G-1-Tabelle KOMPLETT entschieden [H-19], nur 2 Owner-
+           Bestaetigungen via RN-05; danach G-1-Ruecklauf in die W2-Tabelle).
+           Traeger #53-Umfeld/S-2. | Abh.: RN-05 (F-G1-8/9).
+    RN-81  [vor W3] R-11 Resolver target_isa-RT/core_class (OD-11-RT-K) — mit den
+           RN-47-Proben fahren. Traeger 1.4.e-Zeile.
+    RN-82  [Di 25./W2] v32-PLANER-SKELETT-Vorbereitung (S20-Supersede: Wiederver-
+           wendung als offizielles Planer-Skelett, Fork A/PL-0; H-20-Zeile) +
+           v32-Enumeratoren-Kleinposten (H-21d). Traeger H-20/#96.
+    RN-83  [W2/W3-Voraussetzung, spaetestens vor T-3] T-3-RIPPLE-BAU: XML->PDF-
+           VOLLAUTOMATIK + LAGER-SKIP (17.4/18.5-Ausweis; ohne sie kein RN-71).
+           Traeger #18/#57-Folge. | Abh.: RN-19/RN-20.
+    RN-84  [Di 25.] H-20-STAFFEL-3-RESTLISTE namentlich in den #96-Schnitt: Trigger-
+           Akten E-4/E-5/E-6 · YAML-Zug-Reste E-14/E-15/E-10-Akte · MinIO-Smoke
+           (->RN-48) · NP-02-Zeile (->RN-05) · #104-Rest/O5 (->RN-26) · 6c-
+           Publikation (->RN-27) · Band-B-Slots (->RN-26). Traeger #96/H-20.
+
 ## 24.2 P1-P10 — KURZVERZEICHNIS DER EINPLANUNG (Detail in den RN-Zeilen)
 
     P1  E-10/#38a2-Bauzug + #86-ORG-19-Schritte-1-4 + W5-Grammatik-Slot -> RN-03/
@@ -4244,7 +4278,8 @@ Betriebs-Kollisionen: s. 24.5.
 
 ## 24.6 VOLLZAEHLIGKEITS-GEGENZAEHLUNG
 
-    P1-P10: 10/10 in RN-Zeilen (24.2). RN-Plaetze: 76. Massen-Bloecke: 7 Unterlisten
+    P1-P10: 10/10 in RN-Zeilen (24.2). RN-Plaetze: 84 (RN-01..RN-76 + Ergaenzungs-
+    Staffel RN-77..RN-84 aus der Quell-Tafel-Gegenzaehlung). Massen-Bloecke: 7 Unterlisten
     (24.3.1-24.3.7), jede mit Quell-Datei + Fenster + Traeger; innere Zaehler:
     94 (23+68+3) · 156+22+34+74(+1 Sammel)+20+15 · 38/20 · 16 · 22+37+5+14 · 13
     GOAL-Posten · Designplan-Klassen. Leser-Tafel-Posten: L-GOAL 62 (G-01..G-62,
