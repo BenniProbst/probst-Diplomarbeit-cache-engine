@@ -196,3 +196,60 @@ VOLLZOGEN:
   Gegenstand unbekannt) · P3 wf_9292edd5 (Feature-Diff gegen Wellenplan) · P4 wf_a2e443f0 +
   wf_5834b706 (Fragen-Bestand) · P5 wf_355205a7 + wf_f39a28a6 (Kontext-Leser-Vorlaeufer) ·
   P6 wf_cd576b6e (Bau-Strang, zuerst Branch-Suche).
+
+---
+
+## TEIL I — LIVE-REGISTER DER LAUFENDEN WORKFLOWS + AGENTEN (Stand 23.08. 14:07)
+
+Owner-Order: "Bitte notiere alle derzeit laufenden workflows und Agenten in die
+zwischenstandsdoku, wir wollen sie spaeter resumen und uns merken welche potentiell wieder
+am spend limit sterben." — Dieses Register ist die RESUME-LISTE fuer den naechsten Riss.
+Alle Zahlen live gemessen 14:07 (Journal-Scan). Session-ID = 5a19728e-f6e1-4736-a246-e3fda9ac35a1.
+
+### I.1 Die sieben laufenden Workflows (Live-Bilanz + Spend-Risiko + Resume-Rezept)
+
+| Run-ID | Task-ID | Live 14:07 | letzte Aktivitaet | Modell-Profil | 🔴 SPEND-RISIKO | Bisherige Risse |
+|---|---|---|---|---|---|---|
+| wf_bce0efd4-a0d (12-W-Rueckfragen) | w9vky25zp | 22 start / 4 res | 13:58 | **Opus 5 max je Kontext-Fenster** (~40 Fenster sequentiell) + Fable-Synthese | **SEHR HOCH** — teuerster Lauf; Opus-max ueber Riesen-Transkripte | 1x Owner-Stop, 1x Umbau parallel->sequentiell |
+| wf_23486ee9-a39 (Opus-6K-Nachhol-Sweep) | waqlqw5wg | 16 / 6 | 14:06 | 8x **Opus max** + Fable-Konsolidierung | **HOCH** — war bereits KOMPLETT tot (8/0) | 1x Totalriss 22.08. |
+| wf_98cabd77-2a9 (W2-Audit-Fix-Verify) | w6lakww8z | 114 / 87 | 14:06 | Sonnet max + Fable max, viele Agenten | **HOCH** — 17 Agenten waren limit-tot | 1x Limit-Riss 22.08. |
+| wf_b546634b-3f5 (LANDE-ZUG) | wbfio8nym | 61 / 13 | 13:50 | Fable max + K17-Bauten (Ressourcen!) | **HOCH** — Bau+Limit doppelt exponiert | 2x (Credit-Riss 22.08., Owner-Pause 23.08.) |
+| wf_f3f75b60-eb4 (Resume-Abschluss Audit+Explore) | wsvfiudut | 31 / 25 | 13:59 | Fable max Synthesen/Gates | MITTEL | 1x Riss (Vorlauf) |
+| wf_c745729a-45f (Wellenplan-Update) | wzvnkeg94 | 6 / 4 | 13:43 | Fable max (Einplaner = LANGER Einzel-Agent + Verify) | MITTEL — Einzel-Agent mit grosser Schreib-Last | 1x Owner-Stop |
+| wf_bc7303ab-3c8 (Explore-Buendel T2) | wfw1h1o2o | 13 / 11 | 14:02 | Fable max Synthese/Gegenlese | NIEDRIG — fast fertig | 1x Limit-Riss 22.08. |
+
+**RESUME-KOMMANDOS (exakt, fuer den naechsten Riss — Script-Pfade sind stabil):**
+```
+Workflow({scriptPath: "<P>/-home-comdare-Projekte-Research-probst-diplomarbeit-cache-engine/<SID>/workflows/scripts/rueckfragen-vollbild-12w-wf_bce0efd4-a0d.js",       resumeFromRunId: "wf_bce0efd4-a0d"})
+Workflow({scriptPath: "<P>/-home-comdare-wt-ce-o2std/<SID>/workflows/scripts/opus-6k-nachhol-sweep-wf_23486ee9-a39.js",                                                 resumeFromRunId: "wf_23486ee9-a39"})
+Workflow({scriptPath: "<P>/-home-comdare-Projekte-Research-probst-diplomarbeit-cache-engine/<SID>/workflows/scripts/w2-audit-fixverify-s1-s2-wf_98cabd77-2a9.js",        resumeFromRunId: "wf_98cabd77-2a9"})
+Workflow({scriptPath: "<P>/-home-comdare--claude-projects--home-comdare-memory/<SID>/workflows/scripts/lande-zug-sequentiell-wf_b546634b-3f5.js",                        resumeFromRunId: "wf_b546634b-3f5"})
+Workflow({scriptPath: "<P>/-home-comdare-wt-ce-o2std/<SID>/workflows/scripts/resume-abschluss-audit-und-explore-wf_f3f75b60-eb4.js",                                     resumeFromRunId: "wf_f3f75b60-eb4"})
+Workflow({scriptPath: "<P>/-home-comdare-Projekte-Research-probst-diplomarbeit-cache-engine/<SID>/workflows/scripts/wellenplan-update-offene-punkte-wf_c745729a-45f.js", resumeFromRunId: "wf_c745729a-45f"})
+Workflow({scriptPath: "<P>/-home-comdare-Projekte-Research-probst-diplomarbeit-cache-engine/<SID>/workflows/scripts/explore-buendel-tranche2-wf_bc7303ab-3c8.js",        resumeFromRunId: "wf_bc7303ab-3c8"})
+```
+(`<P>` = /home/comdare/.claude/projects · `<SID>` = 5a19728e-f6e1-4736-a246-e3fda9ac35a1)
+
+### I.2 Agenten / Peer-Sessions (Stand 14:07)
+
+| Agent | Rolle | Zustand 14:07 | Kanal / Merkposten |
+|---|---|---|---|
+| a7d3087f9b3391c8d | Endstand-Pruefer: Bilanz + KON122-Material + Full-Join-Nachmessung | **running** (Subagent) | SendMessage an `a7d3087f9b3391c8d`; KEIN Repo-Schreiben (Beobachter-Rolle) |
+| **cifix-vl3-debug** | FAHRER der Lande-Schlussstrecke (Raeumung ✅ 7.5G->27G, dann Mutex/Riegel-cherry/Verschaerfungen/r4/Gates/2. Push/CI/Raeumung) | 🔴 **NICHT in ListAgents sichtbar** — Status unklar (evtl. Limit oder nicht gelistet); Raeumung ist am Objekt belegt | SendMessage an `cifix-vl3-debug`; bei Riss: Schlussstrecke NEU zuweisen (Mutex-Protokoll, §7-Marker) |
+| e1-e4-ebenen-konsolidierung [b53d66/2fb974/86de29/e5c0c5] | Alt-Session 46375cdc-Spuren | idle (angehalten, quittiert) | ruhen seit 11.08.; keine unfertige Arbeit |
+| cross-session halt order [268d63] · workflow halt protocol [ee315a] | leere Sessions (nie beauftragt) | idle | nichts zu resumen |
+
+### I.3 Ressourcen + Merkposten fuer den naechsten Riss
+
+- **Platte: 27 G frei (90 %)** — der Schlussstrecken-Fahrer hat geraeumt (vorher 7.5 G/97 %).
+  Vor dem naechsten 4-Zellen-Kombibau erneut messen (df-Gate >= 5 G, praktisch >= 15 G).
+- **Riss-Erkennung:** `task-notification` mit "hit your session limit" ODER Journal-Stillstand
+  > 20-30 min (NICHT frueher — Denkphasen-Falle, s. Memory-Nachtrag 23.08.).
+- **Riss-Reihenfolge beim Wiederanlauf:** (1) Objekt messen (ce/super-HEAD, porcelain, df,
+  CI-Lage), (2) diese Tabelle abarbeiten — zuerst die BILLIGEN (bc7303ab, c745729a), dann
+  f3f75b60/98cabd77, dann die teuren Opus-Laeufe (bce0efd4, 23486ee9), zuletzt der Lande-Zug
+  (er braucht freie Bau-Slots + Platte), (3) Peers per SendMessage wieder in Fahrt setzen.
+- **Kein Doppel-Start:** Vor jedem Resume `journal.jsonl`-Bilanz messen; gecachte Agenten
+  kommen sofort zurueck, nur echte Risse laufen neu (Cache-Key = Prompt+Opts unveraendert).
+- **#134-GATE bleibt:** Der Heilungs-Workflow fuer die gerissenen Alt-Straenge startet erst,
+  wenn ALLE sieben hier gelisteten Laeufe terminal sind und die Schlussstrecke durch ist.
