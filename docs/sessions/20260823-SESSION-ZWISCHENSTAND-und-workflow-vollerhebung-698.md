@@ -170,3 +170,29 @@ und die zwei Fragen-Laeufe **wf_a2e443f0** (17.08.) + **wf_5834b706** (10.08.).
 - SELBSTCHECK: Alle Zahlen aus eigener Messung (kein uebernommener Bericht); Doku-only,
   0 Eingriffe; ASCII-nah; Resume-Inflation ausdruecklich als Deutungsfalle benannt und mit
   drei Objekt-Belegen (#108/#109/#110) entkraeftet.
+
+---
+
+## TEIL H — VERBUCHUNG 23.08. (Owner-Order nach Vorlage dieser Doku)
+
+Owner verbatim: "bitte verbuche alle diese Agenten als potentiell gerissene Bau-Straenge und
+markiere sie als zu pruefen. Ein resume hat keinen Sinn, nur ein wohl geplanter neuer
+workflow, der alle relevanten Ziele heilt. Aber diesen koennen wir erst machen wenn alle
+derzeitigen workflows fertig sind, wir haben gerade keine Kapazitaet dafuer."
+
+VOLLZOGEN:
+- **Board-Sammeltraeger #134** angelegt: ALLE Kandidaten dieser Doku (Teil C + Teil D + die
+  Alt-Session-Laeufe) sind dort namentlich als **POTENTIELL GERISSENE BAU-STRAENGE — ZU
+  PRUEFEN** verbucht (A1-A11 Null-Laeufe, B1-B12 Teil-Laeufe, mit Run-ID, Datum, Bilanz,
+  Gegenstand, Prioritaet).
+- **KEIN Blind-Resume** — als Doktrin fuer diese Klasse festgeschrieben: ein Resume fuehrt
+  alte Auftraege gegen einen veraenderten Objekt-Stand und erzeugt Dubletten; stattdessen
+  EIN geplanter HEILUNGS-WORKFLOW mit Forensik -> Objekt-Abgleich -> dreiwertigem Urteil
+  (ERNTEN / HEILEN / AUSBUCHEN) -> Dedup gegen die juengeren Laeufe -> Heilung in EINEM Zug.
+- **GATE:** Der Heilungs-Workflow startet ERST, wenn alle sieben derzeit laufenden Workflows
+  terminal sind UND die Lande-Schlussstrecke des Peers durch ist (Kapazitaets-Grund,
+  Owner 23.08.). Bis dahin ruehrt niemand die Kandidaten an.
+- Prioritaeten im Traeger: P1 wf_794b904b (Ledger-IST-SOLL, 93 offen) · P2 wf_eede2f12 (16/0,
+  Gegenstand unbekannt) · P3 wf_9292edd5 (Feature-Diff gegen Wellenplan) · P4 wf_a2e443f0 +
+  wf_5834b706 (Fragen-Bestand) · P5 wf_355205a7 + wf_f39a28a6 (Kontext-Leser-Vorlaeufer) ·
+  P6 wf_cd576b6e (Bau-Strang, zuerst Branch-Suche).
