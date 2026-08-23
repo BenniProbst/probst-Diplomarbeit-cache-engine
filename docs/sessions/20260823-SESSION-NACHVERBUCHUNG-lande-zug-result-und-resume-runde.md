@@ -121,3 +121,53 @@ ce dev 3841d717 (==beide Remotes, CI 16101 SUCCESS) · super dev lokal a9b5c02e
 (dirty 2: diese Doku + Board-Meta) · prt-art unveraendert · Platte 25G frei ·
 Fristen: Di 25 Schnitt · Mi 26 06:00 TRIGGER (davor #114-E07-Q1-Re-Run!) · Sa 29
 Kampagne · Di 15.09. Abgabe.
+
+## 7. NACHTRAG (23.08. spaet): Owner-Doktrin + erste 2 Rueckkehrer verbucht
+
+### 7a. Owner-Doktrin GELOEST != KONFORM (verbatim verankert)
+
+"Bitte bedenke, dass 'geloest' nicht automatisch konform heisst, daher muessen
+workarounds konform nach Plan gegengeprueft und als Struktur-Regression behandelt
+werden." — Memory feedback_geloest_heisst_nicht_konform_workarounds_als_struktur_
+regression.md + Board #135 (Workaround-Register der CI-16095-Heilungskette:
+vl3-Maskierung a/b/c, PMC-Riegel+AUSWEIS [KON122-L18 = EINGANG der Pruefung, nicht
+Ersatz], B06-/TemplateWithUnknownRef-Harmonisierung, stringop-overflow-Duldung,
+NSDMI-Fix; Urteil je Posten KONFORM/REGRESSION/OWNER-ENTSCHEID; mit #128 VOR
+main-FF). Antwort auf die Owner-Frage "Beginnen spend limit abbrueche von vorn?":
+NEIN — Workflow-Schritte mit result kommen aus dem Journal-Cache; nur der tote
+Schritt laeuft neu, und der setzt auf persistierten Riss-Schutz-Artefakten auf
+(schluss-notizen.md-Klasse); notfalls lenkt ein Z10-artiger Prompt-Zusatz den
+Neustart gezielt auf die Artefakte. Verloren ist nur, was ein Agent NIE schrieb.
+
+### 7b. Rueckkehrer 1: Opus-6K-Sweep wf_23486ee9 TERMINAL 10/10 (Gate lief nach!)
+
+NACHHOL-KARTE.md (322 Z.) + GATE.md (90 Z.) VOLL gelesen. Verdikt TRAEGT_MIT_FIXES,
+8/8 Stichproben CONFIRMED, 0 Erfindungen, 9 Kandidaten GESCHLOSSEN (G-A..G-I),
+48 offene Posten N-01..N-48 (Fristklassen: vor Mi 26 = 7, Di-25 = 11, W2 = 26,
+nach Trigger = 4). Verbucht: #136 (Sammel-Traeger, alle 48 namentlich den Zuegen
+zugeordnet — KON122-Bank, docs-Sammel, #96-Zeilen, Wellenplan-Einplaner-Input,
+Betrieb, Owner-Vorlage) + #137 (N-12 .stale-Erfolgspfad, Di-25, teuerster
+Messdaten-Posten) + #138 (N-16 C1-B1-B8-ENTSCHEID vor Mi 26, identitaetswirksam).
+Kern-Rettungen: R7 = nur noch RATIFIKATION (Praemisse stale — entschaerft den
+Mi-26-Blocker) · N-43 PAT id=99 SELBSTROTATION 01.09. 04:03Z (Vault-Nachzug vor
+Kampagnenwoche) · N-44 V-14-Handgriff STALE (vor F-10-Wiedervorlage korrigieren) ·
+N-21 GN-9 NIE mit 1282.5-Altwert · R9/R10 = 2 NEUE Owner-Fragen · GATE-NACHTRAG:
+GN-9 erneut aus juengstem Traeger gefallen (Kette lebt in #117+#7).
+
+### 7c. Rueckkehrer 2: Resume-Abschluss wf_f3f75b60 TERMINAL 23/23 (gate:gegenlese lief nach!)
+
+Tafel 19 Straenge: 14x SITZT + verify93 SITZT_NACH_FIX + 4x DOKU_ONLY_SITZT.
+Gate TRAEGT_MIT_FIXES: GG2-1 (S1-Quellen-Deckung 53->52, reiner Zaehlfehler,
+[KORR-GG2] additiv gesetzt) + GG2-2 (Explore-Kopf "8/8"-Ueberzeichnung praezisiert)
+— beide Korrekturen am Objekt, Substanz unberuehrt, 0 Repo-/Board-Schreibungen
+durch den Lauf. Beweisort: 20260821-w2-audit-fixverify/GEGENLESE-GATE.md (Teil I
+neu + Erst-Gate 22.08. wortgleich als Teil II).
+
+### 7d. Peer-Lage
+
+ListAgents: einziger lebender Peer = e1-e4-ebenen-konsolidierung (interactive,
+idle, ~7h — in KEINER Uebergabe verzeichnet). Status-Ping gesendet; Zustellung
+haengt an der Empfaenger-User-Freigabe (Cross-Session-Approval). Alle uebrigen
+Session-Agenten der Abbruch-Aera sind tot; ihre offene Arbeit tragen die
+laufenden Workflows + Lande-Zug-Ziele 11-27 + #136(6)-Owner-Vorlage (p11-Ersatz,
+gated auf werg46arx-Rueckkehr).
