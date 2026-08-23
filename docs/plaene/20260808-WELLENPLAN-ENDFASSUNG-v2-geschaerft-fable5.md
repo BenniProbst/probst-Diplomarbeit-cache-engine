@@ -2259,6 +2259,7 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
 > TERMINIERT: o2/E-7-Landung im Lande-Zug (RN-01) -> GN-9-Kalibrierlauf ##47 (RN-06, 23./24.08.) ->
 > S-19-ECHTLAUF Mo 24.08. (RN-10, produziert die B-4-Zahl VOR ##49); K-3-Kipp (Di 25. abends Kalibrier gruen)
 > haelt. Das WE-22./23.-Etikett aller Zeilen dieses Abschnitts ist Kalender-HISTORIE; Fenster jetzt in par.24.1.
+| Task | Gegenstand | Klasse | Anker | haengt an |
 |---|---|---|---|---|
 | **#29** | Zielstruktur-SCHNITT der vier Traeger-Unterprojekte VOR dem S-8-Bau (WE-Design-Posten); voller Monolith-Split -> W7/#88 ("beim Aufraeumen") | **(W)** | KON43-01/2+02 · Owner verbatim "4 unter-Projekte […] beim Aufraeumen" | Abstimmung S-6d/#67 (Include-Kanten) |
 | **#7** | S-19 Planungs-Simulation Sa–Mo: gruppieren -> kategorisieren -> B+-Baum-Permutation; PRODUZIERT die B-4-Zahl = Bau-Nenner des Triggers ("41,4 h fuer 128" ist benannte Rechenluecke) | **(M)** | KON37-03 · KON30-03 · KON42-01/3 | Stempel-Strecke komplett (#4+#15+#16+#17, KON17-01) · OF-2 |
@@ -3772,7 +3773,8 @@ Betriebs-Kollisionen: s. 24.5.
            (Thesis 3/90), F-17, F-18 (D-08-ABI), F-19 (#91-E-Punkte), G-1-Rest (F-G1-8
            PMC dreiphasig, F-G1-9 Lastsequenz), PMC-Deckel L1D+dTLB (GOAL G-12, vor W3),
            SKIP-Kennungs-Frage prod1/prod2 (GOAL G-37), OV-17/O2-Nachreichung, PA-3/O3,
-           OV-5b-Rueckhol-Satz (prod2 online), O-1-Bezeichnungssystem (ARBEITSWEISE T3),
+           OV-5b-Rueckhol-Satz (prod2 online), E12/L-C-Thesis-Trailer-Entscheid a/b
+           (owner-gated; V9-Technik via RN-36), O-1-Bezeichnungssystem (ARBEITSWEISE T3),
            F2-Fenster-Reste 22.3 (P1..P7, OV-1 [D-04-GO ersetzt Fork], OV-4, OV-6,
            HY-Ebene4a, OF-1, NP-46/NP-48, K-16/P5-Hash-Form). Traeger Lead/p11. |
            Abh.: nach Lande-Bilanz (R-Tafel-V2 liegt).
@@ -3875,7 +3877,8 @@ Betriebs-Kollisionen: s. 24.5.
            Landung; B-15-par.24-Traeger = HIERMIT dieses par.24 + Bau nach R4) ·
            O9-'G13'-Klaerung · O10-Roh-Transkript-Nachlese (2 GOs) · O11-K-5-Dateien-
            Deklaration · O12-README-allocators-1-Zeiler · O14-Roadmap-17_E4 deprecaten/
-           nachziehen · K-10-prod1-24er-Marker Paragraph-69.6 · D-08-LABEL-KOLLISIONS-
+           nachziehen · E-38/E-39-Zusatzfunde-Sichtung (6k-Sweep UNGEPRUEFT-Klasse,
+           H-30-Teilposten; VERIFY-Nachtrag 23.08.) · K-10-prod1-24er-Marker Paragraph-69.6 · D-08-LABEL-KOLLISIONS-
            Vermerk (s. Marker 19.4) · L6-Prosa-Nachlande-Posten (9 Fundstellen, N-H1)
            · L7-GesamtStempel-Verbuchung · L5-Sprachregel (3 Emitter-Begriffe, M13) ·
            1.4.f-Docs-Block komplett (13 Fallen-Klassen, K7b-5, JB-2/3/4, K9-3,
@@ -3939,7 +3942,8 @@ Betriebs-Kollisionen: s. 24.5.
            T8b aus r2 DURCHZIEHEN — Owner 19.08.). Traeger #83/#82. | Abh.: RN-01.
     RN-36  INFRA-FENSTER VOR Mi 26.: #84 Rotation (Projekt-Token 286/288/289 SOFORT-
            Klasse [GOAL G-12] + O1-GitHub-PAT [SECURITY, in #84-Zug aufgenommen] +
-           R-64-samba-Vault + INF-03/05 + L-A-PAT-Kette/V8/V9-rescue-Ref) + #132-envoy-
+           R-64-samba-Vault + INF-03/05 + L-A-PAT-Kette/V8/V9-rescue-Ref + W17-Backup-
+           Ref-Identitaet [V9-gekoppelt, Register D.7]) + #132-envoy-
            CrashLoop (Optionen a/b) + H-05/U-2-root-Platten-Raeumung (nach F-10-GO;
            E-12-Platten-Zahlen vorher NEU messen) + L-D node6/id56/id18 + L7-Talos-
            Kernel + #87-Talos-Lane-Voraussetzung (v1.13.x; danach AmdL3/##09-Rest).
