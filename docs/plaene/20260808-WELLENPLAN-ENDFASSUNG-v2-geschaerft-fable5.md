@@ -12,7 +12,7 @@
 
 > EINPLANUNGS-MARKER 23.08.2026 (par.24): Juengste Konsolidierung = par.24 (Einplanungs-Nachtrag, Owner-Order
 > 23.08. "keine zurueckgestellten/unbearbeiteten Posten, alles der Reihe nach"). KON119-Reservierung blieb gewahrt
-> (vollzogen); par.25 ist fuer die OV-16/17-Buchung reserviert (RN-27). Der-Reihe-nach-Ordnung: par.24.1 RN-01..RN-84.
+> (vollzogen); par.25 ist fuer die OV-16/17-Buchung reserviert (RN-27). Der-Reihe-nach-Ordnung: par.24.1 RN-01..RN-92.
 
 ---
 
@@ -3731,7 +3731,7 @@ Register-Spiegel mit Vollzaehligkeits-Gegenzaehlung:
     F2-Freeze-Check    = vollzogen per #108 (vorlagen-fenster 3e9ec644/8aae5cd2);
                          Deklarations-Tafel 23.2 gilt mit den par.24-Korrekturen (P1).
 
-## 24.1 DER-REIHE-NACH-GESAMTORDNUNG (RN-01..RN-84; Owner-Order: nichts zurueckgestellt)
+## 24.1 DER-REIHE-NACH-GESAMTORDNUNG (RN-01..RN-92; Owner-Order: nichts zurueckgestellt)
 
 Form je Zeile: RN-Nr | Posten/Kennungen | Traeger | Abhaengigkeit. Fenster-Etiketten
 sind SPAETESTE Fristen (Owner 20.08.); Abarbeitung sequentiell in dieser Reihenfolge,
@@ -4139,6 +4139,33 @@ Betriebs-Kollisionen: s. 24.5.
            (->RN-48) · NP-02-Zeile (->RN-05) · #104-Rest/O5 (->RN-26) · 6c-
            Publikation (->RN-27) · Band-B-Slots (->RN-26). Traeger #96/H-20.
 
+### ERGAENZUNGS-STAFFEL 2 RN-85..RN-92 (23.08.; aus der Register-Gegenzaehlung
+### EINPLANUNGS-REGISTER — 8 Quell-Posten, die in RN-01..RN-84 keinen NAMENTLICHEN
+### Platz trugen; Differenzmenge damit LEER)
+
+    RN-85  [vor Mi 26. 06:00] #90 P-A KANALWERK-/ARENA-DESIGNPLAN abschliessen
+           (checkpoint_measure-Kanal-Baum; C-13/C-17-Detailfragen; O8-RAM-Schwellen-
+           Zuordnung faehrt in RN-19; VOLLLISTE 1.4.a/1.4.d vor-Trigger-Klasse).
+           Traeger #90/#53-Umfeld. | Abh.: RN-04 (D-08-Weiche); speist RN-68.
+    RN-86  [vor Sa 29.] H3-FLAKE-KLAERUNG (VOLLLISTE 1.4.e): Mess-/Testwelt-Flake
+           vor der Kampagne dreiwertig klaeren (BEHOBEN/ENTLASTET/Traeger).
+           Traeger 1.4.e-Zeile/#127-Umfeld. | Abh.: RN-46.
+    RN-87  [W2, vor Trigger] K-1 LAGER-IDENTITAET HYBRID-.so (O-5-Rest, OF-3-
+           Kopplung; VOLLLISTE 1.4.g): Ablage-Identitaet der Hybrid-Kompilate im
+           Lager mit dem RN-19/RN-20-Schema-Zug pruefen; Entscheid-Bedarf via RN-05.
+           Traeger K-1/#57-Umfeld.
+    RN-88  [W2] O-13 DUMP-PLAN-HERKUNFT (WF4-E-C; VOLLLISTE 1.4.g) klaeren; Befund
+           im RN-27-docs-Zug buchen. Traeger O-13.
+    RN-89  [W2, nach B2 am Objekt] W13-EXPLORE CEB 4-vs-6 (VOLLLISTE 1.4.g;
+           KON37-03-Umfeld) am Objekt fahren. Traeger W13.
+    RN-90  [W2] N-8 HW-ERKENNUNG P4-P6 (T2-Klasse; VOLLLISTE 1.4.g). Traeger N-8.
+    RN-91  [W2, beim D-01-Folgezug] H-33 D-01-FABLE-TIEF-NACHLESE (Lead SELBST;
+           Opus-breit liegt: 4. Ebene ABI-fest, Major 9; R5=F-05-Bestaetigung via
+           RN-05). Traeger Lead/D-01. | Abh.: RN-05.
+    RN-92  [Di 25., Freeze-Deklarations-Kontrolle] F2-7-REST GENUS-CT-KOMPOSITION
+           namentlich (VOLLLISTE 1.4.c): Teilstueck-Deklaration im Freeze-Check
+           kontrollieren, Rest-Bauanteil in die RN-31-Randslots. Traeger F2-7/#96.
+
 ## 24.2 P1-P10 — KURZVERZEICHNIS DER EINPLANUNG (Detail in den RN-Zeilen)
 
     P1  E-10/#38a2-Bauzug + #86-ORG-19-Schritte-1-4 + W5-Grammatik-Slot -> RN-03/
@@ -4186,9 +4213,10 @@ Betriebs-Kollisionen: s. 24.5.
     24.3.2  P5: W1-VOLLAUDIT-RESTMENGE. QUELLE: docs/sessions/backups/20260821-
             vollaudit-welle1-stand/VOLLLISTE-features-aufgaben-k1-heute.md.
             156 OFFEN-mit-Traeger (Sektion 1.4: 42 Board-Tasks + 16 F2-Fenster ->
-            RN-05 + 11 Freeze-Reste -> RN-19/RN-31 + 13 vor-Trigger -> RN-32..RN-37
-            + 14 vor-Kampagne -> RN-43..RN-49 + 22 Docs-Zug -> RN-27 + 38 weitere
-            getragene -> je Traeger-Zeile in RN-13..RN-75); 22 VERTAGT-mit-Traeger
+            RN-05 + 11 Freeze-Reste -> RN-19/RN-31/RN-92 + 13 vor-Trigger ->
+            RN-32..RN-37/RN-85 + 14 vor-Kampagne -> RN-43..RN-49/RN-86 + 22
+            Docs-Zug -> RN-27 + 38 weitere getragene -> je Traeger-Zeile in
+            RN-13..RN-75 + RN-87..RN-91); 22 VERTAGT-mit-Traeger
             (Sektion 1.5: V1-V6-Container -> RN-26; V7-V10 -> RN-67; V11-V18 ->
             RN-74 [owner-entschieden]; V19-V21 -> RN-76; V22 deklariert); 34
             GESTRICHEN/UEBERHOLT (Sektion 1.6) -> V10-NEUBEWERTUNGS-PRUEFPOSTEN im
@@ -4278,8 +4306,9 @@ Betriebs-Kollisionen: s. 24.5.
 
 ## 24.6 VOLLZAEHLIGKEITS-GEGENZAEHLUNG
 
-    P1-P10: 10/10 in RN-Zeilen (24.2). RN-Plaetze: 84 (RN-01..RN-76 + Ergaenzungs-
-    Staffel RN-77..RN-84 aus der Quell-Tafel-Gegenzaehlung). Massen-Bloecke: 7 Unterlisten
+    P1-P10: 10/10 in RN-Zeilen (24.2). RN-Plaetze: 92 (RN-01..RN-76 + Ergaenzungs-
+    Staffel RN-77..RN-84 aus der Quell-Tafel-Gegenzaehlung + Ergaenzungs-Staffel 2
+    RN-85..RN-92 aus der Register-Gegenzaehlung). Massen-Bloecke: 7 Unterlisten
     (24.3.1-24.3.7), jede mit Quell-Datei + Fenster + Traeger; innere Zaehler:
     94 (23+68+3) · 156+22+34+74(+1 Sammel)+20+15 · 38/20 · 16 · 22+37+5+14 · 13
     GOAL-Posten · Designplan-Klassen. Leser-Tafel-Posten: L-GOAL 62 (G-01..G-62,
