@@ -212,6 +212,64 @@ bleibt gueltig: Session 46375cdc = 06.08.-Kontext, am 11.08. neu gegruendet +
 geerntet + pausiert, letzter Eintrag 16.08. — kein offenes Werk; N-45 damit
 AUFGEKLAERT (Prozess-Haelfte), die Session gehoert dem Owner.
 
+## 9. NACHTRAG 3 (23.08. ~21:15): 🔴 FABLE-CREDITS ERSCHOEPFT — Riss-Bilanz + Lead-Merge-Rettung
+
+### 9a. Credits-Riss (Blocker-Klasse OWNER: /usage-credits oder Modell-Order)
+
+"You're out of usage credits" toetete: Lande-Zug-Resume bei 14/31 (Z12-Z27 +
+endstand:bilanz = 17 Agenten) · W2-Audit bei 50/54 (S2-fix1:ph89 + beide
+Synthesen + Gate) · Rueckfragen-Synthese steht seit 20:59:57 still (167/117).
+Owner-Handgriff noetig: Credits auffuellen ODER Modell-Entscheid fuer die
+Workflow-Strecken (STEMPEL-STRECKE=FABLE-MAX-Dauerregel — kein eigenmaechtiger
+Downgrade). Resume-Rezepte unveraendert (resumeFromRunId; alle fertigen
+Schritte aus Cache).
+
+### 9b. 🎉 LEAD-RETTUNG: o2-Merge zu Ende gefuehrt — ce dev LOKAL b3dc3e93
+
+Z12 starb MITTEN in der Konfliktaufloesung ("CMakeLists aufgeloest. Jetzt die
+Floor-Datei.") — halber Merge im ce-Hauptklon (MERGE_HEAD f82dfaeb, 2 UU).
+Lead-Uebernahme nach K16 (Vermerk in EIGENER Datei slot2.d/wer.k16-lead-
+uebernahme — die frische Slot-Claim-Lehre): (1) Z12s CMakeLists-Aufloesung
+VERIFIZIERT (0 Marker, 8228 Z., o2-Test 4x registriert, H-9-Union). (2) Floor-
+Konflikt HARMONISIERT: o2-KONTO-Block uebernommen, Zahlen am MERGE-ENDSTAND
+LIVE gemessen (H-7: build-l1 cmake-Refresh RC=0, ctest -N literal "Total
+Tests: 545") -> 545/541/539 loest 544/540/538 ab (+1-Regel des unbedingten
+test_o2_standard_opt_default; Strang-Zahlen 524/520/518 waren Basis-bezogen).
+(3) Merge-Commit LOKAL b3dc3e93, porcelain 0, KEIN PUSH — K17-Endstand-
+Kombibau 4 Zellen + Gates 6/6 + gitleaks stehen aus (Zug-Resume-Pflicht).
+Beweise: o2merge-lead-reconf-ctestN545.log in 20260822-o2-umbau/.
+
+### 9c. Lande-Zug-Resume-2-Bilanz (wyln30o5c, 14/31)
+
+Z01 SCHON_ENTHALTEN (Volltext jetzt gelesen: 38fd6270 traegt beide Marker
+publiziert, Encoding-Falle 'Par.59' vs '§59' dokumentiert) · Z02-Z09 Cache ·
+Z10 Kurz-Verifikation (Patch griff) · Z11-Klasse teilweise · Z12 = 9b ·
+Z13-Z27 credits-tot (super-Phase s13schema/cidual/vorlagenfenster/w1luecken/
+kampvor + docs-Sammel + prt-Phase + Gitlink + KON122 + BU + Raeumung ALLE
+OFFEN). Result-Kopie: wyln30o5c-resume2-result-KOPIE.json.
+
+### 9d. W2-Audit TERMINAL-Tafel (wg4nfrsb1, 50/54): 18/19 SITZT + ph89 FIX_AUSFALL
+
+S1 10/10 SITZT · S2 8/9 SITZT; ph89 = FIX_AUSFALL (Fix-Agent credits-tot) mit
+3 dokumentierten Funden inkl. wortfertiger Fix-Wege (an #89 verbucht):
+FUND-1 MILD H-11/P-23 Kanon-RICHTUNGS-Gegenlauf ph89-Alias-Registry vs. M13
+(4/7 Gruppen; Testdatei Z.87 pinnt Gegenrichtung; kein Produktiv-Konsument,
+aber kuenftiger R-2-verbotener Uebersetzungsbedarf — Fix: Registry an M13-
+Richtung drehen 7->8 Zeilen + Asserts drehen + CT-Kreuz-Wache ODER Absorption
+vorziehen; Traeger M13-Absorptions-/Staffel-3-Zug VORGEZOGEN vor erste
+produktive Konsumierung) · FUND-2 KLEIN TDD-Label T-2->T-3 (Testkopf Z.8) ·
+FUND-3 KLEIN Tippfehler 'daueber'->'darueber' (test_experiment_parser.cpp).
+Die Synthese-/Gate-Rollen des Laufs sind materiell durch die f3f75b60-
+ZWEITFASSUNGEN gedeckt (Abschn. 8a). Result-Kopie: wg4nfrsb1-result-KOPIE.json.
+
+### 9e. Owner-Lueckenpruefungs-Nachholung (Order 23.08. spaet, Stand)
+
+Vollzogen: 5 fluechtige Task-Outputs in Beweisorte kopiert · f3f75b60-Volltexte
+(8a) · Wellenplan-Journal-Volltexte (8b). NOCH OFFEN (nach Zustandssicherung,
+risikolos wiederholbar): ARBEITSWEISE-GESAMT voll (Kipp-Ritual-Versaeumnis) ·
+3-Tage-Memories voll · Ledger-Kopf (juengste KON) · EINPLANUNGS-REGISTER.md
+365 Z. + VERIFY-BERICHT par.1-5.
+
 ### 7d/8d. Peer-Lage
 
 ListAgents: einziger lebender Peer = e1-e4-ebenen-konsolidierung (interactive,
