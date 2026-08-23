@@ -16,12 +16,16 @@ Lese-Ritual im neuen Kontext: NUR ARBEITSWEISE-GESAMT-DOKTRIN voll + Memories de
 
 - **Resume-Kommando (bei jedem Riss identisch):**
   `Workflow({scriptPath: "/home/comdare/.claude/projects/-home-comdare-Projekte-Research-probst-diplomarbeit-cache-engine/5a19728e-f6e1-4736-a246-e3fda9ac35a1/workflows/scripts/rueckfragen-vollbild-12w-wf_bce0efd4-a0d.js", resumeFromRunId: "wf_bce0efd4-a0d"})`
-- **Stand bei Uebergabe:** Task wdyae6xgy (frisch resumed 14:2x). Journal 22 start / 4 result.
-  KARTE.md + **18 Fenster-Dateien** liegen fertig in
-  `~/backups-workflow/20260823-rueckfragen-vollbild/fenster/` (kommen aus dem Cache).
-- **Form:** je Kontextfenster EIN Opus-5-max-Leser, **strikt SEQUENTIELL** (Owner-Order
-  23.08. — Script wurde von parallel() auf for-Schleife umgebaut). Danach EINE
-  Fable-5-max-Synthese.
+- **Stand bei Uebergabe:** Task wxq27z9pv (Resume 14:4x nach dem Batch-Umbau). Journal
+  57 start / 7 result. KARTE.md + **22 Fenster-Dateien** liegen fertig in
+  `~/backups-workflow/20260823-rueckfragen-vollbild/fenster/` (kommen aus dem Cache;
+  vorher 18 — die Strecke waechst).
+- 🔴 **Form GEAENDERT (Owner-Order 23.08. nachmittags): BATCHES VON MAXIMAL 10 AGENTEN
+  PARALLEL** fuer die Opus-Lesestrecke ("Wir haben die Kapazitaet dafuer"). Das Script traegt
+  jetzt `BATCH_GROESSE = 10` + `parallel()` je Gruppe (Zeilen 18-35); die frueheren Formen
+  (erst parallel-alles, dann strikt sequentiell) sind BEIDE ueberholt. Sonst alles wie gehabt:
+  je Kontextfenster EIN Opus-5-max-Leser, danach EINE Fable-5-max-Synthese. **Prompts blieben
+  byte-identisch**, darum liefert der Resume alle fertigen Leser aus dem Cache.
 - 🔴 **DIE FABLE-SYNTHESE WIRD HAENGEN BLEIBEN** (Owner weiss das): Fable-Kontingent ist
   leer. Sobald alle Opus-Leser durch sind, bleibt die Synthese-Stufe stehen — das ist
   ERWARTET, kein Defekt. Dann: Stand melden, Fenster-Dateien sichern, auf Fable-Rueckkehr
@@ -106,7 +110,10 @@ R-C Ebene-4a-Bestaetigung · R-E A4-R4/C1-B7/C1-B8.
 
 ## 6. ARBEITSMODUS IM NAECHSTEN KONTEXT
 
-Langsam, sequentiell, token-sparsam. **NUR den Rueckfragen-Workflow huetten** — kein Bau,
+Langsam und token-sparsam. Der Aufraeum-Modus "hauptsaechlich sequentiell" gilt fuer MEINE
+eigene Arbeit weiter; fuer die Opus-Lesestrecke DIESES Workflows hat der Owner am 23.08.
+nachmittags ausdruecklich Parallelitaet in 10er-Batches angeordnet (= die "Parallelitaet nur
+auf Owner-Order"-Ausnahme). **NUR den Rueckfragen-Workflow huetten** — kein Bau,
 keine Landung, kein neuer Workflow, keine Peer-Weckrufe vor 18:30 UTC. Bei Rueckkehr des
 Workflows: Ergebnis VOLL lesen, Tafel + Verbuchungs-Abgleich sichern, Ledger-Nachtraege
 vorbereiten (aber erst einspielen, wenn Kapazitaet da ist). Owner-Dauerregeln gelten
