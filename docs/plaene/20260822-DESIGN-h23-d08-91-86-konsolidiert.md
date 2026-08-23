@@ -476,3 +476,34 @@ SELBSTCHECK: ASCII-only; reines Design (0 Code-Edits, kein Worktree, kein Bauslo
 kein cmake/ninja/ctest); /home/comdare/wt-ce-lande unberuehrt; Schreibung nur in
 ~/backups-workflow/20260822-h23-design/; alle Objekt-Anker eigene Messungen @ f729b93a
 (bzw. git show 6713156b); Zeilenlagen verschieblich (V14: Anker = Bezeichner).
+
+---
+
+## NACHTRAEGE 23.08.2026 (RECENCY-VERDIKT wf_b6ce88a4 -- additiv, nie Umschreibung;
+## Kanon-Tafel K01-K19 + Belege: ~/backups-workflow/20260823-stempel-recency/RECENCY-VERDIKT.md)
+
+- N-H1 (zu Teil B/L6): NACHTRAG 23.08. (Objekt-Tiefenlesung): Die L6-Stale-Prosa-Menge
+  umfasst am Objekt NEUN Fundstellen statt vier -- ceb_version_stamp.hpp:71 (GliedCount
+  '10'), build_orchestrator.hpp:419/:433/:475/:484 ('bleibt 9' / 'acht'/'neun Glieder'),
+  tier_hybrid_stempel.hpp:37 (BewusstLeer-Behauptung; Planer-FP seit V-08R GEFUELLT),
+  17er-Prosa in axis_variant_version_table.hpp:6/:216 + build_orchestrator.hpp:221/:792 +
+  anatomy_module_abi_v1.hpp:83-108 + pilot_source_map.hpp:55, anatomy_fingerprint.hpp:915
+  (7-Felder-MessGates-Beispiel, lebend 9) und mess_arena.hpp:94 (Debug-Kommentar);
+  saemtlich Kommentar-PROSA, jede tragende Zahl steht als static_assert richtig --
+  Kommentar-Hygiene supersedierend, nie loeschen.
+- N-H2 (zu den Objekt-Ankern): NACHTRAG 23.08.: Alle Objekt-Anker dieses Designs am
+  Nach-Lande-Stand bestaetigt: development = 1f0424a2 (f729b93a + W2-Lande-Merge 5ddda4e5
+  [lande@53c5524e, 10 Merges] + Floor-Nachzug 544/540/538); die 10 Merges bewegen KEIN
+  Identitaets-Byte (Gegenproben leer) und tragen nur Ablauf-Flaechen (T-15b-Retry Bau+Mess
+  mit Owner-5 aus EINER XML-Quelle, C-05-Warmup-Paar, PMC-RAW-Katalog/Ehrlichkeit,
+  kanal_id_schema, per-Binary-Mappe, 120er-S-19-Basis). Dev-Fortschritt 23.08. (db66714a)
+  = reine CI-/Lint-Heilung.
+- N-H3 (Querbezug): NACHTRAG 23.08.: Der zeitgleiche PROVENIENZ-BERICHT (22.08. 18:16,
+  ~/backups-workflow/20260822-e10-provenienz/) und dieses Design (17:53) entstanden ohne
+  Querreferenz und sind in der Sache deckungsgleich -- E-10 vollzieht den Provenienz-
+  Schluss; Ledger-Zitate kuenftig ueber KON-Nummer+Wortlaut ankern (der A4-NACHTRAG
+  verschob die Kopf-Zeilennummern um ~21).
+- FORM-AUFLAGE fuer den E-10-/ORG-19-Bau-Zug (L1-U1, bindend): Schritt 1 faehrt die
+  C.1-FORM (18+1-Meta-Meta-Anker; POD/ABI/kCompositionAxisNames bleiben 18) -- die
+  aelteren Rezept-Formulierungen 'static_assert 18->19 flach' (b1-c3a Teil 6 Schritt 1,
+  Provenienz-Bericht Abschn. 3) werden NICHT woertlich gefahren.
