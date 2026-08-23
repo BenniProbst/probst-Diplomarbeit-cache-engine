@@ -10,6 +10,10 @@
 > als Lande-Bericht des #15-Bruchs reserviert (par.21.1, super-Zug). Owner-Order 18.08.: NIE ausbuchen/verschieben
 > -- W7 ist KEIN Endlager mehr (par.21.0); Platzierungen: Wiederaufnahme-Register + par.21.3.
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): Juengste Konsolidierung = par.24 (Einplanungs-Nachtrag, Owner-Order
+> 23.08. "keine zurueckgestellten/unbearbeiteten Posten, alles der Reihe nach"). KON119-Reservierung blieb gewahrt
+> (vollzogen); par.25 ist fuer die OV-16/17-Buchung reserviert (RN-27). Der-Reihe-nach-Ordnung: par.24.1 RN-01..RN-76.
+
 ---
 
 ## 0. WAS DIESE FASSUNG GEGENÜBER DER VORLAGE ÄNDERT
@@ -2241,9 +2245,20 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
 
 **FREEZE-CHECK Fr 21.08., alle (P):** S-6a–d · S-7 · S-5 · S-3/#17 · ABI-Pflicht · CEB-Stempel · SOLL-Versionierung · HY-A · B1 · B2/B3/B5 · Umbenennung · **NEU: #38d + #38a2 (oder deklarierter Fall nach 18.6(3))**.
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): *(zur #38a2-Zeile oben + FREEZE-CHECK-Klammer)* der Fallweg
+> "deklarierter Fall nach 18.6(3)" ist UEBERHOLT — KON120-06: die 18.6(3)-Buchung beruhte auf uebersehenem
+> DOPPEL-JA (KON91-02 16.08. + KON103-01 17.08.; KON106-04 "als EIN GO fuehren"). #38a2 ist NIE gebaut worden
+> (Provenienz-Bericht 22.08., 0 Commits auf >260 Refs; K19-Klasse: JA ohne Bauplan-Schritt — der 17.08.-Bauplan
+> BUENDEL-BAUPLAN-15 uebersetzte das JA nie in einen Schritt). Geltend: E-10-BAUZUG mit #86/ORG-19 Schritte 1-4,
+> RN-03/RN-11 (par.24), vor Mi 26. 06:00; Design-Gate #133 erfuellt (DESIGN-h23 22.08.).
+
 ## 18.4 WE 22./23.08. (Reserve GEZOGEN, W2-Vorstaffel) + W2 bis Trigger Mi 26.08. 06:00 / F3 Fr 28.08.
 
-| Task | Gegenstand | Klasse | Anker | haengt an |
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): *(zur #7/S-19-Zeile unten)* der "Sa-Mo"-Slot ist verstrichen, die
+> Sa-Lauf-Kette RISS (P3): der LAUF begann nie, obwohl die Freigabe mit der #15-Landung wirksam wurde. NEU
+> TERMINIERT: o2/E-7-Landung im Lande-Zug (RN-01) -> GN-9-Kalibrierlauf ##47 (RN-06, 23./24.08.) ->
+> S-19-ECHTLAUF Mo 24.08. (RN-10, produziert die B-4-Zahl VOR ##49); K-3-Kipp (Di 25. abends Kalibrier gruen)
+> haelt. Das WE-22./23.-Etikett aller Zeilen dieses Abschnitts ist Kalender-HISTORIE; Fenster jetzt in par.24.1.
 |---|---|---|---|---|
 | **#29** | Zielstruktur-SCHNITT der vier Traeger-Unterprojekte VOR dem S-8-Bau (WE-Design-Posten); voller Monolith-Split -> W7/#88 ("beim Aufraeumen") | **(W)** | KON43-01/2+02 · Owner verbatim "4 unter-Projekte […] beim Aufraeumen" | Abstimmung S-6d/#67 (Include-Kanten) |
 | **#7** | S-19 Planungs-Simulation Sa–Mo: gruppieren -> kategorisieren -> B+-Baum-Permutation; PRODUZIERT die B-4-Zahl = Bau-Nenner des Triggers ("41,4 h fuer 128" ist benannte Rechenluecke) | **(M)** | KON37-03 · KON30-03 · KON42-01/3 | Stempel-Strecke komplett (#4+#15+#16+#17, KON17-01) · OF-2 |
@@ -2278,6 +2293,8 @@ KON27-04 ordnet **15 Aufgaben (Prio 1–15)** den Wellen zu: **Bestand #7/#10/#1
       (1) #68 -> W2 [deklarierter erster Verzicht, V-10]
       (2) Ordnungs-Relations-M-Anteil -> W2 [§13.3]
       (3) #38a2 -> W2-Bump-Buendel, Freeze-Nachbuchung DEKLARIERT [KON45-01/3: ein Bruch]
+          ^^ EINPLANUNGS-MARKER 23.08.2026 (par.24): Fall-Deklarat UEBERHOLT (KON120-06
+          Doppel-JA); geltend = E-10-Bauzug RN-03/RN-11 vor Mi 26. 06:00.
       (4) B1 -> W2-Anfang vor Trigger [Ableitung ohne Owner-Datum]
     NIE FALLEN: #87 #78 #86 · KON9-05-Stempelzeile · HY-A · #15 · #16/#17 · B3 (Owner-
     Datum KON34-04) · #38d (Pflicht-Buendel).
@@ -2512,6 +2529,10 @@ Erbinnen-Bau. (6) G-5/run_methodology bleibt echte Owner-Frage (V-12 der Rest-Vo
     D-07  Hybrid = Transmitter/Multiplexer, Glied der MESS-Kette; Autonomie zweistufig, S-20
           spaeter (KON19-02/13-01 + KON21-01/36) -> HY-Design-Register
     D-08  15-Stationen-Kette: Plan-/Memory-Nachzug (8-Stationen-Memory korrigieren) (Z14663)
+          ^^ EINPLANUNGS-MARKER 23.08.2026 (par.24): LABEL-KOLLISION — dieses Wellenplan-D-08
+          (Doku-Nachzug, lebt in RN-27) ist NICHT das KON120-D-08 (Emitter-Entscheid
+          "Steuerung->Compile", DESIGN-h23 Teil B, RN-04/RN-58); Sprachregel: "Wellenplan-D-08"
+          vs "KON120-D-08" (analog L5-Begriffsdreiteilung).
     D-09  Pruefling = drittes Konzept, XML-beschraenkbar 1..3, ERWEITERT den Permutationssatz
           (KON30-02/KON31) -> S-19-Input + prt-art-Rolle
     D-10  Auswahl-Subsystem (17 Dateien): Fortfuehrungs-Entscheid FEHLT; K4/K5 ohne Eigentuemer
@@ -2760,6 +2781,10 @@ identifizieren | T-NEU-4 Journal-BU Kontext 10ff | T-NEU-13 wip/luecken-stufe2 v
 #40 | T-UPD-3 R3-D37B-Zeile stale "offen" -> GELANDET (9b3a1bcd+75505b9d) |
 p2/p3-Worktree-Reste beim #37-Vollzug einspielen/verwerfen.
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): *(zur T-NEU-13/#40-Zeile)* Board-#40 traegt inzwischen 38 NE-Posten/
+> 20 Auftraege seit W0b (P6); Triage + T-UPD-2-Kollisions-Entscheid = RN-29 (Di 25.), Vollzug T-13/T-14 =
+> RN-44 (vor W3). NUMMERNKREIS-WARNUNG: Board-#40 != v1-Paket ##40 (par.7/21.3) — getrennt fuehren (24.3.3).
+
 ## 20.7 OFFEN BEIM OWNER (Stand Kontextende)
 (1) Kenntnisnahme b-Strich Talos: Core-PMC-Zuschnitt + v1.13.x-Upgrade (NICHT v1.14,
 sandboxd-GA 27.08.!) ins A-1-Fenster? (2) Infra-Fenster-TERMIN (WE 22./23. ueberbucht:
@@ -2988,7 +3013,18 @@ Designplan-par.4-W1-Testlast | Freeze-Check-Liste par.18.3) + Synthese mit Frist
 workflows/scripts/w1-vollstaendigkeit-wf.js; Start NACH Review-/Audit-Ruecklauf (Limit-Doktrin);
 das Ergebnis wird Abschnitt 9 des Regressionen-Registers und traegt danach einen Nachtrag HIER.
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): der hier VERSPROCHENE Nachtrag ist par.24.3.2 — W1-Vollaudit-
+> Restmenge Stand 21.08. (VOLLLISTE): 156 OFFEN-mit-Traeger + 22 VERTAGT + 34 GESTRICHEN-neu-bewerten +
+> 74 offene Regressionen + 20 Status-Konflikte + 15 traegerlos (jetzt ALLE mit Traeger); Abgleich-Strang
+> RN-17 (#128), Endstand-Gate RN-70. Die W1-V2-Zeile "B3 OHNE Bau-Spur" ist Snapshot-HISTORIE (23.2/
+> KON119-02: B3 GEBAUT_UNGELANDET -> mit #15 GELANDET).
+
 ## 21.3 WIEDERAUFNAHME-PLATZIERUNGEN (Register Teil B): JEDER VERTAGTE POSTEN MIT NEUEM PLATZ
+
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): die Slot-Anker dieses Abschnitts ("WE 22./23." und "Mo/Di 24./25."
+> nach S-19/T-15b) sind kalendarisch verstrichen bzw. durch den P3-Riss obsolet; die Baender 22+37+5+14
+> bleiben VOLLZAEHLIG gezaehlt und erhalten NEUE Slots im #96-Feinplatzierungs-Schnitt Di 25. (RN-26;
+> Zwischenslots RN-16/RN-54/RN-66). Nichts ausgebucht.
 
 **Band B/W1 (22 Posten, 62 h; der D-2-Marker "geschlossen gestrichen" ist Historie):**
 AG-Concepts11/IsComposition/Noexcept, XL-L3/L5, ST-RankingTie/DriftBestwahl, PK-Folgeposten,
@@ -3374,6 +3410,11 @@ konkret nachschlagen; falls VERTAGT: HY-B-Task beim Di-25. anlegen (22.4 Z-15).
 
 ## 22.3 OWNER-FENSTER-STAND (P1-P7 + L-A..L-D + Einzelposten; Stand 19.08. abends)
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): Stand 19.08. TEIL-UEBERHOLT — (a) die P4/C-3a-Zeile ("Frist Mi
+> 19.08. verpasst -> F2-Fenster, 18.6(3)-Fallweg") ist durch KON120-06 ersetzt (Doppel-JA galt; E-10-Bauzug
+> RN-03); (b) OV-1-Fork ist durch KON120-02 D-04-VOLLES-GO ersetzt; (c) alle weiter offenen Fenster-Posten
+> fahren gesammelt im Owner-Vorlagen-Stau RN-05 (EINE Nachricht, F-01..F-19 + G-1-Rest + Altposten).
+
 **F2-Vorlagenfenster P1-P7 (Ein-Satz-Vorlagen MIT der Landung, vor Fr 21.08.; par.21.6 +
 Board-Owner-Zeile; F-F/13.2: P2/P3 AM ORIGINAL bauen):**
 
@@ -3407,6 +3448,11 @@ Mirrors owner-gated (13.4) | NEU: Betriebs-Punkt PLATTEN-RAEUMUNG prod1 (22.1 U-
 ins Infra-Fenster Do 20.08. abends packen).
 
 ## 22.4 DI-25.-SCHNITT-ZUGAENGE (namentliche Liste fuer #96; JEDE Zeile wird abgehakt)
+
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): diese Z-Liste wird durch par.24.3.1 FORTGESCHRIEBEN — die 94
+> Soll-Ist-Posten (wellenplan-soll-ist.md Tafeln 3-7) treten als namentliche Erweiterung dem #96-Schnitt
+> bei (RN-26); dazu die 24.3.2-Zugaenge (15 Ex-Traegerlose, 34er-Neubewertung). JEDE Zeile wird abgehakt —
+> Abhak-Instanz #96 + EINPLANUNGS-REGISTER.
 
 Bereits gebucht beim Schnitt (Bestand, zaehlt weiter): die 12.4-Zugaenge (B-8/X-13 |
 VL-6b/X-15+[K6-6] | S-8-Methodik-Override/[K12-2] | Peer-Session-Triage/X-14 |
@@ -3462,6 +3508,11 @@ Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr
 
 ## 23.0 STAND-ANKER (19.08. ~20:05)
 
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): dieser Stand-Anker ist HISTORIE — #15 ist GELANDET (Kette
+> 196a621a->66de5c09, CI 16042-16052; KON119), die 10 ce-Lande-Merges des W2-Zugs sind durch (dev
+> 1f0424a2 -> db66714a, CI 16097 SUCCESS), #7/S-19-Freigabe ist WIRKSAM (P3-Neuterminierung s. Marker
+> 18.4 + RN-06/RN-10). Lebender Stand: par.24.0.
+
     GELANDET:   #17/g2 = dev ba33b9ac (Merge von 6af6a415, dual gepusht; Baum-CI 16029
                 SUCCESS 27 Jobs; dev-CI 16031 running mit 0 roten Jobs, Poller laeuft;
                 W1-V1-Buchung folgt mit Terminal-SUCCESS). Stempel-Strecke damit bis auf
@@ -3475,6 +3526,13 @@ Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr
 
 ## 23.1 DIE OFFENE F2-LISTE (aus #93 B-H am Objekt; je Posten: BAUEN bis Fr / FALL
 ## DEKLARIEREN mit Zahl / OWNER-FENSTER — NIE-KUERZEN: jeder Posten behaelt den Platz)
+
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): "bis Fr (21.08.)" ist verstrichen; der Freeze-Check wurde per
+> #108 vollzogen. Jeder F2-1..F2-8-Posten traegt seinen NEUEN Termin in par.24.1: F2-1/B1 -> RN-13-Umfeld/
+> #24 (W2-Anfang vor Trigger) · F2-2/F2-3 -> mit #15-Nachlande GELANDET (c2da9d1a; Einzelbeleg-Kontrolle
+> RN-17) · F2-4/B5 -> #24-B5-Vorposten (RN-13/RN-25-Umfeld, KON64-Anteil nach Doppel-JA klar) · F2-5-Rest
+> -> RN-31 (LG-XlsxAlt/LG-SkipCallback + 6+2-Posten) · F2-6 -> RN-31 · F2-7 -> RN-31-Deklaration ·
+> F2-8/N-1+N-2 -> mit Nachlande GELANDET (Kontrolle RN-17).
 
     F2-1  B1 XML-Konsum je Stufe (Registry-NEUBAU <measurement_tooling> + Stufen-Dimension):
           NICHT GEBAUT (Objekt: Registry ohne Stufen-Dimension, XSD:88 ohne, 0 Commits
@@ -3527,6 +3585,11 @@ Traeger-WF, ist par.22 der persistente Traeger -- kein Bericht-only-Zustand mehr
     ABI-Pflicht 6 Symbole (V-06 Lesart A; Emitter-Haelfte = golden-Folgezug #102) ·
     A-06/A-08/A-09-Umbenennungen. ERFUELLT: S-1 S-3 S-7 B2 HY-A1 SOLL-Vers.-Kern
     MT-L3 PK-Kanon/Kreuz/DeleteP99 ST-Trio(5) HY-Reroute LG-WritebackXlsx XL-L2.
+
+> EINPLANUNGS-MARKER 23.08.2026 (par.24): *(zur Zeile "#38a2/P4 = 18.6(3) DEKLARIERT")* dieses Deklarat
+> ist UEBERHOLT (KON120-06: Doppel-JA uebersehen; KON119-T-A-Buchung redaktionell korrigiert). #38a2
+> faehrt als E-10-BAUZUG (mit #86-Schritten 1-4) VOR Mi 26. 06:00 — RN-03/RN-11; die GEBAUT_UNGELANDET-
+> Posten dieser Tafel sind mit #15 GELANDET (KON119).
 
 ## 23.3 LANDE-NACHLAEUFE (aus dem g2-Lande-Verify R1-R6 + Verify-Bestand)
 
@@ -3625,3 +3688,572 @@ nicht stale' — BESTAETIGT; wf_d9d83069, B.3: 20260819-w93-endstand/vl12-unters
     Formabweichung als 'am Objekt getilgt' vermerken (HIERMIT vollzogen). Worktree nach
     Doktrin AUFRAEUMBAR (alle Bedingungen gemessen; kein Remote-Branch mehr, Submodul
     uninitialisiert) — Abbau bleibt im Aufraeum-Block nach den Landungen.
+
+---
+
+# 24. EINPLANUNGS-NACHTRAG 23.08.2026 — ALLE OFFENEN PUNKTE DER REIHE NACH
+
+Anlass: Owner-Order 23.08. verbatim: "es darf keine Posten geben, die zurueckgestellt
+oder nicht bearbeitet werden. Alles muss gruendlich der Reihe nach abgearbeitet werden"
++ "alle 4 /goal Referenzdokumente einliest und gegen die eben neu erkannten fehlenden
+Punkte den Wellenplan updated und alle offenen Punkte korrekt einplant."
+
+Quellen (alle VOLL gelesen, Einlese-Protokoll B.3-N3 im Register): 4 Referenz-Leser-
+Tafeln L-GOAL/L-WELLENPLAN/L-DESIGNPLAN/L-ARBEITSWEISE (~/backups-workflow/20260823-
+wellenplan-update/) ueber GOAL-v8 816/816 Z. + diesen Wellenplan 3627/3627 Z. +
+Designplan 714/714 Z. + ARBEITSWEISE 1264/1264 Z. · wellenplan-soll-ist.md 292/292 Z.
+(P4, ~/backups-workflow/20260822-lande-zug/) · VOLLLISTE-features-aufgaben-k1-heute.md
+448/448 Z. (P5, docs/sessions/backups/20260821-vollaudit-welle1-stand/) · SESSION
+20260822-beide-leser-vollliste 279/279 Z. · DESIGN 20260822-h23-d08-91-86 509/509 Z.
+· PROVENIENZ-BERICHT E-10 182/182 Z. (~/backups-workflow/20260822-e10-provenienz/).
+
+GELTUNG: par.13-par.23 bleiben stehen; was hier steht, gilt vor. Bei Widerspruch:
+Owner-Wort schlaegt alles, Neueres schlaegt Aelteres (18.1-Klassenregel, 21.0
+NIE-AUSBUCHEN und #96-Mandat gelten unveraendert). NUMMERN-DEKLARATION: der in
+par.22.4/H-14 als "par.24-Nachtrag" angekuendigte WORTFERTIGE OV-16/17-Buchungs-
+Entwurf (d10-liegengebliebenes.md Abschn. 5, Lande-Zug) faehrt als **par.25** im
+Di-25-docs-Zug — Nummer 24 ist hiermit durch den Einplanungs-Nachtrag belegt (V12:
+vergebene Nummer -> naechste freie; keine Inhalts-Kollision, beide Gegenstaende leben).
+
+Register-Spiegel mit Vollzaehligkeits-Gegenzaehlung:
+~/backups-workflow/20260823-wellenplan-update/EINPLANUNGS-REGISTER.md
+
+## 24.0 STAND-ANKER 23.08. (aus Berichten; je Zeile Quelle — V1: vor Verwendung messen)
+
+    ce dev             = 1f0424a2 (f729b93a + W2-Lande-Merge 5ddda4e5, 10 ce-Merges
+                         s19/messfenster/s8kopf/s13schema/pmcpaket/vollzug91/ph89/
+                         trigfix/skip97/kampvor) -> 23.08. db66714a (CI-/Lint-Heilung);
+                         Quelle: DESIGN-h23 N-H2. CI 16097 SUCCESS (Pause-Commit 38428099).
+    Lande-Zug #131     = PAUSIERT 23.08. 13:40 (Owner-Anhalte-Order) mit Resume-Rezepten;
+                         offen: super-/prt-art-/Gitlink-Phasen + KON122 + #19 main-FF.
+    Owner-Pause        = Owner-Order 09:33/13:40; Wiederanlauf gemaess Resume-Rezepten
+                         (Commit 38428099); VERTAGT bleibt Zwischenzustand (Order 19.08.).
+    F2-Freeze-Check    = vollzogen per #108 (vorlagen-fenster 3e9ec644/8aae5cd2);
+                         Deklarations-Tafel 23.2 gilt mit den par.24-Korrekturen (P1).
+
+## 24.1 DER-REIHE-NACH-GESAMTORDNUNG (RN-01..RN-76; Owner-Order: nichts zurueckgestellt)
+
+Form je Zeile: RN-Nr | Posten/Kennungen | Traeger | Abhaengigkeit. Fenster-Etiketten
+sind SPAETESTE Fristen (Owner 20.08.); Abarbeitung sequentiell in dieser Reihenfolge,
+Parallelitaet nur wo owner-geordert (Lande-Zug, E-10-Bauzug "SOFORT", laufende Agenten).
+Betriebs-Kollisionen: s. 24.5.
+
+### FENSTER A — 23.08.-REST (nach Owner-Wiederanlauf; Lande-Bahn hat Vorrang)
+
+    RN-01  Lande-Zug #131 RESUME + Rest-Phasen: super-Ziele s13schema-super 1e92b77e
+           (H-6-Kopplung an ce-s13) · cidual 223ab518 · vorlagenfenster-Fix a6fa04da ·
+           w1luecken-super 8edc34a0 · kampvor-super 025e0c42; prt-art: VOR Phase 3
+           fetchen (Submodul stale), pinduo 25bbf2e, w1luecken-prtart 3710ac4c; o2/E-7-
+           Landung VOR GN-9 (KON120-01-Auflage); Gitlink-Bump ATOMAR + PZW-Nachzug
+           (Designplan 9.5-Anker wandern) + KON122 (E-6-Zeilen 1-6 FINAL, #112-Einspeise,
+           T8b/T8c/T10b/T12b, B-01..B-20-Auswahl) + Remote-Divergenz-Triage origin 27 vs
+           github 25 (P9, Phase-5-Auflage) + #19 main-FF beider Repos (Rest: F-13).
+           Traeger #131/Lead. Auflagen T9/G8/H5/H-7/K17-Endstand-Kombibau/G2-V93/T12
+           unveraendert. | Abh.: Landebahn exklusiv, nichts ueberholt.
+    RN-02  Diesen par.24-Nachtrag landen (Branch bau/wellenplan-offene-punkte; Lead
+           landet sequentiell HINTER dem Zug; Ledger-Spiegelzeile via ledger_nachtrag.sh).
+    RN-03  P1-BAUZUG STARTEN: E-10/#38a2 + #86/ORG-19 Schritte 1-4 in EINEM Zug
+           (7-Schritte-Rezept b1-c3a Teil 6 + L1-U1-Form 18+1; Schritt 1 = XSD-/Registry-
+           Grammatik-Slot [heilt das W5-Versaeumnis KON107-02/F5], Schritt 2 = erste
+           required-Deklaration, Schritt 3 = Tripwire-Ersatz aggregate_required_for_axes,
+           Schritt 4 = organ_stamp_line JE COMP [MemoryOnly verliert Disk-Suffix],
+           Schritte 5-7 = Tests rot-zuerst + K17-Kombibau + Landung; Minor-Regel +
+           Byte-Neutralitaets-Gegenprobe Nicht-IO). Design-Gate #133 ERFUELLT durch
+           DESIGN-h23 (22.08., Teil A E-10 + Teil C). Eigener bau/-Branch; Landung
+           hinter dem Zug, SPAETESTENS vor Mi 26. 06:00. KEINE Owner-Frage (Doppel-JA
+           KON91-02+KON103-01, KON120-06). Traeger #120-B1 + #86 + #133. | Abh.: RN-01
+           nur fuer die LANDUNG, Bau parallel frei (owner-geordert SOFORT).
+    RN-04  P2-ENTSCHEID: D-08-Emitter-Weiche A/B, Default A — Owner-Vorlage liegt
+           (p4-Strang); Entscheid-Zeile vor Mi 26. 06:00, 0 Bau-h; bei Ausbleiben gilt
+           der deklarierte Default A (Vorlage-Text). Traeger #91/E-8/p4. | Abh.: keine.
+    RN-05  OWNER-VORLAGEN-STAU als EINE Nachricht (H2-09-Minimalantwort): F-01, F-02/R7
+           (Enum-Ordnung, VOR Mi 26 — Stempel-Bytes!), F-03..F-08, F-09 (S-19-Schema,
+           vor Di-25-Schema-Schnitt), F-10 (Root-GO, ueberfaellig), F-11..F-15, F-16
+           (Thesis 3/90), F-17, F-18 (D-08-ABI), F-19 (#91-E-Punkte), G-1-Rest (F-G1-8
+           PMC dreiphasig, F-G1-9 Lastsequenz), PMC-Deckel L1D+dTLB (GOAL G-12, vor W3),
+           SKIP-Kennungs-Frage prod1/prod2 (GOAL G-37), OV-17/O2-Nachreichung, PA-3/O3,
+           OV-5b-Rueckhol-Satz (prod2 online), O-1-Bezeichnungssystem (ARBEITSWEISE T3),
+           F2-Fenster-Reste 22.3 (P1..P7, OV-1 [D-04-GO ersetzt Fork], OV-4, OV-6,
+           HY-Ebene4a, OF-1, NP-46/NP-48, K-16/P5-Hash-Form). Traeger Lead/p11. |
+           Abh.: nach Lande-Bilanz (R-Tafel-V2 liegt).
+    RN-06  P3-GLIED 2: GN-9-Kalibrierlauf ##47 in O2-Zielform (nach o2-Landung;
+           variant-audit-a1-Ergebnis einarbeiten; R-19/4096-static_assert-Schranke).
+           K-3-Kipp haelt: Di 25. abends Kalibrier gruen DURCH neue Kette. Traeger
+           ##47/#7-Umfeld. | Abh.: RN-01 (o2), RN-05/F-09 fuer Schema-Zusaetze.
+    RN-07  H-6-Kleinsthandgriffe: (a) Monitore bcqxqdilc/bc9dtvlef Stopp-Verifikation,
+           (d) build-l4/-untracked im super pruefen/raeumen. Traeger Lead-klein.
+    RN-08  AB-10 prt-art-Klon-Dreh (nach Lande-Phase 3). Traeger docs-klein.
+    RN-09  W2-Wellen-Ende-Vollaudit-BU (H-16, Dauerregel 21.08.; nimmt AB-09
+           fixstrecke2-BU mit). Traeger Lead/BU-Zug.
+
+### FENSTER B — Mo 24.08.
+
+    RN-10  P3-GLIED 3: S-19-ECHTLAUF #7 (Kampagnen-XMLs, GN-9-Werte, ggf.
+           --fremde-lane=intel) + C-03-OV-4-Deckel-Rechnung VOR ##51 + C-04
+           9-Messungen-Faktor + O1-O4-F2-Zeilen; PRODUZIERT die B-4-Zahl = Bau-Nenner
+           des Triggers (ersetzt die benannte Rechenluecke "41,4 h fuer 128").
+           Traeger #7. | Abh.: RN-06; #15/#17 gelandet (erfuellt).
+    RN-11  P1-LANDUNG: E-10/#86-Zug landet (RN-03-Fortsetzung; K17-Kombibau,
+           Byte-Gegenprobe, atomar T-8). SPAETESTENS vor Mi 26. 06:00. | Abh.: RN-01.
+    RN-12  W2-Mo-Slots: ##32+##33-Reste (Bump-Buendel-Nachzuege; ##34-Wache = S-14a
+           GELANDET, Restpruefung) + NULL-Bump-Wache-Vollzugsreste OV-2/OV-3 + ##35
+           Resume-Beweis + ##36 T-15+D4-Verdrahtung + ##37/##38/##39/##41.
+           Traeger W2-Mo. | Abh.: RN-01 (Landebahn frei fuer Kleinlandungen).
+    RN-13  #22 OD-7: H-13-Pruefposten am gemergten s8kopf (traegt der Traegerbau die
+           --debug-CLI-Haelfte?) + K12-2-Methodik-Override-Entscheid + S-8/S-9/S-10/
+           S-11-Traegerbau-Start (T-NEU-6, W2-KOPF; deckt B-01/B-04/B-14/B-16 + R-01)
+           + #29a-Zielstruktur-Schnitt VOR S-8 + W8-Explore KEINE-YAML-Naht vor S-12.
+           Traeger #22/T-NEU-6/#29a. | Abh.: RN-01.
+    RN-14  P9: Thesis-GitLab-main-Rueckstand (26 Commits hinter GitHub) heilen —
+           V3-FF-Faelligkeit feststellen, dann FF-SHA-Muster (VOLLE SHA); Fetch-Quelle
+           GITHUB; mit #121-Vorab-Hashes. Traeger Thesis-Zug/#121-Metadata. | Abh.: keine.
+    RN-15  P9: #65 prt-art-Nachstufe + V1-DISKREPANZ #65-vs-#29 am Objekt messen
+           (V6.5: Bau-Zustand + Mengendifferenz beide Richtungen). Traeger #65.
+    RN-16  Band-B/W1-Mo-Randslots: 2-3 leichte Posten aus dem 22er-Band [lok]
+           (Vorgriff; Feinplatzierung RN-26). Traeger #96-Vorgriff.
+    RN-17  #128-SOLL-IST-ABGLEICH STARTEN (H-28; Input: Audit-Soll-Karten + Endstand-CI
+           + dieses par.24) + H-29-Strang: 74 offene Regressionen (VOLLLISTE 5.1
+           R1-R74) + 20 Status-Konflikte (Sektion 3 K-1..K-20) + #40-Abgleich als EIN
+           Abgleich-Strang; dazu #129-D-04-Design-Fortfuehrung + #53-Design (PMC-
+           Schwester zuerst; nach F-G1-8/9). Traeger #128/#129/#53. | Abh.: RN-01-Ende.
+
+### FENSTER C — Di 25.08. (SCHNITT #96 + engster Bau-Slot; K-3-Kipp abends)
+
+    RN-18  U-1 J-1-REZEPTFIX (ROT-Auflage; 7er-J-1-Liste LITERAL + reales Target
+           comdare_profile_run_facade) VOR #18. Traeger #18-Vorlauf.
+    RN-19  #18/S-13-BUENDEL (Di-25-Kern): Export-Element + Ziel-FILTER + per-Binary-
+           XLSX (KON32-01/R33) + FJ-1..FJ-10 + E1-E11 (+r5-Auflagen; O8-RAM-Schwelle
+           im E1-E11-Design zuordnen) + L5-2-KANN-Edits + ##11/<measure_selection> +
+           R-05-XML-Trennung BAU/MESS (Branch-Kandidat bau/measure-selection-xsd nach
+           RN-30-Inventur) + Paper-Experiment-XML je Paper (SEG5-32/R71-W2-Anteil) +
+           #89/ph89-Anschluss + I-8-Felder-Schema (H-27: kanal_tag/zustands_dimension/
+           machine_id + E-2 (iv)/(v)) + K6-6/R29-WritebackMethod-Objektluecken (4.
+           Enum-Wert xlsx + Enum-Wache, GOAL G-41/#18-Posten) + R27/X-15-fail-loud +
+           E-1/E-2-Schema-Landung (H-23 Teil A) + S-13-Testseite (Designplan D-4-
+           Auflage: S-Strecke bekommt Testposten im Paket, T-11b/T-11c je Zug).
+           Traeger #18/#48/#57-Verbund. | Abh.: RN-18.
+    RN-20  #57 LAGER-VOLLAUSBAU (1)-(6) + S-17-LagerBaumWriter VERDRAHTEN (K-6-
+           Konsens: gebaut+unverdrahtet) + R-38/O15-ETA-Merge/avg_size_bytes + R-03/
+           R52-Host-Belegung + B-08/B-09 + R32-Bestandslog-scharf. Traeger #57.
+    RN-21  #48 XML-PUBLIKATIONS-SEKTION (4 Klassen; deckt seg3-kon13-04/-27-02).
+           Traeger #48. | Abh.: RN-19 (ein Verbund).
+    RN-22  #3/S-12 VIER MINI-PIPELINES (Emission, B-17, KEINE YAML) + #106 CI-DUAL-
+           Raenge 3-10 + ce-clang-Stage-Luecken-Fix (#106-Metadata) + M-6/R18-clang-
+           Warnungs-Review + R74/J-1..J-4-Emissionsliste. Traeger #3/#106. | Abh.: W8-
+           Explore (RN-13).
+    RN-23  P9: FULL-JOIN-ENDPROBE 6-10 (T-12d-Rest) als #18-Abnahme-Teil — FJ-6..FJ-10
+           am gebauten Stand beweisen (19 Organ-Segmente, seg_framework_ns ==
+           seg_run_total_ns, markierter Leerwert, kein Spalten-Drop). Traeger #18-
+           Abnahme. | Abh.: RN-19.
+    RN-24  #105: NP-24 + Miniposten-Trio A9/A10/A11 + X-12/V-02R + D5-5-HDR-
+           VERDRAHTUNG (P9-Branch bau/d55-hdr nach RN-30-Inventur; R-20/R62; FRIST
+           vor Sa 29.) + p95-Export. Traeger #105.
+    RN-25  #99 B-5f Tooling-Validierung (3 Stellen, V-13/KON101) + #94 Abi7-Kapselung
+           (C-F4 + decl.hpp:797/R12) + #124 B-8 Gate-Define-Emission + hat()-Paar
+           (X-13/A-12). Traeger #99/#94/#124.
+    RN-26  #96-FEINPLATZIERUNGS-SCHNITT (Pflichtinstanz; nimmt JEDEN Posten): Baender
+           22 (Band B/W1, 62h) + 37 (B-Rest, ~104,5h) + 5 (Band C, 13h) + 14
+           (par.13.3) mit NEUEN Slot-Daten (alte WE-22./23.-Anker obsolet, s. Marker
+           21.3) · Z-1..Z-15 · P4-94er-SOLL-IST-LISTE als namentliche 22.4-Erweiterung
+           (s. 24.3.1) · Paragraph-75-104er-Kandidaten + RECONCILE-Reste (V6/R65,
+           gezaehlte Randslots) · X-1-golden-Ref-Ausbuchung (B6, D12-Muster) · X-14
+           Peer-Sessions-Ernte · O13/ext-A05-Dublette in Paragraph-75-Liste · R-28/
+           X-11-Nested-dirty-17 · #104-Rest/O5-build:standalone-Pin (W2-Mini analog
+           #104). Traeger #96. | Abh.: RN-17-Erkenntnisse fliessen ein.
+    RN-27  Di-25-DOCS-/MEMORY-/LEDGER-ZUG (EIN Zug, H-14 + H-35 + P8; lens-frei):
+           AB-03 (Z-6/Z-7/Z-9-Board-Texte; #123 existiert, #24/#28-Zusaetze) · AB-04
+           12-W-MARKER-TAFEL 0/12 (W11 zuerst; setzt auch GOAL-UE-1/UE-2-Marker Z.229/
+           232 + ARBEITSWEISE-T4-1-Kandidat [dort owner-gated als REGEL-KANDIDAT]) ·
+           AB-07 (B.0-Ort + K16-Baustein) · par.25 = OV-16/OV-17-BUCHUNG (WORTFERTIGER
+           d10-Entwurf; Nummern-Deklaration s. Kopf) + B-17-D-10-Ursachen-Antwort in
+           die Owner-Meldung ("seit 09.08. GEBAUT, nur Buchung fehlte") ·
+           anhang_forward_core.sh:250-Kleinstfix · X-3/X-3b-17:45-Zusaetze · k21-Reste
+           (6c/X-17-Publikation 111 Verdikte ungekuerzt; K-5-Eichlinie als W2/L4-
+           Pruefposten nach RN-31) · H-36 K21/K22-Vermerk · 14 B-KLEINPOSTEN (Session
+           Teil 2: KON122-Zeilen B-03/B-04/B-10/B-14/B-18; Memory-Ergaenzungen B-02/
+           B-05/B-06/B-08/B-12/B-13/B-16; Board-Text B-20; B-11-O2/O3-Marker mit o2-
+           Landung; B-15-par.24-Traeger = HIERMIT dieses par.24 + Bau nach R4) ·
+           O9-'G13'-Klaerung · O10-Roh-Transkript-Nachlese (2 GOs) · O11-K-5-Dateien-
+           Deklaration · O12-README-allocators-1-Zeiler · O14-Roadmap-17_E4 deprecaten/
+           nachziehen · K-10-prod1-24er-Marker Paragraph-69.6 · D-08-LABEL-KOLLISIONS-
+           Vermerk (s. Marker 19.4) · L6-Prosa-Nachlande-Posten (9 Fundstellen, N-H1)
+           · L7-GesamtStempel-Verbuchung · L5-Sprachregel (3 Emitter-Begriffe, M13) ·
+           1.4.f-Docs-Block komplett (13 Fallen-Klassen, K7b-5, JB-2/3/4, K9-3,
+           T-14..T-16-Haelften, D-08-8->15-Korrektur, T-UPD-5-NP/M-Zug, A-16..A-19,
+           L1/L2/L4/L6/L9-Belege, 6c, prod1-24, seg7-45, H5, seg1-04/F8, SEG5-36) ·
+           GOAL-REFERENZ-STAND-23.08.-Block + Marker (L-GOAL Tafel 4: UE-1..UE-9) ·
+           Designplan-par.13-Nachtrag + Marker (L-DESIGNPLAN F) · ARBEITSWEISE-B.3-
+           NACHTRAG + REGEL-KANDIDATEN 12-17 owner-gated (T4-3 K19-Regel, T4-6 CI-
+           Dual, T4-8 NIE-KUERZEN, T4-9 Vollaudit-BU, T4-10 Zeithorizont, T4-1 12-W).
+           Traeger #85 + Lead-Ledger (Lead-only-Hotspots beachtet). | Abh.: RN-01.
+    RN-28  #71 Triage-Sammel (+D-18/R49-Wachen-Nachbar: 3 allow_failure GEGEN Doktrin
+           inkl. super:1841 ergebnis:holen [GOAL G-59], libs/ ohne -Wall, n/a-Gate,
+           289-Writeback) + #74 Repo-Rollen-Umbau (15 CE-Kandidaten; R-28-Bauweg;
+           B-07/SEG5-16/R70 csv_to_latex->measure_to_latex) + P9: #69 750-vs-1310 +
+           prod2-TeX-Probe (vor W3) + #28-TEST-KONSOLIDIERUNG-Beginn (Startzahl 14
+           Skripte/Z-9; O7-smoke_19_1; D-3-Shell-Bissproben-Migration; 279 TUs ohne
+           -Wall = H-21c). Traeger #71/#74/#69/#28.
+    RN-29  #103 TSan-VOLLAUSBAU [lokal, build-tsan-NEUBAU; M-2-Fence-Naht] + P6:
+           #40-NE-TRIAGE (38 NE-Posten/20 Auftraege sichten; NE-01-Zahlenkorrektur
+           bindend; T-UPD-2-Kollision T-13/T-14 W7-vs-vor-W3 AUFLOESEN — Entscheid
+           faellt HIER, Vollzug RN-44) + B7/T-NEU-13 wip/luecken-stufe2-vs-#40-
+           Abgleich. Traeger #103/#40. | Abh.: RN-17 (Abgleich-Strang liefert zu).
+    RN-30  P9: 5 TRAEGER-KANDIDATEN-BRANCHES-INVENTUR (je Branch: Explore-vor-Merge-
+           Pflicht, Ueberholt-Status messen, KON49-02-Verfahren): bau/d55-hdr ->
+           RN-24 · bau/lagp1-object-stat -> RN-47/##21-H2 · rettung/bau/d3-7b-pruef-
+           only-bilanz -> RN-31 · bau/measure-selection-xsd -> RN-19 · b-graph-2d3d
+           (super) -> RN-60/#98. Dazu bau/ci-stage-topologie (D1b-Rest) und
+           bau/stempel-nachlande-f2 (vermutlich gelandet, pruefen). Traeger Inventur/
+           #96. | Abh.: vor den jeweiligen Ziel-RN.
+    RN-31  W0b/W1-KLEINRESTE (Di-Rest + W2-Randslots; aus 13.1/23.1/Soll-Ist Tafel 4):
+           D3-7b pruef_only (+D3-1-Marker-Haelfte, B-1-Rest) · D3-3b Leerzeilen (3
+           Dateien EIN Commit) · ##20-B-Restbau (COPIED_LIST; Runner-git >=2.25) ·
+           ##13 G3-Split (R-09) · F2-6 E-Label-Rest + Flag-f-Kollision · S-14-
+           VOLLAUSROLLUNG (T-NEU-5) · ##31-Vollform + D1c-Vollausbau · D1e/D1f/D2-G2/
+           ##06-CI-Haelfte/##07-Statuserhebung (13.1-OFFEN-Klasse; Soll-Ist fuehrt G —
+           je Posten Objekt-Blick, Konflikt im #128-Strang) · D2-G6-Status · ##08-Rest
+           · ##15-EMITTER/TEMPLATE-Haelfte · ##16/##17-Break-Even-D-04-Neuform-
+           Anschluss (OV-1-Fork ersetzt durch D-04-VOLLES-GO; R69-B-Spline-
+           Konsolidierung) · LG-XlsxAlt + LG-SkipCallback (F2-5-Klasse) + 6+2-Band-A-
+           Deklarationsposten (~33h W2-Randslots) · D-5-xlsx-Profil-Nenner-Wache ·
+           T-12e-S-3-Kombibau-Nachweis · D-6-PMC-Vertragsfolge-Test (mit RN-35) ·
+           G-55/D2-Rest (18 bedingte Registrierungen, F1->F2-Reihenfolge) · R45/R46/
+           R50/R51/R61/R63/R72/R73-W2-Zeilen · K-5-Eichlinien-Posten (W2/L4).
+           Traeger #96-Zuweisung je Zeile. | Abh.: RN-26.
+
+### FENSTER D — vor Mi 26. 06:00 (TRIGGER-VORBEDINGUNGEN)
+
+    RN-32  C-01 VOLLBAU-GATE-VORLAGE (T-NEU-9/R34; KON22: Lagerhaltung fertig UND
+           Stempel fertig UND Algorithmen versioniert UND Messung einbaubar — als
+           Owner-VORLAGE vor dem Trigger; GOAL G-09). Traeger T-NEU-9. | Abh.: RN-19/
+           RN-20-Stand fliesst ein.
+    RN-33  C-02 HEAVY-SIGNAL fuer das 26.08.-Fenster SENDEN (T-NEU-10; KON58-03;
+           GOAL G-48). Traeger Infra/#60-Umfeld.
+    RN-34  R-04 LB-4/5/6-Baum-Vollausbau (P-Klasse: "Trigger IST Baum-Vollausbau") +
+           R-13/R57 zwei unwahre Messgroessen (bytes_in_use_peak-Momentanwert,
+           CLU-64-Literal) + R-12/R56-Restvorbehalt: E07-Q1-Re-Run (<1h, Rezept Par.9)
+           auf der FINAL eingefrorenen Trigger-Linie (#131-Endstand-Anhang).
+           Traeger (P)-Klasse/#114-Anhang.
+    RN-35  #83 PMC fail-loud + #82 I-PMC-2/3-Reste nach pmcpaket-Landung messen
+           (seg1-45 5-Flags/R13, seg1-67/R14, P-1/P-2-Reste/R15; VERTAGT-Posten T6/
+           T8b aus r2 DURCHZIEHEN — Owner 19.08.). Traeger #83/#82. | Abh.: RN-01.
+    RN-36  INFRA-FENSTER VOR Mi 26.: #84 Rotation (Projekt-Token 286/288/289 SOFORT-
+           Klasse [GOAL G-12] + O1-GitHub-PAT [SECURITY, in #84-Zug aufgenommen] +
+           R-64-samba-Vault + INF-03/05 + L-A-PAT-Kette/V8/V9-rescue-Ref) + #132-envoy-
+           CrashLoop (Optionen a/b) + H-05/U-2-root-Platten-Raeumung (nach F-10-GO;
+           E-12-Platten-Zahlen vorher NEU messen) + L-D node6/id56/id18 + L7-Talos-
+           Kernel + #87-Talos-Lane-Voraussetzung (v1.13.x; danach AmdL3/##09-Rest).
+           Traeger #84/#87/#132/Owner-Handgriff. | Abh.: RN-05/F-01+F-10.
+    RN-37  #91-VERBUCHUNG (completed-Buchung + Identitaets-Entscheide E-1..E-10 als
+           Ledger-Zeilen) + E-6-EMITTER-AUDIT-GREP (Klammer-Form-Kanon, #120-D-07-GO,
+           klein, read-only + Schreiber-Fixe mit Minor) + E-9/AB-02-KONTROLLE (W18/
+           LEDGER:8941-Austragung per 38fd6270 — verifizieren, sonst nachholen; GOAL-
+           Trigger-Risiko) + L7-Verbuchung. Traeger #91/#120/Lead-Ledger.
+    RN-38  ##49 BAU-TRIGGER Mi 26. 06:00 AUSLOESEN (Bau-Nenner = B-4-Zahl aus RN-10;
+           Batch max 4096; KIPP-Regel K-4: spaetester Start Fr 28. 06:00).
+           Traeger K-4/Lead. | Abh.: RN-11, RN-19-22, RN-32-37.
+
+### FENSTER E — Mi 26. bis Fr 28.08. (BAU-FENSTER EXKLUSIV; F3 = Fr 28.)
+
+    RN-39  ##50 Zweitlauf (Do 27.) + Bau-Betreuung; waehrend des Baus NULL CI-/
+           Agenten-Last auf prod1 (VII.2; kontaminierte Daten = unheilbare Klasse);
+           K-5-Kipp: Do 27. abends Bau durch. Traeger Lead.
+    RN-40  ##51 USER-GO-VORLAGE = F3 (Fr 28.); W2-Band-A-8-Testposten (MT-L1/L2/L6/L7,
+           PM-m3v2Zero/RAPL/Scaled/NichtGelesen-Seam = Kampagnen-Wahrheit) bis F3
+           gelandet als Teil der GO-Vorlage (Slots Mo/Di/Fr). Traeger ##51/W2-Band-A.
+    RN-41  Bau-freie [lokal/0-CI] Design-/Doku-Posten im Bau-Fenster: #49-
+           Staffelungs-Design (nach F-06/V7-Antwort) · L4-Strategy-Flaechen-Feinschliff
+           (Bau mit/nach B4) · S-22-Design (#92-Folge) · D-24-Bleib-Notizen · R-36/
+           H1-H7-Fork-Vorbereitung · D-10-Auswahl-Subsystem-Explore · R-30-Schicht-
+           Verstoss (Owner-GO "Fenster ist jetzt") · R-34-descoped-Frage-Explore ·
+           R-35-S-7-Locking-Deep-Research · R-29-tier150-Archivierung [lok] · R-16-
+           21-Images-Marker · R-55/R-08-Beleg · D-46-Modi-Design (R46). Traeger je Zeile.
+    RN-42  F-2-FREITAGS-LIEFERUNG Fr 28. (abgabefaehiger Stand; ARBEITSWEISE F-2;
+           GOAL G-16). Traeger Lead.
+
+### FENSTER F — vor Sa 29.08. 06:00 (KAMPAGNEN-VORBEDINGUNGEN)
+
+    RN-43  #125/C-09 DRIFT-GATE-DEBUG-AUSNAHME (H-12: seit messfenster-Merge FAHRBAR;
+           T-12a: RunMethodology-Abschaltung, sonst am 29.08. JEDE Zelle rot; Debug-
+           Zahlen NIE ins Messwertlager, AdmissionStatus) + C-08/R38-Restkontrolle
+           ("5" auf Drift-Achse; messfenster traegt T-15b — nachmessen) + C-07/R37-
+           Granularitaet. Traeger #125/#13-Folge. | Abh.: RN-01.
+    RN-44  C-12 = T-13/T-14 FEHLERKLASSEN (PFLICHT vor W3; 0/18 Achsen, 0/121
+           Algorithmen; L8-Hybrid-Parser-Fehlerklassen andocken; T-UPD-2-Entscheid aus
+           RN-29 vollziehen; T-07/T-08 vor Trigger falls mengen-wirksam — sonst hier).
+           Traeger ##40-Rest/C-12. | Abh.: RN-29.
+    RN-45  #97 C-13-SKIP-OEKONOMIE + C-14-BESTANDSLOG-SKIP-WACHE (R42/R43; 320
+           bit-identische IDs) + #97-REST Ausweis-Host-Verdrahtung. Traeger #97.
+    RN-46  #127 DAUERROTE Achse-06/CRC (H-26; 3 Tests + fixture-Klasse; KON119-06) +
+           K-5-Auswahl-Blindheit-Eichlinie (aus RN-31). Traeger #127.
+    RN-47  P9: C-10-ZWEILANIGKEIT am HEUTIGEN Generator-Stand nachmessen (GOAL G-50;
+           Intel-resource_group, Paragraph-61-Revision/R40) + INTEL-RAW-KREUZPROBE
+           (pmc:intel; prod2 online seit #60; OV-5b-Satz via RN-05) + R60/R-17-Tag-
+           Mismatch baremetal (Runner id6-9) + R59/R-15-L3-Pinning-Pflicht + R58/
+           R-14-Chaos-/Drift-Gate-Aufrufer + ##21-HAELFTE-2 object_stat gegen Store
+           (lagp1-Branch nach RN-30; ##56-W3-Abnahme vorbereitet). Traeger C-10/#82-
+           Folge/##21. | Abh.: RN-30, RN-35.
+    RN-48  C-15 MinIO-Ebene-B-CI-SMOKE-Beweis + COMDARE_RUN_MEASURE-Falle (R44) +
+           N-10/A12-NAS-Creds (T3). Traeger Betrieb/#10-Folge.
+    RN-49  ##52 VOR-GATE + BEIDE OV-15-GOs (bis Sa 29. 06:00) + T-12b/C-05-Warmup-
+           Paar-Legacy-Beweis (run_observable_perm ODER Ausbuchungs-Beweis; R36/R67-
+           Rest nach messfenster-Landung nachmessen) + Deckel-/Nenner-Kontrolle aus
+           RN-10. Traeger ##52/OV-15.
+    RN-50  FRIST-KONTROLLE Sa-29-Klasse: HDR-VERDRAHTUNG gelandet (RN-24; R62)? ·
+           #38c-n/a-Zaehler-Rest (kampvor-super gelandet)? · #127 gruen? · C-12 durch?
+           — je NEIN: sofort eskalieren, nicht rutschen. Traeger Lead-Gate.
+
+### FENSTER G — W3 Sa 29.08.-F4 Fr 04.09. (KAMPAGNE EXKLUSIV; Batch-Pausen [lok])
+
+    RN-51  ##53 KAMPAGNE je Batch-Abend (Debug-GENERALPROBE-Charakter bis T-3;
+           T-15b-Retry 5/5, 3 Werte einzeln; Drift-Gate scharf; xlsx=Ausgabe).
+           Traeger ##53. | Abh.: RN-38-40, RN-43-50.
+    RN-52  HY-B/S-15 (Hybrid erzeugen/einschieben nach Einzelmessung) + #123 HY-B-
+           STEMPEL-EXPORT (Z-6; nach P5-Hash-Form-Antwort [RN-05] + A-11/#102-Linie).
+           Traeger S-15/#123.
+    RN-53  ##54 Overhead-Teilmatrix + ##55 L3-Asym (+T12b-CCD-Semantik) + ##56
+           RUECKSCHRIEB (+object_stat-Haelfte = ##21-H2-Abnahme aus RN-47).
+           Traeger ##54-##56.
+    RN-54  BAND-[lok]-BATCH-PAUSEN: Band-B-Rest-Anteile (37er) + 22er-Restposten OHNE
+           Landung (nur lokale Staende; Landung nach W3). Traeger #96-Slots aus RN-26.
+    RN-55  S-20-SYNC-KANAL-Design (Owner: Autonomie-Stufe SPAETER; Design-only) +
+           R-55/R-08-O(Maschinen)-Vollzugsbeleg W2->W3. Traeger S-20-Design.
+    RN-56  W3-TEXTARBEIT ueber Overleaf-Remote (VII.2-konform): #130-Vorzieh-Anteile
+           + #121-Absatz-Pipeline-Start (nach Owner-3/90 + F-16), DE fuehrt.
+           Traeger #121/#130.
+
+### FENSTER H — W4 Mo 07.-Fr 11.09. (F5 = Fr 11.09.)
+
+    RN-57  ##57 BREAK-EVEN (D4f-Statusraum, D-04-Form aus #129-Design; OV-6-Antwort
+           aus RN-05; R69-B-Spline-vs-Hermite-Konsolidierung vollzogen). Traeger
+           ##57/#129.
+    RN-58  P2-BAU: HY-C-Router + L2 HYBRID-MODUL-EMITTER (8-12h; M9-Fenster;
+           render_hybrid_module_source als Strategy-Schwester, Status-13-Gegenprobe
+           rot-zuerst) + L4-FLAECHEN-BAU (4-6h, falls nicht schon mit B4 in W2-E;
+           Selbstkompilation 3/4 -> 4/4, 6er-Nenner faellt byte-neutral) + L3-START
+           (W4-Anteil je Kampagnen-Scope-Antwort; C2-Vertrags-Testpaare sobald L4-
+           Vertrag steht). Summe P2-Nach-Trigger-Bau 26-40h — Rest W7 (RN-75).
+           Traeger #24/B4-Folge + HY-C. | Abh.: RN-04-Entscheid, RN-51-Messdaten.
+    RN-59  ##58/##58b ANHANG-WACHE (Soll ZUR LAUFZEIT messen; "28" UNBELEGT, real
+           10/12) + ##59 FF0-FF4-Abgabe-Gates. Traeger ##58/##59.
+    RN-60  ##60 C5-Zahlen + #98 F-07b 2D+3D-DIAGRAMME (Owner-KERN; b-graph-2d3d-
+           Branch nach RN-30; SOTA-Form) + ##19 LaTeX-/Ranking-Emitter + R-31-LaTeX-
+           Anlage in Abgabe. Traeger ##60/#98/##19.
+    RN-61  ##61 Backups + P-1 PRAESENS-WACHE 3/3 (Thesis-Zusagen gegen Bau-Stand).
+           Traeger ##61/P-1.
+    RN-62  P7: #130 = 16 UNGETRAGENE THESIS-AUFTRAEGE (Feinverteilung nach F-16;
+           K19-GEGENZAEHLUNG: jeder Auftrag -> Traeger + Wellen-Platz, gegen JA-Liste
+           gegengezaehlt) + #121-Pipeline-Vollzug + #77-Audit-Einarbeitung + #19
+           (Thesis-Textpflichten) + #66-Lizenz (W5-##62-Zulauf) + C.4-E-1-THESIS-
+           TEXTZUG (Drei-Projekte-Abgrenzung, Selbst-Optimierungs-Satz, UltiHash-
+           Prinzip; 18+1-Formel) + GOAL-G-23-Nachzug-Kontrolle (Praesens-Zusagen).
+           Traeger #130/#121/#77. | Abh.: RN-56, F-16.
+    RN-63  #88-MECHANIK-ANTEILE: Parameter-Filter-Registry RF-B + Lager-Typ 3+4-
+           MECHANIK (Schluessel-Schema kam Di 25 mit RN-19) + Hybrid-ML-Design +
+           kleine Hybride P-B..P-E-Details. Traeger #88. (Monolith-Split-Anteil = W7,
+           Owner-Wort, RN-74.)
+    RN-64  D-13 ADR-Register + D-16 KONFORMITAETS-REGISTER-NACHMESSUNG (R48; W4-
+           Realitaetsanker; seit 09.08. ungemessen) + D-21 Syntax+Semantik-
+           ABGABEPFLICHT. Traeger D-13/D-16/D-21.
+    RN-65  ##24/A9-S5a Archiv-xlsx (Rutsch aufgehoben) + ##42-##45-REST (FF-Matrix,
+           .ps1/.py-Abloesung, C5-Geruest, Thesis-Spur; 13.1 ohne Einzelquittung — je
+           Objekt-Blick im RN-17-Strang). Traeger ##24/##42-##45.
+    RN-66  BAND-RESTMENGEN W4: Band-B-Rest-W4-Anteile + Band C (MT-L8, PM-PAPI,
+           AG-PunktFixes; WinPCM W2/W4 [Runner online]; AmdL3 -> #87-Lane) + 14-Alt-
+           Posten-W4-Anteile + R17/K10-12-Wstringop (W4/W5-Randslot) + R-21..R-26/
+           R-29/R-34-Reste + HY-Ebene4(b)/HY-Kurvenlage/HY-Ausgaenge/HY-HonestEmpty
+           (W4-Band-A, 34h) + MT-L10/L11/L12/AG-GenusCount (W4-Band-B). Traeger #96-
+           Slots. | Abh.: RN-26-Feinplatzierung.
+    RN-67  VERTAGT-DESIGN-DURCHZUG: V7 HY-Mehrfach-Dock (HY-B-Design W3 -> W4-Bau
+           nach HY-C) + V8 Heuristik-Familie/scharfe Eviction + V9 Record-and-Replay-
+           BAU (R-22-Design war W2) + V10 PV-1 + Doku-Anker-Sanierung (W4/W5-
+           Randslots). Traeger je Zeile (aus VOLLLISTE 1.5).
+    RN-68  E-4-VOLLZUG-VORBEREITUNG: 4. Mess-Ebene ma-hy nach R5-Antwort (HY-C-/W4-
+           Fenster; Wert-3-Vergabe, Kanalwerk-/Legenden-Erweiterung; Reserve kam vor
+           Trigger). Traeger #90-Folge/HY-C. | Abh.: RN-05/R5=F-05.
+    RN-69  Kap.5-ERGEBNISTEIL (daten-gated) + A9-S3/S4/S5. Traeger W4-Text/##60.
+    RN-70  W4-SCHLUSS-GATE: F5-Stand Fr 11.09. (PDF-faehig, Anhang gegen Nenner,
+           P-1 3/3); RN-17-#128-Abgleich-ENDSTAND (74 Regressionen + 20 Konflikte +
+           34-GESTRICHEN-Neubewertung + 15-Traegerlos-Kontrolle: Differenzmengen
+           LEER, sonst namentlich in par.26-Nachtrag). Traeger Lead-Gate/#128.
+
+### FENSTER I — W5 Sa 12.-Di 15.09.
+
+    RN-71  T-3 MANUELLER RESET + ECHTE MESSUNG (~Sa 12.-Mo 14.09., KON41-01; Ende
+           der --debug-Aera; T-3-Ripple XML->PDF-Vollautomatik + Lager-Skip muss aus
+           W2/W3 stehen). Traeger T-3.
+    RN-72  ##62 W5-SICHERUNG: PDF sauberer Checkout, Spiegel, ABGABE Di 15.09.;
+           KEINE Test-Eingriffe, NUR Nachweise (Koeder-Protokolle, Nenner-Zeilen) in
+           die Abgabe-Doku; W5-Nicht-Bau-Anteile der 14er-Liste. Traeger ##62.
+    RN-73  SCHLUSS-KRITERIUM-KONTROLLE (GOAL G-62): jede ausgewiesene Zahl von
+           aelterer Messung gedeckt; jede sichernde Regel in einem WERKZEUG.
+           Traeger Lead.
+
+### FENSTER J — W7 / NACH ABGABE (NUR owner-entschiedene Kategorie C; KEIN Endlager)
+
+    RN-74  OV-14 Paper-Kopplung (+R71-Rest) · #88-MONOLITH-SPLIT (P-B/P-K; Owner-B3
+           "beim Aufraeumen") · C-1-Journal-Labels (NUR per Owner-Satz) · V13
+           Migration A1/A5/A7 · V14 G5/#274 · V15 Tools-Lagerhaltung (#32) · V16
+           #276 3-ISA-Teilmatrix (ausdruecklich ALLERLETZTE Aufgabe) · V17 Vortrag
+           (D-15). Traeger par.21.6-Tafel.
+    RN-75  #38a3 IO-VOLLAUSBAU (store()/load()-Genus-Vollzug, KON47-03; Kanalwerk-
+           Registrierungs-BAU-Rest aus C.2-Schritt-5/6) + L3-CONTAINER-VIER-W7-Anteil
+           (je Scope-Antwort) + T19-Katalog-Folgefrage (NICHT jetzt erfinden, C.3).
+           Traeger #38a3/#86-Folge.
+    RN-76  V19 g2-Funde 2-4 (L2-Optionen A/B) · V20 XML-Rueckfrage-Kandidaten K1-K4
+           (nach Abgabe buendeln) · V21 Posten-60/Klein-Hybride-Details · V22-
+           Kontrolle (bewusst-nie-Liste bleibt deklariert; Wiederaufnahme nur per
+           Entscheid). Traeger VOLLLISTE-1.5-Zeilen.
+
+## 24.2 P1-P10 — KURZVERZEICHNIS DER EINPLANUNG (Detail in den RN-Zeilen)
+
+    P1  E-10/#38a2-Bauzug + #86-ORG-19-Schritte-1-4 + W5-Grammatik-Slot -> RN-03/
+        RN-11 (+RN-37-Buchung); Design-Gate #133 ERFUELLT (DESIGN-h23); Frist Mi 26.
+        06:00. Das 18.6(3)-Deklarat (18.3/18.6/23.2) ist UEBERHOLT — Marker am Ort.
+    P2  D-08-Entscheid A/B Default A -> RN-04; Nach-Trigger-Bau L2/L3/L4 (26-40h)
+        -> RN-58 (W4) + RN-75 (W7-Anteil); L5 -> RN-01/RN-27; L6 -> RN-27 (9 Fund-
+        stellen); L7 -> RN-37. Label-Kollision Wellenplan-D-08 vs KON120-D-08:
+        Marker an 19.4.
+    P3  S-19-Sa-Kette GERISSEN -> neu terminiert: o2-Landung RN-01 -> GN-9 RN-06
+        (23./24.08.) -> S-19-ECHTLAUF RN-10 (Mo 24.) -> B-4-Zahl vor ##49 (RN-38);
+        K-3-Kipp Di 25. abends haelt. Kette per V6.10 in Ledger UND Checkliste
+        eintragen (RN-02-Ledger-Spiegel).
+    P4  94 offene Soll-Ist-Posten -> 24.3.1 (namentliche #96-Erweiterung, RN-26;
+        NZL-G-23 via RN-01).
+    P5  W1-Vollaudit-Restmenge 156/22/34/74/20/15 -> 24.3.2 (Traeger #128/#96 +
+        benannte Einzel-Traeger; Abgleich-Strang RN-17, Endstand-Gate RN-70).
+    P6  #40 = 38 NE-Posten/20 Auftraege -> RN-29 (Triage + T-UPD-2-Entscheid) +
+        RN-44 (Vollzug T-13/T-14) + Rest-Slots W4 via #96. 24.3.3.
+    P7  #130 = 16 Thesis-Auftraege -> RN-62 (+RN-56-Vorzieh); K19-Gegenzaehlung
+        Pflicht. 24.3.4.
+    P8  docs-/Prozess-Reste -> RN-27 (EIN Di-25-docs-Zug; AB-09 in RN-09; AB-10 in
+        RN-08; H-13 in RN-13); par.25 = OV-16/17-Buchung (Nummern-Deklaration Kopf).
+    P9  Ungeprueftes -> FJ-Endprobe RN-23 · Intel-Kreuzprobe RN-47 · #69 RN-28 ·
+        #65/#29 RN-15 · Remote-Divergenz RN-01 · Thesis-main RN-14 · 5 Branches
+        RN-30 (Explore-vor-Merge je Branch).
+    P10 Frist-freie Board-Posten -> #49 RN-41 · #53 RN-17 · #71/#74 RN-28 · #85
+        RN-27 · #87 RN-36 · #88 RN-63/RN-74 · #94 RN-25 · #98 RN-60 · #103 RN-29 ·
+        #112 RN-01 (KON122) · #123 RN-52 · #129 RN-17/RN-57 · #132 RN-36; Baender
+        22+37+5+14 -> RN-26-Feinplatzierung + RN-16/RN-54/RN-66-Slots. O-1-
+        Bezeichnungssystem -> RN-05 (Owner-Vorlage). "Frist-frei" heisst seit
+        20./23.08.: sofort in der Reihe, nie spaeter.
+
+## 24.3 MASSEN-BLOECKE — NAMENTLICH REFERENZIERTE UNTERLISTEN (kein Posten ohne Platz)
+
+    24.3.1  P4: 94 NOCH-ZU-LANDEN-Posten. QUELLE: ~/backups-workflow/20260822-lande-
+            zug/wellenplan-soll-ist.md (Tafeln 3-7; 23 NZL-G + 68 NZL-F + 3 Kategorie
+            C). FENSTER/TRAEGER: NZL-G-23 -> RN-01 (Lande-Zug, sequentiell); Tafel-4-
+            50 -> je Zeile das dort benannte Fenster (Di-25 -> RN-19..RN-31; vor
+            Trigger -> RN-32..RN-37; vor Sa 29 -> RN-43..RN-50; W2-Slots -> RN-12/
+            RN-13/RN-31); Tafel-5-6 (Wiederaufnahme-Sammel) -> RN-26; Tafel-6-12
+            (W3/W4/W5) -> RN-51..RN-72 je Etikett als SPAETESTE Frist; Tafel-7-3
+            (Kategorie C, Owner-Wort) -> RN-74. Abhak-Instanz: #96 (Di 25.) +
+            EINPLANUNGS-REGISTER Abschnitt B.
+    24.3.2  P5: W1-VOLLAUDIT-RESTMENGE. QUELLE: docs/sessions/backups/20260821-
+            vollaudit-welle1-stand/VOLLLISTE-features-aufgaben-k1-heute.md.
+            156 OFFEN-mit-Traeger (Sektion 1.4: 42 Board-Tasks + 16 F2-Fenster ->
+            RN-05 + 11 Freeze-Reste -> RN-19/RN-31 + 13 vor-Trigger -> RN-32..RN-37
+            + 14 vor-Kampagne -> RN-43..RN-49 + 22 Docs-Zug -> RN-27 + 38 weitere
+            getragene -> je Traeger-Zeile in RN-13..RN-75); 22 VERTAGT-mit-Traeger
+            (Sektion 1.5: V1-V6-Container -> RN-26; V7-V10 -> RN-67; V11-V18 ->
+            RN-74 [owner-entschieden]; V19-V21 -> RN-76; V22 deklariert); 34
+            GESTRICHEN/UEBERHOLT (Sektion 1.6) -> V10-NEUBEWERTUNGS-PRUEFPOSTEN im
+            RN-27-docs-Zug (je Zeile: Beleg noch tragfaehig? sonst Wiederaufnahme
+            via #96); 74 REGRESSIONEN (Sektion 5.1 R1-R74) -> Abgleich-Strang RN-17,
+            Fenster-Pflichten in RN-19/RN-32/RN-34/RN-35/RN-43..RN-47/RN-57/RN-64;
+            +1 Dauer-Fallen-Sammel (15 Klassen) -> Fallen-Register (Dauer); 20
+            STATUS-KONFLIKTE (Sektion 3 K-1..K-20) -> RN-17 (K-3 loest RN-03 am
+            Objekt; K-16 -> RN-05/P5-Form; K-10 -> RN-27-Marker); 15 TRAEGERLOS
+            (Sektion 2) -> JEDER hat jetzt einen Traeger: O1->RN-36 · O2->RN-05 ·
+            O3->RN-05 · O4->entlastet (Board lebt, H-30) · O5->RN-26 · O6->RN-27
+            (NP-Zug) · O7->RN-28 (#28) · O8->RN-19 (E1-E11-Design) · O9->RN-27 ·
+            O10->RN-27 · O11->RN-27 · O12->RN-27 · O13->RN-26 · O14->RN-27 ·
+            O15->RN-20 (#57-Design). Endstand-Gate: RN-70.
+    24.3.3  P6: #40-NE-REGISTER (38 NE-Posten/20 Auftraege seit W0b). QUELLE: Board-
+            Task #40 (+VOLLLISTE 1.4.a-Zeile #40). FENSTER: Triage RN-29 (Di 25.),
+            T-UPD-2-Entscheid RN-29 -> Vollzug RN-44 (vor W3), Rest-Slots W4 via
+            RN-26/#96. TRAEGER: #40. NUMMERNKREIS-WARNUNG: Board-#40 != v1-Paket
+            ##40 (par.7/21.3) — beide leben, getrennt fuehren.
+    24.3.4  P7: #130-THESIS-AUFTRAEGE (16 ungetragene aus 26 Kommentar-Commits,
+            KOMMENTAR-EXTRAKT.md 740 Z.). FENSTER: W4-Textwelle RN-62, Vorzieh
+            RN-56 (Overleaf-Remote, W3-konform); Feinverteilung nach F-16 (RN-05).
+            TRAEGER: #130 (+#121/#77). K19-GEGENZAEHLUNG Pflicht: 16/16 -> Traeger-
+            zeile, Differenz LEER.
+    24.3.5  P10-BAENDER (Wiederaufnahme par.21.3, NIE ausbuchen): 22 (Band B/W1,
+            62h) + 37 (B-Rest, ~104,5h) + 5 (Band C, 13h) + 14 (par.13.3-Liste).
+            QUELLE: par.21.3 + Wiederaufnahme-Register 0f569c8b + Designplan Tafel
+            B. FENSTER: NEU-SLOTTING durch RN-26 (alte WE-22./23.-Anker obsolet):
+            22er -> Mo/Di-Randslots (RN-16/RN-31) + W3-[lok] (RN-54); 37er -> W3-
+            [lok] (RN-54) + W4 (RN-66); 5er -> WinPCM W2/W4, AmdL3 #87 (RN-36-
+            Voraussetzung), MT-L8/PM-PAPI/AG-PunktFixes W4 (RN-66); 14er -> W4/W5-
+            Randslots (RN-66/RN-72). TRAEGER: #96.
+    24.3.6  GOAL-EIGENE OFFENE POSTEN (13, L-GOAL-Kondensat): G-09->RN-32 · G-12->
+            RN-36+RN-05 · G-23->RN-62 · G-37->RN-05+RN-47 · G-41->RN-19 · G-43->
+            RN-43 · G-44->RN-43 · G-48->RN-33 · G-50->RN-47 · G-55/D2->RN-31 ·
+            G-56/D5-Rest->RN-17-Kontrolle (Soll-Ist fuehrt G) · G-57/D3-4->RN-17-
+            Kontrolle (gelandet a558e87c) · G-59->RN-28.
+    24.3.7  DESIGNPLAN-OFFENE KLASSEN: T-12a->RN-43 · T-12b->RN-49 · T-12c-geltende-
+            Fassung (harter Abbruch) in RN-19-Arena-Tests · T-12d->RN-23 · T-12e->
+            RN-31 · D-3->RN-28 · D-4-Testseiten-Pflicht->RN-19/RN-20-Auflage ·
+            D-5->RN-31 · D-6->RN-35 · B-1-Rest/D3-1-Marker-Haelfte->RN-31 · PZW-
+            Nachzug->RN-01-Auflage · 117er-Summen-Sperre bleibt (neue Posten
+            GEZAEHLT daneben, nie eingerechnet).
+
+## 24.4 UEBERHOLT-MARKER 23.08. — VERZEICHNIS
+
+    IM WELLENPLAN AM ORT GESETZT (je "EINPLANUNGS-MARKER 23.08.2026 (par.24)"):
+    Kopf Z.9-11 (juengste Konsolidierung = par.24) · 18.3/#38a2-Zeile + 18.6(3)-
+    Fallzeile + 23.2-Deklarations-Tafel (P1: Doppel-JA, Bauzug statt Fallweg) ·
+    18.4/#7-Zeile (P3-Riss + Neuterminierung) · 19.4/D-08 (P2-Label-Kollision) ·
+    20.6/T-NEU-13 (P6-Nummernkreise) · 21.2 (P5: der versprochene Nachtrag = 24.3.2)
+    · 21.3-Kopf (Slot-Daten verstrichen -> RN-26) · 22.3-Kopf (Fenster-Stand
+    ueberholt; C-3a-Frist-Zeile durch KON120-06 ersetzt) · 22.4-Kopf (Z-Liste durch
+    24.3.1 fortgeschrieben) · 23.0 (Stand-Anker HISTORIE; 24.0 gilt) · 23.1-Kopf
+    ("bis Fr"-Entscheide verstrichen -> je Posten neuer Termin in 24.1).
+    WEITERE WELLENPLAN-INTERNE KANDIDATEN (Marker-Setzung im RN-27-docs-Zug, hier
+    benannt): par.13.3-#87 (Stufigkeits-Ordnung) vs Board-#87 (Talos-Lane) =
+    Nummernkreis-Kollision ausweisen (L-WELLENPLAN E-8) · par.8-OV-16/17-Zeilen:
+    Buchungs-Vermerk nach par.25 (E-9) · par.20.7(2) "WE 22./23. ueberbucht":
+    verstrichen, Posten via RN-06/RN-10/RN-16/RN-35 neu geslottet (E-11) · par.9-R-6/
+    22.1-U-2/23.3-L-N3 Platten-Zahlen: lebende Werte, vor jedem Vollbau NEU messen
+    (E-12, s. 24.5(4)).
+    VORSCHLAEGE FUER DIE ANDEREN DREI REFERENZDOKUMENTE (Einbau via RN-27, additiv
+    + datiert, Marker AM ORT): GOAL UE-1..UE-9 (L-GOAL Tafel 3; Andockung Tafel 4)
+    · Designplan-Kandidaten 1-9 (L-DESIGNPLAN Tafel E; par.13-Nachtrag nach Muster
+    par.9-12) · ARBEITSWEISE T4-1..T4-10 (L-ARBEITSWEISE; NUR als B.3-NACHTRAG +
+    REGEL-KANDIDATEN, Teil A/V owner-gated, Pflege-Regel 1).
+
+## 24.5 BETRIEBS-KOLLISIONS-AUFLOESUNG (damit der Plan keinen Regelbruch einplant)
+
+    (1) EIN-BLECH/EXKLUSIVITAET (GOAL VII.2): W2-Bau-Fenster Mi-Do und W3-Kampagne
+        tragen NULL CI-/Agenten-Last auf prod1. Alle RN-Zeilen der Fenster E/G sind
+        entweder Bau-/Kampagnen-Betrieb selbst, [lok]-Posten ohne Landung, reine
+        Doku/Design (0 CI) oder Overleaf-Textarbeit. Landungen sammeln sich vor Mi
+        26. 06:00 bzw. nach F4.
+    (2) SEQUENTIELL LANDEN (O-6/O-8, K26-Aufraeum-Modus): genau EINE Landebahn;
+        Reihenfolge RN-01 -> RN-02 -> RN-11 -> Di-25-Zuege einzeln (RN-19..RN-31)
+        -> RN-38. Kein gleichzeitiges Mergen; Worktree-Loeschung nur nach rekursiver
+        Nested-Pruefung.
+    (3) PARALLELITAET nur owner-geordert: Lande-Zug (laeuft), E-10-Bauzug (Owner
+        "SOFORT"/Doppel-JA), laufende benannte Agenten. Alles Uebrige sequentiell
+        in RN-Reihenfolge.
+    (4) 3-VOLLBAU-DECKEL prod1 (A2.1(a2)) + df-Gate <5G (A2.1(a)) rahmen jeden
+        Bau-Slot; E-12-Platten-Zahlen vor Vollbauten NEU messen.
+    (5) TECHNISCHE DECKEL bleiben (Owner 20.08.): Zeithorizonte uebergehen heisst
+        sofort ARBEITEN, nicht Deckel brechen.
+
+## 24.6 VOLLZAEHLIGKEITS-GEGENZAEHLUNG
+
+    P1-P10: 10/10 in RN-Zeilen (24.2). RN-Plaetze: 76. Massen-Bloecke: 7 Unterlisten
+    (24.3.1-24.3.7), jede mit Quell-Datei + Fenster + Traeger; innere Zaehler:
+    94 (23+68+3) · 156+22+34+74(+1 Sammel)+20+15 · 38/20 · 16 · 22+37+5+14 · 13
+    GOAL-Posten · Designplan-Klassen. Leser-Tafel-Posten: L-GOAL 62 (G-01..G-62,
+    13 offene einzeln getragen via 24.3.6, Rest AKTIV-Doktrin/Historie) ·
+    L-WELLENPLAN ~340 benannte IDs (ueber RN-01..RN-76 + 24.3-Container) ·
+    L-DESIGNPLAN 175 Eintraege (117er-Katalog via Baender/24.3.5 + Zusatzklassen
+    24.3.7) · L-ARBEITSWEISE 59 Posten (52 je-Vorgang-Pflichten = stehende Doktrin,
+    kein Wellen-Platz noetig; O-1..O-5-Status via RN-05/RN-27). Zeilengenaue
+    Gegenzaehlung (jeder Quell-Posten -> RN-Zeile; Differenzmenge LEER):
+    ~/backups-workflow/20260823-wellenplan-update/EINPLANUNGS-REGISTER.md.
+    Naechste freie Nachtrags-Nummer: par.25 (reserviert fuer OV-16/17-Buchung,
+    RN-27); par.26 = RN-70-Endstand-Nachtrag falls Differenzmengen nicht leer.
