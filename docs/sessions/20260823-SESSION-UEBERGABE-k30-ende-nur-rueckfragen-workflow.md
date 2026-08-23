@@ -61,6 +61,20 @@ TEIL I (Live-Register mit Spend-Risiko je Lauf).
 - 🔴 **Beide erst nach 18:30 UTC ansprechen** — jede Zustellung vorher weckt sie in einen
   toten Zustand.
 
+## 2b. NACHTRAG 23.08. abends — OWNER-GELIEFERTES ABBRUCH-PROTOKOLL (Beweis)
+
+Der Owner hat die Abbruch-Sequenz aus dem K30-Terminal nachgereicht; sie BESTAETIGT die
+Lage dieses Dokuments am Objekt: 6x "Stop Task ... stopped" (Lande-Zug, Rueckfragen-12W,
+Wellenplan, W2-Audit, Resume-Abschluss, Opus-6K-Sweep) + 1x "Error: Task wfw1h1o2o is not
+running (status: completed)" (Explore-Buendel T2 war regulaer fertig; sein Gate starb
+danach am Limit) + "Agent (resumed) failed ... session limit" (= Endstand-Pruefer) +
+"Teammate @cifix-vl3-debug failed ... session limit" — beide Peers Limit-Tod,
+"resets 6:30pm (UTC)" woertlich. RESUME-VOLLZUG K31 (23.08. ~20:10 UTC): CI 16101 =
+SUCCESS @ 3841d717 gemessen (Gate erfuellt; CAVE: API-Host ist gitlab.comdare.LOCAL,
+die .de-Zeile in Abschn. 3 war falsch), alle 7 Workflows resumed, beide Peers mit
+koordinierten Ordern geweckt (Ein-Schreiber: Raeumung NUR im Lande-Zug; Fahrer liefert
+nur Teil-2-Meldung; Pruefer faehrt Full-Join-Endprobe read-only gegen 3841d717).
+
 ## 3. VOLLZUEGE DIESES KONTEXTS (fuer KON122)
 
 - 🎉 **CI-16095-HEILUNG KOMPLETT GELANDET**: ce development @ **3841d717**
