@@ -261,3 +261,15 @@ Marke · #139 Eingangs-Auflagen F-143/F-144(erledigt) · NEU-Traeger kampvor-
 super (F-154) + golden-E-11-Terminierung · KON122-A..D via ledger_nachtrag.sh
 (Lead, im Sammel-Ledger-Zug S-5/L-08). W2-Audit-Workflow wf_98cabd77:
 TERMINAL, kein Resume mehr noetig.
+
+## 10. NACHTRAG ~12:54: RUECKFRAGEN-SYNTHESE OWNER-PAUSIERT
+
+Owner-Order verbatim: "Bitte pausiere die rueckfragen synthese, wir laufen sie
+spaeter zuende." Task wikwy9yz3 (wf_c37fb077-ef7) GESTOPPT 12:54Z.
+Stand: Journal 19/16; riss-sicher auf Platte: 12/12 Stufe-1-Kondensate +
+KONSOLIDAT.md + fold/-Versionskopien (je Schritt). RESUME SPAETER:
+Workflow({scriptPath: "~/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-
+e3fda9ac35a1/workflows/scripts/rueckfragen-synthese-2stufig-wf_c37fb077-ef7.js",
+resumeFromRunId: "wf_c37fb077-ef7"}) — fertige Folds aus Cache, naechster Fold
+liest KONSOLIDAT.md, danach Ledger-Finale + Gegenlese+A2.5. Weiter laufen:
+W2-Abschluss (wi630fc5e) + Lande-Zug (wjagljq3t).
