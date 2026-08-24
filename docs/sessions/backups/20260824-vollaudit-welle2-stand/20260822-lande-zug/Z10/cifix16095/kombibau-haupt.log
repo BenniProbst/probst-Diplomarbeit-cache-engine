@@ -1,0 +1,16 @@
+Z10-KOMBIBAU-CIFIX16095 db66714a 2026-08-23T08:45:41Z
+J-1-LISTE LITERAL: comdare_adhoc_emitter_cli comdare_anatomy_codegen_cli comdare_axis_registry_gen comdare_catalog_codegen_cli comdare_measurement_axis_registry_gen comdare_overlay_source_hash_gen comdare_system_axis_registry_gen
+===== ZELLE gcc-rel (gcc-15/Release) START 08:45:41 =====
+DF-GATE gcc-rel: 19G frei
+100% tests passed, 0 tests failed out of 544
+ZELLE gcc-rel GRUEN
+===== ZELLE clang-rel (clang-22/Release) START 08:48:28 =====
+DF-GATE clang-rel: 19G frei
+100% tests passed, 0 tests failed out of 544
+ZELLE clang-rel GRUEN
+===== ZELLE gcc-dbg (gcc-15/Debug) START 08:50:59 =====
+DF-GATE gcc-dbg: 19G frei
+100% tests passed, 0 tests failed out of 544
+ZELLE gcc-dbg GRUEN
+===== ZELLE clang-dbg (clang-22/Debug) START 08:54:22 =====
+DF-GATE clang-dbg: 19G frei

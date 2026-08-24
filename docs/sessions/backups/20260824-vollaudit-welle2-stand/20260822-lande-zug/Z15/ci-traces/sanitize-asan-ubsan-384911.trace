@@ -1,0 +1,637 @@
+2026-08-24T12:24:22.241143Z 00O [0KRunning with gitlab-runner 19.1.1 (24b9b726)[0;m
+2026-08-24T12:24:22.241152Z 00O [0K  on prod-baremetal-prod1 GjoKPir1B, system ID: s_409f14fb9041[0;m
+2026-08-24T12:24:22.241155Z 00O [0K  feature flags: FF_USE_LEGACY_S3_CACHE_ADAPTER:true[0;m
+2026-08-24T12:24:22.241171Z 00O section_start:1787574262:prepare_executor[0K
+2026-08-24T12:24:22.241173Z 00O+[0K[36;1mPreparing the "shell" executor[0;m[0;m
+2026-08-24T12:24:22.241223Z 00O [0KUsing Shell (bash) executor...[0;m
+2026-08-24T12:24:22.241224Z 00O section_end:1787574262:prepare_executor[0K
+2026-08-24T12:24:22.241301Z 00O+section_start:1787574262:prepare_script[0K
+2026-08-24T12:24:22.241302Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-08-24T12:24:22.274424Z 01O Running on prod1...
+2026-08-24T12:24:22.275798Z 00O section_end:1787574262:prepare_script[0K
+2026-08-24T12:24:22.276130Z 00O+section_start:1787574262:get_sources[0K
+2026-08-24T12:24:22.276134Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-08-24T12:24:22.287095Z 01O [32;1m$ export GIT_CONFIG_SYSTEM=/dev/null # collapsed multi-line command[0;m
+2026-08-24T12:24:22.294635Z 01O [32;1mGitaly correlation ID: 01M0SVN5H0XWEGDCFBKT6QK2CT[0;m
+2026-08-24T12:24:22.297500Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-08-24T12:24:22.298290Z 01O Reinitialized existing Git repository in /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/.git/
+2026-08-24T12:24:23.451981Z 01O [32;1mChecking out 16c90628 as detached HEAD (ref is development)...[0;m
+2026-08-24T12:24:23.516769Z 01O Removing .ccache/
+2026-08-24T12:24:23.516774Z 01O Removing build-clang/
+2026-08-24T12:24:23.516775Z 01O Removing ce-pin/
+2026-08-24T12:24:23.518669Z 01O [32;1mUpdating/initializing submodules recursively with git depth set to 20...[0;m
+2026-08-24T12:24:23.559243Z 01O [32;1mUpdated submodules[0;m
+2026-08-24T12:24:23.574347Z 01O [32;1mConfiguring submodules to use parent git credentials...[0;m
+2026-08-24T12:24:23.584502Z 00O section_end:1787574263:get_sources[0K
+2026-08-24T12:24:23.584856Z 00O+section_start:1787574263:restore_cache[0K
+2026-08-24T12:24:23.584859Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-08-24T12:24:23.643121Z 01O [32;1mChecking cache for ccache-comdare-prt-art-asan-protected...[0;m
+2026-08-24T12:24:23.668393Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=2327542 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-08-24T12:24:23.668427Z 01E Using presigned URL for cache download            [0;m 
+2026-08-24T12:24:23.713998Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/287/28/285756d7c641837ff7212ae790b868380cc862c8a7dc32521841d5b461a41c57 primary_modified[0;m=2026-08-20 13:19:59 +0000 UTC primary_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/287/ccache-comdare-prt-art-asan-protected
+2026-08-24T12:24:23.802850Z 01E Downloading cache from https://minio.comdare.de:9000/buildsystem-cache/project/287/ccache-comdare-prt-art-asan-protected[0;m  etag[0;m="76c585f42076ed4045cbfc1752d8f7bd"
+2026-08-24T12:24:24.273837Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-08-24T12:24:24.275166Z 00O section_end:1787574264:restore_cache[0K
+2026-08-24T12:24:24.275514Z 00O+section_start:1787574264:step_script[0K
+2026-08-24T12:24:24.275521Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-08-24T12:24:24.304099Z 01O [32;1m$ export GIT_CONFIG_SYSTEM=/dev/null # collapsed multi-line command[0;m
+2026-08-24T12:24:24.304497Z 01O [32;1m$ cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler"); (ninja --version || echo "kein ninja")[0;m
+2026-08-24T12:24:24.307307Z 01O cmake version 4.3.4
+2026-08-24T12:24:24.307308Z 01O 
+2026-08-24T12:24:24.307308Z 01O CMake suite maintained and supported by Kitware (kitware.com/cmake).
+2026-08-24T12:24:24.308186Z 01O g++ (GCC) 15.3.0
+2026-08-24T12:24:24.308198Z 01O Copyright (C) 2025 Free Software Foundation, Inc.
+2026-08-24T12:24:24.308198Z 01O This is free software; see the source for copying conditions.  There is NO
+2026-08-24T12:24:24.308199Z 01O warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+2026-08-24T12:24:24.308199Z 01O 
+2026-08-24T12:24:24.308917Z 01O 1.13.1
+2026-08-24T12:24:24.309193Z 01O [32;1m$ git clone --no-checkout --reference-if-able ../comdare-cache-engine --dissociate "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH%/*}/comdare-cache-engine.git" ce-pin[0;m
+2026-08-24T12:24:24.309833Z 01E Cloning into 'ce-pin'...
+2026-08-24T12:24:24.310314Z 01E info: Could not add alternate for '../comdare-cache-engine': reference repository '../comdare-cache-engine' is shallow
+2026-08-24T12:24:28.522285Z 01O [32;1m$ git -C ce-pin checkout --detach "$COMDARE_CE_PIN_SHA"[0;m
+2026-08-24T12:24:28.806681Z 01E HEAD is now at 66de5c09 Fixture-Spiegel fuer den super-XSD-Verbund-Patch (L4-Atomaritaet; fixture_sync-Wache), Abnahme 1 Zelle deklariert (XML-only).
+2026-08-24T12:24:28.808778Z 01O [32;1m$ echo "ce-Pin ausgecheckt: $(git -C ce-pin rev-parse HEAD) (SOLL $COMDARE_CE_PIN_SHA)"[0;m
+2026-08-24T12:24:28.809970Z 01O ce-Pin ausgecheckt: 66de5c0972290ec1ae3d219988ecc207d8f5de6b (SOLL 66de5c0972290ec1ae3d219988ecc207d8f5de6b)
+2026-08-24T12:24:28.809975Z 01O [32;1m$ cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCOMDARE_CACHE_ENGINE_DIR=$CI_PROJECT_DIR/ce-pin -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"[0;m
+2026-08-24T12:24:28.867990Z 01O -- The CXX compiler identification is GNU 15.3.0
+2026-08-24T12:24:28.871872Z 01O -- Detecting CXX compiler ABI info
+2026-08-24T12:24:28.904644Z 01O -- Detecting CXX compiler ABI info - done
+2026-08-24T12:24:28.909968Z 01O -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-08-24T12:24:28.910269Z 01O -- Detecting CXX compile features
+2026-08-24T12:24:28.910606Z 01O -- Detecting CXX compile features - done
+2026-08-24T12:24:29.016472Z 01O -- The C compiler identification is GNU 15.3.0
+2026-08-24T12:24:29.020247Z 01O -- Detecting C compiler ABI info
+2026-08-24T12:24:29.048451Z 01O -- Detecting C compiler ABI info - done
+2026-08-24T12:24:29.053350Z 01O -- Check for working C compiler: /usr/bin/cc - skipped
+2026-08-24T12:24:29.053495Z 01O -- Detecting C compile features
+2026-08-24T12:24:29.053677Z 01O -- Detecting C compile features - done
+2026-08-24T12:24:29.056376Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-08-24T12:24:29.101667Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-08-24T12:24:29.102102Z 01O -- Found Threads: TRUE
+2026-08-24T12:24:29.106225Z 01O -- [PRT-ART V9.4] legacy_reimpl/ skipped (default OFF).
+2026-08-24T12:24:29.106460Z 01E CMake Warning at prt_art/registry_gen/CMakeLists.txt:29 (message):
+2026-08-24T12:24:29.106461Z 01E   prt_art_axis_registry_gen: COMDARE_CE_GENERATED_DIR nicht gesetzt.
+2026-08-24T12:24:29.106461Z 01E 
+2026-08-24T12:24:29.106461Z 01E   Das golden-verdrahtete PathCompression-Organ zieht die CMake-generierte
+2026-08-24T12:24:29.106462Z 01E   flags.hpp der cache-engine.
+2026-08-24T12:24:29.106462Z 01E 
+2026-08-24T12:24:29.106462Z 01E   Setze -DCOMDARE_CE_GENERATED_DIR=<cache-engine-build>/generated (Build
+2026-08-24T12:24:29.106462Z 01E   zuvor konfigurieren).
+2026-08-24T12:24:29.106463Z 01E 
+2026-08-24T12:24:29.106463Z 01E 
+2026-08-24T12:24:29.106474Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:29.106475Z 01O -- comdare-prt-art 0.1.0
+2026-08-24T12:24:29.106477Z 01O --   C++ Standard            : 23
+2026-08-24T12:24:29.106482Z 01O --   Cache-Engine Werkzeug   : /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/ce-pin
+2026-08-24T12:24:29.106483Z 01O --   Use Cache-Engine sub    : OFF
+2026-08-24T12:24:29.106483Z 01O --   Build Tests             : ON
+2026-08-24T12:24:29.106489Z 01O --   Build Legacy-Reimpl V9.4: OFF
+2026-08-24T12:24:29.106489Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:29.106618Z 01O -- Configuring done (0.3s)
+2026-08-24T12:24:29.118082Z 01O -- Generating done (0.0s)
+2026-08-24T12:24:29.118257Z 01O -- Build files have been written to: /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/build-san
+2026-08-24T12:24:29.120932Z 01O [32;1m$ cmake --build build-san[0;m
+2026-08-24T12:24:29.137922Z 01O [1/60] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+2026-08-24T12:24:29.197954Z 01O [2/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_memory_layout.cpp for CXX dependencies
+2026-08-24T12:24:29.198406Z 01O [3/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_value_handle.cpp for CXX dependencies
+2026-08-24T12:24:29.199276Z 01O [4/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_internal_search.cpp for CXX dependencies
+2026-08-24T12:24:29.201169Z 01O [5/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_prt_art_nodes.cpp for CXX dependencies
+2026-08-24T12:24:29.206312Z 01O [6/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_allocator_pools.cpp for CXX dependencies
+2026-08-24T12:24:29.224903Z 01O [7/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_olc_with_reserved_blocks.cpp for CXX dependencies
+2026-08-24T12:24:29.272143Z 01O [8/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp for CXX dependencies
+2026-08-24T12:24:29.273335Z 01O [9/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_measurement.cpp for CXX dependencies
+2026-08-24T12:24:29.275578Z 01O [10/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_prefetch_strategies.cpp for CXX dependencies
+2026-08-24T12:24:29.280170Z 01O [11/60] Building CXX object _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+2026-08-24T12:24:29.282507Z 01O [12/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_lizenz_konsistenz.cpp for CXX dependencies
+2026-08-24T12:24:29.282862Z 01O [13/60] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+2026-08-24T12:24:29.283298Z 01O [14/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_prt_art_identity.cpp for CXX dependencies
+2026-08-24T12:24:29.285553Z 01O [15/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prt_art_nodes.dir/CXX.dd
+2026-08-24T12:24:29.285667Z 01O [16/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_internal_search.dir/CXX.dd
+2026-08-24T12:24:29.285769Z 01O [17/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_value_handle.dir/CXX.dd
+2026-08-24T12:24:29.287975Z 01O [18/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_memory_layout.dir/CXX.dd
+2026-08-24T12:24:29.288190Z 01O [19/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_allocator_pools.dir/CXX.dd
+2026-08-24T12:24:29.288323Z 01O [20/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_olc_with_reserved_blocks.dir/CXX.dd
+2026-08-24T12:24:29.290661Z 01O [21/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prefetch_strategies.dir/CXX.dd
+2026-08-24T12:24:29.290788Z 01O [22/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_measurement.dir/CXX.dd
+2026-08-24T12:24:29.290883Z 01O [23/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prt_art_identity.dir/CXX.dd
+2026-08-24T12:24:29.293065Z 01O [24/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_serialization_and_buffer.dir/CXX.dd
+2026-08-24T12:24:29.293154Z 01O [25/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_lizenz_konsistenz.dir/CXX.dd
+2026-08-24T12:24:29.293579Z 01O [26/60] Building CXX object _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+2026-08-24T12:24:29.297376Z 01O [27/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_default_lookup_registry.cpp for CXX dependencies
+2026-08-24T12:24:29.300835Z 01O [28/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_default_lookup_registry.dir/CXX.dd
+2026-08-24T12:24:29.318111Z 01O [29/60] Linking CXX static library lib/libgtest.a
+2026-08-24T12:24:29.343900Z 01O [30/60] Scanning /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_leaf_only_counter.cpp for CXX dependencies
+2026-08-24T12:24:29.346695Z 01O [31/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_leaf_only_counter.dir/CXX.dd
+2026-08-24T12:24:29.346993Z 01O [32/60] Linking CXX static library lib/libgmock.a
+2026-08-24T12:24:29.364407Z 01O [33/60] Linking CXX static library lib/libgtest_main.a
+2026-08-24T12:24:30.377552Z 01O [34/60] Building CXX object tests/unit/CMakeFiles/test_allocator_pools.dir/test_allocator_pools.cpp.o
+2026-08-24T12:24:30.500100Z 01O [35/60] Building CXX object tests/unit/CMakeFiles/test_prt_art_nodes.dir/test_prt_art_nodes.cpp.o
+2026-08-24T12:24:30.703591Z 01O [36/60] Building CXX object tests/unit/CMakeFiles/test_olc_with_reserved_blocks.dir/test_olc_with_reserved_blocks.cpp.o
+2026-08-24T12:24:30.712357Z 01O [37/60] Building CXX object tests/unit/CMakeFiles/test_memory_layout.dir/test_memory_layout.cpp.o
+2026-08-24T12:24:30.717136Z 01O [38/60] Building CXX object tests/unit/CMakeFiles/test_value_handle.dir/test_value_handle.cpp.o
+2026-08-24T12:24:30.880482Z 01O [39/60] Building CXX object tests/unit/CMakeFiles/test_internal_search.dir/test_internal_search.cpp.o
+2026-08-24T12:24:31.515383Z 01O [40/60] Building CXX object tests/unit/CMakeFiles/test_prefetch_strategies.dir/test_prefetch_strategies.cpp.o
+2026-08-24T12:24:31.836535Z 01O [41/60] Building CXX object tests/unit/CMakeFiles/test_default_lookup_registry.dir/test_default_lookup_registry.cpp.o
+2026-08-24T12:24:31.852463Z 01O [42/60] Linking CXX static library lib/libgmock_main.a
+2026-08-24T12:24:31.936932Z 01O [43/60] Linking CXX executable tests/unit/test_prt_art_nodes
+2026-08-24T12:24:32.021779Z 01O [44/60] Linking CXX executable tests/unit/test_internal_search
+2026-08-24T12:24:32.105345Z 01O [45/60] Linking CXX executable tests/unit/test_value_handle
+2026-08-24T12:24:32.107008Z 01O [46/60] Building CXX object tests/unit/CMakeFiles/test_measurement.dir/test_measurement.cpp.o
+2026-08-24T12:24:32.187821Z 01O [47/60] Linking CXX executable tests/unit/test_allocator_pools
+2026-08-24T12:24:32.189704Z 01O [48/60] Linking CXX executable tests/unit/test_memory_layout
+2026-08-24T12:24:32.271054Z 01O [49/60] Linking CXX executable tests/unit/test_olc_with_reserved_blocks
+2026-08-24T12:24:32.271482Z 01O [50/60] Linking CXX executable tests/unit/test_prefetch_strategies
+2026-08-24T12:24:32.320194Z 01O [51/60] Building CXX object tests/unit/CMakeFiles/test_serialization_and_buffer.dir/test_serialization_and_buffer.cpp.o
+2026-08-24T12:24:32.320200Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp: In member function ‘virtual void LinearValueBuffer_ShouldCompactBelowThreshold_Test::TestBody()’:
+2026-08-24T12:24:32.320202Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp:145:41: warning: ignoring return value of ‘uint64_t comdare::prt_art::value_buffer::LinearValueBuffer::append(std::span<const std::byte>)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+2026-08-24T12:24:32.320203Z 01O   145 |     for (int i = 0; i < 5; ++i) b.append(std::span<std::byte const>(v.data(), v.size()));
+2026-08-24T12:24:32.320203Z 01O       |                                 ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-08-24T12:24:32.320204Z 01O In file included from /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp:5:
+2026-08-24T12:24:32.320205Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/prt_art/include/prt_art/value_buffer/linear_value_buffer.hpp:25:33: note: declared here
+2026-08-24T12:24:32.320205Z 01O    25 |     [[nodiscard]] std::uint64_t append(std::span<std::byte const> payload) {
+2026-08-24T12:24:32.320206Z 01O       |                                 ^~~~~~
+2026-08-24T12:24:32.320206Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp: In member function ‘virtual void LinearValueBuffer_ShouldCompactAboveThreshold_Test::TestBody()’:
+2026-08-24T12:24:32.320216Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp:153:41: warning: ignoring return value of ‘uint64_t comdare::prt_art::value_buffer::LinearValueBuffer::append(std::span<const std::byte>)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+2026-08-24T12:24:32.320217Z 01O   153 |     for (int i = 0; i < 5; ++i) b.append(std::span<std::byte const>(v.data(), v.size()));
+2026-08-24T12:24:32.320217Z 01O       |                                 ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-08-24T12:24:32.320217Z 01O /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/prt_art/include/prt_art/value_buffer/linear_value_buffer.hpp:25:33: note: declared here
+2026-08-24T12:24:32.320218Z 01O    25 |     [[nodiscard]] std::uint64_t append(std::span<std::byte const> payload) {
+2026-08-24T12:24:32.320218Z 01O       |                                 ^~~~~~
+2026-08-24T12:24:32.346247Z 01O [52/60] Linking CXX executable tests/unit/test_default_lookup_registry
+2026-08-24T12:24:32.357748Z 01O [53/60] Linking CXX executable tests/unit/test_measurement
+2026-08-24T12:24:32.397062Z 01O [54/60] Linking CXX executable tests/unit/test_serialization_and_buffer
+2026-08-24T12:24:32.454238Z 01O [55/60] Building CXX object tests/unit/CMakeFiles/test_lizenz_konsistenz.dir/test_lizenz_konsistenz.cpp.o
+2026-08-24T12:24:32.534649Z 01O [56/60] Linking CXX executable tests/unit/test_lizenz_konsistenz
+2026-08-24T12:24:33.002464Z 01O [57/60] Building CXX object tests/unit/CMakeFiles/test_leaf_only_counter.dir/test_leaf_only_counter.cpp.o
+2026-08-24T12:24:33.078296Z 01O [58/60] Linking CXX executable tests/unit/test_leaf_only_counter
+2026-08-24T12:24:34.627433Z 01O [59/60] Building CXX object tests/unit/CMakeFiles/test_prt_art_identity.dir/test_prt_art_identity.cpp.o
+2026-08-24T12:24:34.730640Z 01O [60/60] Linking CXX executable tests/unit/test_prt_art_identity
+2026-08-24T12:24:34.731763Z 01O [32;1m$ ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1 ctest --test-dir build-san --output-on-failure[0;m
+2026-08-24T12:24:34.735025Z 01O Test project /home/gitlab-runner/builds/GjoKPir1B/2/comdare/research/comdare-prt-art/build-san
+2026-08-24T12:24:34.737677Z 01O         Start   1: RedirectNode.PriorityIsP0
+2026-08-24T12:24:34.744585Z 01O   1/224 Test   #1: RedirectNode.PriorityIsP0 .................................................   Passed    0.01 sec
+2026-08-24T12:24:34.744708Z 01O         Start   2: RedirectNode.StoresRestSuffix
+2026-08-24T12:24:34.751733Z 01O   2/224 Test   #2: RedirectNode.StoresRestSuffix .............................................   Passed    0.01 sec
+2026-08-24T12:24:34.751799Z 01O         Start   3: RedirectNode.FullMatchReturnsAllBytes
+2026-08-24T12:24:34.758463Z 01O   3/224 Test   #3: RedirectNode.FullMatchReturnsAllBytes .....................................   Passed    0.01 sec
+2026-08-24T12:24:34.758532Z 01O         Start   4: RedirectNode.PartialMatchReturnsMatchedPrefixLen
+2026-08-24T12:24:34.765154Z 01O   4/224 Test   #4: RedirectNode.PartialMatchReturnsMatchedPrefixLen ..........................   Passed    0.01 sec
+2026-08-24T12:24:34.765228Z 01O         Start   5: RedirectNode.ShortKeyReturnsLengthOfKey
+2026-08-24T12:24:34.771979Z 01O   5/224 Test   #5: RedirectNode.ShortKeyReturnsLengthOfKey ...................................   Passed    0.01 sec
+2026-08-24T12:24:34.772044Z 01O         Start   6: BPlusNode.PriorityIsP0
+2026-08-24T12:24:34.778235Z 01O   6/224 Test   #6: BPlusNode.PriorityIsP0 ....................................................   Passed    0.01 sec
+2026-08-24T12:24:34.778297Z 01O         Start   7: BPlusNode.DefaultKindIsArray256
+2026-08-24T12:24:34.784889Z 01O   7/224 Test   #7: BPlusNode.DefaultKindIsArray256 ...........................................   Passed    0.01 sec
+2026-08-24T12:24:34.784959Z 01O         Start   8: BPlusNode.InsertSlotIncrementsKeyCount
+2026-08-24T12:24:34.792663Z 01O   8/224 Test   #8: BPlusNode.InsertSlotIncrementsKeyCount ....................................   Passed    0.01 sec
+2026-08-24T12:24:34.792741Z 01O         Start   9: BPlusNode.DensityCalculationMatchesCapacity
+2026-08-24T12:24:34.799709Z 01O   9/224 Test   #9: BPlusNode.DensityCalculationMatchesCapacity ...............................   Passed    0.01 sec
+2026-08-24T12:24:34.799777Z 01O         Start  10: BPlusNode.RecommendedKindFollowsThresholds
+2026-08-24T12:24:34.806972Z 01O  10/224 Test  #10: BPlusNode.RecommendedKindFollowsThresholds ................................   Passed    0.01 sec
+2026-08-24T12:24:34.807039Z 01O         Start  11: BPlusNode.CapacityForKindMatchesSpec
+2026-08-24T12:24:34.814076Z 01O  11/224 Test  #11: BPlusNode.CapacityForKindMatchesSpec ......................................   Passed    0.01 sec
+2026-08-24T12:24:34.814147Z 01O         Start  12: BPlusNode.FourInternalSearchKindsAreDistinct
+2026-08-24T12:24:34.821777Z 01O  12/224 Test  #12: BPlusNode.FourInternalSearchKindsAreDistinct ..............................   Passed    0.01 sec
+2026-08-24T12:24:34.821861Z 01O         Start  13: Array256.CapacityAndDensityThreshold
+2026-08-24T12:24:34.829590Z 01O  13/224 Test  #13: Array256.CapacityAndDensityThreshold ......................................   Passed    0.01 sec
+2026-08-24T12:24:34.829668Z 01O         Start  14: Array256.EmptyLookupReturnsNullopt
+2026-08-24T12:24:34.836990Z 01O  14/224 Test  #14: Array256.EmptyLookupReturnsNullopt ........................................   Passed    0.01 sec
+2026-08-24T12:24:34.837068Z 01O         Start  15: Array256.InsertAndLookup
+2026-08-24T12:24:34.844950Z 01O  15/224 Test  #15: Array256.InsertAndLookup ..................................................   Passed    0.01 sec
+2026-08-24T12:24:34.845018Z 01O         Start  16: Array256.EraseRemovesEntry
+2026-08-24T12:24:34.851643Z 01O  16/224 Test  #16: Array256.EraseRemovesEntry ................................................   Passed    0.01 sec
+2026-08-24T12:24:34.851701Z 01O         Start  17: Array256.DensityCalculation
+2026-08-24T12:24:34.858669Z 01O  17/224 Test  #17: Array256.DensityCalculation ...............................................   Passed    0.01 sec
+2026-08-24T12:24:34.858739Z 01O         Start  18: Array65535.CapacityAndDensityThresholds
+2026-08-24T12:24:34.865908Z 01O  18/224 Test  #18: Array65535.CapacityAndDensityThresholds ...................................   Passed    0.01 sec
+2026-08-24T12:24:34.865984Z 01O         Start  19: Array65535.InsertAndLookup
+2026-08-24T12:24:34.873395Z 01O  19/224 Test  #19: Array65535.InsertAndLookup ................................................   Passed    0.01 sec
+2026-08-24T12:24:34.873481Z 01O         Start  20: Array65535.MaxDiscriminator65535InBounds
+2026-08-24T12:24:34.880440Z 01O  20/224 Test  #20: Array65535.MaxDiscriminator65535InBounds ..................................   Passed    0.01 sec
+2026-08-24T12:24:34.880496Z 01O         Start  21: Array65535.EmptyLookupReturnsNullopt
+2026-08-24T12:24:34.887092Z 01O  21/224 Test  #21: Array65535.EmptyLookupReturnsNullopt ......................................   Passed    0.01 sec
+2026-08-24T12:24:34.887144Z 01O         Start  22: VectorU8U8.CapacityAndDensityThresholds
+2026-08-24T12:24:34.893830Z 01O  22/224 Test  #22: VectorU8U8.CapacityAndDensityThresholds ...................................   Passed    0.01 sec
+2026-08-24T12:24:34.893887Z 01O         Start  23: VectorU8U8.InsertSortedByDiscriminator
+2026-08-24T12:24:34.900156Z 01O  23/224 Test  #23: VectorU8U8.InsertSortedByDiscriminator ....................................   Passed    0.01 sec
+2026-08-24T12:24:34.900208Z 01O         Start  24: VectorU8U8.LookupViaBinarySearch
+2026-08-24T12:24:34.907586Z 01O  24/224 Test  #24: VectorU8U8.LookupViaBinarySearch ..........................................   Passed    0.01 sec
+2026-08-24T12:24:34.907664Z 01O         Start  25: VectorU8U8.EraseRemovesEntry
+2026-08-24T12:24:34.914258Z 01O  25/224 Test  #25: VectorU8U8.EraseRemovesEntry ..............................................   Passed    0.01 sec
+2026-08-24T12:24:34.914314Z 01O         Start  26: VectorU16U16.CapacityAndDensityThreshold
+2026-08-24T12:24:34.920721Z 01O  26/224 Test  #26: VectorU16U16.CapacityAndDensityThreshold ..................................   Passed    0.01 sec
+2026-08-24T12:24:34.920770Z 01O         Start  27: VectorU16U16.InsertAndLookup
+2026-08-24T12:24:34.927115Z 01O  27/224 Test  #27: VectorU16U16.InsertAndLookup ..............................................   Passed    0.01 sec
+2026-08-24T12:24:34.927176Z 01O         Start  28: VectorU16U16.EntriesSortedByDiscriminator
+2026-08-24T12:24:34.933225Z 01O  28/224 Test  #28: VectorU16U16.EntriesSortedByDiscriminator .................................   Passed    0.01 sec
+2026-08-24T12:24:34.933279Z 01O         Start  29: InternalSearch.DensityThresholdsFormPartition
+2026-08-24T12:24:34.940908Z 01O  29/224 Test  #29: InternalSearch.DensityThresholdsFormPartition .............................   Passed    0.01 sec
+2026-08-24T12:24:34.940978Z 01O         Start  30: InlineHandle.DefaultConstructorEmpty
+2026-08-24T12:24:34.947740Z 01O  30/224 Test  #30: InlineHandle.DefaultConstructorEmpty ......................................   Passed    0.01 sec
+2026-08-24T12:24:34.947791Z 01O         Start  31: InlineHandle.StoreAndRead
+2026-08-24T12:24:34.954469Z 01O  31/224 Test  #31: InlineHandle.StoreAndRead .................................................   Passed    0.01 sec
+2026-08-24T12:24:34.954519Z 01O         Start  32: InlineHandle.FitsCheck
+2026-08-24T12:24:34.960964Z 01O  32/224 Test  #32: InlineHandle.FitsCheck ....................................................   Passed    0.01 sec
+2026-08-24T12:24:34.961012Z 01O         Start  33: InlineHandle.OversizedStoreTruncates
+2026-08-24T12:24:34.967518Z 01O  33/224 Test  #33: InlineHandle.OversizedStoreTruncates ......................................   Passed    0.01 sec
+2026-08-24T12:24:34.967570Z 01O         Start  34: ExternalHandle.DefaultIsInvalid
+2026-08-24T12:24:34.973682Z 01O  34/224 Test  #34: ExternalHandle.DefaultIsInvalid ...........................................   Passed    0.01 sec
+2026-08-24T12:24:34.973733Z 01O         Start  35: ExternalHandle.StoresOffsetAndSize
+2026-08-24T12:24:34.980698Z 01O  35/224 Test  #35: ExternalHandle.StoresOffsetAndSize ........................................   Passed    0.01 sec
+2026-08-24T12:24:34.980775Z 01O         Start  36: ExternalHandle.InvalidateClears
+2026-08-24T12:24:34.988387Z 01O  36/224 Test  #36: ExternalHandle.InvalidateClears ...........................................   Passed    0.01 sec
+2026-08-24T12:24:34.988445Z 01O         Start  37: ChainRefHandle.DefaultIsEmpty
+2026-08-24T12:24:34.996370Z 01O  37/224 Test  #37: ChainRefHandle.DefaultIsEmpty .............................................   Passed    0.01 sec
+2026-08-24T12:24:34.996452Z 01O         Start  38: ChainRefHandle.ConstructWithChainHead
+2026-08-24T12:24:35.004302Z 01O  38/224 Test  #38: ChainRefHandle.ConstructWithChainHead .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.004442Z 01O         Start  39: ChainRefHandle.PrependIncrements
+2026-08-24T12:24:35.011339Z 01O  39/224 Test  #39: ChainRefHandle.PrependIncrements ..........................................   Passed    0.01 sec
+2026-08-24T12:24:35.011393Z 01O         Start  40: ValueHandle.DefaultIsInline
+2026-08-24T12:24:35.017558Z 01O  40/224 Test  #40: ValueHandle.DefaultIsInline ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.017596Z 01O         Start  41: ValueHandle.ConstructFromExternal
+2026-08-24T12:24:35.024870Z 01O  41/224 Test  #41: ValueHandle.ConstructFromExternal .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.024950Z 01O         Start  42: ValueHandle.ConstructFromChainRef
+2026-08-24T12:24:35.031381Z 01O  42/224 Test  #42: ValueHandle.ConstructFromChainRef .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.031456Z 01O         Start  43: ValueHandle.VisitorPattern
+2026-08-24T12:24:35.037572Z 01O  43/224 Test  #43: ValueHandle.VisitorPattern ................................................   Passed    0.01 sec
+2026-08-24T12:24:35.037622Z 01O         Start  44: CostModel.InlineFitsCheck
+2026-08-24T12:24:35.044608Z 01O  44/224 Test  #44: CostModel.InlineFitsCheck .................................................   Passed    0.01 sec
+2026-08-24T12:24:35.044683Z 01O         Start  45: CostModel.RecommendChainRefForMultiValue
+2026-08-24T12:24:35.051054Z 01O  45/224 Test  #45: CostModel.RecommendChainRefForMultiValue ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.051106Z 01O         Start  46: CostModel.RecommendExternalForLargeValues
+2026-08-24T12:24:35.058150Z 01O  46/224 Test  #46: CostModel.RecommendExternalForLargeValues .................................   Passed    0.01 sec
+2026-08-24T12:24:35.058215Z 01O         Start  47: CostModel.RecommendInlineForSmallSingleAccess
+2026-08-24T12:24:35.064524Z 01O  47/224 Test  #47: CostModel.RecommendInlineForSmallSingleAccess .............................   Passed    0.01 sec
+2026-08-24T12:24:35.064600Z 01O         Start  48: CostModel.InlineRemainsCheaperThanExternalForSmallValues
+2026-08-24T12:24:35.073955Z 01O  48/224 Test  #48: CostModel.InlineRemainsCheaperThanExternalForSmallValues ..................   Passed    0.01 sec
+2026-08-24T12:24:35.074058Z 01O         Start  49: CostModel.ExternalIsRecommendedOnceValueExceedsCapacity
+2026-08-24T12:24:35.080482Z 01O  49/224 Test  #49: CostModel.ExternalIsRecommendedOnceValueExceedsCapacity ...................   Passed    0.01 sec
+2026-08-24T12:24:35.080524Z 01O         Start  50: CostModel.EstimateCostsAreNonNegative
+2026-08-24T12:24:35.086601Z 01O  50/224 Test  #50: CostModel.EstimateCostsAreNonNegative .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.086640Z 01O         Start  51: VirtualOffsetAddress.EmptyKeyReturnsZero
+2026-08-24T12:24:35.092746Z 01O  51/224 Test  #51: VirtualOffsetAddress.EmptyKeyReturnsZero ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.092802Z 01O         Start  52: VirtualOffsetAddress.SingleByteIsValue
+2026-08-24T12:24:35.099349Z 01O  52/224 Test  #52: VirtualOffsetAddress.SingleByteIsValue ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.099389Z 01O         Start  53: VirtualOffsetAddress.TwoBytesA_B_IsAtimes256PlusB
+2026-08-24T12:24:35.106739Z 01O  53/224 Test  #53: VirtualOffsetAddress.TwoBytesA_B_IsAtimes256PlusB .........................   Passed    0.01 sec
+2026-08-24T12:24:35.106817Z 01O         Start  54: VirtualOffsetAddress.ThreeBytesFollowsHornerRule
+2026-08-24T12:24:35.113558Z 01O  54/224 Test  #54: VirtualOffsetAddress.ThreeBytesFollowsHornerRule ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.113610Z 01O         Start  55: VirtualOffsetAddress.CapacityFor3Is16M
+2026-08-24T12:24:35.121090Z 01O  55/224 Test  #55: VirtualOffsetAddress.CapacityFor3Is16M ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.121153Z 01O         Start  56: VirtualOffsetAddress.CapacityFor0Is0
+2026-08-24T12:24:35.127491Z 01O  56/224 Test  #56: VirtualOffsetAddress.CapacityFor0Is0 ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.127566Z 01O         Start  57: VirtualOffsetAddress.DecomposeIsInverse
+2026-08-24T12:24:35.133674Z 01O  57/224 Test  #57: VirtualOffsetAddress.DecomposeIsInverse ...................................   Passed    0.01 sec
+2026-08-24T12:24:35.133720Z 01O         Start  58: VirtualOffsetAddress.KeyLongerThanMaxIsClamped
+2026-08-24T12:24:35.140184Z 01O  58/224 Test  #58: VirtualOffsetAddress.KeyLongerThanMaxIsClamped ............................   Passed    0.01 sec
+2026-08-24T12:24:35.140230Z 01O         Start  59: BytePath.DefaultIsExhausted
+2026-08-24T12:24:35.146229Z 01O  59/224 Test  #59: BytePath.DefaultIsExhausted ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.146275Z 01O         Start  60: BytePath.ConsumeAdvancesCursor
+2026-08-24T12:24:35.152675Z 01O  60/224 Test  #60: BytePath.ConsumeAdvancesCursor ............................................   Passed    0.01 sec
+2026-08-24T12:24:35.152724Z 01O         Start  61: BytePath.PeekDoesNotAdvance
+2026-08-24T12:24:35.159252Z 01O  61/224 Test  #61: BytePath.PeekDoesNotAdvance ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.159299Z 01O         Start  62: BytePath.ConsumeMoreThanAvailableClamps
+2026-08-24T12:24:35.165316Z 01O  62/224 Test  #62: BytePath.ConsumeMoreThanAvailableClamps ...................................   Passed    0.01 sec
+2026-08-24T12:24:35.165361Z 01O         Start  63: BytePath.ResetReturnsToStart
+2026-08-24T12:24:35.171782Z 01O  63/224 Test  #63: BytePath.ResetReturnsToStart ..............................................   Passed    0.01 sec
+2026-08-24T12:24:35.171833Z 01O         Start  64: CacheLineAlignedLayout.AlignedOffsetMultipleOf64
+2026-08-24T12:24:35.178011Z 01O  64/224 Test  #64: CacheLineAlignedLayout.AlignedOffsetMultipleOf64 ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.178060Z 01O         Start  65: CacheLineAlignedLayout.PaddingComputation
+2026-08-24T12:24:35.184477Z 01O  65/224 Test  #65: CacheLineAlignedLayout.PaddingComputation .................................   Passed    0.01 sec
+2026-08-24T12:24:35.184534Z 01O         Start  66: CacheLineAlignedLayout.LinesNeeded
+2026-08-24T12:24:35.191000Z 01O  66/224 Test  #66: CacheLineAlignedLayout.LinesNeeded ........................................   Passed    0.01 sec
+2026-08-24T12:24:35.191058Z 01O         Start  67: CacheLineAlignedLayout.IsAlignedCheck
+2026-08-24T12:24:35.197395Z 01O  67/224 Test  #67: CacheLineAlignedLayout.IsAlignedCheck .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.197462Z 01O         Start  68: CacheLineAlignedLayout.SlotViewReturnsCorrectSubspan
+2026-08-24T12:24:35.203661Z 01O  68/224 Test  #68: CacheLineAlignedLayout.SlotViewReturnsCorrectSubspan ......................   Passed    0.01 sec
+2026-08-24T12:24:35.203710Z 01O         Start  69: MultiLevelLayout.DefaultBudgetsMatchExpectations
+2026-08-24T12:24:35.209982Z 01O  69/224 Test  #69: MultiLevelLayout.DefaultBudgetsMatchExpectations ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.210029Z 01O         Start  70: MultiLevelLayout.TierClassificationByOffset
+2026-08-24T12:24:35.216564Z 01O  70/224 Test  #70: MultiLevelLayout.TierClassificationByOffset ...............................   Passed    0.01 sec
+2026-08-24T12:24:35.216609Z 01O         Start  71: MultiLevelLayout.ResolveAddressUsesAlignedSlot
+2026-08-24T12:24:35.222485Z 01O  71/224 Test  #71: MultiLevelLayout.ResolveAddressUsesAlignedSlot ............................   Passed    0.01 sec
+2026-08-24T12:24:35.222536Z 01O         Start  72: MultiLevelLayout.KeyAtZeroIsHotTier
+2026-08-24T12:24:35.229102Z 01O  72/224 Test  #72: MultiLevelLayout.KeyAtZeroIsHotTier .......................................   Passed    0.01 sec
+2026-08-24T12:24:35.229155Z 01O         Start  73: MultiLevelLayout.BudgetCanBeChanged
+2026-08-24T12:24:35.235933Z 01O  73/224 Test  #73: MultiLevelLayout.BudgetCanBeChanged .......................................   Passed    0.01 sec
+2026-08-24T12:24:35.236004Z 01O         Start  74: PoolDescriptor.KindNamesAreSpecific
+2026-08-24T12:24:35.242443Z 01O  74/224 Test  #74: PoolDescriptor.KindNamesAreSpecific .......................................   Passed    0.01 sec
+2026-08-24T12:24:35.242493Z 01O         Start  75: PoolStatistics.OnAllocIncrementsCounters
+2026-08-24T12:24:35.248499Z 01O  75/224 Test  #75: PoolStatistics.OnAllocIncrementsCounters ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.248544Z 01O         Start  76: PoolStatistics.OnDeallocReducesInUse
+2026-08-24T12:24:35.254358Z 01O  76/224 Test  #76: PoolStatistics.OnDeallocReducesInUse ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.254394Z 01O         Start  77: PoolStatistics.OnDeallocClampsAtZero
+2026-08-24T12:24:35.261269Z 01O  77/224 Test  #77: PoolStatistics.OnDeallocClampsAtZero ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.261348Z 01O         Start  78: PoolSet.SevenPoolsExist
+2026-08-24T12:24:35.267466Z 01O  78/224 Test  #78: PoolSet.SevenPoolsExist ...................................................   Passed    0.01 sec
+2026-08-24T12:24:35.267520Z 01O         Start  79: PoolSet.EachPoolKindIsAccessible
+2026-08-24T12:24:35.273567Z 01O  79/224 Test  #79: PoolSet.EachPoolKindIsAccessible ..........................................   Passed    0.01 sec
+2026-08-24T12:24:35.273616Z 01O         Start  80: PoolSet.ConfigureSetsSlotSizeAndCapacity
+2026-08-24T12:24:35.279723Z 01O  80/224 Test  #80: PoolSet.ConfigureSetsSlotSizeAndCapacity ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.279772Z 01O         Start  81: PoolSet.NoteAllocAggregatesAcrossPools
+2026-08-24T12:24:35.285761Z 01O  81/224 Test  #81: PoolSet.NoteAllocAggregatesAcrossPools ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.285799Z 01O         Start  82: PoolSet.NoteDeallocReducesInUse
+2026-08-24T12:24:35.291997Z 01O  82/224 Test  #82: PoolSet.NoteDeallocReducesInUse ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.292045Z 01O         Start  83: PoolRouter.RoutePageEncodingsToCorrectPools
+2026-08-24T12:24:35.298869Z 01O  83/224 Test  #83: PoolRouter.RoutePageEncodingsToCorrectPools ...............................   Passed    0.01 sec
+2026-08-24T12:24:35.298943Z 01O         Start  84: PoolRouter.RouteValueHandlesToValuePools
+2026-08-24T12:24:35.305909Z 01O  84/224 Test  #84: PoolRouter.RouteValueHandlesToValuePools ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.305981Z 01O         Start  85: PoolRouter.MiscRoutesToRestPool
+2026-08-24T12:24:35.312095Z 01O  85/224 Test  #85: PoolRouter.MiscRoutesToRestPool ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.312143Z 01O         Start  86: OlcWithReservedValueBlocks.InitialVersionIsZero
+2026-08-24T12:24:35.318626Z 01O  86/224 Test  #86: OlcWithReservedValueBlocks.InitialVersionIsZero ...........................   Passed    0.01 sec
+2026-08-24T12:24:35.318668Z 01O         Start  87: OlcWithReservedValueBlocks.ValidateUnchangedVersion
+2026-08-24T12:24:35.325255Z 01O  87/224 Test  #87: OlcWithReservedValueBlocks.ValidateUnchangedVersion .......................   Passed    0.01 sec
+2026-08-24T12:24:35.325321Z 01O         Start  88: OlcWithReservedValueBlocks.BeginWriteSetsWriteMarker
+2026-08-24T12:24:35.331654Z 01O  88/224 Test  #88: OlcWithReservedValueBlocks.BeginWriteSetsWriteMarker ......................   Passed    0.01 sec
+2026-08-24T12:24:35.331710Z 01O         Start  89: OlcWithReservedValueBlocks.EndWriteIncrementsAndClearsMarker
+2026-08-24T12:24:35.338496Z 01O  89/224 Test  #89: OlcWithReservedValueBlocks.EndWriteIncrementsAndClearsMarker ..............   Passed    0.01 sec
+2026-08-24T12:24:35.338547Z 01O         Start  90: OlcWithReservedValueBlocks.ValidateFailsAfterWrite
+2026-08-24T12:24:35.345163Z 01O  90/224 Test  #90: OlcWithReservedValueBlocks.ValidateFailsAfterWrite ........................   Passed    0.01 sec
+2026-08-24T12:24:35.345204Z 01O         Start  91: OlcWithReservedValueBlocks.ReserveBlockReturnsUniqueIds
+2026-08-24T12:24:35.351440Z 01O  91/224 Test  #91: OlcWithReservedValueBlocks.ReserveBlockReturnsUniqueIds ...................   Passed    0.01 sec
+2026-08-24T12:24:35.351519Z 01O         Start  92: OlcWithReservedValueBlocks.ResetClearsState
+2026-08-24T12:24:35.358112Z 01O  92/224 Test  #92: OlcWithReservedValueBlocks.ResetClearsState ...............................   Passed    0.01 sec
+2026-08-24T12:24:35.358179Z 01O         Start  93: OlcWithReservedValueBlocks.SecondWriterCannotEnterWhileFirstActive
+2026-08-24T12:24:35.385991Z 01O  93/224 Test  #93: OlcWithReservedValueBlocks.SecondWriterCannotEnterWhileFirstActive ........   Passed    0.03 sec
+2026-08-24T12:24:35.386068Z 01O         Start  94: OlcWithReservedValueBlocks.ConcurrentWritersKeepMonotoneEvenGenerations
+2026-08-24T12:24:35.393577Z 01O  94/224 Test  #94: OlcWithReservedValueBlocks.ConcurrentWritersKeepMonotoneEvenGenerations ...   Passed    0.01 sec
+2026-08-24T12:24:35.393641Z 01O         Start  95: WriteGuard.AcquiresAndReleasesAutomatically
+2026-08-24T12:24:35.399976Z 01O  95/224 Test  #95: WriteGuard.AcquiresAndReleasesAutomatically ...............................   Passed    0.01 sec
+2026-08-24T12:24:35.400042Z 01O         Start  96: WriteGuard.EachGuardReservesNewBlock
+2026-08-24T12:24:35.406392Z 01O  96/224 Test  #96: WriteGuard.EachGuardReservesNewBlock ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.406446Z 01O         Start  97: DistanceEstimator.MinAndMaxBoundsAreEnforced
+2026-08-24T12:24:35.413429Z 01O  97/224 Test  #97: DistanceEstimator.MinAndMaxBoundsAreEnforced ..............................   Passed    0.01 sec
+2026-08-24T12:24:35.413492Z 01O         Start  98: DistanceEstimator.SparseHighLatencyHasLargerDistance
+2026-08-24T12:24:35.420297Z 01O  98/224 Test  #98: DistanceEstimator.SparseHighLatencyHasLargerDistance ......................   Passed    0.01 sec
+2026-08-24T12:24:35.420351Z 01O         Start  99: DistanceEstimator.DistanceIsAlwaysWithinBounds
+2026-08-24T12:24:35.426522Z 01O  99/224 Test  #99: DistanceEstimator.DistanceIsAlwaysWithinBounds ............................   Passed    0.01 sec
+2026-08-24T12:24:35.426569Z 01O         Start 100: PathOrientedPrefetch.EmptyQueueAfterConstruction
+2026-08-24T12:24:35.432822Z 01O 100/224 Test #100: PathOrientedPrefetch.EmptyQueueAfterConstruction ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.432872Z 01O         Start 101: PathOrientedPrefetch.EnqueueIncrementsCounters
+2026-08-24T12:24:35.440038Z 01O 101/224 Test #101: PathOrientedPrefetch.EnqueueIncrementsCounters ............................   Passed    0.01 sec
+2026-08-24T12:24:35.440088Z 01O         Start 102: PathOrientedPrefetch.SuggestExtrapolates
+2026-08-24T12:24:35.445906Z 01O 102/224 Test #102: PathOrientedPrefetch.SuggestExtrapolates ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.446021Z 01O         Start 103: PathOrientedPrefetch.QueueIsBoundedAt16
+2026-08-24T12:24:35.452710Z 01O 103/224 Test #103: PathOrientedPrefetch.QueueIsBoundedAt16 ...................................   Passed    0.01 sec
+2026-08-24T12:24:35.452763Z 01O         Start 104: PathOrientedPrefetch.ResetClearsQueue
+2026-08-24T12:24:35.460554Z 01O 104/224 Test #104: PathOrientedPrefetch.ResetClearsQueue .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.460631Z 01O         Start 105: RedirectPrefetch.ScheduleTracksAddress
+2026-08-24T12:24:35.467420Z 01O 105/224 Test #105: RedirectPrefetch.ScheduleTracksAddress ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.467483Z 01O         Start 106: RedirectPrefetch.FanOutSlotsRespectCacheLineSize
+2026-08-24T12:24:35.473756Z 01O 106/224 Test #106: RedirectPrefetch.FanOutSlotsRespectCacheLineSize ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.473805Z 01O         Start 107: RedirectPrefetch.NegativeOffsetIsClampedAtZero
+2026-08-24T12:24:35.480163Z 01O 107/224 Test #107: RedirectPrefetch.NegativeOffsetIsClampedAtZero ............................   Passed    0.01 sec
+2026-08-24T12:24:35.480211Z 01O         Start 108: RedirectPrefetch.ResetClearsState
+2026-08-24T12:24:35.486440Z 01O 108/224 Test #108: RedirectPrefetch.ResetClearsState .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.486486Z 01O         Start 109: DensityTracker.EmptyAfterConstruction
+2026-08-24T12:24:35.492857Z 01O 109/224 Test #109: DensityTracker.EmptyAfterConstruction .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.492903Z 01O         Start 110: DensityTracker.RecordAndQuery
+2026-08-24T12:24:35.499122Z 01O 110/224 Test #110: DensityTracker.RecordAndQuery .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.499169Z 01O         Start 111: DensityTracker.Histogram4BucketsByThresholds
+2026-08-24T12:24:35.505531Z 01O 111/224 Test #111: DensityTracker.Histogram4BucketsByThresholds ..............................   Passed    0.01 sec
+2026-08-24T12:24:35.505580Z 01O         Start 112: DensityTracker.ResetClearsHistory
+2026-08-24T12:24:35.512114Z 01O 112/224 Test #112: DensityTracker.ResetClearsHistory .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.512163Z 01O         Start 113: H1PageTypeCost.NoteLookupBuildsOnlineMean
+2026-08-24T12:24:35.518460Z 01O 113/224 Test #113: H1PageTypeCost.NoteLookupBuildsOnlineMean .................................   Passed    0.01 sec
+2026-08-24T12:24:35.518509Z 01O         Start 114: H1PageTypeCost.MultiplePageTypesTrackedSeparately
+2026-08-24T12:24:35.524811Z 01O 114/224 Test #114: H1PageTypeCost.MultiplePageTypesTrackedSeparately .........................   Passed    0.01 sec
+2026-08-24T12:24:35.524861Z 01O         Start 115: H2CodeQuality.ScoreAndNote
+2026-08-24T12:24:35.531917Z 01O 115/224 Test #115: H2CodeQuality.ScoreAndNote ................................................   Passed    0.01 sec
+2026-08-24T12:24:35.531980Z 01O         Start 116: H3InlineVsExternal.EmptyTotalIsZero
+2026-08-24T12:24:35.538069Z 01O 116/224 Test #116: H3InlineVsExternal.EmptyTotalIsZero .......................................   Passed    0.01 sec
+2026-08-24T12:24:35.538118Z 01O         Start 117: H3InlineVsExternal.SharesSumToOne
+2026-08-24T12:24:35.544889Z 01O 117/224 Test #117: H3InlineVsExternal.SharesSumToOne .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.544936Z 01O         Start 118: PrtArtHypothesisMetrics.AllThreeAccessible
+2026-08-24T12:24:35.551456Z 01O 118/224 Test #118: PrtArtHypothesisMetrics.AllThreeAccessible ................................   Passed    0.01 sec
+2026-08-24T12:24:35.551504Z 01O         Start 119: PrtArtIdentity.FlagsAreNonEmpty
+2026-08-24T12:24:35.559206Z 01O 119/224 Test #119: PrtArtIdentity.FlagsAreNonEmpty ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.559251Z 01O         Start 120: PrtArtIdentity.FlagsAreValidCombination
+2026-08-24T12:24:35.566537Z 01O 120/224 Test #120: PrtArtIdentity.FlagsAreValidCombination ...................................   Passed    0.01 sec
+2026-08-24T12:24:35.566590Z 01O         Start 121: PrtArtIdentity.FlagsHaveAllBanksFilled
+2026-08-24T12:24:35.574278Z 01O 121/224 Test #121: PrtArtIdentity.FlagsHaveAllBanksFilled ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.574324Z 01O         Start 122: PrtArtIdentity.IdentifierIsHexString
+2026-08-24T12:24:35.583130Z 01O 122/224 Test #122: PrtArtIdentity.IdentifierIsHexString ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.583221Z 01O         Start 123: PrtArtIdentity.FlagsContainPrtartSpecificPageBits
+2026-08-24T12:24:35.590760Z 01O 123/224 Test #123: PrtArtIdentity.FlagsContainPrtartSpecificPageBits .........................   Passed    0.01 sec
+2026-08-24T12:24:35.590811Z 01O         Start 124: PrtArtIdentity.ContainsPrtArtBPlusAndRedirectNodes
+2026-08-24T12:24:35.599551Z 01O 124/224 Test #124: PrtArtIdentity.ContainsPrtArtBPlusAndRedirectNodes ........................   Passed    0.01 sec
+2026-08-24T12:24:35.599605Z 01O         Start 125: PrtArtIdentity.OlcConcurrencyIsSet
+2026-08-24T12:24:35.607568Z 01O 125/224 Test #125: PrtArtIdentity.OlcConcurrencyIsSet ........................................   Passed    0.01 sec
+2026-08-24T12:24:35.607626Z 01O         Start 126: MapApi.EmptyAfterConstruction
+2026-08-24T12:24:35.616596Z 01O 126/224 Test #126: MapApi.EmptyAfterConstruction .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.616648Z 01O         Start 127: MapApi.IdentityFlagsMatchFreeFunction
+2026-08-24T12:24:35.624435Z 01O 127/224 Test #127: MapApi.IdentityFlagsMatchFreeFunction .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.624472Z 01O         Start 128: MapApi.IdentifierMatchesFreeFunction
+2026-08-24T12:24:35.632126Z 01O 128/224 Test #128: MapApi.IdentifierMatchesFreeFunction ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.632176Z 01O         Start 129: MapApi.PoolsConfiguredFor7Slots
+2026-08-24T12:24:35.640308Z 01O 129/224 Test #129: MapApi.PoolsConfiguredFor7Slots ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.640369Z 01O         Start 130: MapApi.InsertReturnsStatusOk
+2026-08-24T12:24:35.647951Z 01O 130/224 Test #130: MapApi.InsertReturnsStatusOk ..............................................   Passed    0.01 sec
+2026-08-24T12:24:35.648014Z 01O         Start 131: MapApi.InsertExistingReturnsKeyAlreadyExists
+2026-08-24T12:24:35.655775Z 01O 131/224 Test #131: MapApi.InsertExistingReturnsKeyAlreadyExists ..............................   Passed    0.01 sec
+2026-08-24T12:24:35.655828Z 01O         Start 132: MapApi.SetUpdatesExistingKey
+2026-08-24T12:24:35.663320Z 01O 132/224 Test #132: MapApi.SetUpdatesExistingKey ..............................................   Passed    0.01 sec
+2026-08-24T12:24:35.663371Z 01O         Start 133: MapApi.LookupOnEmptyReturnsNullopt
+2026-08-24T12:24:35.672033Z 01O 133/224 Test #133: MapApi.LookupOnEmptyReturnsNullopt ........................................   Passed    0.01 sec
+2026-08-24T12:24:35.672085Z 01O         Start 134: MapApi.LookupAfterInsertRoundtrip
+2026-08-24T12:24:35.679723Z 01O 134/224 Test #134: MapApi.LookupAfterInsertRoundtrip .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.679773Z 01O         Start 135: MapApi.EraseRemovesEntryAndReturnsOk
+2026-08-24T12:24:35.687495Z 01O 135/224 Test #135: MapApi.EraseRemovesEntryAndReturnsOk ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.687545Z 01O         Start 136: MapApi.EraseNonExistentReturnsKeyNotFound
+2026-08-24T12:24:35.694992Z 01O 136/224 Test #136: MapApi.EraseNonExistentReturnsKeyNotFound .................................   Passed    0.01 sec
+2026-08-24T12:24:35.695046Z 01O         Start 137: MapApi.ClearRemovesAll
+2026-08-24T12:24:35.703498Z 01O 137/224 Test #137: MapApi.ClearRemovesAll ....................................................   Passed    0.01 sec
+2026-08-24T12:24:35.703547Z 01O         Start 138: MapApi.ContainsAndCount
+2026-08-24T12:24:35.711032Z 01O 138/224 Test #138: MapApi.ContainsAndCount ...................................................   Passed    0.01 sec
+2026-08-24T12:24:35.711080Z 01O         Start 139: MapApi.RangeScanReturnsNonEmpty
+2026-08-24T12:24:35.718623Z 01O 139/224 Test #139: MapApi.RangeScanReturnsNonEmpty ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.718673Z 01O         Start 140: MapApi.StringKeyAndStringValueWorks
+2026-08-24T12:24:35.725903Z 01O 140/224 Test #140: MapApi.StringKeyAndStringValueWorks .......................................   Passed    0.01 sec
+2026-08-24T12:24:35.725952Z 01O         Start 141: MapApi.DensityTrackerReceivesUpdatesOnInserts
+2026-08-24T12:24:35.734205Z 01O 141/224 Test #141: MapApi.DensityTrackerReceivesUpdatesOnInserts .............................   Passed    0.01 sec
+2026-08-24T12:24:35.734244Z 01O         Start 142: MapApi.OlcReservedBlocksGrowWithWrites
+2026-08-24T12:24:35.743096Z 01O 142/224 Test #142: MapApi.OlcReservedBlocksGrowWithWrites ....................................   Passed    0.01 sec
+2026-08-24T12:24:35.743144Z 01O         Start 143: MapApi.MultiThreadedInsertsAreConsistent
+2026-08-24T12:24:35.755270Z 01O 143/224 Test #143: MapApi.MultiThreadedInsertsAreConsistent ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.755319Z 01O         Start 144: MapApi.HitMissCountersTracked
+2026-08-24T12:24:35.762938Z 01O 144/224 Test #144: MapApi.HitMissCountersTracked .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.762985Z 01O         Start 145: MapApi.ComponentAccessorsAreReachable
+2026-08-24T12:24:35.770461Z 01O 145/224 Test #145: MapApi.ComponentAccessorsAreReachable .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.770511Z 01O         Start 146: TupleApi.MappedTypeIsTuple
+2026-08-24T12:24:35.778362Z 01O 146/224 Test #146: TupleApi.MappedTypeIsTuple ................................................   Passed    0.01 sec
+2026-08-24T12:24:35.778411Z 01O         Start 147: TupleApi.InsertWithMultipleValuesPacksIntoTuple
+2026-08-24T12:24:35.785705Z 01O 147/224 Test #147: TupleApi.InsertWithMultipleValuesPacksIntoTuple ...........................   Passed    0.01 sec
+2026-08-24T12:24:35.785741Z 01O         Start 148: TupleApi.DuplicateInsertReturnsKeyAlreadyExists
+2026-08-24T12:24:35.792853Z 01O 148/224 Test #148: TupleApi.DuplicateInsertReturnsKeyAlreadyExists ...........................   Passed    0.01 sec
+2026-08-24T12:24:35.792898Z 01O         Start 149: TupleApi.EraseInTupleMode
+2026-08-24T12:24:35.800334Z 01O 149/224 Test #149: TupleApi.EraseInTupleMode .................................................   Passed    0.01 sec
+2026-08-24T12:24:35.800380Z 01O         Start 150: VectorApi.EmptyAfterConstruction
+2026-08-24T12:24:35.807500Z 01O 150/224 Test #150: VectorApi.EmptyAfterConstruction ..........................................   Passed    0.01 sec
+2026-08-24T12:24:35.807549Z 01O         Start 151: VectorApi.PushBackReturnsStatusOk
+2026-08-24T12:24:35.814710Z 01O 151/224 Test #151: VectorApi.PushBackReturnsStatusOk .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.814745Z 01O         Start 152: VectorApi.AtAndFrontBackReadAccess
+2026-08-24T12:24:35.822377Z 01O 152/224 Test #152: VectorApi.AtAndFrontBackReadAccess ........................................   Passed    0.01 sec
+2026-08-24T12:24:35.822430Z 01O         Start 153: VectorApi.AtOutOfRangeReturnsNullopt
+2026-08-24T12:24:35.829815Z 01O 153/224 Test #153: VectorApi.AtOutOfRangeReturnsNullopt ......................................   Passed    0.01 sec
+2026-08-24T12:24:35.829866Z 01O         Start 154: VectorApi.FrontBackOnEmptyReturnNullopt
+2026-08-24T12:24:35.837399Z 01O 154/224 Test #154: VectorApi.FrontBackOnEmptyReturnNullopt ...................................   Passed    0.01 sec
+2026-08-24T12:24:35.837472Z 01O         Start 155: VectorApi.PopBackRemovesLast
+2026-08-24T12:24:35.844426Z 01O 155/224 Test #155: VectorApi.PopBackRemovesLast ..............................................   Passed    0.01 sec
+2026-08-24T12:24:35.844474Z 01O         Start 156: VectorApi.PopBackOnEmptyReturnsEmptyContainer
+2026-08-24T12:24:35.851750Z 01O 156/224 Test #156: VectorApi.PopBackOnEmptyReturnsEmptyContainer .............................   Passed    0.01 sec
+2026-08-24T12:24:35.851793Z 01O         Start 157: VectorApi.SetAtUpdatesElement
+2026-08-24T12:24:35.859131Z 01O 157/224 Test #157: VectorApi.SetAtUpdatesElement .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.859174Z 01O         Start 158: VectorApi.SetAtOutOfRangeReturnsError
+2026-08-24T12:24:35.867305Z 01O 158/224 Test #158: VectorApi.SetAtOutOfRangeReturnsError .....................................   Passed    0.01 sec
+2026-08-24T12:24:35.867350Z 01O         Start 159: VectorApi.InsertAtInTheMiddle
+2026-08-24T12:24:35.874849Z 01O 159/224 Test #159: VectorApi.InsertAtInTheMiddle .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.874897Z 01O         Start 160: VectorApi.EraseAtRemovesElement
+2026-08-24T12:24:35.882182Z 01O 160/224 Test #160: VectorApi.EraseAtRemovesElement ...........................................   Passed    0.01 sec
+2026-08-24T12:24:35.882231Z 01O         Start 161: VectorApi.ClearAndReserveAndResize
+2026-08-24T12:24:35.889140Z 01O 161/224 Test #161: VectorApi.ClearAndReserveAndResize ........................................   Passed    0.01 sec
+2026-08-24T12:24:35.889185Z 01O         Start 162: VectorApi.AssignReplacesAll
+2026-08-24T12:24:35.896654Z 01O 162/224 Test #162: VectorApi.AssignReplacesAll ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.896698Z 01O         Start 163: VectorApi.ShrinkToFitOk
+2026-08-24T12:24:35.905991Z 01O 163/224 Test #163: VectorApi.ShrinkToFitOk ...................................................   Passed    0.01 sec
+2026-08-24T12:24:35.906069Z 01O         Start 164: VectorApi.DataPointerAccess
+2026-08-24T12:24:35.913852Z 01O 164/224 Test #164: VectorApi.DataPointerAccess ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.913910Z 01O         Start 165: VectorApi.IteratorsTraverse
+2026-08-24T12:24:35.923611Z 01O 165/224 Test #165: VectorApi.IteratorsTraverse ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.923684Z 01O         Start 166: VectorApi.IdentityFlagsMatchEvenInVectorMode
+2026-08-24T12:24:35.931479Z 01O 166/224 Test #166: VectorApi.IdentityFlagsMatchEvenInVectorMode ..............................   Passed    0.01 sec
+2026-08-24T12:24:35.931534Z 01O         Start 167: VectorApi.ComponentAccessorsAreReachable
+2026-08-24T12:24:35.939346Z 01O 167/224 Test #167: VectorApi.ComponentAccessorsAreReachable ..................................   Passed    0.01 sec
+2026-08-24T12:24:35.939399Z 01O         Start 168: VectorApi.MultiThreadedPushBackIsConsistent
+2026-08-24T12:24:35.948367Z 01O 168/224 Test #168: VectorApi.MultiThreadedPushBackIsConsistent ...............................   Passed    0.01 sec
+2026-08-24T12:24:35.948423Z 01O         Start 169: Status.ConstantsAreDistinct
+2026-08-24T12:24:35.956032Z 01O 169/224 Test #169: Status.ConstantsAreDistinct ...............................................   Passed    0.01 sec
+2026-08-24T12:24:35.956082Z 01O         Start 170: VectorApi_V12.OperatorBracketReturnsValueAtIndex
+2026-08-24T12:24:35.963521Z 01O 170/224 Test #170: VectorApi_V12.OperatorBracketReturnsValueAtIndex ..........................   Passed    0.01 sec
+2026-08-24T12:24:35.963570Z 01O         Start 171: VectorApi_V12.EmplaceBackWithArgs
+2026-08-24T12:24:35.971469Z 01O 171/224 Test #171: VectorApi_V12.EmplaceBackWithArgs .........................................   Passed    0.01 sec
+2026-08-24T12:24:35.971534Z 01O         Start 172: VectorApi_V12.SwapTwoEngines
+2026-08-24T12:24:35.981333Z 01O 172/224 Test #172: VectorApi_V12.SwapTwoEngines ..............................................   Passed    0.01 sec
+2026-08-24T12:24:35.981412Z 01O         Start 173: VectorApi_V12.ReverseIteratorsTraverseInReverseOrder
+2026-08-24T12:24:35.989669Z 01O 173/224 Test #173: VectorApi_V12.ReverseIteratorsTraverseInReverseOrder ......................   Passed    0.01 sec
+2026-08-24T12:24:35.989763Z 01O         Start 174: VectorApi_V12.AssignFromRange
+2026-08-24T12:24:35.997964Z 01O 174/224 Test #174: VectorApi_V12.AssignFromRange .............................................   Passed    0.01 sec
+2026-08-24T12:24:35.998015Z 01O         Start 175: MapApi_V12.OperatorBracketLookup
+2026-08-24T12:24:36.005353Z 01O 175/224 Test #175: MapApi_V12.OperatorBracketLookup ..........................................   Passed    0.01 sec
+2026-08-24T12:24:36.005403Z 01O         Start 176: MapApi_V12.EmplaceWithArgs
+2026-08-24T12:24:36.012891Z 01O 176/224 Test #176: MapApi_V12.EmplaceWithArgs ................................................   Passed    0.01 sec
+2026-08-24T12:24:36.012957Z 01O         Start 177: MapApi_V12.TryEmplaceFailsOnExistingKey
+2026-08-24T12:24:36.024270Z 01O 177/224 Test #177: MapApi_V12.TryEmplaceFailsOnExistingKey ...................................   Passed    0.01 sec
+2026-08-24T12:24:36.024351Z 01O         Start 178: MapApi_V12.InsertOrAssignOverwrites
+2026-08-24T12:24:36.032176Z 01O 178/224 Test #178: MapApi_V12.InsertOrAssignOverwrites .......................................   Passed    0.01 sec
+2026-08-24T12:24:36.032233Z 01O         Start 179: MapApi_V12.SwapTwoMaps
+2026-08-24T12:24:36.039681Z 01O 179/224 Test #179: MapApi_V12.SwapTwoMaps ....................................................   Passed    0.01 sec
+2026-08-24T12:24:36.039730Z 01O         Start 180: MapApi_V12.MaxSizeIsPositive
+2026-08-24T12:24:36.047114Z 01O 180/224 Test #180: MapApi_V12.MaxSizeIsPositive ..............................................   Passed    0.01 sec
+2026-08-24T12:24:36.047153Z 01O         Start 181: MapApi_V12.KeyCompAndValueCompCallable
+2026-08-24T12:24:36.058889Z 01O 181/224 Test #181: MapApi_V12.KeyCompAndValueCompCallable ....................................   Passed    0.01 sec
+2026-08-24T12:24:36.058962Z 01O         Start 182: MapApi_V13.MergeTakesOnlyUniqueKeys
+2026-08-24T12:24:36.066414Z 01O 182/224 Test #182: MapApi_V13.MergeTakesOnlyUniqueKeys .......................................   Passed    0.01 sec
+2026-08-24T12:24:36.066459Z 01O         Start 183: MapApi_V13.ExtractReturnsValueAndRemoves
+2026-08-24T12:24:36.076667Z 01O 183/224 Test #183: MapApi_V13.ExtractReturnsValueAndRemoves ..................................   Passed    0.01 sec
+2026-08-24T12:24:36.076768Z 01O         Start 184: MapApi_V13.ExtractMissingKeyReturnsNullopt
+2026-08-24T12:24:36.085075Z 01O 184/224 Test #184: MapApi_V13.ExtractMissingKeyReturnsNullopt ................................   Passed    0.01 sec
+2026-08-24T12:24:36.085127Z 01O         Start 185: VarLenEncoder.EncodesSmallValuesIn1Byte
+2026-08-24T12:24:36.092188Z 01O 185/224 Test #185: VarLenEncoder.EncodesSmallValuesIn1Byte ...................................   Passed    0.01 sec
+2026-08-24T12:24:36.092237Z 01O         Start 186: VarLenEncoder.EncodesLargerValuesInMultipleBytes
+2026-08-24T12:24:36.100767Z 01O 186/224 Test #186: VarLenEncoder.EncodesLargerValuesInMultipleBytes ..........................   Passed    0.01 sec
+2026-08-24T12:24:36.100864Z 01O         Start 187: VarLenEncoder.EncodeDecodeRoundtrip
+2026-08-24T12:24:36.107658Z 01O 187/224 Test #187: VarLenEncoder.EncodeDecodeRoundtrip .......................................   Passed    0.01 sec
+2026-08-24T12:24:36.107715Z 01O         Start 188: SignalingStream.EmptyOnConstruction
+2026-08-24T12:24:36.115494Z 01O 188/224 Test #188: SignalingStream.EmptyOnConstruction .......................................   Passed    0.01 sec
+2026-08-24T12:24:36.115540Z 01O         Start 189: SignalingStream.AppendNormalEntry
+2026-08-24T12:24:36.121843Z 01O 189/224 Test #189: SignalingStream.AppendNormalEntry .........................................   Passed    0.01 sec
+2026-08-24T12:24:36.121897Z 01O         Start 190: SignalingStream.DecodeRoundtripSingleEntry
+2026-08-24T12:24:36.129577Z 01O 190/224 Test #190: SignalingStream.DecodeRoundtripSingleEntry ................................   Passed    0.01 sec
+2026-08-24T12:24:36.129624Z 01O         Start 191: SignalingStream.MultipleEntriesIterable
+2026-08-24T12:24:36.135688Z 01O 191/224 Test #191: SignalingStream.MultipleEntriesIterable ...................................   Passed    0.01 sec
+2026-08-24T12:24:36.135734Z 01O         Start 192: SignalingStream.ClearResets
+2026-08-24T12:24:36.142536Z 01O 192/224 Test #192: SignalingStream.ClearResets ...............................................   Passed    0.01 sec
+2026-08-24T12:24:36.142580Z 01O         Start 193: LinearValueBuffer.EmptyOnConstruction
+2026-08-24T12:24:36.148771Z 01O 193/224 Test #193: LinearValueBuffer.EmptyOnConstruction .....................................   Passed    0.01 sec
+2026-08-24T12:24:36.148817Z 01O         Start 194: LinearValueBuffer.AppendAndRead
+2026-08-24T12:24:36.155008Z 01O 194/224 Test #194: LinearValueBuffer.AppendAndRead ...........................................   Passed    0.01 sec
+2026-08-24T12:24:36.155055Z 01O         Start 195: LinearValueBuffer.EraseMarksTombstone
+2026-08-24T12:24:36.161180Z 01O 195/224 Test #195: LinearValueBuffer.EraseMarksTombstone .....................................   Passed    0.01 sec
+2026-08-24T12:24:36.161224Z 01O         Start 196: LinearValueBuffer.EraseTwiceIsSafe
+2026-08-24T12:24:36.167481Z 01O 196/224 Test #196: LinearValueBuffer.EraseTwiceIsSafe ........................................   Passed    0.01 sec
+2026-08-24T12:24:36.167532Z 01O         Start 197: LinearValueBuffer.ShouldCompactBelowThreshold
+2026-08-24T12:24:36.173625Z 01O 197/224 Test #197: LinearValueBuffer.ShouldCompactBelowThreshold .............................   Passed    0.01 sec
+2026-08-24T12:24:36.173671Z 01O         Start 198: LinearValueBuffer.ShouldCompactAboveThreshold
+2026-08-24T12:24:36.179848Z 01O 198/224 Test #198: LinearValueBuffer.ShouldCompactAboveThreshold .............................   Passed    0.01 sec
+2026-08-24T12:24:36.179892Z 01O         Start 199: LinearValueBuffer.CompactRemovesTombstonesAndRemaps
+2026-08-24T12:24:36.186477Z 01O 199/224 Test #199: LinearValueBuffer.CompactRemovesTombstonesAndRemaps .......................   Passed    0.01 sec
+2026-08-24T12:24:36.186525Z 01O         Start 200: LizenzKonsistenz.KeinFremderSpdxBezeichnerImEigencode
+2026-08-24T12:24:36.203354Z 01O 200/224 Test #200: LizenzKonsistenz.KeinFremderSpdxBezeichnerImEigencode .....................   Passed    0.02 sec
+2026-08-24T12:24:36.203406Z 01O         Start 201: LizenzKonsistenz.LicenseUndNoticeNennenDenselbenBezeichner
+2026-08-24T12:24:36.210169Z 01O 201/224 Test #201: LizenzKonsistenz.LicenseUndNoticeNennenDenselbenBezeichner ................   Passed    0.01 sec
+2026-08-24T12:24:36.210218Z 01O         Start 202: LizenzKonsistenz.ChangeDateStehtUndIstDerEntschiedene
+2026-08-24T12:24:36.216819Z 01O 202/224 Test #202: LizenzKonsistenz.ChangeDateStehtUndIstDerEntschiedene .....................   Passed    0.01 sec
+2026-08-24T12:24:36.216871Z 01O         Start 203: LizenzKonsistenz.ChangeDateIstEinIsoDatumNachOf1
+2026-08-24T12:24:36.222929Z 01O 203/224 Test #203: LizenzKonsistenz.ChangeDateIstEinIsoDatumNachOf1 ..........................   Passed    0.01 sec
+2026-08-24T12:24:36.222965Z 01O         Start 204: LizenzKonsistenz.ChangeDateStehtInNoticeUndReadmeOhnePlatzhalterRest
+2026-08-24T12:24:36.230041Z 01O 204/224 Test #204: LizenzKonsistenz.ChangeDateStehtInNoticeUndReadmeOhnePlatzhalterRest ......   Passed    0.01 sec
+2026-08-24T12:24:36.230097Z 01O         Start 205: LizenzKonsistenzKoeder.SaubererBaumIstGruen
+2026-08-24T12:24:36.237334Z 01O 205/224 Test #205: LizenzKonsistenzKoeder.SaubererBaumIstGruen ...............................   Passed    0.01 sec
+2026-08-24T12:24:36.237366Z 01O         Start 206: LizenzKonsistenzKoeder.FremderSpdxBezeichnerWirdGefunden
+2026-08-24T12:24:36.244733Z 01O 206/224 Test #206: LizenzKonsistenzKoeder.FremderSpdxBezeichnerWirdGefunden ..................   Passed    0.01 sec
+2026-08-24T12:24:36.244782Z 01O         Start 207: LizenzKonsistenzKoeder.NoticeMitApacheBehauptungWirdGefunden
+2026-08-24T12:24:36.251394Z 01O 207/224 Test #207: LizenzKonsistenzKoeder.NoticeMitApacheBehauptungWirdGefunden ..............   Passed    0.01 sec
+2026-08-24T12:24:36.251472Z 01O         Start 208: LizenzKonsistenzKoeder.VergessenerOf1PlatzhalterInNoticeWirdGefunden
+2026-08-24T12:24:36.260753Z 01O 208/224 Test #208: LizenzKonsistenzKoeder.VergessenerOf1PlatzhalterInNoticeWirdGefunden ......   Passed    0.01 sec
+2026-08-24T12:24:36.260823Z 01O         Start 209: DefaultLookupRegistry.EnumeratesNineAxes
+2026-08-24T12:24:36.267706Z 01O 209/224 Test #209: DefaultLookupRegistry.EnumeratesNineAxes ..................................   Passed    0.01 sec
+2026-08-24T12:24:36.267754Z 01O         Start 210: DefaultLookupRegistry.KnownAxesAreFlagged
+2026-08-24T12:24:36.273460Z 01O 210/224 Test #210: DefaultLookupRegistry.KnownAxesAreFlagged .................................   Passed    0.01 sec
+2026-08-24T12:24:36.273509Z 01O         Start 211: DefaultLookupRegistry.PrtArtEigeneAchsenSindNichtDefaultLookup
+2026-08-24T12:24:36.279414Z 01O 211/224 Test #211: DefaultLookupRegistry.PrtArtEigeneAchsenSindNichtDefaultLookup ............   Passed    0.01 sec
+2026-08-24T12:24:36.279464Z 01O         Start 212: DefaultLookupRegistry.UnknownAxisIsNotDefaultLookup
+2026-08-24T12:24:36.285068Z 01O 212/224 Test #212: DefaultLookupRegistry.UnknownAxisIsNotDefaultLookup .......................   Passed    0.01 sec
+2026-08-24T12:24:36.285123Z 01O         Start 213: DefaultLookupRegistry.EachAxisHasCeLibraryPath
+2026-08-24T12:24:36.292458Z 01O 213/224 Test #213: DefaultLookupRegistry.EachAxisHasCeLibraryPath ............................   Passed    0.01 sec
+2026-08-24T12:24:36.292508Z 01O         Start 214: LeafOnlyCounter.InnerNodeAccessIsNoOp
+2026-08-24T12:24:36.298846Z 01O 214/224 Test #214: LeafOnlyCounter.InnerNodeAccessIsNoOp .....................................   Passed    0.01 sec
+2026-08-24T12:24:36.298888Z 01O         Start 215: LeafOnlyCounter.LeafAccessIncrements
+2026-08-24T12:24:36.304933Z 01O 215/224 Test #215: LeafOnlyCounter.LeafAccessIncrements ......................................   Passed    0.01 sec
+2026-08-24T12:24:36.304984Z 01O         Start 216: LeafOnlyCounter.MixedLeafAndInnerNodes
+2026-08-24T12:24:36.310904Z 01O 216/224 Test #216: LeafOnlyCounter.MixedLeafAndInnerNodes ....................................   Passed    0.01 sec
+2026-08-24T12:24:36.310954Z 01O         Start 217: LeafOnlyCounter.CachePressureEstimate
+2026-08-24T12:24:36.317107Z 01O 217/224 Test #217: LeafOnlyCounter.CachePressureEstimate .....................................   Passed    0.01 sec
+2026-08-24T12:24:36.317159Z 01O         Start 218: LeafOnlyCounter.EmptyCounterPressureZero
+2026-08-24T12:24:36.325936Z 01O 218/224 Test #218: LeafOnlyCounter.EmptyCounterPressureZero ..................................   Passed    0.01 sec
+2026-08-24T12:24:36.326008Z 01O         Start 219: LeafOnlyCounter.ConcurrentAccessIsThreadSafeOnSameLeaf
+2026-08-24T12:24:36.334875Z 01O 219/224 Test #219: LeafOnlyCounter.ConcurrentAccessIsThreadSafeOnSameLeaf ....................   Passed    0.01 sec
+2026-08-24T12:24:36.334939Z 01O         Start 220: LeafOnlyCounter.Reset
+2026-08-24T12:24:36.342301Z 01O 220/224 Test #220: LeafOnlyCounter.Reset .....................................................   Passed    0.01 sec
+2026-08-24T12:24:36.342356Z 01O         Start 221: LeafOnlyCounter.ConcurrentResetAndRecordNoUseAfterFree
+2026-08-24T12:24:36.645520Z 01O 221/224 Test #221: LeafOnlyCounter.ConcurrentResetAndRecordNoUseAfterFree ....................   Passed    0.30 sec
+2026-08-24T12:24:36.645607Z 01O         Start 222: PerNodeCounter.IncrementsAllNodesInclInner
+2026-08-24T12:24:36.652454Z 01O 222/224 Test #222: PerNodeCounter.IncrementsAllNodesInclInner ................................   Passed    0.01 sec
+2026-08-24T12:24:36.652515Z 01O         Start 223: PerNodeCounter.TrackedNodesGrowsLinearlyWithUniqueAccesses
+2026-08-24T12:24:36.659569Z 01O 223/224 Test #223: PerNodeCounter.TrackedNodesGrowsLinearlyWithUniqueAccesses ................   Passed    0.01 sec
+2026-08-24T12:24:36.659624Z 01O         Start 224: KuehnComparison.LeafOnlyTracksFewerNodesThanPerNode
+2026-08-24T12:24:36.666716Z 01O 224/224 Test #224: KuehnComparison.LeafOnlyTracksFewerNodesThanPerNode .......................   Passed    0.01 sec
+2026-08-24T12:24:36.667006Z 01O 
+2026-08-24T12:24:36.667007Z 01O 100% tests passed, 0 tests failed out of 224
+2026-08-24T12:24:36.667012Z 01O 
+2026-08-24T12:24:36.667012Z 01O Total Test time (real) =   1.93 sec
+2026-08-24T12:24:36.667885Z 01O [32;1m$ rm -rf "${CI_BUILDS_DIR:-/var/lib/gitlab-runner/builds}/.gitiso-${CI_JOB_ID}"[0;m
+2026-08-24T12:24:36.669453Z 00O section_end:1787574276:step_script[0K
+2026-08-24T12:24:36.669863Z 00O+section_start:1787574276:archive_cache[0K
+2026-08-24T12:24:36.669867Z 00O+[0K[36;1mSaving cache for successful job[0;m[0;m
+2026-08-24T12:24:36.728718Z 01O [32;1mCreating cache ccache-comdare-prt-art-asan-protected...[0;m
+2026-08-24T12:24:36.754312Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=2329323 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-08-24T12:24:36.755975Z 01E .ccache: found 426 matching artifact files and directories[0;m 
+2026-08-24T12:24:36.866663Z 01E Using presigned URL for cache upload              [0;m 
+2026-08-24T12:24:36.866670Z 01E Uploading cache.zip to https://minio.comdare.de:9000/buildsystem-cache/project/287/ccache-comdare-prt-art-asan-protected[0;m 
+2026-08-24T12:24:37.638674Z 01O [32;1mCreated cache[0;m
+2026-08-24T12:24:37.640554Z 00O section_end:1787574277:archive_cache[0K
+2026-08-24T12:24:37.640776Z 00O+section_start:1787574277:cleanup_file_variables[0K
+2026-08-24T12:24:37.640779Z 00O+[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+2026-08-24T12:24:37.677691Z 00O section_end:1787574277:cleanup_file_variables[0K
+2026-08-24T12:24:37.677807Z 00O [32;1mJob succeeded[0;m

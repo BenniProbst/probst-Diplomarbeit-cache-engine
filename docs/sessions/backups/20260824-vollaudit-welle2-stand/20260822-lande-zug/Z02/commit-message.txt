@@ -1,0 +1,17 @@
+merge(s8kopf): W2-Lande-Zug 3/10 -- T-NEU-6 S-8-Traegerbau-KOPF (bau/s8kopf @ 41ee8780; Audit r1 SITZT 0/0/2 KLEIN)
+
+B-01-Naht-Schablone (3 Nachrichtenklassen hinauf, compile-hart) + B-14 sechs
+Steuerdocks (Nenner fremd, 3!-Permutation) + Traeger-Rakete + #22(ii)-Debug-
+Neutralitaet + #29-Par.-4.4-Grenzwache; 8 Dateien +1266/-5, Basis 66de5c09.
+H-1-Harmonisierung tests/unit/CMakeLists.txt-Dateiende: Ziel-Fassung (7868 Z.)
+VOLL uebernommen + s8-Anhang (59 Z., eigener Trenner) byte-gleich zur Quelle
+= 7927 Z.; Union beider Seiten, keine Zaehlwerk-Doppelung (Muster der Merges
+881d1a15/61d5d139). Restposten-Traeger: S8A-01 = 7er-J-1-Werkzeugliste literal
+im Lande-Protokoll + K17-Endstand-Kombibau (deckt G8; Facade ueber REALES
+Target comdare_profile_run_facade); S8A-02 = Zeilen-Anker main.cpp:714-719
+statt :721-726 -> Korrektur beim naechsten Anfassen der Kopf-TU, Traeger
+T7/#122. H-15: traeger/-Baum VOR vollzug91 (Merge 6/10) gelandet. Kein
+Zwischenbau: Branch-Abnahme 512/512 gcc-Release + 4-Zellen liegt; Endstand-
+Kombibau T-11b deckt den Merge-Stand.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>

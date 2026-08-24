@@ -1,0 +1,43 @@
+=== EXPLORE STRUKTURELL+HISTORISCH Z14 (24.08.2026, eigene Messung) ===
+--- ls-remote origin (Netz-Wahrheit) ---
+25bbf2e23c91821bd16511c097e76937ca590fda	refs/heads/bau/pinduo
+3710ac4c18425a6933bca3b3da02f6edfb8b07b6	refs/heads/bau/w1luecken-prtart
+777fff7e99fbca875aabc4ade8b990c60eb6f73c	refs/heads/development
+c6f07540e7e8ed3b88fec409dba6ac2aa8795b9b	refs/heads/main
+--- ls-remote github bau/pinduo ---
+RC_github_lsremote=0
+--- merge-base development bau/pinduo ---
+777fff7e99fbca875aabc4ade8b990c60eb6f73c
+--- rev-parse Tips ---
+777fff7e99fbca875aabc4ade8b990c60eb6f73c
+25bbf2e23c91821bd16511c097e76937ca590fda
+--- Commits dev..pinduo ---
+25bbf2e fix(tests): T9 -- Lizenz-Wache ueberspringt den ce-pin-Klon der D-10a-CI-Jobs
+4941c41 docs(registry_gen): E1#7-Nachzug -- Geschwister-Wortlaut im Gate-Kommentar als Historie markiert (gleiche Doku-Drift-Klasse wie FINDINGS#13; reine Kommentar-Insertion)
+f1fc5d8 fix(ci): D-10a -- ce-SHA-Pin fuer alle fuenf Bau-Jobs + registry_roundtrip-Kopf nachgezogen (FINDINGS#12+#13/KON119-04)
+--- numstat 777fff7e..25bbf2e2 (Gesamt-Delta) ---
+58	5	.gitlab-ci.yml
+3	0	prt_art/registry_gen/CMakeLists.txt
+15	0	prt_art/registry_gen/registry_roundtrip.cmake
+7	2	tests/unit/support/lizenz_audit.hpp
+--- numstat je Commit ---
+COMMIT f1fc5d8 fix(ci): D-10a -- ce-SHA-Pin fuer alle fuenf Bau-Jobs + registry_roundtrip-Kopf nachgezogen (FINDINGS#12+#13/KON119-04)
+
+58	5	.gitlab-ci.yml
+15	0	prt_art/registry_gen/registry_roundtrip.cmake
+COMMIT 4941c41 docs(registry_gen): E1#7-Nachzug -- Geschwister-Wortlaut im Gate-Kommentar als Historie markiert (gleiche Doku-Drift-Klasse wie FINDINGS#13; reine Kommentar-Insertion)
+
+3	0	prt_art/registry_gen/CMakeLists.txt
+COMMIT 25bbf2e fix(tests): T9 -- Lizenz-Wache ueberspringt den ce-pin-Klon der D-10a-CI-Jobs
+
+7	2	tests/unit/support/lizenz_audit.hpp
+--- merge-tree --write-tree development bau/pinduo ---
+ef4c8c753c8e4238b45c36efba5fd785d914ef2b
+RC_mergetree=0
+--- pinduo tree oid ---
+ef4c8c753c8e4238b45c36efba5fd785d914ef2b
+--- .gitmodules? ---
+0
+--- status/stash ---
+0
+0

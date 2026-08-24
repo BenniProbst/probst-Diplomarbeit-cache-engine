@@ -1,0 +1,453 @@
+Test project /home/comdare/Projekte/Research/comdare-prt-art/build-z15-gcc-rel
+        Start   1: RedirectNode.PriorityIsP0
+  1/224 Test   #1: RedirectNode.PriorityIsP0 .................................................   Passed    0.00 sec
+        Start   2: RedirectNode.StoresRestSuffix
+  2/224 Test   #2: RedirectNode.StoresRestSuffix .............................................   Passed    0.00 sec
+        Start   3: RedirectNode.FullMatchReturnsAllBytes
+  3/224 Test   #3: RedirectNode.FullMatchReturnsAllBytes .....................................   Passed    0.00 sec
+        Start   4: RedirectNode.PartialMatchReturnsMatchedPrefixLen
+  4/224 Test   #4: RedirectNode.PartialMatchReturnsMatchedPrefixLen ..........................   Passed    0.00 sec
+        Start   5: RedirectNode.ShortKeyReturnsLengthOfKey
+  5/224 Test   #5: RedirectNode.ShortKeyReturnsLengthOfKey ...................................   Passed    0.00 sec
+        Start   6: BPlusNode.PriorityIsP0
+  6/224 Test   #6: BPlusNode.PriorityIsP0 ....................................................   Passed    0.00 sec
+        Start   7: BPlusNode.DefaultKindIsArray256
+  7/224 Test   #7: BPlusNode.DefaultKindIsArray256 ...........................................   Passed    0.00 sec
+        Start   8: BPlusNode.InsertSlotIncrementsKeyCount
+  8/224 Test   #8: BPlusNode.InsertSlotIncrementsKeyCount ....................................   Passed    0.00 sec
+        Start   9: BPlusNode.DensityCalculationMatchesCapacity
+  9/224 Test   #9: BPlusNode.DensityCalculationMatchesCapacity ...............................   Passed    0.00 sec
+        Start  10: BPlusNode.RecommendedKindFollowsThresholds
+ 10/224 Test  #10: BPlusNode.RecommendedKindFollowsThresholds ................................   Passed    0.00 sec
+        Start  11: BPlusNode.CapacityForKindMatchesSpec
+ 11/224 Test  #11: BPlusNode.CapacityForKindMatchesSpec ......................................   Passed    0.00 sec
+        Start  12: BPlusNode.FourInternalSearchKindsAreDistinct
+ 12/224 Test  #12: BPlusNode.FourInternalSearchKindsAreDistinct ..............................   Passed    0.00 sec
+        Start  13: Array256.CapacityAndDensityThreshold
+ 13/224 Test  #13: Array256.CapacityAndDensityThreshold ......................................   Passed    0.00 sec
+        Start  14: Array256.EmptyLookupReturnsNullopt
+ 14/224 Test  #14: Array256.EmptyLookupReturnsNullopt ........................................   Passed    0.00 sec
+        Start  15: Array256.InsertAndLookup
+ 15/224 Test  #15: Array256.InsertAndLookup ..................................................   Passed    0.00 sec
+        Start  16: Array256.EraseRemovesEntry
+ 16/224 Test  #16: Array256.EraseRemovesEntry ................................................   Passed    0.00 sec
+        Start  17: Array256.DensityCalculation
+ 17/224 Test  #17: Array256.DensityCalculation ...............................................   Passed    0.00 sec
+        Start  18: Array65535.CapacityAndDensityThresholds
+ 18/224 Test  #18: Array65535.CapacityAndDensityThresholds ...................................   Passed    0.00 sec
+        Start  19: Array65535.InsertAndLookup
+ 19/224 Test  #19: Array65535.InsertAndLookup ................................................   Passed    0.00 sec
+        Start  20: Array65535.MaxDiscriminator65535InBounds
+ 20/224 Test  #20: Array65535.MaxDiscriminator65535InBounds ..................................   Passed    0.00 sec
+        Start  21: Array65535.EmptyLookupReturnsNullopt
+ 21/224 Test  #21: Array65535.EmptyLookupReturnsNullopt ......................................   Passed    0.00 sec
+        Start  22: VectorU8U8.CapacityAndDensityThresholds
+ 22/224 Test  #22: VectorU8U8.CapacityAndDensityThresholds ...................................   Passed    0.00 sec
+        Start  23: VectorU8U8.InsertSortedByDiscriminator
+ 23/224 Test  #23: VectorU8U8.InsertSortedByDiscriminator ....................................   Passed    0.00 sec
+        Start  24: VectorU8U8.LookupViaBinarySearch
+ 24/224 Test  #24: VectorU8U8.LookupViaBinarySearch ..........................................   Passed    0.00 sec
+        Start  25: VectorU8U8.EraseRemovesEntry
+ 25/224 Test  #25: VectorU8U8.EraseRemovesEntry ..............................................   Passed    0.00 sec
+        Start  26: VectorU16U16.CapacityAndDensityThreshold
+ 26/224 Test  #26: VectorU16U16.CapacityAndDensityThreshold ..................................   Passed    0.00 sec
+        Start  27: VectorU16U16.InsertAndLookup
+ 27/224 Test  #27: VectorU16U16.InsertAndLookup ..............................................   Passed    0.00 sec
+        Start  28: VectorU16U16.EntriesSortedByDiscriminator
+ 28/224 Test  #28: VectorU16U16.EntriesSortedByDiscriminator .................................   Passed    0.00 sec
+        Start  29: InternalSearch.DensityThresholdsFormPartition
+ 29/224 Test  #29: InternalSearch.DensityThresholdsFormPartition .............................   Passed    0.00 sec
+        Start  30: InlineHandle.DefaultConstructorEmpty
+ 30/224 Test  #30: InlineHandle.DefaultConstructorEmpty ......................................   Passed    0.00 sec
+        Start  31: InlineHandle.StoreAndRead
+ 31/224 Test  #31: InlineHandle.StoreAndRead .................................................   Passed    0.00 sec
+        Start  32: InlineHandle.FitsCheck
+ 32/224 Test  #32: InlineHandle.FitsCheck ....................................................   Passed    0.00 sec
+        Start  33: InlineHandle.OversizedStoreTruncates
+ 33/224 Test  #33: InlineHandle.OversizedStoreTruncates ......................................   Passed    0.00 sec
+        Start  34: ExternalHandle.DefaultIsInvalid
+ 34/224 Test  #34: ExternalHandle.DefaultIsInvalid ...........................................   Passed    0.00 sec
+        Start  35: ExternalHandle.StoresOffsetAndSize
+ 35/224 Test  #35: ExternalHandle.StoresOffsetAndSize ........................................   Passed    0.00 sec
+        Start  36: ExternalHandle.InvalidateClears
+ 36/224 Test  #36: ExternalHandle.InvalidateClears ...........................................   Passed    0.00 sec
+        Start  37: ChainRefHandle.DefaultIsEmpty
+ 37/224 Test  #37: ChainRefHandle.DefaultIsEmpty .............................................   Passed    0.00 sec
+        Start  38: ChainRefHandle.ConstructWithChainHead
+ 38/224 Test  #38: ChainRefHandle.ConstructWithChainHead .....................................   Passed    0.00 sec
+        Start  39: ChainRefHandle.PrependIncrements
+ 39/224 Test  #39: ChainRefHandle.PrependIncrements ..........................................   Passed    0.00 sec
+        Start  40: ValueHandle.DefaultIsInline
+ 40/224 Test  #40: ValueHandle.DefaultIsInline ...............................................   Passed    0.00 sec
+        Start  41: ValueHandle.ConstructFromExternal
+ 41/224 Test  #41: ValueHandle.ConstructFromExternal .........................................   Passed    0.00 sec
+        Start  42: ValueHandle.ConstructFromChainRef
+ 42/224 Test  #42: ValueHandle.ConstructFromChainRef .........................................   Passed    0.00 sec
+        Start  43: ValueHandle.VisitorPattern
+ 43/224 Test  #43: ValueHandle.VisitorPattern ................................................   Passed    0.00 sec
+        Start  44: CostModel.InlineFitsCheck
+ 44/224 Test  #44: CostModel.InlineFitsCheck .................................................   Passed    0.00 sec
+        Start  45: CostModel.RecommendChainRefForMultiValue
+ 45/224 Test  #45: CostModel.RecommendChainRefForMultiValue ..................................   Passed    0.00 sec
+        Start  46: CostModel.RecommendExternalForLargeValues
+ 46/224 Test  #46: CostModel.RecommendExternalForLargeValues .................................   Passed    0.00 sec
+        Start  47: CostModel.RecommendInlineForSmallSingleAccess
+ 47/224 Test  #47: CostModel.RecommendInlineForSmallSingleAccess .............................   Passed    0.00 sec
+        Start  48: CostModel.InlineRemainsCheaperThanExternalForSmallValues
+ 48/224 Test  #48: CostModel.InlineRemainsCheaperThanExternalForSmallValues ..................   Passed    0.00 sec
+        Start  49: CostModel.ExternalIsRecommendedOnceValueExceedsCapacity
+ 49/224 Test  #49: CostModel.ExternalIsRecommendedOnceValueExceedsCapacity ...................   Passed    0.00 sec
+        Start  50: CostModel.EstimateCostsAreNonNegative
+ 50/224 Test  #50: CostModel.EstimateCostsAreNonNegative .....................................   Passed    0.00 sec
+        Start  51: VirtualOffsetAddress.EmptyKeyReturnsZero
+ 51/224 Test  #51: VirtualOffsetAddress.EmptyKeyReturnsZero ..................................   Passed    0.00 sec
+        Start  52: VirtualOffsetAddress.SingleByteIsValue
+ 52/224 Test  #52: VirtualOffsetAddress.SingleByteIsValue ....................................   Passed    0.00 sec
+        Start  53: VirtualOffsetAddress.TwoBytesA_B_IsAtimes256PlusB
+ 53/224 Test  #53: VirtualOffsetAddress.TwoBytesA_B_IsAtimes256PlusB .........................   Passed    0.00 sec
+        Start  54: VirtualOffsetAddress.ThreeBytesFollowsHornerRule
+ 54/224 Test  #54: VirtualOffsetAddress.ThreeBytesFollowsHornerRule ..........................   Passed    0.00 sec
+        Start  55: VirtualOffsetAddress.CapacityFor3Is16M
+ 55/224 Test  #55: VirtualOffsetAddress.CapacityFor3Is16M ....................................   Passed    0.00 sec
+        Start  56: VirtualOffsetAddress.CapacityFor0Is0
+ 56/224 Test  #56: VirtualOffsetAddress.CapacityFor0Is0 ......................................   Passed    0.00 sec
+        Start  57: VirtualOffsetAddress.DecomposeIsInverse
+ 57/224 Test  #57: VirtualOffsetAddress.DecomposeIsInverse ...................................   Passed    0.00 sec
+        Start  58: VirtualOffsetAddress.KeyLongerThanMaxIsClamped
+ 58/224 Test  #58: VirtualOffsetAddress.KeyLongerThanMaxIsClamped ............................   Passed    0.00 sec
+        Start  59: BytePath.DefaultIsExhausted
+ 59/224 Test  #59: BytePath.DefaultIsExhausted ...............................................   Passed    0.00 sec
+        Start  60: BytePath.ConsumeAdvancesCursor
+ 60/224 Test  #60: BytePath.ConsumeAdvancesCursor ............................................   Passed    0.00 sec
+        Start  61: BytePath.PeekDoesNotAdvance
+ 61/224 Test  #61: BytePath.PeekDoesNotAdvance ...............................................   Passed    0.00 sec
+        Start  62: BytePath.ConsumeMoreThanAvailableClamps
+ 62/224 Test  #62: BytePath.ConsumeMoreThanAvailableClamps ...................................   Passed    0.00 sec
+        Start  63: BytePath.ResetReturnsToStart
+ 63/224 Test  #63: BytePath.ResetReturnsToStart ..............................................   Passed    0.00 sec
+        Start  64: CacheLineAlignedLayout.AlignedOffsetMultipleOf64
+ 64/224 Test  #64: CacheLineAlignedLayout.AlignedOffsetMultipleOf64 ..........................   Passed    0.00 sec
+        Start  65: CacheLineAlignedLayout.PaddingComputation
+ 65/224 Test  #65: CacheLineAlignedLayout.PaddingComputation .................................   Passed    0.00 sec
+        Start  66: CacheLineAlignedLayout.LinesNeeded
+ 66/224 Test  #66: CacheLineAlignedLayout.LinesNeeded ........................................   Passed    0.00 sec
+        Start  67: CacheLineAlignedLayout.IsAlignedCheck
+ 67/224 Test  #67: CacheLineAlignedLayout.IsAlignedCheck .....................................   Passed    0.00 sec
+        Start  68: CacheLineAlignedLayout.SlotViewReturnsCorrectSubspan
+ 68/224 Test  #68: CacheLineAlignedLayout.SlotViewReturnsCorrectSubspan ......................   Passed    0.00 sec
+        Start  69: MultiLevelLayout.DefaultBudgetsMatchExpectations
+ 69/224 Test  #69: MultiLevelLayout.DefaultBudgetsMatchExpectations ..........................   Passed    0.00 sec
+        Start  70: MultiLevelLayout.TierClassificationByOffset
+ 70/224 Test  #70: MultiLevelLayout.TierClassificationByOffset ...............................   Passed    0.00 sec
+        Start  71: MultiLevelLayout.ResolveAddressUsesAlignedSlot
+ 71/224 Test  #71: MultiLevelLayout.ResolveAddressUsesAlignedSlot ............................   Passed    0.00 sec
+        Start  72: MultiLevelLayout.KeyAtZeroIsHotTier
+ 72/224 Test  #72: MultiLevelLayout.KeyAtZeroIsHotTier .......................................   Passed    0.00 sec
+        Start  73: MultiLevelLayout.BudgetCanBeChanged
+ 73/224 Test  #73: MultiLevelLayout.BudgetCanBeChanged .......................................   Passed    0.00 sec
+        Start  74: PoolDescriptor.KindNamesAreSpecific
+ 74/224 Test  #74: PoolDescriptor.KindNamesAreSpecific .......................................   Passed    0.00 sec
+        Start  75: PoolStatistics.OnAllocIncrementsCounters
+ 75/224 Test  #75: PoolStatistics.OnAllocIncrementsCounters ..................................   Passed    0.00 sec
+        Start  76: PoolStatistics.OnDeallocReducesInUse
+ 76/224 Test  #76: PoolStatistics.OnDeallocReducesInUse ......................................   Passed    0.00 sec
+        Start  77: PoolStatistics.OnDeallocClampsAtZero
+ 77/224 Test  #77: PoolStatistics.OnDeallocClampsAtZero ......................................   Passed    0.00 sec
+        Start  78: PoolSet.SevenPoolsExist
+ 78/224 Test  #78: PoolSet.SevenPoolsExist ...................................................   Passed    0.00 sec
+        Start  79: PoolSet.EachPoolKindIsAccessible
+ 79/224 Test  #79: PoolSet.EachPoolKindIsAccessible ..........................................   Passed    0.00 sec
+        Start  80: PoolSet.ConfigureSetsSlotSizeAndCapacity
+ 80/224 Test  #80: PoolSet.ConfigureSetsSlotSizeAndCapacity ..................................   Passed    0.00 sec
+        Start  81: PoolSet.NoteAllocAggregatesAcrossPools
+ 81/224 Test  #81: PoolSet.NoteAllocAggregatesAcrossPools ....................................   Passed    0.00 sec
+        Start  82: PoolSet.NoteDeallocReducesInUse
+ 82/224 Test  #82: PoolSet.NoteDeallocReducesInUse ...........................................   Passed    0.00 sec
+        Start  83: PoolRouter.RoutePageEncodingsToCorrectPools
+ 83/224 Test  #83: PoolRouter.RoutePageEncodingsToCorrectPools ...............................   Passed    0.00 sec
+        Start  84: PoolRouter.RouteValueHandlesToValuePools
+ 84/224 Test  #84: PoolRouter.RouteValueHandlesToValuePools ..................................   Passed    0.00 sec
+        Start  85: PoolRouter.MiscRoutesToRestPool
+ 85/224 Test  #85: PoolRouter.MiscRoutesToRestPool ...........................................   Passed    0.00 sec
+        Start  86: OlcWithReservedValueBlocks.InitialVersionIsZero
+ 86/224 Test  #86: OlcWithReservedValueBlocks.InitialVersionIsZero ...........................   Passed    0.00 sec
+        Start  87: OlcWithReservedValueBlocks.ValidateUnchangedVersion
+ 87/224 Test  #87: OlcWithReservedValueBlocks.ValidateUnchangedVersion .......................   Passed    0.00 sec
+        Start  88: OlcWithReservedValueBlocks.BeginWriteSetsWriteMarker
+ 88/224 Test  #88: OlcWithReservedValueBlocks.BeginWriteSetsWriteMarker ......................   Passed    0.00 sec
+        Start  89: OlcWithReservedValueBlocks.EndWriteIncrementsAndClearsMarker
+ 89/224 Test  #89: OlcWithReservedValueBlocks.EndWriteIncrementsAndClearsMarker ..............   Passed    0.00 sec
+        Start  90: OlcWithReservedValueBlocks.ValidateFailsAfterWrite
+ 90/224 Test  #90: OlcWithReservedValueBlocks.ValidateFailsAfterWrite ........................   Passed    0.00 sec
+        Start  91: OlcWithReservedValueBlocks.ReserveBlockReturnsUniqueIds
+ 91/224 Test  #91: OlcWithReservedValueBlocks.ReserveBlockReturnsUniqueIds ...................   Passed    0.00 sec
+        Start  92: OlcWithReservedValueBlocks.ResetClearsState
+ 92/224 Test  #92: OlcWithReservedValueBlocks.ResetClearsState ...............................   Passed    0.00 sec
+        Start  93: OlcWithReservedValueBlocks.SecondWriterCannotEnterWhileFirstActive
+ 93/224 Test  #93: OlcWithReservedValueBlocks.SecondWriterCannotEnterWhileFirstActive ........   Passed    0.02 sec
+        Start  94: OlcWithReservedValueBlocks.ConcurrentWritersKeepMonotoneEvenGenerations
+ 94/224 Test  #94: OlcWithReservedValueBlocks.ConcurrentWritersKeepMonotoneEvenGenerations ...   Passed    0.00 sec
+        Start  95: WriteGuard.AcquiresAndReleasesAutomatically
+ 95/224 Test  #95: WriteGuard.AcquiresAndReleasesAutomatically ...............................   Passed    0.00 sec
+        Start  96: WriteGuard.EachGuardReservesNewBlock
+ 96/224 Test  #96: WriteGuard.EachGuardReservesNewBlock ......................................   Passed    0.00 sec
+        Start  97: DistanceEstimator.MinAndMaxBoundsAreEnforced
+ 97/224 Test  #97: DistanceEstimator.MinAndMaxBoundsAreEnforced ..............................   Passed    0.00 sec
+        Start  98: DistanceEstimator.SparseHighLatencyHasLargerDistance
+ 98/224 Test  #98: DistanceEstimator.SparseHighLatencyHasLargerDistance ......................   Passed    0.00 sec
+        Start  99: DistanceEstimator.DistanceIsAlwaysWithinBounds
+ 99/224 Test  #99: DistanceEstimator.DistanceIsAlwaysWithinBounds ............................   Passed    0.00 sec
+        Start 100: PathOrientedPrefetch.EmptyQueueAfterConstruction
+100/224 Test #100: PathOrientedPrefetch.EmptyQueueAfterConstruction ..........................   Passed    0.00 sec
+        Start 101: PathOrientedPrefetch.EnqueueIncrementsCounters
+101/224 Test #101: PathOrientedPrefetch.EnqueueIncrementsCounters ............................   Passed    0.00 sec
+        Start 102: PathOrientedPrefetch.SuggestExtrapolates
+102/224 Test #102: PathOrientedPrefetch.SuggestExtrapolates ..................................   Passed    0.00 sec
+        Start 103: PathOrientedPrefetch.QueueIsBoundedAt16
+103/224 Test #103: PathOrientedPrefetch.QueueIsBoundedAt16 ...................................   Passed    0.00 sec
+        Start 104: PathOrientedPrefetch.ResetClearsQueue
+104/224 Test #104: PathOrientedPrefetch.ResetClearsQueue .....................................   Passed    0.00 sec
+        Start 105: RedirectPrefetch.ScheduleTracksAddress
+105/224 Test #105: RedirectPrefetch.ScheduleTracksAddress ....................................   Passed    0.00 sec
+        Start 106: RedirectPrefetch.FanOutSlotsRespectCacheLineSize
+106/224 Test #106: RedirectPrefetch.FanOutSlotsRespectCacheLineSize ..........................   Passed    0.00 sec
+        Start 107: RedirectPrefetch.NegativeOffsetIsClampedAtZero
+107/224 Test #107: RedirectPrefetch.NegativeOffsetIsClampedAtZero ............................   Passed    0.00 sec
+        Start 108: RedirectPrefetch.ResetClearsState
+108/224 Test #108: RedirectPrefetch.ResetClearsState .........................................   Passed    0.00 sec
+        Start 109: DensityTracker.EmptyAfterConstruction
+109/224 Test #109: DensityTracker.EmptyAfterConstruction .....................................   Passed    0.00 sec
+        Start 110: DensityTracker.RecordAndQuery
+110/224 Test #110: DensityTracker.RecordAndQuery .............................................   Passed    0.00 sec
+        Start 111: DensityTracker.Histogram4BucketsByThresholds
+111/224 Test #111: DensityTracker.Histogram4BucketsByThresholds ..............................   Passed    0.00 sec
+        Start 112: DensityTracker.ResetClearsHistory
+112/224 Test #112: DensityTracker.ResetClearsHistory .........................................   Passed    0.00 sec
+        Start 113: H1PageTypeCost.NoteLookupBuildsOnlineMean
+113/224 Test #113: H1PageTypeCost.NoteLookupBuildsOnlineMean .................................   Passed    0.00 sec
+        Start 114: H1PageTypeCost.MultiplePageTypesTrackedSeparately
+114/224 Test #114: H1PageTypeCost.MultiplePageTypesTrackedSeparately .........................   Passed    0.00 sec
+        Start 115: H2CodeQuality.ScoreAndNote
+115/224 Test #115: H2CodeQuality.ScoreAndNote ................................................   Passed    0.00 sec
+        Start 116: H3InlineVsExternal.EmptyTotalIsZero
+116/224 Test #116: H3InlineVsExternal.EmptyTotalIsZero .......................................   Passed    0.00 sec
+        Start 117: H3InlineVsExternal.SharesSumToOne
+117/224 Test #117: H3InlineVsExternal.SharesSumToOne .........................................   Passed    0.00 sec
+        Start 118: PrtArtHypothesisMetrics.AllThreeAccessible
+118/224 Test #118: PrtArtHypothesisMetrics.AllThreeAccessible ................................   Passed    0.00 sec
+        Start 119: PrtArtIdentity.FlagsAreNonEmpty
+119/224 Test #119: PrtArtIdentity.FlagsAreNonEmpty ...........................................   Passed    0.00 sec
+        Start 120: PrtArtIdentity.FlagsAreValidCombination
+120/224 Test #120: PrtArtIdentity.FlagsAreValidCombination ...................................   Passed    0.00 sec
+        Start 121: PrtArtIdentity.FlagsHaveAllBanksFilled
+121/224 Test #121: PrtArtIdentity.FlagsHaveAllBanksFilled ....................................   Passed    0.00 sec
+        Start 122: PrtArtIdentity.IdentifierIsHexString
+122/224 Test #122: PrtArtIdentity.IdentifierIsHexString ......................................   Passed    0.00 sec
+        Start 123: PrtArtIdentity.FlagsContainPrtartSpecificPageBits
+123/224 Test #123: PrtArtIdentity.FlagsContainPrtartSpecificPageBits .........................   Passed    0.00 sec
+        Start 124: PrtArtIdentity.ContainsPrtArtBPlusAndRedirectNodes
+124/224 Test #124: PrtArtIdentity.ContainsPrtArtBPlusAndRedirectNodes ........................   Passed    0.00 sec
+        Start 125: PrtArtIdentity.OlcConcurrencyIsSet
+125/224 Test #125: PrtArtIdentity.OlcConcurrencyIsSet ........................................   Passed    0.00 sec
+        Start 126: MapApi.EmptyAfterConstruction
+126/224 Test #126: MapApi.EmptyAfterConstruction .............................................   Passed    0.00 sec
+        Start 127: MapApi.IdentityFlagsMatchFreeFunction
+127/224 Test #127: MapApi.IdentityFlagsMatchFreeFunction .....................................   Passed    0.00 sec
+        Start 128: MapApi.IdentifierMatchesFreeFunction
+128/224 Test #128: MapApi.IdentifierMatchesFreeFunction ......................................   Passed    0.00 sec
+        Start 129: MapApi.PoolsConfiguredFor7Slots
+129/224 Test #129: MapApi.PoolsConfiguredFor7Slots ...........................................   Passed    0.00 sec
+        Start 130: MapApi.InsertReturnsStatusOk
+130/224 Test #130: MapApi.InsertReturnsStatusOk ..............................................   Passed    0.00 sec
+        Start 131: MapApi.InsertExistingReturnsKeyAlreadyExists
+131/224 Test #131: MapApi.InsertExistingReturnsKeyAlreadyExists ..............................   Passed    0.00 sec
+        Start 132: MapApi.SetUpdatesExistingKey
+132/224 Test #132: MapApi.SetUpdatesExistingKey ..............................................   Passed    0.00 sec
+        Start 133: MapApi.LookupOnEmptyReturnsNullopt
+133/224 Test #133: MapApi.LookupOnEmptyReturnsNullopt ........................................   Passed    0.00 sec
+        Start 134: MapApi.LookupAfterInsertRoundtrip
+134/224 Test #134: MapApi.LookupAfterInsertRoundtrip .........................................   Passed    0.00 sec
+        Start 135: MapApi.EraseRemovesEntryAndReturnsOk
+135/224 Test #135: MapApi.EraseRemovesEntryAndReturnsOk ......................................   Passed    0.00 sec
+        Start 136: MapApi.EraseNonExistentReturnsKeyNotFound
+136/224 Test #136: MapApi.EraseNonExistentReturnsKeyNotFound .................................   Passed    0.00 sec
+        Start 137: MapApi.ClearRemovesAll
+137/224 Test #137: MapApi.ClearRemovesAll ....................................................   Passed    0.00 sec
+        Start 138: MapApi.ContainsAndCount
+138/224 Test #138: MapApi.ContainsAndCount ...................................................   Passed    0.00 sec
+        Start 139: MapApi.RangeScanReturnsNonEmpty
+139/224 Test #139: MapApi.RangeScanReturnsNonEmpty ...........................................   Passed    0.00 sec
+        Start 140: MapApi.StringKeyAndStringValueWorks
+140/224 Test #140: MapApi.StringKeyAndStringValueWorks .......................................   Passed    0.00 sec
+        Start 141: MapApi.DensityTrackerReceivesUpdatesOnInserts
+141/224 Test #141: MapApi.DensityTrackerReceivesUpdatesOnInserts .............................   Passed    0.00 sec
+        Start 142: MapApi.OlcReservedBlocksGrowWithWrites
+142/224 Test #142: MapApi.OlcReservedBlocksGrowWithWrites ....................................   Passed    0.00 sec
+        Start 143: MapApi.MultiThreadedInsertsAreConsistent
+143/224 Test #143: MapApi.MultiThreadedInsertsAreConsistent ..................................   Passed    0.00 sec
+        Start 144: MapApi.HitMissCountersTracked
+144/224 Test #144: MapApi.HitMissCountersTracked .............................................   Passed    0.00 sec
+        Start 145: MapApi.ComponentAccessorsAreReachable
+145/224 Test #145: MapApi.ComponentAccessorsAreReachable .....................................   Passed    0.00 sec
+        Start 146: TupleApi.MappedTypeIsTuple
+146/224 Test #146: TupleApi.MappedTypeIsTuple ................................................   Passed    0.00 sec
+        Start 147: TupleApi.InsertWithMultipleValuesPacksIntoTuple
+147/224 Test #147: TupleApi.InsertWithMultipleValuesPacksIntoTuple ...........................   Passed    0.00 sec
+        Start 148: TupleApi.DuplicateInsertReturnsKeyAlreadyExists
+148/224 Test #148: TupleApi.DuplicateInsertReturnsKeyAlreadyExists ...........................   Passed    0.00 sec
+        Start 149: TupleApi.EraseInTupleMode
+149/224 Test #149: TupleApi.EraseInTupleMode .................................................   Passed    0.00 sec
+        Start 150: VectorApi.EmptyAfterConstruction
+150/224 Test #150: VectorApi.EmptyAfterConstruction ..........................................   Passed    0.00 sec
+        Start 151: VectorApi.PushBackReturnsStatusOk
+151/224 Test #151: VectorApi.PushBackReturnsStatusOk .........................................   Passed    0.00 sec
+        Start 152: VectorApi.AtAndFrontBackReadAccess
+152/224 Test #152: VectorApi.AtAndFrontBackReadAccess ........................................   Passed    0.00 sec
+        Start 153: VectorApi.AtOutOfRangeReturnsNullopt
+153/224 Test #153: VectorApi.AtOutOfRangeReturnsNullopt ......................................   Passed    0.00 sec
+        Start 154: VectorApi.FrontBackOnEmptyReturnNullopt
+154/224 Test #154: VectorApi.FrontBackOnEmptyReturnNullopt ...................................   Passed    0.00 sec
+        Start 155: VectorApi.PopBackRemovesLast
+155/224 Test #155: VectorApi.PopBackRemovesLast ..............................................   Passed    0.00 sec
+        Start 156: VectorApi.PopBackOnEmptyReturnsEmptyContainer
+156/224 Test #156: VectorApi.PopBackOnEmptyReturnsEmptyContainer .............................   Passed    0.00 sec
+        Start 157: VectorApi.SetAtUpdatesElement
+157/224 Test #157: VectorApi.SetAtUpdatesElement .............................................   Passed    0.00 sec
+        Start 158: VectorApi.SetAtOutOfRangeReturnsError
+158/224 Test #158: VectorApi.SetAtOutOfRangeReturnsError .....................................   Passed    0.00 sec
+        Start 159: VectorApi.InsertAtInTheMiddle
+159/224 Test #159: VectorApi.InsertAtInTheMiddle .............................................   Passed    0.00 sec
+        Start 160: VectorApi.EraseAtRemovesElement
+160/224 Test #160: VectorApi.EraseAtRemovesElement ...........................................   Passed    0.00 sec
+        Start 161: VectorApi.ClearAndReserveAndResize
+161/224 Test #161: VectorApi.ClearAndReserveAndResize ........................................   Passed    0.00 sec
+        Start 162: VectorApi.AssignReplacesAll
+162/224 Test #162: VectorApi.AssignReplacesAll ...............................................   Passed    0.00 sec
+        Start 163: VectorApi.ShrinkToFitOk
+163/224 Test #163: VectorApi.ShrinkToFitOk ...................................................   Passed    0.00 sec
+        Start 164: VectorApi.DataPointerAccess
+164/224 Test #164: VectorApi.DataPointerAccess ...............................................   Passed    0.00 sec
+        Start 165: VectorApi.IteratorsTraverse
+165/224 Test #165: VectorApi.IteratorsTraverse ...............................................   Passed    0.00 sec
+        Start 166: VectorApi.IdentityFlagsMatchEvenInVectorMode
+166/224 Test #166: VectorApi.IdentityFlagsMatchEvenInVectorMode ..............................   Passed    0.00 sec
+        Start 167: VectorApi.ComponentAccessorsAreReachable
+167/224 Test #167: VectorApi.ComponentAccessorsAreReachable ..................................   Passed    0.00 sec
+        Start 168: VectorApi.MultiThreadedPushBackIsConsistent
+168/224 Test #168: VectorApi.MultiThreadedPushBackIsConsistent ...............................   Passed    0.00 sec
+        Start 169: Status.ConstantsAreDistinct
+169/224 Test #169: Status.ConstantsAreDistinct ...............................................   Passed    0.00 sec
+        Start 170: VectorApi_V12.OperatorBracketReturnsValueAtIndex
+170/224 Test #170: VectorApi_V12.OperatorBracketReturnsValueAtIndex ..........................   Passed    0.00 sec
+        Start 171: VectorApi_V12.EmplaceBackWithArgs
+171/224 Test #171: VectorApi_V12.EmplaceBackWithArgs .........................................   Passed    0.00 sec
+        Start 172: VectorApi_V12.SwapTwoEngines
+172/224 Test #172: VectorApi_V12.SwapTwoEngines ..............................................   Passed    0.00 sec
+        Start 173: VectorApi_V12.ReverseIteratorsTraverseInReverseOrder
+173/224 Test #173: VectorApi_V12.ReverseIteratorsTraverseInReverseOrder ......................   Passed    0.00 sec
+        Start 174: VectorApi_V12.AssignFromRange
+174/224 Test #174: VectorApi_V12.AssignFromRange .............................................   Passed    0.00 sec
+        Start 175: MapApi_V12.OperatorBracketLookup
+175/224 Test #175: MapApi_V12.OperatorBracketLookup ..........................................   Passed    0.00 sec
+        Start 176: MapApi_V12.EmplaceWithArgs
+176/224 Test #176: MapApi_V12.EmplaceWithArgs ................................................   Passed    0.00 sec
+        Start 177: MapApi_V12.TryEmplaceFailsOnExistingKey
+177/224 Test #177: MapApi_V12.TryEmplaceFailsOnExistingKey ...................................   Passed    0.00 sec
+        Start 178: MapApi_V12.InsertOrAssignOverwrites
+178/224 Test #178: MapApi_V12.InsertOrAssignOverwrites .......................................   Passed    0.00 sec
+        Start 179: MapApi_V12.SwapTwoMaps
+179/224 Test #179: MapApi_V12.SwapTwoMaps ....................................................   Passed    0.00 sec
+        Start 180: MapApi_V12.MaxSizeIsPositive
+180/224 Test #180: MapApi_V12.MaxSizeIsPositive ..............................................   Passed    0.00 sec
+        Start 181: MapApi_V12.KeyCompAndValueCompCallable
+181/224 Test #181: MapApi_V12.KeyCompAndValueCompCallable ....................................   Passed    0.00 sec
+        Start 182: MapApi_V13.MergeTakesOnlyUniqueKeys
+182/224 Test #182: MapApi_V13.MergeTakesOnlyUniqueKeys .......................................   Passed    0.00 sec
+        Start 183: MapApi_V13.ExtractReturnsValueAndRemoves
+183/224 Test #183: MapApi_V13.ExtractReturnsValueAndRemoves ..................................   Passed    0.00 sec
+        Start 184: MapApi_V13.ExtractMissingKeyReturnsNullopt
+184/224 Test #184: MapApi_V13.ExtractMissingKeyReturnsNullopt ................................   Passed    0.00 sec
+        Start 185: VarLenEncoder.EncodesSmallValuesIn1Byte
+185/224 Test #185: VarLenEncoder.EncodesSmallValuesIn1Byte ...................................   Passed    0.00 sec
+        Start 186: VarLenEncoder.EncodesLargerValuesInMultipleBytes
+186/224 Test #186: VarLenEncoder.EncodesLargerValuesInMultipleBytes ..........................   Passed    0.00 sec
+        Start 187: VarLenEncoder.EncodeDecodeRoundtrip
+187/224 Test #187: VarLenEncoder.EncodeDecodeRoundtrip .......................................   Passed    0.00 sec
+        Start 188: SignalingStream.EmptyOnConstruction
+188/224 Test #188: SignalingStream.EmptyOnConstruction .......................................   Passed    0.00 sec
+        Start 189: SignalingStream.AppendNormalEntry
+189/224 Test #189: SignalingStream.AppendNormalEntry .........................................   Passed    0.00 sec
+        Start 190: SignalingStream.DecodeRoundtripSingleEntry
+190/224 Test #190: SignalingStream.DecodeRoundtripSingleEntry ................................   Passed    0.00 sec
+        Start 191: SignalingStream.MultipleEntriesIterable
+191/224 Test #191: SignalingStream.MultipleEntriesIterable ...................................   Passed    0.00 sec
+        Start 192: SignalingStream.ClearResets
+192/224 Test #192: SignalingStream.ClearResets ...............................................   Passed    0.00 sec
+        Start 193: LinearValueBuffer.EmptyOnConstruction
+193/224 Test #193: LinearValueBuffer.EmptyOnConstruction .....................................   Passed    0.00 sec
+        Start 194: LinearValueBuffer.AppendAndRead
+194/224 Test #194: LinearValueBuffer.AppendAndRead ...........................................   Passed    0.00 sec
+        Start 195: LinearValueBuffer.EraseMarksTombstone
+195/224 Test #195: LinearValueBuffer.EraseMarksTombstone .....................................   Passed    0.00 sec
+        Start 196: LinearValueBuffer.EraseTwiceIsSafe
+196/224 Test #196: LinearValueBuffer.EraseTwiceIsSafe ........................................   Passed    0.00 sec
+        Start 197: LinearValueBuffer.ShouldCompactBelowThreshold
+197/224 Test #197: LinearValueBuffer.ShouldCompactBelowThreshold .............................   Passed    0.00 sec
+        Start 198: LinearValueBuffer.ShouldCompactAboveThreshold
+198/224 Test #198: LinearValueBuffer.ShouldCompactAboveThreshold .............................   Passed    0.00 sec
+        Start 199: LinearValueBuffer.CompactRemovesTombstonesAndRemaps
+199/224 Test #199: LinearValueBuffer.CompactRemovesTombstonesAndRemaps .......................   Passed    0.00 sec
+        Start 200: LizenzKonsistenz.KeinFremderSpdxBezeichnerImEigencode
+200/224 Test #200: LizenzKonsistenz.KeinFremderSpdxBezeichnerImEigencode .....................   Passed    0.01 sec
+        Start 201: LizenzKonsistenz.LicenseUndNoticeNennenDenselbenBezeichner
+201/224 Test #201: LizenzKonsistenz.LicenseUndNoticeNennenDenselbenBezeichner ................   Passed    0.00 sec
+        Start 202: LizenzKonsistenz.ChangeDateStehtUndIstDerEntschiedene
+202/224 Test #202: LizenzKonsistenz.ChangeDateStehtUndIstDerEntschiedene .....................   Passed    0.00 sec
+        Start 203: LizenzKonsistenz.ChangeDateIstEinIsoDatumNachOf1
+203/224 Test #203: LizenzKonsistenz.ChangeDateIstEinIsoDatumNachOf1 ..........................   Passed    0.00 sec
+        Start 204: LizenzKonsistenz.ChangeDateStehtInNoticeUndReadmeOhnePlatzhalterRest
+204/224 Test #204: LizenzKonsistenz.ChangeDateStehtInNoticeUndReadmeOhnePlatzhalterRest ......   Passed    0.00 sec
+        Start 205: LizenzKonsistenzKoeder.SaubererBaumIstGruen
+205/224 Test #205: LizenzKonsistenzKoeder.SaubererBaumIstGruen ...............................   Passed    0.00 sec
+        Start 206: LizenzKonsistenzKoeder.FremderSpdxBezeichnerWirdGefunden
+206/224 Test #206: LizenzKonsistenzKoeder.FremderSpdxBezeichnerWirdGefunden ..................   Passed    0.00 sec
+        Start 207: LizenzKonsistenzKoeder.NoticeMitApacheBehauptungWirdGefunden
+207/224 Test #207: LizenzKonsistenzKoeder.NoticeMitApacheBehauptungWirdGefunden ..............   Passed    0.00 sec
+        Start 208: LizenzKonsistenzKoeder.VergessenerOf1PlatzhalterInNoticeWirdGefunden
+208/224 Test #208: LizenzKonsistenzKoeder.VergessenerOf1PlatzhalterInNoticeWirdGefunden ......   Passed    0.00 sec
+        Start 209: DefaultLookupRegistry.EnumeratesNineAxes
+209/224 Test #209: DefaultLookupRegistry.EnumeratesNineAxes ..................................   Passed    0.00 sec
+        Start 210: DefaultLookupRegistry.KnownAxesAreFlagged
+210/224 Test #210: DefaultLookupRegistry.KnownAxesAreFlagged .................................   Passed    0.00 sec
+        Start 211: DefaultLookupRegistry.PrtArtEigeneAchsenSindNichtDefaultLookup
+211/224 Test #211: DefaultLookupRegistry.PrtArtEigeneAchsenSindNichtDefaultLookup ............   Passed    0.00 sec
+        Start 212: DefaultLookupRegistry.UnknownAxisIsNotDefaultLookup
+212/224 Test #212: DefaultLookupRegistry.UnknownAxisIsNotDefaultLookup .......................   Passed    0.00 sec
+        Start 213: DefaultLookupRegistry.EachAxisHasCeLibraryPath
+213/224 Test #213: DefaultLookupRegistry.EachAxisHasCeLibraryPath ............................   Passed    0.00 sec
+        Start 214: LeafOnlyCounter.InnerNodeAccessIsNoOp
+214/224 Test #214: LeafOnlyCounter.InnerNodeAccessIsNoOp .....................................   Passed    0.00 sec
+        Start 215: LeafOnlyCounter.LeafAccessIncrements
+215/224 Test #215: LeafOnlyCounter.LeafAccessIncrements ......................................   Passed    0.00 sec
+        Start 216: LeafOnlyCounter.MixedLeafAndInnerNodes
+216/224 Test #216: LeafOnlyCounter.MixedLeafAndInnerNodes ....................................   Passed    0.00 sec
+        Start 217: LeafOnlyCounter.CachePressureEstimate
+217/224 Test #217: LeafOnlyCounter.CachePressureEstimate .....................................   Passed    0.00 sec
+        Start 218: LeafOnlyCounter.EmptyCounterPressureZero
+218/224 Test #218: LeafOnlyCounter.EmptyCounterPressureZero ..................................   Passed    0.00 sec
+        Start 219: LeafOnlyCounter.ConcurrentAccessIsThreadSafeOnSameLeaf
+219/224 Test #219: LeafOnlyCounter.ConcurrentAccessIsThreadSafeOnSameLeaf ....................   Passed    0.00 sec
+        Start 220: LeafOnlyCounter.Reset
+220/224 Test #220: LeafOnlyCounter.Reset .....................................................   Passed    0.00 sec
+        Start 221: LeafOnlyCounter.ConcurrentResetAndRecordNoUseAfterFree
+221/224 Test #221: LeafOnlyCounter.ConcurrentResetAndRecordNoUseAfterFree ....................   Passed    0.03 sec
+        Start 222: PerNodeCounter.IncrementsAllNodesInclInner
+222/224 Test #222: PerNodeCounter.IncrementsAllNodesInclInner ................................   Passed    0.00 sec
+        Start 223: PerNodeCounter.TrackedNodesGrowsLinearlyWithUniqueAccesses
+223/224 Test #223: PerNodeCounter.TrackedNodesGrowsLinearlyWithUniqueAccesses ................   Passed    0.00 sec
+        Start 224: KuehnComparison.LeafOnlyTracksFewerNodesThanPerNode
+224/224 Test #224: KuehnComparison.LeafOnlyTracksFewerNodesThanPerNode .......................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 224
+
+Total Test time (real) =   0.25 sec

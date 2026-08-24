@@ -1,0 +1,50 @@
+KOMBIBAU-Z12-NEUFAHRT ENDSTAND 943c70ee52796da8dede7ace1bf3a370a0994d16 2026-08-24T11:38:25Z
+===== ZELLE gcc-rel (gcc-15/Release) START 11:38:25 =====
+/dev/nvme0n1p2  251G  220G   19G  93% /
+-- Schritt 1: Configure --
+-- Schritt 2: 7 Werkzeuge + Facade bauen --
+-- Schritt 3: RE-CONFIGURE --
+-- Schritt 4: Vollbau (all) --
+-- Schritt 5: comdare_tests --
+-- Schritt 6: ctest (FRISCH) --
+100% tests passed, 0 tests failed out of 545
+FRISCH-BELEG LastTest.log: 2026-08-24T11:40:45Z
+ZELLE gcc-rel GRUEN
+/dev/nvme0n1p2  251G  220G   19G  93% /
+===== ZELLE clang-rel (clang-22/Release) START 11:40:45 =====
+/dev/nvme0n1p2  251G  220G   19G  93% /
+-- Schritt 1: Configure --
+-- Schritt 2: 7 Werkzeuge + Facade bauen --
+-- Schritt 3: RE-CONFIGURE --
+-- Schritt 4: Vollbau (all) --
+-- Schritt 5: comdare_tests --
+-- Schritt 6: ctest (FRISCH) --
+100% tests passed, 0 tests failed out of 545
+FRISCH-BELEG LastTest.log: 2026-08-24T11:43:26Z
+ZELLE clang-rel GRUEN
+/dev/nvme0n1p2  251G  217G   22G  91% /
+===== ZELLE gcc-dbg (gcc-15/Debug) START 11:43:26 =====
+/dev/nvme0n1p2  251G  217G   22G  91% /
+-- Schritt 1: Configure --
+-- Schritt 2: 7 Werkzeuge + Facade bauen --
+-- Schritt 3: RE-CONFIGURE --
+-- Schritt 4: Vollbau (all) --
+-- Schritt 5: comdare_tests --
+-- Schritt 6: ctest (FRISCH) --
+100% tests passed, 0 tests failed out of 545
+FRISCH-BELEG LastTest.log: 2026-08-24T11:46:07Z
+ZELLE gcc-dbg GRUEN
+/dev/nvme0n1p2  251G  219G   20G  92% /
+===== ZELLE clang-dbg (clang-22/Debug) START 11:46:07 =====
+/dev/nvme0n1p2  251G  219G   20G  92% /
+-- Schritt 1: Configure --
+-- Schritt 2: 7 Werkzeuge + Facade bauen --
+-- Schritt 3: RE-CONFIGURE --
+-- Schritt 4: Vollbau (all) --
+-- Schritt 5: comdare_tests --
+-- Schritt 6: ctest (FRISCH) --
+100% tests passed, 0 tests failed out of 545
+FRISCH-BELEG LastTest.log: 2026-08-24T11:48:39Z
+ZELLE clang-dbg GRUEN
+/dev/nvme0n1p2  251G  219G   20G  92% /
+KOMBIBAU-Z12-NEUFAHRT-ENDE FAIL=0 2026-08-24T11:48:39Z

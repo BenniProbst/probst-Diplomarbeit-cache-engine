@@ -1,0 +1,61 @@
+-----------------------------------------------------------------------------
+FALL 1: N  Positiv-Fall (NENNER): echter Plan gegen echtes Objekt
+  [OK]   rc=0 wie gefordert
+  [OK]   Ausgabe enthaelt literal: 5 von 5 Ankern
+  [OK]   Ausgabe enthaelt literal: 943c70ee52796da8dede7ace1bf3a370a0994d16
+
+-----------------------------------------------------------------------------
+FALL 2: K1 Anker 'SCHEMA-DATEIEN' auf gewuerfelten Falschwert 75 gesetzt (echt: 24)
+  [OK]   rc=1 wie gefordert
+  [OK]   Ausgabe enthaelt literal: Plan sagt 75, Objekt liefert 24
+
+-----------------------------------------------------------------------------
+FALL 3: K2 2 gewuerfelte Altmuster-Zeilen in eine .gitlab-ci.yml-Kopie geschleust
+  [OK]   rc=1 wie gefordert
+  [OK]   Ausgabe enthaelt literal: CI-ALTMUSTER   : Plan sagt 0, Objekt liefert 2
+
+-----------------------------------------------------------------------------
+FALL 4: K3 beide Ausfuehrungszeilen der Mess-Ausbeute-Wache aus der Kopie entfernt
+        Koeder beisst: 2 Ausfuehrungszeilen entfernt, 0 uebrig.
+  [OK]   rc=1 wie gefordert
+  [OK]   Ausgabe enthaelt literal: CI-AUFRUFE     : Plan sagt 2, Objekt liefert 0
+
+-----------------------------------------------------------------------------
+FALL 5: K4 Plan nennt ce-SHA ac6c2819845c530ebd923cd46714581d3c16babc, HEAD fuehrt 943c70ee52796da8dede7ace1bf3a370a0994d16
+  [OK]   rc=2 wie gefordert
+  [OK]   Ausgabe enthaelt literal: einen ANDEREN ce-Zustand
+
+-----------------------------------------------------------------------------
+FALL 6: K5 Gitlink zeigt auf einen Commit, den kein Klon fuehrt
+  [OK]   rc=2 wie gefordert
+  [OK]   Ausgabe enthaelt literal: KEIN Gruen ohne Messung
+
+-----------------------------------------------------------------------------
+FALL 7: K6 Anker-Block aus dem Plan entfernt
+  [OK]   rc=2 wie gefordert
+  [OK]   Ausgabe enthaelt literal: Ohne Anker gibt es kein SOLL
+
+-----------------------------------------------------------------------------
+FALL 8: K7 Wegwerf-ce: 10 gewuerfelte Aufruf-Stellen in 5 Dateien (+ je 1 Kommentar-Aufrufe)
+  [OK]   rc=0 wie gefordert
+  [OK]   Ausgabe enthaelt literal: SCHEMA-STELLEN : Plan sagt 10, Objekt liefert 10
+  [OK]   Ausgabe enthaelt literal: SCHEMA-DATEIEN : Plan sagt 5, Objekt liefert 5
+
+-----------------------------------------------------------------------------
+FALL 9: K8 dieselbe Wegwerf-Lage, Anker um +1 verschoben (11 statt 10)
+  [OK]   rc=1 wie gefordert
+  [OK]   Ausgabe enthaelt literal: Plan sagt 11, Objekt liefert 10
+
+-----------------------------------------------------------------------------
+FALL 10: K9 eigene Registrierung in .gitlab-ci.yml, ohne allow_failure
+        Nenner: 2968 Zeilen in .gitlab-ci.yml.
+  [OK]   Probe wird gerufen (1 Treffer), Wache erwaehnt (1 Treffer)
+  [OK]   kein allow_failure im Job docs:plan-zahlen-wache
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  10 Faelle gefahren, 22 Zusicherungen gehalten, 0 gerissen.
+  Gewuerfelt in diesem Lauf: Anker='SCHEMA-DATEIEN' Falschwert=75, Altmuster=2,
+  Wegwerf-ce=10 Stellen in 5 Dateien (+ 1 Kommentar-Aufrufe je Datei).
+-----------------------------------------------------------------------------
+PLAN-ZAHLEN-PROBE: OK (10 Faelle, 22 Zusicherungen, beide Richtungen gefahren).

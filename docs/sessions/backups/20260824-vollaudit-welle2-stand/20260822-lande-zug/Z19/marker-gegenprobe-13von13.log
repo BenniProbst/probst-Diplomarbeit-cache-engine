@@ -1,0 +1,35 @@
+=== Befund-Bn-Marker (alle Dateien) ===
+      2 Befund B1
+      1 Befund B10
+      1 Befund B11
+      3 Befund B2
+      3 Befund B3
+      4 Befund B4
+      2 Befund B5
+      3 Befund B6
+      2 Befund B7
+      2 Befund B8
+      3 Befund B9
+=== GRENZE-Marker ===
+fixture_schema_subset_check.cmake:144:#    AUSGEWIESENE GRENZE, nicht verschwiegen: nur EINE Ebene. Includet eine inkludierte Datei ihrerseits
+golden_n_consistency_check.cmake:51:# AUSGEWIESENE GRENZE (B14-NB4/NB5, geprueft statt behauptet): ALLE XPath-Pfade dieser Wache sind
+xml_canonical_utils.cmake:163:#    GRENZE VON CMAKE -P, hier bewusst offen benannt statt verschwiegen -- eine ausgewiesene Grenze
+xml_canonical_utils.cmake:531:#    AUSGEWIESENE GRENZE (B14-NB5, am Objekt geprueft statt behauptet): xmllints XPath-Zahl-zu-String-
+xml_canonical_utils.cmake:549:            "Kopf-Kommentar dieser Funktion, AUSGEWIESENE GRENZE). Kein stilles Weiterrechnen mit "
+=== Namespace-Grenze golden_n ~:51 ===
+#
+# AUSGEWIESENE GRENZE (B14-NB4/NB5, geprueft statt behauptet): ALLE XPath-Pfade dieser Wache sind
+# unpraefixierte Elementnamen (/comdare_experiment/..., //axis, //run_options, ...). Ein Dokument mit
+# Namensraum-Praefix ODER Default-Namensraum an der Wurzel wuerde JEDEN dieser Pfade auf 0 Treffer
+# fallen lassen -- FAIL-CLOSED (die Wache FATALt "Dokumentwurzel ist nicht <comdare_experiment>" statt
+# still falsch gruen zu sein), aber NICHT namensraum-robust. Das ist BEWUSST keine Luecke, die hier
+# per local-name()/namespace-uri() geschlossen wird (wie bei der XSD-Vokabular-Zaehlung in
+=== Dezimal-Grenze xml_canonical_utils :531/:549 Umfeld ===
+532:#    Wandlung bleibt fuer diesen Werkzeugstand bis in hohe zweistellige Milliarden dezimal (empirisch:
+535:#    dezimale Form und FATALt auf der exponentiellen -- absichtlich LAUT, nicht still falsch: ein
+547:            "${_ctx}: count(${_expr}) auf ${_label} '${_file}' lieferte '${_n}' statt einer dezimalen "
+=== xs:include fixture_schema :144 Umfeld ===
+71:include("${CMAKE_CURRENT_LIST_DIR}/xml_canonical_utils.cmake")
+138:# -- B14-NB5: xs:include/xs:import-BLINDHEIT geschlossen (fuer die HAEUFIGE Form: das Hauptdokument
+140:#    Deklarationen im HAUPTDOKUMENT; eine ueber <xs:include schemaLocation="../> bzw. <xs:import .../>
+150:#    und hier benannt. Heute (per grep verifiziert) nutzt experiment_schema.xsd weder include noch

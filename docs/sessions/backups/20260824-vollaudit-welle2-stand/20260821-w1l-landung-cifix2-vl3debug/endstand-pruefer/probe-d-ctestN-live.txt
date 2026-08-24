@@ -1,0 +1,24 @@
+FULL-JOIN-ENDPROBE (d): ctest -N EINMAL LIVE am Endstand -- 2026-08-23T20:08:33Z
+Baum: build-l1 (gcc-Release, vom r4 auf 3841d717 konfiguriert; HEAD unveraendert, porcelain 0)
+Repo-HEAD: 3841d7175086d5141fb28d6a401ae1ab4d137b30
+//Test COMDARE_HOST_RUNS_AVX2
+COMDARE_HOST_RUNS_AVX2:INTERNAL=1
+COMDARE_HOST_RUNS_AVX2_COMPILED:INTERNAL=TRUE
+COMDARE_HOST_RUNS_AVX2_EXITCODE:INTERNAL=0
+//Test COMDARE_HOST_RUNS_AVX512F
+COMDARE_HOST_RUNS_AVX512F:INTERNAL=1
+COMDARE_HOST_RUNS_AVX512F_COMPILED:INTERNAL=TRUE
+COMDARE_HOST_RUNS_AVX512F_EXITCODE:INTERNAL=0
+
+  Test #543: test_c13_selektiver_rebuild
+  Test #544: test_c14_messwert_presence_wache
+
+Total Tests: 544
+
+GEZAEHLTE Test-Zeilen (grep -c '^  Test #'): 544
+ANKER (scripts/ci_test_inventory_floor.txt):
+  avx512f 544
+  avx2 540
+  basis 538
+
+URTEIL (d): 544 == 544 (avx512f-Anker, Klasse aus CMakeCache belegt) -- EXAKT.

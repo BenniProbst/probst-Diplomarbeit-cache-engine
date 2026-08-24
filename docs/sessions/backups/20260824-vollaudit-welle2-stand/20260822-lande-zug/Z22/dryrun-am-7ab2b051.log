@@ -1,0 +1,12 @@
+== Z22 T6 DRY-RUN am aktuellen super-HEAD ==
+DATUM=2026-08-24T17:13:02Z
+HEAD=7ab2b051d62b1a47a8371a21a51e241ce1e7a5b6
+BRANCH=development
+PATCH_SHA256=60fa5504bcaddc09185e342e19c5cc92aaca17c51e2857d8cc6b8217e93eedab
+PATCH_ZEILEN=73
+GITAPPLY_CHECK_RC=0
+Checking patch Code/04_csv_to_latex/csv_to_latex.cpp...
+GITAPPLY_CHECK_VERBOSE_RC=0
+== patch(1) --dry-run Zweitbeweis ==
+checking file Code/04_csv_to_latex/csv_to_latex.cpp
+PATCH_DRYRUN_RC=0

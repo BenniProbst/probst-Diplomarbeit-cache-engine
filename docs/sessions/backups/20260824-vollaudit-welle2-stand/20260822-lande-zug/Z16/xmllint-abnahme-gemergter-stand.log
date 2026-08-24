@@ -1,0 +1,12 @@
+Z16 W-A/W-B-ABNAHME am GEMERGTEN Stand ff800699 (Arbeitsbaum-XSD; 2026-08-24T12:38:28Z)
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/test_data_xml/experiment_golden.xml validates
+RC=0 fuer /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/test_data_xml/experiment_golden.xml
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/test_data_xml/experiment_golden_kern.xml validates
+RC=0 fuer /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/test_data_xml/experiment_golden_kern.xml
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/experiment_golden.xml validates
+RC=0 fuer /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/experiment_golden.xml
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml validates
+RC=0 fuer /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml
+--- df nach Landung ---
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  251G  224G   15G  94% /

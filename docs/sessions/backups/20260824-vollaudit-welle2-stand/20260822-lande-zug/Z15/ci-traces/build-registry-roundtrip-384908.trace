@@ -1,0 +1,406 @@
+2026-08-24T12:24:05.512274Z 00O [0KRunning with gitlab-runner 19.1.1 (24b9b726)[0;m
+2026-08-24T12:24:05.512318Z 00O [0K  on prod-baremetal-prod2 tyXhWqv1v, system ID: s_0899959f8a36[0;m
+2026-08-24T12:24:05.512332Z 00O [0K  feature flags: FF_USE_LEGACY_S3_CACHE_ADAPTER:true[0;m
+2026-08-24T12:24:05.512426Z 00O section_start:1787574245:prepare_executor[0K
+2026-08-24T12:24:05.512436Z 00O+[0K[36;1mPreparing the "shell" executor[0;m[0;m
+2026-08-24T12:24:05.512734Z 00O [0KUsing Shell (bash) executor...[0;m
+2026-08-24T12:24:05.512740Z 00O section_end:1787574245:prepare_executor[0K
+2026-08-24T12:24:05.513148Z 00O+section_start:1787574245:prepare_script[0K
+2026-08-24T12:24:05.513156Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-08-24T12:24:05.562991Z 01O Running on prod2...
+2026-08-24T12:24:05.569524Z 00O section_end:1787574245:prepare_script[0K
+2026-08-24T12:24:05.571133Z 00O+section_start:1787574245:get_sources[0K
+2026-08-24T12:24:05.571147Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-08-24T12:24:05.681286Z 01O [32;1mGitaly correlation ID: 01M0SVMMP276D0NAJ57ZJJST9N[0;m
+2026-08-24T12:24:05.694594Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-08-24T12:24:05.697433Z 01O Reinitialized existing Git repository in /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/.git/
+2026-08-24T12:24:06.875443Z 01O [32;1mChecking out 16c90628 as detached HEAD (ref is development)...[0;m
+2026-08-24T12:24:06.942429Z 01O Removing .ccache/
+2026-08-24T12:24:06.942435Z 01O Removing build-clang-dbg/
+2026-08-24T12:24:06.945894Z 01O [32;1mUpdating/initializing submodules recursively with git depth set to 20...[0;m
+2026-08-24T12:24:07.132206Z 01O [32;1mUpdated submodules[0;m
+2026-08-24T12:24:07.209422Z 01O [32;1mConfiguring submodules to use parent git credentials...[0;m
+2026-08-24T12:24:07.267778Z 00O section_end:1787574247:get_sources[0K
+2026-08-24T12:24:07.271726Z 00O+section_start:1787574247:restore_cache[0K
+2026-08-24T12:24:07.271757Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-08-24T12:24:07.389914Z 01O [32;1mChecking cache for ccache-comdare-prt-art-protected...[0;m
+2026-08-24T12:24:07.431361Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=2660051 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-08-24T12:24:07.431382Z 01E Using presigned URL for cache download            [0;m 
+2026-08-24T12:24:07.487510Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/287/4a/4a1e0d88aeb4674d494fc14b12b4ee76f5a6d6ce2cbb00bad023303ef49c0e56 primary_modified[0;m=2026-08-20 13:19:06 +0000 UTC primary_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/287/ccache-comdare-prt-art-protected
+2026-08-24T12:24:07.557684Z 01E Downloading cache from https://minio.comdare.de:9000/buildsystem-cache/project/287/ccache-comdare-prt-art-protected[0;m  etag[0;m="f18a26de5eed1c012b5ad564656d5499"
+2026-08-24T12:24:08.211422Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-08-24T12:24:08.212874Z 00O section_end:1787574248:restore_cache[0K
+2026-08-24T12:24:08.213444Z 00O+section_start:1787574248:step_script[0K
+2026-08-24T12:24:08.213451Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-08-24T12:24:08.274840Z 01O [32;1m$ cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler"); (ninja --version || echo "kein ninja")[0;m
+2026-08-24T12:24:08.301899Z 01O cmake version 4.3.4
+2026-08-24T12:24:08.301907Z 01O 
+2026-08-24T12:24:08.301908Z 01O CMake suite maintained and supported by Kitware (kitware.com/cmake).
+2026-08-24T12:24:08.307054Z 01O g++ (GCC) 15.3.0
+2026-08-24T12:24:08.307058Z 01O Copyright (C) 2025 Free Software Foundation, Inc.
+2026-08-24T12:24:08.307059Z 01O This is free software; see the source for copying conditions.  There is NO
+2026-08-24T12:24:08.307060Z 01O warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+2026-08-24T12:24:08.307061Z 01O 
+2026-08-24T12:24:08.311124Z 01O 1.13.1
+2026-08-24T12:24:08.312284Z 01O [32;1m$ git clone --no-checkout --reference-if-able ../comdare-cache-engine --dissociate "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH%/*}/comdare-cache-engine.git" ce-pin[0;m
+2026-08-24T12:24:08.314902Z 01E Cloning into 'ce-pin'...
+2026-08-24T12:24:08.320627Z 01E info: Could not add alternate for '../comdare-cache-engine': reference repository '../comdare-cache-engine' is shallow
+2026-08-24T12:24:13.080697Z 01O [32;1m$ git -C ce-pin checkout --detach "$COMDARE_CE_PIN_SHA"[0;m
+2026-08-24T12:24:13.485338Z 01E HEAD is now at 196a621a chore(landung): T-B Lock-Regen -- 4 Traeger-Erst-Versionen 1.0.0.c (L1-Schritt 3, eigener Commit)
+2026-08-24T12:24:13.488343Z 01O [32;1m$ echo "ce-Pin ausgecheckt: $(git -C ce-pin rev-parse HEAD) (SOLL $COMDARE_CE_PIN_SHA)"[0;m
+2026-08-24T12:24:13.490113Z 01O ce-Pin ausgecheckt: 196a621a8a1180dbd47163b75cbb8b102e66a08b (SOLL 196a621a8a1180dbd47163b75cbb8b102e66a08b)
+2026-08-24T12:24:13.490116Z 01O [32;1m$ cmake -B build-ce-conf -S ce-pin -G Ninja -DCMAKE_BUILD_TYPE=Debug[0;m
+2026-08-24T12:24:13.616235Z 01O -- The CXX compiler identification is GNU 15.3.0
+2026-08-24T12:24:13.623142Z 01O -- Detecting CXX compiler ABI info
+2026-08-24T12:24:13.684430Z 01O -- Detecting CXX compiler ABI info - done
+2026-08-24T12:24:13.690642Z 01O -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-08-24T12:24:13.690924Z 01O -- Detecting CXX compile features
+2026-08-24T12:24:13.691476Z 01O -- Detecting CXX compile features - done
+2026-08-24T12:24:13.706245Z 01O -- Boost.MP11: vendored Header gefunden -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/cmake/../cmake/third_party/boost_mp11/include
+2026-08-24T12:24:13.706252Z 01O -- Boost.MP11 ready: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/cmake/../cmake/third_party/boost_mp11/include
+2026-08-24T12:24:13.709194Z 01O -- GTest: lokaler Tarball gefunden: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/cmake/third_party/googletest-1.15.2.tar.gz
+2026-08-24T12:24:13.973217Z 01O -- The C compiler identification is GNU 15.3.0
+2026-08-24T12:24:13.979042Z 01O -- Detecting C compiler ABI info
+2026-08-24T12:24:14.029201Z 01O -- Detecting C compiler ABI info - done
+2026-08-24T12:24:14.043941Z 01O -- Check for working C compiler: /usr/bin/cc - skipped
+2026-08-24T12:24:14.044217Z 01O -- Detecting C compile features
+2026-08-24T12:24:14.044651Z 01O -- Detecting C compile features - done
+2026-08-24T12:24:14.051306Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-08-24T12:24:14.098918Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-08-24T12:24:14.099837Z 01O -- Found Threads: TRUE
+2026-08-24T12:24:14.102916Z 01O -- ==============================================================
+2026-08-24T12:24:14.102920Z 01O -- comdare-cache-engine Multi-OS-Konfiguration (Phase 6)
+2026-08-24T12:24:14.102920Z 01O --   OS                : Linux
+2026-08-24T12:24:14.102946Z 01O --   Architektur       : x86_64
+2026-08-24T12:24:14.102947Z 01O --   Block AO Plattform: unknown
+2026-08-24T12:24:14.102948Z 01O --   Cache-Line-Size   : 64 B
+2026-08-24T12:24:14.102948Z 01O --   ISA detected      : scalar-only
+2026-08-24T12:24:14.102949Z 01O -- ==============================================================
+2026-08-24T12:24:14.103164Z 01E CMake Warning at cmake/check_submodules.cmake:36 (message):
+2026-08-24T12:24:14.103168Z 01E   
+2026-08-24T12:24:14.103169Z 01E   ──────────────────────────────────────────────────────
+2026-08-24T12:24:14.103171Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103171Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103172Z 01E 
+2026-08-24T12:24:14.103174Z 01E 
+2026-08-24T12:24:14.103196Z 01E CMake Warning at cmake/check_submodules.cmake:37 (message):
+2026-08-24T12:24:14.103197Z 01E   Fehlende cache-engine-interne Module (Skelett-Inkonsistenz):
+2026-08-24T12:24:14.103198Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103198Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103199Z 01E 
+2026-08-24T12:24:14.103199Z 01E 
+2026-08-24T12:24:14.103215Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103216Z 01E     - modules/comdare-search-engine
+2026-08-24T12:24:14.103217Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103217Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103218Z 01E 
+2026-08-24T12:24:14.103218Z 01E 
+2026-08-24T12:24:14.103229Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103230Z 01E     - modules/comdare-cache-engine-core
+2026-08-24T12:24:14.103231Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103231Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103232Z 01E 
+2026-08-24T12:24:14.103232Z 01E 
+2026-08-24T12:24:14.103238Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103239Z 01E     - modules/comdare-measurement
+2026-08-24T12:24:14.103239Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103240Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103240Z 01E 
+2026-08-24T12:24:14.103240Z 01E 
+2026-08-24T12:24:14.103251Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103252Z 01E     - modules/comdare-isa-dispatch
+2026-08-24T12:24:14.103253Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103254Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103254Z 01E 
+2026-08-24T12:24:14.103254Z 01E 
+2026-08-24T12:24:14.103260Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103261Z 01E     - modules/comdare-build-tools
+2026-08-24T12:24:14.103261Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103262Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103262Z 01E 
+2026-08-24T12:24:14.103263Z 01E 
+2026-08-24T12:24:14.103274Z 01E CMake Warning at cmake/check_submodules.cmake:39 (message):
+2026-08-24T12:24:14.103275Z 01E     - modules/comdare-test-system
+2026-08-24T12:24:14.103275Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103276Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103276Z 01E 
+2026-08-24T12:24:14.103277Z 01E 
+2026-08-24T12:24:14.103286Z 01E CMake Warning at cmake/check_submodules.cmake:41 (message):
+2026-08-24T12:24:14.103287Z 01E     Erwarteter Inhalt pro Modul: CMakeLists.txt + README.md
+2026-08-24T12:24:14.103287Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103288Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103288Z 01E 
+2026-08-24T12:24:14.103289Z 01E 
+2026-08-24T12:24:14.103298Z 01E CMake Warning at cmake/check_submodules.cmake:42 (message):
+2026-08-24T12:24:14.103299Z 01E   
+2026-08-24T12:24:14.103299Z 01E   ──────────────────────────────────────────────────────
+2026-08-24T12:24:14.103308Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.103309Z 01E   CMakeLists.txt:571 (include)
+2026-08-24T12:24:14.103309Z 01E 
+2026-08-24T12:24:14.103310Z 01E 
+2026-08-24T12:24:14.136807Z 01O -- comdare Plugin-Controller: keine Pruefling-Repos konfiguriert (nur CE-Permutation, Stufe 1)
+2026-08-24T12:24:14.151507Z 01O -- Test-Temp-Wurzel (Posten 69): comdare_test_<uid>_654c7f157a33 (stabil aus CMAKE_BINARY_DIR=/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf)
+2026-08-24T12:24:14.159711Z 01O -- comdare_codegen_anatomy_module: anatomy_codegen_pilot_hot (STATIC, fp=hot_pilot) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules/anatomy_perm_hot_pilot.cpp
+2026-08-24T12:24:14.160459Z 01O -- comdare_codegen_anatomy_module: anatomy_codegen_pilot_wormhole_shared (SHARED, fp=wormhole_pilot) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules/anatomy_perm_wormhole_pilot.cpp
+2026-08-24T12:24:14.161283Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_0 (SHARED, fp=anatomy_multi_pilot_0) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_0.cpp
+2026-08-24T12:24:14.161924Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_1 (SHARED, fp=anatomy_multi_pilot_1) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_1.cpp
+2026-08-24T12:24:14.162515Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_2 (SHARED, fp=anatomy_multi_pilot_2) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_2.cpp
+2026-08-24T12:24:14.163147Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_3 (SHARED, fp=anatomy_multi_pilot_3) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_3.cpp
+2026-08-24T12:24:14.163772Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_4 (SHARED, fp=anatomy_multi_pilot_4) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_4.cpp
+2026-08-24T12:24:14.164386Z 01O -- comdare_codegen_anatomy_module: anatomy_multi_pilot_5 (SHARED, fp=anatomy_multi_pilot_5) -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_5.cpp
+2026-08-24T12:24:14.164915Z 01O -- comdare_codegen_anatomy_module_list: generated 6 SHARED targets (prefix=anatomy_multi_pilot, output=/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/anatomy_modules_multi)
+2026-08-24T12:24:14.168851Z 01E CMake Warning at cmake/anatomy_codegen_runner.cmake:87 (message):
+2026-08-24T12:24:14.168852Z 01E   comdare_run_anatomy_codegen_tool: tool not yet built.
+2026-08-24T12:24:14.168852Z 01E 
+2026-08-24T12:24:14.168852Z 01E     Expected one of: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/Release/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/Debug/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/RelWithDebInfo/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/MinSizeRel/comdare-anatomy-codegen-tool
+2026-08-24T12:24:14.168854Z 01E     Run 'cmake --build <build-dir> --target comdare_anatomy_codegen_cli' and re-configure to enable R5.I Configure-Time Codegen.
+2026-08-24T12:24:14.168865Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.168865Z 01E   tests/unit/CMakeLists.txt:1147 (comdare_run_anatomy_codegen_tool)
+2026-08-24T12:24:14.168865Z 01E 
+2026-08-24T12:24:14.168866Z 01E 
+2026-08-24T12:24:14.168868Z 01O -- R5.I: configure-time codegen SKIPPED (status=SKIPPED). Build the tool first: cmake --build . --target comdare_anatomy_codegen_cli, then re-configure to enable the R5.I pilot test.
+2026-08-24T12:24:14.168988Z 01E CMake Warning at cmake/anatomy_codegen_runner.cmake:87 (message):
+2026-08-24T12:24:14.168989Z 01E   comdare_run_anatomy_codegen_tool: tool not yet built.
+2026-08-24T12:24:14.168989Z 01E 
+2026-08-24T12:24:14.168989Z 01E     Expected one of: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/Release/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/Debug/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/RelWithDebInfo/comdare-anatomy-codegen-tool;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/anatomy_codegen_tool/MinSizeRel/comdare-anatomy-codegen-tool
+2026-08-24T12:24:14.168990Z 01E     Run 'cmake --build <build-dir> --target comdare_anatomy_codegen_cli' and re-configure to enable R5.I Configure-Time Codegen.
+2026-08-24T12:24:14.168991Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.168991Z 01E   tests/unit/CMakeLists.txt:1301 (comdare_run_anatomy_codegen_tool)
+2026-08-24T12:24:14.168991Z 01E 
+2026-08-24T12:24:14.168991Z 01E 
+2026-08-24T12:24:14.169006Z 01O -- F15: SKIPPED (status=SKIPPED). Build comdare_anatomy_codegen_cli first, then re-configure.
+2026-08-24T12:24:14.173040Z 01E CMake Warning at cmake/adhoc_emitter.cmake:76 (message):
+2026-08-24T12:24:14.173041Z 01E   comdare_run_adhoc_emitter: tool not yet built.
+2026-08-24T12:24:14.173041Z 01E 
+2026-08-24T12:24:14.173041Z 01E     Expected one of: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/adhoc_emitter/comdare-adhoc-emitter;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/adhoc_emitter/Release/comdare-adhoc-emitter;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/adhoc_emitter/Debug/comdare-adhoc-emitter;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/adhoc_emitter/RelWithDebInfo/comdare-adhoc-emitter;/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/apps/adhoc_emitter/MinSizeRel/comdare-adhoc-emitter
+2026-08-24T12:24:14.173043Z 01E     Run 'cmake --build <build-dir> --target comdare_adhoc_emitter_cli' and re-configure to enable R5.G Auto-Permutations-Skalierung.
+2026-08-24T12:24:14.173043Z 01E Call Stack (most recent call first):
+2026-08-24T12:24:14.173043Z 01E   tests/unit/CMakeLists.txt:1714 (comdare_run_adhoc_emitter)
+2026-08-24T12:24:14.173044Z 01E 
+2026-08-24T12:24:14.173044Z 01E 
+2026-08-24T12:24:14.173058Z 01O -- R5.G: Auto-Permutations-Skalierung SKIPPED (status=SKIPPED). Build comdare_adhoc_emitter_cli first, then re-configure.
+2026-08-24T12:24:14.598686Z 01O -- GO-3 A1: test_buildvariant_dll_real/test_ap5_simd_extension_coherence NICHT registriert (Host ohne AVX2+AVX-512F — real-DLLs werden nur GEBAUT, Muster Dispatch-Varianten)
+2026-08-24T12:24:14.913924Z 01O -- GO-3 A1 Kohaerenz-Guard bewiesen: Negativ-Probe (ohne AVX2-Flag) korrekt ABGELEHNT, Positiv-Probe (mit AVX2-Flag) kompiliert
+2026-08-24T12:24:14.914752Z 01O -- W3-KERN: Mess-Interface-Testate REGISTRIERT (dock + biss)
+2026-08-24T12:24:14.914755Z 01O -- Goal-V6 Phase D: 4789 — 28 add_test-D-Tests (16 leicht + 12 Boost) + 5 DLL-Round-Trip-Tests (test_dgenus_dll/test_buildvariant_dll{,_real}/test_adhoc_buildvariant_dll/test_d13_dll_runtime_measure) als OFFIZIELLE CMake-Targets (6 SHARED-DLLs via $<TARGET_FILE>). container_dll (test_d4b) bleibt scratch-verifiziert (Folge).
+2026-08-24T12:24:14.915069Z 01O -- tools-tests: test_cacheline_policy_selector (#174) + test_load_profile_writer (#175) als add_test registriert (best_binary_selector-Tool = tools/best_binary_selector add_executable).
+2026-08-24T12:24:15.031973Z 01O -- B2-ABSCHLUSS Schichtungs-Wache: Negativprobe feuert am #error, Kontrolle baut (2/2)
+2026-08-24T12:24:15.044178Z 01O -- Durchstich: pdflatex gefunden (1 von 1): /usr/local/bin/pdflatex
+2026-08-24T12:24:15.053395Z 01O -- comdare E-E: Overlay-Quell-Hash verdrahtet -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/cache_engine/abi/overlay_source_hash_generated.hpp
+2026-08-24T12:24:15.053397Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:15.053398Z 01O -- comdare-cache-engine 0.1.0
+2026-08-24T12:24:15.053398Z 01O --   C++ Standard:           23
+2026-08-24T12:24:15.053399Z 01O --   Detection Mode:         COMPILE_TIME
+2026-08-24T12:24:15.053399Z 01O --   Build Builder:          ON
+2026-08-24T12:24:15.053399Z 01O --   Build Benchmarks:       ON
+2026-08-24T12:24:15.053399Z 01O --   Build Tests:            ON
+2026-08-24T12:24:15.053400Z 01O --   Pre-Build Permutations: 
+2026-08-24T12:24:15.053400Z 01O --   Experiment Mode (V8.4): OFF
+2026-08-24T12:24:15.053400Z 01O --   Legacy-Reimpl (V8.2):   OFF [DEPRECATED]
+2026-08-24T12:24:15.053400Z 01O --   Auto-Run Builder V13.4: OFF
+2026-08-24T12:24:15.053401Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:15.053484Z 01O -- V41.F.6.1.C Allocator Axis 6 effective USE flags:
+2026-08-24T12:24:15.053485Z 01O --   Batch 1: USE_STD=1 MIMALLOC=0 SNMALLOC=0 PMR=1 POOL=1 VAMPIR_NFP=0
+2026-08-24T12:24:15.053487Z 01O --   Batch 2: USE_JEMALLOC=0 TCMALLOC=0 DLMALLOC=0
+2026-08-24T12:24:15.053489Z 01O --   Batch 3: USE_HOARD=0 SLAB=0 MICHAEL_LF=0
+2026-08-24T12:24:15.053491Z 01O --   Batch 4: USE_SCALLOC=0 NUMALLOC=0 RPMALLOC=0
+2026-08-24T12:24:15.053493Z 01O --   Batch 5: USE_LRMALLOC=0 CAMA=0 STARMALLOC=0
+2026-08-24T12:24:15.053495Z 01O --   Batch 6: USE_TCMALLOC_WH=0 HMALLOC=0 PIM_MALLOC=0
+2026-08-24T12:24:15.053497Z 01O --   Batch 7: USE_CRYSTALLINE=0 EXGEN=0 BUDDY=0
+2026-08-24T12:24:15.053499Z 01O --   Batch 8: USE_PTMALLOC2=0 VMEM_MAG=0 (VOLLAUSBAU 24 Vendor)
+2026-08-24T12:24:15.053722Z 01O -- V41.F.6.1 Topic queuing Pilot:
+2026-08-24T12:24:15.053726Z 01O --   axis_Q1 VOLLAUSBAU (13/13 W2): NO_BUFFER=1 FIFO=1 LIFO=1 BOUNDED_RING=1 APPEND_ONLY=1 PRIORITY_HEAP=1 DELTA_CHAIN=1 SKIPLIST_BUFFER=1 TOMBSTONE_BUFFER=1 COPY_ON_WRITE=1 EPOCH_BUFFER=1 BATCHED_INSERT_BUFFER=1 LOCKFREE_SPSC=1 LOCKFREE_MPMC=1
+2026-08-24T12:24:15.053727Z 01O --   axis_Q2 VOLLAUSBAU (5/5 W3): EAGER=1 WATERMARK=1 LAZY=1 TIMED=1 ADAPTIVE_LSM=1
+2026-08-24T12:24:15.053999Z 01O -- V41.F.6.1 Topic traversal Pilot:
+2026-08-24T12:24:15.054007Z 01O --   axis_03a (22 search_algo = 17 + 4 per-K + S22 SwissTable, Masstree deferred): ARRAY256=0 VECTOR_U8U8=0 VECTOR_U16U16=0 ARRAY65535=0 ORIGINAL_ART=0 ORIGINAL_HOT=0 ORIGINAL_START=0 ORIGINAL_WORMHOLE=0 ORIGINAL_SURF=0 K_ARY=1 INTERPOLATION=1 EYTZINGER=1 SKIP_LIST=0 HASH_SEARCH=0 LINEAR_SCAN=1 BST=0 BTREE=0 K_ARY_K2=0 K_ARY_K4=0 K_ARY_K8=0 K_ARY_K16=0 SWISSTABLE=0
+2026-08-24T12:24:15.054008Z 01O --   axis_03b (3 cache_traversal): LINEAR_FANOUT=1 HASH_LOOKUP=1 BINARY_SEARCH_FANOUT=1
+2026-08-24T12:24:15.054009Z 01O --   axis_03m (2 mapping): DIRECT_PLACEMENT=1 POOL_RELATIVE=1
+2026-08-24T12:24:15.054146Z 01O --   axis_12 (3 platforms): GENERIC=1 X86_64=1 AARCH64=1
+2026-08-24T12:24:15.054206Z 01O --   axis_05 (5 layouts): CACHE_LINE_ALIGNED=1 AOS_STRICT=1 SOA=1 PACKED_BITMAP=1 AOSOA=1
+2026-08-24T12:24:15.054256Z 01O --   axis_02 (3 compressions): NONE=1 PATRICIA=1 BYTE_WISE=1
+2026-08-24T12:24:15.054327Z 01O --   axis_01_page_type (6 page-types): DENSE=1 EXT=1 PATRICIA=1 REDIRECT=1 CUSTOM=1 BPLUS=1
+2026-08-24T12:24:15.054389Z 01O --   axis_btree_order (5 shapes): KT2=0 KT3=0 KT4=1 KT8=0 KT16=0
+2026-08-24T12:24:15.054443Z 01O --   axis_skip_list_shape (4 shapes): MAX16_P50=1 MAX8_P50=0 MAX32_P50=0 MAX16_P25=0
+2026-08-24T12:24:15.054501Z 01O --   axis_bst_shape (3 shapes): PTR_SIZE_T=1 PTR_U32=0 PTR_U16=0
+2026-08-24T12:24:15.054556Z 01O --   axis_hash_probe_shape (4 shapes): OA_LF70=1 OA_LF50=0 OA_LF90=0 CHAINING=0
+2026-08-24T12:24:15.054610Z 01O --   axis_04 (4 node-types): NODE4=1 NODE16=1 NODE48=1 NODE256=1
+2026-08-24T12:24:15.054663Z 01O --   axis_07 (4 prefetchers): NONE=1 DISTANCE_ESTIMATOR=1 HARDWARE_PREFETCH=1 PATH_ORIENTED=1
+2026-08-24T12:24:15.054717Z 01O --   axis_11 (4 telemetries): LEAF=1 DENSITY=1 INSERT=1 LATENCY=1
+2026-08-24T12:24:15.054769Z 01O --   axis_10 (4 serializers): RAW=1 VAR_LEN=1 SUCCINCT=1 COMPRESSED=1
+2026-08-24T12:24:15.054826Z 01O --   axis_14 (5 value-handles): INLINE=1 EXT_POOL=1 SHARED_REF=1 VERSIONED=1 CHAIN_REF=1
+2026-08-24T12:24:15.054895Z 01O --   axis_08 (9 concurrency): NONE=1 BLOCKING=1 RW=1 OLC=1 LF=1 WF=1 RCU=1 HP=1 OLC_RB=1
+2026-08-24T12:24:15.054952Z 01O --   axis_filter (5 filters): BLOOM=1 CUCKOO=1 RANGE_SURF=1 XOR=1 NONE=0
+2026-08-24T12:24:15.055005Z 01O --   axis_io (4 io-strategies): IN_MEM=1 DIRECT=1 BUFFERED=1 MMAP=1
+2026-08-24T12:24:15.055053Z 01O --   axis_persistence_target (2 targets): MEMORY_ONLY=1 DISK_WRITEBACK=0 (Q-1 FALL B: DISK_WRITEBACK=0 haelt den Voll-Bau bei 2^17)
+2026-08-24T12:24:15.055105Z 01O --   axis_migration (4 migrations): NONE=1 HOT_COLD=1 TIER=1 ADAPTIVE=1
+2026-08-24T12:24:15.055163Z 01O --   axis_01 (4 clusterings): HEAP=1 CLUSTERED=1 NON_CLUSTERED=1 IOT=1
+2026-08-24T12:24:15.055216Z 01O --   axis_09 (4 main-CPU-ISAs): AMD64=1 AARCH64=1 RISCV=1 POWERPC=1
+2026-08-24T12:24:15.055286Z 01O --   axis_09b (8 SIMD-extensions): NO_EXT=1 SSE2=1 AVX2=1 AVX512=1 NEON=1 SVE2=1 RVV=1 CUDA_GH200=1
+2026-08-24T12:24:15.055412Z 01O -- comdare paper-init: copying a04_mimalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A04-mimalloc
+2026-08-24T12:24:15.055566Z 01O -- comdare paper-init READY: a04_mimalloc (2 files)
+2026-08-24T12:24:15.055844Z 01O -- comdare is_original_codegen: registered mimalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp
+2026-08-24T12:24:15.055986Z 01O -- comdare paper-init: copying a05_jemalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A05-jemalloc
+2026-08-24T12:24:15.056082Z 01O -- comdare paper-init READY: a05_jemalloc (1 files)
+2026-08-24T12:24:15.056322Z 01O -- comdare is_original_codegen: registered jemalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a05_jemalloc_is_original.hpp
+2026-08-24T12:24:15.056419Z 01O -- comdare paper-init: copying a07_snmalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A07-snmalloc
+2026-08-24T12:24:15.056517Z 01O -- comdare paper-init READY: a07_snmalloc (1 files)
+2026-08-24T12:24:15.056765Z 01O -- comdare is_original_codegen: registered snmalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a07_snmalloc_is_original.hpp
+2026-08-24T12:24:15.056871Z 01O -- comdare paper-init: copying a20_dlmalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A20-dlmalloc
+2026-08-24T12:24:15.057046Z 01O -- comdare paper-init READY: a20_dlmalloc (1 files)
+2026-08-24T12:24:15.057195Z 01O -- comdare is_original_codegen: registered dlmalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a20_dlmalloc_is_original.hpp
+2026-08-24T12:24:15.057303Z 01O -- comdare paper-init: copying a10_rpmalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A10-rpmalloc
+2026-08-24T12:24:15.057421Z 01O -- comdare paper-init READY: a10_rpmalloc (1 files)
+2026-08-24T12:24:15.057627Z 01O -- comdare is_original_codegen: registered rpmalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a10_rpmalloc_is_original.hpp
+2026-08-24T12:24:15.057728Z 01O -- comdare paper-init: copying a11_lrmalloc from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/allocator/A11-lrmalloc
+2026-08-24T12:24:15.057798Z 01O -- comdare paper-init READY: a11_lrmalloc (1 files)
+2026-08-24T12:24:15.057980Z 01O -- comdare is_original_codegen: registered lrmalloc -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a11_lrmalloc_is_original.hpp
+2026-08-24T12:24:15.058089Z 01O -- comdare paper-init: copying p01_art from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P01-ART/unodb
+2026-08-24T12:24:15.058183Z 01O -- comdare paper-init READY: p01_art (1 files)
+2026-08-24T12:24:15.058413Z 01O -- comdare is_original_codegen: registered art -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p01_art_is_original.hpp
+2026-08-24T12:24:15.058503Z 01O -- comdare paper-init: copying p02_hot from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P02-HOT
+2026-08-24T12:24:15.058636Z 01O -- comdare paper-init READY: p02_hot (1 files)
+2026-08-24T12:24:15.059004Z 01O -- comdare is_original_codegen: registered hot -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p02_hot_is_original.hpp
+2026-08-24T12:24:15.059102Z 01O -- comdare paper-init: copying p05_start from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P05-START
+2026-08-24T12:24:15.059183Z 01O -- comdare paper-init READY: p05_start (1 files)
+2026-08-24T12:24:15.059390Z 01O -- comdare is_original_codegen: registered start -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p05_start_is_original.hpp
+2026-08-24T12:24:15.059496Z 01O -- comdare paper-init: copying p07_wormhole from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P07-Wormhole/wormhole
+2026-08-24T12:24:15.059602Z 01O -- comdare paper-init READY: p07_wormhole (1 files)
+2026-08-24T12:24:15.059786Z 01O -- comdare is_original_codegen: registered wormhole -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p07_wormhole_is_original.hpp
+2026-08-24T12:24:15.059890Z 01O -- comdare paper-init: copying p10_surf from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P10-SuRF/SuRF
+2026-08-24T12:24:15.059973Z 01O -- comdare paper-init READY: p10_surf (1 files)
+2026-08-24T12:24:15.060171Z 01O -- comdare is_original_codegen: registered surf -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p10_surf_is_original.hpp
+2026-08-24T12:24:15.060278Z 01O -- comdare paper-init: copying p03_masstree from /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/traversal/P03-Masstree/masstree-beta
+2026-08-24T12:24:15.060434Z 01O -- comdare paper-init READY: p03_masstree (3 files)
+2026-08-24T12:24:15.060636Z 01O -- comdare is_original_codegen: registered masstree -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p03_masstree_is_original.hpp
+2026-08-24T12:24:15.060727Z 01O -- comdare paper-roll-out: SKIP q01_concurrentqueue (/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin/ext/queuing/Q01-concurrentqueue/concurrentqueue.h missing)
+2026-08-24T12:24:15.063765Z 01O -- 
+2026-08-24T12:24:15.063769Z 01O -- ═══════════════════════════════════════════════════════════════
+2026-08-24T12:24:15.063775Z 01O --  COMDARE Achsen-Hierarchie (G.1) — Anatomie-Achsen pro Topic
+2026-08-24T12:24:15.063777Z 01O -- ═══════════════════════════════════════════════════════════════
+2026-08-24T12:24:15.064044Z 01O --   allocator/
+2026-08-24T12:24:15.064048Z 01O --       axis_06_allocator: 25 Wrapper
+2026-08-24T12:24:15.064219Z 01O --   concurrency/
+2026-08-24T12:24:15.064220Z 01O --       axis_08_concurrency: 10 Wrapper
+2026-08-24T12:24:15.064335Z 01O --   filter/
+2026-08-24T12:24:15.064336Z 01O --       axis_filter: 6 Wrapper
+2026-08-24T12:24:15.064621Z 01O --   hardware/
+2026-08-24T12:24:15.064623Z 01O --       axis_09_isa: 4 Wrapper
+2026-08-24T12:24:15.064624Z 01O --       axis_09b_simd_extension: 9 Wrapper
+2026-08-24T12:24:15.064627Z 01O --       axis_12_general_hardware: 3 Wrapper
+2026-08-24T12:24:15.064761Z 01O --   io/
+2026-08-24T12:24:15.064763Z 01O --       axis_io: 5 Wrapper
+2026-08-24T12:24:15.064858Z 01O --   memory_layout/
+2026-08-24T12:24:15.064858Z 01O --       axis_05_memory_layout: 5 Wrapper
+2026-08-24T12:24:15.064959Z 01O --   migration/
+2026-08-24T12:24:15.064960Z 01O --       axis_migration: 4 Wrapper
+2026-08-24T12:24:15.065519Z 01O --   nodes/
+2026-08-24T12:24:15.065521Z 01O --       axis_01_page_type: 6 Wrapper
+2026-08-24T12:24:15.065522Z 01O --       axis_02_path_compression: 4 Wrapper
+2026-08-24T12:24:15.065524Z 01O --       axis_04_node_type: 6 Wrapper
+2026-08-24T12:24:15.065526Z 01O --       axis_bst_shape: 3 Wrapper
+2026-08-24T12:24:15.065527Z 01O --       axis_btree_order: 5 Wrapper
+2026-08-24T12:24:15.065533Z 01O --       axis_hash_probe_shape: 4 Wrapper
+2026-08-24T12:24:15.065534Z 01O --       axis_skip_list_shape: 4 Wrapper
+2026-08-24T12:24:15.065646Z 01O --   prefetch/
+2026-08-24T12:24:15.065647Z 01O --       axis_07_prefetch: 7 Wrapper
+2026-08-24T12:24:15.065768Z 01O --   search_engine/
+2026-08-24T12:24:15.065769Z 01O --       axis_01_index_organization: 5 Wrapper
+2026-08-24T12:24:15.065826Z 01O --   sequence/
+2026-08-24T12:24:15.065827Z 01O --       axis_growth: 1 Wrapper
+2026-08-24T12:24:15.065929Z 01O --   serialization/
+2026-08-24T12:24:15.065930Z 01O --       axis_10_serialization: 5 Wrapper
+2026-08-24T12:24:15.066030Z 01O --   telemetry/
+2026-08-24T12:24:15.066031Z 01O --       axis_11_telemetry: 5 Wrapper
+2026-08-24T12:24:15.066363Z 01O --   traversal/
+2026-08-24T12:24:15.066374Z 01O --       axis_03a_search_algo: 17 Wrapper
+2026-08-24T12:24:15.066375Z 01O --       axis_03b_cache_traversal: 3 Wrapper
+2026-08-24T12:24:15.066377Z 01O --       axis_03m_mapping: 2 Wrapper
+2026-08-24T12:24:15.066452Z 01O --   value_handle/
+2026-08-24T12:24:15.066453Z 01O --       axis_14_value_handle: 5 Wrapper
+2026-08-24T12:24:15.066472Z 01O -- ───────────────────────────────────────────────────────────────
+2026-08-24T12:24:15.066473Z 01O --  Gesamt: 15 Topics · 25 Achsen · 153 Wrapper
+2026-08-24T12:24:15.066477Z 01O --  Permutations-Raum (Produkt der Achsen-Kardinalitaeten): >= 1e15 (kombinatorisch)
+2026-08-24T12:24:15.066482Z 01O -- ═══════════════════════════════════════════════════════════════
+2026-08-24T12:24:15.066483Z 01O -- 
+2026-08-24T12:24:15.066628Z 01O -- Registrierungs-Protokoll: 6 bedingte Registrierungs-Bloecke vermerkt -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf/comdare_registrierungs_protokoll.txt
+2026-08-24T12:24:15.072414Z 01O -- Configuring done (1.6s)
+2026-08-24T12:24:15.511304Z 01O -- Generating done (0.4s)
+2026-08-24T12:24:15.511721Z 01O -- Build files have been written to: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-ce-conf
+2026-08-24T12:24:15.547611Z 01O [32;1m$ cmake -B build-reggen -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCOMDARE_CACHE_ENGINE_DIR=$CI_PROJECT_DIR/ce-pin -DCOMDARE_CE_GENERATED_DIR=$CI_PROJECT_DIR/build-ce-conf/generated[0;m
+2026-08-24T12:24:15.619454Z 01O -- The CXX compiler identification is GNU 15.3.0
+2026-08-24T12:24:15.627475Z 01O -- Detecting CXX compiler ABI info
+2026-08-24T12:24:15.726037Z 01O -- Detecting CXX compiler ABI info - done
+2026-08-24T12:24:15.736256Z 01O -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-08-24T12:24:15.736409Z 01O -- Detecting CXX compile features
+2026-08-24T12:24:15.736822Z 01O -- Detecting CXX compile features - done
+2026-08-24T12:24:16.111726Z 01O -- The C compiler identification is GNU 15.3.0
+2026-08-24T12:24:16.116235Z 01O -- Detecting C compiler ABI info
+2026-08-24T12:24:16.157032Z 01O -- Detecting C compiler ABI info - done
+2026-08-24T12:24:16.163227Z 01O -- Check for working C compiler: /usr/bin/cc - skipped
+2026-08-24T12:24:16.163430Z 01O -- Detecting C compile features
+2026-08-24T12:24:16.163692Z 01O -- Detecting C compile features - done
+2026-08-24T12:24:16.167602Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-08-24T12:24:16.245921Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-08-24T12:24:16.246785Z 01O -- Found Threads: TRUE
+2026-08-24T12:24:16.254013Z 01O -- [PRT-ART V9.4] legacy_reimpl/ skipped (default OFF).
+2026-08-24T12:24:16.254429Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:16.254431Z 01O -- comdare-prt-art 0.1.0
+2026-08-24T12:24:16.254433Z 01O --   C++ Standard            : 23
+2026-08-24T12:24:16.254438Z 01O --   Cache-Engine Werkzeug   : /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/ce-pin
+2026-08-24T12:24:16.254440Z 01O --   Use Cache-Engine sub    : OFF
+2026-08-24T12:24:16.254442Z 01O --   Build Tests             : ON
+2026-08-24T12:24:16.254446Z 01O --   Build Legacy-Reimpl V9.4: OFF
+2026-08-24T12:24:16.254447Z 01O -- ──────────────────────────────────────────────────────────
+2026-08-24T12:24:16.254669Z 01O -- Configuring done (0.7s)
+2026-08-24T12:24:16.269225Z 01O -- Generating done (0.0s)
+2026-08-24T12:24:16.269403Z 01O -- Build files have been written to: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen
+2026-08-24T12:24:16.272625Z 01O [32;1m$ cmake --build build-reggen --target prt_art_axis_registry_gen[0;m
+2026-08-24T12:24:16.433413Z 01O [1/4] Scanning /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/prt_art/registry_gen/main.cpp for CXX dependencies
+2026-08-24T12:24:16.437952Z 01O [2/4] Generating CXX dyndep file prt_art/registry_gen/CMakeFiles/prt_art_axis_registry_gen.dir/CXX.dd
+2026-08-24T12:24:17.567670Z 01O [3/4] Building CXX object prt_art/registry_gen/CMakeFiles/prt_art_axis_registry_gen.dir/main.cpp.o
+2026-08-24T12:24:17.599572Z 01O [4/4] Linking CXX executable prt_art/registry_gen/prt_art_axis_registry_gen
+2026-08-24T12:24:17.600529Z 01O [32;1m$ ctest --test-dir build-reggen -R '^test_prt_registry_roundtrip$' --output-on-failure -V[0;m
+2026-08-24T12:24:17.605853Z 01O UpdateCTestConfiguration  from :/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen/DartConfiguration.tcl
+2026-08-24T12:24:17.606044Z 01O Test project /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen
+2026-08-24T12:24:17.606187Z 01O Constructing a list of tests
+2026-08-24T12:24:17.607210Z 01O Done constructing a list of tests
+2026-08-24T12:24:17.607211Z 01O Updating test list for fixtures
+2026-08-24T12:24:17.607212Z 01O Added 0 tests to meet fixture requirements
+2026-08-24T12:24:17.607239Z 01O Checking test dependency graph...
+2026-08-24T12:24:17.607239Z 01O Checking test dependency graph end
+2026-08-24T12:24:17.607501Z 01O test 14
+2026-08-24T12:24:17.607502Z 01O     Start 14: test_prt_registry_roundtrip
+2026-08-24T12:24:17.607502Z 01O 
+2026-08-24T12:24:17.607503Z 01O 14: Test command: /usr/bin/cmake "-DGEN_TOOL=/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen/prt_art/registry_gen/prt_art_axis_registry_gen" "-DCOMMITTED=/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/prt_art/registry_gen/../algorithm_profiles/prt_art_axis_registry.xml" "-DWORKDIR=/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen/prt_art/registry_gen/registry_roundtrip_prt" "-P" "/home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/prt_art/registry_gen/registry_roundtrip.cmake"
+2026-08-24T12:24:17.607504Z 01O 14: Working Directory: /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen/prt_art/registry_gen
+2026-08-24T12:24:17.607504Z 01O 14: Test timeout computed to be: 120
+2026-08-24T12:24:17.613657Z 01O 14: -- Generator-Ausgabe:
+2026-08-24T12:24:17.613660Z 01O 14: prt_art_axis_registry_gen: 5 Slots, 5 Bausteine -> /home/gitlab-runner/builds/tyXhWqv1v/1/comdare/research/comdare-prt-art/build-reggen/prt_art/registry_gen/registry_roundtrip_prt/regenerated_registry.xml
+2026-08-24T12:24:17.613662Z 01O 14:   axis_01 page_type : 1
+2026-08-24T12:24:17.613662Z 01O 14:   axis_07 prefetch : 1
+2026-08-24T12:24:17.613663Z 01O 14:   axis_11 telemetry : 1
+2026-08-24T12:24:17.613663Z 01O 14:   axis_14 value_handle : 1
+2026-08-24T12:24:17.613664Z 01O 14:   axis_02 path_compression : 1 (golden_wired)
+2026-08-24T12:24:17.613665Z 01O 14: 
+2026-08-24T12:24:17.620166Z 01O 14: -- registry_roundtrip: Byte-Diff == 0 — committete XML == Code-Reflektion.
+2026-08-24T12:24:17.621637Z 01O 1/1 Test #14: test_prt_registry_roundtrip ......   Passed    0.01 sec
+2026-08-24T12:24:17.622300Z 01O 
+2026-08-24T12:24:17.622302Z 01O The following tests passed:
+2026-08-24T12:24:17.622303Z 01O 	test_prt_registry_roundtrip
+2026-08-24T12:24:17.622306Z 01O 
+2026-08-24T12:24:17.622307Z 01O 100% tests passed, 0 tests failed out of 1
+2026-08-24T12:24:17.622310Z 01O 
+2026-08-24T12:24:17.622311Z 01O Label Time Summary:
+2026-08-24T12:24:17.622319Z 01O registry     =   0.01 sec*proc (1 test)
+2026-08-24T12:24:17.622322Z 01O roundtrip    =   0.01 sec*proc (1 test)
+2026-08-24T12:24:17.622326Z 01O 
+2026-08-24T12:24:17.622327Z 01O Total Test time (real) =   0.02 sec
+2026-08-24T12:24:17.626591Z 00O section_end:1787574257:step_script[0K
+2026-08-24T12:24:17.627415Z 00O+section_start:1787574257:archive_cache[0K
+2026-08-24T12:24:17.627425Z 00O+[0K[36;1mSaving cache for successful job[0;m[0;m
+2026-08-24T12:24:17.705106Z 01O [32;1mNot uploading cache ccache-comdare-prt-art-protected due to policy[0;m
+2026-08-24T12:24:17.709336Z 00O section_end:1787574257:archive_cache[0K
+2026-08-24T12:24:17.710445Z 00O+section_start:1787574257:cleanup_file_variables[0K
+2026-08-24T12:24:17.710499Z 00O+[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+2026-08-24T12:24:17.815902Z 00O section_end:1787574257:cleanup_file_variables[0K
+2026-08-24T12:24:17.816219Z 00O [32;1mJob succeeded[0;m

@@ -1,0 +1,6 @@
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.
+=== EINSTIEGS-MATRIX (fsyntax-only):
+e1_factory_zuerst: SYNTAX-GRUEN / e2_attach_direkt: SYNTAX-GRUEN / e3_beide_wie_bisher: SYNTAX-GRUEN

@@ -1,0 +1,18 @@
+=============================================================================
+ PRE-PUSH-LANDE-GATES (--nur=tabu): EIN Gate, PROBE-Modus
+=============================================================================
+
+BEREICH: 20c111c4..HEAD   (46 Commits)
+  Basis:  20c111c4   Spitze: 3b2fda12
+
+=============================================================================
+ [6/6] TABU-CRC-PROBE (golden_fullpilot_320* + permutation_axes.xml + CRC-Anker)
+=============================================================================
+  TABU-BEWEGT  libs/cache_engine/algorithm_profiles/permutation_axes.xml
+    soll dfa3b020e750e2e4cd7b08733c7a235d9a882387419811c8ce8fcbfecdb030e8
+    ist  cfa3b020e750e2e4cd7b08733c7a235d9a882387419811c8ce8fcbfecdb030e8
+
+=============================================================================
+PRE-PUSH-LANDE-GATES: ROT am GATE [6/6] TABU-CRC-PROBE -- TABU-Datei(en) bewegt (oben) -- STOPP, NIE regenerieren, Lead melden (Re-Anker nur via B-10.3)
+FAIL-FAST: spaetere Gates sind NICHT gelaufen und damit NICHT gruen.
+=============================================================================

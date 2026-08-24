@@ -1,0 +1,143 @@
+# comdare dynamic planer child-pipeline (CiYamlBuilder v2, STUFE 1 = Mess-Achsen-Stufe) -- GENERIERT, deterministisch, host-unabhaengig.
+# source_kind=thesis profile_id=m3v2_study measurement_combo_count=1 perm_count=1 registry_trio_loaded=1
+#
+# Ledger §42: CE erhaelt die XML und steuert ALLES. DREISTUFIGE Legenden-Kette --
+#   STUFE 1 (HIER, ceb-build/ceb-emit): je Mess-Kombination [a,b,c] EINE CEB-Pipeline
+#           (ceb:build -> ceb:emit('tier ci') -> ceb:trigger). Der PLANER steuert die CEB-Jobs.
+#   STUFE 2 (CEB-emittiert, 'tier ci', S4-§62-B-Batch): je Host-Lane EIN Build+Pruef-Batch
+#           "tier:build-batch:<host>" (iteriert intern Perms x 4096er-Scheiben, Testate [d,e,f][g,h,i]) + EIN Mess-Batch "measure:[a,b,c]:batch:<host>" (GN-11/320er-gegatet).
+stages:
+  - ceb-build
+  - ceb-emit
+variables:
+  COMDARE_GN_RANGE: "0:4"   # SICHERES kleines Fenster (Pilot->Serie); Voll-Bau ist INC-G6-gegatet
+  GIT_SUBMODULE_STRATEGY: "none"   # Child: manueller Deploy-Token-Klon im Job-Prolog, kein Auto-Fetch
+  CCACHE_MAXSIZE: "3G"
+  CMAKE_BUILD_PARALLEL_LEVEL: "6"                 # Parent-Spiegel: Runner-Core-Budget (nicht -j nproc)
+cache:
+  key: "ccache-$CI_PROJECT_NAME"
+  paths: [".ccache"]
+
+# =================================================================================
+# measurement_combo 0 legend=[all] (CEB-Typ)
+# =================================================================================
+# JOB ceb-build combo 0 (STUFE 1: Planer steuert CEB-Bau, CEB-Typ [all])
+"ceb:build:[all]":
+  stage: ceb-build
+  tags: ["amd64"]
+  resource_group: "ceb-_all_"
+  interruptible: false   # CEB-Bau darf nie auto-cancelt werden
+  script:
+    - |
+      set -euo pipefail
+      # RUNTIME-Shell-Export aller $CI_PROJECT_DIR-abhaengigen Env (Nacharbeit 3+4, KLASSE): immun gegen
+      # die GitLab-variables-Vorexpansion/-Vererbung (die vorexpandierte Parent-Def ueberschriebe sonst
+      # versions-/wegabhaengig die Child-Def -> leer expandiert -> /.ccache bzw. /Code/...-fehlt).
+      export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+      export CCACHE_MAXSIZE="3G"
+      export COMDARE_GOLDEN_N_PROFILE="${CI_PROJECT_DIR}/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_study.profile.xml"
+      case "${COMDARE_PLAN_METHODIK_PROFILE:-}" in
+        '') : ;;
+        /*) : ;;
+        *) export COMDARE_PLAN_METHODIK_PROFILE="${CI_PROJECT_DIR}/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/${COMDARE_PLAN_METHODIK_PROFILE}" ;;
+      esac
+      # CHILD-SUBMODULE-KLON (W10-Nacharbeit 2): Parent-Spiegel, Deploy-Token via CI-Variablen (NIE Klartext).
+      if [ -f .gitmodules ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        for spec in "Code/external/comdare-cache-engine:comdare-cache-engine" "Code/external/comdare-prt-art:comdare-prt-art"; do
+          p="${spec%%:*}"; r="${spec##*:}"
+          git config -f .gitmodules "submodule.${p}.url" "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/${r}.git"
+        done
+        git submodule sync --recursive -- Code/external/comdare-cache-engine Code/external/comdare-prt-art
+        git submodule update --init --recursive --force -- Code/external/comdare-cache-engine Code/external/comdare-prt-art
+        git checkout -- .gitmodules 2>/dev/null || true
+      fi
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    # PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver (CEB) fehlt"; exit 1; }
+      echo "== STUFE 1: CEB [all] gebaut (Messsystem-Typ) =="
+      echo "[CEB-TESTAT] ts=$(date -u +%FT%TZ) ceb=[all] status=gebaut"
+    # CI-DUAL (Owner 14.08.): clang-22-Zwilling -- Bau+Test-Gate der Stufe, sequentiell im selben
+    # Slot (T-11b); gleiche Defines, eigenes build-clang; misst NIE (N2).
+    - cmake -B build-clang -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=clang-22 -DCMAKE_CXX_COMPILER=clang++-22
+    - cmake --build build-clang --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER_CLANG=$(find build-clang -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER_CLANG" -a -x "$DRIVER_CLANG" || { echo "comdare-messung-driver (clang-Zwilling) fehlt"; exit 1; }
+      cmake --build build-clang --target 02_messung_driver/all
+      ctest --test-dir build-clang/02_messung_driver --no-tests=error --output-on-failure
+      echo "[DUAL-TESTAT] ts=$(date -u +%FT%TZ) compiler=clang-22 build_type=Release status=gebaut+getestet ceb=[all]"
+# JOB ceb-emit combo 0 (STUFE 1->2: CEB emittiert Child-2, CEB-Hoheit)
+"ceb:emit:[all]":
+  stage: ceb-emit
+  tags: ["amd64"]
+  needs: ["ceb:build:[all]"]
+  script:
+    - |
+      set -euo pipefail
+      # RUNTIME-Shell-Export aller $CI_PROJECT_DIR-abhaengigen Env (Nacharbeit 3+4, KLASSE): immun gegen
+      # die GitLab-variables-Vorexpansion/-Vererbung (die vorexpandierte Parent-Def ueberschriebe sonst
+      # versions-/wegabhaengig die Child-Def -> leer expandiert -> /.ccache bzw. /Code/...-fehlt).
+      export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+      export CCACHE_MAXSIZE="3G"
+      export COMDARE_GOLDEN_N_PROFILE="${CI_PROJECT_DIR}/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_study.profile.xml"
+      case "${COMDARE_PLAN_METHODIK_PROFILE:-}" in
+        '') : ;;
+        /*) : ;;
+        *) export COMDARE_PLAN_METHODIK_PROFILE="${CI_PROJECT_DIR}/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/${COMDARE_PLAN_METHODIK_PROFILE}" ;;
+      esac
+      # CHILD-SUBMODULE-KLON (W10-Nacharbeit 2): Parent-Spiegel, Deploy-Token via CI-Variablen (NIE Klartext).
+      if [ -f .gitmodules ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        for spec in "Code/external/comdare-cache-engine:comdare-cache-engine" "Code/external/comdare-prt-art:comdare-prt-art"; do
+          p="${spec%%:*}"; r="${spec##*:}"
+          git config -f .gitmodules "submodule.${p}.url" "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/${r}.git"
+        done
+        git submodule sync --recursive -- Code/external/comdare-cache-engine Code/external/comdare-prt-art
+        git submodule update --init --recursive --force -- Code/external/comdare-cache-engine Code/external/comdare-prt-art
+        git checkout -- .gitmodules 2>/dev/null || true
+      fi
+    - cd Code
+    # PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      # G4a P-A: MinIO-Rohcreds maschinenlokal in MC_HOST_prodcache falten. Das Skript ist source-sicher
+      # (kein exit, kein set -e) und bei COMDARE_STORAGE_CACHE != true vollstaendig inert -- das
+      # unbedingte Sourcen ist damit unschaedlich und haelt den Nicht-Storage-Lauf unveraendert.
+      . external/comdare-cache-engine/scripts/comdare_storage_activation.sh
+      # Blackhole-Schutz (P-A): der ArtifactCache-Default ist 12 Versuche (artifact_cache.hpp:923); mit
+      # dem 120s-Timeout je Versuch grindet ein unerreichbarer Store pathologisch lange je Objekt.
+      # Deckel NUR wenn Storage ueberhaupt scharf ist; ein bereits gesetzter Wert gewinnt. Die
+      # :-Expansion ist Pflicht -- der umgebende Block laeuft unter `set -u`.
+      if [ "${COMDARE_STORAGE_CACHE:-}" = "true" ]; then
+        export COMDARE_ARTEFAKT_TRIES="${COMDARE_ARTEFAKT_TRIES:-2}"
+      fi
+      # §40.b-Praezisierung: die CEB (nicht der Planer) emittiert ihre STUFE-2-Sicht (System-Perms
+      # des FREIGEGEBENEN Raums + je-Host Build+Pruef-Batch + gegatete Mess-Batches) via 'tier ci'.
+      "$DRIVER" tier ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/tier-child-_all_.yml"
+      echo "== CEB-emittierte STUFE-2 (erste 20 Zeilen) =="; head -20 "$CI_PROJECT_DIR/tier-child-_all_.yml"
+  artifacts:
+    paths:
+      - tier-child-_all_.yml
+# JOB ceb-trigger combo 0 (STUFE 1: Grandchild-Trigger der Child-2)
+"ceb:trigger:[all]":
+  stage: ceb-emit
+  needs:
+    - job: "ceb:emit:[all]"
+      artifacts: true
+  trigger:
+    include:
+      - artifact: tier-child-_all_.yml
+        job: "ceb:emit:[all]"
+    strategy: depend
+    forward:
+      yaml_variables: true       # Allowlist (exakt der variables:-Block oben) an Grandchild
+      pipeline_variables: false  # kein blindes Erben des Eltern-Variablenraums (Isolation)

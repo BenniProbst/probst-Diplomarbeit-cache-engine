@@ -1,0 +1,17 @@
+KOMBIBAU-Z15-ENDSTAND 16c9062 2026-08-24T12:21:34Z
+/dev/nvme0n1p2  251G  223G   16G  94% /
+ce-Pin ausgecheckt: 66de5c0972290ec1ae3d219988ecc207d8f5de6b (SOLL 66de5c0972290ec1ae3d219988ecc207d8f5de6b)
+===== ZELLE gcc-rel (g++/Release) START 12:21:35 =====
+100% tests passed, 0 tests failed out of 224
+ZELLE gcc-rel GRUEN
+===== ZELLE gcc-dbg (g++/Debug) START 12:21:42 =====
+100% tests passed, 0 tests failed out of 224
+ZELLE gcc-dbg GRUEN
+===== ZELLE clang-rel (clang++/Release) START 12:21:46 =====
+100% tests passed, 0 tests failed out of 224
+ZELLE clang-rel GRUEN
+===== ZELLE clang-dbg (clang++/Debug) START 12:21:51 =====
+100% tests passed, 0 tests failed out of 224
+ZELLE clang-dbg GRUEN
+/dev/nvme0n1p2  251G  224G   15G  94% /
+KOMBIBAU-Z15-ENDE FAIL=0 2026-08-24T12:21:55Z

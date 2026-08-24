@@ -1,0 +1,941 @@
+[  0%] Built target comdare_overlay_source_hash_gen
+[  0%] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3418134 Bytes, sha512=17ce209466a6f770... (unveraendert)
+[  0%] Built target comdare_overlay_source_hash
+[  0%] Building CXX object tools/latex_anhang/CMakeFiles/comdare_latex_anhang.dir/main.cpp.o
+[  0%] Building CXX object tools/p27_bundle_finder/CMakeFiles/p27_bundle_finder.dir/src/main.cpp.o
+[  0%] Built target comdare_hdr_histogram_wrapper
+[  0%] Built target comdare_builder_xml_config_parser
+[  0%] Built target is_original_validator
+[  0%] Built target comdare_module_loader
+[  1%] Built target comdare_workload_generator
+[  2%] Building CXX object libs/cache_engine/builder/anatomy_module_loader/CMakeFiles/comdare_anatomy_module_loader.dir/anatomy_module_loader.cpp.o
+[  2%] Built target comdare_latex_anhang_lib
+[  2%] Built target comdare_workload_driver
+[  3%] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[  4%] Built target comdare_vendored_zlib
+[  4%] Building CXX object tools/best_binary_selector/CMakeFiles/comdare_best_binary_selector.dir/__/__/libs/cache_engine/builder/best_binary_selector/best_binary_selector.cpp.o
+[  4%] Built target comdare_perm_mock_test
+[  4%] Building CXX object apps/h2_score_akte_tool/CMakeFiles/comdare_h2_score_akte_cli.dir/main.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_sequence_d10.dir/genus_module_sequence.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/hybrid_reroute_set.dir/hybrid_tier_module_set.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/hybrid_reroute_searchalgorithm.dir/hybrid_tier_module.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_set_d9.dir/genus_module_set.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_view_d11.dir/genus_module_view.cpp.o
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_adapter_d12.dir/genus_module_adapter.cpp.o
+[  4%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_view_d11.so
+[  4%] Built target perm_view_d11
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_alt_major7.dir/genus_module_alt_major7.cpp.o
+[  4%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_sequence_d10.so
+[  4%] Built target perm_sequence_d10
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_major7_neue_magic.dir/genus_module_major7_neue_magic.cpp.o
+[  4%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_set_d9.so
+[  4%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_adapter_d12.so
+[  4%] Built target perm_set_d9
+[  4%] Building CXX object tests/unit/CMakeFiles/perm_q2_luegner.dir/genus_module_q2_luegner.cpp.o
+[  4%] Built target perm_adapter_d12
+[  5%] Building CXX object tests/unit/CMakeFiles/perm_q2_ohne_gattung.dir/genus_module_q2_ohne_gattung.cpp.o
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_alt_major7.so
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_major7_neue_magic.so
+[  6%] Built target perm_alt_major7
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_q2_ohne_genus.dir/genus_module_q2_ohne_genus.cpp.o
+[  6%] Built target perm_major7_neue_magic
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_alt_magic_ohne_symbole.dir/genus_module_alt_magic_ohne_symbole.cpp.o
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_q2_luegner.so
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_q2_ohne_gattung.so
+[  6%] Built target perm_q2_luegner
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_buildvariant_avx512.dir/genus_buildvariant_avx512.cpp.o
+[  6%] Built target perm_q2_ohne_gattung
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_buildvariant_avx2.dir/genus_buildvariant_avx2.cpp.o
+In file included from /home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/src/gtest-all.cc:38:
+In file included from /home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/include/gtest/gtest.h:64:
+In file included from /home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/include/gtest/gtest-death-test.h:43:
+In file included from /home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h:47:
+In file included from /home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/include/gtest/gtest-matchers.h:49:
+/home/comdare/wt-ce-bump15/build/clang-debug/_deps/googletest-src/googletest/include/gtest/gtest-printers.h:524:35: warning: implicit conversion from 'char8_t' to 'char32_t' may change the meaning of the represented code unit [-Wcharacter-conversion]
+  524 |   PrintTo(ImplicitCast_<char32_t>(c), os);
+      |           ~~~~~~~~~~~~~           ^
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_buildvariant_avx512.so
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_buildvariant_avx2.so
+[  6%] Built target perm_buildvariant_avx512
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_set_defekt_d13.dir/genus_module_set_defekt.cpp.o
+[  6%] Built target perm_buildvariant_avx2
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_q2_ohne_genus.so
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_alt_magic_ohne_symbole.so
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_buildvariant_real_avx2.dir/genus_buildvariant_real_avx2.cpp.o
+[  6%] Built target perm_q2_ohne_genus
+[  6%] Built target perm_alt_magic_ohne_symbole
+[  6%] Building CXX object tools/best_binary_selector/CMakeFiles/comdare_best_binary_selector.dir/__/__/libs/cache_engine/builder/best_binary_selector/best_binary_selector_main.cpp.o
+[  6%] Building CXX object tests/unit/CMakeFiles/perm_buildvariant_real_avx512.dir/genus_buildvariant_real_avx512.cpp.o
+[  6%] Linking CXX shared library ../../generated/goalv6_dll_modules/libhybrid_reroute_set.so
+[  6%] Built target hybrid_reroute_set
+[  7%] Built target comdare_vendored_liburing
+[  7%] Built target ck1_naht_voll
+[  7%] Built target ck1_naht_leer
+[  7%] Built target comdare_paper_a04_mimalloc_codegen
+[  7%] Linking CXX shared library ../../generated/goalv6_dll_modules/libhybrid_reroute_searchalgorithm.so
+[  7%] Built target comdare_paper_a05_jemalloc_codegen
+[  7%] Linking CXX executable latex_anhang
+[  7%] Built target comdare_paper_a07_snmalloc_codegen
+[  7%] Built target comdare_paper_a20_dlmalloc_codegen
+[  7%] Built target comdare_paper_a10_rpmalloc_codegen
+[  8%] Built target comdare_paper_a11_lrmalloc_codegen
+[  8%] Built target comdare_paper_p01_art_codegen
+[  8%] Built target comdare_paper_p02_hot_codegen
+[  8%] Built target comdare_paper_p05_start_codegen
+[  8%] Built target hybrid_reroute_searchalgorithm
+[  8%] Built target comdare_latex_anhang
+[  8%] Built target comdare_paper_p07_wormhole_codegen
+[  8%] Built target comdare_paper_p10_surf_codegen
+[  8%] Built target comdare_paper_p03_masstree_codegen
+[  8%] Built target comdare_builder_codegen
+[  8%] Building CXX object libs/execution_engine/CMakeFiles/comdare_experiment.dir/src/result_aggregator.cpp.o
+[  8%] Built target comdare_builder_permutation_loop
+[  8%] Built target comdare_paper_codegen_all
+[  8%] Building CXX object tools/ycsb_cli/CMakeFiles/comdare_ycsb_cli.dir/main.cpp.o
+[ 10%] Built target comdare_vendored_xlsxwriter
+[ 10%] Linking CXX static library libcomdare_anatomy_module_loader.a
+[ 10%] Built target comdare_ycsb_cli_lib
+[ 10%] Built target comdare_adhoc_emitter_cli
+[ 10%] Built target comdare_anatomy_module_loader
+[ 10%] Built target comdare_catalog_codegen_cli
+[ 10%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_set_defekt_d13.so
+[ 10%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_buildvariant_real_avx2.so
+[ 10%] Building CXX object tests/unit/CMakeFiles/test_t15_drift_gate_messschleife.dir/test_t15_drift_gate_messschleife.cpp.o
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_codegen_pilot_hot.dir/__/__/generated/anatomy_modules/anatomy_perm_hot_pilot.cpp.o
+[ 10%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_buildvariant_real_avx512.so
+[ 10%] Built target perm_set_defekt_d13
+[ 10%] Built target perm_buildvariant_real_avx2
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_codegen_pilot_wormhole_shared.dir/__/__/generated/anatomy_modules/anatomy_perm_wormhole_pilot.cpp.o
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_0.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_0.cpp.o
+[ 10%] Built target perm_buildvariant_real_avx512
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_1.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_1.cpp.o
+[ 10%] Linking CXX executable comdare-h2-score-akte
+[ 10%] Built target comdare_h2_score_akte_cli
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_2.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_2.cpp.o
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_3.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_3.cpp.o
+[ 10%] Linking CXX executable p27_bundle_finder
+[ 10%] Built target p27_bundle_finder
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_4.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_4.cpp.o
+[ 10%] Linking CXX static library libcomdare_experiment.a
+[ 10%] Built target comdare_experiment
+[ 10%] Linking CXX executable best_binary_selector
+[ 10%] Building CXX object tests/unit/CMakeFiles/anatomy_multi_pilot_5.dir/__/__/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_5.cpp.o
+[ 10%] Built target comdare_best_binary_selector
+[ 10%] Building CXX object tests/unit/CMakeFiles/r5i_configure_pilot_0.dir/__/__/generated/r5i_anatomy_modules/anatomy_perm_r5i_configure_pilot_0.cpp.o
+[ 10%] Linking CXX executable ycsb_cli
+[ 10%] Built target comdare_ycsb_cli
+[ 10%] Building CXX object tests/unit/CMakeFiles/r5i_configure_pilot_1.dir/__/__/generated/r5i_anatomy_modules/anatomy_perm_r5i_configure_pilot_1.cpp.o
+1 warning generated.
+[ 10%] Linking CXX static library ../../../lib/libgtest.a
+[ 10%] Built target gtest
+[ 10%] Building CXX object tests/unit/CMakeFiles/r5i_configure_pilot_2.dir/__/__/generated/r5i_anatomy_modules/anatomy_perm_r5i_configure_pilot_2.cpp.o
+[ 10%] Linking CXX shared library comdare_anatomy_perm_wormhole_pilot.so
+[ 10%] Built target anatomy_codegen_pilot_wormhole_shared
+[ 10%] Building CXX object tests/unit/CMakeFiles/f15_measurement_pilot_0.dir/__/__/generated/f15_measurement_modules/anatomy_perm_f15_measurement_pilot_0.cpp.o
+[ 10%] Linking CXX static library comdare_anatomy_perm_hot_pilot.a
+[ 10%] Built target anatomy_codegen_pilot_hot
+[ 10%] Building CXX object tests/unit/CMakeFiles/f15_measurement_pilot_1.dir/__/__/generated/f15_measurement_modules/anatomy_perm_f15_measurement_pilot_1.cpp.o
+[ 10%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_1.so
+[ 10%] Built target anatomy_multi_pilot_1
+[ 10%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_0.so
+[ 10%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_adhoc_perm.dir/auto_emitted_perm_module.cpp.o
+[ 10%] Built target anatomy_multi_pilot_0
+[ 10%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_0.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_0.cpp.o
+[ 10%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_2.so
+[ 10%] Built target anatomy_multi_pilot_2
+[ 10%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_1.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_1.cpp.o
+[ 10%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_3.so
+[ 10%] Built target anatomy_multi_pilot_3
+[ 11%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_2.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_10.cpp.o
+[ 12%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_4.so
+[ 12%] Built target anatomy_multi_pilot_4
+[ 12%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_3.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_11.cpp.o
+[ 12%] Linking CXX shared library ../../generated/r5i_anatomy_modules/comdare_anatomy_perm_r5i_configure_pilot_1.so
+[ 12%] Built target r5i_configure_pilot_1
+[ 12%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_4.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_12.cpp.o
+[ 12%] Linking CXX shared library ../../generated/anatomy_modules_multi/comdare_anatomy_perm_anatomy_multi_pilot_5.so
+[ 12%] Built target anatomy_multi_pilot_5
+[ 12%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_5.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_13.cpp.o
+[ 12%] Linking CXX shared library ../../generated/r5i_anatomy_modules/comdare_anatomy_perm_r5i_configure_pilot_0.so
+[ 12%] Built target r5i_configure_pilot_0
+[ 12%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_6.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_14.cpp.o
+[ 12%] Linking CXX shared library ../../generated/r5i_anatomy_modules/comdare_anatomy_perm_r5i_configure_pilot_2.so
+[ 12%] Linking CXX executable test_t15_drift_gate_messschleife
+[ 12%] Built target r5i_configure_pilot_2
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_7.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_15.cpp.o
+[ 13%] Built target test_t15_drift_gate_messschleife
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_8.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_16.cpp.o
+[ 13%] Linking CXX shared library ../../generated/f15_measurement_modules/comdare_anatomy_perm_f15_measurement_pilot_1.so
+[ 13%] Built target f15_measurement_pilot_1
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_9.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_17.cpp.o
+[ 13%] Linking CXX shared library ../../generated/f15_measurement_modules/comdare_anatomy_perm_f15_measurement_pilot_0.so
+[ 13%] Built target f15_measurement_pilot_0
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_10.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_18.cpp.o
+[ 13%] Linking CXX shared library ../../generated/r5g_adhoc_modules/comdare_anatomy_perm_r5g_adhoc.so
+[ 13%] Built target comdare_r5g_adhoc_perm
+[ 13%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_0.so
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_11.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_19.cpp.o
+[ 13%] Built target comdare_r5g_autobuilt_perm_0
+[ 13%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_12.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_2.cpp.o
+[ 13%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_2.so
+[ 13%] Built target comdare_r5g_autobuilt_perm_2
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_13.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_20.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_1.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_1
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_14.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_21.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_4.so
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_3.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_4
+[ 14%] Built target comdare_r5g_autobuilt_perm_3
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_16.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_23.cpp.o
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_15.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_22.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_5.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_5
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_6.so
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_17.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_24.cpp.o
+[ 14%] Built target comdare_r5g_autobuilt_perm_6
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_18.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_25.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_7.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_7
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_19.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_26.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_8.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_8
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_20.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_27.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_10.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_10
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_21.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_28.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_9.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_9
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_22.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_29.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_12.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_12
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_23.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_3.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_11.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_11
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_24.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_30.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_13.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_13
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_25.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_31.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_14.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_14
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_26.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_32.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_15.so
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_16.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_15
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_27.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_33.cpp.o
+[ 14%] Built target comdare_r5g_autobuilt_perm_16
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_28.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_34.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_17.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_17
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_29.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_35.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_18.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_18
+[ 14%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_30.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_36.cpp.o
+[ 14%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_19.so
+[ 14%] Built target comdare_r5g_autobuilt_perm_19
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_31.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_37.cpp.o
+[ 15%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_20.so
+[ 15%] Built target comdare_r5g_autobuilt_perm_20
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_32.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_38.cpp.o
+[ 15%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_21.so
+[ 15%] Built target comdare_r5g_autobuilt_perm_21
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_33.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_39.cpp.o
+[ 15%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_22.so
+[ 15%] Built target comdare_r5g_autobuilt_perm_22
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_34.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_4.cpp.o
+[ 15%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_24.so
+[ 15%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_23.so
+[ 15%] Built target comdare_r5g_autobuilt_perm_24
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_35.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_40.cpp.o
+[ 15%] Built target comdare_r5g_autobuilt_perm_23
+[ 15%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_36.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_41.cpp.o
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_25.so
+[ 16%] Built target comdare_r5g_autobuilt_perm_25
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_37.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_42.cpp.o
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_26.so
+[ 16%] Built target comdare_r5g_autobuilt_perm_26
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_38.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_43.cpp.o
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_27.so
+[ 16%] Built target comdare_r5g_autobuilt_perm_27
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_39.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_44.cpp.o
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_28.so
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_29.so
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_30.so
+[ 16%] Built target comdare_r5g_autobuilt_perm_28
+[ 16%] Built target comdare_r5g_autobuilt_perm_29
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_40.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_45.cpp.o
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_41.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_46.cpp.o
+[ 16%] Built target comdare_r5g_autobuilt_perm_30
+[ 16%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_42.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_47.cpp.o
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_32.so
+[ 16%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_31.so
+[ 16%] Built target comdare_r5g_autobuilt_perm_32
+[ 17%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_43.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_5.cpp.o
+[ 17%] Built target comdare_r5g_autobuilt_perm_31
+[ 17%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_44.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_6.cpp.o
+[ 17%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_33.so
+[ 17%] Built target comdare_r5g_autobuilt_perm_33
+[ 17%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_45.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_7.cpp.o
+[ 17%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_34.so
+[ 17%] Built target comdare_r5g_autobuilt_perm_34
+[ 17%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_46.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_8.cpp.o
+[ 17%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_35.so
+[ 17%] Built target comdare_r5g_autobuilt_perm_35
+[ 17%] Building CXX object tests/unit/CMakeFiles/comdare_r5g_autobuilt_perm_47.dir/__/__/generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_9.cpp.o
+[ 17%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_36.so
+[ 17%] Built target comdare_r5g_autobuilt_perm_36
+[ 17%] Building CXX object tests/unit/CMakeFiles/test_d1_d2_selection.dir/test_d1_d2_selection.cpp.o
+[ 18%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_37.so
+[ 18%] Built target comdare_r5g_autobuilt_perm_37
+[ 18%] Building CXX object tests/unit/CMakeFiles/test_d3_ceb_generator.dir/test_d3_ceb_generator.cpp.o
+[ 18%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_38.so
+[ 18%] Built target comdare_r5g_autobuilt_perm_38
+[ 18%] Built target test_d7_build_variant
+[ 18%] Building CXX object tests/unit/CMakeFiles/test_d7a_build_inspection.dir/test_d7a_build_inspection.cpp.o
+[ 18%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_39.so
+[ 18%] Built target comdare_r5g_autobuilt_perm_39
+[ 18%] Built target test_d7b_definition_per_node
+[ 19%] Built target test_d8_operability
+[ 19%] Building CXX object tests/unit/CMakeFiles/test_d9_set.dir/test_d9_set.cpp.o
+[ 19%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_41.so
+[ 19%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_40.so
+[ 19%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_42.so
+[ 19%] Built target comdare_r5g_autobuilt_perm_41
+[ 19%] Built target comdare_r5g_autobuilt_perm_40
+[ 19%] Building CXX object tests/unit/CMakeFiles/test_d9_set_adapter.dir/test_d9_set_adapter.cpp.o
+[ 19%] Building CXX object tests/unit/CMakeFiles/test_d10_sequence.dir/test_d10_sequence.cpp.o
+[ 19%] Built target comdare_r5g_autobuilt_perm_42
+[ 19%] Building CXX object tests/unit/CMakeFiles/test_d11_view.dir/test_d11_view.cpp.o
+[ 19%] Linking CXX executable test_d7a_build_inspection
+[ 19%] Built target test_d7a_build_inspection
+[ 19%] Building CXX object tests/unit/CMakeFiles/test_genus_docks.dir/test_genus_docks.cpp.o
+[ 19%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_44.so
+[ 19%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_43.so
+[ 19%] Built target comdare_r5g_autobuilt_perm_44
+[ 19%] Built target test_d12_virus
+[ 19%] Built target test_d13_runtime_measure
+[ 20%] Built target test_d14_result_ingest
+[ 20%] Built target comdare_r5g_autobuilt_perm_43
+[ 20%] Built target test_d14b_perm_runner
+[ 20%] Built target test_a1_load_profile_opmix
+[ 20%] Built target test_d14c_e2e_pipeline
+[ 20%] Built target test_d15_selection_filter_chain
+[ 20%] Built target test_cmd2_container_attribution
+[ 20%] Built target test_allocator_profile_bestand
+[ 20%] Building CXX object tests/unit/CMakeFiles/test_container_genus.dir/test_container_genus.cpp.o
+[ 20%] Building CXX object tests/unit/CMakeFiles/test_container_dock.dir/test_container_dock.cpp.o
+[ 20%] Linking CXX executable test_d3_ceb_generator
+[ 20%] Linking CXX executable test_d9_set
+[ 20%] Built target test_d9_set
+[ 20%] Built target test_d3_ceb_generator
+[ 21%] Built target test_d_v42_probe2
+[ 21%] Built target test_d_v42_probe
+[ 21%] Building CXX object tests/unit/CMakeFiles/test_d_v42_memory_layout_observable.dir/test_d_v42_memory_layout_observable.cpp.o
+[ 21%] Built target test_d_v42_telemetry_observable
+[ 21%] Building CXX object tests/unit/CMakeFiles/test_d_v42_serialization_observable.dir/test_d_v42_serialization_observable.cpp.o
+[ 21%] Linking CXX executable test_d9_set_adapter
+[ 21%] Linking CXX executable test_d11_view
+[ 21%] Built target test_d9_set_adapter
+[ 21%] Linking CXX executable test_d10_sequence
+[ 21%] Building CXX object tests/unit/CMakeFiles/test_d_v42_node_type_observable.dir/test_d_v42_node_type_observable.cpp.o
+[ 21%] Built target test_d11_view
+[ 21%] Built target test_d_v42_telemetry_registry_observable
+[ 21%] Built target test_d10_sequence
+[ 21%] Building CXX object tests/unit/CMakeFiles/test_axis_growth_policies.dir/test_axis_growth_policies.cpp.o
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_genus_permutation_engines.dir/test_genus_permutation_engines.cpp.o
+[ 22%] Linking CXX executable test_d_v42_serialization_observable
+[ 22%] Built target test_d_v42_serialization_observable
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_axis_view_policies.dir/test_axis_view_policies.cpp.o
+[ 22%] Linking CXX executable test_container_genus
+[ 22%] Built target test_container_genus
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c0_organ_concept.dir/test_e24_c0_organ_concept.cpp.o
+[ 22%] Linking CXX executable test_d_v42_memory_layout_observable
+[ 22%] Built target test_d_v42_memory_layout_observable
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c1_organ_concept.dir/test_e24_c1_organ_concept.cpp.o
+[ 22%] Linking CXX executable test_d_v42_node_type_observable
+[ 22%] Linking CXX executable test_axis_growth_policies
+[ 22%] Built target test_d_v42_node_type_observable
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c2_set_permutation_engine.dir/test_e24_c2_set_permutation_engine.cpp.o
+[ 22%] Built target test_axis_growth_policies
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c2_sequence_permutation_engine.dir/test_e24_c2_sequence_permutation_engine.cpp.o
+[ 22%] Linking CXX executable test_genus_permutation_engines
+[ 22%] Built target test_genus_permutation_engines
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c2_view_permutation_engine.dir/test_e24_c2_view_permutation_engine.cpp.o
+[ 22%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_45.so
+[ 22%] Linking CXX executable test_d1_d2_selection
+[ 22%] Built target comdare_r5g_autobuilt_perm_45
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c2_adapter_permutation_engine.dir/test_e24_c2_adapter_permutation_engine.cpp.o
+[ 22%] Built target test_d1_d2_selection
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c3_set_anatomy.dir/test_e24_c3_set_anatomy.cpp.o
+[ 22%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_46.so
+[ 22%] Built target comdare_r5g_autobuilt_perm_46
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c3_sequence_anatomy.dir/test_e24_c3_sequence_anatomy.cpp.o
+[ 22%] Linking CXX executable test_axis_view_policies
+[ 22%] Built target test_axis_view_policies
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c3_view_anatomy.dir/test_e24_c3_view_anatomy.cpp.o
+[ 22%] Linking CXX shared library ../../generated/r5g_autobuilt_modules/comdare_anatomy_perm_auto_47.so
+[ 22%] Linking CXX executable test_e24_c0_organ_concept
+[ 22%] Linking CXX executable test_genus_docks
+[ 22%] Built target test_e24_c0_organ_concept
+[ 22%] Built target comdare_r5g_autobuilt_perm_47
+[ 22%] Building CXX object tests/unit/CMakeFiles/test_e24_c3_adapter_anatomy.dir/test_e24_c3_adapter_anatomy.cpp.o
+[ 23%] Building CXX object tests/unit/CMakeFiles/test_e24_c3_cross_genus.dir/test_e24_c3_cross_genus.cpp.o
+[ 23%] Built target test_genus_docks
+[ 23%] Building CXX object tests/unit/CMakeFiles/test_e24_c4_genus_conformance_gates.dir/test_e24_c4_genus_conformance_gates.cpp.o
+[ 24%] Linking CXX executable test_e24_c1_organ_concept
+[ 24%] Built target test_e24_c1_organ_concept
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c5_fk8_genus_baupfad_d1.dir/test_e24_c5_fk8_genus_baupfad_d1.cpp.o
+[ 24%] Linking CXX executable test_container_dock
+[ 24%] Built target test_container_dock
+[ 24%] Linking CXX executable test_e24_c2_sequence_permutation_engine
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_a8s3_sa_organ_member_vollstaendigkeit.dir/test_a8s3_sa_organ_member_vollstaendigkeit.cpp.o
+[ 24%] Built target test_e24_c2_sequence_permutation_engine
+[ 24%] Built target comdare_axis_version_lock
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6v_growth_statistics.dir/test_e24_c6v_growth_statistics.cpp.o
+[ 24%] Linking CXX executable test_e24_c2_set_permutation_engine
+[ 24%] Built target test_e24_c2_set_permutation_engine
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6v_view_statistics.dir/test_e24_c6v_view_statistics.cpp.o
+[ 24%] Linking CXX executable test_e24_c3_set_anatomy
+[ 24%] Linking CXX executable test_e24_c2_view_permutation_engine
+[ 24%] Built target test_e24_c3_set_anatomy
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6v_inner_container_statistics.dir/test_e24_c6v_inner_container_statistics.cpp.o
+[ 24%] Built target test_e24_c2_view_permutation_engine
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6v_set_ehrlichkeit.dir/test_e24_c6v_set_ehrlichkeit.cpp.o
+[ 24%] Linking CXX executable test_e24_c2_adapter_permutation_engine
+[ 24%] Linking CXX executable test_e24_c3_sequence_anatomy
+[ 24%] Built target test_e24_c2_adapter_permutation_engine
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_genus_observer_aggregate.dir/test_e24_c6_genus_observer_aggregate.cpp.o
+[ 24%] Built target test_e24_c3_sequence_anatomy
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_axis_row_writer.dir/test_e24_c6_axis_row_writer.cpp.o
+[ 24%] Linking CXX executable test_e24_c3_view_anatomy
+[ 24%] Built target test_e24_c3_view_anatomy
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_set_wire_aggregate.dir/test_e24_c6_set_wire_aggregate.cpp.o
+[ 24%] Linking CXX executable test_e24_c3_adapter_anatomy
+[ 24%] Built target test_e24_c3_adapter_anatomy
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_sequence_wire_aggregate.dir/test_e24_c6_sequence_wire_aggregate.cpp.o
+[ 24%] Linking CXX executable test_e24_c6v_growth_statistics
+[ 24%] Built target test_e24_c6v_growth_statistics
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_adapter_wire_aggregate.dir/test_e24_c6_adapter_wire_aggregate.cpp.o
+[ 24%] Linking CXX executable test_e24_c6v_view_statistics
+[ 24%] Built target test_e24_c6v_view_statistics
+[ 24%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_view_wire_aggregate.dir/test_e24_c6_view_wire_aggregate.cpp.o
+[ 24%] Linking CXX executable test_e24_c6_genus_observer_aggregate
+[ 24%] Linking CXX executable test_e24_c6v_set_ehrlichkeit
+[ 24%] Built target test_e24_c6_genus_observer_aggregate
+[ 24%] Built target test_e24_c6v_set_ehrlichkeit
+[ 25%] Building CXX object tests/unit/CMakeFiles/test_e24_c6_set_algebra_abi.dir/test_e24_c6_set_algebra_abi.cpp.o
+[ 25%] Building CXX object tests/unit/CMakeFiles/test_e24_c7_gattung_map_umbenennung.dir/test_e24_c7_gattung_map_umbenennung.cpp.o
+[ 25%] Linking CXX executable test_e24_c6v_inner_container_statistics
+[ 25%] Built target test_e24_c6v_inner_container_statistics
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c7_container_gattungs_kern.dir/test_e24_c7_container_gattungs_kern.cpp.o
+[ 26%] Linking CXX executable test_e24_c6_axis_row_writer
+[ 26%] Linking CXX executable test_e24_c4_genus_conformance_gates
+[ 26%] Built target test_e24_c6_axis_row_writer
+[ 26%] Built target test_e24_c4_genus_conformance_gates
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c7_element_type_vertrag.dir/test_e24_c7_element_type_vertrag.cpp.o
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c7_gattung_abi_sichtbar.dir/test_e24_c7_gattung_abi_sichtbar.cpp.o
+[ 26%] Linking CXX executable test_e24_c6_set_wire_aggregate
+[ 26%] Linking CXX executable test_e24_c3_cross_genus
+[ 26%] Linking CXX executable test_e24_c5_fk8_genus_baupfad_d1
+[ 26%] Built target test_e24_c6_set_wire_aggregate
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c7_symmetrie_und_benennung.dir/test_e24_c7_symmetrie_und_benennung.cpp.o
+[ 26%] Built target test_e24_c3_cross_genus
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c4_genus_pruef_docks.dir/test_e24_c4_genus_pruef_docks.cpp.o
+[ 26%] Built target test_e24_c5_fk8_genus_baupfad_d1
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_e24_c5_fk7_dock_fehlerklassen.dir/test_e24_c5_fk7_dock_fehlerklassen.cpp.o
+[ 26%] Linking CXX executable test_e24_c6_sequence_wire_aggregate
+[ 26%] Built target test_e24_c6_sequence_wire_aggregate
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_migration_two_tier.dir/test_migration_two_tier.cpp.o
+[ 26%] Linking CXX executable test_a8s3_sa_organ_member_vollstaendigkeit
+[ 26%] Built target test_a8s3_sa_organ_member_vollstaendigkeit
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_seg_coverage.dir/test_seg_coverage.cpp.o
+[ 26%] Linking CXX executable test_e24_c7_gattung_map_umbenennung
+[ 26%] Built target test_e24_c7_gattung_map_umbenennung
+[ 26%] Linking CXX executable test_e24_c6_view_wire_aggregate
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_filter_real_from_keys.dir/test_filter_real_from_keys.cpp.o
+[ 26%] Linking CXX executable test_e24_c6_adapter_wire_aggregate
+[ 26%] Built target test_e24_c6_view_wire_aggregate
+[ 26%] Building CXX object tests/unit/CMakeFiles/test_patricia_real.dir/test_patricia_real.cpp.o
+[ 26%] Built target test_e24_c6_adapter_wire_aggregate
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_value_handle_real.dir/test_value_handle_real.cpp.o
+[ 27%] Linking CXX executable test_e24_c6_set_algebra_abi
+[ 27%] Built target test_e24_c6_set_algebra_abi
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_prefetch_real.dir/test_prefetch_real.cpp.o
+[ 27%] Linking CXX executable test_e24_c7_container_gattungs_kern
+[ 27%] Built target test_e24_c7_container_gattungs_kern
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_prefetch_adversarial_verify.dir/test_prefetch_adversarial_verify.cpp.o
+[ 27%] Linking CXX executable test_e24_c7_element_type_vertrag
+[ 27%] Built target test_e24_c7_element_type_vertrag
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_prefetch_patha_t7.dir/test_prefetch_patha_t7.cpp.o
+[ 27%] Linking CXX executable test_e24_c7_gattung_abi_sichtbar
+[ 27%] Linking CXX executable test_e24_c7_symmetrie_und_benennung
+[ 27%] Built target test_e24_c7_gattung_abi_sichtbar
+[ 27%] Built target test_e24_c7_symmetrie_und_benennung
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_a8s1_t17_vollzaehligkeit.dir/test_a8s1_t17_vollzaehligkeit.cpp.o
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_a8s3_t17_stats_lesezeitpunkt.dir/test_a8s3_t17_stats_lesezeitpunkt.cpp.o
+[ 27%] Linking CXX executable test_migration_two_tier
+[ 27%] Built target test_migration_two_tier
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_04_execution_alloc_conformance.dir/test_s5_04_execution_alloc_conformance.cpp.o
+[ 27%] Linking CXX executable test_filter_real_from_keys
+[ 27%] Built target test_filter_real_from_keys
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_04_execution_perf_sanity.dir/test_s5_04_execution_perf_sanity.cpp.o
+[ 27%] Linking CXX executable test_patricia_real
+[ 27%] Built target test_patricia_real
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_03_placement_alloc_conformance.dir/test_s5_03_placement_alloc_conformance.cpp.o
+[ 27%] Linking CXX executable test_value_handle_real
+[ 27%] Linking CXX executable test_e24_c5_fk7_dock_fehlerklassen
+[ 27%] Built target test_value_handle_real
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_03_placement_perf_sanity.dir/test_s5_03_placement_perf_sanity.cpp.o
+[ 27%] Built target test_e24_c5_fk7_dock_fehlerklassen
+[ 27%] Linking CXX executable test_s5_04_execution_alloc_conformance
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_01d_traversal_alloc_conformance.dir/test_s5_01d_traversal_alloc_conformance.cpp.o
+[ 27%] Built target test_s5_04_execution_alloc_conformance
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_01d_traversal_perf_sanity.dir/test_s5_01d_traversal_perf_sanity.cpp.o
+[ 27%] Linking CXX executable test_prefetch_real
+[ 27%] Built target test_prefetch_real
+[ 27%] Building CXX object tests/unit/CMakeFiles/test_s5_02a_layout_alloc_conformance.dir/test_s5_02a_layout_alloc_conformance.cpp.o
+[ 28%] Linking CXX executable test_e24_c4_genus_pruef_docks
+[ 28%] Linking CXX executable test_prefetch_patha_t7
+[ 28%] Built target test_e24_c4_genus_pruef_docks
+[ 29%] Building CXX object tests/unit/CMakeFiles/test_s5_02a_layout_perf_sanity.dir/test_s5_02a_layout_perf_sanity.cpp.o
+[ 29%] Built target test_prefetch_patha_t7
+[ 29%] Building CXX object tests/unit/CMakeFiles/test_s5_01a_pool_stores_alloc_conformance.dir/test_s5_01a_pool_stores_alloc_conformance.cpp.o
+[ 29%] Linking CXX executable test_prefetch_adversarial_verify
+[ 29%] Built target test_prefetch_adversarial_verify
+[ 30%] Building CXX object tests/unit/CMakeFiles/test_s5_01a_pool_stores_perf_sanity.dir/test_s5_01a_pool_stores_perf_sanity.cpp.o
+[ 30%] Linking CXX executable test_s5_03_placement_alloc_conformance
+[ 30%] Built target test_s5_03_placement_alloc_conformance
+[ 30%] Building CXX object tests/unit/CMakeFiles/test_s5_02b_filter_alloc_conformance.dir/test_s5_02b_filter_alloc_conformance.cpp.o
+[ 30%] Linking CXX executable test_s5_01d_traversal_alloc_conformance
+[ 30%] Built target test_s5_01d_traversal_alloc_conformance
+[ 30%] Building CXX object tests/unit/CMakeFiles/test_s5_02b_filter_perf_sanity.dir/test_s5_02b_filter_perf_sanity.cpp.o
+[ 30%] Linking CXX executable test_s5_02a_layout_alloc_conformance
+[ 30%] Built target test_s5_02a_layout_alloc_conformance
+[ 30%] Building CXX object tests/unit/CMakeFiles/test_s5_01b_composable_alloc_conformance.dir/test_s5_01b_composable_alloc_conformance.cpp.o
+[ 31%] Linking CXX executable test_s5_04_execution_perf_sanity
+[ 31%] Linking CXX executable test_s5_02b_filter_alloc_conformance
+[ 31%] Built target test_s5_04_execution_perf_sanity
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_s5_01b_composable_perf_sanity.dir/test_s5_01b_composable_perf_sanity.cpp.o
+[ 31%] Built target test_s5_02b_filter_alloc_conformance
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_s5_01c_fassaden_conformance.dir/test_s5_01c_fassaden_conformance.cpp.o
+[ 31%] Linking CXX executable test_s5_01a_pool_stores_alloc_conformance
+[ 31%] Built target test_s5_01a_pool_stores_alloc_conformance
+[ 31%] Linking CXX executable test_s5_03_placement_perf_sanity
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_s5_05q_queuing_alloc_conformance.dir/test_s5_05q_queuing_alloc_conformance.cpp.o
+[ 31%] Built target test_s5_03_placement_perf_sanity
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_s5_05q_queuing_perf_sanity.dir/test_s5_05q_queuing_perf_sanity.cpp.o
+[ 31%] Linking CXX executable test_s5_01d_traversal_perf_sanity
+[ 31%] Built target test_s5_01d_traversal_perf_sanity
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_h64_allocator_adapter_failure_contract.dir/test_h64_allocator_adapter_failure_contract.cpp.o
+[ 31%] Linking CXX executable test_s5_02a_layout_perf_sanity
+[ 31%] Linking CXX executable test_s5_01b_composable_alloc_conformance
+[ 31%] Built target test_s5_02a_layout_perf_sanity
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_h81_allocator_statistics_forwarder_recursion.dir/test_h81_allocator_statistics_forwarder_recursion.cpp.o
+[ 31%] Built target test_s5_01b_composable_alloc_conformance
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_a1_wurf_vertrag_allokator_store.dir/test_a1_wurf_vertrag_allokator_store.cpp.o
+[ 31%] Linking CXX executable test_h64_allocator_adapter_failure_contract
+[ 31%] Built target test_h64_allocator_adapter_failure_contract
+[ 31%] Building CXX object tests/unit/CMakeFiles/test_cow_memento.dir/test_cow_memento.cpp.o
+[ 31%] Linking CXX executable test_seg_coverage
+[ 31%] Built target test_seg_coverage
+[ 32%] Building CXX object tests/unit/CMakeFiles/test_cuckoo_eviction_correctness.dir/test_cuckoo_eviction_correctness.cpp.o
+[ 33%] Linking CXX executable test_a8s1_t17_vollzaehligkeit
+[ 33%] Built target test_a8s1_t17_vollzaehligkeit
+[ 33%] Building CXX object tests/unit/CMakeFiles/test_hash_lookup_backward_shift.dir/test_hash_lookup_backward_shift.cpp.o
+[ 33%] Linking CXX executable test_a8s3_t17_stats_lesezeitpunkt
+[ 33%] Linking CXX executable test_s5_02b_filter_perf_sanity
+[ 33%] Built target test_a8s3_t17_stats_lesezeitpunkt
+[ 33%] Linking CXX executable test_h81_allocator_statistics_forwarder_recursion
+[ 33%] Building CXX object tests/unit/CMakeFiles/test_scalloc_realloc_alignment.dir/test_scalloc_realloc_alignment.cpp.o
+[ 33%] Built target test_s5_02b_filter_perf_sanity
+[ 33%] Built target test_h81_allocator_statistics_forwarder_recursion
+[ 33%] Building CXX object tests/unit/CMakeFiles/test_br1_full22_count.dir/test_br1_full22_count.cpp.o
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_br1_subset.dir/test_br1_subset.cpp.o
+[ 34%] Linking CXX executable test_a1_wurf_vertrag_allokator_store
+[ 34%] Built target test_a1_wurf_vertrag_allokator_store
+[ 34%] Built target test_br2_descriptor_foundation
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_br2_roundtrip.dir/test_br2_roundtrip.cpp.o
+[ 34%] Linking CXX executable test_s5_01b_composable_perf_sanity
+[ 34%] Built target test_s5_01b_composable_perf_sanity
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_br3_obs22.dir/test_br3_obs22.cpp.o
+[ 34%] Linking CXX executable test_cuckoo_eviction_correctness
+[ 34%] Linking CXX executable test_s5_01c_fassaden_conformance
+[ 34%] Built target test_cuckoo_eviction_correctness
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_br_kf15_real.dir/test_br_kf15_real.cpp.o
+[ 34%] Built target test_s5_01c_fassaden_conformance
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_clu_per_layout.dir/test_clu_per_layout.cpp.o
+[ 34%] Linking CXX executable test_s5_05q_queuing_perf_sanity
+[ 34%] Built target test_s5_05q_queuing_perf_sanity
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_cow_capable_wrappers.dir/test_cow_capable_wrappers.cpp.o
+[ 34%] Linking CXX executable test_hash_lookup_backward_shift
+[ 34%] Linking CXX executable test_scalloc_realloc_alignment
+[ 34%] Built target test_hash_lookup_backward_shift
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_d4b_container_adapter.dir/test_d4b_container_adapter.cpp.o
+[ 34%] Built target test_scalloc_realloc_alignment
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_genus_binding.dir/test_genus_binding.cpp.o
+[ 34%] Linking CXX executable test_br1_subset
+[ 34%] Built target test_br1_subset
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_genus_organ_binding.dir/test_genus_organ_binding.cpp.o
+[ 34%] Linking CXX executable test_s5_01a_pool_stores_perf_sanity
+[ 34%] Built target test_s5_01a_pool_stores_perf_sanity
+[ 34%] Built target test_kf4_resource_control
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_kf5_cacheline_weave.dir/test_kf5_cacheline_weave.cpp.o
+[ 34%] Linking CXX executable test_s5_05q_queuing_alloc_conformance
+[ 34%] Built target test_s5_05q_queuing_alloc_conformance
+[ 34%] Building CXX object tests/unit/CMakeFiles/test_kf6_node_run_body.dir/test_kf6_node_run_body.cpp.o
+[ 34%] Linking CXX executable test_d4b_container_adapter
+[ 34%] Linking CXX executable test_cow_memento
+[ 34%] Linking CXX executable test_genus_binding
+[ 34%] Built target test_d4b_container_adapter
+[ 35%] Built target test_kf7_runtime_loop
+[ 35%] Built target test_kf8_ceb_generator
+[ 35%] Built target test_genus_binding
+[ 35%] Built target test_kf9_experiment_tree
+[ 35%] Built target test_kf10_repetition_plan
+[ 35%] Built target test_cow_memento
+[ 35%] Built target test_kf11_telemetry_silent
+[ 35%] Built target test_kf12_kf13_slurm_prepare
+[ 35%] Built target test_kf15_inverse_signature
+[ 35%] Building CXX object tests/unit/CMakeFiles/test_kf16_build_orchestrator.dir/test_kf16_build_orchestrator.cpp.o
+[ 36%] Building CXX object tests/unit/CMakeFiles/test_kf16b_build_resilience.dir/test_kf16b_build_resilience.cpp.o
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_w6_parallel_provision.dir/test_w6_parallel_provision.cpp.o
+[ 37%] Linking CXX executable test_cow_capable_wrappers
+[ 37%] Built target test_cow_capable_wrappers
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_w11_async_push_pump.dir/test_w11_async_push_pump.cpp.o
+[ 37%] Linking CXX executable test_genus_organ_binding
+[ 37%] Built target test_genus_organ_binding
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_s5_artifact_cache_bounded.dir/test_s5_artifact_cache_bounded.cpp.o
+[ 37%] Linking CXX executable test_clu_per_layout
+[ 37%] Built target test_clu_per_layout
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_s1_cache_key_prefix.dir/test_s1_cache_key_prefix.cpp.o
+[ 37%] Linking CXX executable test_br_kf15_real
+[ 37%] Linking CXX executable test_kf6_node_run_body
+[ 37%] Built target test_br_kf15_real
+[ 37%] Built target test_kf6_node_run_body
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_e24_c10_g6_identitaets_bilanz.dir/test_e24_c10_g6_identitaets_bilanz.cpp.o
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_s2_pull_tier_binary.dir/test_s2_pull_tier_binary.cpp.o
+[ 37%] Linking CXX executable test_kf5_cacheline_weave
+[ 37%] Built target test_kf5_cacheline_weave
+[ 37%] Linking CXX executable test_br1_full22_count
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_45_parallel_measure_loop.dir/test_45_parallel_measure_loop.cpp.o
+[ 37%] Built target test_br1_full22_count
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_cache_mc_timeout.dir/test_cache_mc_timeout.cpp.o
+[ 37%] Linking CXX executable test_br3_obs22
+[ 37%] Linking CXX executable test_br2_roundtrip
+[ 37%] Built target test_br3_obs22
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_r2_suffix_wachen.dir/test_r2_suffix_wachen.cpp.o
+[ 37%] Built target test_br2_roundtrip
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_w10_c4_zellwert_naht.dir/test_w10_c4_zellwert_naht.cpp.o
+[ 37%] Linking CXX executable test_w11_async_push_pump
+[ 37%] Built target test_w11_async_push_pump
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_e24_c9_fk5_fehlerraum.dir/test_e24_c9_fk5_fehlerraum.cpp.o
+[ 37%] Linking CXX executable test_s1_cache_key_prefix
+[ 37%] Linking CXX executable test_s5_artifact_cache_bounded
+[ 37%] Built target test_s1_cache_key_prefix
+[ 37%] Built target test_s5_artifact_cache_bounded
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_a15_fk3_axis_error_traits.dir/test_a15_fk3_axis_error_traits.cpp.o
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_a15_fk4_organ_slot_traits.dir/test_a15_fk4_organ_slot_traits.cpp.o
+[ 37%] Linking CXX executable test_45_parallel_measure_loop
+[ 37%] Built target test_45_parallel_measure_loop
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_fk6_algo_error_classes.dir/test_fk6_algo_error_classes.cpp.o
+[ 37%] Linking CXX executable test_cache_mc_timeout
+[ 37%] Built target test_cache_mc_timeout
+[ 37%] Built target test_resthygiene2_organ_fingerprint
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_all19_segment_timer.dir/test_all19_segment_timer.cpp.o
+[ 37%] Linking CXX executable test_r2_suffix_wachen
+[ 37%] Built target test_r2_suffix_wachen
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_m8_storetrav_segment.dir/test_m8_storetrav_segment.cpp.o
+[ 37%] Linking CXX executable test_e24_c9_fk5_fehlerraum
+[ 37%] Linking CXX executable test_kf16b_build_resilience
+[ 37%] Built target test_e24_c9_fk5_fehlerraum
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_br3_observer.dir/test_br3_observer.cpp.o
+[ 37%] Built target test_kf16b_build_resilience
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_obs_phaseB_t11_t12_iso.dir/test_obs_phaseB_t11_t12_iso.cpp.o
+[ 37%] Linking CXX executable test_w6_parallel_provision
+[ 37%] Linking CXX executable test_kf16_build_orchestrator
+[ 37%] Built target test_w6_parallel_provision
+[ 37%] Built target test_kf16_build_orchestrator
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_obs_phaseB_t14_t16.dir/test_obs_phaseB_t14_t16.cpp.o
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_pathb_segment_timer.dir/test_pathb_segment_timer.cpp.o
+[ 37%] Linking CXX executable test_fk6_algo_error_classes
+[ 37%] Linking CXX executable test_s2_pull_tier_binary
+[ 37%] Built target test_fk6_algo_error_classes
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_segment_timer_differentiation.dir/test_segment_timer_differentiation.cpp.o
+[ 37%] Built target test_s2_pull_tier_binary
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_obs_phaseA.dir/test_obs_phaseA.cpp.o
+[ 37%] Linking CXX executable test_a15_fk3_axis_error_traits
+[ 37%] Built target test_a15_fk3_axis_error_traits
+[ 37%] Building CXX object tests/unit/CMakeFiles/test_obs_phaseB_pilot.dir/test_obs_phaseB_pilot.cpp.o
+[ 38%] Linking CXX executable test_w10_c4_zellwert_naht
+[ 38%] Built target test_w10_c4_zellwert_naht
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_obs_phaseB_t11_t12.dir/test_obs_phaseB_t11_t12.cpp.o
+[ 38%] Linking CXX executable test_obs_phaseB_t14_t16
+[ 38%] Built target test_obs_phaseB_t14_t16
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_d_v42_abi_telemetry_coupling.dir/test_d_v42_abi_telemetry_coupling.cpp.o
+[ 38%] Linking CXX executable test_a15_fk4_organ_slot_traits
+[ 38%] Built target test_a15_fk4_organ_slot_traits
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_a8s4_konstitutiv_kette.dir/test_a8s4_konstitutiv_kette.cpp.o
+[ 38%] Linking CXX executable test_obs_phaseB_t11_t12_iso
+[ 38%] Built target test_obs_phaseB_t11_t12_iso
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_a8s4_release_pfad_neutralitaet.dir/test_a8s4_release_pfad_neutralitaet.cpp.o
+[ 38%] Linking CXX executable test_pathb_segment_timer
+[ 38%] Built target test_pathb_segment_timer
+[ 38%] Built target test_kf1_thesis_profile_parser
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_q1_lockfree_concurrency.dir/test_q1_lockfree_concurrency.cpp.o
+[ 38%] Linking CXX executable test_segment_timer_differentiation
+[ 38%] Built target test_segment_timer_differentiation
+[ 38%] Built target test_v5_io_real_fixture
+[ 38%] Built target test_winsorized_mean
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_conformance_gate.dir/test_conformance_gate.cpp.o
+[ 38%] Linking CXX executable test_d_v42_abi_telemetry_coupling
+[ 38%] Linking CXX executable test_br3_observer
+[ 38%] Built target test_d_v42_abi_telemetry_coupling
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_188_4bbV_pool_adapter_flip_compile.dir/test_188_4bbV_pool_adapter_flip_compile.cpp.o
+[ 38%] Linking CXX executable test_m8_storetrav_segment
+[ 38%] Built target test_br3_observer
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_phase_b_effective_search_algo_contrast.dir/test_phase_b_effective_search_algo_contrast.cpp.o
+[ 38%] Built target test_m8_storetrav_segment
+[ 38%] Building CXX object tests/unit/CMakeFiles/m3v2_pmc_smoke.dir/thesis_tiere/m3v2_pmc_smoke.cpp.o
+[ 38%] Linking CXX executable test_obs_phaseB_t11_t12
+[ 38%] Built target test_obs_phaseB_t11_t12
+[ 38%] Building CXX object tests/unit/CMakeFiles/test_harness_compile.dir/test_harness_compile.cpp.o
+[ 39%] Linking CXX executable test_conformance_gate
+[ 39%] Built target test_conformance_gate
+[ 39%] Building CXX object tests/unit/CMakeFiles/test_tp1_planer_filter_iterator.dir/test_tp1_planer_filter_iterator.cpp.o
+[ 39%] Linking CXX executable test_e24_c10_g6_identitaets_bilanz
+[ 39%] Linking CXX executable test_q1_lockfree_concurrency
+[ 39%] Built target test_e24_c10_g6_identitaets_bilanz
+[ 39%] Building CXX object tests/unit/CMakeFiles/test_a5_eta_slice_verdrahtung.dir/test_a5_eta_slice_verdrahtung.cpp.o
+[ 39%] Built target test_q1_lockfree_concurrency
+[ 39%] Building CXX object tests/unit/CMakeFiles/test_f3_lager_key_provider_iterator.dir/test_f3_lager_key_provider_iterator.cpp.o
+[ 39%] Linking CXX executable test_a8s4_konstitutiv_kette
+[ 39%] Built target test_a8s4_konstitutiv_kette
+[ 40%] Building CXX object tests/unit/CMakeFiles/test_b3_schema_freeze_stufe1.dir/test_b3_schema_freeze_stufe1.cpp.o
+[ 40%] Linking CXX executable test_a8s4_release_pfad_neutralitaet
+[ 40%] Built target test_a8s4_release_pfad_neutralitaet
+[ 40%] Building CXX object tests/unit/CMakeFiles/test_lazy_resume_binary.dir/test_lazy_resume_binary.cpp.o
+[ 40%] Linking CXX executable test_obs_phaseA
+[ 40%] Built target test_obs_phaseA
+[ 40%] Building CXX object tests/unit/CMakeFiles/test_w5_status_reader.dir/test_w5_status_reader.cpp.o
+[ 41%] Linking CXX executable test_obs_phaseB_pilot
+[ 41%] Built target test_obs_phaseB_pilot
+[ 41%] Building CXX object tests/unit/CMakeFiles/test_experiment_dock_payload.dir/test_experiment_dock_payload.cpp.o
+[ 41%] Linking CXX executable test_phase_b_effective_search_algo_contrast
+[ 41%] Built target test_phase_b_effective_search_algo_contrast
+[ 41%] Built target test_progress_delta
+[ 41%] Built target test_gn_cell_filter
+[ 41%] Built target linux_perf_pmc_smoke
+[ 41%] Building CXX object tests/unit/CMakeFiles/test_dgenus_dll.dir/test_dgenus_dll.cpp.o
+[ 41%] Linking CXX executable test_experiment_dock_payload
+[ 41%] Built target test_experiment_dock_payload
+[ 41%] Building CXX object tests/unit/CMakeFiles/test_e24_c10_genus_dll_roundtrip.dir/test_e24_c10_genus_dll_roundtrip.cpp.o
+[ 42%] Linking CXX executable test_all19_segment_timer
+[ 42%] Built target test_all19_segment_timer
+[ 42%] Building CXX object tests/unit/CMakeFiles/test_e24_c10_g5_lade_wache.dir/test_e24_c10_g5_lade_wache.cpp.o
+[ 43%] Linking CXX executable m3v2_pmc_smoke
+[ 43%] Built target m3v2_pmc_smoke
+[ 43%] Built target test_buildvariant_dll
+[ 43%] Building CXX object tests/unit/CMakeFiles/test_d4b_container_dll.dir/test_d4b_container_dll.cpp.o
+[ 43%] Linking CXX executable test_harness_compile
+[ 43%] Built target test_harness_compile
+[ 43%] Built target test_ap5_simd_extension_coherence
+[ 43%] Building CXX object tests/unit/CMakeFiles/perm_adhoc_buildvariant.dir/genus_adhoc_buildvariant.cpp.o
+[ 43%] Linking CXX executable test_dgenus_dll
+[ 43%] Built target test_dgenus_dll
+[ 43%] Built target test_w3_mess_interface_testate_biss
+[ 43%] Built target test_cacheline_policy_selector
+[ 43%] Built target test_load_profile_writer
+[ 43%] Built target test_kf3_cacheline_subaxis
+[ 43%] Building CXX object tests/unit/CMakeFiles/test_ff2_node_width_subaxis.dir/test_ff2_node_width_subaxis.cpp.o
+[ 43%] Linking CXX executable test_d4b_container_dll
+[ 43%] Built target test_d4b_container_dll
+[ 43%] Building CXX object tests/unit/CMakeFiles/test_fb_alloc_hw_subaxis.dir/test_fb_alloc_hw_subaxis.cpp.o
+[ 43%] Linking CXX executable test_188_4bbV_pool_adapter_flip_compile
+[ 43%] Built target test_188_4bbV_pool_adapter_flip_compile
+[ 43%] Building CXX object tests/unit/CMakeFiles/test_best_binary_selector_parse_rank.dir/test_best_binary_selector_parse_rank.cpp.o
+[ 43%] Linking CXX executable test_a5_eta_slice_verdrahtung
+[ 43%] Built target test_a5_eta_slice_verdrahtung
+[ 43%] Building CXX object tests/unit/CMakeFiles/test_hybrid_spline_selector_scaffold.dir/test_hybrid_spline_selector_scaffold.cpp.o
+[ 43%] Linking CXX executable test_b3_schema_freeze_stufe1
+[ 43%] Built target test_b3_schema_freeze_stufe1
+[ 43%] Built target test_e4_contract_xml_to_axislevels
+[ 44%] Building CXX object tests/unit/CMakeFiles/test_a9b_active_deklaration_inert.dir/test_a9b_active_deklaration_inert.cpp.o
+[ 45%] Linking CXX executable test_lazy_resume_binary
+[ 45%] Built target test_lazy_resume_binary
+[ 45%] Built target test_t1_system_achsen_eine_entscheidung
+[ 45%] Built target test_e3_contract_conformance_gate_wirksam
+[ 45%] Built target test_e3_contract_binary_id_bijektion
+[ 45%] Building CXX object tests/unit/CMakeFiles/test_e2_contract_abi_vertrag.dir/test_e2_contract_abi_vertrag.cpp.o
+[ 45%] Linking CXX executable test_f3_lager_key_provider_iterator
+[ 45%] Linking CXX executable test_e24_c10_g5_lade_wache
+[ 45%] Built target test_f3_lager_key_provider_iterator
+[ 45%] Building CXX object tests/unit/CMakeFiles/test_m1_mess_achsen_wirkung.dir/test_m1_mess_achsen_wirkung.cpp.o
+[ 45%] Built target test_e24_c10_g5_lade_wache
+[ 45%] Building CXX object tests/unit/CMakeFiles/r3_biss_modul_gates_an.dir/r3_mess_gate_stamp_module.cpp.o
+[ 45%] Linking CXX executable test_tp1_planer_filter_iterator
+[ 45%] Linking CXX executable test_ff2_node_width_subaxis
+[ 45%] Linking CXX executable test_e24_c10_genus_dll_roundtrip
+[ 45%] Linking CXX executable test_best_binary_selector_parse_rank
+[ 45%] Built target test_tp1_planer_filter_iterator
+[ 45%] Built target test_ff2_node_width_subaxis
+[ 45%] Built target test_e24_c10_genus_dll_roundtrip
+[ 45%] Building CXX object tests/unit/CMakeFiles/test_b2_mess_gate_trennung.dir/test_b2_mess_gate_trennung.cpp.o
+[ 45%] Building CXX object tests/unit/CMakeFiles/r3_biss_modul_gates_aus.dir/r3_mess_gate_stamp_module.cpp.o
+[ 45%] Building CXX object tests/unit/CMakeFiles/test_b2_gate_zustand_g2an_g3aus.dir/test_b2_gate_zustand_g2an_g3aus.cpp.o
+[ 45%] Built target test_best_binary_selector_parse_rank
+[ 45%] Building CXX object tests/unit/CMakeFiles/test_b5_pmc_ehrlichkeit_alle_sieben.dir/test_b5_pmc_ehrlichkeit_alle_sieben.cpp.o
+[ 45%] Linking CXX executable test_hybrid_spline_selector_scaffold
+[ 46%] Linking CXX executable test_fb_alloc_hw_subaxis
+[ 46%] Built target test_hybrid_spline_selector_scaffold
+[ 46%] Built target test_fb_alloc_hw_subaxis
+[ 46%] Built target test_parser_konsolidierung
+[ 47%] Building CXX object tests/unit/CMakeFiles/test_m1h_stufen_und_pmc_wache.dir/test_m1h_stufen_und_pmc_wache.cpp.o
+[ 48%] Linking CXX executable test_e2_contract_abi_vertrag
+[ 49%] Building CXX object tests/unit/CMakeFiles/test_phase6_vorbau.dir/test_phase6_vorbau.cpp.o
+[ 49%] Built target test_e2_contract_abi_vertrag
+[ 49%] Building CXX object tests/unit/CMakeFiles/test_simd_field_sum_dispatch.dir/test_simd_field_sum_dispatch.cpp.o
+[ 49%] Linking CXX executable test_w5_status_reader
+[ 49%] Built target test_w5_status_reader
+[ 49%] Building CXX object tests/unit/CMakeFiles/test_simd_field_sum_dispatch_avx2.dir/test_simd_field_sum_dispatch.cpp.o
+[ 50%] Linking CXX executable test_simd_field_sum_dispatch
+[ 50%] Built target test_simd_field_sum_dispatch
+[ 50%] Building CXX object tests/unit/CMakeFiles/test_simd_field_sum_dispatch_avx512.dir/test_simd_field_sum_dispatch.cpp.o
+[ 50%] Linking CXX executable test_m1_mess_achsen_wirkung
+[ 50%] Linking CXX shared library ../../generated/goalv6_dll_modules/libperm_adhoc_buildvariant.so
+[ 50%] Built target test_m1_mess_achsen_wirkung
+[ 50%] Building CXX object tests/unit/CMakeFiles/test_fk1_nicht_gebaut_marker.dir/test_fk1_nicht_gebaut_marker.cpp.o
+[ 50%] Built target perm_adhoc_buildvariant
+[ 50%] Building CXX object tests/unit/CMakeFiles/test_a8s3_csv_klasse_c.dir/test_a8s3_csv_klasse_c.cpp.o
+[ 50%] Linking CXX executable test_b2_mess_gate_trennung
+[ 50%] Built target test_b2_mess_gate_trennung
+[ 50%] Linking CXX executable test_phase6_vorbau
+[ 50%] Building CXX object tests/unit/CMakeFiles/test_rf2_admission_marker_inert.dir/test_rf2_admission_marker_inert.cpp.o
+[ 50%] Linking CXX executable test_simd_field_sum_dispatch_avx2
+[ 50%] Built target test_phase6_vorbau
+[ 50%] Built target test_simd_field_sum_dispatch_avx2
+[ 50%] Building CXX object tests/unit/CMakeFiles/test_m1hb_observer_zellen_ehrlich.dir/test_m1hb_observer_zellen_ehrlich.cpp.o
+[ 50%] Linking CXX executable test_a9b_active_deklaration_inert
+[ 51%] Built target test_e04_slice_marker
+[ 51%] Building CXX object tests/unit/CMakeFiles/test_p_cacheline_store_line_source.dir/test_p_cacheline_store_line_source.cpp.o
+[ 51%] Built target test_a9b_active_deklaration_inert
+[ 51%] Building CXX object tests/unit/CMakeFiles/test_b14_layout_scan_line_subaxis.dir/test_b14_layout_scan_line_subaxis.cpp.o
+[ 51%] Linking CXX executable test_m1h_stufen_und_pmc_wache
+[ 51%] Built target test_m1h_stufen_und_pmc_wache
+[ 51%] Built target test_ms1_arenen_kein_alloc_im_fenster
+[ 52%] Built target test_ms2_pre_touch_seitenfehler
+[ 52%] Building CXX object tests/unit/CMakeFiles/test_ck1_messkette_koeder.dir/test_ck1_messkette_koeder.cpp.o
+[ 52%] Linking CXX executable test_simd_field_sum_dispatch_avx512
+[ 52%] Built target test_simd_field_sum_dispatch_avx512
+[ 52%] Built target test_check_size_mengenrechnung
+[ 52%] Building CXX object tests/unit/CMakeFiles/naht1_modul_mess_an.dir/naht1_visitor_module.cpp.o
+[ 53%] Linking CXX shared library ../../generated/r3_biss_modules/libr3_biss_modul_gates_an.so
+[ 53%] Built target r3_biss_modul_gates_an
+[ 53%] Building CXX object tests/unit/CMakeFiles/naht1_modul_mess_aus.dir/naht1_visitor_module.cpp.o
+[ 53%] Linking CXX shared library ../../generated/r3_biss_modules/libr3_biss_modul_gates_aus.so
+[ 53%] Built target r3_biss_modul_gates_aus
+[ 53%] Building CXX object _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[ 53%] Linking CXX executable test_b14_layout_scan_line_subaxis
+[ 53%] Built target test_b14_layout_scan_line_subaxis
+[ 53%] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[ 54%] Linking CXX executable test_p_cacheline_store_line_source
+[ 54%] Built target test_p_cacheline_store_line_source
+[ 55%] Building CXX object libs/cache_engine/builder/experiment_runner/CMakeFiles/comdare_builder_experiment_runner.dir/experiment_runner.cpp.o
+[ 55%] Linking CXX executable test_ck1_messkette_koeder
+[ 55%] Built target test_ck1_messkette_koeder
+[ 55%] Built target comdare_builder_experiment_driver
+[ 55%] Built target comdare_anatomy_codegen_tool
+[ 55%] Built target comdare_lager_ablage
+[ 55%] Built target comdare_anatomy_codegen_cli
+[ 55%] Building CXX object apps/f15_compare/CMakeFiles/comdare_f15_compare_cli.dir/main.cpp.o
+[ 55%] Linking CXX static library ../../../lib/libgtest_main.a
+[ 55%] Built target gtest_main
+[ 55%] Building CXX object apps/perm_runner/CMakeFiles/comdare_perm_runner.dir/main.cpp.o
+[ 55%] Linking CXX static library libcomdare_builder_experiment_runner.a
+[ 55%] Built target comdare_builder_experiment_runner
+[ 55%] Built target comdare_limits_generated_source_catalog
+[ 56%] Building CXX object tests/unit/CMakeFiles/test_pressure_state.dir/test_pressure_state.cpp.o
+[ 56%] Linking CXX executable test_b5_pmc_ehrlichkeit_alle_sieben
+[ 56%] Built target test_b5_pmc_ehrlichkeit_alle_sieben
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_cache_recommendation.dir/test_cache_recommendation.cpp.o
+[ 57%] Linking CXX static library ../../../lib/libgmock.a
+[ 57%] Built target gmock
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_cpuid_probe.dir/test_cpuid_probe.cpp.o
+[ 57%] Linking CXX executable test_b2_gate_zustand_g2an_g3aus
+[ 57%] Linking CXX executable test_a8s3_csv_klasse_c
+[ 57%] Built target test_b2_gate_zustand_g2an_g3aus
+[ 57%] Built target test_a8s3_csv_klasse_c
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_permutation_flags.dir/test_permutation_flags.cpp.o
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_event_hierarchy.dir/test_event_hierarchy.cpp.o
+[ 57%] Linking CXX executable test_cache_recommendation
+[ 57%] Built target test_cache_recommendation
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_observer_registry.dir/test_observer_registry.cpp.o
+[ 57%] Linking CXX executable test_pressure_state
+[ 57%] Linking CXX executable test_fk1_nicht_gebaut_marker
+[ 57%] Built target test_fk1_nicht_gebaut_marker
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_decision_trees.dir/test_decision_trees.cpp.o
+[ 57%] Built target test_pressure_state
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_decision_lambda_registry.dir/test_decision_lambda_registry.cpp.o
+[ 57%] Linking CXX shared library ../../generated/naht1_modules_aus/comdare_anatomy_perm_naht1_aus.so
+[ 57%] Built target naht1_modul_mess_aus
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_concurrency_disciplines.dir/test_concurrency_disciplines.cpp.o
+[ 57%] Linking CXX executable test_cpuid_probe
+[ 57%] Linking CXX executable perm_runner
+[ 57%] Built target comdare_perm_runner
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_telemetry_strategies.dir/test_telemetry_strategies.cpp.o
+[ 57%] Built target test_cpuid_probe
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_platform_concepts.dir/test_platform_concepts.cpp.o
+[ 57%] Linking CXX shared library ../../generated/naht1_modules_an/comdare_anatomy_perm_naht1_an.so
+[ 57%] Built target naht1_modul_mess_an
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_cache_hierarchy_and_mode.dir/test_cache_hierarchy_and_mode.cpp.o
+[ 57%] Linking CXX executable test_m1hb_observer_zellen_ehrlich
+[ 57%] Built target test_m1hb_observer_zellen_ehrlich
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_measurement_buffer.dir/test_measurement_buffer.cpp.o
+[ 57%] Linking CXX executable test_rf2_admission_marker_inert
+[ 57%] Built target test_rf2_admission_marker_inert
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_sub_engines.dir/test_sub_engines.cpp.o
+[ 57%] Linking CXX executable test_permutation_flags
+[ 57%] Built target test_permutation_flags
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_allocator_concepts.dir/test_allocator_concepts.cpp.o
+[ 57%] Linking CXX executable test_event_hierarchy
+[ 57%] Linking CXX executable test_observer_registry
+[ 57%] Built target test_event_hierarchy
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_abi_interface.dir/test_abi_interface.cpp.o
+[ 57%] Built target test_observer_registry
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_config_durability.dir/test_config_durability.cpp.o
+[ 57%] Linking CXX executable test_decision_lambda_registry
+[ 57%] Built target test_decision_lambda_registry
+[ 57%] Building CXX object tests/unit/CMakeFiles/test_chaos_drift_gate.dir/test_chaos_drift_gate.cpp.o
+[ 57%] Linking CXX executable test_decision_trees
+[ 58%] Linking CXX executable comdare-f15-compare
+[ 58%] Linking CXX executable test_concurrency_disciplines
+[ 58%] Built target test_decision_trees
+[ 58%] Building CXX object tests/unit/CMakeFiles/test_test_data_accumulation.dir/test_test_data_accumulation.cpp.o
+/usr/bin/ld: ../../libs/common/measurement/hdr_histogram_wrapper/libcomdare_hdr_histogram_wrapper.a(hdr_histogram.c.o): relocation R_X86_64_32S against `.text' can not be used when making a PIE object; recompile with -fPIE
+/usr/bin/ld: failed to set dynamic section sizes: bad value
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [apps/f15_compare/CMakeFiles/comdare_f15_compare_cli.dir/build.make:105: apps/f15_compare/comdare-f15-compare] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:7828: apps/f15_compare/CMakeFiles/comdare_f15_compare_cli.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+[ 58%] Built target test_concurrency_disciplines
+[ 58%] Linking CXX executable test_platform_concepts
+[ 58%] Linking CXX executable test_cache_hierarchy_and_mode
+[ 58%] Linking CXX executable test_telemetry_strategies
+[ 58%] Built target test_platform_concepts
+[ 58%] Built target test_cache_hierarchy_and_mode
+[ 58%] Built target test_telemetry_strategies
+[ 59%] Linking CXX executable test_measurement_buffer
+[ 59%] Linking CXX executable test_sub_engines
+[ 59%] Built target test_measurement_buffer
+[ 59%] Built target test_sub_engines
+[ 59%] Linking CXX executable test_allocator_concepts
+[ 59%] Linking CXX executable test_abi_interface
+[ 59%] Built target test_allocator_concepts
+[ 59%] Built target test_abi_interface
+[ 59%] Linking CXX executable test_config_durability
+[ 59%] Linking CXX executable test_test_data_accumulation
+[ 59%] Built target test_config_durability
+[ 59%] Built target test_test_data_accumulation
+[ 59%] Linking CXX executable test_chaos_drift_gate
+[ 59%] Built target test_chaos_drift_gate
+gmake: *** [Makefile:146: all] Error 2

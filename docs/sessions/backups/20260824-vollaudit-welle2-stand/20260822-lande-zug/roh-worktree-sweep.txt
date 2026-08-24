@@ -1,0 +1,62 @@
+## WORKTREE-SWEEP 2026-08-22T14:16:49+00:00
+=== /home/comdare/wt-ce-a11 [bau/a11-ccache-allowlist-drop @ ec048560] dirty=0 untracked=0
+=== /home/comdare/wt-ce-bump15 [bau/bump15-preimage-bruch @ af0f251a] dirty=0 untracked=0
+=== /home/comdare/wt-ce-f3v [bau/flaeche3-vereinigung @ dac3d91a] dirty=0 untracked=0
+=== /home/comdare/wt-ce-g2 [bau/g2-semantik @ 6af6a415] dirty=0 untracked=0
+=== /home/comdare/wt-ce-golden-rettung [golden-rettung @ fbe898be] dirty=0 untracked=0
+=== /home/comdare/wt-ce-hy-a [bau/hy-a-hybrid-struktur @ a4366cb8] dirty=0 untracked=0
+=== /home/comdare/wt-ce-k2 [bau/k2-weg-a-fixture @ 7a5ed464] dirty=1 untracked=1
+    | ?? _wiederanlauf.sh
+=== /home/comdare/wt-ce-kampvor [bau/kampvor @ 1e1bc199] dirty=0 untracked=0
+=== /home/comdare/wt-ce-l10 [bau/l10-snmalloc-system @ 14a7d0c4] dirty=0 untracked=0
+=== /home/comdare/wt-ce-l1fix [bau/l1-ci-fix-16040 @ b791d3e2] dirty=0 untracked=0
+=== /home/comdare/wt-ce-lande [lande/w2-s1s2 @ 61d5d139] dirty=0 untracked=0
+=== /home/comdare/wt-ce-messfenster [bau/messfenster @ 3a746090] dirty=0 untracked=0
+=== /home/comdare/wt-ce-nachlande [bau/stempel-nachlande-f2 @ e9d035f6] dirty=0 untracked=0
+=== /home/comdare/wt-ce-o2std [bau/o2-standard @ fa48a551] dirty=1 untracked=0
+    |  M libs/cache_engine/profile_facade/profile_run_entry.hpp
+=== /home/comdare/wt-ce-ph89 [bau/ph89 @ 2809e4d4] dirty=0 untracked=0
+=== /home/comdare/wt-ce-pmcpaket [bau/pmcpaket @ 1d38263b] dirty=0 untracked=0
+=== /home/comdare/wt-ce-s13schema [bau/s13schema @ c76d3116] dirty=0 untracked=0
+=== /home/comdare/wt-ce-s19 [bau/s19 @ a1b348ae] dirty=0 untracked=0
+=== /home/comdare/wt-ce-s8kopf [bau/s8kopf @ 41ee8780] dirty=0 untracked=0
+=== /home/comdare/wt-ce-skip97 [bau/skip97 @ 1c9f58a5] dirty=0 untracked=0
+=== /home/comdare/wt-ce-trigfix [bau/trigfix @ 0f900dcf] dirty=0 untracked=0
+=== /home/comdare/wt-ce-v08r [bau/v08r-fingerprint-sha @ eab9476b] dirty=0 untracked=0
+=== /home/comdare/wt-ce-varwache [bau/variant-wache @ e0126fad] dirty=0 untracked=0
+=== /home/comdare/wt-ce-vl12 [bau/vl12-s6b-pod-vorstufe @ cd011e60] dirty=0 untracked=0
+=== /home/comdare/wt-ce-vl3 [bau/vl3-debug-flag @ 7bf66ddd] dirty=0 untracked=0
+=== /home/comdare/wt-ce-vollzug91 [bau/vollzug91 @ 6713156b] dirty=0 untracked=0
+=== /home/comdare/wt-ce-w1luecken [bau/w1-luecken @ 3149c8a2] dirty=0 untracked=0
+=== /home/comdare/wt-ce-xorf [bau/xorf-offline-peeling @ b8d6edab] dirty=0 untracked=0
+=== /home/comdare/wt-prt-pinduo [bau/pinduo @ 25bbf2e2] dirty=0 untracked=0
+=== /home/comdare/wt-super-cidual [bau/cidual @ 223ab518] dirty=0 untracked=0
+=== /home/comdare/wt-super-kampvor [bau/kampvor @ 025e0c42] dirty=0 untracked=0
+=== /home/comdare/wt-super-s13schema [bau/s13schema @ 1e92b77e] dirty=0 untracked=0
+=== /home/comdare/wt-super-vorlagenfix [fix/vorlagenfenster-r1 @ a6fa04da] dirty=0 untracked=0
+=== /home/comdare/wt-super-w1luecken [bau/w1luecken-super @ 8edc34a0] dirty=0 untracked=0
+    NESTED Code/external/comdare-cache-engine [DETACHED @ 66de5c09] dirty=0 stash=0 heads: main=e114cabd 
+    NESTED Code/external/comdare-prt-art [DETACHED @ d11781fa] dirty=0 stash=0 heads: main=c6f07540 
+=== /home/comdare/wt-thesis-lizenz [development @ c169fd22] dirty=0 untracked=0
+=== /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.git/modules/Code/external/comdare-cache-engine/.claude/worktrees/wf_5834b706-7b5-15 [bau/p2-warnstufe-aufteilen @ 237d0952] dirty=0 untracked=0
+=== /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.git/modules/Code/external/comdare-cache-engine/.claude/worktrees/wf_5834b706-7b5-16 [bau/p3-ci-clang-pflicht @ 708cf156] dirty=0 untracked=0
+=== /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.git/modules/Code/external/comdare-cache-engine/.claude/worktrees/wf_5834b706-7b5-19 [bau/p6-lizenz-umsetzung @ f6d13dfb] dirty=0 untracked=0
+=== /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.git/modules/Code/external/comdare-cache-engine/.claude/worktrees/wf_e22d25ef-71c-7 [worktree-wf_e22d25ef-71c-7 @ 7f3901fb] dirty=17 untracked=17
+    | ?? abschluss.sh
+    | ?? aufsetzen.sh
+    | ?? bau/
+    | ?? ci_lauf.sh
+    | ?? commit.sh
+    | ?? g.sh
+    | ?? hygiene.sh
+    | ?? messen.sh
+=== SUPER-HAUPTKLON status ===
+    |  M Code/external/comdare-cache-engine
+    | ?? build-l4/
+=== SUPER-HAUPTKLON Submodul-Status ===
+    |  c169fd22c6047687d4f5ac27b5deb18e023b8382 Code/external/20260931-overleaf-diplomarbeit (remotes/origin/development)
+    | +f729b93aab08bbf3cacd0c8b62ab29545e74e5f9 Code/external/comdare-cache-engine (o8-fenster-start-975-gf729b93a)
+    |  d11781fa84561e99cbad9f2eab098d7450ea4ae1 Code/external/comdare-prt-art (pre-f6-destructive-20260529-92-gd11781f)
+    |  c169fd22c6047687d4f5ac27b5deb18e023b8382 thesis/diplomarbeit (remotes/github/development)
+=== CE-HAUPTKLON-CHECKOUT status (super/Code/external/comdare-cache-engine) ===
+    dirty_zeilen=0

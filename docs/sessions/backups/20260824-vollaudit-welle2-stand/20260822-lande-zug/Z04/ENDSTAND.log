@@ -1,0 +1,37 @@
+Z04 ENDSTAND (22.08.2026) — Merge 5/10: bau/pmcpaket -> lande/w2-s1s2
+
+MERGE: 9da4d21db88f0feaa8e858d13c6317d2e7b1e556 (--no-ff; Eltern 96a69ba3 + 1d38263b)
+  16 Dateien, +970/-146; Branch lande/w2-s1s2 im Worktree /home/comdare/wt-ce-lande; porcelain 0.
+
+KONFLIKTE (2) + HARMONISIERUNG:
+  - pmc_host_probe.hpp: Weiterleitungs-Struktur (pmcpaket) uebernommen; Doku auf
+    Fenster-Semantik; kKoederFenster aus der Strategie entfernt (eine Wahrheit im Kern).
+  - measurement/pmc_event_biss.hpp (ADD, konfliktfrei — GEFAHR erkannt): 899645ef-Fix
+    (CI 16073/Job 382856) VOLL portiert: read_format TIME_ENABLED|TIME_RUNNING, LeseForm,
+    kPmcKoederFenster=5, Leer-Fenster-Wiederholung; Kopf-K13-Absatz mit PRAEZISIERUNG.
+    OHNE Port haette der Kern-Umzug den CI-Fix still verloren (alter Kern in neuer Datei).
+  - tests/unit/CMakeLists.txt: EOF-Union beider Bloecke voll + Trenner (Muster 881d1a15).
+  - Iterator auto-merged; S-5/H-3 semantisch gegengelesen (merge-03-Log): Gegeneingang
+    EINMAL je Lauf VOR erster Zelle (stderr) + messfenster-C-11 nach measure_hb.done()
+    (xlsx-INFO) komplementaer; pmc_zelle :1063 ohne available-Gate; s13-Mappe intakt.
+
+ABNAHME (gcc-Release-Zwischenlauf nach kritischem Merge, slot2 "lande-w2-zug", df 20G):
+  J-0b: COMDARE_CE_PRUEFLINGE=<wt>/tests/pruefling_fixture, gcc/Release/Ninja (Cache-Literal).
+  J-1: 7 Werkzeuge literal RC=0. RE-CONFIGURE RC=0. Vollbau RC=0 (1839 Schritte, 2m46).
+  Warnungs-Bilanz: 1 Treffer = VORBESTAND (stringop-overflow test_v41_topic_traversal,
+  identisch in gcc-rel-build.log der f729b93a-Landung + CI-Traces 382997/382833) — 0 NEU.
+  comdare_tests RC=0. ctest -j8: "100% tests passed, 0 tests failed out of 534", CTEST_RC=0.
+  Nenner-Kette: Z03-Endstand 532/532 -> Z04 534/534; Delta +2 = exakt #533
+  test_pmc_startup_pruefung + #534 test_pmc_raw_event_katalog (ctest -N-Literale).
+  Strang-relevante Einzel-Literale: linux_perf_pmc_smoke/m3v2_pmc_smoke/
+  test_experiment_plan_director/test_a8s3_csv_klasse_c/beide neue Tests je "Passed".
+  Diff-Hygiene-Wache 96a69ba3..9da4d21d: "DIFF-HYGIENE-WACHE: GRUEN." GUARD_RC=0.
+  clang-format-22 dry-run beider harmonisierter Dateien: OK.
+
+RAEUMUNG: KEINE in Z04 (per Ziel: wt-ce-pmcpaket-Raeumung = Z11). Quell-WT traegt KEIN
+  Build-Verzeichnis (eigenes ls + Audit-r2-Befund). Eigener Bau-Baum build/gcc-release
+  bleibt lebender Zug-Baum fuer Merges 6/10 ff. df vor==nach: 20G frei.
+
+RESTPOSTEN-TRAEGER: T6/A-1 NP-34 = Z22 (super-Abschnitt) · T8b/A-2 = Z24 (Lead) ·
+  F-39/F-41/F-42 Bestand · T-11b-Endstand-Kombibau = Zug-Pflicht vor Push (K17) ·
+  Board-#82/#83-Status-Nachzug = Lead-Board-Zug.

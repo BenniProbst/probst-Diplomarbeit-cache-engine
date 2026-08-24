@@ -1,0 +1,2 @@
+comdare-experiment-planner: unbekanntes Subkommando '--emit-tier-ci' -- erwartet: validate | plan dump|ci|cmake | cache-key | fingerprint | status | check-size | simulate | version | help.
+  (Die CEB-Rolle 'tier ci|cmake' und der Mess-Lauf 'run' leben im comdare-messung-driver.)

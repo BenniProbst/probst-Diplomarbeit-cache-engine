@@ -1,0 +1,31 @@
+[28/34] Linking CXX static library lib/libgtest.a
+[29/34] Linking CXX static library lib/libgtest_main.a
+[30/34] Building CXX object tests/unit/CMakeFiles/test_rcu.dir/test_rcu.cpp.o
+In file included from /opt/gcc-15.3/include/c++/15.3.0/atomic:52,
+                 from /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:39,
+                 from /home/comdare/wt-ce-bump15/tests/unit/test_rcu.cpp:4:
+In function ‘void std::atomic_thread_fence(memory_order)’,
+    inlined from ‘void comdare::rcu::RcuDomain::read_lock(comdare::rcu::RcuReaderState*)’ at /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:105:37:
+/opt/gcc-15.3/include/c++/15.3.0/bits/atomic_base.h:147:26: warning: ‘atomic_thread_fence’ is not supported with ‘-fsanitize=thread’ [-Wtsan]
+  147 |   { __atomic_thread_fence(int(__m)); }
+      |     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+In function ‘void std::atomic_thread_fence(memory_order)’,
+    inlined from ‘void comdare::rcu::RcuDomain::synchronize()’ at /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:125:33:
+/opt/gcc-15.3/include/c++/15.3.0/bits/atomic_base.h:147:26: warning: ‘atomic_thread_fence’ is not supported with ‘-fsanitize=thread’ [-Wtsan]
+  147 |   { __atomic_thread_fence(int(__m)); }
+      |     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+[31/34] Linking CXX executable tests/unit/test_rcu
+[32/34] Building CXX object tests/unit/CMakeFiles/test_rcu_concurrency.dir/test_rcu_concurrency.cpp.o
+In file included from /opt/gcc-15.3/include/c++/15.3.0/atomic:52,
+                 from /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:39,
+                 from /home/comdare/wt-ce-bump15/tests/unit/test_rcu_concurrency.cpp:17:
+In function ‘void std::atomic_thread_fence(memory_order)’,
+    inlined from ‘void comdare::rcu::RcuDomain::read_lock(comdare::rcu::RcuReaderState*)’ at /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:105:37:
+/opt/gcc-15.3/include/c++/15.3.0/bits/atomic_base.h:147:26: warning: ‘atomic_thread_fence’ is not supported with ‘-fsanitize=thread’ [-Wtsan]
+  147 |   { __atomic_thread_fence(int(__m)); }
+      |     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+In function ‘void std::atomic_thread_fence(memory_order)’,
+    inlined from ‘void comdare::rcu::RcuDomain::synchronize()’ at /home/comdare/wt-ce-bump15/libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp:125:33:
+/opt/gcc-15.3/include/c++/15.3.0/bits/atomic_base.h:147:26: warning: ‘atomic_thread_fence’ is not supported with ‘-fsanitize=thread’ [-Wtsan]
+  147 |   { __atomic_thread_fence(int(__m)); }
+      |     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~

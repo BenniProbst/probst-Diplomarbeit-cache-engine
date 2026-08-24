@@ -1,0 +1,25 @@
+=============================================================================
+ PRE-PUSH-LANDE-GATES (--nur=gitleaks): EIN Gate, PROBE-Modus
+=============================================================================
+
+BEREICH: 20c111c4..HEAD   (46 Commits)
+  Basis:  20c111c4   Spitze: 3b2fda12
+
+=============================================================================
+ [3/6] GITLEAKS -- Selbstbiss, dann Echt-Scan ueber 20c111c4..HEAD
+=============================================================================
+WERKZEUG: /home/comdare/.local/bin/gitleaks (Version 8.30.1), Config .gitleaks.toml
+SELBSTBISS: gebissen (Koeder-Laenge 26, gitleaks-Exit 1) -- Werkzeug und Config sind scharf.
+GATE [3/6] GRUEN. NENNER: 46 Commits, 1558505 Bytes gescannt, 0 Funde;
+  Selbstbiss davor: 1 Fund aus 1 Koeder (Pflicht).
+
+=============================================================================
+PRE-PUSH-LANDE-GATES (--nur=gitleaks): GRUEN -- NUR dieses eine Gate.
+NICHT GEFAHREN (und damit OHNE Urteil):
+   * diff
+   * format
+   * lock
+   * floor
+   * tabu
+Der volle Lauf vor dem Push bleibt Pflicht.
+=============================================================================

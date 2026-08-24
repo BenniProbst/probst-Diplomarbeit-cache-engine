@@ -1,0 +1,21 @@
+Test project /home/comdare/wt-ce-lande/build/gcc-release
+    Start 542: test_c14_lager_presence_wache
+1/3 Test #542: test_c14_lager_presence_wache ......   Passed    0.00 sec
+    Start 543: test_c13_selektiver_rebuild
+2/3 Test #543: test_c13_selektiver_rebuild ........   Passed    0.00 sec
+    Start 544: test_c14_messwert_presence_wache
+3/3 Test #544: test_c14_messwert_presence_wache ...   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+bestandslog    =   0.00 sec*proc (2 tests)
+c13            =   0.00 sec*proc (1 test)
+c14            =   0.00 sec*proc (2 tests)
+koeder         =   0.00 sec*proc (3 tests)
+messwert       =   0.00 sec*proc (1 test)
+skip           =   0.00 sec*proc (3 tests)
+wachen         =   0.00 sec*proc (3 tests)
+
+Total Test time (real) =   0.01 sec
+CTEST_RC=0

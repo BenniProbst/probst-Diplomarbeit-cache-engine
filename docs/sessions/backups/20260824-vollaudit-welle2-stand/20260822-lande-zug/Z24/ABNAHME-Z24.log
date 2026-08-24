@@ -1,0 +1,25 @@
+ABNAHME Z24 -- 2026-08-24T19:21:00Z
+
+SCRIPT-AUSGABE (ledger_nachtrag.sh, RC=0):
+  Einfuegepunkt Zeile 19; Nachtrag 514 Zeile(n); Ledger 32589 -> 33103 Zeilen.
+
+KOPF-VERIFIKATION (grep -n '^## KON12', erste 2):
+19:## KON122 (24.08.2026 abends, W2-Lande-Zug #131 / Z24 "Ledger AN der Landung"): W2-LANDUNG KOMPLETT -- ce+prt-art+super GELANDET (CI 286/287/288 TERMINAL SUCCESS) + STRANG-/AUDIT-BUCHUNGEN L1-L21 + L-08a-j + E-6 + #112/Ledger-#44
+683:## KON121 (22.08. vormittags, Lead): Owner-Ruege "Faden verloren" — Volllesung, Explore-Verbuchung, Restfragen
+  (683 = 169 + 514 -> Verschiebung exakt)
+
+NON-ASCII im Einschub Z.19-532: 0 Zeilen (LC_ALL=C grep -c rc=1)
+glpat-Literal im Einschub: 0
+
+COMMIT:
+  14bf66582b04d6526d195505a0d4b40ad562ed14 ledger(z24): KON122 -- W2-Landung ce+prt-art+super AN der Landung verbucht (L1-L21 + L-08a-j + E-6 Zeilen 1-6 + #112/Ledger-#44 + K-15/K-16-ZU)
+   docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md | 514 ++++++++++++++++++++++++
+   1 file changed, 514 insertions(+)
+
+WC LEDGER NACHHER:
+  33103 docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md
+
+PUSH: NICHT gefahren (Ziel Z24 deklariert keinen Push; Traeger = naechster Push, Z23-Restposten 2).
+dev lokal vs origin:
+  14bf66582b04d6526d195505a0d4b40ad562ed14
+  a23e6cdaae895147fb8fed449b8b6b76c1d1c24a

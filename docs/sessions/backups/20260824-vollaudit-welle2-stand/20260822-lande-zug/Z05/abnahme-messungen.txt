@@ -1,0 +1,26 @@
+== Z05 ABNAHME (2026-08-22T17:22:02Z) ==
+-- Merge-Commit:
+85a67b08975089d5abd44a22f8224e094dfb5322 | Eltern: 9da4d21db88f0feaa8e858d13c6317d2e7b1e556 6713156bd3bcf29ce4841c6a422848b380d6e39b | merge(vollzug91): W2-Lande-Zug 6/10 -- #91-VOLLZUG E-3 I-1-Schema + I-2/I-7-CT-Festschreibung + M13-/M6-Skelette (bau/vollzug91 @ 6713156b; Audit r1 SITZT 0/0/2 KLEIN)
+-- porcelain nach Commit: 0 Zeilen
+-- Diff gegen Erstelter (name-status):
+A	libs/cache_engine/include/cache_engine/lager/bestand_schluessel_schema.hpp
+A	libs/cache_engine/include/cache_engine/measurement/kanal_id_schema.hpp
+A	libs/cache_engine/include/cache_engine/naming/begriffs_alias_registry.hpp
+M	libs/traeger/ceb/CMakeLists.txt
+A	libs/traeger/ceb/include/traeger/ceb/parameter_filter_registry.hpp
+M	tests/unit/CMakeLists.txt
+A	tests/unit/test_begriffs_alias_registry.cpp
+A	tests/unit/test_bestand_schluessel_schema.cpp
+A	tests/unit/test_kanal_id_schema.cpp
+A	tests/unit/test_parameter_filter_registry_skelett.cpp
+-- Diffstat-Summe:
+ 10 files changed, 914 insertions(+)
+-- CMakeLists-Delta gegen Erstelter (soll +53/-0):
+53	0	tests/unit/CMakeLists.txt
+-- Byte-Identitaet: erste 8052 Zeilen == ours, letzte 53 == Block:
+HEAD-TEIL identisch
+BLOCK-TEIL identisch
+-- 2. Elter == Quelle-Tip:
+6713156bd3bcf29ce4841c6a422848b380d6e39b
+-- neue Header/Tests identisch mit Strang-Tip (diff HEAD..6713156b auf den 9 Auto-Pfaden, soll leer):
+0

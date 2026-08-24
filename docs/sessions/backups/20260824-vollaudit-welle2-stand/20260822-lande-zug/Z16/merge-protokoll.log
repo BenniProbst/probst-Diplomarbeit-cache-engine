@@ -1,0 +1,14 @@
+=== Z16 MERGE-PROTOKOLL 2026-08-24T12:38:01Z ===
+--- HEAD-DRIFT-CHECK VOR MERGE ---
+348f54f40f8c903bc159c9a19a703de64a6a9d96
+refs/heads/development
+--- STATUS VOR MERGE ---
+ M Code/external/comdare-cache-engine
+?? build-l4/
+--- MERGE ---
+Merge made by the 'ort' strategy.
+ Code/test_data_xml/experiment_schema.xsd | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+MERGE_RC=0
+--- HEAD NACH MERGE ---
+ff800699b14dc9862d920666ec7966500b3697c9

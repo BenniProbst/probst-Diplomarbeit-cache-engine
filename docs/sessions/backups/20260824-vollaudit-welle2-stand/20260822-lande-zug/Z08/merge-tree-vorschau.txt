@@ -1,0 +1,8 @@
+1427496a6529834ad7db984f9b7d9b956464ec99
+100644 a8fc017d24df595826ad787dd47d53522a3d32c9 1	tests/unit/CMakeLists.txt
+100644 d0a5c6f8acd9b30e9f65d107f9a3fab9db7c9643 2	tests/unit/CMakeLists.txt
+100644 f9e62c7743e356b32e622c2db1fac4dfba878eaa 3	tests/unit/CMakeLists.txt
+
+Auto-merging tests/unit/CMakeLists.txt
+CONFLICT (content): Merge conflict in tests/unit/CMakeLists.txt
+VORSCHAU_RC=1

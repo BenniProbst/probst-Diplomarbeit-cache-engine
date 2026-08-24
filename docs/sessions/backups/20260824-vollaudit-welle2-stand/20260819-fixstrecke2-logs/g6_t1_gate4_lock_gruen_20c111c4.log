@@ -1,0 +1,7 @@
+axis_version_lock: BESTAND heuristik discovered=6 traeger=6 (nenner: alle *.hpp unter libs/cache_engine/heuristik)
+axis_version_lock: BESTAND organ discovered=640 traeger=122 forwarder_prosa=518 multi=1 (nenner: Quell-Dateien der organ-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND system discovered=16 traeger=0 forwarder_prosa=16 multi=0 (nenner: Quell-Dateien der system-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND mess discovered=1 traeger=0 forwarder_prosa=1 multi=0 (nenner: Quell-Dateien der mess-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND tier_substanz discovered=55 traeger=0 forwarder_prosa=55 multi=0 (nenner: Quell-Dateien der tier_substanz-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND overlay gesamt=712 traeger=122 (nenner: ALLE Quell-Dateien des Overlay-Schnitts -- die Menge, ueber die das Overlay-Glied [7] hasht)
+axis_version_lock: GRUEN bestand konsistent -- 718 Dateien (heuristik=6, organ=640, system=16, mess=1, tier_substanz=55) -- deckt 712 von 712 Overlay-Quellen (Schnitt: builder/overlay_source_set.hpp)

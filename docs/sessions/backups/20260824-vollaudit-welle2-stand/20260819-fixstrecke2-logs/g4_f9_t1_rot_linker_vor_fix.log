@@ -1,0 +1,15 @@
+[0/2] Re-checking globbed directories...
+[1/3] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3418134 Bytes, sha512=17ce209466a6f770... (unveraendert)
+[2/3] Linking CXX executable tests/unit/test_hy_a1_attach_nur_array_include
+FAILED: [code=1] tests/unit/test_hy_a1_attach_nur_array_include 
+: && /usr/bin/g++ -O3 -DNDEBUG  tests/unit/CMakeFiles/test_hy_a1_attach_nur_array_include.dir/test_hy_a1_attach_nur_array_include.cpp.o -o tests/unit/test_hy_a1_attach_nur_array_include  lib/libgtest.a  lib/libgtest_main.a  lib/libgtest.a  libs/cache_engine/builder/anatomy_module_loader/libcomdare_anatomy_module_loader.a  -ldl && :
+/usr/bin/x86_64-linux-gnu-ld: tests/unit/CMakeFiles/test_hy_a1_attach_nur_array_include.dir/test_hy_a1_attach_nur_array_include.cpp.o: in function `(anonymous namespace)::HyA1AttachNurArrayInclude_StatischePolicyAttachLinktUeberDenArrayHeaderAllein_Test::TestBody()':
+test_hy_a1_attach_nur_array_include.cpp:(.text+0x17c): undefined reference to `comdare::cache_engine::hybrid::DockArray<comdare::cache_engine::hybrid::StatischeDockArrayPolicy<2ul> >::attach(comdare::cache_engine::hybrid::DockContractDescriptor const&)'
+/usr/bin/x86_64-linux-gnu-ld: test_hy_a1_attach_nur_array_include.cpp:(.text+0x1fa): undefined reference to `comdare::cache_engine::hybrid::DockArray<comdare::cache_engine::hybrid::StatischeDockArrayPolicy<2ul> >::attach(comdare::cache_engine::hybrid::DockContractDescriptor const&)'
+/usr/bin/x86_64-linux-gnu-ld: test_hy_a1_attach_nur_array_include.cpp:(.text+0x278): undefined reference to `comdare::cache_engine::hybrid::DockArray<comdare::cache_engine::hybrid::StatischeDockArrayPolicy<2ul> >::attach(comdare::cache_engine::hybrid::DockContractDescriptor const&)'
+/usr/bin/x86_64-linux-gnu-ld: test_hy_a1_attach_nur_array_include.cpp:(.text+0x371): undefined reference to `comdare::cache_engine::hybrid::DockArray<comdare::cache_engine::hybrid::StatischeDockArrayPolicy<2ul> >::attach(comdare::cache_engine::hybrid::DockContractDescriptor const&)'
+/usr/bin/x86_64-linux-gnu-ld: tests/unit/CMakeFiles/test_hy_a1_attach_nur_array_include.dir/test_hy_a1_attach_nur_array_include.cpp.o: in function `(anonymous namespace)::HyA1AttachNurArrayInclude_RuntimePolicyAttachLinktUeberDenArrayHeaderAllein_Test::TestBody()':
+test_hy_a1_attach_nur_array_include.cpp:(.text+0x6ba): undefined reference to `comdare::cache_engine::hybrid::DockArray<comdare::cache_engine::hybrid::RuntimeDockArrayPolicy>::attach(comdare::cache_engine::hybrid::DockContractDescriptor const&)'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

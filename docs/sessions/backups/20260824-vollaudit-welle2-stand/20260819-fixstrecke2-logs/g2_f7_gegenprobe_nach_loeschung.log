@@ -1,0 +1,5 @@
+100% tests passed, 0 tests failed out of 1
+bash: scripts/ci_xml_wellformed_guard.sh: No such file or directory
+  160 XML-Dateien geprueft, 4 nicht wohlgeformt.
+-----------------------------------------------------------------------------
+ci_xml_wellformed_guard: FAILED -- 4 von 160 getrackten XML-Dateien sind nicht wohlgeformt.

@@ -1,0 +1,20 @@
+=== Z15 MERGE-VERIFIKATION (Objekt-Messung) ===
+--- HEAD / Parents ---
+16c90628651fd50538d1448d4e68a151ba6fbb9f
+parents: 7a658fe6e52315e64e0ef2f600fb6b3777bfde9f 3710ac4c18425a6933bca3b3da02f6edfb8b07b6
+--- Wirkung auf development (HEAD^1..HEAD) ---
+4	0	.gitlab-ci.yml
+--- Wirkung gegen pinduo-Tip (25bbf2e..HEAD) ---
+4	0	.gitlab-ci.yml
+--- B14 ist Ancestor (SOLL rc=0) ---
+RC=0
+--- status porcelain (SOLL 0) ---
+0
+--- Trailer im Merge-Commit ---
+1
+--- Branch-Lage (KEIN Push: ahead erwartet) ---
+## development...origin/development [ahead 6]
+--- YAML-Invarianten am Commit ---
+5
+1
+1

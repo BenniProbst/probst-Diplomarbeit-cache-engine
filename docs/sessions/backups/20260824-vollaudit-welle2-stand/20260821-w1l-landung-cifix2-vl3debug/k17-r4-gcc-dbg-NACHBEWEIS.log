@@ -1,0 +1,20 @@
+== r4-NACHBEWEIS build-dbg Voll-ctest @ 3841d717 2026-08-23T14:06:55Z (Anlass: tail-3 frass Bilanz + K11-Pipe-rc; LastTestsFailed war stale 13:49 K13-Phase) ==
+warnungs-review           =   0.00 sec*proc (1 test)
+wdh                       =   0.00 sec*proc (1 test)
+welle5                    =   0.01 sec*proc (5 tests)
+workload_driver           =   0.00 sec*proc (1 test)
+writeback                 =   0.28 sec*proc (1 test)
+writeback_method          =   0.00 sec*proc (1 test)
+writer_kern               =   0.00 sec*proc (1 test)
+xl                        =   0.00 sec*proc (1 test)
+xlsx                      =   0.33 sec*proc (8 tests)
+xml_export                =   0.00 sec*proc (1 test)
+zielfilter                =   0.28 sec*proc (1 test)
+zulassung                 =   0.05 sec*proc (3 tests)
+zwei-welten               =   0.00 sec*proc (1 test)
+
+Total Test time (real) =  86.55 sec
+CTEST-RC=0
+LastTestsFailed nach Lauf: FEHLT (0 Fails)
+DRITTER BELEG aus LastTest.log (Lauf 14:06): gestartet=544, Test-Passed-Marker=540
+KLAERUNG der 4 ohne 'Test Passed.'-Marker: 188 test_e24_c1_organ_concept_negativ, 189 test_e24_c4_dock_version_negativ, 190 test_hy_a1_reroute_gate_negativ, 198 test_hy_a1_contract_token_negativ = Negativ-Compile-Proben (WILL_FAIL-Klasse, anderes Endstatus-Format in LastTest.log). 0x 'Test Failed.', 544x end-time-Bloecke, CTEST-RC=0, LastTestsFailed FEHLT => Voll-Lauf GRUEN, vierfach belegt.

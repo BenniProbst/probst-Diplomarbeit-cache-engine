@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/634] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3418134 Bytes, sha512=17ce209466a6f770... (unveraendert)
+[2/16] Generating CXX dyndep file tools/axis_registry_gen/CMakeFiles/comdare_axis_registry_gen.dir/CXX.dd
+[3/14] Generating CXX dyndep file tools/measurement_axis_registry_gen/CMakeFiles/comdare_measurement_axis_registry_gen.dir/CXX.dd
+[4/12] Generating CXX dyndep file tools/system_axis_registry_gen/CMakeFiles/comdare_system_axis_registry_gen.dir/CXX.dd
+[5/10] Generating CXX dyndep file tests/unit/CMakeFiles/test_profile_roundtrip.dir/CXX.dd
+[6/8] Linking CXX executable tests/unit/test_ap5_simd_extension_coherence
+[7/8] Building CXX object tests/unit/CMakeFiles/test_ap5_simd_extension_coherence.dir/test_ap5_simd_extension_coherence.cpp.o

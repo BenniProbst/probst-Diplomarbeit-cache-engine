@@ -1,0 +1,73 @@
+=============================================================================
+ PRE-PUSH-LANDE-GATES (--nur=diff): EIN Gate, PROBE-Modus
+=============================================================================
+
+BEREICH: 20c111c4..HEAD   (47 Commits)
+  Basis:  20c111c4   Spitze: 1db9d29d
+
+=============================================================================
+ [1/6] DIFF-HYGIENE (ASCII + Spaltenbreite), KUMULATIV 20c111c4...HEAD
+=============================================================================
+=============================================================================
+ DIFF-HYGIENE-WACHE: ASCII + Spaltenbreite  (scripts/ci_diff_ascii_width_guard.sh)
+=============================================================================
+
+MODUS: --bereich (KUMULATIV -- der ganze Stand, der nach '20c111c4' ginge,
+       NICHT ein einzelner Push)
+BEREICH (Teil der Aussage, nicht Beiwerk):
+  BASIS      20c111c4 = 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7
+  SPITZE     HEAD = 1db9d29d6f6b7b869820b8153e69becea6d43f3f
+  ABZWEIGUNG (merge-base) = 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7
+  47 Commit(s) im Bereich; 0 Commit(s) nur auf der BASIS (Divergenz).
+
+MODUS: git diff selbst ausgefuehrt (Repo: /home/comdare/wt-ce-bump15)
+ARGUMENTE: git diff -U0 --no-color --no-ext-diff 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7 1db9d29d6f6b7b869820b8153e69becea6d43f3f
+
+VERSTOESSE (falls vorhanden):
+  NICHT-ASCII   koeder_g6_diff.txt:1
+  >120-SPALTEN  koeder_g6_diff.txt:2 (121 Byte)
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  7521 Zusatzzeilen in selbst verfasstem Code geprueft, davon 1 Nicht-ASCII,
+  davon 1 ueber 120 Spalten.
+  7606 Zusatzzeilen insgesamt im Diff; 85 davon uebersprungen.
+  GEPRUEFT WIRD ALLES; VOLL ausgenommen sind genau zwei Klassen, je Datei
+  unten mit GRUND benannt: Doku-Prosa *.md und Vendor-Baeume. *.xml ist NUR
+  von der BREITEN-Regel frei (16.08.2026, s. Kopf) und bleibt ASCII-geprueft.
+  Die frueher hier gedruckte Sammelbezeichnung "(Doku-Prosa/Sonstiges)" war
+  irrefuehrend -- darunter lagen 143 getrackte *.sh mit 10.084 Zeilen Quelltext.
+  Uebersprungene Dateien (namentlich MIT GRUND, keine zweite stille Null):
+    - docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/24_messmodell_korrektur_zwei_dimensionen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/20260802-hybrid_tier_stufe_soll_design.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - libs/cache_engine/algorithm_profiles/thesis_profiles/SCHEMA.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/messarchitektur_design_observer_handle_no_dynamic_cast.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/21_f6_plugin_controller_slot_merge_3stufen_bewiesen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - libs/cache_engine/hybrid/README.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/abhaengigkeitskette_lebewesen_pruefdock_abi_konvergenz.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/20260803-e24_container_gattungs_abi_dossier.md  [Doku-Prosa *.md, Sprachdoktrin]
+  BREITEN-AUSNAHME (nicht still): 3 Zeile(n) ueber 120 Byte in *.xml
+  NICHT als Breiten-Verstoss gezaehlt -- ASCII wurde an ihnen GEPRUEFT.
+  Je Datei mit GRUND (printf statt echo: s. Begruendung oben):
+    - libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+    - tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+  VENDOR-AUSNAHME (nicht still): diese Baeume tragen COMDARE-VENDOR-PROVENANCE.md
+  und werden als Fremdcode NICHT auf ASCII/Breite geprueft --
+    - ext/io/liburing/
+    - ext/io/libxlsxwriter/
+    - ext/io/zlib/
+  Eigener Code in diesen Baeumen (Wrapper, CMakeLists) liegt AUSSERHALB und
+  wird weiter geprueft.
+  GRENZE (ungedeckt, ausdruecklich): geprueft ist der ZUWACHS in diesem Diff,
+  nicht der Bestand der beruehrten Dateien und nicht der des Baums. Wer ueber
+  eine DATEI urteilen will, misst die Datei -- nicht diesen Bereich.
+-----------------------------------------------------------------------------
+
+DIFF-HYGIENE-WACHE: ROT.  KUMULATIV ueber 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7..1db9d29d6f6b7b869820b8153e69becea6d43f3f (47 Commits)
+
+=============================================================================
+PRE-PUSH-LANDE-GATES: ROT am GATE [1/6] DIFF-HYGIENE -- Verstoesse im kumulativen Diff (Liste oben)
+FAIL-FAST: spaetere Gates sind NICHT gelaufen und damit NICHT gruen.
+=============================================================================

@@ -1,0 +1,80 @@
+== Z11 SWEEP 8 WORKTREES 2026-08-23T20:50:08Z ==
+=== /home/comdare/wt-ce-s8kopf ===
+HEAD=41ee878056bd0388cd8bcf6472067e20192237c5 BRANCH=bau/s8kopf
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=189M
+=== /home/comdare/wt-ce-s13schema ===
+HEAD=c76d31164d7ffd5ffbb9f776e6839e7fc08114c7 BRANCH=bau/s13schema
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=188M
+=== /home/comdare/wt-ce-pmcpaket ===
+HEAD=1d38263b017ff8aa3126650a41b208b0c8795a90 BRANCH=bau/pmcpaket
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=188M
+=== /home/comdare/wt-ce-vollzug91 ===
+HEAD=6713156bd3bcf29ce4841c6a422848b380d6e39b BRANCH=bau/vollzug91
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=189M
+=== /home/comdare/wt-ce-ph89 ===
+HEAD=2809e4d4688bb13229855039bdf80b1942ddff24 BRANCH=bau/ph89
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+    /home/comdare/wt-ce-ph89/build
+wt-groesse=212M
+=== /home/comdare/wt-ce-trigfix ===
+HEAD=0f900dcf405578c8406edf2edc63d1ee3d2bcbe3 BRANCH=bau/trigfix
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=188M
+=== /home/comdare/wt-ce-skip97 ===
+HEAD=1c9f58a503f4281006948fa0dbcbe05ede215c25 BRANCH=bau/skip97
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=188M
+=== /home/comdare/wt-ce-kampvor ===
+HEAD=1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f BRANCH=bau/kampvor
+status-rc=0 zeilen=0
+nested-gits (mindepth2):
+nested-gits-anzahl=0
+submodule status:
+    -d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue
+build-verzeichnisse (maxdepth1):
+wt-groesse=188M
+== skip97 DOPPEL-BEDINGUNG build/ ==
+kein build/ in skip97 (Stand jetzt)
+== df vor Raeumung ==
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  251G  214G   25G  90% /
+== ENDE SWEEP ==

@@ -1,0 +1,82 @@
+=============================================================================
+PROBE PERSIST-SAMMLER  (Beweis am Git-Zustand)
+  Pruefling : /tmp/kampvor-audit/tip/ci/persist_sammler.sh
+  Werkbank  : /tmp/tmp.bXtD79Sp0B
+  Modus     : --selbstbiss
+=============================================================================
+  [ OK ]  P1  nur Kopfzeile -> KEIN Commit, Index bleibt leer
+  [ OK ]  P2  1 Datenzeile(n), Token koeder_016de7314d2b671d -> 1 Commit, 1 neue CSV, Token im Blob
+  [ OK ]  P3  Artefakt ohne Messwert (build_manifest.txt) -> trotzdem KEIN Commit
+  [ OK ]  P4  golden 1 + smoke 1 -> datenzeilen_gesamt=2, 1 Commit
+  [ OK ]  P5  1 leere + 1 volle CSV (1 Zeilen) -> Commit, aber Ausfall sichtbar
+  [ OK ]  P6  0-Byte-CSV -> 0 Datenzeilen (nicht -1), KEIN Commit
+  [ OK ]  P7  letzte Datenzeile OHNE Newline -> zaehlt trotzdem (awk statt wc)
+  [ OK ]  P8  PROVENANCE.txt behaelt alle Alt-Felder und traegt die neue Zahl
+  [ OK ]  P9  ohne Argumente / unbekannter Modus -> rc=2
+  [ OK ]  P11 abgelehnter Laufordner der Vor-Pipeline darf NICHT mitcommittet werden
+        Koeder biss: check-ignore rc=0 fuer die Quell-CSV, Regel literal:
+          > .gitignore:42:*.csv	Code/measure_out/perm-0001/measurements.csv
+  [ OK ]  P12 xlsx neben CSV -> mitgesammelt, byte-gleich committet, xlsx_gesamt=1
+  [ OK ]  P13 nur xlsx (smoke) -> eingesammelt, aber KEIN Commit (Gate bleibt CSV)
+  [ OK ]  P14 Kopf + NUR 3 Leerzeilen -> datenzeilen_gesamt=0, KEIN Commit
+  [ OK ]  P15 Kopf + 3 Leerzeilen + 5 echte -> datenzeilen_gesamt=5, 1 Commit
+  [ OK ]  P16 NUR 4 n/a-Zeilen (;-Schema) -> echt_zeilen_gesamt=0, KEIN Commit
+  [ OK ]  P17 4 n/a + 2 echte ;-Zeilen -> Commit, Nenner getrennt, Token im Blob
+  [ OK ]  P18 PROVENANCE ohne na_zeilen_gesamt= (Alt-sammeln) -> HINWEIS + Commit, kein rc=2
+        Koeder biss: 4 von 4 Vorkommen gefunden (grep -cF).
+  [ OK ]  P10 Registrierung in .gitlab-ci.yml (mit vorgeschaltetem Koeder)
+-----------------------------------------------------------------------------
+NENNER: 18 Fall/Faelle gefahren, 18 gehalten, 0 gerissen.
+-----------------------------------------------------------------------------
+PROBE PERSIST-SAMMLER: OK (18 von 18 Faellen gehalten).
+
+=============================================================================
+SELBSTBISS: die Probe wird gegen Wegwerf-Mutanten des Sammlers gefahren.
+=============================================================================
+  -- m1_gate_weg: Commit-Gate entfernt
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P1  nur Kopfzeile -> KEIN Commit, Index bleibt leer
+         [ROT ]  P3  Artefakt ohne Messwert (build_manifest.txt) -> trotzdem KEIN Commit
+         [ROT ]  P6  0-Byte-CSV -> 0 Datenzeilen (nicht -1), KEIN Commit
+         [ROT ]  P11 abgelehnter Laufordner der Vor-Pipeline darf NICHT mitcommittet werden
+         [ROT ]  P13 nur xlsx (smoke) -> eingesammelt, aber KEIN Commit (Gate bleibt CSV)
+         [ROT ]  P14 Kopf + NUR 3 Leerzeilen -> datenzeilen_gesamt=0, KEIN Commit
+         [ROT ]  P16 NUR 2 n/a-Zeilen (;-Schema) -> echt_zeilen_gesamt=0, KEIN Commit
+  -- m2_datei_statt_zeile: jede CSV zaehlt als 1 -- Dateien statt Zeilen (der Originaldefekt)
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P1  nur Kopfzeile -> KEIN Commit, Index bleibt leer
+         [ROT ]  P4  golden 4 + smoke 4 -> datenzeilen_gesamt=8, 1 Commit
+         [ROT ]  P5  1 leere + 1 volle CSV (3 Zeilen) -> Commit, aber Ausfall sichtbar
+         [ROT ]  P6  0-Byte-CSV -> 0 Datenzeilen (nicht -1), KEIN Commit
+         [ROT ]  P11 abgelehnter Laufordner der Vor-Pipeline darf NICHT mitcommittet werden
+         [ROT ]  P14 Kopf + NUR 3 Leerzeilen -> datenzeilen_gesamt=0, KEIN Commit
+         [ROT ]  P16 NUR 5 n/a-Zeilen (;-Schema) -> echt_zeilen_gesamt=0, KEIN Commit
+         [ROT ]  P17 2 n/a + 4 echte ;-Zeilen -> Commit, Nenner getrennt, Token im Blob
+         [ROT ]  P18 PROVENANCE ohne na_zeilen_gesamt= (Alt-sammeln) -> HINWEIS + Commit, kein rc=2
+  -- m3_nur_golden: measure_out_smoke faellt aus der Summe
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P4  golden 5 + smoke 4 -> datenzeilen_gesamt=9, 1 Commit
+         [ROT ]  P13 nur xlsx (smoke) -> eingesammelt, aber KEIN Commit (Gate bleibt CSV)
+  -- m4_add_ganzer_baum: staged wieder measurement/ als GANZES statt nur $DEST
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P11 abgelehnter Laufordner der Vor-Pipeline darf NICHT mitcommittet werden
+  -- m5_xlsx_weg_golden: xlsx faellt aus dem Sammel-Selektor der golden-Wurzel
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P12 xlsx neben CSV -> mitgesammelt, byte-gleich committet, xlsx_gesamt=1
+  -- m6_xlsx_weg_smoke: xlsx faellt aus dem Sammel-Selektor der smoke-Wurzel
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P13 nur xlsx (smoke) -> eingesammelt, aber KEIN Commit (Gate bleibt CSV)
+  -- m7_na_tot: n/a-Zaehlung tot -- das n/a-Phantom committet wieder (P16)
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P16 NUR 6 n/a-Zeilen (;-Schema) -> echt_zeilen_gesamt=0, KEIN Commit
+         [ROT ]  P17 2 n/a + 3 echte ;-Zeilen -> Commit, Nenner getrennt, Token im Blob
+  -- m8_na_alles: jede ;-Datenzeile gilt als n/a -- echtes ;-Fenster verweigert (P17)
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P17 3 n/a + 2 echte ;-Zeilen -> Commit, Nenner getrennt, Token im Blob
+  -- m9_hinweis_stumm: der Versions-Skew-HINWEIS verstummt (P18)
+     gebissen: rc=1, gerissene Faelle:
+         [ROT ]  P18 PROVENANCE ohne na_zeilen_gesamt= (Alt-sammeln) -> HINWEIS + Commit, kein rc=2
+-----------------------------------------------------------------------------
+SELBSTBISS-NENNER: 9 von 9 Mutanten haben die Probe rot gemacht.
+-----------------------------------------------------------------------------
+SELBSTBISS: OK (9 von 9).

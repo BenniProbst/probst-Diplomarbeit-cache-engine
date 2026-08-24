@@ -1,0 +1,16 @@
+== FIXR1 FUND2 REGISTER-FUND: echte F3-Definition der Eingangsmenge 2026-08-19T18:12:15+00:00 ==
+QUELLE: /home/comdare/.claude/jobs/5a19728e/timeline.jsonl (19.08.), woertliche Saetze:
+--- Eintrag mit F3-Definition (at + Satz) ---
+{"at":"2026-08-19T07:27:45.963Z
+{"at":"2026-08-19T07:28:10.413Z
+3. **F3**: Endstand decken — der reale Tip ist `e285d316` mit **30** Commits (die Übergaben nannten 25/32, nie literal gemessen); Hygiene + Volllauf müssen bis zum Tip reichen.
+**F3**: Endstand decken — der reale Tip ist `e285d316` mit **30** Commits (die Übergaben nannten 25/32, nie literal gemessen); Hygiene + Volllauf müssen bis zum Tip reichen.
+F1–F9 (mit F1=V-01R-**Bau**, F2-Rezept aus den g2-Logs, F3-Hygiene-Hälfte schon grün) + T-2 + T-10-**Bau-Hälfte** (Ernte-Hälfte per 12.1 geschlossen) + L21 + die 12.4-Zusätze (6b-Reparatur/X-17-Matrix als Eingangsdokument, **B3-Anker-Abgleich vor der #93-D-Messung** — der Wurf sitzt in `mess_achsen_naht.hpp:477-517`, nicht im abi_adapter). #93 hat konkretisierte Prüfposten je Gruppe, der Di-25.-Schnitt seine Zugänge (X-13/X-15/X-14/X-1/X-11), der Docs-/Memory-Zug seine 13 Fallen-Klassen aus 12.2c.
+4-Zellen-Abnahme mit Master-Logs je Zelle (deckt F3 und den F2-Tip-Volllauf), dann adversariale Verify-Rekursion bis NULL_NEUE_FUNDE. Das ist zulässig parallel zur laufenden BU-Redaktion, weil die Schreiber disjunkt sind (super-docs vs. bump15-Worktree) — und nötig, weil der Freeze **Freitag** ist.
+--- Zeitstempel der drei tragenden Eintraege ---
+{"at":"2026-08-19T07:12:39.775Z
+{"at":"2026-08-19T07:18:40.617Z
+{"at":"2026-08-19T07:28:32.442Z
+{"at":"2026-08-19T12:05:30.068Z
+ABGRENZUNG: Verify-Kandidat 'F3=C-F3 (decl.hpp)' ist ein r2-VORSTRECKEN-Posten (Basis e285d316),
+nicht der F3 der f2-Eingangsmenge. Der Commit-Treffer 04e9bd4f enthaelt nur 'A-F3' (A2.5-Block).

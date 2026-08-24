@@ -1,0 +1,83 @@
+## SUPER STORE REF-ANALYSE 2026-08-22T14:14:51+00:00
+dev local: e6c90277 origin/development: 93542880 HEAD: e6c90277
+dev-vs-origin: 0/1
+--- LOKALE HEADS ---
+b-checkheft-nachtrag|74c1e780|inDevLokal=no|inDevOrigin=no|behind/ahead=653/1|cherry:+0/-1
+b-ci-rueckschrieb-beide-zeiger|87d70adf|inDevLokal=no|inDevOrigin=no|behind/ahead=655/2|cherry:+1/-1
+b-e18-snap|5c4cf900|inDevLokal=yes|inDevOrigin=yes|behind/ahead=779/0|
+b-ee-zyklus-heilung|51eebbfe|inDevLokal=yes|inDevOrigin=yes|behind/ahead=538/0|
+b-graph-2d3d|6124c6f7|inDevLokal=yes|inDevOrigin=yes|behind/ahead=735/0|
+b-honest-empty|838612f3|inDevLokal=yes|inDevOrigin=yes|behind/ahead=787/0|
+b-kandidatenliste-75|5ffaa526|inDevLokal=yes|inDevOrigin=yes|behind/ahead=525/0|
+b-numa-core-class|32641f31|inDevLokal=yes|inDevOrigin=yes|behind/ahead=626/0|
+b-super-ascii-wache|7780c6af|inDevLokal=yes|inDevOrigin=yes|behind/ahead=656/0|
+b-uebergabe-ernte-0608|d570912a|inDevLokal=yes|inDevOrigin=yes|behind/ahead=311/0|
+b1-e18-super-anteil|8131a9a2|inDevLokal=yes|inDevOrigin=yes|behind/ahead=808/0|
+b14-golden-kf6|50dc231b|inDevLokal=yes|inDevOrigin=yes|behind/ahead=769/0|
+backup/pre-diplom-adopt-2026-07-22-development|eec84b0e|inDevLokal=no|inDevOrigin=no|behind/ahead=3087/1913|cherry:+1059/-842
+backup/pre-diplom-adopt-2026-07-22-main|332c54af|inDevLokal=no|inDevOrigin=no|behind/ahead=3087/1882|cherry:+1050/-820
+backup/pre-identity-adopt-2026-07-26|557b8b38|inDevLokal=no|inDevOrigin=no|behind/ahead=3087/1958|cherry:+1057/-889
+bau/bu-workflows-5-kontexte|90979dc3|inDevLokal=yes|inDevOrigin=yes|behind/ahead=189/0|
+bau/ci-dual-compiler|323101d1|inDevLokal=yes|inDevOrigin=yes|behind/ahead=140/0|
+bau/ci-speicher-senken|51d38e6b|inDevLokal=yes|inDevOrigin=yes|behind/ahead=350/0|
+bau/cidual|223ab518|inDevLokal=no|inDevOrigin=no|behind/ahead=13/1|cherry:+1/-0
+bau/d3-leeres-messfenster|7444d8c0|inDevLokal=yes|inDevOrigin=yes|behind/ahead=498/0|
+bau/d3-naehte|3a526606|inDevLokal=yes|inDevOrigin=yes|behind/ahead=396/0|
+bau/d5-2-median-kanon-super|08cab824|inDevLokal=yes|inDevOrigin=yes|behind/ahead=438/0|
+bau/e21-vollzug-a1|fe7bb459|inDevLokal=yes|inDevOrigin=yes|behind/ahead=189/0|
+bau/f1-1x1-honest-empty|8e9a31d2|inDevLokal=yes|inDevOrigin=yes|behind/ahead=190/0|
+bau/gnu-bauweg|e856c795|inDevLokal=yes|inDevOrigin=yes|behind/ahead=438/0|
+bau/host-belegung|ec9dc27e|inDevLokal=yes|inDevOrigin=yes|behind/ahead=426/0|
+bau/kampvor|025e0c42|inDevLokal=no|inDevOrigin=no|behind/ahead=13/1|cherry:+1/-0
+bau/lagp1-object-stat|54c11a67|inDevLokal=yes|inDevOrigin=yes|behind/ahead=437/0|
+bau/lizenz-vier-repos|904d22b2|inDevLokal=yes|inDevOrigin=yes|behind/ahead=144/0|
+bau/mutations-sicheres-testen|e6d90232|inDevLokal=yes|inDevOrigin=yes|behind/ahead=292/0|
+bau/p3-ci-clang-pflicht|3ba0f7b3|inDevLokal=yes|inDevOrigin=yes|behind/ahead=329/0|
+bau/p3-guard-basis-literal|afa5815a|inDevLokal=yes|inDevOrigin=yes|behind/ahead=299/0|
+bau/p6-lizenz-umsetzung|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+bau/provenienz-zellkoordinaten|7c61ab91|inDevLokal=yes|inDevOrigin=yes|behind/ahead=438/0|
+bau/s13schema|1e92b77e|inDevLokal=no|inDevOrigin=no|behind/ahead=13/1|cherry:+1/-0
+bau/strang-c-f1-wachen|a1ee9780|inDevLokal=yes|inDevOrigin=yes|behind/ahead=221/0|
+bau/texlive-gate-haertung|5363eebb|inDevLokal=yes|inDevOrigin=yes|behind/ahead=188/0|
+bau/w1luecken-super|8edc34a0|inDevLokal=no|inDevOrigin=no|behind/ahead=8/1|cherry:+1/-0
+bau/warn-super|324418ba|inDevLokal=yes|inDevOrigin=yes|behind/ahead=408/0|
+bau/xml-wohlgeformtheit-super|2983e9ba|inDevLokal=yes|inDevOrigin=yes|behind/ahead=500/0|
+development|e6c90277|inDevLokal=yes|inDevOrigin=no|behind/ahead=0/1|cherry:+1/-0
+f1-transport-uebernahme|fbb78c6d|inDevLokal=yes|inDevOrigin=yes|behind/ahead=310/0|
+fix/blinde-wache-normalized-bar|282def69|inDevLokal=yes|inDevOrigin=yes|behind/ahead=352/0|
+fix/vorlagenfenster-r1|a6fa04da|inDevLokal=no|inDevOrigin=no|behind/ahead=7/1|cherry:+1/-0
+fix/wide-aggregat-eine-logik|a4985738|inDevLokal=yes|inDevOrigin=yes|behind/ahead=346/0|
+l1-super-landung-scratch|725ead43|inDevLokal=yes|inDevOrigin=yes|behind/ahead=681/0|
+landung-d3|2ef98848|inDevLokal=yes|inDevOrigin=yes|behind/ahead=436/0|
+landung-xml-super|b4a8dc6f|inDevLokal=yes|inDevOrigin=yes|behind/ahead=439/0|
+landung/e18-snap|dc2ac470|inDevLokal=yes|inDevOrigin=yes|behind/ahead=363/0|
+landung/e18-snap-neu|38b6bdbd|inDevLokal=yes|inDevOrigin=yes|behind/ahead=279/0|
+landung/gitlink-aebc4f2c-OBSOLET|e4c1488d|inDevLokal=no|inDevOrigin=no|behind/ahead=365/1|cherry:+1/-0
+landung/r3-d37b-super|b6a9fdb5|inDevLokal=yes|inDevOrigin=yes|behind/ahead=320/0|
+main|85dc85e8|inDevLokal=yes|inDevOrigin=yes|behind/ahead=368/0|
+w0a/d1g-super-configure|41b20a16|inDevLokal=yes|inDevOrigin=yes|behind/ahead=356/0|
+wip/luecken-stufe2-pause-1308|6b89fce5|inDevLokal=no|inDevOrigin=no|behind/ahead=193/1|cherry:+1/-0
+worktree-wf_1fb6bc6f-719-4|ac2afddd|inDevLokal=yes|inDevOrigin=yes|behind/ahead=232/0|
+worktree-wf_5834b706-7b5-15|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+worktree-wf_5834b706-7b5-16|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+worktree-wf_5834b706-7b5-17|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+worktree-wf_5834b706-7b5-18|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+worktree-wf_5834b706-7b5-19|44b49194|inDevLokal=yes|inDevOrigin=yes|behind/ahead=330/0|
+worktree-wf_bc389245-884-2|b6a9fdb5|inDevLokal=yes|inDevOrigin=yes|behind/ahead=320/0|
+worktree-wf_bc389245-884-3|f9ad63af|inDevLokal=yes|inDevOrigin=yes|behind/ahead=321/0|
+worktree-wf_bc389245-884-4|707b4211|inDevLokal=yes|inDevOrigin=yes|behind/ahead=321/0|
+worktree-wf_bc389245-884-6|7144f4f6|inDevLokal=yes|inDevOrigin=yes|behind/ahead=322/0|
+worktree-wf_bc389245-884-7|e36d2607|inDevLokal=yes|inDevOrigin=yes|behind/ahead=321/0|
+worktree-wf_d826aca8-6ce-7|87d16c37|inDevLokal=yes|inDevOrigin=yes|behind/ahead=225/0|
+worktree-wf_d826aca8-6ce-8|87d16c37|inDevLokal=yes|inDevOrigin=yes|behind/ahead=225/0|
+--- REMOTE REFS (nicht in origin/development) ---
+gh-scrub/rescue/thesis-gitlink-paritaet-20260810|18a0bdf3|inDevOrigin=NO
+github/rescue/thesis-gitlink-paritaet-20260810|18a0bdf3|inDevOrigin=NO
+origin/bau/cidual|223ab518|inDevOrigin=NO
+origin/bau/kampvor|025e0c42|inDevOrigin=NO
+origin/bau/s13schema|1e92b77e|inDevOrigin=NO
+origin/bau/w1luecken-super|8edc34a0|inDevOrigin=NO
+origin/fix/vorlagenfenster-r1|a6fa04da|inDevOrigin=NO
+origin/rescue/thesis-gitlink-paritaet-20260810|18a0bdf3|inDevOrigin=NO
+(Ende Nicht-Enthaltene; alle uebrigen remote-Refs enthalten)
+--- STASH ---

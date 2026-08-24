@@ -1,0 +1,138 @@
+=============================================================================
+BISSPROBE MESS-AUSBEUTE-WACHE
+  Pruefling : /tmp/kampvor-audit/tip/ci/mess_ausbeute_wache.sh
+  Werkbank  : /tmp/tmp.IKUrmmRyjb
+  Modus     : --selbstbiss
+=============================================================================
+  [ OK ]  F1  measurements.csv mit NUR der Kopfzeile -> rc=1
+  [ OK ]  F2  Kopf + 1 gewuerfelte Datenzeile(n) -> rc=0, Nenner nennt 1
+  [ OK ]  F3  keine measurements.csv, Mindest=1 -> rc=1
+  [ OK ]  F4  keine measurements.csv, Mindest=0 -> rc=1 (eigener Fehlergrund)
+  [ OK ]  F5  1 leere + 1 CSV mit 3 Zeile(n), modus=voll -> rc=1 (##26 M==N)
+  [ OK ]  F5b dieselbe Lage, modus=pruef_only -> rc=0 MIT sichtbarer WARNUNG (##26 weich)
+  [ OK ]  F5c Gegenprobe ##26: 2 volle CSVs, modus=voll -> rc=0, KEIN M-von-N-Befund
+  [ OK ]  F6  4 Datenzeile(n), gefordert 5 -> rc=1 und beide Zahlen genannt
+  [ OK ]  F7  Wurzel existiert nicht -> rc=2 (kein Gruen ohne Pruefung)
+  [ OK ]  F8  ohne Argument -> rc=2
+  [ OK ]  F8b Mindest ist keine Zahl -> rc=2
+  [ OK ]  F9  letzte Datenzeile OHNE Newline -> zaehlt trotzdem (awk statt wc)
+  [ OK ]  F12 leeres Fenster, modus=provision_only -> rc=0 MIT sichtbarer WARNUNG
+  [ OK ]  F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)
+  [ OK ]  F14 dasselbe Fenster OHNE drittes Argument -> rc=1 (Rueckwaerts-Vertrag)
+  [ OK ]  F15 unbekannter Modus -> rc=2, KEIN stiller Rueckfall auf einen Default
+  [ OK ]  F16 modus=auto ohne LAUF_MARKER.txt -> rc=2 (kein Gruen ohne Pruefung)
+  [ OK ]  F17 modus=auto mit provision_only-Marker -> Modus wird GELESEN, rc=0
+  [ OK ]  F18 modus=auto, 1 voll + 1 provision_only -> schaerfster gewinnt, rc=1
+  [ OK ]  F19 modus=auto, Marker mit unlesbarem Modus -> rc=2 statt Erlaubnis
+  [ OK ]  F20 keine CSV, modus=provision_only -> trotzdem rc=1 (Zweig unveraendert)
+  [ OK ]  F21 Kopf + 3 Leerzeilen + 3 echte Zeile(n) -> GENAU 3, nicht 6
+  [ OK ]  F22 Kopf + NUR 3 Leerzeilen, modus=voll -> rc=1, 0 Datenzeilen
+  [ OK ]  F23 leeres Fenster, modus=pruef_only -> rc=0 MIT sichtbarer WARNUNG
+  [ OK ]  F23b leeres Fenster, modus=prune_only -> rc=0, WEDER die eine NOCH die andere Begruendung
+  [ OK ]  F24 modus=auto mit pruef_only-Marker -> Modus wird GELESEN, rc=0
+  [ OK ]  F25 modus=auto, 1 voll + 1 pruef_only -> schaerfster gewinnt, rc=1
+  [ OK ]  F26 keine CSV, modus=pruef_only -> trotzdem rc=1 (Zweig unveraendert)
+  [ OK ]  F27 ;-Kopf + 4 reine n/a-Zeile(n), modus=voll -> rc=1, Ausgabe nennt exakt 4
+  [ OK ]  F28 Gegenprobe: 4 echte ;-Zeile(n), modus=voll -> rc=0 UND '0 n/a'
+        Koeder beisst: 2 gewuerfelte Vorkommen geschrieben, 2 gefunden.
+        .gitlab-ci.yml: 0 Vorkommen (Nenner: 2945 Zeilen geprueft).
+  [ OK ]  F10 Abnahme: 'test -n "$(find' == 0 in .gitlab-ci.yml (nach beissendem Koeder)
+        1 Aufruf(e) in .gitlab-ci.yml (zugleich Gegenprobe: grep -F findet hier).
+        Job-Block 'test:mess-ausbeute-bissprobe:': 13 Zeilen, davon 0 mit allow_failure.
+  [ OK ]  F11 eigene Registrierung in .gitlab-ci.yml, ohne allow_failure
+=============================================================================
+NENNER: 32 Faelle gefahren, 32 gehalten, 0 gerissen.
+        Pruefling: /tmp/kampvor-audit/tip/ci/mess_ausbeute_wache.sh
+        Fall-Namen im Quelltext: 32, davon distinkt: 32.
+=============================================================================
+BISSPROBE GRUEN: 32 von 32 Faellen gehalten.
+
+=============================================================================
+SELBSTBISS: Wegwerf-Mutanten der Wache -- die Probe MUSS an ihnen rot werden.
+=============================================================================
+  Wache: 391 Zeilen, davon 4 mit 'exit 1' (Nenner der Mutation).
+
+  --- Mutant 'M1  ohne 'exit 1' im Keine-CSV-Zweig' (391 -> 390 Zeilen, 1 entfernt) ---
+  [ OK ]  Mutant 'M1  ohne 'exit 1' im Keine-CSV-Zweig' wird gefangen (Probe rc=1). Literale Ausgabe:
+          | BISSPROBE MESS-AUSBEUTE-WACHE
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F4  keine measurements.csv, Mindest=0 -> rc=1 (eigener Fehlergrund)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F20 keine CSV, modus=provision_only -> trotzdem rc=1 (Zweig unveraendert)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F26 keine CSV, modus=pruef_only -> trotzdem rc=1 (Zweig unveraendert)
+          | NENNER: 32 Faelle gefahren, 29 gehalten, 3 gerissen.
+          | BISSPROBE ROT: 3 von 32 Faellen gerissen.
+
+  --- Mutant 'M2  ohne 'exit 1' im Summen-Zweig' (391 -> 390 Zeilen, 1 entfernt) ---
+  [ OK ]  Mutant 'M2  ohne 'exit 1' im Summen-Zweig' wird gefangen (Probe rc=1). Literale Ausgabe:
+          | BISSPROBE MESS-AUSBEUTE-WACHE
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F1  measurements.csv mit NUR der Kopfzeile -> rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F6  2 Datenzeile(n), gefordert 3 -> rc=1 und beide Zahlen genannt
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F14 dasselbe Fenster OHNE drittes Argument -> rc=1 (Rueckwaerts-Vertrag)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F18 modus=auto, 1 voll + 1 provision_only -> schaerfster gewinnt, rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F22 Kopf + NUR 3 Leerzeilen, modus=voll -> rc=1, 0 Datenzeilen
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F25 modus=auto, 1 voll + 1 pruef_only -> schaerfster gewinnt, rc=1
+          | NENNER: 32 Faelle gefahren, 25 gehalten, 7 gerissen.
+          | BISSPROBE ROT: 7 von 32 Faellen gerissen.
+
+  --- Mutant 'M3  ohne 'exit 1' im D4d-Echte-Zweig (KON44-02)' (391 -> 390 Zeilen, 1 entfernt) ---
+  [ OK ]  Mutant 'M3  ohne 'exit 1' im D4d-Echte-Zweig (KON44-02)' wird gefangen (Probe rc=1). Literale Ausgabe:
+          | BISSPROBE MESS-AUSBEUTE-WACHE
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F27 ;-Kopf + 3 reine n/a-Zeile(n), modus=voll -> rc=1, Ausgabe nennt exakt 3
+          | NENNER: 32 Faelle gefahren, 31 gehalten, 1 gerissen.
+          | BISSPROBE ROT: 1 von 32 Faellen gerissen.
+
+  --- Mutant 'M4  ohne 'exit 1' im M==N-Zweig (##26/KON60-05)' (391 -> 390 Zeilen, 1 entfernt) ---
+  [ OK ]  Mutant 'M4  ohne 'exit 1' im M==N-Zweig (##26/KON60-05)' wird gefangen (Probe rc=1). Literale Ausgabe:
+          | BISSPROBE MESS-AUSBEUTE-WACHE
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F5  1 leere + 1 CSV mit 7 Zeile(n), modus=voll -> rc=1 (##26 M==N)
+          | NENNER: 32 Faelle gefahren, 31 gehalten, 1 gerissen.
+          | BISSPROBE ROT: 1 von 32 Faellen gerissen.
+
+  --- Mutant 'M5  ohne alle vier 'exit 1'' (391 -> 387 Zeilen, 4 entfernt) ---
+  [ OK ]  Mutant 'M5  ohne alle vier 'exit 1'' wird gefangen (Probe rc=1). Literale Ausgabe:
+          | BISSPROBE MESS-AUSBEUTE-WACHE
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F1  measurements.csv mit NUR der Kopfzeile -> rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F3  keine measurements.csv, Mindest=1 -> rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F4  keine measurements.csv, Mindest=0 -> rc=1 (eigener Fehlergrund)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F5  1 leere + 1 CSV mit 6 Zeile(n), modus=voll -> rc=1 (##26 M==N)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F6  1 Datenzeile(n), gefordert 2 -> rc=1 und beide Zahlen genannt
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F14 dasselbe Fenster OHNE drittes Argument -> rc=1 (Rueckwaerts-Vertrag)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F18 modus=auto, 1 voll + 1 provision_only -> schaerfster gewinnt, rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F20 keine CSV, modus=provision_only -> trotzdem rc=1 (Zweig unveraendert)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F22 Kopf + NUR 3 Leerzeilen, modus=voll -> rc=1, 0 Datenzeilen
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F25 modus=auto, 1 voll + 1 pruef_only -> schaerfster gewinnt, rc=1
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F26 keine CSV, modus=pruef_only -> trotzdem rc=1 (Zweig unveraendert)
+          |         RISS: rc=0, gefordert war rc=1
+          |   [ROT ]  F27 ;-Kopf + 3 reine n/a-Zeile(n), modus=voll -> rc=1, Ausgabe nennt exakt 3
+          | NENNER: 32 Faelle gefahren, 19 gehalten, 13 gerissen.
+          | BISSPROBE ROT: 13 von 32 Faellen gerissen.
+
+=============================================================================
+NENNER SELBSTBISS: 5 Mutanten gefahren, 5 gefangen.
+=============================================================================
+SELBSTBISS GRUEN: alle 5 Mutanten gefangen -- die Probe beisst.

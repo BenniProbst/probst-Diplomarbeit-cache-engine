@@ -1,0 +1,76 @@
+[1/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_memory_layout.cpp for CXX dependencies
+[2/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp for CXX dependencies
+[3/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_allocator_pools.cpp for CXX dependencies
+[4/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_prefetch_strategies.cpp for CXX dependencies
+[5/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_internal_search.cpp for CXX dependencies
+[6/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_prt_art_nodes.cpp for CXX dependencies
+[7/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_lizenz_konsistenz.cpp for CXX dependencies
+[8/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_olc_with_reserved_blocks.cpp for CXX dependencies
+[9/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_prt_art_identity.cpp for CXX dependencies
+[10/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_measurement.cpp for CXX dependencies
+[11/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prt_art_nodes.dir/CXX.dd
+[12/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_allocator_pools.dir/CXX.dd
+[13/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_internal_search.dir/CXX.dd
+[14/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_memory_layout.dir/CXX.dd
+[15/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_olc_with_reserved_blocks.dir/CXX.dd
+[16/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prefetch_strategies.dir/CXX.dd
+[17/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_measurement.dir/CXX.dd
+[18/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_prt_art_identity.dir/CXX.dd
+[19/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_serialization_and_buffer.dir/CXX.dd
+[20/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_value_handle.cpp for CXX dependencies
+[21/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_lizenz_konsistenz.dir/CXX.dd
+[22/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_value_handle.dir/CXX.dd
+[23/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_default_lookup_registry.cpp for CXX dependencies
+[24/60] Scanning /home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_leaf_only_counter.cpp for CXX dependencies
+[25/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_default_lookup_registry.dir/CXX.dd
+[26/60] Generating CXX dyndep file tests/unit/CMakeFiles/test_leaf_only_counter.dir/CXX.dd
+[27/60] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[28/60] Building CXX object tests/unit/CMakeFiles/test_allocator_pools.dir/test_allocator_pools.cpp.o
+[29/60] Building CXX object tests/unit/CMakeFiles/test_prefetch_strategies.dir/test_prefetch_strategies.cpp.o
+[30/60] Building CXX object tests/unit/CMakeFiles/test_olc_with_reserved_blocks.dir/test_olc_with_reserved_blocks.cpp.o
+[31/60] Building CXX object tests/unit/CMakeFiles/test_value_handle.dir/test_value_handle.cpp.o
+[32/60] Building CXX object _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[33/60] Building CXX object tests/unit/CMakeFiles/test_prt_art_nodes.dir/test_prt_art_nodes.cpp.o
+[34/60] Building CXX object tests/unit/CMakeFiles/test_memory_layout.dir/test_memory_layout.cpp.o
+[35/60] Building CXX object tests/unit/CMakeFiles/test_internal_search.dir/test_internal_search.cpp.o
+[36/60] Building CXX object tests/unit/CMakeFiles/test_measurement.dir/test_measurement.cpp.o
+[37/60] Building CXX object _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[38/60] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+In file included from /home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/src/gtest-all.cc:38:
+In file included from /home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/include/gtest/gtest.h:64:
+In file included from /home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/include/gtest/gtest-death-test.h:43:
+In file included from /home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h:47:
+In file included from /home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/include/gtest/gtest-matchers.h:49:
+/home/comdare/Projekte/Research/comdare-prt-art/build-z15-clang-dbg/_deps/googletest-src/googletest/include/gtest/gtest-printers.h:524:35: warning: implicit conversion from 'char8_t' to 'char32_t' may change the meaning of the represented code unit [-Wcharacter-conversion]
+  524 |   PrintTo(ImplicitCast_<char32_t>(c), os);
+      |           ~~~~~~~~~~~~~           ^
+1 warning generated.
+[39/60] Linking CXX static library lib/libgtest.a
+[40/60] Linking CXX static library lib/libgtest_main.a
+[41/60] Linking CXX static library lib/libgmock.a
+[42/60] Linking CXX static library lib/libgmock_main.a
+[43/60] Linking CXX executable tests/unit/test_prt_art_nodes
+[44/60] Linking CXX executable tests/unit/test_allocator_pools
+[45/60] Linking CXX executable tests/unit/test_value_handle
+[46/60] Linking CXX executable tests/unit/test_olc_with_reserved_blocks
+[47/60] Linking CXX executable tests/unit/test_memory_layout
+[48/60] Linking CXX executable tests/unit/test_internal_search
+[49/60] Linking CXX executable tests/unit/test_prefetch_strategies
+[50/60] Building CXX object tests/unit/CMakeFiles/test_default_lookup_registry.dir/test_default_lookup_registry.cpp.o
+[51/60] Linking CXX executable tests/unit/test_measurement
+[52/60] Linking CXX executable tests/unit/test_default_lookup_registry
+[53/60] Building CXX object tests/unit/CMakeFiles/test_serialization_and_buffer.dir/test_serialization_and_buffer.cpp.o
+/home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp:145:33: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  145 |     for (int i = 0; i < 5; ++i) b.append(std::span<std::byte const>(v.data(), v.size()));
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/comdare/Projekte/Research/comdare-prt-art/tests/unit/test_serialization_and_buffer.cpp:153:33: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  153 |     for (int i = 0; i < 5; ++i) b.append(std::span<std::byte const>(v.data(), v.size()));
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+[54/60] Building CXX object tests/unit/CMakeFiles/test_leaf_only_counter.dir/test_leaf_only_counter.cpp.o
+[55/60] Linking CXX executable tests/unit/test_serialization_and_buffer
+[56/60] Linking CXX executable tests/unit/test_leaf_only_counter
+[57/60] Building CXX object tests/unit/CMakeFiles/test_lizenz_konsistenz.dir/test_lizenz_konsistenz.cpp.o
+[58/60] Linking CXX executable tests/unit/test_lizenz_konsistenz
+[59/60] Building CXX object tests/unit/CMakeFiles/test_prt_art_identity.dir/test_prt_art_identity.cpp.o
+[60/60] Linking CXX executable tests/unit/test_prt_art_identity

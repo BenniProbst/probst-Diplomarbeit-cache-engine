@@ -1,0 +1,39 @@
+CI 16097 -- TERMINAL-BEWEIS (API-Kopie, erhoben 2026-08-23 ~13:52Z)
+pipeline=16097 status=success sha=b247a339654e67828cba47f0c1ec5d5f545d1af2 ref=development
+created=2026-08-23T09:20:46.572Z started=2026-08-23T09:20:50.448Z finished=2026-08-23T10:03:32.074Z duration=2558s
+JOB-ZAHL=27  VERTEILUNG={'success': 26, 'manual': 1}
+--------------------------------------------------------------------------
+383108   success    lint         lint:secrets
+383109   success    lint         lint:format
+383110   success    lint         lint:static
+383111   success    lint         lint:layer-includes
+383112   success    lint         lint:xml-wellformed
+383113   success    build        build:clang
+383114   success    build        pmc:amd
+383115   success    build        pmc:intel
+383116   success    sanitize     sanitize:asan-ubsan
+383117   success    sanitize     sanitize:tsan
+383118   success    test         test:unit
+383119   success    test         test:unit:debug
+383120   success    test         test:unit:clang
+383121   success    test         test:unit:clang:debug
+383122   success    contract     contract
+383123   success    contract     test:coverage-guard
+383124   success    contract     contract:durability
+383125   success    contract     contract:conformance
+383126   success    contract     contract:pool_flip
+383127   success    contract     contract:harness
+383128   success    contract     contract:profile_coverage
+383129   success    contract     contract:axis-version-lock
+383130   success    contract     contract:experiment_driver
+383131   success    contract     contract:mess_report_smoke
+383132   success    contract     contract:node_shape
+383133   manual     contract     is_original:relock
+383134   success    chaos        chaos:drift
+--------------------------------------------------------------------------
+HEILUNGS-NACHWEIS gegen 16095:
+  test:unit:clang:debug  job=383121 status=success
+  test:unit:clang        job=383120 status=success
+  test:unit:debug        job=383119 status=success
+  test:unit              job=383118 status=success
+  lint:static            job=383110 status=success

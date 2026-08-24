@@ -1,0 +1,34 @@
+=============================================================================
+ DIFF-HYGIENE-WACHE: ASCII + Spaltenbreite  (scripts/ci_diff_ascii_width_guard.sh)
+=============================================================================
+
+MODUS: git diff selbst ausgefuehrt (Repo: /home/comdare/wt-ce-lande)
+ARGUMENTE: git diff -U0 --no-color --no-ext-diff 96a69ba3..9da4d21d
+
+VERSTOESSE (falls vorhanden):
+  (keine)
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  970 Zusatzzeilen in selbst verfasstem Code geprueft, davon 0 Nicht-ASCII,
+  davon 0 ueber 120 Spalten.
+  970 Zusatzzeilen insgesamt im Diff; 0 davon uebersprungen.
+  GEPRUEFT WIRD ALLES; VOLL ausgenommen sind genau zwei Klassen, je Datei
+  unten mit GRUND benannt: Doku-Prosa *.md und Vendor-Baeume. *.xml ist NUR
+  von der BREITEN-Regel frei (16.08.2026, s. Kopf) und bleibt ASCII-geprueft.
+  Die frueher hier gedruckte Sammelbezeichnung "(Doku-Prosa/Sonstiges)" war
+  irrefuehrend -- darunter lagen 143 getrackte *.sh mit 10.084 Zeilen Quelltext.
+  VENDOR-AUSNAHME (nicht still): diese Baeume tragen COMDARE-VENDOR-PROVENANCE.md
+  und werden als Fremdcode NICHT auf ASCII/Breite geprueft --
+    - ext/io/liburing/
+    - ext/io/libxlsxwriter/
+    - ext/io/zlib/
+  Eigener Code in diesen Baeumen (Wrapper, CMakeLists) liegt AUSSERHALB und
+  wird weiter geprueft.
+  GRENZE (ungedeckt, ausdruecklich): geprueft ist der ZUWACHS in diesem Diff,
+  nicht der Bestand der beruehrten Dateien und nicht der des Baums. Wer ueber
+  eine DATEI urteilen will, misst die Datei -- nicht diesen Bereich.
+-----------------------------------------------------------------------------
+
+DIFF-HYGIENE-WACHE: GRUEN.
+GUARD_RC=0

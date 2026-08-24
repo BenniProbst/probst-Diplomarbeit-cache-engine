@@ -1,0 +1,28 @@
+FULL-JOIN-ENDPROBE (b): Merge-Diffstat gegen Strang-Diffstat -- 2026-08-23T20:07:53Z
+Verwerf-Verdacht = 0-Datei-Merge oder Merge deutlich SCHMALER als der Strang.
+
+== 85a67b08  (Strang 6713156b, Basis 66de5c09)
+   Merge bringt : 10 files changed, 914 insertions(+)  [10 Dateien]
+   Strang hatte : 10 files changed, 914 insertions(+)  [10 Dateien]
+   OK: Merge >= Strang (Zusatzdateien = Zielzweig-Seite der Unionen)
+
+== a58f77b5  (Strang 2809e4d4, Basis 66de5c09)
+   Merge bringt : 42 files changed, 2246 insertions(+), 12 deletions(-)  [42 Dateien]
+   Strang hatte : 42 files changed, 2246 insertions(+), 12 deletions(-)  [42 Dateien]
+   OK: Merge >= Strang (Zusatzdateien = Zielzweig-Seite der Unionen)
+
+== f7b64039  (Strang 0f900dcf, Basis 66de5c09)
+   Merge bringt : 5 files changed, 687 insertions(+), 2 deletions(-)  [5 Dateien]
+   Strang hatte : 5 files changed, 687 insertions(+), 2 deletions(-)  [5 Dateien]
+   OK: Merge >= Strang (Zusatzdateien = Zielzweig-Seite der Unionen)
+
+== cf524bd1  (Strang 1c9f58a5, Basis 66de5c09)
+   Merge bringt : 7 files changed, 811 insertions(+), 1 deletion(-)  [7 Dateien]
+   Strang hatte : 7 files changed, 811 insertions(+), 1 deletion(-)  [7 Dateien]
+   OK: Merge >= Strang (Zusatzdateien = Zielzweig-Seite der Unionen)
+
+== b4c593f5  (Strang 1e1bc199, Basis 66de5c09)
+   Merge bringt : 2 files changed, 166 insertions(+), 1 deletion(-)  [2 Dateien]
+   Strang hatte : 2 files changed, 166 insertions(+), 1 deletion(-)  [2 Dateien]
+   OK: Merge >= Strang (Zusatzdateien = Zielzweig-Seite der Unionen)
+

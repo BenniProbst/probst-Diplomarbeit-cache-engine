@@ -1,0 +1,28 @@
+commit f7b640399444f5b1fb92a20769dc02ee7d9411b9
+Merge: a58f77b5 0f900dcf
+Author: Claude Fable 5 <noreply@anthropic.com>
+Date:   Sat Aug 22 17:44:30 2026 +0000
+
+    merge(trigfix): W2-Lande-Zug 8/10 -- E-7/R-12 E-07-Gate-Pruefer (23 Literale/10 Kriterien, fail-closed; traegt #114-E07_GATE=GO) + E-8/R-13 bytes_in_use_peak-Demo-Fix + 2 Tests (bau/trigfix @ 0f900dcf; Audit r1+ANNEX SITZT 0/0/3 KLEIN)
+    
+    KONFLIKT-DEKLARATION tests/unit/CMakeLists.txt: bekannte Dateiende-Flaeche (H-9)
+    -- Union harmonisiert: alle Bloecke der Merges 1-7 VOLL erhalten, trigfix-Block
+    (22 Zeilen, +2 comdare_add_test) ans Dateiende; Zaehlwerk EINMAL live gemessen
+    261+2=263. Uebrige 4 Dateien konfliktfrei (profile_facade/ additiv per H-16;
+    experiment_demo.hpp vom Zielzweig seit Basis unberuehrt).
+    
+    Restposten-Traeger: KLEIN-1 (ersetze()-npos) = Folge-Commit DIESES Zugs (Z07,
+    Audit-Fix-Weg "im Lande-Zug"); KLEIN-2/KLEIN-3 + P-17-Codex-Pass = T-9-Folge-
+    welle; #114-VORBEHALT E07-Q1-Default-A-Re-Run auf final eingefrorener Trigger-
+    Linie (nach Z10, vor Trigger Mi 26.08. 06:00; Ausfuehrender = offene Frage 8).
+    K17-Kombibau T-11b bindet den Zug-ENDSTAND (Quer-Auflage G8/H5: 7er-J-1-Liste
+    literal + reales Target comdare_profile_run_facade).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+ .../profile_facade/e07_gate_kriterien.hpp          | 272 ++++++++++++++++++++
+ .../include/comdare/experiment/experiment_demo.hpp |  16 +-
+ tests/unit/CMakeLists.txt                          |  22 ++
+ tests/unit/test_e07_gate_kriterien.cpp             | 273 +++++++++++++++++++++
+ tests/unit/test_e8_bytes_in_use_peak_demo.cpp      | 106 ++++++++
+ 5 files changed, 687 insertions(+), 2 deletions(-)

@@ -1,0 +1,42 @@
+== Strang-relevante Tests aus dem 534er-Lauf (Literale) ==
+ 25/534 Test #365: linux_perf_pmc_smoke .................................   Passed    0.34 sec
+ 26/534 Test #331: m3v2_pmc_smoke .......................................   Passed    0.13 sec
+ 49/534 Test #361: test_experiment_plan_director ........................   Passed    0.01 sec
+422/534 Test #461: test_a8s3_csv_klasse_c ...............................   Passed    0.00 sec
+531/534 Test #534: test_pmc_raw_event_katalog ...........................   Passed    0.00 sec
+532/534 Test #533: test_pmc_startup_pruefung ............................   Passed    0.00 sec
+
+== df NACH Bau ==
+/dev/nvme0n1p2  251G  219G   20G  92% /
+
+== Worktree-Zustand nach Commit ==
+PORCELAIN_COUNT=0
+
+== Quell-WT wt-ce-pmcpaket: Build-Verzeichnisse? (Raeumung=Z11) ==
+KEIN build-Verzeichnis (deckt Audit-r2-Befund)
+
+== Merge-Zusammenfassung ==
+9da4d21db88f0feaa8e858d13c6317d2e7b1e556
+merge(pmcpaket): W2-Lande-Zug 5/10 -- #82/#83 I-PMC-2/3 + PMC-fail-loud (bau/pmcpaket @ 1d38263b; Audit r2 SITZT, 2/2 VERTAGT quittiert)
+      (super-Nachzug-Fenster, Board-#83-REST) - F-42 Uncore-Rechte (Infra).
+    - Kombibau: 4-Zellen am Endstand des Zugs (K17); Branch-Beleg gcc-Release 512/512 (SB).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+ .../cache_engine_builder_iterator.hpp              |  31 +++-
+ .../cache_engine/builder/linux_perf_pmc_source.hpp | 113 +++++++++++--
+ libs/cache_engine/builder/pmc_startup_pruefung.hpp | 186 +++++++++++++++++++++
+ .../cache_engine/measurement/pmc_event_biss.hpp    | 146 ++++++++++++++++
+ .../cache_engine/measurement/pmc_event_set.hpp     |   7 +
+ .../measurement/pmc_raw_event_katalog.hpp          | 116 +++++++++++++
+ .../cache_engine/measurement/pmc_source.hpp        |   7 +-
+ .../planner/experiment_plan_director.hpp           |  47 ++++--
+ .../profile_facade/planner/pmc_host_probe.hpp      | 113 ++-----------
+ tests/unit/CMakeLists.txt                          |  34 ++++
+ tests/unit/test_a8s3_csv_klasse_c.cpp              |  14 +-
+ tests/unit/test_pmc_raw_event_katalog.cpp          |  74 ++++++++
+ tests/unit/test_pmc_startup_pruefung.cpp           | 104 ++++++++++++
+ tests/unit/thesis_tiere/linux_perf_pmc_smoke.cpp   |  12 +-
+ tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp         |  13 +-
+ .../thesis_tiere/test_experiment_plan_director.cpp |  99 ++++++++++-
+ 16 files changed, 970 insertions(+), 146 deletions(-)

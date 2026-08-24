@@ -1,0 +1,48 @@
+=== BUMP15-VOLLABNAHME ZELLE 2: CC=/usr/bin/gcc CXX=/usr/bin/g++ TYPE=Release DIR=/home/comdare/wt-ce-bump15/build/gcc-release MODE=frisch START=2026-08-19T20:01:02+00:00
+TIP_AM_START 79171599d442cb22c8b7e4272e905c7997b597f4 fix(a25-f2): M-5/W2-1 -- byte-gleich-Behauptung an :515 GEMESSEN (Task #101, vertagt aus G2d)
+DF_GATE avail=5.1G limit=5G
+SLOT_GENOMMEN strangA_bump15_c2.slot belegte_slots_jetzt=2 deckel=3
+BELEGPRUEFUNG_VOR_RM tracked=0 csv_xlsx=0
+FRISCH_GERAEUMT build/gcc-release
+CONF_PRUEFLINGE=/home/comdare/wt-ce-bump15/tests/pruefling_fixture
+CACHE_SOLL_IST BT=Release/Release CXX=/usr/bin/g++//usr/bin/g++
+PHASE_CONF RC=0
+PHASE_TOOLS RC=0
+PHASE_RECONF RC=0
+PHASE_ALL RC=0
+PHASE_RECONF2 RC=0
+PHASE_FACADE RC=0
+PHASE_TESTS RC=0
+== REGISTRIERUNGS-PROTOKOLL (/home/comdare/wt-ce-bump15/build/gcc-release/comdare_registrierungs_protokoll.txt):
+# comdare-cache-engine -- Registrierungs-Protokoll der bedingten Test-Bloecke.
+# Erzeugt zur Configure-Zeit von cmake/registrierungs_protokoll.cmake.
+# Gelesen von scripts/ci_test_coverage_guard.sh (NENNER der Abdeckungs-Wache).
+# Format: BLOCK|<kennung>|AKTIV|UEBERSPRUNGEN|<tests,komma>|<grund>
+BLOCK|pruefling_slots_v1|AKTIV|test_pruefling_fixture_ladung|Pruefling fixture_min sichert pruefling_slots_v1 zu
+BLOCK|r5i_configure_codegen|AKTIV|test_v41_anatomy_r5i_configure_codegen|anatomy-codegen-Werkzeug gefunden (status=FOUND), Snippet vorhanden
+BLOCK|f15_measurement|AKTIV|test_v41_anatomy_f15_measurement|anatomy-codegen-Werkzeug gefunden (status=FOUND), Snippet vorhanden
+BLOCK|r5g_adhoc_autobuilt|AKTIV|test_v41_anatomy_adhoc_autobuilt_load|comdare-adhoc-emitter gefunden, 48 Permutations-DLLs emittiert
+BLOCK|r5d_f15_compare_cli_smoke|AKTIV|f15_compare_cli_smoke|Target comdare_f15_compare_cli vorhanden
+BLOCK|s18_fixture_schema_subset_check_ce|AKTIV|fixture_schema_subset_check_ce|Rider #95 im #16-Auftrag: ce-Fixture-Wache (Nichtleer/Wohlform/DOCTYPE hart, Schema-Bein nachbar-gebunden)
+ENDE|6
+== CTEST_ZAEHLUNG (ctest -N tail -2):
+
+Total Tests: 507
+PHASE_CTEST RC=0
+== CTEST_SUMMENZEILE (literal, mit out-of-N):
+100% tests passed, 0 tests failed out of 507
+== CTEST_SCHLUSS (tail -4):
+xml_export                =   0.00 sec*proc (1 test)
+zulassung                 =   0.02 sec*proc (3 tests)
+
+Total Test time (real) =  29.36 sec
+== TABU_PROBE_NACH_ZELLE:
+cfa3b020e750e2e4cd7b08733c7a235d9a882387419811c8ce8fcbfecdb030e8  libs/cache_engine/algorithm_profiles/permutation_axes.xml
+65e35415323f1f73439ec698ce9b4f0fbae26e7206ee2b08f9864c5449eb410a  tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt
+665db1661eba5db16050454a9f5178fc9fcc794aa6b8efb8257124bfd8bc5fd9  tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids_abi4.txt
+3e11f402df381e10da8e46690bd81ac4d3649973c0c0da1fcdaedf1163a92d4c  tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids_abi5.txt
+82ce616884358d2d12e3af2a8ff82b7138815723e5e06b76a8c01a6803babb0f  tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids_abi6.txt
+188://     anchor kNewGolden131072Crc64 = 0xF1C1F26A1232073B  [MISMATCH]
+191:inline constexpr std::uint64_t kNewGolden131072Crc64 = 0x56F1B721C72DC10EULL;
+DONE_CELL2_RC_CTEST=0
+ENDE vollabnahme_79171599_c2 2026-08-19T20:07:19+00:00

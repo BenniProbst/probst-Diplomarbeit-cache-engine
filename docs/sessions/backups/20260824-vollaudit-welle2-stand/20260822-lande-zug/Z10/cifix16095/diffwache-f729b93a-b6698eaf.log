@@ -1,0 +1,49 @@
+=============================================================================
+ DIFF-HYGIENE-WACHE: ASCII + Spaltenbreite  (scripts/ci_diff_ascii_width_guard.sh)
+=============================================================================
+
+MODUS: --bereich (KUMULATIV -- der ganze Stand, der nach 'f729b93a' ginge,
+       NICHT ein einzelner Push)
+BEREICH (Teil der Aussage, nicht Beiwerk):
+  BASIS      f729b93a = f729b93aab08bbf3cacd0c8b62ab29545e74e5f9
+  SPITZE     HEAD = b6698eaf6dbe89760e7c1de741186f8190f65347
+  ABZWEIGUNG (merge-base) = f729b93aab08bbf3cacd0c8b62ab29545e74e5f9
+  30 Commit(s) im Bereich; 0 Commit(s) nur auf der BASIS (Divergenz).
+
+MODUS: git diff selbst ausgefuehrt (Repo: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine)
+ARGUMENTE: git diff -U0 --no-color --no-ext-diff f729b93aab08bbf3cacd0c8b62ab29545e74e5f9 b6698eaf6dbe89760e7c1de741186f8190f65347
+
+VERSTOESSE (falls vorhanden):
+  (keine)
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  11200 Zusatzzeilen in selbst verfasstem Code geprueft, davon 0 Nicht-ASCII,
+  davon 0 ueber 120 Spalten.
+  11272 Zusatzzeilen insgesamt im Diff; 72 davon uebersprungen.
+  GEPRUEFT WIRD ALLES; VOLL ausgenommen sind genau zwei Klassen, je Datei
+  unten mit GRUND benannt: Doku-Prosa *.md und Vendor-Baeume. *.xml ist NUR
+  von der BREITEN-Regel frei (16.08.2026, s. Kopf) und bleibt ASCII-geprueft.
+  Die frueher hier gedruckte Sammelbezeichnung "(Doku-Prosa/Sonstiges)" war
+  irrefuehrend -- darunter lagen 143 getrackte *.sh mit 10.084 Zeilen Quelltext.
+  Uebersprungene Dateien (namentlich MIT GRUND, keine zweite stille Null):
+    - docs/architecture/20260821-d09-pruefling-drittes-konzept-s19-input.md  [Doku-Prosa *.md, Sprachdoktrin]
+  BREITEN-AUSNAHME (nicht still): 3 Zeile(n) ueber 120 Byte in *.xml
+  NICHT als Breiten-Verstoss gezaehlt -- ASCII wurde an ihnen GEPRUEFT.
+  Je Datei mit GRUND (printf statt echo: s. Begruendung oben):
+    - libs/cache_engine/algorithm_profiles/paper_experiments/bender_cacheoblivious.experiment.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+    - libs/cache_engine/algorithm_profiles/paper_experiments/saikkonen_layoutinvariant.experiment.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+    - libs/cache_engine/algorithm_profiles/paper_experiments/saikkonen_multilevel.experiment.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+  VENDOR-AUSNAHME (nicht still): diese Baeume tragen COMDARE-VENDOR-PROVENANCE.md
+  und werden als Fremdcode NICHT auf ASCII/Breite geprueft --
+    - ext/io/liburing/
+    - ext/io/libxlsxwriter/
+    - ext/io/zlib/
+  Eigener Code in diesen Baeumen (Wrapper, CMakeLists) liegt AUSSERHALB und
+  wird weiter geprueft.
+  GRENZE (ungedeckt, ausdruecklich): geprueft ist der ZUWACHS in diesem Diff,
+  nicht der Bestand der beruehrten Dateien und nicht der des Baums. Wer ueber
+  eine DATEI urteilen will, misst die Datei -- nicht diesen Bereich.
+-----------------------------------------------------------------------------
+
+DIFF-HYGIENE-WACHE: GRUEN.  KUMULATIV ueber f729b93aab08bbf3cacd0c8b62ab29545e74e5f9..b6698eaf6dbe89760e7c1de741186f8190f65347 (30 Commits)

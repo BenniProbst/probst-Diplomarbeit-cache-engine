@@ -1,0 +1,965 @@
+{
+  "summary": "Wellenplan-Soll-Ist + rekursive Worktree-Inventur + SEQUENTIELLE Landung aller ungelandeten Strecken mit Cache-Raeumung je Schritt",
+  "agentCount": 31,
+  "logs": [
+    "[lande:Z12] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z13] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z14] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z15] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z16] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z17] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z18] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z19] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z20] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z21] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z22] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z23] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z24] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z25] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z26] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[lande:Z27] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+    "[endstand:bilanz] failed: You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models."
+  ],
+  "result": {
+    "sollist": {
+      "gelandet": 56,
+      "gestrichen_ueberholt": 21,
+      "offen": 94,
+      "offene_posten_kurz": [
+        "8 verbleibende ce-Merges auf lande/w2-s1s2: s8kopf 41ee8780, s13schema c76d3116, pmcpaket 1d38263b, vollzug91 6713156b, ph89 2809e4d4, trigfix 0f900dcf, skip97 1c9f58a5, kampvor 1e1bc199 (s19+messfenster BEREITS im Zweig 61d5d139); danach Endstand-Kombibau T-11b + Dual-Push",
+        "super-Phase: s13schema 1e92b77e (KOPPLUNG ce-s13), cidual 223ab518, vorlagenfenster-Fix a6fa04da (T1-Harmonisierung), w1luecken-super 8edc34a0, NEU kampvor-super 025e0c42 (#38c-Rest, heute NICHT-ANC gemessen) + Gitlink-Bump ATOMAR+PZW + KON122",
+        "prt-art Phase 3: pinduo 25bbf2e ZUERST, dann B14 3710ac4c (Rezept #107); VORHER Hauptklon-Submodul fetchen (lokal dev d11781fa STALE, echter Remote dev = 777fff7)",
+        "ce o2-standard fa48a551 landen (E-7), danach GN-9/##47-Kalibrierlauf in O2-Zielform",
+        "Docs-Pflichten: AB-02/T2 Par.59-W18-Austragung VOR Mi 26. 06:00 + T3-T13/G2(V93-Textfix vor Freeze-Uebernahme)/G4/T8b/T8c + OV-16/17-Buchung + par.24-Nachtrag + #122 SITZT-KLEINs",
+        "#19 main-FF beider Repos als Schlussglied (Rest: F-13-Scope-Antwort)",
+        "Di-25-Bauten: #18 S-13-Buendel (U-1-ROT-Auflage J-1-Rezeptfix), #57+S-17, #48, #3/S-12+#106-Raenge-3-10, S-8..S-11-Traegerbau, #99, #94, #103, #105 (HDR-Verdrahtung Frist vor Sa 29.), #124",
+        "Vor Trigger Mi 26. 06:00: #114-E07-Beweislauf, R-04, R-13, C-01-Vollbau-Gate, C-02-HEAVY-Signal, #7/S-19-Echtlauf+C-03-Deckel, #91-E-Punkte-Vollzug, D-08-Emitter-Design, #38a2-Bau (7-Schritte-Rezept) + #86 ORG-19-IO",
+        "#24-Block: B1-Registry-Neubau (F2-1), B4-System-B-Anschluss, B5+Vorposten-Zwillingswache; #120 B-Block-Vollzuege + golden-Folgezug B-7/E-B/B-10/A-11",
+        "Vor W3 (Sa 29.): T-13/T-14-Fehlerklassen (C-12, 0/18), #125 C-09, #127 Dauerrote/CRC, #97-Rest; Wiederaufnahme-Baender B/W1 22 + Rest 37 + C 5 + 14 Alt-W7 -> #96-Feinplatzierung Di 25.",
+        "W2-Serie ##35/##36-##48, ##49-Trigger Mi 26. 06:00, ##50/##51=F3; W3-W5: ##52-##62 + HY-B/HY-C + P-1 + T-3-Ripple (XML->PDF-Vollautomatik+Lager-Skip)",
+        "Thesis/Design: #121-Absatz-Pipeline + #130 (16 Auftraege) + #77, #129 D-04-Command-Pattern, #53 PMC-Schwester, #128 Soll-Ist-Abgleich, S-2/G-1-Bau + Owner-Restfragen R1-R8",
+        "Kategorie C per Owner-Wort (nach Abgabe): OV-14 Paper-Kopplung, W7/#88 Monolith-Split, C-1 Journal-Labels",
+        "Traeger-KANDIDATEN aus Inventur-Vorblick (Stand ungeprueft): bau/d55-hdr (D5-5), bau/lagp1-object-stat (##21-H2), rettung/bau/d3-7b-pruef-only-bilanz, bau/measure-selection-xsd (##11), b-graph-2d3d (#98); ce 177 / super 68 / wt-prt-pinduo 8 lokale Branches = Phase-2-Inventurmenge"
+      ],
+      "datei": "/home/comdare/backups-workflow/20260822-lande-zug/wellenplan-soll-ist.md"
+    },
+    "plan_ziele": 27,
+    "ergebnisse": [
+      {
+        "ziel": "Z01 — T2/AB-02 [PFLICHT, ZEITKRITISCH vor Mi 26.08. 06:00]: Par.59/W18-Austragungs-Marker '[Par.59-MERGE-STEMPEL]' an beide Ledger-Stellen (Entwurf a: AUSGETRAGEN-Marker unter die K7a-Zeile; Entwurf b: Folge-TODO-Nachtrag), docs-only, Phase 0 des S1-Fahrplans, super-Hauptklon development.",
+        "status": "SCHON_ENTHALTEN",
+        "explore_befund": "DREI-ACHSEN-EXPLORE (alles selbst am Objekt gemessen, 22.08. ~14:45): (1) STRUKTURELL: Ledger docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md (32387 Z., HEAD e6c90277) traegt BEIDE Marker bereits: Stelle A = :23337 K7a-Zeile '- **[§59-MERGE-STEMPEL]** K7a Merge-Stempel-POD ...' UNVERAENDERT + direkt darunter :23338-23343 der 6-Zeilen-AUSGETRAGEN-Marker (Entwurf a); Stelle B = :23120 (§59-KERN-MESS-SCHEMA-Zeile mit '§59-Folge-TODOs:'-Liste) + direkt darunter :23121-23123 der 3-Zeilen-NACHTRAG (Entwurf b). Anker-Eindeutigkeit gegengezaehlt: die Folge-TODO-Nennung existiert im Ledger genau 1x (:23120), die K7a-Bau-Posten-Zeile genau 1x (:23337) — exakt die von der Auflage gemeinten Alt-Stellen :23021/:23235 (Kopf-Drift +99/+102). (2) DESIGN: quelle_tip ablock/lande-auflagen.md Abschn. 1 VOLL gelesen (dazu SYNTHESE-S1-AUDIT.md 118 Z. + SYNTHESE-S2-relevanter Gate-Teil + GEGENLESE-GATE.md 168 Z. voll): Wortlaut im Ledger == Entwuerfe a+b mit zwei korrekten Anpassungen — ASCII-'Par.59' des Auflagen-Dokuments wurde auf den ECHTEN Ledger-Anker '§59' transliteriert (WICHTIG: mein Erst-grep auf 'Par.59-MERGE-STEMPEL' war deshalb eine Encoding-Falsch-Null; wirksamer Anker-Wortlaut ist '[§59-MERGE-STEMPEL]'), und die Zeilenfenster-Referenz wurde als ':5146-5156 [Stand 22.08.]' datiert (bedient die Anker-vor-Nummern-Regel). Substanz 1:1: owner-verboten, Owner-E2 02.08. 'Merge Zeile kann daher nicht existieren', DV-1 entfernte Code ERSATZLOS (adhoc_emitter.hpp:110, anatomy_version_stamp.hpp:392, merge_plan.hpp Kopf), Zeile bleibt Historie, 'loest KEINEN Trigger-Bau am 26.08. aus'; uebrige §59-Folge-TODOs unberuehrt. (3) HISTORISCH: Vollzugs-Commit 38fd6270cd626fbe903b19aa0d70d901f430a8d5 (22.08.2026 12:04:32 +0000, 'ledger: T2-docs-Zug — Par.59-MERGE-STEMPEL-Austragungs-Marker (AB-02 ...) + 69.6-Worker-Marker (AB-05) + JB-4-Inventar-Nachbuchung (AB-06); Marker AM ORT, Zeilen bleiben', Fable-5-Trailer, 1 Datei +19/-0 = NUR Insertionen, keine Zeile geloescht). Er ist Ancestor von HEAD e6c90277 UND von 93542880 = ls-remote-Stand BEIDER Remotes (origin+github) — der Marker ist also bereits PUBLIZIERT; die FRIST Mi 26. 06:00 ist seit 22.08. 12:04 erfuellt, das Trigger-Fehlbau-Risiko des owner-verbotenen W18-Postens ist beseitigt. quelle_tip ist der juengste Stand (ablock r2 via GEGENLESE-GATE Stichprobe 1 'VERIFIZIERT', kein Ueberholt-Marker); der Ledger-Kopf :78-84 fuehrte AB-02 noch als 'naechster dedizierter docs-Zug' — genau dieser Zug ist 38fd6270 (Kopf-Text = aeltere Historie, kein Widerspruch). KONSEQUENZ: Kein Eingriff durch diesen Agenten — jede erneute Einfuegung waere eine Dublette (Dedup-Gegenzaehlung statt Doppel-Marker). ledger_nachtrag.sh war nicht anzuwenden (Marker AM ORT, nicht Kopf-Nachtrag; Schreibung erfolgte im vorgefundenen Commit).",
+        "abnahme": "Docs-only-Abnahme durch eigene Objekt-Messung (K18), Beweiskopien unter /home/comdare/backups-workflow/20260822-lande-zug/Z01/ (nur daraus zitiert): (a) beweis-marker-fenster-heutige-zeilen.txt — grep -n 'MERGE-STEMPEL' = 9 Treffer, davon die zwei Ziel-Stellen mit Markern :23121-23123 (NACHTRAG 22.08.2026) und :23338-23343 (AUSGETRAGEN 22.08.2026, W2-docs-Zug A-8/W18 per Wellenplan 19.6) jeweils DIREKT unter ihrer unveraenderten Traeger-Zeile (:23120 / :23337); (b) beweis-commit-38fd6270-vollzug-ab02-ab05-ab06.txt — voller git show: 1 Datei, 19 Insertionen, 0 Deletionen ('Zeilen bleiben' bewiesen), Wortlaut-Abgleich gegen quelle-lande-auflagen-ablock-kopie.md Abschn. 1 = deckungsgleich (Par.->§-Transliteration + '[Stand 22.08.]'-Datierung als einzige, korrekte Abweichungen); (c) beweis-remote-ancestor.txt — merge-base --is-ancestor 38fd6270 93542880 = JA und ls-remote: origin/development == github/development == 93542880, d.h. beide Marker liegen auf BEIDEN Remotes. Kein Bau, kein ctest noetig (kein Bau-Gegenstand), Bauslot slot2 unberuehrt, df-Gate nicht einschlaegig. git status des Hauptklons: Ledger clean committet (nur Gitlink 'M Code/external/comdare-cache-engine' dirty = deklariert normal vor Bump + untracked build-l4/, beides nicht von mir angefasst).",
+        "geraeumt": "Nichts zu raeumen: docs-only-Ziel ohne Bau, kein eigenes Build-Verzeichnis dieses Strangs (ablock-Strang lief laut Auflagen-Kopf ohne Worktree und ohne Bau-Slot). df-Gate nicht ausgeloest.",
+        "worktree_geloescht": "Keiner (kein Quell-Worktree fuer dieses Ziel; Arbeit lag im super-Hauptklon auf development). Nichts geloescht.",
+        "restposten": [
+          "PUSH-LAGE (fuer Lande-Push-Planung, NICHT AB-02-kritisch): super development lokal e6c90277 ist 1 Commit vor beiden Remotes (93542880) — der lokale Spitzen-Commit e6c90277 'ledger: NACHTRAG zu KON120-02 (A4-Antwort OS-Matrix/id56)' faehrt mit dem naechsten Lande-Push mit; der AB-02-Marker-Commit 38fd6270 selbst ist BEREITS auf origin+github.",
+          "AN Z24/Z21 (T8c/AB-06-Buendel): Commit 38fd6270 hat AB-06 (JB-4-Nachbuchung, Ledger ~:2190-2192) UND AB-05 (69.6-Worker-Marker, ~:23708-23714) bereits MIT vollzogen — deren AB-06-/AB-05-Anteil vor erneuter Einfuegung als SCHON_ENTHALTEN gegenpruefen (Dubletten-Gefahr). Der T8c-Anteil (F-64 K7b-5-SUPERSEDED an KON74-04, F-65 F-A-KON119-Halbsatz, L2-Option-B; Entwuerfe in a-block-docs-ergebnis.md Abschn. 2/4.8/4.10) ist NICHT in 38fd6270 enthalten (Diff traegt nur die 3 Marker) — dort bleibt Arbeit.",
+          "Laut Ledger-Kopf :82-84 weiter offen aus dem AB-Block: AB-03 (Board Z-6-Task 'HY-B-Stempel-Export (W3)' + #24-FB20-K-1- + #28-seg4-15-Textzusaetze; Board = Lead-only) und AB-04 (12 W-Marker-docs-only-Commit vor Di-25, W11 Lizenz zuerst) sowie OV-16/17-Buchung + par.24 — Traeger laut Fahrplan T3/T4, nicht Z01.",
+          "Offene Frage 5 (Traeger-Etikett 'Lead-Ledger-Zug KON121+' — Zuordnung Lead/Zug) ist fuer AB-02 gegenstandslos geworden: der Vollzug lief als 'T2-docs-Zug' (Commit-Etikett) und die Frist war das ranghoehere Kriterium; keine Nacharbeit noetig.",
+          "Beweisort: /home/comdare/backups-workflow/20260822-lande-zug/Z01/ (4 Dateien: Commit-Show, Marker-Fenster mit heutigen Zeilennummern, Remote-/Ancestor-Beweis, Quell-Auflagen-Kopie)."
+        ]
+      },
+      {
+        "ziel": "Z02 — Merge 3/10: bau/s8kopf @ 41ee8780 --no-ff in lande/w2-s1s2 (S-8-Traegerbau-KOPF), Worktree wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"",
+        "status": "GELANDET",
+        "merge_sha": "bc0561063f31c8a3f16573c9f93902d132f6c7d4",
+        "explore_befund": "3-Achsen-Explore VOR dem Merge dokumentiert (~/backups-workflow/20260822-lande-zug/Z02/EXPLORE-BEFUND.md, 14:52 UTC) und von diesem Lauf eigenstaendig NACHGEMESSEN (K18). STRUKTURELL: merge-base(61d5d139,41ee8780)=66de5c09; Diff-Menge 8 Dateien +1266/-5 == Audit-Kopf; Flaechen-Ueberlappung beider Seiten = GENAU 1 Datei tests/unit/CMakeLists.txt; git merge-tree --write-tree RC=1, Tree 043d6ef5, CONFLICT nur diese Datei (kein Auto-Union — echter Konflikt, Harmonisierung von Hand Pflicht). DESIGN: audit-runde-1.md (28067 B) voll gelesen — VERDIKT SITZT 0/0/2 KLEIN (S8A-01/S8A-02, G6-IDs); alle 26 Punkte ERFUELLT; TABU-Zonen unberuehrt, keine CI-YAML, ASCII 0 Verstoesse; Vertragsflaechen am Ziel vorhanden (comdare_add_test, COMDARE_TEST_TMP_BUILD_TAG verzeichnisweit, comdare_planner-INTERFACE-Target aus #29-Skeleton); Nenner: +2 ctest-Eintraege, Endstand-Nenner EINMAL live am Kombibau (H-7). HISTORISCH: 41ee8780 == origin (ls-remote literal) == Audit-Objekt == Fahrplan #131; audit-runde-1 = einzige/juengste Runde (GEGENLESE-Tafel bestaetigt, kein Ueberholt-Marker); Reihenfolge turnusgemaess Merge 3/10 nach s19+messfenster. BESONDERHEIT WIEDERANLAUF: Ein erster Z02-Lauf fuhr den Merge (14:53:59 UTC) samt Doku und starb still vor der Meldung; origin-Ref-Sicherung bc056106 lag bei Wiederanlauf (Push 16:31:39Z, Pipeline 16090 status=skipped = ci.skip, 0 Jobs, R4-konform). Dieser Lauf hat nichts uebernommen, sondern alles am Objekt verifiziert.",
+        "abnahme": "Eigene Objekt-Messungen (Beweis-Kopien in ~/backups-workflow/20260822-lande-zug/Z02/VERIFIKATION-NACHLAUF.md): (1) bc056106 = --no-ff-Merge mit Eltern 61d5d139+41ee8780, Trailer \"Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>\" literal im Body, Botschaft traegt Strang/Tip/Audit-Verdikt/Restposten-Traeger. (2) Tree-Diff Auto-Merge-Baum 043d6ef5 vs bc056106^{tree}: GENAU 1 Datei (tests/unit/CMakeLists.txt 27+/25- = Konfliktmarker vs Union) — alle anderen 7 Dateien byte-identisch zum Auto-Merge, keine Fremd-Abweichung. (3) H-1-Union BYTE-BEWIESEN: Zeilen ZIEL=7868/QUELLE=7635/MERGE=7927=7868+59; cmp(head-7868, Ziel-Fassung voll)=RC=0 UND cmp(tail-59, Quell-Anhang)=RC=0 — Bloecke BEIDER Seiten voll, Trenner dazwischen, Zaehlwerk-Duplikation arithmetisch ausgeschlossen (Muster 881d1a15/61d5d139). (4) Name-only Ziel->Merge = exakt die 8 Strang-Dateien. (5) Worktree porcelain 0, HEAD==origin lande/w2-s1s2. Kein Pflicht-Zwischenbau gefahren (Branch-Abnahme 512/512 gcc-Release \"100% tests passed, 0 tests failed out of 512\" + 4-Zellen liegt laut Audit P-20; Baum-Abweichung nur die dokumentierte Union-Datei => kein Struktur-Risiko); kompilierender Endstand wird vom T-11b-Endstand-Kombibau {gcc,clang}x{Release,Debug} VOR dem Lande-Push gedeckt (K17), der die 7er-J-1-Liste LITERAL faehrt (S8A-01/G8, Liste im Lande-Protokoll hinterlegt) und die Facade ueber das REALE Target comdare_profile_run_facade baut.",
+        "geraeumt": "NICHTS geraeumt — Raeumung Build-Cache s8kopf + wt-ce-s8kopf laut Ziel NUR im Raeumfenster Z11. df -h / vor/nach: 24G frei (91% belegt), df-Gate >5G erfuellt, kein Bau gefahren.",
+        "worktree_geloescht": "NEIN — wt-ce-s8kopf steht planmaessig (HEAD 41ee8780 == gemergter Tip == origin, porcelain 0 Zeilen); Loeschung erst im Raeumfenster Z11 nach rekursiver Pruef-Doktrin.",
+        "restposten": [
+          "S8A-01/G8 (an Z10/Endstand-Kombibau): T-11b faehrt die VOLLE 7er-J-1-Liste LITERAL — comdare_adhoc_emitter_cli comdare_anatomy_codegen_cli comdare_axis_registry_gen comdare_catalog_codegen_cli comdare_measurement_axis_registry_gen comdare_overlay_source_hash_gen comdare_system_axis_registry_gen — dann RE-CONFIGURE mit -DCOMDARE_CE_PRUEFLINGE=<src>/tests/pruefling_fixture, Vollbau, comdare_tests, ctest --no-tests=error; Facade ueber REALES Target comdare_profile_run_facade; 7er-Liste literal im Lande-Protokoll (EXPLORE-BEFUND.md + VERIFIKATION-NACHLAUF.md) hinterlegt",
+          "S8A-02 (an Z21/T7/#122): Zeilen-Anker in test_s8kopf_planner_kopf.cpp (Kopf- + Abschnitts-Kommentar, Symbol 'main.cpp:721-726') beim NAECHSTEN Anfassen der Kopf-TU auf 'main.cpp:714-719' korrigieren ODER durch Marker-Zitat ersetzen — KEIN eigener Fix-Commit; Ledger-ENTWURF braucht keine Korrektur (traegt keinen Zeilen-Anker)",
+          "H-15 (an Z06/vollzug91-Merge): traeger/-Baum des vollzug91-Strangs (traeger/ceb) beim Merge 6/10 gegen den jetzt gelandeten s8-Stand (libs/traeger/planner/*) sichten — Lande-Reihenfolge eingehalten, Sichtung dort faellig",
+          "F-17 (Owner-Vorlage R-1/OV-10 Dock-Zahl 6-vs-4) + F-18 (R-01/(P)-Lesarten-Vorlage S-2) — unveraendert offene Owner-Vorlagen aus audit-runde-1 Abschnitt 4/5, Traeger Staffel-Synthese/Owner-Runde (nur weitergetragen, kein Z02-Gegenstand)",
+          "github-Remote traegt weder lande/w2-s1s2 noch bau/s8kopf (ls-remote 0 Zeilen, RC=0) — Stand geht mit dem finalen Lande-Push auf BEIDE Remotes; origin-Ref-Sicherung liegt (bc056106, Pipeline 16090 skipped/ci.skip)",
+          "Hinweis Wiederanlauf-Aktenlage: Erster Z02-Lauf starb still NACH Merge+Doku+Ref-Push (journal.jsonl gegenpruefen, falls dort ein Z02-Eintrag fehlt/haengt)"
+        ]
+      },
+      {
+        "ziel": "Z03 - Merge 4/10: ce bau/s13schema @ c76d3116 --no-ff in lande/w2-s1s2 (wt-ce-lande), S13-01..03 CSV=Kind + Ziel-Filter + per-Binary-Mappe/Resume-Vertrag (#18/D-1, KON32-01); inkl. Sichtung/Vormerkung der 7 ph89-TEIL-6-Schema-Bedarfe und H-6-Kopplungs-Dokumentation",
+        "status": "GELANDET",
+        "merge_sha": "b283f86c5de8d065276fe85f25e2bc1f3afc4015",
+        "explore_befund": "STRUKTURELL: merge-tree HEAD(bc056106) x c76d3116 = 2 Konflikte + 4 Auto-Merges; merge-base sauber 66de5c09; Quell-Diff exakt 10 Dateien +1095/-78; lande-seitiger Anfasser aller Kollisionsflaechen NUR messfenster 3a746090. Konflikt 1 tests/unit/CMakeLists.txt = bekannte Dateiende-Flaeche, beide Seiten reine Anhaenge nach Basis-Z.7576 (diff-bewiesen; Git verzahnte aehnliche include-Listen ZWEIER verschiedener Tests) -> deterministische Rekonstruktion BASE[1..7576]+HEAD-Anbau[351Z. voll]+s13-Anbau[91Z. voll]=8018 Z., beide Teile byte-genau gegen die Eltern verifiziert. Konflikt 2 profile_run_entry.hpp:1032-1041 = messfenster-C-11 (mess_warnungen-Deklaration + alter roher csv-Strom) x s13-S13-01 (Strom entfernt) -> Deklaration BLEIBT, \"csv << r.resumed_csv_rows\" ENTFAELLT (resumed-Zeilen via mappe.blob_aus_csv); T-6-Symmetrie geprueft: experiment-Seam trug nie mess_warnungen (messfenster-Originalstand), beide Seams tragen persistenz_ok + u2192-Escape-fertig-Zeile. Auto-Union-Verdacht an allen 4 Auto-Merges substanzgeprueft (per_binary_mappe 6 Treffer, mess_retry 9, binary_retry 4, X-6-Zwilling an beiden Strukturen :357/:509). DESIGN: SYNTHESE-S1/S2 + GEGENLESE-GATE + s13schema-soll-karte/r1/fix-r1/r2 + Strang-Ergebnis + p-h-89-ergebnis VOLL gelesen; s13schema r2 = SITZT (2/2 BEHOBEN: S13A-F1 ASCII-Wache rot->gruen 1095/0/0 + Byte-Beweis-Pfeil-Escape gcc+clang, S13A-F2 Interpretations-Nachtrag), LANDEREIF; Spannung Nr.1 (result.csv = Design-Interpretation, Owner-Feinabstimmung offen) getragen. ph89-TEIL-6 (7 Schema-Bedarfe) GESICHTET: alle XSD-/Grammatik-seitig, ce-Haelfte aendert kein XSD -> Nr.1 (TemplateType-Kommentar tolerant->R-4-hart, NICHT in super 1e92b77e enthalten) fuer super-Phase/Folge-Schema-Zug VORGEMERKT, Nr.2-6 (Struktur-Grammatik) -> S13-04ff/Staffel-3, Nr.7 kein Bedarf; Vormerkung im Merge-Commit-Text. HISTORISCH: ls-remote origin bau/s13schema == c76d3116 == quelle_tip; genau 2 Commits auf Basis; juengste Runde r2 (22.08. 06:56) misst exakt diesen Tip; kein Ueberholt-Marker in Synthesen/Gate; H-6-Kopplung mit super 1e92b77e bindend deklariert (P-06 r2: super unveraendert). Persistiert: ~/backups-workflow/20260822-lande-zug/Z03/EXPLORE-BEFUND.md",
+        "abnahme": "Merge b283f86c (--no-ff, Eltern bc056106+c76d3116, Trailer gesetzt), porcelain 0, TABU im Z03-Diff 0 Treffer (10 Dateien; der eine grep-Treffer der Gegenrichtung war der Tool-PFADNAME tools/gen_golden_fullpilot aus der lande-Historie, keine golden-Daten). clang-format-22 --dry-run -Werror 5/5 Merge-Dateien + Harmonisierungs-Testdatei RC=0. ABNAHME-ZWISCHENLAUF gcc-Release (Owner-erlaubt bei Struktur-Risiko Kern-Naht-Konflikt; df-Gate 24G>5G; Bauslot slot2.d \"lande-w2-zug\"): J-0b Configure RC=0 (-DCOMDARE_CE_PRUEFLINGE=.../tests/pruefling_fixture) -> J-1 SIEBEN Werkzeuge literal RC=0 -> RE-CONFIGURE RC=0 -> Vollbau all ALL_RC=0 (2602 Targets) -> comdare_tests RC=0 -> ctest -N \"Total Tests: 532\" (Nenner-Konsistenz: dev-Sprosse 524 + s19 2 + messfenster 1 + s8kopf 2 + s13 3) -> ctest --no-tests=error Lauf 1: literal \"99% tests passed, 1 tests failed out of 532\" (CTEST_RC=8) = ECHTER FUND: Kreuz-Luecke W1L x s13 - test_lg_e2e_xlsx_facade (B06, dev seit 21.08., Basis ohne s13) pinnte Alt-Kontrakt \"measurements.csv entsteht immer\" am Profil ohne writeback_methods; s13-Ziel-Filter setzt owner-gemaess (KON32-01 Default=NUR xlsx) korrekt keine CSV (csv_ok=0, persistenz_ok=1). HARMONISIERUNG (LANDUNG-HARMONISIERT-VERTRAEGE, ph89-Praezedenz) als eigener Commit 96a69ba3: Test umbenannt ...OhneUndeklarierteCsv, CSV-Existenz->Abwesenheits-Pruefung (beide Laeufe), B06-Kernsubstanz (Facade->genau EINE xlsx, ZIP-Signatur, 2-Sheet-Nenner, Wiederholung) voll erhalten; Rot-Beweis persistiert (ctest-voll.log Test 516). Danach Zielgruppe literal \"100% tests passed, 0 tests failed out of 5\" (lg_e2e+3x s13+t2a_f4) und VOLLLAUF literal \"100% tests passed, 0 tests failed out of 532\", CTEST2_RC=0. Endstand lande/w2-s1s2 @ 96a69ba3, porcelain 0. Beweise (gesicherte Kopien): ~/backups-workflow/20260822-lande-zug/Z03/ (bau-j0b/j1/reconfigure/all/tests, ctest-voll, ctest-voll-lauf2, ctest-harmonisierung-nachbarn, harmonisierung-beweis, merge-commit, ENDSTAND, EXPLORE-BEFUND). T-11b-4-Zellen bleibt Endstand-Kombibau des Zugs (K17; diese Abnahme = 1 Zelle gcc-Release).",
+        "geraeumt": "Build-Verzeichnis des gelandeten Strangs (wt-ce-s13schema/build) existierte bereits NICHT mehr (vom Fix-Stufen-Slot nach Belegpruefung entfernt; Beleg ENDSTAND.log \"build/ EXISTIERT NICHT\") - keine Raeumung noetig, Doppel-Bedingung gegenstandslos. Zug-eigenes wt-ce-lande/build/gcc-release bleibt BEWUSST stehen (Folge-Merges Z04ff + Endstand-Kombibau brauchen es). df VOR Z03: 24G frei (91%); NACH Z03 inkl. Zug-Bau: 20G frei (92%) - ueber dem 5G-Gate.",
+        "worktree_geloescht": "NEIN - Raeumung wt-ce-s13schema ist laut Ziel-Definition Z11 zugewiesen. Zustand fuer Z11 dokumentiert: HEAD c76d3116 == origin (ls-remote-bewiesen), porcelain 0, build/ bereits entfernt (ENDSTAND.log).",
+        "restposten": [
+          "H-6-LANDE-KOPPLUNG (bindend): super bau/s13schema @ 1e92b77e MUSS im SELBEN Lande-Ereignis landen -> super-Phase dieses Zugs (Z16); Zug zwischen ce-Lande-Push und super-Phase NICHT beenden (VERTAGT=nur Zwischenzustand). Kein Push in Z03 erfolgt (Push nur als Lande-Push am Zug-Ende mit 6/6-Gates+gitleaks).",
+          "ph89-TEIL-6 Schema-Bedarfe (p-h-89-ergebnis.md Z.174-196), in Z03 gesichtet+vorgemerkt (ce aendert kein XSD): Nr.1 TemplateType-XSD-Kommentar-Nachzug (tolerant->R-4-hart; Kommentar-only, NICHT in 1e92b77e) -> in der super-Phase (Z16) einarbeiten ODER an Staffel-3-Schema-Zug; Nr.2-6 (external-Pfad, Markierungs-Grammatik, Ranking-Grammatik, Gesamt-Klassen-Ladung, D-09-1..3-Deckel) -> S13-04ff/Staffel-3-Schema-Zug (D-1-Di-25-Buendel); Nr.7 kein Bedarf.",
+          "T-11b-Endstand-Kombibau {gcc,clang}x{Release,Debug} am Zug-Endstand VOR dem Push (K17) mit Quer-Auflage G8/H5: 7er-J-1-Liste LITERAL + Facade ueber REALES Target comdare_profile_run_facade; Z03-Abnahme war 1 Zelle gcc-Release 532/532.",
+          "Harmonisierungs-Commit 96a69ba3 (B06-Alt-Kontrakt -> S13-02-Vertrag, Kreuz-Luecke W1L x s13) beim Endstand-Kombibau/clang-Review mitpruefen; fuer den KON-Ledger-Zug AN der Landung als eigenen Vermerk vormerken (Lead; Kreuz-Luecken-Befund + Test-Umbenennung RunProfileErzeugtDieMappeAlsXlsxOhneUndeklarierteCsv).",
+          "Ledger-ENTWURF-Zeilen des s13-Strangs (20260820-w2-sofortstaffel/s13-schema-kette-ergebnis.md Z.145-167 inkl. S13A-F2-NACHTRAG 'nicht als glatt erledigt fuehren') -> Lead beim KON-Zug AN der Landung eintragen.",
+          "test_rcu unter Parallel-Last weiter beobachten (s13-Fix-Runden-Nachbarbefund, #103-TSan-Umfeld); in beiden Z03-Vollaeufen unauffaellig (einziger Rot-Fall war Test 516).",
+          "F-25: per_binary_mappe-Vollkette im ECHTEN Mess-Lauf (ladbare Tier-DLLs) -> Mess-Fenster Sa/So (S13-05..07).",
+          "S13-04 Export-Element -> Staffel 3/D-1-Di-25-Buendel; KON32-01-Toleranz (a) bleibt bis dahin formal in Kraft, Board-#18 bleibt pending (Spannungen Nr.2/Nr.5 der soll-karte).",
+          "Kumulatives Diff-Hygiene-Gate gegen origin/main erst am Lande-Push messbar (Strang-Wache war gruen 1095/0/0; meine 3 Harmonisierungs-Kommentarzeilen + Testdatei-Aenderungen sind ASCII-only).",
+          "Raeumung wt-ce-s13schema = Z11 (Zustand dokumentiert: c76d3116==origin, porcelain 0, build/ weg; rekursive Pruef-Doktrin dort fahren).",
+          "Monitor-Restlauf b112wjurx beendet (stream ended), Hintergrund-Bau blb7mp1qm exit 0 - keine haengenden Prozesse dieses Ziels; Bauslot slot2.d bleibt beim Zug ('lande-w2-zug')."
+        ]
+      },
+      {
+        "ziel": "Z04 — Merge 5/10: ce bau/pmcpaket @ 1d38263b --no-ff in lande/w2-s1s2 (#82/#83: I-PMC-2/3 + PMC-fail-loud), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"",
+        "status": "GELANDET",
+        "merge_sha": "9da4d21db88f0feaa8e858d13c6317d2e7b1e556",
+        "explore_befund": "3-Achsen-Explore VOR Merge dokumentiert (/home/comdare/backups-workflow/20260822-lande-zug/Z04/EXPLORE-BEFUND-vor-merge.md + explore-01..06-Logs). HISTORISCH: 1d38263b == wt-ce-pmcpaket-HEAD == origin-Ref (eigene ls-remote-Messung), juengste Audit-Runde r2 = SITZT (2/2 VERTAGT quittiert, 0 Commits seit Audit), Gegenlese-G4/T8b praezisieren BEIDE Funde VERTAGT mit Zug-Plaetzen, kein Ueberholt-Marker; nicht in lande/w2-s1s2 enthalten (is-ancestor rc=1). STRUKTURELL: merge-base 66de5c09 (== dokumentierte Basis), 16 Dateien (11M+5A) deckungsgleich Audit; 3 Ueberlappungs-Dateien, merge-tree: 2 Inhalts-Konflikte (pmc_host_probe.hpp, tests/unit/CMakeLists.txt), Iterator auto-merge (H-3-Vorhersage traf). KERN-FUND des Explores: pmcpaket zog den Probe-Kern in ALTER Form nach measurement/pmc_event_biss.hpp (konfliktfreies ADD) und machte pmc_host_probe.hpp zur Weiterleitung — die Lande-Seite traegt dort aber den PMC-Fenster-Fix 899645ef (CI 16073/Job 382856: read_format TIME_ENABLED|TIME_RUNNING, LeseForm, kKoederFenster=5); naive Konfliktloesung haette den CI-Fix STILL verloren. HARMONISIERUNG (A2.1b): Delegations-Struktur uebernommen UND 899645ef-Mechanik voll in den EINEN Kern portiert (kPmcKoederFenster=5 dort, Doku mitgezogen) — Planer-Probe UND CEB-Gegeneingang urteilen jetzt identisch (genau die Ein-Wahrheit-Absicht beider Seiten); Referenz-Sicherheit grep-bewiesen (kKoederFenster/LeseForm nirgends extern referenziert, 0 Test-Pins auf read_format). CMakeLists: EOF-Union beider Bloecke voll + Trenner (Muster 881d1a15). 899645ef-Zweithaelfte (profile_run_facade.cpp stderr-Vermerk) liegt ausserhalb der pmcpaket-Flaeche, blieb erhalten. DESIGN: Audit-Kette r1 FIXES_NOETIG (0 ERNST, A-1 MILD, A-2 KLEIN) -> fix-r1 2/2 VERTAGT -> r2 SITZT; H-10 gewahrt (kampvor erst 10/10); S-5-Endstand-Gegenprobe am gemergten Iterator VOLLZOGEN (Gegeneingang EINMAL je Lauf VOR erster Zelle/stderr/host_biss-Nenner + messfenster-C-11 nach measure_hb.done()/xlsx-INFO — komplementaer, kein Widerspruch; pmc_zelle :1063 ohne available-Gate; s13-PerBinaryMappe intakt).",
+        "abnahme": "Zwischenmerge-Abnahme + wegen Struktur-Risiko (Kern-Umzug + Fix-Port) erlaubter gcc-Release-Zwischenlauf als volle Bau-Treppe (slot2.d \"lande-w2-zug\", df-Gate 20G frei vor==nach): J-0b Cache-Literal COMDARE_CE_PRUEFLINGE=/home/comdare/wt-ce-lande/tests/pruefling_fixture, gcc/Release/Ninja; J-1 SIEBEN Werkzeuge literal RC=0; RE-CONFIGURE RC=0; Vollbau RC=0 (1839 Schritte, 2m46); comdare_tests RC=0; ctest --no-tests=error -j8: \"100% tests passed, 0 tests failed out of 534\", CTEST_RC=0. Nenner-Kette: Z03-Endstand 532/532 -> Z04 534/534, Delta +2 = exakt Test #533 test_pmc_startup_pruefung + #534 test_pmc_raw_event_katalog (ctest -N-Literale). Strang-relevante Einzel-Literale alle \"Passed\" (linux_perf_pmc_smoke #365, m3v2_pmc_smoke #331, test_experiment_plan_director #361, test_a8s3_csv_klasse_c #461, beide neue Tests). Warnungs-Bilanz: 1 gcc-Warnung = VORBESTAND (stringop-overflow via test_v41_topic_traversal, identisch in gcc-rel-build.log der f729b93a-Landung 20260822-lande-cifix-varwache + CI-Traces 382997/382833) — 0 NEUE Warnungen. clang-format-22 dry-run beider harmonisierter Dateien OK; Diff-Hygiene-Wache 96a69ba3..9da4d21d literal \"DIFF-HYGIENE-WACHE: GRUEN.\" GUARD_RC=0; 0 Restmarker. Endgueltige Deckung der 3 Restzellen = T-11b-Endstand-Kombibau des Zugs VOR Push (K17, unveraendert Zug-Pflicht). Beweise: /home/comdare/backups-workflow/20260822-lande-zug/Z04/ (abnahme-01..11, ENDSTAND.log).",
+        "geraeumt": "KEINE Raeumung in Z04 (per Ziel-Definition: Raeumung wt-ce-pmcpaket = Z11). Quell-Worktree traegt KEIN Build-Verzeichnis (eigenes ls + Audit-r2-Befund \"ls build* leer\" — nichts zu raeumen). Eigener Bau-Baum /home/comdare/wt-ce-lande/build/gcc-release bleibt stehen als lebender Zug-Baum fuer die Merges 6/10 ff. (Endstand-Kombibau braucht ihn). df -h /: 20G frei vor und nach dem Bau (Gate >=5G erfuellt).",
+        "worktree_geloescht": "NEIN — Loeschung/Raeumung von wt-ce-pmcpaket ist per Ziel-Definition Z11 zugewiesen. Worktree steht clean: HEAD=1d38263b==origin bau/pmcpaket, porcelain 0 (explore-02-Log). Keine rekursive Loeschpruefung hier gefahren, da nicht Gegenstand von Z04.",
+        "restposten": [
+          "T6/A-1 (VERTAGT mit Platz): NP-34-Patch np34-csv-to-latex-umschrift.patch (sha256 60fa5504, 73 Z., in pmcpaket/-Audit-Ordner) im super-Lande-Abschnitt = Z22, IM SELBEN Commit-Zug wie der Gitlink-Bump ueber den pmcpaket-tragenden ce-Endstand; S1-SYNTHESE-Umhaengung an BEIDEN Stellen (Z.99 Phase-4 + Z.247 Folgepakete); bewegt sich super seit 657003bb, Patch-Match vor Anwendung erneut pruefen (r2-Weiterreichungs-Pflicht Nr. 1)",
+          "T8b/A-2 (VERTAGT mit Platz, Lead-Anteil): SIEBEN-static_asserts-Ledgerzeilen + Board-#82-Textkorrektur 6->7 im Lead-only-Ledger-Zug AN der Landung = Z24; woertliche Entwuerfe in ~/backups-workflow/20260821-w2-audit-fixverify/pmcpaket/fix-runde-1.md (r2-Weiterreichungs-Pflicht Nr. 2)",
+          "F-39: Intel-RAW-Katalog-Eintraege erst nach Intel-Host-Kreuzprobe (Muster+static_assert-Form stehen)",
+          "F-41: W1-FATAL-Flip (CMakeLists Vendor-leer WARNING->FATAL) = Folgepaket super-Nachzug-Fenster, Board-#83-REST",
+          "F-42: amd_l3-Uncore-Wertfuellung braucht CAP_PERFMON/paranoid<=0 (Infra-Posten)",
+          "T-11b-Endstand-Kombibau {gcc,clang}x{Release,Debug} am Zug-Endstand VOR Push (K17) — deckt die 3 Restzellen dieses Zwischenmerges final",
+          "Board-#82/#83-Status-Nachzug (pending->GELANDET-Vermerk) = Lead im Board-Zug; Merge-SHA 9da4d21d als Beleg",
+          "Protokoll-Hinweis fuer Lande-KON/Endstand: Die Fenster-Biss-Mechanik (kPmcKoederFenster=5, TIME_ENABLED|TIME_RUNNING) wohnt seit diesem Merge in measurement/pmc_event_biss.hpp (nicht mehr in pmc_host_probe.hpp) — aeltere Berichte, die die Mechanik in der Planer-Probe verorten, sind oertlich ueberholt (Rohdaten unangetastet, nur Marker-Wissen)"
+        ]
+      },
+      {
+        "ziel": "Z05 — Merge 6/10: ce bau/vollzug91 @ 6713156b --no-ff in lande/w2-s1s2 (#91-VOLLZUG E-3, V91-Beweissicherung), Worktree /home/comdare/wt-ce-lande",
+        "status": "GELANDET",
+        "merge_sha": "85a67b08975089d5abd44a22f8224e094dfb5322",
+        "explore_befund": "Pflicht-Lektuere VOLL: SYNTHESE-S1 (118 Z.), SYNTHESE-S2 (83 Z.), GEGENLESE-GATE (168 Z.) + vollzug91/audit-runde-1.md (329 Z., juengste Runde — kein r2, GEGENLESE-Tafel bestaetigt). STRUKTURELL: merge-base HEAD(9da4d21d)..6713156b = 66de5c09 (Strang-Basis, nicht enthalten); vollzug91-Seite = exakt die 10 auditierten Pfade (8 neue Dateien: 4 Header + 4 Tests; 2 CMake-Mods); Flaechen-Schnitt mit HEAD = genau 1 Datei tests/unit/CMakeLists.txt; git merge-tree RC=1 mit exakt diesem einen Content-Konflikt; theirs dort = reiner +53-Anfuegeblock am DATEIENDE (eigener Trenner, beginnt mit Leerzeile) = bekannte H-9-Harmonisierungsflaeche (Muster 881d1a15/61d5d139). DESIGN: Audit r1 22.08. = SITZT 0/0/2 KLEIN; V91-A1 (T-11c-Rot-Laeufe ohne persistierten Schnappschuss) -> Z25-Vollaudit-BU; V91-A2 (J-1-Liste wich ab: comdare_axis_version_lock statt comdare_overlay_source_hash_gen) -> G8/H5-Quer-Auflage im Z10-Endstand-Kombibau (kanonische 7er-Liste literal + reales Target comdare_profile_run_facade); H-15 gesichtet: s8kopf beruehrte nur libs/traeger/planner/*, vollzug91 nur libs/traeger/ceb/CMakeLists.txt (neue INTERFACE-Include-Wurzel, am HEAD kein target_include_directories-Duplikat) -> disjunkt, auto-merge; H-11-Reihenfolge vollzug91 VOR ph89 eingehalten (ph89 = Merge 7/10). HISTORISCH: ls-remote origin bau/vollzug91 = 6713156b = lokaler Ref = Quell-WT wt-ce-vollzug91 (porcelain 0); Ziel-quelle_tip ist der JUENGSTE Stand, kein Ueberholt-Marker; einziger im Bericht ueberholter Punkt (DESIGN-90 untracked) ist ZUGUNSTEN des Strangs erledigt (super 5b5a818f committed, H-17-Vorbedingung erfuellt). Befund VOR Eingriff dokumentiert: explore-strukturell/merge-tree/h15-traeger/konfliktflaeche.txt + BEFUND-INDEX.txt im Beweisordner.",
+        "abnahme": "Merge --no-ff mit Harmonisierung: genau 1 UU-Konflikt (tests/unit/CMakeLists.txt), Aufloesung = H-9-Union: ours voll (8052 Z., byte-identisch verifiziert per cmp) + #91-Block voll (53 Z., byte-identisch) = 8105 Z.; Gegenprobe 0 Konfliktmarker, 4 neue Tests je genau 1x registriert, Duplikat-Gates ueber ALLE comdare_add_test-/add_test-NAME-Namen hausweit = 0/0. Abnahme-Messungen (eigene Objekt-Messung, K18): Merge 85a67b08, Eltern exakt 9da4d21d + 6713156b; diff gegen Erstelter = exakt die 10 Audit-Pfade, Diffstat literal \"10 files changed, 914 insertions(+)\" (== Strang-Diffstat, 0 Deletionen); CMakeLists-Delta +53/-0; die 9 Auto-Merge-Pfade byte-identisch zum Strang-Tip (diff HEAD..6713156b auf ihnen = 0 Zeilen); porcelain nach Commit = 0; keine TABU-Pfade im Diff (axes/topics/heuristik/test_data_xml/.gitlab-ci.yml: 0). Abnahme-Form: ce-Zwischenmerge OHNE Teilbau — Struktur-Risiko NIEDRIG (reine Anfuege-Union + 8 neue Dateien, keine bestehende TU geaendert, statische Gates gruen; Strang-Tip selbst gcc-Release 514/514 auditiert); kompilierender Endstand gedeckt durch Z10-Endstand-Kombibau {gcc,clang}x{Release,Debug} nach Owner-Vorgabe T-11b/K17, dort zugleich V91-A2-Deckung (G8/H5). df-Gate: 20G frei vor und nach (kein Bau, kein Slot-Verbrauch; slot2.d blieb dem Zug erhalten). KEIN Push in diesem Schritt (Lande-Push mit pre_push_lande_gates folgt am Zug-Ende laut Fahrplan). Beweise SOFORT kopiert: /home/comdare/backups-workflow/20260822-lande-zug/Z05/ (BEFUND-INDEX, 4 Explore-Dateien, harmonisierung-gegenprobe, abnahme-messungen, merge-start.log, commit-message, log-nach-merge; nur Kopien zitiert).",
+        "geraeumt": "nein — Raeumung wt-ce-vollzug91 per Ziel-Definition auf Z11 vertagt; nichts geloescht. Vorinformation fuer Z11: der Quell-WT traegt KEIN Top-Level-Build-Verzeichnis (find -maxdepth 1 -name '*build*' = leer; der Strang baute ueber Slot-Verzeichnis, laut Audit AF-3 slot2.d, Slots laengst freigegeben). df -h / vorher == nachher: 20G frei (92%), ueber dem 5G-Gate.",
+        "worktree_geloescht": "nein — Z11 per Ziel-Definition. Zustand fuer Z11 gemessen: /home/comdare/wt-ce-vollzug91 clean (status --porcelain = 0 Zeilen), HEAD = 6713156b = origin/bau/vollzug91, Tip seit diesem Merge Ancestor von lande/w2-s1s2 (HEAD^2 == 6713156b bewiesen).",
+        "restposten": [
+          "V91-A1 (KLEIN, Beweissicherung) -> Z25-Vollaudit-BU: T-11c-Mutationsprotokoll M1-M4 (Rot-Literale + Reverts + 4/4-Gegenprobe) aus dem Strang-Transkript als ~/backups-workflow/20260820-w2-sofortstaffel/vollzug91-beweise/mutationsprotokoll.txt ablegen ODER im KON-Absatz die Zeile 'T-11c-Protokoll = vollzug-91-ergebnis.md Abschn.7 (deklarierter Beweisort)' mitfuehren (Fix-Weg audit-runde-1 Abschn. 3)",
+          "V91-A2 (KLEIN, Verfahren) -> Z10-Endstand-Kombibau: kanonische 7er-J-1-Liste LITERAL fahren (comdare_adhoc_emitter_cli, comdare_anatomy_codegen_cli, comdare_axis_registry_gen, comdare_catalog_codegen_cli, comdare_measurement_axis_registry_gen, comdare_overlay_source_hash_gen, comdare_system_axis_registry_gen) + Facade ueber REALES Target comdare_profile_run_facade und literal quittieren (G8/H5-Quer-Auflage; hier nur weitergereicht, kein Vollzug in Z05)",
+          "P-02-Lande-Posten (Lead-only): completed-Buchung #91 + KON-Ledger-Absatz AN der Landung; woertlicher Buchungs-ENTWURF liegt in vollzug-91-ergebnis.md Abschn. 6 (KON-Nummer folgt, KON120 verbraucht)",
+          "Raeumung + Worktree-Loeschung wt-ce-vollzug91 = Z11 (rekursive Pruef-Doktrin dort; Vorinformation: clean, kein Build-Verzeichnis, Tip in lande/w2-s1s2 enthalten)",
+          "Hinweis an Z06/ph89-Merge: H-11 — Ebene-0-Kanon wallclock gegen die ph89-Paper-Gruppen halten (Reihenfolge vollzug91 VOR ph89 ist mit Z05 erfuellt)",
+          "Getragene vollzug91-F-Posten unveraendert bei ihren Traegern (kein Z05-Handlungsbedarf): F-95/G-2 I-8-Feld-Einbau vor Sa 29.08. (W2-Schema-Zug), F-96 hardware_identitaet vs machine_id (D-2-Fenster), F-97/O-C Genus-Namen Bestand 3/4 (Owner-Vorlage bei erster Neu-Benennung), M13-/M6-FUELLUNG nach Trigger (#88)"
+        ]
+      },
+      {
+        "ziel": "Z06 — Merge 7/10: ce bau/ph89 @ 2809e4d4 --no-ff in lande/w2-s1s2 (#89 P-H: 33 Paper-Prueflinge, PV-4/R-4-Haerte, I-5, M14, D-09), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"",
+        "status": "GELANDET",
+        "merge_sha": "a58f77b5aa6021114a82df9828f27867ce33f2ad",
+        "explore_befund": "3-Achsen-Explore VOR Merge dokumentiert (/home/comdare/backups-workflow/20260822-lande-zug/Z06/explore-befund-z06.md). HISTORISCH: origin bau/ph89 == 2809e4d4 == wt-ce-ph89 (ls-remote-Literal, porcelain 0) = juengster Stand; juengste Audit-Runde r1 SITZT 0/0/1 KLEIN (Gate-Tafel OK); Ledger-Kopf inzwischen KON121+KON120-02-Nachtrag+KON120-07 (juenger als Audit-Lesestand KON120-01..05) gegengelesen: KEINE neue ph89-Verfuegung, kein Ueberholt-Marker; KON120-07 P.2 bestaetigt Board-#122-Traeger der ph89-A-1-Anmerkung; R7(D-09 a/b)=offene Owner-Frage==Audit-N-5, kein Gate. DESIGN: Audit ph89/audit-runde-1.md + Strang-Bericht p-h-89-ergebnis.md VOLL gelesen; Auflagen H-9/H-11/H-12/H-13/H-16 (STAFFEL2-SYNTHESE 2.1, Schritt 7) extrahiert; FUND-1 KLEIN = Bericht-Nenner 6->7 C++-Dateien (Doku-only, T7/#122). STRUKTURELL: merge-base 66de5c09; merge-tree = GENAU 1 Konflikt tests/unit/CMakeLists.txt (H-9-Flaeche); Overlap-Menge = {profile_run_facade.cpp (Auto-Union, ph89-Seite 1 Hunk +13/-1 in validate_profile_facade), CMakeLists.txt}. AUFLOESUNG: H-9 Union HEAD-Fassung (8105 Z.) VOLL + ph89-Block 31 Z. mit Trenner ans Dateiende = 8136 Z., 0 Marker (CAVE: gemeinsame Include-Zeilen verzahnten 2 Konflikt-Hunks zweier VERSCHIEDENER Testbloecke — Bloecke voll uebernommen statt Hunk-Wahl); Naht profile_run_facade.cpp verifiziert (PV-4-Block :858, Exit vr.ok&&dr.ok :866, Run-Pfad-Aufrufer :593); H-11-KANON-ABGLEICH am Objekt: M13 kanon_of(mess_ebene,compare)==wallclock + w->wallclock (static_assert :127) x ph89-Gruppe {w,compare} kanonisch=w => identische Aequivalenzklasse {wallclock,w,compare}, kein Pfad kanonisiert nach compare = widerspruchsfrei, M13-Absorption=Folge-Posten (D1); H-13 Flip getragen (Tolerant-Grep=0, IsHardR4Error :541); H-16 kollisionsfrei. Merge-Stat 42 Dateien +2246/-12 == Audit-Literal EXAKT.",
+        "abnahme": "gcc-Release-Zwischenlauf am Merge-Stand a58f77b5 (Ziel-Empfehlung \"groesster Merge\"; df-Gate 20G>5G vorher+nachher; Bauslot slot2.d=\"lande-w2-zug\"): J-1 7er-Werkzeugliste LITERAL RC=0 -> RE-CONFIGURE RC=0 -> Vollbau all RC=0 (1739 Targets) -> Facade REALES Target comdare_profile_run_facade RC=0 -> comdare_tests RC=0 -> ctest --no-tests=error CTEST_RC=0 (direkter RC, keine Pipe) mit LITERAL \"100% tests passed, 0 tests failed out of 539\"; ph89-Test sichtbar+gruen \"539/539 Test #539: test_ph89_paper_prueflinge ... Passed\". Nenner-Kette exakt: Z03=532, Z04=534 (+2 pmcpaket), +4 vollzug91 (gezaehlte Registrierungen im Merge-Diff), +1 ph89 = 539 == gemessen. Warnungs-Befund: genau 1 stringop-overflow-Zeile (gcc-15-STL via Alt-TU test_v41_topic_traversal) = VORBESTAND, identisch 1 Treffer im Audit-Scratch-Bau des ph89-Branches UND im Z04-Vollbau — keine neue Warnung, keine ph89-Datei beteiligt. BEIDE MENGEN: dieser Lauf deckt NUR die gcc-Release-Zelle am Zwischenstand; clang-Release/gcc-Debug/clang-Debug = K17-Endstand-Kombibau VOR Push (T-11b/P-22, mit G8/H5-Quer-Auflage). Beweise (Kopien, aus denen zitiert wird): /home/comdare/backups-workflow/20260822-lande-zug/Z06/ (abnahme-z06.md, explore-befund-z06.md, z06-j1-werkzeuge.log, z06-reconfigure.log, z06-vollbau.log, z06-facade.log, z06-tests-target.log, z06-ctest-gcc-release.log). Worktree-Endzustand porcelain 0.",
+        "geraeumt": "Build-Verzeichnis des GELANDETEN Strangs (wt-ce-ph89/build): existiert NICHT mehr (ls-Beweis RC=1) — bereits vom Strang-Agent nach dokumentierter Doppel-Belegpruefung entfernt (p-h-89-ergebnis.md ENDSTAND \"git ls-files 0, csv/xlsx 0\" + Audit Abschnitt 2 Nachlauf-Hygiene); nichts zu raeumen, kein Loeschschritt gefahren. df vorher/nachher unveraendert 20G frei (>5G-Gate). Lande-Build wt-ce-lande/build/gcc-release BLEIBT stehen (traegt Merges 8-10 + Endstand-Kombibau; nicht Gegenstand der Strang-Raeumungs-Doktrin).",
+        "worktree_geloescht": "NEIN — wt-ce-ph89 steht (HEAD 2809e4d4, porcelain 0); Raeumung per Ziel-Vorgabe explizit in Z11 (rekursive Pruef-Doktrin dort).",
+        "restposten": [
+          "T7/#122 (Vollzug in Z21): ph89-FUND-1 Doku-Anmerkung — Bericht-Nenner 6->7 geaenderte C++-Dateien; bei Zahlen-Uebernahme als '7 geaenderte C++-Dateien (alle formatsauber, auditiert 7x RC=0)' fuehren; Board-#122-Traegerschaft von KON120-07 P.2 bestaetigt",
+          "Z24/Ledger-Zug: ph89-Ledger-ENTWURF WOERTLICH in p-h-89-ergebnis.md Z.236-241 (ENDSTAND Punkt 5) — beim Einpflegen R-5-CAVE/#112 vollziehen: Ledger-#44-Wortlaut nachschlagen und gegen das Gebaute halten (PV-4-Dereferenzierung + R-4-Haerte SIND gebaut)",
+          "K17-Endstand-Kombibau {gcc,clang}x{Release,Debug} VOR dem Push bleibt Zug-Pflicht (P-22): am Zwischenstand a58f77b5 ist NUR die gcc-Release-Zelle gedeckt (539/539); Quer-Auflage G8/H5 (7er-J-1-Liste literal + reales Target comdare_profile_run_facade) dabei fahren",
+          "7 Schema-Bedarfe ph89-TEIL-6 an s13-Zug: bereits in Merge 4/10 (Z03) gesichtet/vorgemerkt — Vollzug im s13-/D-1-Folgezug, kein neuer Traeger noetig",
+          "M13-Absorption der 7 ph89-Paper-Alias-Gruppen = Folge-Posten nach Trigger (H-11-Folge, STAFFEL2-SYNTHESE Z.312, ph89-Design D1) — KEINE Lande-Pflicht, Kanon-Abgleich in Z06 vollzogen und widerspruchsfrei dokumentiert",
+          "Emissions-Verdrahtung paper_stamp_lines in den Paper-Experiment-Bau-Pfad + M14-Report-Daten-Fuellung = nach-Trigger (K4 2d); Organ-Zeile voller Prueflinge haengt am K-3-REST/F-83 (SOTA-METADATEN-BLOCKER, getragener Bestand)",
+          "Raeumung wt-ce-ph89 (Worktree; danach ggf. origin-Branch bau/ph89 erst nach gruen+gemergt+CI) = Z11 nach rekursiver Pruef-Doktrin",
+          "Vorbestands-Warnung -Wstringop-overflow (gcc-15-STL, test_v41_topic_traversal/InterpolationSearchAlgo::erase, 1 Treffer stabil ueber Audit-/Z04-/Z06-Baeume) — Kandidat fuer den Warnungs-Review-Doppelpass (gcc dann clang) am Zug-Endstand; keine ph89-Schuld"
+        ]
+      },
+      {
+        "ziel": "Z07 — Merge 8/10: ce bau/trigfix @ 0f900dcf --no-ff in lande/w2-s1s2 (E-7/R-12 E07-Gate-Pruefer + E-8/R-13 bytes_in_use_peak-Demo-Fix) inkl. der im Auftrag benannten ersetze()-npos-Haertung (KLEIN-1), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"",
+        "status": "GELANDET",
+        "merge_sha": "f7b640399444f5b1fb92a20769dc02ee7d9411b9",
+        "explore_befund": "3-Achsen-Explore VOR Eingriff dokumentiert (~/backups-workflow/20260822-lande-zug/Z07/EXPLORE-BEFUND.md); Pflichtlektuere voll: SYNTHESE-S1/S2 + GEGENLESE-GATE + trigfix/audit-runde-1.md (r1+ANNEX) + trigfix/soll-karte.md. HISTORISCH: 0f900dcf ist der JUENGSTE Tip (ls-remote origin literal; 1 Commit auf Basis 66de5c09 vom 21.08.; github traegt den Zweig nicht = reine origin-Sicherung, audit-konform; kein Ueberholt-Marker — GEGENLESE-Tafel \"OK, T-9-Folgewelle getragen\"; #114 hat den Pruefer @ 0f900dcf bereits produktiv genutzt, E07_GATE=GO; probe/rerun-20260822 liegt im Audit-Ordner). STRUKTURELL: merge-base == Strang-Basis 66de5c09; merge-tree sagte EXAKT 1 Konflikt voraus = tests/unit/CMakeLists.txt (bekannte H-9-Dateiende-Flaeche), 4 Dateien konfliktfrei (profile_facade/ additiv per H-16; experiment_demo.hpp in libs/execution_engine vom Zielzweig seit Basis unberuehrt); Zaehlwerk comdare_add_test Basis 245 / HEAD 261 / Tip 247 -> SOLL 263. DESIGN: Audit-Verdikt SITZT 0/0/3 KLEIN, alle 19 Soll-Punkte ERFUELLT ausser P-17 (strukturell Folgewelle); TABU-Zonen 0 Treffer im Diff; KLEIN-1-Fix-Weg laut Audit woertlich \"im Lande-Zug oder T-9-Pass\" -> als eigener Commit gefahren, KLEIN-2/3 bleiben T-9; Quer-Auflage G8/H5 bindet den Endstand-Kombibau. Ist == Vorhersage: genau 1 UU-Konflikt, Union harmonisiert (HEAD-Bloecke der Merges 1-7 VOLL + trigfix-Block 22 Zeilen ans Dateiende), Zaehlwerk EINMAL live 263, beide neuen Tests je exakt 1x.",
+        "abnahme": "Merge f7b64039 (--no-ff, Eltern a58f77b5 + 0f900dcf, KONFLIKT-DEKLARATION im Commit-Text, Fable-Trailer) + Haertungs-Commit a84f1119 (KLEIN-1: pos = (nl == std::string::npos) ? proto.size() : nl + 1; in tests/unit/test_e07_gate_kriterien.cpp ersetze(); clang-format-22 --dry-run -Werror rc=0; ASCII 0 Nicht-ASCII in 3 Add-Zeilen, Positiv-Kontrolle 2 npos-Treffer). Zwischenmerge-Abnahme (Ziel-konform): df-Gate 20G frei; gcc-Release-Teilbau beider neuer Targets im J-0b-konfigurierten Baum wt-ce-lande/build/gcc-release (COMDARE_CE_PRUEFLINGE gesetzt, Ninja) TEILBAU_RC=0; ctest gefiltert mit --no-tests=error: CTEST_RC=0, Bilanz-Literal aus gesicherter Kopie ctest-e07-e8.log \"100% tests passed, 0 tests failed out of 2\" — Test #540 test_e07_gate_kriterien Passed + #541 test_e8_bytes_in_use_peak_demo Passed (N=2 gefilterter Nenner; die 23 Entfernungs-Proben laufen alle durchs gehaertete ersetze() = Beweis kein Semantik-Delta). VOLLER Nenner + T-11b-Quadmatrix {gcc,clang}x{Release,Debug} mit 7er-J-1-Liste literal, RE-CONFIGURE, comdare_tests, Facade ueber comdare_profile_run_facade = Endstand-Kombibau VOR dem Push (K17/G8/H5, Zug-Endstufe — nicht dieser Zwischenschritt). KEIN Push (Lande-Push mit pre_push_lande_gates 6/6 + gitleaks = Endstufe). Beweise als Kopien in ~/backups-workflow/20260822-lande-zug/Z07/ (EXPLORE-BEFUND.md, ABNAHME.md, merge-stat, Haertungs-Diff, 22-Zeilen-Block, Teilbau-/ctest-Logs, df vor/nach, Zug-Log).",
+        "geraeumt": "Nichts zu raeumen: eigenes Build-Verzeichnis des gelandeten Strangs (wt-ce-trigfix/build) EXISTIERT NICHT — vom Strang selbst entfernt (Audit-r1-Literal \"build/ entfernt\"), heute erneut gemessen BUILD_FEHLT. df 20G vor == 20G nach (df-vor/nach-bau.txt). Der Lande-Baum wt-ce-lande/build/gcc-release bleibt stehen (laufender Abnahme-/Beweis-Baum des Zugs, Klasse build-b10-Ausnahme).",
+        "worktree_geloescht": "NEIN (planmaessig): Raeumung wt-ce-trigfix ist laut Ziel-Vorgabe Z11. Zustand fuer Z11 vorgemessen: HEAD 0f900dcf == origin refs/heads/bau/trigfix, porcelain 0, build/ fehlt, kein nested git bekannt; #114-Re-Run-Vorbehalt spricht zusaetzlich fuer Stehenlassen bis nach Z10. Z11 faehrt die rekursive Pruef-Doktrin selbst.",
+        "restposten": [
+          "T-9-Folgewelle (Traeger im Audit r1+ANNEX, NICHT dieser Zug): KLEIN-2 setze()-end()-Guard in libs/cache_engine/profile_facade/e07_gate_kriterien.hpp + KLEIN-3 Tippfehler-Rename 'Unguelig'->'Ungueltig' (Testname+Variable) + P-17-Codex-Pass der neuen Tests inkl. P-16-Beobachtung (2 GRUEN-Seite-e07-Tests + e8-Tests 2/3 ohne eigenen Mutations-Beleg) und MF-1-Kandidat",
+          "#114-VORBEHALT (zeitkritisch): E07-Q1-Default-A-Re-Run (<1h, Rezept ~/backups-workflow/20260822-parallel-heilung/b10-beweislauf/BEWEIS.md par. 9) auf der FINAL eingefrorenen Trigger-Linie — nach Z10, vor Trigger Mi 26.08. 06:00; Ausfuehrender = offene Frage 8 (Lead/Owner-Entscheid noetig)",
+          "Z11: Raeumung wt-ce-trigfix nach rekursiver Pruef-Doktrin (Vormessung liegt: HEAD==origin 0f900dcf, porcelain 0, build/ fehlt)",
+          "Zug-Endstufe vor Push: Endstand-Kombibau T-11b {gcc,clang}x{Release,Debug} am Endstand mit VOLLER 7er-J-1-Liste literal + realem Target comdare_profile_run_facade + RE-CONFIGURE + comdare_tests (Quer-Auflage G8/H5; deckt den vollen ctest-Nenner dieses Merges mit) + pre_push_lande_gates 6/6 + gitleaks-Koeder",
+          "Bereits getragene Bestandsposten (kein Z07-Delta, nur zur Vollzaehligkeit): F-103/O-B Peak-POD-Quelle owner-gated (E-24) · KK-9 P-5 latex_anhang-Doku-Rest (Ledger:25480) · F-101 Karten-Hygiene rest_karte_r3 C5-CLU als GEHEILT (Phase-5-Konsolidierung)",
+          "Lead-only-Notiz: Audit-Probe-Kopie in 20260821-w2-audit-fixverify/trigfix/probe/ traegt bewusst die UNGEHAERTETE ersetze()-Kopie (BU-additiv, nicht angefasst)"
+        ]
+      },
+      {
+        "ziel": "Z08 — Merge 9/10: ce bau/skip97 @ 1c9f58a5 --no-ff in lande/w2-s1s2 (#97/E-12: C-13 Skip-Oekonomie + C-14 Bestandslog-SKIP-Wache + S97-F1 Mess-Genus-Schwester/F1-Leer-Zellen-Wache Weg 2), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"",
+        "status": "GELANDET",
+        "explore_befund": "HISTORISCH: T11-Pflicht erfuellt — Merge-Tip 1c9f58a5 (NICHT 100c32d2; Parent-Kette selbst gemessen 1c9f58a5^==100c32d2). ls-remote origin bau/skip97 == lokal == 1c9f58a5, einziger skip97-Ref, kein Ueberholt-Marker; juengste Runde = audit-runde-2 (SITZT auf exakt diesem Tip), Gegenlese-Gate hatte T11 wortgenau verifiziert; H4: Erstlauf-A-3 aufgeloest (r1 P-16). Pflicht-Lektuere voll: SYNTHESE-S1 (inkl. G1-G9) + SYNTHESE-S2 (inkl. H1-H5) + GEGENLESE-GATE + kompletter skip97-Ordner (soll-karte 437 Z., audit-r1 312 Z., fix-runde-1 209 Z., audit-r2 202 Z.). DESIGN: Audit r2 SITZT — F1 BEHOBEN (Weg 2, 3 Dateien +187, rot/gruen-Logs fix1-schwester-c14m-ROT/GRUEN + eigene Biss-Gegenprobe des Pruefers), F2 BEHOBEN (Sieben-Protokoll), F3 ENTLASTET, 0 VERTAGT; Zweig-eigen 513/513; kumulativer Zweig-Diff 7 Dateien +811/-1 == Audit-Mengendeklaration. STRUKTURELL: merge-base == 66de5c09 (deklarierte Basis); merge-tree-Vorschau = GENAU 1 Konflikt tests/unit/CMakeLists.txt (bekannte H-9-Dateiende-Flaeche), 6 Dateien auto-clean; Kreuz-Beruehrungs-Gegenprobe 66de5c09..HEAD ueber alle 6 Nicht-CMake-Dateien = 0 Commits; Test-Namens-Kollisionen im Ziel-CMakeLists = 0. Befund VOR dem Eingriff dokumentiert (BEFUND.md).",
+        "abnahme": "Merge cf524bd1 per --no-ff, Konflikt-Harmonisierung nach A2.1b-Muster (881d1a15/61d5d139): OURS voll (8158 Z.) + THEIRS-#97-Block voll (50 Z., skip97:7577-7626) ans Dateiende = 8208 Z.; beide Haelften byte-identisch gegengeprueft (diff leer/leer), 0 Konfliktmarker, je Test genau 1 Registrierung; Diff gegen Erst-Elter exakt 7 Dateien +811/-1; Trailer gesetzt. Zwischenmerge-Abnahme mit Struktur-Risiko-Teilbau (CMakeLists-Union + 3 neue TUs): df-Gate 20G>5G; RE-CONFIGURE gcc-release mit -DCOMDARE_CE_PRUEFLINGE=/home/comdare/wt-ce-lande/tests/pruefling_fixture RECONF_RC=0; Teilbau der 3 neuen Targets TEILBAU_RC=0; ctest --no-tests=error -R der drei Tests: literal \"100% tests passed, 0 tests failed out of 3\", CTEST_RC=0 (#542 test_c14_lager_presence_wache, #543 test_c13_selektiver_rebuild, #544 test_c14_messwert_presence_wache; Nummern-Verschiebung erwartungsgemaess, T-7 zaehlt am Endstand). Zaehlwerk ctest -N am Merge-Stand: Total Tests 544 (vorher 541, +3 = skip97-Beitrag). Volle 4-Zellen-Matrix + J-1-SIEBEN (literal ausgeschrieben in BEFUND.md) + reales Facade-Target comdare_profile_run_facade = Endstand-Kombibau T-11b vor dem Push (G8/H5, K17) — nicht dieser Zwischenschritt. Endzustand: porcelain 0, HEAD cf524bd1, df nachher 20G. Beweise: /home/comdare/backups-workflow/20260822-lande-zug/Z08/ (BEFUND.md, merge-tree-vorschau, merge-commit, theirs-block, reconf/teilbau/ctest-Logs, ctest-N, df vor/nach).",
+        "merge_sha": "cf524bd1801c51c496c8d885669aef6f538ff77f",
+        "geraeumt": "Keine Raeumung in Z08 — per Ziel-Definition \"Raeumung wt-ce-skip97 in Z11\" (Worktree samt build/ steht unangetastet: HEAD 1c9f58a5, porcelain 0, origin-Ref gesichert). Lande-Baucache wt-ce-lande/build/gcc-release bleibt fuer Merge 10/10 + Endstand-Kombibau. df vor/nach Bau je 20G frei (df-vor-bau.txt/df-nach-bau.txt).",
+        "worktree_geloescht": "NEIN — wt-ce-skip97 bleibt stehen (Ziel-Vorgabe: Raeumung in Z11 nach rekursiver Pruef-Doktrin); wt-ce-lande bleibt als Lande-Worktree aktiv.",
+        "restposten": [
+          "[Lead/Board, T11-Haelfte 2] Board-#97-Text auf 1c9f58a5 nachziehen (Board-IST traegt noch 100c32d2; offene Frage 6 des Fahrplans)",
+          "[Register] observe-Duo cache_engine_builder_iterator.hpp:2303/:3186 -> F-106-Registerzeile; wortfertiger ENTWURF in skip97/fix-runde-1.md Abschnitt 4 (Traeger: Folge-Zug Planer-/Orchestrierungs-Seite, mit F-106)",
+          "[Lead/Ledger, KON-Zug AN der Landung] ENTWURF-Ledger-Zeile S97-F1 aus fix-runde-1.md Abschnitt 4 einpflegen (S97-F1 BEHOBEN via Weg 2, ce 1c9f58a5, Test #513-Klasse, echtes T-1-Rot 22.08.)",
+          "[Folge-Bau nach der Landung, F-106] #97-Rest Ausweis-Host-Verdrahtung (entscheide_selektiven_rebuild weiterhin 0 Produktions-Aufrufer, Modul bewusst host-frei) — NICHT dieser Zug",
+          "[Endstand-Kombibau T-11b, G8/H5] J-1-SIEBEN-Liste literal fahren + Facade ueber REALES Target comdare_profile_run_facade (Alias comdare_facade existiert nicht, RC=1-Beweis skip97/verify2-all.log); H-7-Nenner EINMAL live am Endstand (skip97-Zweigsoll war 513, Lande-Stand nach 9/10 = 544 registriert); Anker-Ratschen-Gegenpruefung (#500-Klasse) mitnehmen",
+          "[Prozess-Notiz aus S97-F3, fuer kuenftige Straenge] auch Neben-Rots (Ratschen-/Hygiene-Laeufe) als Log-Kopie in den Beweis-Ordner sichern",
+          "[Z11] Raeumung wt-ce-skip97 (inkl. build/) erst nach rekursiver Nested-/Refs-Pruefung gegen den ECHTEN Remote im Hauptklon"
+        ]
+      },
+      {
+        "ziel": "Z09 — Merge 10/10: ce bau/kampvor @ 1e1bc199 --no-ff in lande/w2-s1s2 (Kampagnen-Vorstaffel, ce-Haelfte; E-10 Generator-Haelfte window_belongs_to + E-20/R-15 Pin-Pflicht-Deklaration), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \"lande-w2-zug\"; inkl. T12: P-25-Vorbedingung IM Zug + P-26 ci.skip-API-Nachpruefung Projekt 286",
+        "status": "GELANDET",
+        "merge_sha": "b4c593f5fa65201a6b3876dc3703649be5f7e478",
+        "explore_befund": "HISTORISCH: 1e1bc199 ist DER juengste Tip — origin==lokal==wt-ce-kampvor (ls-remote RC=0), github traegt den Branch nicht; juengste Runde = audit-runde-1 (22.08.) Verdikt SITZT (24x ERFUELLT, 0 ERNST/0 MILD/1 KLEIN K-1), kein Ueberholt-Marker (Gegenlese-Gate-Tafel). DESIGN: kampvor/audit-runde-1.md + soll-karte.md (557 Z.) + SYNTHESE-S1/S2 + GEGENLESE-GATE VOLL gelesen; Vertraege am Objekt intakt (TESTAT-Kontrakt Marker bewusst ohne TESTAT/offen=, kein YAML, TABU 0 Treffer, Nenner II.5, fail-closed II.7); P-25-Wortlaut = H-10: pmcpaket MUSS VOR ce-kampvor. STRUKTURELL: merge-base = 66de5c09 (exakt Strang-Basis); merge-tree --write-tree RC=0 Tree 305f635c OHNE Konfliktsektion; Delta HEAD->Mergetree ZEILENIDENTISCH zum Strang-Delta 66de5c09..1e1bc199 (2 Dateien +166/-1; +/- Zeilenvergleich hpp RC=0 und test RC=0, je 0 Abweichungszeilen); einziger Mit-Toucher beider Dateien seit Basis = pmcpaket 1d38263b; Marker-Lagen im gemergten Blob disjunkt+semantisch korrekt ([PMC-TESTAT] :1759/:1775 VOR [PIN-DEKLARATION] :1802/:1806; kampvor-Bau-Batch :1519-1580); die 1 Minus-Zeile = kampvors EIGENE kommentierte Assert-Anpassung (Scheiben-Fortschritt 2x je Perm wegen Skip-Zweig) — Auto-Union-Anfangsverdacht entkraeftet, KEINE Harmonisierung noetig.",
+        "abnahme": "P-25 IM Zug erfuellt VOR dem Merge (Literal): merge-base --is-ancestor 1d38263b HEAD RC=0 UND 9da4d21d HEAD RC=0 UND 66de5c09 HEAD RC=0 — H-10-Ordnung gewahrt. MERGE_RC=0 ('ort'), Merge b4c593f5 mit exakt 2 Eltern cf524bd1+1e1bc199; Commit-Tree 305f635c == merge-tree-VORHERSAGE byte-exakt; Diffstat 2 Dateien +166/-1 == Strang-Delta; status --porcelain 0 Zeilen. P-26 per GitLab-API (NUR gitlab.comdare.local, Projekt 286, glhdr.curlrc): pipelines?ref=bau/kampvor und ?sha=1e1bc199... liefern je GENAU 1 Datensatz id=16071 status=\"skipped\" source=\"push\" (21.08. 17:45); Nenner /jobs UNION /bridges = [] + [] (alle CURL_RC=0) => 0 ausgefuehrte Jobs/Bridges, ci.skip-Pipelinefreiheit im Wirkungs-Sinn BEWIESEN (der skipped-Datensatz ist GitLabs Skip-Buchhaltung, praezise dokumentiert). Kompilat-Abnahme: ce-Zwischenmerge (letzter der Serie) — gedeckt durch den deklarierten K17/T-11b-Endstand-Kombibau {gcc,clang}x{Release,Debug} VOR dem Push (Owner-Vorgabe); kein Struktur-Risiko (0 Konflikte, rein additiv) => kein Zwischenbau gefahren, df 20G frei unveraendert. Beweise als Kopien: ~/backups-workflow/20260822-lande-zug/Z09/ (PROTOKOLL-Z09.txt, merge-beleg.txt, z09-mergetree.txt, 2 leere Delta-Diff-Beweise, 4 P-26-JSONs, status-nach-merge.txt).",
+        "geraeumt": "NICHTS geraeumt — per Ziel-Vorgabe \"Raeumung wt-ce-kampvor in Z11\" delegiert (Build-Verzeichnis + Caches des Strangs). Kein eigener Bau in Z09 gefahren; df -h / vor/nach: 20G frei / 20G frei (92%), unveraendert.",
+        "worktree_geloescht": "NEIN — Loeschung wt-ce-kampvor ist Z11 zugewiesen (Ziel-Vorgabe). Zustand uebergeben: wt-ce-kampvor clean (porcelain leer) auf bau/kampvor @ 1e1bc199, Tip == origin == jetzt Ancestor von lande/w2-s1s2 (b4c593f5) — loeschreif nach rekursiver Pruef-Doktrin in Z11.",
+        "restposten": [
+          "K-1 (Owner-Verdopplungs-Semantik CCD0+CCD1, Owner-Wort 07.08., Ledger Z.30689-30691) -> T12b im docs-Sammel Z21: bei der F-108-Korrektur (Wellenplan Z.718 '2x128 MiB CCD' -> '96+32 MiB (2 CCD)') in DERSELBEN ##55-Zeile die Verdopplungs-Semantik nachtragen (je Domaene einmal messen: CCD0-Pin 0-7,16-23 UND CCD1-Pin 8-15,24-31) + CCD1-Menge als zweite SOLL-Deklaration im W3-Vorstaffel-Posten (F-114-Umfeld) vormerken",
+          "super-Haelfte bau/kampvor @ 025e0c42 = Z20 (Phase 4); dort P-26-Analogpruefung fuer Projekt 288 (super-Push war ebenfalls ci.skip)",
+          "Treiber-Haelfte window_belongs_to (F-112-TEIL) + Pin-Aktuator run_profile/prod2-Topologie (F-114) = W3-Vorstaffel; E-10-YAML-Haelfte = Staffel-3-YAML-Zug (LEAD-ENTSCHEIDE Punkt 9) — deklarierte Nachfolge-Zuege, kein Z09-Verzug",
+          "Raeumung wt-ce-kampvor (Build-Dir nach Doppel-Bedingung + Worktree-Loeschung nach rekursiver Pruef-Doktrin) = Z11",
+          "K17/T-11b-Endstand-Kombibau 4 Zellen + volle 7er-J-1-Liste literal + reales Target comdare_profile_run_facade (Quer-Auflage G8/H5) am ce-Endstand VOR dem Lande-Push + pre_push_lande_gates 6/6 = Folgeziele des Zugs (ce-Endstand nach Z09 = b4c593f5)"
+        ]
+      },
+      {
+        "ziel": "Z10 — ce-Endstand: lande/w2-s1s2 --no-ff in development, H-5/F-10-Nachzug + F-14-Sichtung, K17/T-11b-Endstand-Kombibau, Gates 6/6 + gitleaks, Dual-Push, CI 286 gruen — per WIEDERANLAUF-LAGE Z10 (Lead 23.08. ~20:45Z) bereits am Objekt vollzogen; Auftrag dieses Schritts: KURZ-Verifikation + GELANDET-Verbuchung, NICHTS mergen/pushen/bauen/raeumen",
+        "status": "GELANDET",
+        "merge_sha": "5ddda4e57c994ac3c9b94eae26d1accaae716fa1",
+        "explore_befund": "Kurz-Verifikation am Objekt (23.08. 20:42Z), Beweislog-Kopie /home/comdare/backups-workflow/20260822-lande-zug/Z10/z10-wiederanlauf-kurzverifikation-20260823.log — NUR daraus zitiert. STRUKTURELL: ce-Hauptklon HEAD=3841d7175086d5141fb28d6a401ae1ab4d137b30 auf Branch development, porcelain leer (rc=0); ls-remote origin development=3841d717... (rc=0) und github development=3841d717... (rc=0) => lokal==origin==github. Gesamte Traeger-Kette vorhanden und Vorfahr von HEAD (ancestor_rc=0 fuer 8/8 Anker): Endstand-Merge 5ddda4e57c99, Floor 1f0424a205, Heilungen db66714a38 (NSDMI) + b6698eaf6d (Maskierung a/b) + b247a33965 (Form c), PMC-Riegel-Cherry 1f51eb3db9, Riegel-AUSWEIS 3841d71750, sowie lande/w2-s1s2-Tip b4c593f5fa65 (Merges 1-10 enthalten). HISTORISCH: CI-Pipeline 16101 (Projekt 286) via API: sha=3841d717... ref=development status=\"success\", detailed_status.label=\"passed\", finished_at=2026-08-23T14:43:46Z, duration=2503s, curl_rc=0 => TERMINAL SUCCESS exakt am HEAD-Stand; WIEDERANLAUF-Lage ersetzt den alten BLOCKIERT-Stand von 13:0x, Split-Brain aufgeloest. DESIGN/BEWEISORTE: alle benannten Orte existieren — Z10/endstand-beweis/INDEX.md (13526 B, 23.08. 20:12), Z10/Z10-PROTOKOLL.md (10163 B), ZUG-BILANZ.md (59922 B, Zug-Ebene), 20260821-w1l-landung/cifix2-vl3debug/ inkl. endstand-pruefer/. Kein Eingriff noetig, kein Eingriff erfolgt.",
+        "abnahme": "Verbuchung nach eigener Objekt-Messung (K18), Zitate ausschliesslich aus der Beweislog-Kopie /home/comdare/backups-workflow/20260822-lande-zug/Z10/z10-wiederanlauf-kurzverifikation-20260823.log: (1) ce development lokal==origin==github @ 3841d7175086d5141fb28d6a401ae1ab4d137b30, porcelain 0 Zeilen; (2) Ketten-Anker 8/8 mit ancestor_rc=0 gegen HEAD; (3) CI 16101 status=\"success\" terminal (finished_at 2026-08-23T14:43:46.468Z) auf exakt der HEAD-SHA. Die volle Abnahme des Ziels (K17-Kombibauten r1@5ddda4e5 + r3@b247a339 + r4@3841d717 je 4/4 Zellen 544er LITERAL inkl. gcc-dbg-NACHBEWEIS 14:06:55Z; Gates 6/6 an zwei Staenden; Full-Join-Endprobe Merges 6-10 5/5; H-5/F-10 + F-14 vollzogen; Traeger-Kette KON122-L14..L19) ist Lead-verifiziert dokumentiert an den Beweisorten: /home/comdare/backups-workflow/20260822-lande-zug/Z10/endstand-beweis/INDEX.md + /home/comdare/backups-workflow/20260822-lande-zug/ZUG-BILANZ.md Abschn. 7-9 + /home/comdare/backups-workflow/20260821-w1l-landung/cifix2-vl3debug/ inkl. endstand-pruefer/ — Existenz aller Orte in diesem Schritt gemessen (Log Z. 24-29). CI-16101-Jobaufteilung 27=26 success+1 manual ist Lead-Messung aus der WIEDERANLAUF-Lage, in der Kurz-Verifikation nicht neu erhoben (Order-Umfang: HEAD + ls-remote + Pipeline-Status).",
+        "geraeumt": "Nichts — per Order (WIEDERANLAUF Punkt 3) in diesem Schritt kein Bau, keine Raeumung, kein Push, kein Merge. Einzige Schreibaktion: additives Beweislog z10-wiederanlauf-kurzverifikation-20260823.log im bestehenden Z10-Beweisort. df-Gate entfiel mangels Bau.",
+        "worktree_geloescht": "Nein — Worktree-Loeschung war per Order ausdruecklich nicht Teil dieses Schritts; wt-ce-lande wurde weder geprueft noch angefasst (Zustand zuletzt laut ZUG-BILANZ; Branch-Tip b4c593f5 nachweislich Vorfahr von development, Log Z. 20).",
+        "restposten": [
+          "wt-ce-lande + Branch lande/w2-s1s2: Loeschung/Raeumung in diesem Schritt per Order ausgesetzt; Tip b4c593f5fa65 ist gemessen Vorfahr von development (ancestor_rc=0) — Loeschung im Aufraeumschritt NUR nach rekursiver Worktree-Doktrin (nested gits, refs gegen echten Remote im Hauptklon, porcelain+stash leer, untracked additiv sichern)",
+          "Cache-/Build-Verzeichnis-Raeumung des Zugs: per Order nicht in diesem Schritt; Lage laut ZUG-BILANZ.md Abschn. 7-9 — offene Raeumungen dort dem Aufraeumschritt zufuehren (Doppel-Bedingung git ls-files==0 UND find *.csv/*.xlsx ausserhalb _deps==0)",
+          "CI 16101 enthaelt 1 manual-Job (Lead-Messung 27=26 success+1 manual); kein Handlungsbedarf laut Order, nur Kenntnisnahme fuers Board",
+          "Ortshinweis fuer Verweise: ZUG-BILANZ.md liegt auf Zug-Ebene (/home/comdare/backups-workflow/20260822-lande-zug/ZUG-BILANZ.md), nicht unter Z10/",
+          "Board #131 / Memory-Verbuchung der Z10-Landung ist Lead-only — dieser Report samt Beweislog-Pfad /home/comdare/backups-workflow/20260822-lande-zug/Z10/z10-wiederanlauf-kurzverifikation-20260823.log ist die Grundlage"
+        ]
+      },
+      {
+        "ziel": "Z11 — ce-Raeumfenster NACH CI-gruen: Build-Caches + Worktrees der 8 gelandeten Straenge raeumen (wt-ce-s8kopf, wt-ce-s13schema, wt-ce-pmcpaket, wt-ce-vollzug91, wt-ce-ph89, wt-ce-trigfix, wt-ce-skip97, wt-ce-kampvor)",
+        "status": "GELANDET",
+        "explore_befund": "HISTORISCH: ZUG-BILANZ.md Abschn. 9 (r3-Endstand 23.08. 20:15Z) + slot2.d/wer-Terminal-Marker: Schlussstrecke r4 BEENDET, Push 3841d717, Raeumung an diesen Zug uebergeben; Z11-Fenster laut Bilanz Z.114-121 exakt die 8 Straenge; #114-Vorbehalt an der trigfix-Zeile geklaert = E07-Q1-Re-Run laeuft auf der final eingefrorenen dev-Linie (Rezept b10-beweislauf/BEWEIS.md Par. 9, Traeger Lead/Owner) und haengt NICHT am Worktree. STRUKTURELL (eigene Messung 20:49Z, Log z11-explore-global.log): fetch origin+github rc=0/0; dev lokal==origin==github==3841d7175086d5141fb28d6a401ae1ab4d137b30; alle 8 Branch-Heads exakt auf den Auftrags-Tips (41ee8780/c76d3116/1d38263b/6713156b/2809e4d4/0f900dcf/1c9f58a5/1e1bc199) und ALLE 8 merge-base --is-ancestor origin/development rc=0 (8/8); CI 286 Pipeline 16101 @ dev-Tip status=success, Nenner /jobs=27 (26 success + 1 manual relock), /bridges=0 (JSON-Kopien ci-pipelines-am-devtip.json, ci-jobs-16101.json, ci-bridges-16101.json) — Bedingung gruen+gemergt selbst am Objekt gemessen. Stash repo-global leer; keine nested Worktrees unter den 8 Pfaden (worktree list); Vendor-Submodul Q01-concurrentqueue in allen 8 UNinitialisiert (Prefix '-', find .git mindepth2 = 0/8). DESIGN (z11-sweep-8wt.log + z11-pruef2-ignored-messdaten.log): alle 8 status --porcelain = 0 Zeilen; ignored-Bestand nur extrahierte Vendor-Papierquellen (.extracted.marker-Klasse, Extraktionsprodukte getrackter Archive); Messdateien je Baum 8 csv/xlsx, davon 8/8 im Index getrackt, UNGETRACKTE Messdateien 0/8 Baeume — Verlustrisiko 0, daher keine untracked-Sicherung noetig (Ordner unberuehrt). Abweichungen zu den Vormessungen (Momentaufnahmen bestaetigt): skip97-build/ inzwischen WEG (r4-Raeumung 13:46Z), dafuer ph89/build NEU da (23M, nur gcc-release) — Doppel-Bedingung dort erfuellt: git ls-files build = 0 getrackte Dateien, csv/xlsx ausserhalb _deps = 0 (innerhalb _deps ebenfalls 0).",
+        "abnahme": "Eigene Objekt-Messung nach K18 (z11-abnahme.log, 20:53Z): 8/8 Zielpfade WEG und aus git worktree list ausgetragen (Nenner: 34 Eintraege vorher inkl. der 8, 26 nachher); jede Loeschung als EIGENER Schritt nach gelesener Pruef-Ausgabe (K14), git worktree remove OHNE --force, je Schritt Guard HEAD==Tip + porcelain leer, alle 8 remove-rc=0 (Logs loesch-1-s8kopf.log bis loesch-8-kampvor.log, ph89 zweistufig 5a/5b); alle 8 Branch-Refs bau/* stehen unveraendert auf ihren Tips (KEINE Branch-Loeschung — Lead-GO je Branch ausstehend); wt-ce-lande @ 53c5524e STEHT (bis Z27); Alt-Worktrees Abschn. 4, wt-ce-o2std (aktiver E-7-Strang, DIRTY), wt-ce-s19, wt-ce-messfenster, interne wf_*-Worktrees und /tmp-prunable-Eintrag UNBERUEHRT; ce-Hauptklon-Checkout porcelain=0 unveraendert; kein Merge, kein Push, kein Bau, kein Ledger-/Board-/Memory-Edit. Beweiskopien vollstaendig unter /home/comdare/backups-workflow/20260822-lande-zug/Z11/ (explore-global, sweep-8wt, pruef2, 8 Loesch-Logs, abnahme; nur Kopien zitiert).",
+        "geraeumt": "Build-Caches der 8 Straenge: nur ph89 trug einen (build/ 23M, Inhalt gcc-release) — nach erfuellter Doppel-Bedingung (tracked=0, csv/xlsx ausserhalb _deps=0) als eigener Schritt geraeumt (loesch-5a-ph89-build.log, df davor/danach im Log); skip97-build bereits durch Schlussstrecke r4 weg (Fremd-Beleg raeumung-r4.log, eigene Nachmessung: kein build/), die uebrigen 6 Straenge hatten frisch gemessen KEINE Build-Verzeichnisse. Worktree-Baeume: 8 Baeume a 188-212M entfernt. df /: vorher 25G frei (90%), nachher 27G frei (89%) — ca. 1.5-2G freigeraeumt (8 Baeume + 23M Cache).",
+        "worktree_geloescht": "wt-ce-s8kopf, wt-ce-s13schema, wt-ce-pmcpaket, wt-ce-vollzug91, wt-ce-ph89, wt-ce-trigfix, wt-ce-skip97, wt-ce-kampvor (8/8, je remove-rc=0, Verzeichnis-weg=JA, aus worktree list ausgetragen; wt-ce-lande NICHT geloescht — bleibt bis Z27)",
+        "restposten": [
+          "Strang-Branches bau/s8kopf..bau/kampvor: lokale Refs + origin-Refs stehen noch; Loeschung NUR mit Lead-GO je Branch (gruen+gemergt-Beweis liegt in Z11/z11-explore-global.log: 8/8 ancestor-rc=0 + CI 16101 SUCCESS); Remote-Loeschung = explizite Owner/Lead-Autorisierung",
+          "wt-ce-s19 (a1b348ae) + wt-ce-messfenster (3a746090): NICHT in der Z11-8er-Auftragsliste, stehen noch; beide Tips frisch gemessen ancestor von origin/development (rc=0/rc=0, z11-abnahme.log) — gleiche Raeum-Klasse, Traeger Lead bzw. Folge-Ziel nach derselben Doktrin",
+          "4 K17-Endstand-Baeume im ce-Hauptklon (build-l1 3.8G, build-l1-clang, build-dbg 8.1G, build-dbg-clang) + ccache: per r3-Uebergabe an Zug wf_b546634b, NICHT Z11-Umfang; stehen absichtlich (Beweis-/Wiederanlauf-Wert) mindestens bis W2-Vollaudit-BU — Traeger spaeterer Zug-Schritt",
+          "wt-ce-lande @ 53c5524e: O-6-rekursive Pruefung + Loeschung = Z27 (Zug-Ende); build/ dort bereits geraeumt (r4)",
+          "super-Hauptklon build-l4/ 3.4G untracked: CMAKE_HOME_DIRECTORY=<super>/Code = Bau aus dem SUPER-Baum, kein Cache der 8 ce-Straenge — Loeschung nur nach Doppel-Bedingung dort, Traeger Lead/super-Phase",
+          "#114 E07-Q1-Default-A-Re-Run auf final eingefrorener Trigger-Linie VOR Mi 26.08. 06:00 (Traeger Lead/Owner-Entscheid, Rezept b10-beweislauf/BEWEIS.md Par. 9) — von Z11 unberuehrt, b10-Beweisbaum nicht angefasst",
+          "Alt-Worktrees Inventur Abschn. 4 (18+1 enthaltene) + /tmp-Scratch prunable-Admin-Eintrag (ce-audit-7150cc51) + Archiv-Tafel A1-A23 + E1/E2-Entscheide: Lead-Schritte, unberuehrt",
+          "Board/Memory-Nachtraege (Lead-only): Z11-Vollzug in ZUG-BILANZ/Board #131 nachfuehren; Beweisort /home/comdare/backups-workflow/20260822-lande-zug/Z11/"
+        ]
+      },
+      {
+        "ziel": "Z12",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z13",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z14",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z15",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z16",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z17",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z18",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z19",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z20",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z21",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z22",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z23",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z24",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z25",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z26",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      },
+      {
+        "ziel": "Z27",
+        "status": "FEHLER",
+        "explore_befund": "agent null",
+        "abnahme": "-",
+        "restposten": [
+          "Agent starb - Lead pruefen"
+        ]
+      }
+    ],
+    "endstand": null
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Soll-Ist"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Inventur"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Plan"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Landung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Endstand"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "soll-ist:wellenplan",
+      "phaseIndex": 1,
+      "phaseTitle": "Soll-Ist",
+      "agentId": "a889a2680a5df5eac",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"gelandet\":56,\"gestrichen_ueberholt\":21,\"offen\":94,\"offene_posten_kurz\":[\"8 verbleibende ce-Merges auf lande/w2-s1s2: s8kopf 41ee8780, s13schema c76d3116, pmcpaket 1d38263b, vollzug91 6713156b, ph89 2809e4d4, trigfix 0f900dcf, skip97 1c9f58a5, kampvor 1e1bc199 (s19+messfenster BEREITS im Zweig 61d5d139); danach Endstand-Kombibau T-11b + Dual-Push\",\"super-Phase: s13schema 1e92b77e (KOPPLUNG ce-s13…",
+      "promptPreview": "FABLE-MAX WELLENPLAN-SOLL-IST (Owner-Order 22.08., erster Punkt).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ 61d5d139 = Merges 1/10 (…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "inventur:rekursiv",
+      "phaseIndex": 2,
+      "phaseTitle": "Inventur",
+      "agentId": "ad106fdae0f1a21d9",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"datei\":\"/home/comdare/backups-workflow/20260822-lande-zug/inventur.md\",\"kandidaten\":[{\"repo\":\"ce\",\"ref\":\"lande/w2-s1s2\",\"tip\":\"61d5d139\",\"einstufung\":\"LANDEN\",\"begruendung\":\"Zug-Traeger in wt-ce-lande: Merges 1/10 (s19 881d1a15) + 2/10 (messfenster 61d5d139) BEREITS GEFAHREN (Ancestor-Beweis beider Tips), clean; NUR LOKAL — keine origin-Ref, Push erst am Zug-Ende mit Gates 6/6 + gitleaks.\"},{\"re…",
+      "promptPreview": "FABLE-MAX VOLL-INVENTUR aller ungelandeten Strecken (read-only, KEIN Merge/Bau/Push).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ 61d5…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "plan:konsolidierung",
+      "phaseIndex": 3,
+      "phaseTitle": "Plan",
+      "agentId": "ac3fdc6c945c318e1",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziele\":[{\"id\":\"Z01\",\"repo\":\"super\",\"was\":\"T2/AB-02 [PFLICHT, ZEITKRITISCH]: Par.59-W18-Austragungs-Marker '[Par.59-MERGE-STEMPEL]' an beide Ledger-Stellen setzen (Entwurf a: AUSGETRAGEN-Marker unter die :23235-Zeile; Entwurf b: :23021-Nachtrag) — docs-only, Phase 0 des S1-Fahrplans\",\"worktree\":\"super-Hauptklon (development)\",\"quelle_tip\":\"ablock/lande-auflagen.md Abschn. 1 (Entwuerfe WORTFERTIG;…",
+      "promptPreview": "FABLE-MAX LANDE-PLAN-KONSOLIDIERUNG (read-only).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ 61d5d139 = Merges 1/10 (s19 a1b348ae) + 2…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "lande:Z01",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "afd9c40f9179bc29b",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z01 — T2/AB-02 [PFLICHT, ZEITKRITISCH vor Mi 26.08. 06:00]: Par.59/W18-Austragungs-Marker '[Par.59-MERGE-STEMPEL]' an beide Ledger-Stellen (Entwurf a: AUSGETRAGEN-Marker unter die K7a-Zeile; Entwurf b: Folge-TODO-Nachtrag), docs-only, Phase 0 des S1-Fahrplans, super-Hauptklon development.\",\"status\":\"SCHON_ENTHALTEN\",\"explore_befund\":\"DREI-ACHSEN-EXPLORE (alles selbst am Objekt gemessen, 2…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "lande:Z02",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a77e0021188776e0d",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z02 — Merge 3/10: bau/s8kopf @ 41ee8780 --no-ff in lande/w2-s1s2 (S-8-Traegerbau-KOPF), Worktree wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"\",\"status\":\"GELANDET\",\"merge_sha\":\"bc0561063f31c8a3f16573c9f93902d132f6c7d4\",\"explore_befund\":\"3-Achsen-Explore VOR dem Merge dokumentiert (~/backups-workflow/20260822-lande-zug/Z02/EXPLORE-BEFUND.md, 14:52 UTC) und von diesem Lauf eigenstaendig NAC…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "lande:Z03",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a9255fa3190b38706",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z03 - Merge 4/10: ce bau/s13schema @ c76d3116 --no-ff in lande/w2-s1s2 (wt-ce-lande), S13-01..03 CSV=Kind + Ziel-Filter + per-Binary-Mappe/Resume-Vertrag (#18/D-1, KON32-01); inkl. Sichtung/Vormerkung der 7 ph89-TEIL-6-Schema-Bedarfe und H-6-Kopplungs-Dokumentation\",\"status\":\"GELANDET\",\"merge_sha\":\"b283f86c5de8d065276fe85f25e2bc1f3afc4015\",\"explore_befund\":\"STRUKTURELL: merge-tree HEAD(bc…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "lande:Z04",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a705a87b9d968864b",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z04 — Merge 5/10: ce bau/pmcpaket @ 1d38263b --no-ff in lande/w2-s1s2 (#82/#83: I-PMC-2/3 + PMC-fail-loud), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"\",\"status\":\"GELANDET\",\"merge_sha\":\"9da4d21db88f0feaa8e858d13c6317d2e7b1e556\",\"explore_befund\":\"3-Achsen-Explore VOR Merge dokumentiert (/home/comdare/backups-workflow/20260822-lande-zug/Z04/EXPLORE-BEFUND-vor-merge.…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "lande:Z05",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "aeeaf60c3d5b6bcb7",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615238,
+      "lastProgressAt": 1787517615238,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z05 — Merge 6/10: ce bau/vollzug91 @ 6713156b --no-ff in lande/w2-s1s2 (#91-VOLLZUG E-3, V91-Beweissicherung), Worktree /home/comdare/wt-ce-lande\",\"status\":\"GELANDET\",\"merge_sha\":\"85a67b08975089d5abd44a22f8224e094dfb5322\",\"explore_befund\":\"Pflicht-Lektuere VOLL: SYNTHESE-S1 (118 Z.), SYNTHESE-S2 (83 Z.), GEGENLESE-GATE (168 Z.) + vollzug91/audit-runde-1.md (329 Z., juengste Runde — kein r…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "lande:Z06",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a08b615da3cf6826a",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615239,
+      "lastProgressAt": 1787517615239,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z06 — Merge 7/10: ce bau/ph89 @ 2809e4d4 --no-ff in lande/w2-s1s2 (#89 P-H: 33 Paper-Prueflinge, PV-4/R-4-Haerte, I-5, M14, D-09), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"\",\"status\":\"GELANDET\",\"merge_sha\":\"a58f77b5aa6021114a82df9828f27867ce33f2ad\",\"explore_befund\":\"3-Achsen-Explore VOR Merge dokumentiert (/home/comdare/backups-workflow/20260822-lande-zug/Z06/ex…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "lande:Z07",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ac6a0fde1a0380482",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615239,
+      "lastProgressAt": 1787517615239,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z07 — Merge 8/10: ce bau/trigfix @ 0f900dcf --no-ff in lande/w2-s1s2 (E-7/R-12 E07-Gate-Pruefer + E-8/R-13 bytes_in_use_peak-Demo-Fix) inkl. der im Auftrag benannten ersetze()-npos-Haertung (KLEIN-1), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"\",\"status\":\"GELANDET\",\"merge_sha\":\"f7b640399444f5b1fb92a20769dc02ee7d9411b9\",\"explore_befund\":\"3-Achsen-Explore VOR Eingri…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "lande:Z08",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ad679f4ca8fd74e00",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615239,
+      "lastProgressAt": 1787517615239,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z08 — Merge 9/10: ce bau/skip97 @ 1c9f58a5 --no-ff in lande/w2-s1s2 (#97/E-12: C-13 Skip-Oekonomie + C-14 Bestandslog-SKIP-Wache + S97-F1 Mess-Genus-Schwester/F1-Leer-Zellen-Wache Weg 2), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"\",\"status\":\"GELANDET\",\"explore_befund\":\"HISTORISCH: T11-Pflicht erfuellt — Merge-Tip 1c9f58a5 (NICHT 100c32d2; Parent-Kette selbst geme…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "lande:Z09",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ac28ded133107c6b6",
+      "model": "fable",
+      "state": "done",
+      "startedAt": 1787517615239,
+      "lastProgressAt": 1787517615239,
+      "cached": true,
+      "resultPreview": "{\"ziel\":\"Z09 — Merge 10/10: ce bau/kampvor @ 1e1bc199 --no-ff in lande/w2-s1s2 (Kampagnen-Vorstaffel, ce-Haelfte; E-10 Generator-Haelfte window_belongs_to + E-20/R-15 Pin-Pflicht-Deklaration), Worktree /home/comdare/wt-ce-lande, Bauslot slot2.d \\\"lande-w2-zug\\\"; inkl. T12: P-25-Vorbedingung IM Zug + P-26 ci.skip-API-Nachpruefung Projekt 286\",\"status\":\"GELANDET\",\"merge_sha\":\"b4c593f5fa65201a6b3876d…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "lande:Z10",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a92b1daf1d140ed68",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787517615247,
+      "queuedAt": 1787517615239,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Z10 — ce-Endstand: lande/w2-s1s2 --no-ff in development, H-…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787517794225,
+      "tokens": 52477,
+      "toolCalls": 7,
+      "durationMs": 178977,
+      "resultPreview": "{\"ziel\":\"Z10 — ce-Endstand: lande/w2-s1s2 --no-ff in development, H-5/F-10-Nachzug + F-14-Sichtung, K17/T-11b-Endstand-Kombibau, Gates 6/6 + gitleaks, Dual-Push, CI 286 gruen — per WIEDERANLAUF-LAGE Z10 (Lead 23.08. ~20:45Z) bereits am Objekt vollzogen; Auftrag dieses Schritts: KURZ-Verifikation + GELANDET-Verbuchung, NICHTS mergen/pushen/bauen/raeumen\",\"status\":\"GELANDET\",\"merge_sha\":\"5ddda4e57c9…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "lande:Z11",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a1b9653f92843283f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1787517794226,
+      "queuedAt": 1787517794226,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Z11 — ce-Raeumfenster NACH CI-gruen: Build-Caches + Worktre…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787518484683,
+      "tokens": 122381,
+      "toolCalls": 24,
+      "durationMs": 690456,
+      "resultPreview": "{\"ziel\":\"Z11 — ce-Raeumfenster NACH CI-gruen: Build-Caches + Worktrees der 8 gelandeten Straenge raeumen (wt-ce-s8kopf, wt-ce-s13schema, wt-ce-pmcpaket, wt-ce-vollzug91, wt-ce-ph89, wt-ce-trigfix, wt-ce-skip97, wt-ce-kampvor)\",\"status\":\"GELANDET\",\"explore_befund\":\"HISTORISCH: ZUG-BILANZ.md Abschn. 9 (r3-Endstand 23.08. 20:15Z) + slot2.d/wer-Terminal-Marker: Schlussstrecke r4 BEENDET, Push 3841d717…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "lande:Z12",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a745560ba5c2f0c3b",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787518484685,
+      "queuedAt": 1787518484684,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "cd /home/comdare/wt-ce-o2std && git show f82dfaeb --stat --…",
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519257585,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 136535,
+      "toolCalls": 50,
+      "durationMs": 772900
+    },
+    {
+      "type": "workflow_agent",
+      "index": 16,
+      "label": "lande:Z13",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "aca2c6bf77b44917d",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519257586,
+      "queuedAt": 1787519257585,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519258078,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 492
+    },
+    {
+      "type": "workflow_agent",
+      "index": 17,
+      "label": "lande:Z14",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ab2be0a26085ccc17",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519258078,
+      "queuedAt": 1787519258078,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519258426,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 348
+    },
+    {
+      "type": "workflow_agent",
+      "index": 18,
+      "label": "lande:Z15",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "af5beb210af401ccb",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519258427,
+      "queuedAt": 1787519258426,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519258802,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 375
+    },
+    {
+      "type": "workflow_agent",
+      "index": 19,
+      "label": "lande:Z16",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a47b4d7eb72ea6d77",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519258802,
+      "queuedAt": 1787519258802,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519259152,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 350
+    },
+    {
+      "type": "workflow_agent",
+      "index": 20,
+      "label": "lande:Z17",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ac989f5487acb93cd",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519259152,
+      "queuedAt": 1787519259152,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519259481,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 329
+    },
+    {
+      "type": "workflow_agent",
+      "index": 21,
+      "label": "lande:Z18",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a99547455563a1de1",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519259482,
+      "queuedAt": 1787519259482,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519259960,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 478
+    },
+    {
+      "type": "workflow_agent",
+      "index": 22,
+      "label": "lande:Z19",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ab37d9c719addcd2d",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519259961,
+      "queuedAt": 1787519259961,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519260534,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 573
+    },
+    {
+      "type": "workflow_agent",
+      "index": 23,
+      "label": "lande:Z20",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a3a8adc6cdedb360b",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519260534,
+      "queuedAt": 1787519260534,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519260880,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 345
+    },
+    {
+      "type": "workflow_agent",
+      "index": 24,
+      "label": "lande:Z21",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a95243737073421b3",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519260880,
+      "queuedAt": 1787519260880,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519261266,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 386
+    },
+    {
+      "type": "workflow_agent",
+      "index": 25,
+      "label": "lande:Z22",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "aad98399a47fbc790",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519261266,
+      "queuedAt": 1787519261266,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519261640,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 374
+    },
+    {
+      "type": "workflow_agent",
+      "index": 26,
+      "label": "lande:Z23",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a40a12f19301e8a03",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519261640,
+      "queuedAt": 1787519261640,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519261977,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 337
+    },
+    {
+      "type": "workflow_agent",
+      "index": 27,
+      "label": "lande:Z24",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a05428830a3cb6ef6",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519261977,
+      "queuedAt": 1787519261977,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519262350,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 373
+    },
+    {
+      "type": "workflow_agent",
+      "index": 28,
+      "label": "lande:Z25",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "ab3c7eef111641df7",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519262351,
+      "queuedAt": 1787519262351,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519262803,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 452
+    },
+    {
+      "type": "workflow_agent",
+      "index": 29,
+      "label": "lande:Z26",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "a7ca9c803ad36272b",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519262804,
+      "queuedAt": 1787519262804,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519263249,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 445
+    },
+    {
+      "type": "workflow_agent",
+      "index": 30,
+      "label": "lande:Z27",
+      "phaseIndex": 4,
+      "phaseTitle": "Landung",
+      "agentId": "acc46d9f6e2bee0b6",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519263250,
+      "queuedAt": 1787519263250,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX LANDE-SCHRITT (SEQUENTIELL - du bist der EINZIGE Schreiber; slot2 gehoert dir).\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ …",
+      "lastProgressAt": 1787519263616,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 366
+    },
+    {
+      "type": "workflow_agent",
+      "index": 31,
+      "label": "endstand:bilanz",
+      "phaseIndex": 5,
+      "phaseTitle": "Endstand",
+      "agentId": "a9872848849cbf3bc",
+      "model": "claude-fable-5",
+      "state": "error",
+      "startedAt": 1787519263626,
+      "queuedAt": 1787519263616,
+      "attempt": 1,
+      "promptPreview": "FABLE-MAX ENDSTAND-PRUEFUNG DES LANDE-ZUGS.\nSTAND (22.08.2026, vom Lead gemessen):\n- ce-Repo (Submodul-Hauptklon): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, dev lokal==origin f729b93a, CI 16088 SUCCESS. Floor-Anker 524/520/518.\n- Lande-Worktree /home/comdare/wt-ce-lande, Branch lande/w2-s1s2 @ 61d5d139 = Merges 1/10 (s19 a1b348ae) + 2/10 (…",
+      "lastProgressAt": 1787519263972,
+      "error": "You're out of usage credits. Run /usage-credits to keep using Fable 5 or /model to switch models.",
+      "tokens": 0,
+      "toolCalls": 0,
+      "durationMs": 346
+    }
+  ],
+  "totalTokens": 311393,
+  "totalToolCalls": 81
+}

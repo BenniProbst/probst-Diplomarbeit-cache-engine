@@ -1,0 +1,24 @@
+commit a23e6cdaae895147fb8fed449b8b6b76c1d1c24a
+Author:     Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+AuthorDate: Mon Aug 24 18:15:25 2026 +0000
+Commit:     Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+CommitDate: Mon Aug 24 18:15:25 2026 +0000
+
+    W2-Lande-Zug ATOMAR (Z23): Gitlink ce -> 943c70ee + prt-art -> 16c90628 + PZW-9.5-Nachzug
+    
+    Gitlink ce 66de5c09 -> 943c70ee (45 Commits: die 10 S1+S2-Lande-Merges s19/messfenster/s8kopf/s13schema/pmcpaket/vollzug91/ph89/trigfix/skip97/kampvor + H-5/F-10-Nachzug + o2-standard/E-7 + axis-lock-Regen; dev-CI 286: 16150 SUCCESS @ 943c70ee; K17/T-11b-Endstand-Kombibau 4 Zellen verbucht) PLUS Gitlink prt-art d11781fa -> 16c90628 (10 Commits: pinduo + w1luecken-prtart/B14 nach Rezept #107; dev-CI 287: 16184 SUCCESS @ 16c90628) PLUS PZW-Anker-Nachzug IM SELBEN Commit (Designplan 9.5: CE-SHA -> 943c70ee, STELLEN 42->44, DATEIEN 23->24, LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0, Nenner 530->564 Test-.cpp / 2968 Z. YML; LIVE mit den Formeln der Wache selbst, Gegenprobe Bissproben-Kanal rc=0 '5 von 5 Ankern').
+    
+    H-6-Kopplung mit diesem Bump beidseitig live (super-XSD-Subset 1e92b77e/Z16 + ce-s13 im Endstand); L-01-Zugkopplung erfuellt: np34-Patch 16893298 faehrt im selben Push-Zug (Frist Mi 26.08. 06:00 eingehalten). Fixture-Spiegel vorab geprueft: golden.xml-Instanzen beidseitig unveraendert seit KON119-Sync (Substanz 8234286c), kern_seam-Fixture ce-seitig unveraendert 66de..943c, Subset-Wache per Z16 gruen-bewiesen. Zaehlwerke EINMAL live gezaehlt, keine Deltas (KON119-Muster).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+ Code/external/comdare-cache-engine                  |  2 +-
+ Code/external/comdare-prt-art                       |  2 +-
+ ...0808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md | 21 ++++++++++++++++++---
+ 3 files changed, 20 insertions(+), 5 deletions(-)
+---GITLINKS AM HEAD---
+160000 commit 943c70ee52796da8dede7ace1bf3a370a0994d16	Code/external/comdare-cache-engine
+160000 commit 16c90628651fd50538d1448d4e68a151ba6fbb9f	Code/external/comdare-prt-art
+---REMOTE-STAENDE NACH PUSH---
+a23e6cdaae895147fb8fed449b8b6b76c1d1c24a	refs/heads/development
+a23e6cdaae895147fb8fed449b8b6b76c1d1c24a	refs/heads/development

@@ -1,0 +1,16 @@
+=== BEWEIS Z01/AB-02 — Remote-Deckung + Ancestor-Kette, 22.08.2026 ===
+--- ls-remote origin development ---
+93542880b9e1f956ea018d32cfa83754d9de3532	refs/heads/development
+--- ls-remote github development ---
+93542880b9e1f956ea018d32cfa83754d9de3532	refs/heads/development
+--- lokal development ---
+e6c90277fb2d346417a67aa087b24ff0eefdb655
+MERGE-BASE-BEWEIS: 38fd6270 IST Ancestor von 93542880 (= Stand BEIDER Remotes)
+MERGE-BASE-BEWEIS: 38fd6270 IST Ancestor von HEAD e6c90277
+--- Commit-Metadaten ---
+38fd6270cd626fbe903b19aa0d70d901f430a8d5
+2026-08-22 12:04:32 +0000
+Benjamin-Elias Probst
+ledger: T2-docs-Zug — Par.59-MERGE-STEMPEL-Austragungs-Marker (AB-02, owner-verboten per E2/DV-1, kein Trigger-Bau) + 69.6-Worker-Marker (AB-05) + JB-4-Inventar-Nachbuchung (AB-06); Marker AM ORT, Zeilen bleiben
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+

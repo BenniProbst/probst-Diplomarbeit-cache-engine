@@ -1,0 +1,89 @@
+++ date -Is
++ echo '=== J-0b CONFIGURE 2026-08-22T06:34:10+00:00 ==='
+=== J-0b CONFIGURE 2026-08-22T06:34:10+00:00 ===
++ tail -5
++ cmake --preset gcc-release -DCOMDARE_CE_PRUEFLINGE=
+-- 
+-- Registrierungs-Protokoll: 6 bedingte Registrierungs-Bloecke vermerkt -> /home/comdare/wt-ce-ph89/build/gcc-release/comdare_registrierungs_protokoll.txt
+-- Configuring done (0.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: /home/comdare/wt-ce-ph89/build/gcc-release
++ echo RC_J0b=0
+RC_J0b=0
+++ date -Is
++ echo '=== J-1 SIEBEN WERKZEUGE 2026-08-22T06:34:11+00:00 ==='
+=== J-1 SIEBEN WERKZEUGE 2026-08-22T06:34:11+00:00 ===
++ tail -4
++ cmake --build --preset gcc-release --target comdare_adhoc_emitter_cli comdare_anatomy_codegen_cli comdare_axis_registry_gen comdare_catalog_codegen_cli comdare_measurement_axis_registry_gen comdare_overlay_source_hash_gen comdare_system_axis_registry_gen
+[50/54] Building CXX object tools/axis_registry_gen/CMakeFiles/comdare_axis_registry_gen.dir/main.cpp.o
+[51/54] Linking CXX executable tools/axis_registry_gen/comdare_axis_registry_gen
+[52/54] Building CXX object apps/adhoc_emitter/CMakeFiles/comdare_adhoc_emitter_cli.dir/main.cpp.o
+[53/54] Linking CXX executable apps/adhoc_emitter/comdare-adhoc-emitter
++ echo RC_J1=0
+RC_J1=0
+++ date -Is
++ echo '=== RE-CONFIGURE 2026-08-22T06:34:23+00:00 ==='
+=== RE-CONFIGURE 2026-08-22T06:34:23+00:00 ===
++ cmake --preset gcc-release -DCOMDARE_CE_PRUEFLINGE=
++ tail -3
+-- Configuring done (0.2s)
+-- Generating done (0.3s)
+-- Build files have been written to: /home/comdare/wt-ce-ph89/build/gcc-release
++ echo RC_RECONF=0
+RC_RECONF=0
+++ date -Is
++ echo '=== ALL 2026-08-22T06:34:23+00:00 ==='
+=== ALL 2026-08-22T06:34:23+00:00 ===
++ cmake --build --preset gcc-release --target all
++ tail -6
+[2509/2515] Linking CXX executable tests/unit/test_vl3_debug_flag_sperre
+[2510/2515] Linking CXX executable tests/unit/test_check_size_cli_deckel
+[2511/2515] Building CXX object tests/unit/CMakeFiles/test_t2a_f4_facade_plan_durchreichung.dir/test_t2a_f4_facade_plan_durchreichung.cpp.o
+[2512/2515] Linking CXX executable tests/unit/test_t2a_f4_facade_plan_durchreichung
+[2513/2515] Building CXX object tests/unit/CMakeFiles/test_d37b_modus_riegel.dir/test_d37b_modus_riegel.cpp.o
+[2514/2515] Linking CXX executable tests/unit/test_d37b_modus_riegel
++ echo RC_ALL=0
+RC_ALL=0
+++ date -Is
++ echo '=== FACADE 2026-08-22T06:36:48+00:00 ==='
+=== FACADE 2026-08-22T06:36:48+00:00 ===
++ cmake --build --preset gcc-release --target comdare_facade
++ tail -3
+[0/2] Re-checking globbed directories...
+ninja: error: unknown target 'comdare_facade'
++ echo RC_FACADE=0
+RC_FACADE=0
++ cmake --build --preset gcc-release --target comdare_profile_run_facade
++ tail -3
+[0/2] Re-checking globbed directories...
+[1/6] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3420405 Bytes, sha512=9c3a0bb29a31a523... (unveraendert)
++ echo RC_FACADE2=0
+RC_FACADE2=0
+++ date -Is
++ echo '=== TESTS 2026-08-22T06:36:48+00:00 ==='
+=== TESTS 2026-08-22T06:36:48+00:00 ===
++ cmake --build --preset gcc-release --target comdare_tests
++ tail -3
+[6/9] Generating CXX dyndep file tests/unit/CMakeFiles/test_profile_roundtrip.dir/CXX.dd
+[7/9] Building CXX object tests/unit/CMakeFiles/test_profile_roundtrip.dir/thesis_tiere/test_profile_roundtrip.cpp.o
+[8/9] Linking CXX executable tests/unit/test_profile_roundtrip
++ echo RC_TESTS=0
+RC_TESTS=0
+++ date -Is
++ echo '=== CTEST VOLL 2026-08-22T06:36:51+00:00 ==='
+=== CTEST VOLL 2026-08-22T06:36:51+00:00 ===
+++ head -1
+++ ls -d build
++ BUILDDIR=build
++ cd build
++ ctest --no-tests=error --output-on-failure
++ tail -15
+Test project /home/comdare/wt-ce-ph89/build
+No tests were found!!!
+Errors while running CTest
++ echo RC_CTEST=0
+RC_CTEST=0
+++ date -Is
++ echo '=== ENDMARKE_TREPPE_FERTIG 2026-08-22T06:36:51+00:00 ==='
+=== ENDMARKE_TREPPE_FERTIG 2026-08-22T06:36:51+00:00 ===

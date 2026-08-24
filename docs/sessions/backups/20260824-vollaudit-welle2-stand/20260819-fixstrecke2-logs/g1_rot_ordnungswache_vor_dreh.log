@@ -1,0 +1,8 @@
+g++ (GCC) 15.3.0
+libs/cache_engine/topics/axis.hpp:18:9: warning: ‘#pragma once’ in main file [-Wpragma-once-outside-header]
+   18 | #pragma once
+      |         ^~~~
+libs/cache_engine/topics/axis.hpp:151:71: error: static assertion failed: V-01R/KON101 (Owner 17.08.: 'definitiv mit drehen'): die AxisKind-Enumeratoren stehen NICHT in der Kategorien-Ordnung MESS, SYSTEM, ORGAN. Enum-Bloecke umsortieren -- nie die Kategorien-Zuordnung an eine falsche Ordnung anpassen.
+  151 | static_assert(detail::axis_kind_ordinale_folgen_der_kategorien_ordnung(),
+      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+EXIT=1

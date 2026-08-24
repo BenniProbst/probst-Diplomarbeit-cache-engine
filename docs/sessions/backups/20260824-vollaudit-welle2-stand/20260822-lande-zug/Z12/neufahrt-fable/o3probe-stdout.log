@@ -1,0 +1,16 @@
+== O3-PROBE START 2026-08-24T11:50:11Z HEAD=943c70ee ==
+-- (1) Opt-in ON: WARNING + Statuszeile muessen feuern --
+PROBE_ON_RC=0
+2:  COMDARE_OPT_O3=ON: Release-Builds tragen -O3 statt des O2-Standards
+17:-- Release-Optimierung: -O3 (COMDARE_OPT_O3-Opt-in unter Warnung)
+-- (2) Restore OFF: O2-Statuszeile + Cache-Wert --
+RESTORE_OFF_RC=0
+1:-- Release-Optimierung: -O2 (O2-Standard, Owner-Entscheid 21.08.2026)
+COMDARE_OPT_O3:BOOL=OFF
+-- (3) No-Op-Kontrolle nach Restore (Baum baulich unveraendert) --
+NOOP_RC=0 zeilen=1783
+[1745/1747] Building CXX object tests/unit/CMakeFiles/test_lg_e2e_xlsx_facade.dir/test_lg_e2e_xlsx_facade.cpp.o
+[1746/1747] Linking CXX executable tests/unit/test_lg_e2e_xlsx_facade
+-- (4) ctest -N Schlusszeile (Inventur unveraendert) --
+Total Tests: 545
+== O3-PROBE ENDE 2026-08-24T11:51:54Z ==

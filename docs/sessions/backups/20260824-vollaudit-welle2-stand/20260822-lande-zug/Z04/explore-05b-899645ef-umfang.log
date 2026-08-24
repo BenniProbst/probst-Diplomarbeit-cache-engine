@@ -1,0 +1,5 @@
+== 899645ef voller Umfang (name-status) ==
+899645ef60240f3c27c3d3ad2020cda3b8349c88 fix(planner): PMC-Probe misst Fenster-Gueltigkeit + Befund-Vermerk auf stderr — CI 16073/382856
+
+M	libs/cache_engine/profile_facade/planner/pmc_host_probe.hpp
+M	libs/cache_engine/profile_facade/profile_run_facade.cpp

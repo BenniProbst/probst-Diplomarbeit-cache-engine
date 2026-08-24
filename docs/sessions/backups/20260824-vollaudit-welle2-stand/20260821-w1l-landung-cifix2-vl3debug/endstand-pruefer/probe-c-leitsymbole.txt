@@ -1,0 +1,65 @@
+FULL-JOIN-ENDPROBE (c): Leitsymbol-Greps am Endstand 3841d717 -- 2026-08-23T20:08:14Z
+Werkzeug: git grep (nur getrackte Dateien; NIE 'grep -v /build' -- frisst /builder/).
+
+pmc_raw_event_katalog                  Treffer=14   Dateien=7
+    libs/cache_engine/builder/linux_perf_pmc_source.hpp
+    libs/cache_engine/include/cache_engine/measurement/pmc_event_set.hpp
+    libs/cache_engine/include/cache_engine/measurement/pmc_raw_event_katalog.hpp
+    libs/cache_engine/include/cache_engine/measurement/pmc_source.hpp
+paper_pruefling_registry               Treffer=43   Dateien=39
+    docs/architecture/20260821-d09-pruefling-drittes-konzept-s19-input.md
+    libs/cache_engine/algorithm_profiles/paper_experiments/art.experiment.xml
+    libs/cache_engine/algorithm_profiles/paper_experiments/b2tree.experiment.xml
+    libs/cache_engine/algorithm_profiles/paper_experiments/bender_cacheoblivious.experiment.xml
+e07_gate_kriterien                     Treffer=10   Dateien=4
+    libs/cache_engine/profile_facade/e07_gate_kriterien.hpp
+    scripts/ci_test_inventory_floor.txt
+    tests/unit/CMakeLists.txt
+    tests/unit/test_e07_gate_kriterien.cpp
+test_c13_selektiver_rebuild            Treffer=10   Dateien=3
+    scripts/ci_test_inventory_floor.txt
+    tests/unit/CMakeLists.txt
+    tests/unit/test_c13_selektiver_rebuild.cpp
+test_c14_lager_presence_wache          Treffer=13   Dateien=5
+    libs/cache_engine/builder/bestandslog/lager_presence.hpp
+    scripts/ci_test_inventory_floor.txt
+    tests/unit/CMakeLists.txt
+    tests/unit/test_c14_lager_presence_wache.cpp
+test_c14_messwert_presence_wache       Treffer=8    Dateien=4
+    libs/cache_engine/builder/bestandslog/messwert_registrierung.hpp
+    scripts/ci_test_inventory_floor.txt
+    tests/unit/CMakeLists.txt
+    tests/unit/test_c14_messwert_presence_wache.cpp
+PinPflichtDeklarationR15ImMessBatch    Treffer=1    Dateien=1
+    tests/unit/thesis_tiere/test_experiment_plan_director.cpp
+window_belongs_to                      Treffer=21   Dateien=4
+    libs/cache_engine/builder/bestandslog/batch_planner.hpp
+    libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp
+    tests/unit/test_g3_batch_planner.cpp
+    tests/unit/thesis_tiere/test_experiment_plan_director.cpp
+
+-- Sonderfall pmc_raw_event_katalog: Null-Befund AUFKLAEREN (nie stille Null) --
+verwandte pmc_raw-/Katalog-Namen im Baum:
+libs/cache_engine/builder/linux_perf_pmc_source.hpp
+libs/cache_engine/builder/pmc_startup_pruefung.hpp
+libs/cache_engine/include/cache_engine/measurement/pmc_event_set.hpp
+libs/cache_engine/include/cache_engine/measurement/pmc_raw_event_katalog.hpp
+libs/cache_engine/include/cache_engine/measurement/pmc_source.hpp
+libs/cache_engine/profile_facade/planner/pmc_host_probe.hpp
+tests/unit/test_pmc_raw_event_katalog.cpp
+tests/unit/thesis_tiere/test_experiment_plan_director.cpp
+
+kPmcEvents (der tatsaechliche Event-Katalog des Zuges):
+libs/cache_engine/builder/linux_perf_pmc_source.hpp:460:        // 10.08.2026 (PMC-Meta-Meta-Achse): type/config/Name kommen aus measurement::kPmcEvents -- DEM
+libs/cache_engine/builder/linux_perf_pmc_source.hpp:463:        // .data() ist hier NUL-terminiert: jedes kPmcEvents[i].name ist im Event-Set-Header aus einem
+libs/cache_engine/builder/linux_perf_pmc_source.hpp:466:        l1d_oc_       = oeffne_generisch_(c_l1d_, cme::kPmcEvents[cme::kPmcEventIndexL1d].type,
+libs/cache_engine/builder/linux_perf_pmc_source.hpp:467:                                          cme::kPmcEvents[cme::kPmcEventIndexL1d].config,
+libs/cache_engine/builder/linux_perf_pmc_source.hpp:468:                                          cme::kPmcEvents[cme::kPmcEventIndexL1d].name.data(), l1d_domaene_);
+
+pmc_event_biss (der Z04/pmcpaket-Kern, Merge 5/10):
+Treffer gesamt: 8
+    libs/cache_engine/builder/pmc_startup_pruefung.hpp
+    libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp
+    libs/cache_engine/profile_facade/planner/pmc_host_probe.hpp
+    tests/unit/support/pmc_stdout_maskierung.hpp
+    tests/unit/test_vl3_debug_stdout_bytegleich.cpp

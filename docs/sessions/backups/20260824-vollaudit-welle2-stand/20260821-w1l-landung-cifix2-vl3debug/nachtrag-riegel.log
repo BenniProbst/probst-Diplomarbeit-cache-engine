@@ -1,0 +1,42 @@
+=== NACHTRAG RIEGEL (23.08.2026, cifix3 nach CI 16095/383091) ===
+ENTSCHEID: Weg B (Z10-Vorschlag) -- Env-Riegel COMDARE_PMC_PROBE_AUS an der EINEN Erhebungsstelle
+(construct_plan_into, profile_run_facade.cpp); Maskierung b6698eaf bleibt als Drift-Wache (inert im Regelfall).
+
+--- 383091-SIMULATION (Riegel-AN vs Riegel-AUS, plan ci, prod1): Diff = EXAKT die CI-Flaechen ---
+56,57c56,57
+<     # PMC-BEFUND lage=unbrauchbar vendor=unbekannt events=0/0 biss=[] quelle=nicht_erhoben grund=probe_per_env_riegel_nicht_gefahren beweist-nicht=runner-host
+<     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+---
+>     # PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host
+>     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+67c67
+<     - cmake -B build-clang -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=clang-22 -DCMAKE_CXX_COMPILER=clang++-22
+---
+>     - cmake -B build-clang -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=clang-22 -DCMAKE_CXX_COMPILER=clang++-22
+106,107c106,107
+<     # PMC-BEFUND lage=unbrauchbar vendor=unbekannt events=0/0 biss=[] quelle=nicht_erhoben grund=probe_per_env_riegel_nicht_gefahren beweist-nicht=runner-host
+<     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+---
+>     # PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host
+>     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCOMDARE_PMC_VENDOR=amd -DCMAKE_BUILD_TYPE=Release -UCOMDARE_MEASUREMENT_COMBO -DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15
+
+--- Riegel-AN stderr-Vermerk ---
+[dump-plan] PMC-BEFUND lage=unbrauchbar vendor=unbekannt events=0/0 biss=[] quelle=nicht_erhoben grund=probe_per_env_riegel_nicht_gefahren beweist-nicht=runner-host
+
+--- GRUEN je Bauform (Endstand nach clang-format) ---
+gcc-Debug   build-dbg:          3/3 Passed (Director+Sperre+Bytegleich), 8/8 Einzelfaelle, 20x ctest GGGG..G stabil
+gcc-Release build-cifix2-rel:   3/3 Passed + Endstand-Rebuild 1/1
+clang-22-Rel build-clang-cifix2: 3/3 Passed + Endstand-Rebuild 1/1
+clang-format-22 --dry-run -Werror: rc=0 nach -i; Non-ASCII in neuen Zeilen: 0
+VERMERK 23.08.: 5a8e2841 (Weg B, Env-Riegel COMDARE_PMC_PROBE_AUS) durch LEAD-ENTSCHEID verworfen
+(Weg a = Define-Maskierung test-lokal; Riegel = neue Produkt-Abschalt-Oberflaeche ohne Owner-Wort verboten,
+Konflikt fail-loud #83). Commit war NUR lokal, nie gepusht; Patch hier als Beleg, dann reset auf b6698eaf.
+
+=== FORM-(c)-BEWEISE (23.08., Weg a nach Lead-Entscheid; Vorlage Z10/form-c-define-maskierung-VORLAGE.md) ===
+PROZESSBEWEIS an ECHTEN Lage-Kipp-Bytes (plan ci, unbrauchbar-Form vs amd-Form, /tmp/cifix3-Paar):
+  roh_gleich=0 maskiert_gleich=1 zeilen=2/2 define_tokens=0/3 stages_mutation_bleibt_ungleich=1 (rc=0)
+  -> Formen (b)+(c) decken den 383091-Kipp voll; 0/3-Asymmetrie = die drei Hunks @@ -54/-65/-104
+K13-MUTATION Form (c): Token intel->intex im Helfer -> Test #514 ***Failed rc=8, Text literal
+  'Form (c) muss den intel-Define-Kipp beidseitig normalisieren' (k13-formc-mutation-ROT.log)
+  Mutation zurueck -> 3x GRUEN gcc-dbg (GGG) + gcc-Release 1/1 + clang-22-Release 1/1; 8/8 Einzelfaelle
+clang-format-22 rc=0; neue Zeilen 0 Non-ASCII; Helfer +45/-5, Test +53

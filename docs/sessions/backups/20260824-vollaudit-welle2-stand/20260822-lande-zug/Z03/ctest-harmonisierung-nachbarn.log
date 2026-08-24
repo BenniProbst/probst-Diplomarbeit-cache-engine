@@ -1,0 +1,35 @@
+Test project /home/comdare/wt-ce-lande/build/gcc-release
+    Start 335: test_t2a_f4_facade_plan_durchreichung
+1/5 Test #335: test_t2a_f4_facade_plan_durchreichung ...   Passed    2.56 sec
+    Start 516: test_lg_e2e_xlsx_facade
+2/5 Test #516: test_lg_e2e_xlsx_facade .................   Passed    0.01 sec
+    Start 530: test_s13_02_zielfilter_vier_faelle
+3/5 Test #530: test_s13_02_zielfilter_vier_faelle ......   Passed    0.03 sec
+    Start 531: test_s13_01_csv_kind_projektion
+4/5 Test #531: test_s13_01_csv_kind_projektion .........   Passed    0.01 sec
+    Start 532: test_s13_03_per_binary_mappe
+5/5 Test #532: test_s13_03_per_binary_mappe ............   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+bau_filter        =   2.56 sec*proc (1 test)
+bestandslog       =   2.56 sec*proc (1 test)
+csv_kind          =   0.01 sec*proc (1 test)
+e2e               =   0.01 sec*proc (1 test)
+facade            =   2.61 sec*proc (3 tests)
+koeder            =   0.04 sec*proc (3 tests)
+lager             =   0.01 sec*proc (1 test)
+lg                =   0.01 sec*proc (1 test)
+mappe             =   0.02 sec*proc (2 tests)
+naht              =   0.01 sec*proc (1 test)
+per_binary        =   0.01 sec*proc (1 test)
+projektion        =   0.01 sec*proc (1 test)
+resume_vertrag    =   0.01 sec*proc (1 test)
+s13               =   0.04 sec*proc (3 tests)
+standalone        =   2.59 sec*proc (2 tests)
+writeback         =   0.03 sec*proc (1 test)
+xlsx              =   0.01 sec*proc (1 test)
+zielfilter        =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   2.62 sec

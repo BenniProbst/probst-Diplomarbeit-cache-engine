@@ -1,0 +1,37 @@
+-- The CXX compiler identification is GNU 15.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The C compiler identification is GNU 15.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- [PRT-ART V9.4] legacy_reimpl/ skipped (default OFF).
+CMake Warning at prt_art/registry_gen/CMakeLists.txt:29 (message):
+  prt_art_axis_registry_gen: COMDARE_CE_GENERATED_DIR nicht gesetzt.
+
+  Das golden-verdrahtete PathCompression-Organ zieht die CMake-generierte
+  flags.hpp der cache-engine.
+
+  Setze -DCOMDARE_CE_GENERATED_DIR=<cache-engine-build>/generated (Build
+  zuvor konfigurieren).
+
+
+-- ──────────────────────────────────────────────────────────
+-- comdare-prt-art 0.1.0
+--   C++ Standard            : 23
+--   Cache-Engine Werkzeug   : /home/comdare/Projekte/Research/comdare-prt-art/ce-pin
+--   Use Cache-Engine sub    : OFF
+--   Build Tests             : ON
+--   Build Legacy-Reimpl V9.4: OFF
+-- ──────────────────────────────────────────────────────────
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/comdare/Projekte/Research/comdare-prt-art/build-z15-gcc-rel

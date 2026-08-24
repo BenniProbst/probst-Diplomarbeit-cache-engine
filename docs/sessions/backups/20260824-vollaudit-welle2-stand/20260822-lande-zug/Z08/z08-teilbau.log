@@ -1,0 +1,23 @@
+[0/2] Re-checking globbed directories...
+[1/39] Generating CXX dyndep file tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/CXX.dd
+[2/37] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3420405 Bytes, sha512=9c3a0bb29a31a523... (unveraendert)
+[3/37] Generating CXX dyndep file libs/common/serialization/xml_config_parser/CMakeFiles/comdare_builder_xml_config_parser.dir/CXX.dd
+[4/35] Generating CXX dyndep file apps/is_original_validator/CMakeFiles/is_original_validator.dir/CXX.dd
+[5/21] Scanning /home/comdare/wt-ce-lande/tests/unit/test_c13_selektiver_rebuild.cpp for CXX dependencies
+[6/21] Generating CXX dyndep file tests/unit/CMakeFiles/test_c13_selektiver_rebuild.dir/CXX.dd
+[7/21] Scanning /home/comdare/wt-ce-lande/tests/unit/test_c14_lager_presence_wache.cpp for CXX dependencies
+[8/21] Scanning /home/comdare/wt-ce-lande/tests/unit/test_c14_messwert_presence_wache.cpp for CXX dependencies
+[9/21] Generating CXX dyndep file tests/unit/CMakeFiles/test_c14_lager_presence_wache.dir/CXX.dd
+[10/21] Generating CXX dyndep file tests/unit/CMakeFiles/test_c14_messwert_presence_wache.dir/CXX.dd
+[11/21] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[12/21] Building CXX object tests/unit/CMakeFiles/test_c13_selektiver_rebuild.dir/test_c13_selektiver_rebuild.cpp.o
+[13/21] Building CXX object tests/unit/CMakeFiles/test_c14_messwert_presence_wache.dir/test_c14_messwert_presence_wache.cpp.o
+[14/21] Building CXX object tests/unit/CMakeFiles/test_c14_lager_presence_wache.dir/test_c14_lager_presence_wache.cpp.o
+[15/21] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[16/21] Linking CXX static library lib/libgtest.a
+[17/21] Linking CXX static library lib/libgtest_main.a
+[18/21] Linking CXX executable tests/unit/test_c14_messwert_presence_wache
+[19/21] Linking CXX executable tests/unit/test_c14_lager_presence_wache
+[20/21] Linking CXX executable tests/unit/test_c13_selektiver_rebuild
+TEILBAU_RC=0

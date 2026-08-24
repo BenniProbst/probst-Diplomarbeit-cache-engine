@@ -1,0 +1,7 @@
+=== PROFIL-VALIDAT (rein-lesend; KEIN DLL-Bau, KEINE Messung) ===
+  Profil id=m3v2_study schema_version=1
+  geprueft: 18 Achsen, 31 Werte, 8 axis_sweeps, 21 sota_series, 6 workloads, 1 run_methodology, 1 measurement_framework, 2 writeback_methods
+VALIDAT OK: das Profil ist gegen die AxisRegistry/EnabledStrategies konsistent.
+profile_ref-Dereferenzierung (PV-4): 6 von 7 base_tiers aufgeloest.
+  [FEHLER]  UNERFUELLBARES XML-ZIEL "ERROR": <base_tier id="art" profile_ref="../sota/nicht_da.profile.xml"> -> Ziel-Datei existiert nicht (/tmp/ph89_audit_cli/sota/nicht_da.profile.xml). Harter Planer-Fehler (R-4, KON112-10).
+(--validate: rein-lesend — es wurde KEINE DLL gebaut und KEINE Messung durchgefuehrt.)

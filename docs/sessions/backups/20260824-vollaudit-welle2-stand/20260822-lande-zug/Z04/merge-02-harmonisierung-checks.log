@@ -1,0 +1,10 @@
+== Restmarker-Suche (soll 0) ==
+0
+== clang-format-22 dry-run ueber die 3 harmonisierten Dateien ==
+FORMAT_OK libs/cache_engine/profile_facade/planner/pmc_host_probe.hpp
+FORMAT_OK libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp
+== kKoederFenster-Restreferenzen im Worktree (soll: nur Kern) ==
+libs/cache_engine/profile_facade/planner/pmc_host_probe.hpp:182:    /// Leer-Fenster-Deckel kPmcKoederFenster) wohnt seit der W2-Landung ebenfalls im Kern, damit
+libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp:84:inline constexpr unsigned kPmcKoederFenster = 5u;
+libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp:97:///                        (gedeckelt auf kPmcKoederFenster; wert/zeiten kumulieren ueber den fd);
+libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp:122:    for (unsigned fenster = 0; fenster < kPmcKoederFenster; ++fenster) {

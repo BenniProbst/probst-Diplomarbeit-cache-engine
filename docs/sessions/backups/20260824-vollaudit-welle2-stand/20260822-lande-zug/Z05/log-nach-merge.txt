@@ -1,0 +1,3 @@
+85a67b08 merge(vollzug91): W2-Lande-Zug 6/10 -- #91-VOLLZUG E-3 I-1-Schema + I-2/I-7-CT-Festschreibung + M13-/M6-Skelette (bau/vollzug91 @ 6713156b; Audit r1 SITZT 0/0/2 KLEIN)
+9da4d21d merge(pmcpaket): W2-Lande-Zug 5/10 -- #82/#83 I-PMC-2/3 + PMC-fail-loud (bau/pmcpaket @ 1d38263b; Audit r2 SITZT, 2/2 VERTAGT quittiert)
+96a69ba3 test(lande/w2-4of10): B06-Alt-Kontrakt an S13-02-Ziel-Filter harmonisiert (Kreuz-Luecke W1L x s13)

@@ -1,0 +1,9 @@
+== FIXR1 TABU-WACHE FINAL (nach allen Fix-R1-Schreibvorgaengen) 2026-08-19T18:17:49+00:00 ==
+PROBE 1: frische sha256+Anker-Probe gegen g1-Referenz
+cmp EXIT=0 -- BYTE-IDENTISCH, TABU-CRC 0x56F1B721C72DC10E UNBEWEGT
+PROBE 2: git-Status der TABU-Pfade + Worktree gesamt
+STATUS_TABU_EXIT=0 (leer = unberuehrt)
+?? .review-tmp/
+STATUS_GESAMT_EXIT=0
+PROBE 3: HEAD unveraendert, KEINE Fix-R1-Commits
+8cd32a0d fix(a25-f2): G6/F6 -- ASCII-Nachzug der Terminierungs-Notiz (Mittelpunkt-Zeichen raus)

@@ -1,0 +1,6 @@
+== FIXR1 FUND5 ROT-PROBE (keine gebuendelte End-Quittung persistiert) 2026-08-19T18:10:26+00:00 ==
+PROBE 1: Dateien mit 'endquittung' im Namen
+0
+EXIT=1 (Zaehler 0 + EXIT 1 = keine vorhanden)
+PROBE 2: Dateien mit Inhalt 'QUITTUNGSKETTE' (ohne fixr1_*)
+EXIT=1 (1 = 0 Treffer)

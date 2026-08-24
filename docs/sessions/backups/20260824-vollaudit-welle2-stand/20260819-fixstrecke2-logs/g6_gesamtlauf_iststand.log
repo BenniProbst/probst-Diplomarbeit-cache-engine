@@ -1,0 +1,144 @@
+=============================================================================
+ PRE-PUSH-LANDE-GATES: sechs Gates, fail-fast, Nenner je Gate
+=============================================================================
+
+BEREICH: 20c111c4..HEAD   (46 Commits)
+  Basis:  20c111c4   Spitze: 3b2fda12
+
+=============================================================================
+ [1/6] DIFF-HYGIENE (ASCII + Spaltenbreite), KUMULATIV 20c111c4...HEAD
+=============================================================================
+=============================================================================
+ DIFF-HYGIENE-WACHE: ASCII + Spaltenbreite  (scripts/ci_diff_ascii_width_guard.sh)
+=============================================================================
+
+MODUS: --bereich (KUMULATIV -- der ganze Stand, der nach '20c111c4' ginge,
+       NICHT ein einzelner Push)
+BEREICH (Teil der Aussage, nicht Beiwerk):
+  BASIS      20c111c4 = 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7
+  SPITZE     HEAD = 3b2fda12983de6832661e22a2e722beddddb74f4
+  ABZWEIGUNG (merge-base) = 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7
+  46 Commit(s) im Bereich; 0 Commit(s) nur auf der BASIS (Divergenz).
+
+MODUS: git diff selbst ausgefuehrt (Repo: /home/comdare/wt-ce-bump15)
+ARGUMENTE: git diff -U0 --no-color --no-ext-diff 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7 3b2fda12983de6832661e22a2e722beddddb74f4
+
+VERSTOESSE (falls vorhanden):
+  (keine)
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  7519 Zusatzzeilen in selbst verfasstem Code geprueft, davon 0 Nicht-ASCII,
+  davon 0 ueber 120 Spalten.
+  7604 Zusatzzeilen insgesamt im Diff; 85 davon uebersprungen.
+  GEPRUEFT WIRD ALLES; VOLL ausgenommen sind genau zwei Klassen, je Datei
+  unten mit GRUND benannt: Doku-Prosa *.md und Vendor-Baeume. *.xml ist NUR
+  von der BREITEN-Regel frei (16.08.2026, s. Kopf) und bleibt ASCII-geprueft.
+  Die frueher hier gedruckte Sammelbezeichnung "(Doku-Prosa/Sonstiges)" war
+  irrefuehrend -- darunter lagen 143 getrackte *.sh mit 10.084 Zeilen Quelltext.
+  Uebersprungene Dateien (namentlich MIT GRUND, keine zweite stille Null):
+    - docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/24_messmodell_korrektur_zwei_dimensionen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/20260802-hybrid_tier_stufe_soll_design.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - libs/cache_engine/algorithm_profiles/thesis_profiles/SCHEMA.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/messarchitektur_design_observer_handle_no_dynamic_cast.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/21_f6_plugin_controller_slot_merge_3stufen_bewiesen.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - libs/cache_engine/hybrid/README.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/abhaengigkeitskette_lebewesen_pruefdock_abi_konvergenz.md  [Doku-Prosa *.md, Sprachdoktrin]
+    - docs/architecture/20260803-e24_container_gattungs_abi_dossier.md  [Doku-Prosa *.md, Sprachdoktrin]
+  BREITEN-AUSNAHME (nicht still): 3 Zeile(n) ueber 120 Byte in *.xml
+  NICHT als Breiten-Verstoss gezaehlt -- ASCII wurde an ihnen GEPRUEFT.
+  Je Datei mit GRUND (printf statt echo: s. Begruendung oben):
+    - libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+    - tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml  [XML-Markup *.xml, nur Breite frei (ASCII gilt)]
+  VENDOR-AUSNAHME (nicht still): diese Baeume tragen COMDARE-VENDOR-PROVENANCE.md
+  und werden als Fremdcode NICHT auf ASCII/Breite geprueft --
+    - ext/io/liburing/
+    - ext/io/libxlsxwriter/
+    - ext/io/zlib/
+  Eigener Code in diesen Baeumen (Wrapper, CMakeLists) liegt AUSSERHALB und
+  wird weiter geprueft.
+  GRENZE (ungedeckt, ausdruecklich): geprueft ist der ZUWACHS in diesem Diff,
+  nicht der Bestand der beruehrten Dateien und nicht der des Baums. Wer ueber
+  eine DATEI urteilen will, misst die Datei -- nicht diesen Bereich.
+-----------------------------------------------------------------------------
+
+DIFF-HYGIENE-WACHE: GRUEN.  KUMULATIV ueber 20c111c44f35af5e49a0f9e3fe7bc79a8bdb06b7..3b2fda12983de6832661e22a2e722beddddb74f4 (46 Commits)
+GATE [1/6] GRUEN. NENNER: siehe Wachen-Ausgabe oben (Bereich, Dateien, Zusatzzeilen).
+
+=============================================================================
+ [2/6] CLANG-FORMAT -- CI-Formel-Paritaet (delegiert: vor_push_alle_wachen.sh --nur=format)
+=============================================================================
+=============================================================================
+ VOR-PUSH-WACHE (--nur=format): NUR das Format-Gate, CI-Vollmenge
+=============================================================================
+
+=============================================================================
+ [nur=format] CLANG-FORMAT -- CI-Formel-Paritaet (Vollmenge wie Job lint:format)
+=============================================================================
+WERKZEUG: /home/comdare/tools/cf22/usr/bin/clang-format-22 -- Version 22.1.8 (Pflicht ==22.1.8, Herkunft base-pipeline.yml:43 COMDARE_LLVM_VER)
+
+VERSTOESSE (falls vorhanden):
+  (keine)
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  2341 Dateien Vollmenge / 1923 geprueft, davon 0 abweichend.
+  Formel (CI-paritaetisch, base-pipeline.yml:293): git ls-files -- libs apps tests adapters benchmark_suite benchmarks
+  | Endungs-Regex (c|cc|cxx|cpp|h|hh|hxx|hpp) | Exclude-RE (base-pipeline.yml:59).
+-----------------------------------------------------------------------------
+
+=============================================================================
+ NICHT VON DIESEM LAUF GEPRUEFT (--nur=format):
+   * Diff-Hygiene (Wache 1) -- bereichsgebunden.
+   * cppcheck (Wache 3)     -- eigener Voll-Scope-Lauf.
+   Der volle Lauf vor dem Push bleibt Pflicht; dieses Verdikt gilt NUR dem Format.
+=============================================================================
+
+=============================================================================
+VOR-PUSH-WACHE (--nur=format): GRUEN -- das Format-Gate ueber die CI-Vollmenge.
+KEINE Aussage ueber die oben genannten ungeprueften Gates.
+=============================================================================
+GATE [2/6] GRUEN. NENNER: siehe Wachen-Ausgabe oben (Vollmenge/geprueft/abweichend).
+
+=============================================================================
+ [3/6] GITLEAKS -- Selbstbiss, dann Echt-Scan ueber 20c111c4..HEAD
+=============================================================================
+WERKZEUG: /home/comdare/.local/bin/gitleaks (Version 8.30.1), Config .gitleaks.toml
+SELBSTBISS: gebissen (Koeder-Laenge 26, gitleaks-Exit 1) -- Werkzeug und Config sind scharf.
+GATE [3/6] GRUEN. NENNER: 46 Commits, 1558505 Bytes gescannt, 0 Funde;
+  Selbstbiss davor: 1 Fund aus 1 Koeder (Pflicht).
+
+=============================================================================
+ [4/6] AXIS-VERSION-LOCK --check (Digest-Tripwire gegen axis_version.lock)
+=============================================================================
+WERKZEUG: build/gcc-release/tools/axis_version_lock/comdare_axis_version_lock
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/anatomy_base.hpp
+axis_version_lock:     erwartet e3ee62f1e58ea905f963fed9955aeedbf7abde76ec57b298bcc4e2d092756d9d
+axis_version_lock:     ist      fd08d04356bfd0ebf8deff221073f31464f31a550eeaefd94286ad6576e175d4
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/observable_tier.hpp
+axis_version_lock:     erwartet 168aa97c8eccd75b4e2f05fdf05290f009cab28c8a59758d6dfbbaa96e016de7
+axis_version_lock:     ist      359729928f7f0b1cdc60781619275d39b4267ad17835cae9c960b969ecaac0bf
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/pruefling_merge.hpp
+axis_version_lock:     erwartet a5e06f1fe453a75489b26c08b5efc8e69e150ff2e04458752b94528a78b9c228
+axis_version_lock:     ist      bad127f683b9dc8962c92af51934af3c08fdf8236b61833944daea09a11808d5
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/system_axes/target_isa_complex_axis.hpp
+axis_version_lock:     erwartet 8e2de63f276f1fd5df5f40241a6158911532cfbb99bb72eecb6af779dfbe4489
+axis_version_lock:     ist      adc0c0e03734cb99ab9293631362f73718e6aa65dae5a87c7fbe2e4ff8b48cc6
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: BESTAND heuristik discovered=6 traeger=6 (nenner: alle *.hpp unter libs/cache_engine/heuristik)
+axis_version_lock: BESTAND organ discovered=640 traeger=122 forwarder_prosa=518 multi=1 (nenner: Quell-Dateien der organ-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND system discovered=16 traeger=0 forwarder_prosa=16 multi=0 (nenner: Quell-Dateien der system-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND mess discovered=1 traeger=0 forwarder_prosa=1 multi=0 (nenner: Quell-Dateien der mess-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND tier_substanz discovered=55 traeger=0 forwarder_prosa=55 multi=0 (nenner: Quell-Dateien der tier_substanz-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND overlay gesamt=712 traeger=122 (nenner: ALLE Quell-Dateien des Overlay-Schnitts -- die Menge, ueber die das Overlay-Glied [7] hasht)
+NENNER: Tool-Exit 1, 4 ROT-Befund(e), 6 BESTAND-Zeile(n).
+
+=============================================================================
+PRE-PUSH-LANDE-GATES: ROT am GATE [4/6] AXIS-VERSION-LOCK -- Digest-Drift ohne Version-Bump (4 Befunde oben): Version bumpen UND Lock-Regen committen
+FAIL-FAST: spaetere Gates sind NICHT gelaufen und damit NICHT gruen.
+=============================================================================

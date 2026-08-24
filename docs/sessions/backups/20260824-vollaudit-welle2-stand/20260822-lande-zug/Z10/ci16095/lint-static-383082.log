@@ -1,0 +1,82 @@
+2026-08-22T18:35:06.478987Z 00O [0KRunning with gitlab-runner 19.1.1 (24b9b726)[0;m
+2026-08-22T18:35:06.479002Z 00O [0K  on prod-baremetal-prod1 GjoKPir1B, system ID: s_409f14fb9041[0;m
+2026-08-22T18:35:06.479008Z 00O [0K  feature flags: FF_USE_LEGACY_S3_CACHE_ADAPTER:true[0;m
+2026-08-22T18:35:06.479039Z 00O section_start:1787423706:prepare_executor[0K
+2026-08-22T18:35:06.479043Z 00O+[0K[36;1mPreparing the "shell" executor[0;m[0;m
+2026-08-22T18:35:06.479242Z 00O [0KUsing Shell (bash) executor...[0;m
+2026-08-22T18:35:06.479245Z 00O section_end:1787423706:prepare_executor[0K
+2026-08-22T18:35:06.479389Z 00O+section_start:1787423706:prepare_script[0K
+2026-08-22T18:35:06.479393Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-08-22T18:35:06.626033Z 01O Running on prod1...
+2026-08-22T18:35:06.627404Z 00O section_end:1787423706:prepare_script[0K
+2026-08-22T18:35:06.627928Z 00O+section_start:1787423706:get_sources[0K
+2026-08-22T18:35:06.627934Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-08-22T18:35:06.639440Z 01O [32;1m$ export GIT_CONFIG_SYSTEM=/dev/null # collapsed multi-line command[0;m
+2026-08-22T18:35:06.648190Z 01O [32;1mGitaly correlation ID: 01M0NC2FSZ2AA3DS799ACJ1N0B[0;m
+2026-08-22T18:35:06.650782Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-08-22T18:35:06.651746Z 01O Reinitialized existing Git repository in /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.git/
+2026-08-22T18:35:09.051831Z 01O [32;1mChecking out 1f0424a2 as detached HEAD (ref is development)...[0;m
+2026-08-22T18:35:09.324660Z 01O Removing .ccache/
+2026-08-22T18:35:09.324667Z 01O Removing build-dbg/
+2026-08-22T18:35:09.324668Z 01O Removing config.status
+2026-08-22T18:35:09.324669Z 01O Removing ctest-junit.xml
+2026-08-22T18:35:09.324669Z 01O Removing ext/allocator/axis_06_allocator/paper_a04_mimalloc/.extracted.marker
+2026-08-22T18:35:09.324670Z 01O Removing ext/allocator/axis_06_allocator/paper_a04_mimalloc/src/
+2026-08-22T18:35:09.324671Z 01O Removing ext/allocator/axis_06_allocator/paper_a05_jemalloc/.extracted.marker
+2026-08-22T18:35:09.324671Z 01O Removing ext/allocator/axis_06_allocator/paper_a05_jemalloc/src/
+2026-08-22T18:35:09.324672Z 01O Removing ext/allocator/axis_06_allocator/paper_a07_snmalloc/.extracted.marker
+2026-08-22T18:35:09.324672Z 01O Removing ext/allocator/axis_06_allocator/paper_a07_snmalloc/src/
+2026-08-22T18:35:09.324673Z 01O Removing ext/allocator/axis_06_allocator/paper_a10_rpmalloc/.extracted.marker
+2026-08-22T18:35:09.324674Z 01O Removing ext/allocator/axis_06_allocator/paper_a10_rpmalloc/rpmalloc/
+2026-08-22T18:35:09.324674Z 01O Removing ext/allocator/axis_06_allocator/paper_a11_lrmalloc/.extracted.marker
+2026-08-22T18:35:09.324675Z 01O Removing ext/allocator/axis_06_allocator/paper_a11_lrmalloc/lrmalloc.cpp
+2026-08-22T18:35:09.324675Z 01O Removing ext/allocator/axis_06_allocator/paper_a20_dlmalloc/.extracted.marker
+2026-08-22T18:35:09.324675Z 01O Removing ext/allocator/axis_06_allocator/paper_a20_dlmalloc/malloc.c
+2026-08-22T18:35:09.324676Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p01_art/.extracted.marker
+2026-08-22T18:35:09.324676Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p01_art/art.hpp
+2026-08-22T18:35:09.324677Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p02_hot/.extracted.marker
+2026-08-22T18:35:09.324677Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p02_hot/hot/
+2026-08-22T18:35:09.324678Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p03_masstree/.extracted.marker
+2026-08-22T18:35:09.324678Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p03_masstree/masstree_get.hh
+2026-08-22T18:35:09.324679Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p03_masstree/masstree_insert.hh
+2026-08-22T18:35:09.324680Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p03_masstree/masstree_remove.hh
+2026-08-22T18:35:09.324680Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p05_start/.extracted.marker
+2026-08-22T18:35:09.324681Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p05_start/START/
+2026-08-22T18:35:09.324681Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p07_wormhole/.extracted.marker
+2026-08-22T18:35:09.324681Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p07_wormhole/wh.c
+2026-08-22T18:35:09.324682Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p10_surf/.extracted.marker
+2026-08-22T18:35:09.324682Z 01O Removing ext/traversal/axis_03a_search_algo/paper_p10_surf/include/
+2026-08-22T18:35:09.327143Z 01O [32;1mSkipping Git submodules setup[0;m
+2026-08-22T18:35:09.328449Z 00O section_end:1787423709:get_sources[0K
+2026-08-22T18:35:09.329138Z 00O+section_start:1787423709:restore_cache[0K
+2026-08-22T18:35:09.329141Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-08-22T18:35:09.443876Z 01O [32;1mChecking cache for citool-cppcheck-2.21.0-protected...[0;m
+2026-08-22T18:35:09.471254Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=473661 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-08-22T18:35:09.471268Z 01E Using presigned URL for cache download            [0;m 
+2026-08-22T18:35:09.512395Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/286/44/44742870b1e39dafad3ed91b20636ed95ad9739d13eb60b4f506b929ba6a9ce2 primary_modified[0;m=2026-07-06 17:42:55 +0000 UTC primary_url[0;m=https://minio.comdare.de:9000/buildsystem-cache/project/286/citool-cppcheck-2.21.0-protected
+2026-08-22T18:35:09.573279Z 01E cache.zip is up to date                           [0;m 
+2026-08-22T18:35:09.610281Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-08-22T18:35:09.611253Z 00O section_end:1787423709:restore_cache[0K
+2026-08-22T18:35:09.611592Z 00O+section_start:1787423709:step_script[0K
+2026-08-22T18:35:09.611599Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-08-22T18:35:09.648255Z 01O [32;1m$ export GIT_CONFIG_SYSTEM=/dev/null # collapsed multi-line command[0;m
+2026-08-22T18:35:09.648676Z 01O [32;1m$ set -euo pipefail # collapsed multi-line command[0;m
+2026-08-22T18:35:09.649284Z 01O [32;1m$ export PATH="${COMDARE_CITOOLS_DIR}/bin:$PATH"[0;m
+2026-08-22T18:35:09.649286Z 01O [32;1m$ set -euo pipefail # collapsed multi-line command[0;m
+2026-08-22T18:35:13.077659Z 01E tests/unit/test_c13_selektiver_rebuild.cpp:205:21: warning: Member variable 'Fall::flotten_neubau' has no initializer. [uninitMemberVarNoCtor]
+2026-08-22T18:35:13.077673Z 01E         bool        flotten_neubau;
+2026-08-22T18:35:13.077674Z 01E                     ^
+2026-08-22T18:35:19.263927Z 01E tests/unit/test_s13_02_zielfilter_vier_faelle.cpp:138:17: warning: Member variable 'FallErwartung::csv_erwartet' has no initializer. [uninitMemberVarNoCtor]
+2026-08-22T18:35:19.263935Z 01E     bool        csv_erwartet;  ///< measurements.csv MUSS liegen
+2026-08-22T18:35:19.263935Z 01E                 ^
+2026-08-22T18:35:19.263936Z 01E tests/unit/test_s13_02_zielfilter_vier_faelle.cpp:139:17: warning: Member variable 'FallErwartung::xlsx_erwartet' has no initializer. [uninitMemberVarNoCtor]
+2026-08-22T18:35:19.263936Z 01E     bool        xlsx_erwartet; ///< genau EINE .xlsx MUSS liegen
+2026-08-22T18:35:19.263937Z 01E                 ^
+2026-08-22T18:35:19.263939Z 01E tests/unit/test_s13_02_zielfilter_vier_faelle.cpp:208:21: warning: Member variable 'ExpFall::csv_erwartet' has no initializer. [uninitMemberVarNoCtor]
+2026-08-22T18:35:19.263939Z 01E         bool        csv_erwartet;
+2026-08-22T18:35:19.263940Z 01E                     ^
+2026-08-22T18:35:24.142306Z 00O section_end:1787423724:step_script[0K
+2026-08-22T18:35:24.142875Z 00O+section_start:1787423724:cleanup_file_variables[0K
+2026-08-22T18:35:24.142880Z 00O+[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+2026-08-22T18:35:24.175077Z 00O section_end:1787423724:cleanup_file_variables[0K
+2026-08-22T18:35:24.175170Z 00O [31;1mERROR: Job failed: exit status 2[0;m

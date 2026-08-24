@@ -1,0 +1,19 @@
+== FIXR1 FUND3 GRUEN-SUBSTANZ: TABU live nachgerechnet + alle Paare 2026-08-19T18:13:23+00:00 ==
+PROBE 1: frische Probe (g1-Format) gegen g1_tabu_vorher.txt
+cmp EXIT=0 -- BYTE-IDENTISCH
+PROBE 2: g6_tabu_final gegen g1_tabu_vorher
+cmp EXIT=0 -- BYTE-IDENTISCH
+PROBE 3: alle uebrigen Tabu-Stuetzpunkte gegen g1_tabu_vorher (798er-Format)
+g2_tabu_nachher: IDENTISCH
+g3_tabu_vorher: IDENTISCH
+g3_tabu_nachher: IDENTISCH
+g4_tabu_vorher: IDENTISCH
+g4_tabu_nach_gruppe_a: IDENTISCH
+g4_tabu_nach_gruppe_b: IDENTISCH
+g6_tabu_nach_gruppe: IDENTISCH
+PROBE 4: Paare mit eigenem Format (Vorher==Nachher genuegt)
+g5-Paar: IDENTISCH (1041 B)
+m3-Paar: IDENTISCH (721 B)
+PROBE 5: CRC-Zeile 191 live:
+191:inline constexpr std::uint64_t kNewGolden131072Crc64 = 0x56F1B721C72DC10EULL;
+EXIT=0

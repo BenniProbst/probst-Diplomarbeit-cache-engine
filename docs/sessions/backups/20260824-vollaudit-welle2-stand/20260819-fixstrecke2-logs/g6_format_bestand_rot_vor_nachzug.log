@@ -1,0 +1,47 @@
+=============================================================================
+ VOR-PUSH-WACHE (--nur=format): NUR das Format-Gate, CI-Vollmenge
+=============================================================================
+
+=============================================================================
+ [nur=format] CLANG-FORMAT -- CI-Formel-Paritaet (Vollmenge wie Job lint:format)
+=============================================================================
+WERKZEUG: /home/comdare/tools/cf22/usr/bin/clang-format-22 -- Version 22.1.8 (Pflicht ==22.1.8, Herkunft base-pipeline.yml:43 COMDARE_LLVM_VER)
+
+VERSTOESSE (falls vorhanden):
+  FORMAT-ABWEICHUNG   libs/cache_engine/builder/measurement_snapshot.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/hybrid/hybrid_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/hybrid/hybrid_stempel_kette.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/adapter_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/sequence_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/set_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/include/cache_engine/abi/view_module_abi_v1.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/profile_facade/mess_achsen_naht.hpp
+  FORMAT-ABWEICHUNG   libs/cache_engine/reclamation/rcu_reclaim/rcu.hpp
+  FORMAT-ABWEICHUNG   tests/unit/test_b3_wallclock_erbe_ct.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_d2_mess_konsistenz_gate.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_hy_a2_stempel_kette.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_m1_mess_achsen_wirkung.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_rcu_concurrency.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_s3_ordnung_relation.cpp
+  FORMAT-ABWEICHUNG   tests/unit/test_v5_measurement_snapshot.cpp
+  FORMAT-ABWEICHUNG   tests/unit/thesis_tiere/test_experiment_projection.cpp
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  2341 Dateien Vollmenge / 1923 geprueft, davon 19 abweichend.
+  Formel (CI-paritaetisch, base-pipeline.yml:293): git ls-files -- libs apps tests adapters benchmark_suite benchmarks
+  | Endungs-Regex (c|cc|cxx|cpp|h|hh|hxx|hpp) | Exclude-RE (base-pipeline.yml:59).
+-----------------------------------------------------------------------------
+
+=============================================================================
+ NICHT VON DIESEM LAUF GEPRUEFT (--nur=format):
+   * Diff-Hygiene (Wache 1) -- bereichsgebunden.
+   * cppcheck (Wache 3)     -- eigener Voll-Scope-Lauf.
+   Der volle Lauf vor dem Push bleibt Pflicht; dieses Verdikt gilt NUR dem Format.
+=============================================================================
+
+=============================================================================
+VOR-PUSH-WACHE (--nur=format): ROT -- das Format-Gate hat angeschlagen (siehe oben).
+=============================================================================

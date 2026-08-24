@@ -1,0 +1,40 @@
+=============================================================================
+ DIFF-HYGIENE-WACHE: ASCII + Spaltenbreite  (scripts/ci_diff_ascii_width_guard.sh)
+=============================================================================
+
+MODUS: git diff selbst ausgefuehrt (Repo: /home/comdare/wt-ce-s13schema)
+ARGUMENTE: git diff -U0 --no-color --no-ext-diff 66de5c09..HEAD
+
+VERSTOESSE (falls vorhanden):
+  NICHT-ASCII   libs/cache_engine/profile_facade/experiment_run_entry.hpp:255
+  NICHT-ASCII   libs/cache_engine/profile_facade/experiment_run_entry.hpp:263
+  NICHT-ASCII   libs/cache_engine/profile_facade/experiment_run_entry.hpp:272
+  NICHT-ASCII   libs/cache_engine/profile_facade/experiment_run_entry.hpp:563
+  NICHT-ASCII   libs/cache_engine/profile_facade/experiment_run_entry.hpp:570
+  NICHT-ASCII   libs/cache_engine/profile_facade/profile_run_entry.hpp:799
+  NICHT-ASCII   libs/cache_engine/profile_facade/profile_run_entry.hpp:1543
+  NICHT-ASCII   libs/cache_engine/profile_facade/profile_run_entry.hpp:1549
+
+-----------------------------------------------------------------------------
+NENNER (nie eine nackte Null):
+  1091 Zusatzzeilen in selbst verfasstem Code geprueft, davon 8 Nicht-ASCII,
+  davon 0 ueber 120 Spalten.
+  1091 Zusatzzeilen insgesamt im Diff; 0 davon uebersprungen.
+  GEPRUEFT WIRD ALLES; VOLL ausgenommen sind genau zwei Klassen, je Datei
+  unten mit GRUND benannt: Doku-Prosa *.md und Vendor-Baeume. *.xml ist NUR
+  von der BREITEN-Regel frei (16.08.2026, s. Kopf) und bleibt ASCII-geprueft.
+  Die frueher hier gedruckte Sammelbezeichnung "(Doku-Prosa/Sonstiges)" war
+  irrefuehrend -- darunter lagen 143 getrackte *.sh mit 10.084 Zeilen Quelltext.
+  VENDOR-AUSNAHME (nicht still): diese Baeume tragen COMDARE-VENDOR-PROVENANCE.md
+  und werden als Fremdcode NICHT auf ASCII/Breite geprueft --
+    - ext/io/liburing/
+    - ext/io/libxlsxwriter/
+    - ext/io/zlib/
+  Eigener Code in diesen Baeumen (Wrapper, CMakeLists) liegt AUSSERHALB und
+  wird weiter geprueft.
+  GRENZE (ungedeckt, ausdruecklich): geprueft ist der ZUWACHS in diesem Diff,
+  nicht der Bestand der beruehrten Dateien und nicht der des Baums. Wer ueber
+  eine DATEI urteilen will, misst die Datei -- nicht diesen Bereich.
+-----------------------------------------------------------------------------
+
+DIFF-HYGIENE-WACHE: ROT.

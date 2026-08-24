@@ -1,0 +1,23 @@
+=============================================================================
+ PRE-PUSH-LANDE-GATES (--nur=tabu): EIN Gate, PROBE-Modus
+=============================================================================
+
+BEREICH: 20c111c4..HEAD   (45 Commits)
+  Basis:  20c111c4   Spitze: 04e9bd4f
+
+=============================================================================
+ [6/6] TABU-CRC-PROBE (golden_fullpilot_320* + permutation_axes.xml + CRC-Anker)
+=============================================================================
+GATE [6/6] GRUEN. NENNER: 5 Dateien byteidentisch, Anker 1x in libs/cache_engine/profile_facade/source_catalog.hpp,
+  0 TABU-Beruehrungen in 45 Commits (20c111c4..HEAD).
+
+=============================================================================
+PRE-PUSH-LANDE-GATES (--nur=tabu): GRUEN -- NUR dieses eine Gate.
+NICHT GEFAHREN (und damit OHNE Urteil):
+   * diff
+   * format
+   * gitleaks
+   * lock
+   * floor
+Der volle Lauf vor dem Push bleibt Pflicht.
+=============================================================================

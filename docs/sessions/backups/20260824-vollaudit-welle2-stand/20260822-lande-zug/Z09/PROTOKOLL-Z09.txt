@@ -1,0 +1,80 @@
+Z09 -- Merge 10/10: ce bau/kampvor @ 1e1bc199 --no-ff in lande/w2-s1s2 (22.08.2026, Fable-max Lande-Schritt)
+Worktree: /home/comdare/wt-ce-lande (Schreiber: lande-w2-zug, slot2.d)
+
+== EXPLORE (3 Achsen, VOR dem Merge) ==
+HISTORISCH:
+  origin bau/kampvor  = 1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f (ls-remote RC=0)
+  lokale Branch       = 1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f
+  wt-ce-kampvor HEAD  = 1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f (porcelain leer)
+  github bau/kampvor  = NICHT vorhanden (leere Ausgabe, RC=0)
+  Juengste Audit-Runde = audit-runde-1 (22.08.), Verdikt SITZT, 24x ERFUELLT,
+  0 ERNST / 0 MILD / 1 KLEIN (K-1); kein Ueberholt-Marker (Gegenlese-Gate Tafel Zeile kampvor).
+DESIGN:
+  kampvor/audit-runde-1.md + soll-karte.md VOLL gelesen; SYNTHESE-S1/S2 + GEGENLESE-GATE VOLL gelesen.
+  Vertraege intakt am Objekt: TESTAT-Kontrakt (Marker BEWUSST ohne TESTAT/offen=), kein YAML,
+  TABU-Zonen 0 Treffer, Nenner II.5 (P-07), fail-closed II.7 (P-08/P-13).
+STRUKTURELL:
+  merge-base HEAD(cf524bd1) x 1e1bc199 = 66de5c09 (exakt die Strang-Basis)
+  git merge-tree --write-tree HEAD 1e1bc199 -> RC=0, Tree 305f635c908784676d24c746ca13833c1b627404,
+  KEINE Konfliktsektion.
+  Delta HEAD->Mergetree == kampvor-Delta 66de5c09->1e1bc199 ZEILENIDENTISCH:
+    hpp  +/- Zeilenvergleich diff RC=0 (z09-hpp-deltadiff.txt leer)
+    test +/- Zeilenvergleich diff RC=0 (z09-test-deltadiff.txt leer)
+  Konfliktflaeche geteilt NUR mit pmcpaket (einziger Toucher beider Dateien seit 66de5c09: 1d38263b).
+  Marker-Lagen im gemergten Blob disjunkt+semantisch korrekt:
+    kampvor Bau-Batch :1519-1580 ([FENSTER-TOPOLOGIE]/[FENSTER-FREMD])
+    pmcpaket Mess-Batch [PMC-TESTAT] :1759/:1775 VOR kampvor [PIN-DEKLARATION] :1802/:1806
+  Die 1 Minus-Zeile = kampvors EIGENE Assert-Anpassung (Scheiben-Fortschritt 2x je Perm wegen
+  Skip-Zweig, im Diff kommentiert) -- keine Fremd-Kollision. KEINE Harmonisierung noetig
+  (Auto-Union-Anfangsverdacht durch Zeilenidentitaet + Marker-Lagen-Probe entkraeftet).
+
+== P-25-VORBEDINGUNG (T12, IM Zug erfuellt, VOR dem Merge gemessen) ==
+Wortlaut audit-runde-1 P-25: "bau/pmcpaket (Schritt 4) MUSS VOR ce-bau/kampvor (Schritt 10) liegen"
+  git merge-base --is-ancestor 1d38263b HEAD -> RC_TIP=0   (pmcpaket-Tip ist Ancestor)
+  git merge-base --is-ancestor 9da4d21d HEAD -> RC_MERGE=0 (pmcpaket-Merge Z04 ist Ancestor)
+  git merge-base --is-ancestor 66de5c09 HEAD -> RC_BASIS=0
+=> H-10-Ordnung GEWAHRT (kampvor als LETZTER ce-Merge 10/10, staerkst-geteilte Emissions-Flaeche zuletzt).
+
+== MERGE ==
+git merge --no-ff 1e1bc199 -> MERGE_RC=0, "Merge made by the 'ort' strategy"
+  MERGE_COMMIT = b4c593f5fa65201a6b3876dc3703649be5f7e478
+  PARENTS      = cf524bd1801c51c496c8d885669aef6f538ff77f 1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f
+  TREE         = 305f635c908784676d24c746ca13833c1b627404 == merge-tree-VORHERSAGE (byte-exakt)
+  Diffstat: 2 Dateien, 166 insertions(+), 1 deletion(-) == Strang-Delta
+  status --porcelain danach: 0 Zeilen (clean)
+
+== P-26 ci.skip-PIPELINEFREIHEIT (T12, GitLab-API, NUR gitlab.comdare.local, Projekt 286) ==
+GET /projects/286/pipelines?ref=bau/kampvor  -> CURL_RC=0: GENAU 1 Datensatz:
+  id=16071 sha=1e1bc199... ref=bau/kampvor status="skipped" source="push" created 2026-08-21T17:45:00Z
+GET /projects/286/pipelines?sha=1e1bc1995... -> CURL_RC=0: identisch nur 16071 (skipped)
+Nenner-Doktrin (/jobs UNION /bridges):
+  GET /projects/286/pipelines/16071/jobs    -> [] (CURL_RC=0)
+  GET /projects/286/pipelines/16071/bridges -> [] (CURL_RC=0)
+BEFUND: Der ci.skip-Push erzeugte KEINEN ausgefuehrten Lauf -- 0 Jobs + 0 Bridges; der eine
+Datensatz ist GitLabs skip-Buchhaltung (status=skipped). Pipelinefreiheit im Wirkungs-Sinn
+BEWIESEN; Rest-Praezisierung (Datensatz existiert, Status skipped) hiermit dokumentiert.
+Die super-Haelfte (Projekt 288, 025e0c42) prueft Z20 (Phase 4) analog.
+
+== ABNAHME ==
+ce-Zwischenmerge (letzter der 10): kompilierender Zustand gedeckt durch den deklarierten
+K17/T-11b-Endstand-Kombibau {gcc,clang}x{Release,Debug} VOR dem Push (Owner-Vorgabe im
+Zug-Auftrag; dieser Merge IST der ce-Endstand der Serie). Kein Struktur-Risiko am Objekt
+(0 Konflikte, Delta zeilenidentisch, rein additiv, Marker disjunkt) -> kein Zwischenbau
+noetig (df 20G frei, unveraendert -- kein Bau gefahren).
+
+== RAEUMUNG / WORKTREE ==
+Per Ziel-Vorgabe: "Raeumung wt-ce-kampvor in Z11" -> Build-Verzeichnis-Raeumung + Worktree-
+Loeschung DELEGIERT an Z11 (nichts geloescht; wt-ce-kampvor steht clean @ 1e1bc199).
+
+== RESTPOSTEN (Traeger) ==
+1. K-1 (Owner-Verdopplungs-Semantik CCD0+CCD1, Owner-Wort 07.08., Ledger Z.30689-30691)
+   -> T12b im docs-Sammel Z21: F-108-Korrektur Wellenplan Z.718 "2x128 MiB CCD" ->
+   "96+32 MiB (2 CCD)" + in DERSELBEN ##55-Zeile Verdopplungs-Semantik (je Domaene einmal:
+   CCD0-Pin 0-7,16-23 UND CCD1-Pin 8-15,24-31) + CCD1-Menge als zweite SOLL-Deklaration
+   im W3-Vorstaffel-Posten (F-114-Umfeld) vormerken.
+2. super-Haelfte bau/kampvor @ 025e0c42 = Z20 (Phase 4); dort P-26-Analog fuer Projekt 288.
+3. Treiber-Haelfte window_belongs_to (F-112-TEIL) + Pin-Aktuator (F-114) = W3-Vorstaffel;
+   YAML-Haelfte = Staffel-3-YAML-Zug (LEAD-ENTSCHEIDE Punkt 9).
+4. Raeumung wt-ce-kampvor (Build-Dir + Worktree nach rekursiver Pruef-Doktrin) = Z11.
+5. K17-Endstand-Kombibau (4 Zellen am Endstand b4c593f5 bzw. juengerem Zug-Endstand) +
+   pre_push_lande_gates VOR dem Lande-Push = Folgeziele des Zugs.

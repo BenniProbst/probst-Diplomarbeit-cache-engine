@@ -1,0 +1,43 @@
+== github-Refs NICHT in origin/development, je Referenz-Store (nach frischem github-Fetch) ==
+-- CE --
+(Rest enthalten)
+-- SUPER --
+github/rescue/thesis-gitlink-paritaet-20260810|18a0bdf3|inDevOrigin=NO
+(Rest enthalten)
+-- PRT --
+(Rest enthalten)
+-- THESIS --
+github/main|246eff90|inDevOrigin=NO
+(Rest enthalten)
+== THESIS github/main Stand + ahead ==
+246eff90
+13/26
+246eff9 Alles bis FF3 kommentiert
+ce9bfa6 Evaluation comments
+728fc74 -O3 Optimierung muss mit rein
+bd9bce8 Evaluationsmethodik
+f21f76c Evaluation Thema verfehlt
+081f282 Mehr abbildungen
+f9bdd07 Hardware Erweiterungen permutieren
+4f59a18 System-Achse
+== THESIS github traegt noch overleaf-2026-06-22-1726 / rescue/gate8? ==
+  github/development
+  github/main
+  github/overleaf-2026-06-22-1726
+  github/rescue/gate8-graph-abbildungen-8970465d
+== PRT nested-main c6f07540 im Hauptklon? ==
+objekt=vorhanden
+in dev: ja
+in main: ja
+submodstore-objekt=vorhanden
+substore in dev: ja
+c6f0754 docs(ledger): E-02-Nachzug 03.08. -- Ist-Anker, A13-Stand, E-24-Kante, Kanon-Ergaenzung, Watch-Punkte (additiv, Bestandstext unveraendert)
+== LANDE-ZWEIG: s19+messfenster als Ancestors von 61d5d139? ==
+s19 a1b348ae: ENTHALTEN im Lande-Zweig
+messfenster 3a746090: ENTHALTEN im Lande-Zweig
+61d5d139 merge(messfenster): W2-Lande-Zug 2/10 -- T-15b Mess-Retry-Klammer + Warmup-Paar (bau/messfenster @ 3a746090; Audit r2 SITZT, 0 neue Funde)
+881d1a15 merge(s19): W2-Lande-Zug 1/10 -- #7/C-1 Planungs-Simulation als Planer-Etappe (bau/s19 @ a1b348ae)
+== origin traegt lande/w2-s1s2? ==
+ls-remote-rc=0
+== ce ext-Submodul Zustand im Hauptklon-Checkout ==
+ d655418bb644b7f85159d94c591d7d983949fb81 ext/queuing/Q01-concurrentqueue (v1.0.5-2-gd655418)

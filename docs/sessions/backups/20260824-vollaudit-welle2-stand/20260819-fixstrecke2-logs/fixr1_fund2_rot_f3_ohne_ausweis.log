@@ -1,0 +1,21 @@
+== FIXR1 FUND2 ROT-PROBE (F3 aus der Eingangsmenge ohne Ausweis) 2026-08-19T18:09:05+00:00 ==
+PROBE 1: git log --oneline e285d316..HEAD --grep=F3 (f2-Strecken-Commits mit F3-Bezug)
+04e9bd4f fix(a25-f2): G6/F9 -- Makro-Kommentare einzeilig geschlossen: 120er-Kante haelt beide Gates
+(Ausgabe leer = KEIN f2-Commit traegt F3) EXIT=0
+PROBE 2: Wort-F3 in den Strecken-Logs (ohne fixr1_*)
+EXIT=1 (1 = 0 Treffer)
+PROBE 3: Wort-F3 in der Session-Timeline
+57
+EXIT=0
+PROBE 4: Register-12.4-Script-Suche im Job-Verzeichnis
+/home/comdare/.claude/jobs/5a19728e/tmp/wf8check/agent-a00782379b8b0a2f1.jsonl
+/home/comdare/.claude/jobs/5a19728e/tmp/wf8check/agent-a44128dd76af99740.jsonl
+/home/comdare/.claude/jobs/5a19728e/tmp/wf8check/agent-ad48b911c277db26d.jsonl
+/home/comdare/.claude/jobs/5a19728e/tmp/wf8check/journal.jsonl
+/home/comdare/.claude/jobs/5a19728e/tmp/wf8check/agent-ac50b6b152939845c.jsonl
+EXIT=0 (1 = 0 Treffer)
+PROBE 5: Kandidaten-Beleg -- Basis-Commit e285d316:
+e285d316 fix(a25-r2): C-F3 Ehrlichkeits-Doku der K-4-Zahlproben (decl.hpp)
+
+ .../cache_engine/abi/anatomy_module_abi_v1_decl.hpp       | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)

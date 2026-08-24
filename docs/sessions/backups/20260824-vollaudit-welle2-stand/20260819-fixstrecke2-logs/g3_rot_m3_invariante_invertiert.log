@@ -1,0 +1,30 @@
+[ RUN      ] HyA2StempelKette.InvarianteGruenBeiTeilmengeUndLeererBelegung
+/home/comdare/wt-ce-bump15/tests/unit/test_hy_a2_stempel_kette.cpp:178: Failure
+Expected equality of these values:
+  voll.status
+    Which is: 15
+  hy::hybrid_status_ok
+    Which is: 0
+
+/home/comdare/wt-ce-bump15/tests/unit/test_hy_a2_stempel_kette.cpp:184: Failure
+Expected equality of these values:
+  beide.status
+    Which is: 15
+  hy::hybrid_status_ok
+    Which is: 0
+
+--
+[ RUN      ] HyA2StempelKette.InvarianteMeldetFremdesTierAmDock
+/home/comdare/wt-ce-bump15/tests/unit/test_hy_a2_stempel_kette.cpp:251: Failure
+Expected equality of these values:
+  fremd.status
+    Which is: 0
+  hy::hybrid_status_rt_ct_wert_differiert
+    Which is: 15
+
+/home/comdare/wt-ce-bump15/tests/unit/test_hy_a2_stempel_kette.cpp:257: Failure
+Expected equality of these values:
+  ohne_namen.status
+    Which is: 0
+  hy::hybrid_status_rt_ct_wert_differiert
+    Which is: 15

@@ -1,0 +1,71 @@
+Test project /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/build-dbg
+    Start 514: test_vl3_debug_stdout_bytegleich
+1/1 Test #514: test_vl3_debug_stdout_bytegleich ...***Failed    0.06 sec
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from Vl3DebugStdoutByteGleich
+[ RUN      ] Vl3DebugStdoutByteGleich.DeterminismusAnkerZweiGleicheLaeufe
+[       OK ] Vl3DebugStdoutByteGleich.DeterminismusAnkerZweiGleicheLaeufe (27 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.PlanDumpBytegleich
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_vl3_debug_stdout_bytegleich.cpp:133: Failure
+Expected equality of these values:
+  o.pmc_zeilen
+    Which is: 1
+  m.pmc_zeilen
+    Which is: 0
+plan dump: die PMC-Zeilenklasse muss beidseitig gleich oft auftreten (Struktur-Nenner)
+
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_vl3_debug_stdout_bytegleich.cpp:137: Failure
+Expected equality of these values:
+  o.text
+    Which is: "# comdare-experiment-plan v1.1\nsource_kind=thesis\nprofile_id=m3v2_study\nprofile axes=18 values=31\nregistry_trio loaded=1 organ=cache_engine organ_axes=18 organ_offers=83 system=cache_engine_system system_axes=3 system_offers=6 measurement=cache_engine_measurement measurement_axes=3 measurement_offers=20\nmeasurement_combo_count=1\npmc_befund=<HOST-LEBENDIG>\nperm_count=1\nresolver resolved=1 ok=1 rejects=0\nmeasurement_combo 0 legend=[all]\nperm 0 opt=O3 simd=no_extension opt_flag=-O3 march_flag=- build_version_suffix=+opt=O3\n  step 0 kind=thesis_sweep_pass label=<basis> merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 1 kind=thesis_sweep_pass label=search_algo merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 2 kind=thesis_sweep_pass label=node_type merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 3 kind=thesis_sweep_pass label=memory_layout merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 4 kind=thesis_sweep_pass label=prefetch merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 5 kind=thesis_sweep_pass label=path_compression merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 6 kind=thesis_sweep_pass label=migration_policy merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 7 kind=thesis_sweep_pass label=filter merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 8 kind=thesis_sweep_pass label=value_handle merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n"
+  m.text
+    Which is: "# comdare-experiment-plan v1.1\nsource_kind=thesis\nprofile_id=m3v2_study\nprofile axes=18 values=31\nregistry_trio loaded=1 organ=cache_engine organ_axes=18 organ_offers=83 system=cache_engine_system system_axes=3 system_offers=6 measurement=cache_engine_measurement measurement_axes=3 measurement_offers=20\nmeasurement_combo_count=1\nperm_count=1\nresolver resolved=1 ok=1 rejects=0\nmeasurement_combo 0 legend=[all]\nperm 0 opt=O3 simd=no_extension opt_flag=-O3 march_flag=- build_version_suffix=+opt=O3\n  step 0 kind=thesis_sweep_pass label=<basis> merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 1 kind=thesis_sweep_pass label=search_algo merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 2 kind=thesis_sweep_pass label=node_type merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 3 kind=thesis_sweep_pass label=memory_layout merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 4 kind=thesis_sweep_pass label=prefetch merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 5 kind=thesis_sweep_pass label=path_compression merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 6 kind=thesis_sweep_pass label=migration_policy merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 7 kind=thesis_sweep_pass label=filter merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n  step 8 kind=thesis_sweep_pass label=value_handle merge=- binary_id=- series=- pruefling_type=- lebewesen=- built_stem=-\n"
+With diff:
+@@ -5,5 @@
+ registry_trio loaded=1 organ=cache_engine organ_axes=18 organ_offers=83 system=cache_engine_system system_axes=3 system_offers=6 measurement=cache_engine_measurement measurement_axes=3 measurement_offers=20
+ measurement_combo_count=1
+-pmc_befund=<HOST-LEBENDIG>
+ perm_count=1
+ resolver resolved=1 ok=1 rejects=0
+
+plan dump: stdout muss ausserhalb der host-lebendigen PMC-Zeilenklasse BYTE-identisch sein (Nenner: 1623 vs 1587 Bytes roh, 1 maskierte PMC-Zeile(n))
+
+[  FAILED  ] Vl3DebugStdoutByteGleich.PlanDumpBytegleich (7 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.PlanCiBytegleich
+[       OK ] Vl3DebugStdoutByteGleich.PlanCiBytegleich (7 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.PlanCmakeBytegleich
+[       OK ] Vl3DebugStdoutByteGleich.PlanCmakeBytegleich (7 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.ValidateBytegleich
+[       OK ] Vl3DebugStdoutByteGleich.ValidateBytegleich (5 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.ExitAchtSperreLaesstStdoutLeer
+[       OK ] Vl3DebugStdoutByteGleich.ExitAchtSperreLaesstStdoutLeer (0 ms)
+[ RUN      ] Vl3DebugStdoutByteGleich.ExitSechsGateAbbruchIdentischMitUndOhneFlag
+[       OK ] Vl3DebugStdoutByteGleich.ExitSechsGateAbbruchIdentischMitUndOhneFlag (2 ms)
+[----------] 7 tests from Vl3DebugStdoutByteGleich (59 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (59 ms total)
+[  PASSED  ] 6 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Vl3DebugStdoutByteGleich.PlanDumpBytegleich
+
+ 1 FAILED TEST
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+bytegleich      =   0.06 sec*proc (1 test)
+cli             =   0.06 sec*proc (1 test)
+debug           =   0.06 sec*proc (1 test)
+planer          =   0.06 sec*proc (1 test)
+prozessprobe    =   0.06 sec*proc (1 test)
+standalone      =   0.06 sec*proc (1 test)
+vl3             =   0.06 sec*proc (1 test)
+
+Total Test time (real) =   0.07 sec
+
+The following tests FAILED:
+	514 - test_vl3_debug_stdout_bytegleich (Failed)         bytegleich cli debug planer prozessprobe standalone vl3
+Errors while running CTest

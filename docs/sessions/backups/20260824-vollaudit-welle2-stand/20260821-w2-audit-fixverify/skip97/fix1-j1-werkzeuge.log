@@ -1,0 +1,95 @@
+[0/2] Re-checking globbed directories...
+[1/54] Scanning /home/comdare/wt-ce-skip97/tools/overlay_source_hash_gen/main.cpp for CXX dependencies
+[2/54] Generating CXX dyndep file tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/CXX.dd
+[3/54] Building CXX object tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/main.cpp.o
+[4/54] Linking CXX executable tools/overlay_source_hash_gen/comdare_overlay_source_hash_gen
+[5/54] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3420405 Bytes, sha512=9c3a0bb29a31a523... (Header NEU geschrieben)
+[6/54] Scanning /home/comdare/wt-ce-skip97/libs/common/serialization/xml_config_parser/xml_config_parser.cpp for CXX dependencies
+[7/54] Generating CXX dyndep file libs/common/serialization/xml_config_parser/CMakeFiles/comdare_builder_xml_config_parser.dir/CXX.dd
+[8/54] Scanning /home/comdare/wt-ce-skip97/apps/is_original_validator/main.cpp for CXX dependencies
+[9/54] Generating CXX dyndep file apps/is_original_validator/CMakeFiles/is_original_validator.dir/CXX.dd
+[10/54] Building CXX object libs/common/serialization/xml_config_parser/CMakeFiles/comdare_builder_xml_config_parser.dir/xml_config_parser.cpp.o
+[11/54] Linking CXX static library libs/common/serialization/xml_config_parser/libcomdare_builder_xml_config_parser.a
+[12/54] Building CXX object apps/is_original_validator/CMakeFiles/is_original_validator.dir/main.cpp.o
+[13/54] Linking CXX executable apps/is_original_validator/is_original_validator
+[14/54] comdare is_original_codegen: snmalloc (paper_a07_snmalloc)
+is_original_validator: allocate (paper=aligned_alloc) PASS (sha=8e4e0d1adc67...)
+is_original_validator: deallocate (paper=free_aligned_sized) PASS (sha=f34e11734073...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a07_snmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[15/54] comdare is_original_codegen: mimalloc (paper_a04_mimalloc)
+is_original_validator: allocate (paper=mi_malloc_aligned) PASS (sha=ccebd637625f...)
+is_original_validator: deallocate (paper=mi_free) PASS (sha=3d7d0ea0a588...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[16/54] comdare is_original_codegen: hot (paper_p02_hot)
+is_original_validator: insert (paper=insert) PASS (sha=c4f8d7743595...)
+is_original_validator: lookup (paper=lookup) PASS (sha=482010e862ef...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p02_hot_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[17/54] comdare is_original_codegen: start (paper_p05_start)
+is_original_validator: insert (paper=insertLater) PASS (sha=8cfb67dea8a3...)
+is_original_validator: lookup (paper=EqualityLookup) PASS (sha=c28af8ba06a6...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p05_start_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[18/54] comdare is_original_codegen: surf (paper_p10_surf)
+is_original_validator: lookup (paper=lookupKey) PASS (sha=53ec75480d8c...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p10_surf_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 1 functions, module=ALL ORIGINAL)
+[19/54] comdare is_original_codegen: masstree (paper_p03_masstree)
+is_original_validator: insert (paper=find_insert) PASS (sha=0ba9749f7e08...)
+is_original_validator: lookup (paper=get) PASS (sha=e794f6acc16d...)
+is_original_validator: erase (paper=find_locked) PASS (sha=beb708826e09...)
+is_original_validator: clear (paper=destroy) PASS (sha=e14d26ac3fc5...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p03_masstree_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 4 functions, module=ALL ORIGINAL)
+[20/54] comdare is_original_codegen: jemalloc (paper_a05_jemalloc)
+is_original_validator: allocate (paper=je_aligned_alloc) PASS (sha=4798000098af...)
+is_original_validator: deallocate (paper=je_free) PASS (sha=8f431329f70a...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a05_jemalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[21/54] comdare is_original_codegen: lrmalloc (paper_a11_lrmalloc)
+is_original_validator: allocate (paper=lf_aligned_alloc) PASS (sha=11be5da7ed74...)
+is_original_validator: deallocate (paper=lf_free) PASS (sha=34ca0f1d077d...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a11_lrmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[22/54] comdare is_original_codegen: rpmalloc (paper_a10_rpmalloc)
+is_original_validator: allocate (paper=rpaligned_alloc) PASS (sha=f150152f9ba3...)
+is_original_validator: deallocate (paper=rpfree) PASS (sha=fa94eb0a55e5...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a10_rpmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[23/54] comdare is_original_codegen: dlmalloc (paper_a20_dlmalloc)
+is_original_validator: allocate (paper=public_mEMALIGn) PASS (sha=4ba9217e3c2a...)
+is_original_validator: deallocate (paper=public_fREe) PASS (sha=e764b358f9fb...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a20_dlmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[24/54] comdare is_original_codegen: art (paper_p01_art)
+is_original_validator: insert (paper=insert_internal) PASS (sha=7e81f55e6ead...)
+is_original_validator: lookup (paper=get) PASS (sha=ecddea59e7e1...)
+is_original_validator: erase (paper=remove_internal) PASS (sha=43c78362753d...)
+is_original_validator: clear (paper=clear) PASS (sha=79e6a528b117...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p01_art_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 4 functions, module=ALL ORIGINAL)
+[25/54] comdare is_original_codegen: wormhole (paper_p07_wormhole)
+is_original_validator: insert (paper=wh_put) PASS (sha=48b20b96bd2c...)
+is_original_validator: lookup (paper=wh_get) PASS (sha=05a308bead77...)
+is_original_validator: erase (paper=wh_del) PASS (sha=b44fc1b7d265...)
+is_original_validator: WROTE /home/comdare/wt-ce-skip97/build/gcc-release/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p07_wormhole_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 3 functions, module=ALL ORIGINAL)
+[26/54] Scanning /home/comdare/wt-ce-skip97/tools/measurement_axis_registry_gen/main.cpp for CXX dependencies
+[27/54] Generating CXX dyndep file tools/measurement_axis_registry_gen/CMakeFiles/comdare_measurement_axis_registry_gen.dir/CXX.dd
+[28/54] Scanning /home/comdare/wt-ce-skip97/tools/system_axis_registry_gen/main.cpp for CXX dependencies
+[29/54] Scanning /home/comdare/wt-ce-skip97/apps/anatomy_codegen_tool/main.cpp for CXX dependencies
+[30/54] Generating CXX dyndep file tools/system_axis_registry_gen/CMakeFiles/comdare_system_axis_registry_gen.dir/CXX.dd
+[31/54] Generating CXX dyndep file apps/anatomy_codegen_tool/CMakeFiles/comdare_anatomy_codegen_cli.dir/CXX.dd
+[32/54] Scanning /home/comdare/wt-ce-skip97/libs/cache_engine/builder/anatomy_codegen_tool/anatomy_codegen_tool.cpp for CXX dependencies
+[33/54] Generating CXX dyndep file libs/cache_engine/builder/anatomy_codegen_tool/CMakeFiles/comdare_anatomy_codegen_tool.dir/CXX.dd
+[34/54] Scanning /home/comdare/wt-ce-skip97/tools/axis_registry_gen/main.cpp for CXX dependencies
+[35/54] Generating CXX dyndep file tools/axis_registry_gen/CMakeFiles/comdare_axis_registry_gen.dir/CXX.dd
+[36/54] Scanning /home/comdare/wt-ce-skip97/apps/adhoc_emitter/main.cpp for CXX dependencies
+[37/54] Generating CXX dyndep file apps/adhoc_emitter/CMakeFiles/comdare_adhoc_emitter_cli.dir/CXX.dd
+[38/54] Scanning /home/comdare/wt-ce-skip97/apps/catalog_codegen_tool/main.cpp for CXX dependencies
+[39/54] Generating CXX dyndep file apps/catalog_codegen_tool/CMakeFiles/comdare_catalog_codegen_cli.dir/CXX.dd
+[40/54] Building CXX object apps/anatomy_codegen_tool/CMakeFiles/comdare_anatomy_codegen_cli.dir/main.cpp.o
+[41/54] Building CXX object tools/measurement_axis_registry_gen/CMakeFiles/comdare_measurement_axis_registry_gen.dir/main.cpp.o
+[42/54] Linking CXX executable tools/measurement_axis_registry_gen/comdare_measurement_axis_registry_gen
+[43/54] Building CXX object tools/system_axis_registry_gen/CMakeFiles/comdare_system_axis_registry_gen.dir/main.cpp.o
+[44/54] Linking CXX executable tools/system_axis_registry_gen/comdare_system_axis_registry_gen
+[45/54] Building CXX object libs/cache_engine/builder/anatomy_codegen_tool/CMakeFiles/comdare_anatomy_codegen_tool.dir/anatomy_codegen_tool.cpp.o
+[46/54] Linking CXX static library libs/cache_engine/builder/anatomy_codegen_tool/libcomdare_anatomy_codegen_tool.a
+[47/54] Linking CXX executable apps/anatomy_codegen_tool/comdare-anatomy-codegen-tool
+[48/54] Building CXX object apps/catalog_codegen_tool/CMakeFiles/comdare_catalog_codegen_cli.dir/main.cpp.o
+[49/54] Linking CXX executable apps/catalog_codegen_tool/comdare-catalog-codegen
+[50/54] Building CXX object tools/axis_registry_gen/CMakeFiles/comdare_axis_registry_gen.dir/main.cpp.o
+[51/54] Linking CXX executable tools/axis_registry_gen/comdare_axis_registry_gen
+[52/54] Building CXX object apps/adhoc_emitter/CMakeFiles/comdare_adhoc_emitter_cli.dir/main.cpp.o
+[53/54] Linking CXX executable apps/adhoc_emitter/comdare-adhoc-emitter

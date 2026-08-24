@@ -1,0 +1,369 @@
+=== 0: Platz ===
+/dev/nvme0n1p2  251G  227G   12G  96% /
+=== 1: Baum + Ziel (clang-22, gleiche Form wie die Erst-Probe) ===
+configure.sh: Quellverzeichnis : /home/comdare/wt-ce-hy-a
+configure.sh: Bauverzeichnis   : build-rcu
+configure.sh: Praefix          : /usr/local
+configure.sh: cmake            : cmake
+
+-- The CXX compiler identification is Clang 22.1.8
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++-22 - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Boost.MP11: vendored Header gefunden -> /home/comdare/wt-ce-hy-a/cmake/../cmake/third_party/boost_mp11/include
+-- Boost.MP11 ready: /home/comdare/wt-ce-hy-a/cmake/../cmake/third_party/boost_mp11/include
+-- GTest: lokaler Tarball gefunden: /home/comdare/wt-ce-hy-a/cmake/third_party/googletest-1.15.2.tar.gz
+-- The C compiler identification is Clang 22.1.8
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/clang-22 - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- ==============================================================
+-- comdare-cache-engine Multi-OS-Konfiguration (Phase 6)
+--   OS                : Linux
+--   Architektur       : x86_64
+--   Block AO Plattform: unknown
+--   Cache-Line-Size   : 64 B
+--   ISA detected      : scalar-only
+-- ==============================================================
+CMake Warning at cmake/check_submodules.cmake:36 (message):
+  
+  ──────────────────────────────────────────────────────
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:37 (message):
+  Fehlende cache-engine-interne Module (Skelett-Inkonsistenz):
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-search-engine
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-cache-engine-core
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-measurement
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-isa-dispatch
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-build-tools
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:39 (message):
+    - modules/comdare-test-system
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:41 (message):
+    Erwarteter Inhalt pro Modul: CMakeLists.txt + README.md
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+CMake Warning at cmake/check_submodules.cmake:42 (message):
+  
+  ──────────────────────────────────────────────────────
+Call Stack (most recent call first):
+  CMakeLists.txt:571 (include)
+
+
+-- comdare Plugin-Controller: keine Pruefling-Repos konfiguriert (nur CE-Permutation, Stufe 1)
+-- Test-Temp-Wurzel (Posten 69): comdare_test_<uid>_006576d6db8d (stabil aus CMAKE_BINARY_DIR=/home/comdare/wt-ce-hy-a/build-rcu)
+-- comdare_codegen_anatomy_module: anatomy_codegen_pilot_hot (STATIC, fp=hot_pilot) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules/anatomy_perm_hot_pilot.cpp
+-- comdare_codegen_anatomy_module: anatomy_codegen_pilot_wormhole_shared (SHARED, fp=wormhole_pilot) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules/anatomy_perm_wormhole_pilot.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_0 (SHARED, fp=anatomy_multi_pilot_0) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_0.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_1 (SHARED, fp=anatomy_multi_pilot_1) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_1.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_2 (SHARED, fp=anatomy_multi_pilot_2) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_2.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_3 (SHARED, fp=anatomy_multi_pilot_3) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_3.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_4 (SHARED, fp=anatomy_multi_pilot_4) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_4.cpp
+-- comdare_codegen_anatomy_module: anatomy_multi_pilot_5 (SHARED, fp=anatomy_multi_pilot_5) -> /home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi/anatomy_perm_anatomy_multi_pilot_5.cpp
+-- comdare_codegen_anatomy_module_list: generated 6 SHARED targets (prefix=anatomy_multi_pilot, output=/home/comdare/wt-ce-hy-a/build-rcu/generated/anatomy_modules_multi)
+CMake Warning at cmake/anatomy_codegen_runner.cmake:87 (message):
+  comdare_run_anatomy_codegen_tool: tool not yet built.
+
+    Expected one of: /home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/Release/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/Debug/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/RelWithDebInfo/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/MinSizeRel/comdare-anatomy-codegen-tool
+    Run 'cmake --build <build-dir> --target comdare_anatomy_codegen_cli' and re-configure to enable R5.I Configure-Time Codegen.
+Call Stack (most recent call first):
+  tests/unit/CMakeLists.txt:1143 (comdare_run_anatomy_codegen_tool)
+
+
+-- R5.I: configure-time codegen SKIPPED (status=SKIPPED). Build the tool first: cmake --build . --target comdare_anatomy_codegen_cli, then re-configure to enable the R5.I pilot test.
+CMake Warning at cmake/anatomy_codegen_runner.cmake:87 (message):
+  comdare_run_anatomy_codegen_tool: tool not yet built.
+
+    Expected one of: /home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/Release/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/Debug/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/RelWithDebInfo/comdare-anatomy-codegen-tool;/home/comdare/wt-ce-hy-a/build-rcu/apps/anatomy_codegen_tool/MinSizeRel/comdare-anatomy-codegen-tool
+    Run 'cmake --build <build-dir> --target comdare_anatomy_codegen_cli' and re-configure to enable R5.I Configure-Time Codegen.
+Call Stack (most recent call first):
+  tests/unit/CMakeLists.txt:1297 (comdare_run_anatomy_codegen_tool)
+
+
+-- F15: SKIPPED (status=SKIPPED). Build comdare_anatomy_codegen_cli first, then re-configure.
+CMake Warning at cmake/adhoc_emitter.cmake:76 (message):
+  comdare_run_adhoc_emitter: tool not yet built.
+
+    Expected one of: /home/comdare/wt-ce-hy-a/build-rcu/apps/adhoc_emitter/comdare-adhoc-emitter;/home/comdare/wt-ce-hy-a/build-rcu/apps/adhoc_emitter/Release/comdare-adhoc-emitter;/home/comdare/wt-ce-hy-a/build-rcu/apps/adhoc_emitter/Debug/comdare-adhoc-emitter;/home/comdare/wt-ce-hy-a/build-rcu/apps/adhoc_emitter/RelWithDebInfo/comdare-adhoc-emitter;/home/comdare/wt-ce-hy-a/build-rcu/apps/adhoc_emitter/MinSizeRel/comdare-adhoc-emitter
+    Run 'cmake --build <build-dir> --target comdare_adhoc_emitter_cli' and re-configure to enable R5.G Auto-Permutations-Skalierung.
+Call Stack (most recent call first):
+  tests/unit/CMakeLists.txt:1710 (comdare_run_adhoc_emitter)
+
+
+-- R5.G: Auto-Permutations-Skalierung SKIPPED (status=SKIPPED). Build comdare_adhoc_emitter_cli first, then re-configure.
+-- GO-3 A1 Kohaerenz-Guard bewiesen: Negativ-Probe (ohne AVX2-Flag) korrekt ABGELEHNT, Positiv-Probe (mit AVX2-Flag) kompiliert
+-- W3-KERN: Mess-Interface-Testate REGISTRIERT (dock + biss)
+-- Goal-V6 Phase D: 4607 — 28 add_test-D-Tests (16 leicht + 12 Boost) + 5 DLL-Round-Trip-Tests (test_dgenus_dll/test_buildvariant_dll{,_real}/test_adhoc_buildvariant_dll/test_d13_dll_runtime_measure) als OFFIZIELLE CMake-Targets (6 SHARED-DLLs via $<TARGET_FILE>). container_dll (test_d4b) bleibt scratch-verifiziert (Folge).
+-- tools-tests: test_cacheline_policy_selector (#174) + test_load_profile_writer (#175) als add_test registriert (best_binary_selector-Tool = tools/best_binary_selector add_executable).
+-- B2-ABSCHLUSS Schichtungs-Wache: Negativprobe feuert am #error, Kontrolle baut (2/2)
+-- Durchstich: pdflatex gefunden (1 von 1): /usr/local/texlive/2026/bin/x86_64-linux/pdflatex
+-- comdare E-E: Overlay-Quell-Hash verdrahtet -> /home/comdare/wt-ce-hy-a/build-rcu/generated/cache_engine/abi/overlay_source_hash_generated.hpp
+-- ──────────────────────────────────────────────────────────
+-- comdare-cache-engine 0.1.0
+--   C++ Standard:           23
+--   Detection Mode:         COMPILE_TIME
+--   Build Builder:          ON
+--   Build Benchmarks:       ON
+--   Build Tests:            ON
+--   Pre-Build Permutations: 
+--   Experiment Mode (V8.4): OFF
+--   Legacy-Reimpl (V8.2):   OFF [DEPRECATED]
+--   Auto-Run Builder V13.4: OFF
+-- ──────────────────────────────────────────────────────────
+-- V41.F.6.1.C Allocator Axis 6 effective USE flags:
+--   Batch 1: USE_STD=1 MIMALLOC=0 SNMALLOC=0 PMR=1 POOL=1 VAMPIR_NFP=0
+--   Batch 2: USE_JEMALLOC=0 TCMALLOC=0 DLMALLOC=0
+--   Batch 3: USE_HOARD=0 SLAB=0 MICHAEL_LF=0
+--   Batch 4: USE_SCALLOC=0 NUMALLOC=0 RPMALLOC=0
+--   Batch 5: USE_LRMALLOC=0 CAMA=0 STARMALLOC=0
+--   Batch 6: USE_TCMALLOC_WH=0 HMALLOC=0 PIM_MALLOC=0
+--   Batch 7: USE_CRYSTALLINE=0 EXGEN=0 BUDDY=0
+--   Batch 8: USE_PTMALLOC2=0 VMEM_MAG=0 (VOLLAUSBAU 24 Vendor)
+-- V41.F.6.1 Topic queuing Pilot:
+--   axis_Q1 VOLLAUSBAU (13/13 W2): NO_BUFFER=1 FIFO=1 LIFO=1 BOUNDED_RING=1 APPEND_ONLY=1 PRIORITY_HEAP=1 DELTA_CHAIN=1 SKIPLIST_BUFFER=1 TOMBSTONE_BUFFER=1 COPY_ON_WRITE=1 EPOCH_BUFFER=1 BATCHED_INSERT_BUFFER=1 LOCKFREE_SPSC=1 LOCKFREE_MPMC=1
+--   axis_Q2 VOLLAUSBAU (5/5 W3): EAGER=1 WATERMARK=1 LAZY=1 TIMED=1 ADAPTIVE_LSM=1
+-- V41.F.6.1 Topic traversal Pilot:
+--   axis_03a (22 search_algo = 17 + 4 per-K + S22 SwissTable, Masstree deferred): ARRAY256=0 VECTOR_U8U8=0 VECTOR_U16U16=0 ARRAY65535=0 ORIGINAL_ART=0 ORIGINAL_HOT=0 ORIGINAL_START=0 ORIGINAL_WORMHOLE=0 ORIGINAL_SURF=0 K_ARY=1 INTERPOLATION=1 EYTZINGER=1 SKIP_LIST=0 HASH_SEARCH=0 LINEAR_SCAN=1 BST=0 BTREE=0 K_ARY_K2=0 K_ARY_K4=0 K_ARY_K8=0 K_ARY_K16=0 SWISSTABLE=0
+--   axis_03b (3 cache_traversal): LINEAR_FANOUT=1 HASH_LOOKUP=1 BINARY_SEARCH_FANOUT=1
+--   axis_03m (2 mapping): DIRECT_PLACEMENT=1 POOL_RELATIVE=1
+--   axis_12 (3 platforms): GENERIC=1 X86_64=1 AARCH64=1
+--   axis_05 (5 layouts): CACHE_LINE_ALIGNED=1 AOS_STRICT=1 SOA=1 PACKED_BITMAP=1 AOSOA=1
+--   axis_02 (3 compressions): NONE=1 PATRICIA=1 BYTE_WISE=1
+--   axis_01_page_type (6 page-types): DENSE=1 EXT=1 PATRICIA=1 REDIRECT=1 CUSTOM=1 BPLUS=1
+--   axis_btree_order (5 shapes): KT2=0 KT3=0 KT4=1 KT8=0 KT16=0
+--   axis_skip_list_shape (4 shapes): MAX16_P50=1 MAX8_P50=0 MAX32_P50=0 MAX16_P25=0
+--   axis_bst_shape (3 shapes): PTR_SIZE_T=1 PTR_U32=0 PTR_U16=0
+--   axis_hash_probe_shape (4 shapes): OA_LF70=1 OA_LF50=0 OA_LF90=0 CHAINING=0
+--   axis_04 (4 node-types): NODE4=1 NODE16=1 NODE48=1 NODE256=1
+--   axis_07 (4 prefetchers): NONE=1 DISTANCE_ESTIMATOR=1 HARDWARE_PREFETCH=1 PATH_ORIENTED=1
+--   axis_11 (4 telemetries): LEAF=1 DENSITY=1 INSERT=1 LATENCY=1
+--   axis_10 (4 serializers): RAW=1 VAR_LEN=1 SUCCINCT=1 COMPRESSED=1
+--   axis_14 (5 value-handles): INLINE=1 EXT_POOL=1 SHARED_REF=1 VERSIONED=1 CHAIN_REF=1
+--   axis_08 (9 concurrency): NONE=1 BLOCKING=1 RW=1 OLC=1 LF=1 WF=1 RCU=1 HP=1 OLC_RB=1
+--   axis_filter (5 filters): BLOOM=1 CUCKOO=1 RANGE_SURF=1 XOR=1 NONE=0
+--   axis_io (4 io-strategies): IN_MEM=1 DIRECT=1 BUFFERED=1 MMAP=1
+--   axis_persistence_target (2 targets): MEMORY_ONLY=1 DISK_WRITEBACK=0 (Q-1 FALL B: DISK_WRITEBACK=0 haelt den Voll-Bau bei 2^17)
+--   axis_migration (4 migrations): NONE=1 HOT_COLD=1 TIER=1 ADAPTIVE=1
+--   axis_01 (4 clusterings): HEAP=1 CLUSTERED=1 NON_CLUSTERED=1 IOT=1
+--   axis_09 (4 main-CPU-ISAs): AMD64=1 AARCH64=1 RISCV=1 POWERPC=1
+--   axis_09b (8 SIMD-extensions): NO_EXT=1 SSE2=1 AVX2=1 AVX512=1 NEON=1 SVE2=1 RVV=1 CUDA_GH200=1
+-- comdare paper-init HIT: a04_mimalloc already extracted
+-- comdare is_original_codegen: registered mimalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp
+-- comdare paper-init HIT: a05_jemalloc already extracted
+-- comdare is_original_codegen: registered jemalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a05_jemalloc_is_original.hpp
+-- comdare paper-init HIT: a07_snmalloc already extracted
+-- comdare is_original_codegen: registered snmalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a07_snmalloc_is_original.hpp
+-- comdare paper-init HIT: a20_dlmalloc already extracted
+-- comdare is_original_codegen: registered dlmalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a20_dlmalloc_is_original.hpp
+-- comdare paper-init HIT: a10_rpmalloc already extracted
+-- comdare is_original_codegen: registered rpmalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a10_rpmalloc_is_original.hpp
+-- comdare paper-init HIT: a11_lrmalloc already extracted
+-- comdare is_original_codegen: registered lrmalloc -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a11_lrmalloc_is_original.hpp
+-- comdare paper-init HIT: p01_art already extracted
+-- comdare is_original_codegen: registered art -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p01_art_is_original.hpp
+-- comdare paper-init HIT: p02_hot already extracted
+-- comdare is_original_codegen: registered hot -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p02_hot_is_original.hpp
+-- comdare paper-init HIT: p05_start already extracted
+-- comdare is_original_codegen: registered start -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p05_start_is_original.hpp
+-- comdare paper-init HIT: p07_wormhole already extracted
+-- comdare is_original_codegen: registered wormhole -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p07_wormhole_is_original.hpp
+-- comdare paper-init HIT: p10_surf already extracted
+-- comdare is_original_codegen: registered surf -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p10_surf_is_original.hpp
+-- comdare paper-init HIT: p03_masstree already extracted
+-- comdare is_original_codegen: registered masstree -> /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p03_masstree_is_original.hpp
+-- comdare paper-roll-out: SKIP q01_concurrentqueue (/home/comdare/wt-ce-hy-a/ext/queuing/Q01-concurrentqueue/concurrentqueue.h missing)
+-- 
+-- ═══════════════════════════════════════════════════════════════
+--  COMDARE Achsen-Hierarchie (G.1) — Anatomie-Achsen pro Topic
+-- ═══════════════════════════════════════════════════════════════
+--   allocator/
+--       axis_06_allocator: 25 Wrapper
+--   concurrency/
+--       axis_08_concurrency: 10 Wrapper
+--   filter/
+--       axis_filter: 6 Wrapper
+--   hardware/
+--       axis_09_isa: 4 Wrapper
+--       axis_09b_simd_extension: 9 Wrapper
+--       axis_12_general_hardware: 3 Wrapper
+--   io/
+--       axis_io: 5 Wrapper
+--   memory_layout/
+--       axis_05_memory_layout: 5 Wrapper
+--   migration/
+--       axis_migration: 4 Wrapper
+--   nodes/
+--       axis_01_page_type: 6 Wrapper
+--       axis_02_path_compression: 4 Wrapper
+--       axis_04_node_type: 6 Wrapper
+--       axis_bst_shape: 3 Wrapper
+--       axis_btree_order: 5 Wrapper
+--       axis_hash_probe_shape: 4 Wrapper
+--       axis_skip_list_shape: 4 Wrapper
+--   prefetch/
+--       axis_07_prefetch: 7 Wrapper
+--   search_engine/
+--       axis_01_index_organization: 5 Wrapper
+--   sequence/
+--       axis_growth: 1 Wrapper
+--   serialization/
+--       axis_10_serialization: 5 Wrapper
+--   telemetry/
+--       axis_11_telemetry: 5 Wrapper
+--   traversal/
+--       axis_03a_search_algo: 17 Wrapper
+--       axis_03b_cache_traversal: 3 Wrapper
+--       axis_03m_mapping: 2 Wrapper
+--   value_handle/
+--       axis_14_value_handle: 5 Wrapper
+-- ───────────────────────────────────────────────────────────────
+--  Gesamt: 15 Topics · 25 Achsen · 153 Wrapper
+--  Permutations-Raum (Produkt der Achsen-Kardinalitaeten): >= 1e15 (kombinatorisch)
+-- ═══════════════════════════════════════════════════════════════
+-- 
+-- Registrierungs-Protokoll: 6 bedingte Registrierungs-Bloecke vermerkt -> /home/comdare/wt-ce-hy-a/build-rcu/comdare_registrierungs_protokoll.txt
+-- Configuring done (0.9s)
+-- Generating done (0.3s)
+-- Build files have been written to: /home/comdare/wt-ce-hy-a/build-rcu
+
+configure.sh: fertig. config.status geschrieben.
+configure.sh: weiter mit:  make        (bauen)
+configure.sh:              make check  (Tests)
+configure.sh:              make install
+CONFIGURE_RC=0
+[0/2] Re-checking globbed directories...
+[1/30] Scanning /home/comdare/wt-ce-hy-a/tools/overlay_source_hash_gen/main.cpp for CXX dependencies
+[2/30] Generating CXX dyndep file tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/CXX.dd
+[3/30] Building CXX object tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/main.cpp.o
+[4/30] Linking CXX executable tools/overlay_source_hash_gen/comdare_overlay_source_hash_gen
+[5/30] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
+[overlay_source_hash_gen] 712 Dateien, 3403575 Bytes, sha512=dbc12730d9b0adc1... (Header NEU geschrieben)
+[6/30] Scanning /home/comdare/wt-ce-hy-a/apps/is_original_validator/main.cpp for CXX dependencies
+[7/30] Generating CXX dyndep file apps/is_original_validator/CMakeFiles/is_original_validator.dir/CXX.dd
+[8/30] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[9/30] Building CXX object apps/is_original_validator/CMakeFiles/is_original_validator.dir/main.cpp.o
+[10/30] Linking CXX executable apps/is_original_validator/is_original_validator
+[11/30] comdare is_original_codegen: snmalloc (paper_a07_snmalloc)
+is_original_validator: allocate (paper=aligned_alloc) PASS (sha=8e4e0d1adc67...)
+is_original_validator: deallocate (paper=free_aligned_sized) PASS (sha=f34e11734073...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a07_snmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[12/30] comdare is_original_codegen: start (paper_p05_start)
+is_original_validator: insert (paper=insertLater) PASS (sha=8cfb67dea8a3...)
+is_original_validator: lookup (paper=EqualityLookup) PASS (sha=c28af8ba06a6...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p05_start_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[13/30] comdare is_original_codegen: mimalloc (paper_a04_mimalloc)
+is_original_validator: allocate (paper=mi_malloc_aligned) PASS (sha=ccebd637625f...)
+is_original_validator: deallocate (paper=mi_free) PASS (sha=3d7d0ea0a588...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[14/30] comdare is_original_codegen: hot (paper_p02_hot)
+is_original_validator: insert (paper=insert) PASS (sha=c4f8d7743595...)
+is_original_validator: lookup (paper=lookup) PASS (sha=482010e862ef...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p02_hot_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[15/30] comdare is_original_codegen: surf (paper_p10_surf)
+is_original_validator: lookup (paper=lookupKey) PASS (sha=53ec75480d8c...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p10_surf_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 1 functions, module=ALL ORIGINAL)
+[16/30] comdare is_original_codegen: masstree (paper_p03_masstree)
+is_original_validator: insert (paper=find_insert) PASS (sha=0ba9749f7e08...)
+is_original_validator: lookup (paper=get) PASS (sha=e794f6acc16d...)
+is_original_validator: erase (paper=find_locked) PASS (sha=beb708826e09...)
+is_original_validator: clear (paper=destroy) PASS (sha=e14d26ac3fc5...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p03_masstree_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 4 functions, module=ALL ORIGINAL)
+[17/30] comdare is_original_codegen: jemalloc (paper_a05_jemalloc)
+is_original_validator: allocate (paper=je_aligned_alloc) PASS (sha=4798000098af...)
+is_original_validator: deallocate (paper=je_free) PASS (sha=8f431329f70a...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a05_jemalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[18/30] comdare is_original_codegen: lrmalloc (paper_a11_lrmalloc)
+is_original_validator: allocate (paper=lf_aligned_alloc) PASS (sha=11be5da7ed74...)
+is_original_validator: deallocate (paper=lf_free) PASS (sha=34ca0f1d077d...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a11_lrmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[19/30] comdare is_original_codegen: dlmalloc (paper_a20_dlmalloc)
+is_original_validator: allocate (paper=public_mEMALIGn) PASS (sha=4ba9217e3c2a...)
+is_original_validator: deallocate (paper=public_fREe) PASS (sha=e764b358f9fb...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a20_dlmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[20/30] comdare is_original_codegen: rpmalloc (paper_a10_rpmalloc)
+is_original_validator: allocate (paper=rpaligned_alloc) PASS (sha=f150152f9ba3...)
+is_original_validator: deallocate (paper=rpfree) PASS (sha=fa94eb0a55e5...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/allocator/axis_06_allocator/legacy_code/paper_a10_rpmalloc_is_original.hpp (axis_mixin=comdare::cache_engine::alloc::concepts::AllocatorOriginalCodeMixin, 2 functions, module=ALL ORIGINAL)
+[21/30] comdare is_original_codegen: art (paper_p01_art)
+is_original_validator: insert (paper=insert_internal) PASS (sha=7e81f55e6ead...)
+is_original_validator: lookup (paper=get) PASS (sha=ecddea59e7e1...)
+is_original_validator: erase (paper=remove_internal) PASS (sha=43c78362753d...)
+is_original_validator: clear (paper=clear) PASS (sha=79e6a528b117...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p01_art_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 4 functions, module=ALL ORIGINAL)
+[22/30] comdare is_original_codegen: wormhole (paper_p07_wormhole)
+is_original_validator: insert (paper=wh_put) PASS (sha=48b20b96bd2c...)
+is_original_validator: lookup (paper=wh_get) PASS (sha=05a308bead77...)
+is_original_validator: erase (paper=wh_del) PASS (sha=b44fc1b7d265...)
+is_original_validator: WROTE /home/comdare/wt-ce-hy-a/build-rcu/generated/topics/traversal/axis_03a_search_algo/legacy_code/paper_p07_wormhole_is_original.hpp (axis_mixin=comdare::cache_engine::lookup::concepts::SearchAlgoOriginalCodeMixin, 3 functions, module=ALL ORIGINAL)
+[23/30] Scanning /home/comdare/wt-ce-hy-a/tests/unit/test_rcu_concurrency.cpp for CXX dependencies
+[24/30] Generating CXX dyndep file tests/unit/CMakeFiles/test_rcu_concurrency.dir/CXX.dd
+[25/30] Building CXX object tests/unit/CMakeFiles/test_rcu_concurrency.dir/test_rcu_concurrency.cpp.o
+[26/30] Building CXX object _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+In file included from /home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/src/gtest-all.cc:38:
+In file included from /home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/include/gtest/gtest.h:64:
+In file included from /home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/include/gtest/gtest-death-test.h:43:
+In file included from /home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h:47:
+In file included from /home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/include/gtest/gtest-matchers.h:49:
+/home/comdare/wt-ce-hy-a/build-rcu/_deps/googletest-src/googletest/include/gtest/gtest-printers.h:524:35: warning: implicit conversion from 'char8_t' to 'char32_t' may change the meaning of the represented code unit [-Wcharacter-conversion]
+  524 |   PrintTo(ImplicitCast_<char32_t>(c), os);
+      |           ~~~~~~~~~~~~~           ^
+1 warning generated.
+[27/30] Linking CXX static library lib/libgtest.a
+[28/30] Linking CXX static library lib/libgtest_main.a
+[29/30] Linking CXX executable tests/unit/test_rcu_concurrency
+ZIEL_RC=0
+=== 2: 50x OHNE Last ===
+NACH_FIX_OHNE_LAST: gruen=50 rot=0
+=== 3: 30x UNTER LAST -- die Serie, die VORHER 5 rot hatte ===
+NACH_FIX_UNTER_LAST: gruen=30 rot=0
+=== 4: 60x UNTER LAST, HAERTER (64 Prozesse) -- Belastungsprobe des Fixes ===
+NACH_FIX_HARTE_LAST: gruen=60 rot=0
+=== 5: 20x mit ulimit -u 40 (SOLL weiter rot: EAGAIN, Umgebungslimit) ===
+NACH_FIX_THREAD_LIMIT: gruen=0 rot=20
+=== 6: aufraeumen ===
+/dev/nvme0n1p2  251G  227G   12G  96% /
+=== GEGENPROBE FERTIG ===

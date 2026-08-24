@@ -1,0 +1,27 @@
+Merge bau/w1luecken-super @ 8edc34a0 in development -- super-Phase Merge 4 (Z19): #113-Rest B11 skip_anker-Bissprobe
+
+Strang: W1-Luecken (#113), super-Haelfte; Tip 8edc34a0 (origin-gesichert, 1 Commit
+auf Basis 8aae5cd2). Inhalt: B11 = ROT-statt-SKIPPED-Mutationsprobe des B14-B4-
+Skip-Ankers (NEU Code/tests/skip_anker_bissprobe.cmake +42, Registrierung ans
+DATEIENDE von Code/tests/CMakeLists.txt +13; Regex DRIFT-FREI per
+get_test_property aus der Live-Property, keine zweite Kopie; Labels
+da_unit;fixture_sync). Die 13/13 B14-xmllint-Heilungen/GRENZE (B1..B11 GEHEILT,
+GRENZE-1 golden_n:51 Namespace, GRENZE-2 comdare_xml_count-Dezimal :531/:549)
+sind Objekt-Befund der Basis -- Marker-Gegenprobe in der Z19-Abnahme.
+
+Audit-Verdikt: verify-ergebnis.md 21.08. TRAEGT_MIT_FIXES; super-Anteil traegt
+(B10 VERIFIZIERT-ERLEDIGT ohne Edit, B11 gebaut; Bissprobe am Tip 1/1 Passed).
+V-F2 (prt-art B14) durch Z14/Z15 vollzogen (pinduo zuerst, D-10a fuehrend);
+V-F3: da_unit-Bilanz konfigurationsabhaengig (371 Bau-Baum / 406 Verify-Baum) --
+Endstand-Nenner misst der Phasen-Kombibau (Z23, T-11b sinngemaess super).
+
+Merge konfliktfrei (merge-tree RC=0, reine Tree-OID; Code/tests/ auf development
+seit Basis unveraendert, Dateiende-Anhang ohne Harmonisierungsbedarf); Gitlink
+Code/external UNBERUEHRT (Sperre bis Z23). Kein Push in diesem Schritt (R4,
+Phasen-Push Z23). Explore-Befund + Beweise:
+~/backups-workflow/20260822-lande-zug/Z19/. Restposten-Traeger: Raeumung
+wt-super-w1luecken (nested ce 66de5c09 + prt-art d11781fa) = Z26; Ledger-/Board-
+Nachtraege = Lead-Nachlande-Zug.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+

@@ -1,0 +1,286 @@
+Test project /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/build-dbg
+    Start 361: test_experiment_plan_director
+1/1 Test #361: test_experiment_plan_director ....***Failed    0.10 sec
+Running main() from /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/build-dbg/_deps/googletest-src/googletest/src/gtest_main.cc
+[==========] Running 90 tests from 20 test suites.
+[----------] Global test environment set-up.
+[----------] 12 tests from ExperimentPlanDirector
+[ RUN      ] ExperimentPlanDirector.RegistryTrioLoadsThreeArtRegistriesWith18_3_16
+[       OK ] ExperimentPlanDirector.RegistryTrioLoadsThreeArtRegistriesWith18_3_16 (1 ms)
+[ RUN      ] ExperimentPlanDirector.ThesisMinYieldsSingleIdentityPermAndSinglePass
+[       OK ] ExperimentPlanDirector.ThesisMinYieldsSingleIdentityPermAndSinglePass (0 ms)
+[ RUN      ] ExperimentPlanDirector.ThesisAllAxesGoldenYields2x2PermsTimesSweepPasses
+[       OK ] ExperimentPlanDirector.ThesisAllAxesGoldenYields2x2PermsTimesSweepPasses (0 ms)
+[ RUN      ] ExperimentPlanDirector.ThesisDumpPlanIsByteDeterministic
+[       OK ] ExperimentPlanDirector.ThesisDumpPlanIsByteDeterministic (0 ms)
+[ RUN      ] ExperimentPlanDirector.ExperimentGoldenWalksPhasesUnderEachPerm
+[       OK ] ExperimentPlanDirector.ExperimentGoldenWalksPhasesUnderEachPerm (0 ms)
+[ RUN      ] ExperimentPlanDirector.MeasurementToolingStaysDefaultOneComboWhenUndeclared
+[       OK ] ExperimentPlanDirector.MeasurementToolingStaysDefaultOneComboWhenUndeclared (1 ms)
+[ RUN      ] ExperimentPlanDirector.ExperimentDumpPlanIsByteDeterministic
+[       OK ] ExperimentPlanDirector.ExperimentDumpPlanIsByteDeterministic (1 ms)
+[ RUN      ] ExperimentPlanDirector.DirectorAnnotatesPlanHeaderWithRegistryTrio
+[       OK ] ExperimentPlanDirector.DirectorAnnotatesPlanHeaderWithRegistryTrio (1 ms)
+[ RUN      ] ExperimentPlanDirector.ResolverOrganPureProfileZeroRejectsInPlanHead
+[       OK ] ExperimentPlanDirector.ResolverOrganPureProfileZeroRejectsInPlanHead (1 ms)
+[ RUN      ] ExperimentPlanDirector.ResolverRoutesMisplacedSystemAxisInDumpPlan
+[       OK ] ExperimentPlanDirector.ResolverRoutesMisplacedSystemAxisInDumpPlan (1 ms)
+[ RUN      ] ExperimentPlanDirector.ResolverInertWithoutFullTrio
+[       OK ] ExperimentPlanDirector.ResolverInertWithoutFullTrio (0 ms)
+[ RUN      ] ExperimentPlanDirector.ThreeStageTopologyMeasurementComboOuterSystemPermInner
+[       OK ] ExperimentPlanDirector.ThreeStageTopologyMeasurementComboOuterSystemPermInner (0 ms)
+[----------] 12 tests from ExperimentPlanDirector (8 ms total)
+
+[----------] 4 tests from CMakeGraphBuilder
+[ RUN      ] CMakeGraphBuilder.ThesisTopologyIsomorphicToDirectorWalk
+[       OK ] CMakeGraphBuilder.ThesisTopologyIsomorphicToDirectorWalk (0 ms)
+[ RUN      ] CMakeGraphBuilder.ExperimentTopologyIsomorphicToDirectorWalk
+[       OK ] CMakeGraphBuilder.ExperimentTopologyIsomorphicToDirectorWalk (0 ms)
+[ RUN      ] CMakeGraphBuilder.EmitsPerComboCebBuildEmitTargetsAndAggregate
+[       OK ] CMakeGraphBuilder.EmitsPerComboCebBuildEmitTargetsAndAggregate (0 ms)
+[ RUN      ] CMakeGraphBuilder.CMakeTextIsByteDeterministic
+[       OK ] CMakeGraphBuilder.CMakeTextIsByteDeterministic (1 ms)
+[----------] 4 tests from CMakeGraphBuilder (3 ms total)
+
+[----------] 3 tests from PlanTextBuilder
+[ RUN      ] PlanTextBuilder.StepTraegtDenRealGebautenStemUndDerKopfBleibtV11
+[       OK ] PlanTextBuilder.StepTraegtDenRealGebautenStemUndDerKopfBleibtV11 (0 ms)
+[ RUN      ] PlanTextBuilder.BuiltStemIstByteGleichDerOrchestratorFunktion
+[       OK ] PlanTextBuilder.BuiltStemIstByteGleichDerOrchestratorFunktion (0 ms)
+[ RUN      ] PlanTextBuilder.DumpPlanShowsMeasurementComboStage
+[       OK ] PlanTextBuilder.DumpPlanShowsMeasurementComboStage (0 ms)
+[----------] 3 tests from PlanTextBuilder (2 ms total)
+
+[----------] 2 tests from TierCmakeGraphBuilder
+[ RUN      ] TierCmakeGraphBuilder.TierBatchIsProvisionPruefPerHostAndMeasureIsSharp
+[       OK ] TierCmakeGraphBuilder.TierBatchIsProvisionPruefPerHostAndMeasureIsSharp (0 ms)
+[ RUN      ] TierCmakeGraphBuilder.SliceKanalLaneReachesBareMetalPath
+[       OK ] TierCmakeGraphBuilder.SliceKanalLaneReachesBareMetalPath (0 ms)
+[----------] 2 tests from TierCmakeGraphBuilder (1 ms total)
+
+[----------] 14 tests from CiYamlBuilder
+[ RUN      ] CiYamlBuilder.ThesisTopologyIsomorphicToDirectorWalk
+[       OK ] CiYamlBuilder.ThesisTopologyIsomorphicToDirectorWalk (0 ms)
+[ RUN      ] CiYamlBuilder.ExperimentTopologyIsomorphicToDirectorWalk
+[       OK ] CiYamlBuilder.ExperimentTopologyIsomorphicToDirectorWalk (1 ms)
+[ RUN      ] CiYamlBuilder.EmitsPerComboCebJobsWithTwoStages
+[       OK ] CiYamlBuilder.EmitsPerComboCebJobsWithTwoStages (0 ms)
+[ RUN      ] CiYamlBuilder.CebTriggerForwardsAllowlistAsEmissionTimeLiteralsNoSelfRef
+[       OK ] CiYamlBuilder.CebTriggerForwardsAllowlistAsEmissionTimeLiteralsNoSelfRef (0 ms)
+[ RUN      ] CiYamlBuilder.CebTriggerForwardsStorageAndLagerGateOptInsEmissionGated
+[       OK ] CiYamlBuilder.CebTriggerForwardsStorageAndLagerGateOptInsEmissionGated (0 ms)
+[ RUN      ] CiYamlBuilder.YamlIsByteDeterministic
+[       OK ] CiYamlBuilder.YamlIsByteDeterministic (1 ms)
+[ RUN      ] CiYamlBuilder.SimdRunnerTagRoutingMatchesPilotMatrix
+[       OK ] CiYamlBuilder.SimdRunnerTagRoutingMatchesPilotMatrix (0 ms)
+[ RUN      ] CiYamlBuilder.BothStagesEmitParentMirroredCcacheConfig
+[       OK ] CiYamlBuilder.BothStagesEmitParentMirroredCcacheConfig (0 ms)
+[ RUN      ] CiYamlBuilder.NoCiProjectDirInVariablesBlockBothStages
+[       OK ] CiYamlBuilder.NoCiProjectDirInVariablesBlockBothStages (0 ms)
+[ RUN      ] CiYamlBuilder.ChildPrologForwardsActiveProfileBasenameNotHardAllAxes
+[       OK ] CiYamlBuilder.ChildPrologForwardsActiveProfileBasenameNotHardAllAxes (1 ms)
+[ RUN      ] CiYamlBuilder.CebEmitJobCarriesStorageActivation
+[       OK ] CiYamlBuilder.CebEmitJobCarriesStorageActivation (0 ms)
+[ RUN      ] CiYamlBuilder.BothStagesEmitSubmoduleClonePrologInBuildJobs
+[       OK ] CiYamlBuilder.BothStagesEmitSubmoduleClonePrologInBuildJobs (0 ms)
+[ RUN      ] CiYamlBuilder.PerComboCebEmitCarriesDistinctMeasurementComboSelectorWhenFannedOut
+[       OK ] CiYamlBuilder.PerComboCebEmitCarriesDistinctMeasurementComboSelectorWhenFannedOut (0 ms)
+[ RUN      ] CiYamlBuilder.SingleComboCebEmitOmitsMeasurementComboSelectorForByteStability
+[       OK ] CiYamlBuilder.SingleComboCebEmitOmitsMeasurementComboSelectorForByteStability (0 ms)
+[----------] 14 tests from CiYamlBuilder (10 ms total)
+
+[----------] 1 test from SimdRunnerTags
+[ RUN      ] SimdRunnerTags.FlagGranularListDerivesTagsFromRealMarch
+[       OK ] SimdRunnerTags.FlagGranularListDerivesTagsFromRealMarch (0 ms)
+[----------] 1 test from SimdRunnerTags (0 ms total)
+
+[----------] 1 test from PlanLegend
+[ RUN      ] PlanLegend.FormatsShortDeterministicYamlSafeArraysAndJobNames
+[       OK ] PlanLegend.FormatsShortDeterministicYamlSafeArraysAndJobNames (0 ms)
+[----------] 1 test from PlanLegend (0 ms total)
+
+[----------] 1 test from MeasurementToolingFanOut
+[ RUN      ] MeasurementToolingFanOut.HauptAxisIsToolingNotCategories
+[       OK ] MeasurementToolingFanOut.HauptAxisIsToolingNotCategories (0 ms)
+[----------] 1 test from MeasurementToolingFanOut (0 ms total)
+
+[----------] 22 tests from TierCiYamlBuilder
+[ RUN      ] TierCiYamlBuilder.EmitsOneBuildBatchAndOneMeasureBatchPerHost
+[       OK ] TierCiYamlBuilder.EmitsOneBuildBatchAndOneMeasureBatchPerHost (0 ms)
+[ RUN      ] TierCiYamlBuilder.BuildLegendsCarryNoSubAxisAndMeasureIsSharp
+[       OK ] TierCiYamlBuilder.BuildLegendsCarryNoSubAxisAndMeasureIsSharp (0 ms)
+[ RUN      ] TierCiYamlBuilder.KeinAllowFailureInEmittierterJobYamlBeideStufenUndZellEbeneIntakt
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_experiment_plan_director.cpp:1257: Failure
+Expected: (count_occurrences(tb_ohne.text(), "befund_grund=unbenannt")) > (0u), actual: 0 vs 0
+Riegel-AUSWEIS: ein grundloser Unbrauchbar-Befund muss 'befund_grund=unbenannt' testieren
+
+[  FAILED  ] TierCiYamlBuilder.KeinAllowFailureInEmittierterJobYamlBeideStufenUndZellEbeneIntakt (1 ms)
+[ RUN      ] TierCiYamlBuilder.StageTwoIsByteDeterministic
+[       OK ] TierCiYamlBuilder.StageTwoIsByteDeterministic (2 ms)
+[ RUN      ] TierCiYamlBuilder.PerBatchSliceArithmetic4096
+[       OK ] TierCiYamlBuilder.PerBatchSliceArithmetic4096 (0 ms)
+[ RUN      ] TierCiYamlBuilder.PruefStepEmittedPerPermWithContractEnv
+[       OK ] TierCiYamlBuilder.PruefStepEmittedPerPermWithContractEnv (0 ms)
+[ RUN      ] TierCiYamlBuilder.SoftFailGuardAndFinalExit
+[       OK ] TierCiYamlBuilder.SoftFailGuardAndFinalExit (0 ms)
+[ RUN      ] TierCiYamlBuilder.TestatMarkenSindKlassifiziertUndHaengenAmElse
+[       OK ] TierCiYamlBuilder.TestatMarkenSindKlassifiziertUndHaengenAmElse (2 ms)
+[ RUN      ] TierCiYamlBuilder.KeinTestatUnbedingtHinterEinemSoftFailGuard
+[       OK ] TierCiYamlBuilder.KeinTestatUnbedingtHinterEinemSoftFailGuard (1 ms)
+[ RUN      ] TierCiYamlBuilder.JederEmittierteCtestAufrufMachtDenLeerlaufZumFehler
+[       OK ] TierCiYamlBuilder.JederEmittierteCtestAufrufMachtDenLeerlaufZumFehler (4 ms)
+[ RUN      ] TierCiYamlBuilder.CtestGrammatikHelferErkennenPraefixeUndExakteSchreibweise
+[       OK ] TierCiYamlBuilder.CtestGrammatikHelferErkennenPraefixeUndExakteSchreibweise (0 ms)
+[ RUN      ] TierCiYamlBuilder.SetEAbbruchMarkenSindWirklichSetEGebunden
+[       OK ] TierCiYamlBuilder.SetEAbbruchMarkenSindWirklichSetEGebunden (1 ms)
+[ RUN      ] TierCiYamlBuilder.FehlerTestatTraegtDieselbenFelderWieSeinErfolgsTestat
+[       OK ] TierCiYamlBuilder.FehlerTestatTraegtDieselbenFelderWieSeinErfolgsTestat (1 ms)
+[ RUN      ] TierCiYamlBuilder.TraceHygieneAndTimeout
+[       OK ] TierCiYamlBuilder.TraceHygieneAndTimeout (0 ms)
+[ RUN      ] TierCiYamlBuilder.LaneBudgetLiteralsNoNproc
+[       OK ] TierCiYamlBuilder.LaneBudgetLiteralsNoNproc (0 ms)
+[ RUN      ] TierCiYamlBuilder.BatchJobsCarryGnOutPersistenceFlags
+[       OK ] TierCiYamlBuilder.BatchJobsCarryGnOutPersistenceFlags (0 ms)
+[ RUN      ] TierCiYamlBuilder.G4aStorageActivationPmcPreflightAndPruneAreEmittedInCorrectOrder
+[       OK ] TierCiYamlBuilder.G4aStorageActivationPmcPreflightAndPruneAreEmittedInCorrectOrder (0 ms)
+[ RUN      ] TierCiYamlBuilder.BatchJobsCarryCancelTrapAndHeartbeatTee
+[       OK ] TierCiYamlBuilder.BatchJobsCarryCancelTrapAndHeartbeatTee (0 ms)
+[ RUN      ] TierCiYamlBuilder.SliceKanalMarkerFamilyV2Emission
+[       OK ] TierCiYamlBuilder.SliceKanalMarkerFamilyV2Emission (0 ms)
+[ RUN      ] TierCiYamlBuilder.EmptyLaneEmitsNoJobPair
+[       OK ] TierCiYamlBuilder.EmptyLaneEmitsNoJobPair (0 ms)
+[ RUN      ] TierCiYamlBuilder.WindowBelongsToVerdrahtungGeneratorHaelfte
+[       OK ] TierCiYamlBuilder.WindowBelongsToVerdrahtungGeneratorHaelfte (0 ms)
+[ RUN      ] TierCiYamlBuilder.PinPflichtDeklarationR15ImMessBatch
+[       OK ] TierCiYamlBuilder.PinPflichtDeklarationR15ImMessBatch (0 ms)
+[----------] 22 tests from TierCiYamlBuilder (24 ms total)
+
+[----------] 2 tests from PlanerBlockReservation
+[ RUN      ] PlanerBlockReservation.ProFormaShapeIsExactAndClockFree
+[       OK ] PlanerBlockReservation.ProFormaShapeIsExactAndClockFree (0 ms)
+[ RUN      ] PlanerBlockReservation.DelegatesToValueCoreAndAcceptsExplicitId
+[       OK ] PlanerBlockReservation.DelegatesToValueCoreAndAcceptsExplicitId (0 ms)
+[----------] 2 tests from PlanerBlockReservation (0 ms total)
+
+[----------] 3 tests from SelectMeasurementCombo
+[ RUN      ] SelectMeasurementCombo.EmptySelectorIsIdentityAndSlugMatchIsExact
+[       OK ] SelectMeasurementCombo.EmptySelectorIsIdentityAndSlugMatchIsExact (0 ms)
+[ RUN      ] SelectMeasurementCombo.SelectorTrichotomyIdentitySubsetMissOnFannedFixture
+[       OK ] SelectMeasurementCombo.SelectorTrichotomyIdentitySubsetMissOnFannedFixture (2 ms)
+[ RUN      ] SelectMeasurementCombo.EmitTierCmakeSelectorTrichotomyIdentitySubsetMiss
+[       OK ] SelectMeasurementCombo.EmitTierCmakeSelectorTrichotomyIdentitySubsetMiss (1 ms)
+[----------] 3 tests from SelectMeasurementCombo (3 ms total)
+
+[----------] 1 test from MeasurementComboEnvBridge
+[ RUN      ] MeasurementComboEnvBridge.TierCommandsCarryComboEnvWhenFannedAndOmitForAll
+[       OK ] MeasurementComboEnvBridge.TierCommandsCarryComboEnvWhenFannedAndOmitForAll (1 ms)
+[----------] 1 test from MeasurementComboEnvBridge (1 ms total)
+
+[----------] 1 test from MeasurementComboCtDefine
+[ RUN      ] MeasurementComboCtDefine.CebCompileSitesCarryDefineWhenFannedAndOmitForAll
+[       OK ] MeasurementComboCtDefine.CebCompileSitesCarryDefineWhenFannedAndOmitForAll (1 ms)
+[----------] 1 test from MeasurementComboCtDefine (1 ms total)
+
+[----------] 2 tests from PmcPflichtInvariante
+[ RUN      ] PmcPflichtInvariante.JedeTreiberKonfigurationTraegtDasPmcFlag
+[       OK ] PmcPflichtInvariante.JedeTreiberKonfigurationTraegtDasPmcFlag (4 ms)
+[ RUN      ] PmcPflichtInvariante.FlagStehtVorDemBuildTypUndLaesstDieComboNachbarschaftIntakt
+[       OK ] PmcPflichtInvariante.FlagStehtVorDemBuildTypUndLaesstDieComboNachbarschaftIntakt (0 ms)
+[----------] 2 tests from PmcPflichtInvariante (5 ms total)
+
+[----------] 1 test from PmcFailLoud
+[ RUN      ] PmcFailLoud.UnbrauchbarerBefundLaesstDenPreflightScheiternStattSkippen
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_experiment_plan_director.cpp:3243: Failure
+Expected: (s.find("befund_grund=koeder_hat_nicht_gebissen")) != (std::string::npos), actual: 18446744073709551615 vs 18446744073709551615
+Riegel-AUSWEIS: das FEHLER-Testat muss den fehlgrund des Befunds woertlich ausweisen
+
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_experiment_plan_director.cpp:3261: Failure
+Expected: (ausweis_pos) != (std::string::npos), actual: 18446744073709551615 vs 18446744073709551615
+Riegel-AUSWEIS: das FEHLER-Testat muss den Env-Riegel-Grund woertlich nennen
+
+/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_experiment_plan_director.cpp:3263: Failure
+Expected: (sr.find("\n      exit 1\n", ausweis_pos)) != (std::string::npos), actual: 18446744073709551615 vs 18446744073709551615
+Riegel-AUSWEIS: auch der Riegel-Fall bricht den Mess-Batch mit exit 1 hart ab
+
+[  FAILED  ] PmcFailLoud.UnbrauchbarerBefundLaesstDenPreflightScheiternStattSkippen (1 ms)
+[----------] 1 test from PmcFailLoud (1 ms total)
+
+[----------] 4 tests from PmcMetaMetaAchse
+[ RUN      ] PmcMetaMetaAchse.DerBefundPrueferBeisstAmKunsttext
+[       OK ] PmcMetaMetaAchse.DerBefundPrueferBeisstAmKunsttext (0 ms)
+[ RUN      ] PmcMetaMetaAchse.JedeTreiberEmissionNenntDenGemessenenHostBefund
+[       OK ] PmcMetaMetaAchse.JedeTreiberEmissionNenntDenGemessenenHostBefund (2 ms)
+[ RUN      ] PmcMetaMetaAchse.DreiBefundeErzeugenDreiVerschiedeneEmissionen
+[       OK ] PmcMetaMetaAchse.DreiBefundeErzeugenDreiVerschiedeneEmissionen (0 ms)
+[ RUN      ] PmcMetaMetaAchse.DumpPlanNenntDieLageUndUnterscheidetSichGenauDarin
+[       OK ] PmcMetaMetaAchse.DumpPlanNenntDieLageUndUnterscheidetSichGenauDarin (0 ms)
+[----------] 4 tests from PmcMetaMetaAchse (2 ms total)
+
+[----------] 6 tests from PmcHostProbe
+[ RUN      ] PmcHostProbe.KeinBissIstUnbrauchbarUndNenntDenGrund
+[       OK ] PmcHostProbe.KeinBissIstUnbrauchbarUndNenntDenGrund (0 ms)
+[ RUN      ] PmcHostProbe.OeffnenOhneWertZaehltNichtAlsBiss
+[       OK ] PmcHostProbe.OeffnenOhneWertZaehltNichtAlsBiss (0 ms)
+[ RUN      ] PmcHostProbe.IntelMitBissWirdIntel
+[       OK ] PmcHostProbe.IntelMitBissWirdIntel (0 ms)
+[ RUN      ] PmcHostProbe.UnbekannteHardwareformIstUnbrauchbarObwohlDieZaehlerBeissen
+[       OK ] PmcHostProbe.UnbekannteHardwareformIstUnbrauchbarObwohlDieZaehlerBeissen (0 ms)
+[ RUN      ] PmcHostProbe.TeilverfuegbarkeitIstBrauchbarUndDerBissVektorSagtWelche
+[       OK ] PmcHostProbe.TeilverfuegbarkeitIstBrauchbarUndDerBissVektorSagtWelche (0 ms)
+[ RUN      ] PmcHostProbe.RealeProbeStimmtMitProcCpuinfoUeberein
+[REALE PROBE] PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host
+[       OK ] PmcHostProbe.RealeProbeStimmtMitProcCpuinfoUeberein (21 ms)
+[----------] 6 tests from PmcHostProbe (21 ms total)
+
+[----------] 5 tests from MeasurementModi61
+[ RUN      ] MeasurementModi61.ProfileDrivenModeParallelBuildLanesAndCompileStamp
+[       OK ] MeasurementModi61.ProfileDrivenModeParallelBuildLanesAndCompileStamp (1 ms)
+[ RUN      ] MeasurementModi61.TwoModeProfileHardFailsExactlyOne
+[       OK ] MeasurementModi61.TwoModeProfileHardFailsExactlyOne (0 ms)
+[ RUN      ] MeasurementModi61.UnknownModeTokenFailsClosedInsteadOfSilentMeasure
+[       OK ] MeasurementModi61.UnknownModeTokenFailsClosedInsteadOfSilentMeasure (0 ms)
+[ RUN      ] MeasurementModi61.PlanBuildSemanticSpiegeltDieRegistryZeileFuerJedenModus
+[       OK ] MeasurementModi61.PlanBuildSemanticSpiegeltDieRegistryZeileFuerJedenModus (0 ms)
+[ RUN      ] MeasurementModi61.MethodikOverrideDecouplesCatalogFromMethodik
+[       OK ] MeasurementModi61.MethodikOverrideDecouplesCatalogFromMethodik (1 ms)
+[----------] 5 tests from MeasurementModi61 (4 ms total)
+
+[----------] 1 test from CompileTypeStamp
+[ RUN      ] CompileTypeStamp.BtVersionSuffixOnlyForDebugElseByteStable
+[       OK ] CompileTypeStamp.BtVersionSuffixOnlyForDebugElseByteStable (0 ms)
+[----------] 1 test from CompileTypeStamp (0 ms total)
+
+[----------] 4 tests from CompilerPinInvariante
+[ RUN      ] CompilerPinInvariante.GegenprobeDerPruefer
+[       OK ] CompilerPinInvariante.GegenprobeDerPruefer (0 ms)
+[ RUN      ] CompilerPinInvariante.JedeTreiberKonfigurationGepinntUndJedeBauStufeMitClangZwilling
+[       OK ] CompilerPinInvariante.JedeTreiberKonfigurationGepinntUndJedeBauStufeMitClangZwilling (4 ms)
+[ RUN      ] CompilerPinInvariante.ZwillingFolgtDemBuildTypDesProfils
+[       OK ] CompilerPinInvariante.ZwillingFolgtDemBuildTypDesProfils (0 ms)
+[ RUN      ] CompilerPinInvariante.BareMetalSpiegelSagtDiePins
+[       OK ] CompilerPinInvariante.BareMetalSpiegelSagtDiePins (0 ms)
+[----------] 4 tests from CompilerPinInvariante (5 ms total)
+
+[----------] Global test environment tear-down
+[==========] 90 tests from 20 test suites ran. (100 ms total)
+[  PASSED  ] 88 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] TierCiYamlBuilder.KeinAllowFailureInEmittierterJobYamlBeideStufenUndZellEbeneIntakt
+[  FAILED  ] PmcFailLoud.UnbrauchbarerBefundLaesstDenPreflightScheiternStattSkippen
+
+ 2 FAILED TESTS
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+contract    =   0.10 sec*proc (1 test)
+e4          =   0.10 sec*proc (1 test)
+planner     =   0.10 sec*proc (1 test)
+profiles    =   0.10 sec*proc (1 test)
+
+Total Test time (real) =   0.11 sec
+
+The following tests FAILED:
+	361 - test_experiment_plan_director (Failed)            contract e4 planner profiles
+Errors while running CTest

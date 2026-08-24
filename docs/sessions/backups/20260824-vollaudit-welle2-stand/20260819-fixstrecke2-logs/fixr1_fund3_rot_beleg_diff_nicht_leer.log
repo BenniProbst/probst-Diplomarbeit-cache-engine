@@ -1,0 +1,9 @@
+== FIXR1 FUND3 ROT-PROBE (G1-P7-Beleg 'diff leer' widerlegt) 2026-08-19T18:10:26+00:00 ==
+PROBE 1: Dateigroessen
+798 /home/comdare/backups-workflow/20260819-fixstrecke2-logs/g1_tabu_vorher.txt
+643 /home/comdare/backups-workflow/20260819-fixstrecke2-logs/g1_tabu_nachher.txt
+PROBE 2: diff g1_tabu_vorher.txt g1_tabu_nachher.txt
+6,7d5
+< 188://     anchor kNewGolden131072Crc64 = 0xF1C1F26A1232073B  [MISMATCH]
+< 191:inline constexpr std::uint64_t kNewGolden131072Crc64 = 0x56F1B721C72DC10EULL;
+EXIT=1 (1 = diff NICHT leer -- der quittierte Satz 'diff leer' war woertlich falsch)

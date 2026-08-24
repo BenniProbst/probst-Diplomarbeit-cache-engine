@@ -1,0 +1,65 @@
+== Z20 MERGE-BEWEIS 2026-08-24T13:15:17Z ==
+66426ea541a26f076ee97f9bd0d148a8c3e46585 d4d721c7231cb071c27726d06a42d37f7c4dfe3a 025e0c42469233190c5b83d0cac518753e727c52 2026-08-24 13:14:41 +0000 Merge bau/kampvor @ 025e0c42 in development -- super-Phase Merge 5 (Z20): E-9 #38c-Rest n/a-Zaehler-Heilung frische_wache + persist_sammler (KON44-02)
+--FULL-MSG--
+Merge bau/kampvor @ 025e0c42 in development -- super-Phase Merge 5 (Z20): E-9 #38c-Rest n/a-Zaehler-Heilung frische_wache + persist_sammler (KON44-02)
+
+Strang: Kampagnen-Vorstaffel (kampvor), super-Haelfte; Tip 025e0c42
+(origin+github gesichert, 1 Commit auf Basis a7e8e151). Inhalt: n/a-Zaehler-
+Heilung in ci/frische_wache.sh (zweites n/a-awk + Gate ECHT_DIESER-eq-0,
+4 Nenner-Zeilen) und ci/persist_sammler.sh (bilanz_zaehlen SECHS Zahlen,
+gate_verweigern-GATE-MUTATIONSMARKE, PROVENANCE additiv, Versions-Skew
+konditional: FEHLT=Hinweis, Widerspruch=exit 2) + Proben-Nachzug
+(frische_probe +123, persist_probe +127, bissprobe +2, mess_ausbeute_wache
++4); 6 Dateien 385+/26-, alles unter ci/; awk-Paritaet dreifach 1/1/1.
+
+Audit-Verdikt (kampvor/audit-runde-1.md 23.08., Fable-max): SITZT --
+P-01..P-42, 0 ERNST, 0 MILD, 2 KLEIN (beide Berichts-/Beweis-Hygiene, kein
+Code-Delta; KLEIN-1 durch das Audit selbst erledigt = F-152, 5 Proben-Logs
+persistiert; KLEIN-2 = F-153 Lint-je-Datei-Formel). T-1-Rot unabhaengig
+reproduziert (frische 14/17 Risse F6c/F6d/F6e, persist 15/18 Risse
+P16/P17/P18 an Basis a7e8e151), Selbstbisse am Tip 7/7 + 9/9 + 5/5.
+Lande-Fenster: S-2c (S2-Drittabgleich F-154, Frist vor Sa 29.08.,
+E-9-Formel); Bissproben-Wiederholung laut S-2c nicht noetig. Inventur-Fund
+L16; kampvor-Klammer mit der ce-Haelfte 1e1bc199 (Z09, Merge 10/10
+b4c593f5 -> 5ddda4e5); H-10-Ordnung pmcpaket VOR ce-kampvor war vollzogen.
+P-26/F-C beilaeufig geschlossen: 288-Pipeline 16070 @ 025e0c42 skipped,
+/jobs UNION /bridges = 0 (ce-Haelfte 16071 bereits in ZUG-BILANZ Z09).
+
+Merge konfliktfrei. Explore-merge-tree an 17c93c2a: RC=0, reine Tree-OID
+663bbe24; ZWISCHEN Explore und Merge kam Lead-docs d4d721c7 (Nachtrag 11,
+1 Datei docs/sessions, 0 ci/-Beruehrung, bereits origin) -- Gegenprobe am
+REALEN Erst-Elter d4d721c7: merge-tree = 0ca384b3 == HEAD^{tree}, RC=0,
+weiterhin konfliktfrei; ci/ auf development seit Basis a7e8e151
+unveraendert; TABU/YAML/CMakeLists je 0 Treffer. Gitlink Code/external
+UNBERUEHRT (Sperre bis Z23). Kein Push in
+diesem Schritt (R4, Phasen-Push Z23). Abnahme: bash -n ci/persist_sammler.sh
++ sh -n ci/frische_wache.sh (F-153: je Datei das einschlaegige Lint).
+Explore-Befund + Beweise: ~/backups-workflow/20260822-lande-zug/Z20/.
+Restposten-Traeger: T12b/K-1 CCD0+CCD1-Verdopplungs-Semantik -> docs-Sammel
+Z21 (F-108-##55-Zeile); F-112/F-114 -> W3-Vorstaffel; E-10-YAML ->
+Staffel-3-YAML-Zug; F-113 -> Karten-Konsolidierung; T-9-Codex-Pass ->
+Folgewelle; Raeumung wt-super-kampvor -> Z26.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+--STAT--
+ ci/frische_wache.sh                 |  64 ++++++++++++++----
+ ci/mess_ausbeute_wache.sh           |   4 +-
+ ci/persist_sammler.sh               |  91 +++++++++++++++++++++++---
+ ci/tests/frische_wache_probe.sh     | 123 +++++++++++++++++++++++++++++++++-
+ ci/tests/mess_ausbeute_bissprobe.sh |   2 +-
+ ci/tests/persist_sammler_probe.sh   | 127 ++++++++++++++++++++++++++++++++++++
+ 6 files changed, 385 insertions(+), 26 deletions(-)
+--ANC-NACHHER--
+ANC_RC=0 (0=IST Ancestor=SOLL)
+--DEV-HEAD--
+66426ea541a26f076ee97f9bd0d148a8c3e46585
+--ORIGIN-DEV (kein Push dieses Schritts)--
+d4d721c7231cb071c27726d06a42d37f7c4dfe3a	refs/heads/development
+--GITLINK--
+160000 commit 66de5c0972290ec1ae3d219988ecc207d8f5de6b	Code/external/comdare-cache-engine
+--STATUS--
+ M Code/external/comdare-cache-engine
+?? build-l4/
+--DF-NACHHER--
+/dev/nvme0n1p2  251G  224G   15G  94% /

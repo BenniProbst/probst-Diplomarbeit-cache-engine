@@ -1,0 +1,20 @@
+== VERTAGTEN-RUNDE TABU-ENDPROBE 2026-08-19T18:41:16+00:00 ==
+PROBE1: sha256-Satz vor==nach, IDENTISCH
+PROBE2: Anker-Treffer mit TABU-CRC = 1
+PROBE3: STATUS_TABU_EXIT=0 (leer=unberuehrt)
+PROBE4: Worktree gesamt:
+?? .review-tmp/
+TIP: 79171599d442cb22c8b7e4272e905c7997b597f4
+79171599 fix(a25-f2): M-5/W2-1 -- byte-gleich-Behauptung an :515 GEMESSEN (Task #101, vertagt aus G2d)
+15b26ff1 fix(a25-f2): tools-3-FORMAT -- clang-format-22 flaechig auf 3 Dateien (Task #100, vertagt aus G2d)
+== NACHPROBE ANKER (praeziser) 2026-08-19T18:41:39+00:00 ==
+CRC-Literal-Vorkommen source_catalog.hpp: 2
+CRC-Literal-Vorkommen test_e24: 1
+187://   gen_golden_fullpilot: N=131072 ids  CRC64-ECMA-182 = 0x56F1B721C72DC10E
+191:inline constexpr std::uint64_t kNewGolden131072Crc64 = 0x56F1B721C72DC10EULL;
+-- geaenderte Dateien 8cd32a0d..HEAD (abschliessend):
+ apps/experiment_planner/main.cpp                   |  2 +-
+ tools/axis_registry_gen/main.cpp                   |  3 +-
+ tools/gen_golden_fullpilot/main.cpp                |  3 +-
+ .../include/comdare/p27/bundle_finder.hpp          | 38 ++++++++--------------
+ 4 files changed, 18 insertions(+), 28 deletions(-)

@@ -1,0 +1,7 @@
+17c93c2aa8aa88e88613185c39d7639832434571
+Benjamin-Elias Probst Mon Aug 24 13:03:54 2026 +0000
+Merge bau/w1luecken-super @ 8edc34a0 in development -- super-Phase Merge 4 (Z19): #113-Rest B11 skip_anker-Bissprobe
+
+ Code/tests/CMakeLists.txt             | 13 +++++++++++
+ Code/tests/skip_anker_bissprobe.cmake | 42 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)

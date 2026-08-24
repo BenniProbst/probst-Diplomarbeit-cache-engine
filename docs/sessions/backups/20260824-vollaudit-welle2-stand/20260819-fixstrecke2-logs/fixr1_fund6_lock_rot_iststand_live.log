@@ -1,0 +1,39 @@
+== FIXR1 FUND6 LIVE-PROBE Gate 4 axis_version_lock am Ist-Stand (HEAD=8cd32a0d) 2026-08-19T18:12:59+00:00 ==
+$ sh scripts/pre_push_lande_gates.sh --nur=lock
+=============================================================================
+ PRE-PUSH-LANDE-GATES (--nur=lock): EIN Gate, PROBE-Modus
+=============================================================================
+
+=============================================================================
+ [4/6] AXIS-VERSION-LOCK --check (Digest-Tripwire gegen axis_version.lock)
+=============================================================================
+WERKZEUG: build/gcc-release/tools/axis_version_lock/comdare_axis_version_lock
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/anatomy_base.hpp
+axis_version_lock:     erwartet e3ee62f1e58ea905f963fed9955aeedbf7abde76ec57b298bcc4e2d092756d9d
+axis_version_lock:     ist      fd08d04356bfd0ebf8deff221073f31464f31a550eeaefd94286ad6576e175d4
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/observable_tier.hpp
+axis_version_lock:     erwartet 168aa97c8eccd75b4e2f05fdf05290f009cab28c8a59758d6dfbbaa96e016de7
+axis_version_lock:     ist      359729928f7f0b1cdc60781619275d39b4267ad17835cae9c960b969ecaac0bf
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/anatomy/pruefling_merge.hpp
+axis_version_lock:     erwartet a5e06f1fe453a75489b26c08b5efc8e69e150ff2e04458752b94528a78b9c228
+axis_version_lock:     ist      bad127f683b9dc8962c92af51934af3c08fdf8236b61833944daea09a11808d5
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: ROT Digest geaendert OHNE gueltigen Version-Bump (- -> -) libs/cache_engine/system_axes/target_isa_complex_axis.hpp
+axis_version_lock:     erwartet 8e2de63f276f1fd5df5f40241a6158911532cfbb99bb72eecb6af779dfbe4489
+axis_version_lock:     ist      adc0c0e03734cb99ab9293631362f73718e6aa65dae5a87c7fbe2e4ff8b48cc6
+axis_version_lock:     HINWEIS Version bumpen UND bewussten Lock-Regen-Commit (--write) fahren
+axis_version_lock: BESTAND heuristik discovered=6 traeger=6 (nenner: alle *.hpp unter libs/cache_engine/heuristik)
+axis_version_lock: BESTAND organ discovered=640 traeger=122 forwarder_prosa=518 multi=1 (nenner: Quell-Dateien der organ-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND system discovered=16 traeger=0 forwarder_prosa=16 multi=0 (nenner: Quell-Dateien der system-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND mess discovered=1 traeger=0 forwarder_prosa=1 multi=0 (nenner: Quell-Dateien der mess-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND tier_substanz discovered=55 traeger=0 forwarder_prosa=55 multi=0 (nenner: Quell-Dateien der tier_substanz-Eintraege des Overlay-Schnitts, builder/overlay_source_set.hpp)
+axis_version_lock: BESTAND overlay gesamt=712 traeger=122 (nenner: ALLE Quell-Dateien des Overlay-Schnitts -- die Menge, ueber die das Overlay-Glied [7] hasht)
+NENNER: Tool-Exit 1, 4 ROT-Befund(e), 6 BESTAND-Zeile(n).
+
+=============================================================================
+PRE-PUSH-LANDE-GATES: ROT am GATE [4/6] AXIS-VERSION-LOCK -- Digest-Drift ohne Version-Bump (4 Befunde oben): Version bumpen UND Lock-Regen committen
+FAIL-FAST: spaetere Gates sind NICHT gelaufen und damit NICHT gruen.
+=============================================================================
+EXIT=1

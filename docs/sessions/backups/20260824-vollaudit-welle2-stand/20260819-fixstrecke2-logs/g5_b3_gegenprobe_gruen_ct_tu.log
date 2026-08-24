@@ -1,0 +1,43 @@
+== B3-BISS: der CT-Zweig erbt wallclock -- Hoheit CEB, Tier erbt (KON37-01/KON34-04) ==
+
+---- (a) NENNER: CT-Zweig mit w-loser Bestellung '[macro]' ----
+    ct_measurement_combo_legend() = '[macro]'
+  [OK]  (a) die einkompilierte Bestellung ist '[macro]' (w-los, spezifisch)
+  [OK]  (a) die Bestellung ist KEINE Vollmenge (sonst waere das Erbe hier unbeobachtbar)
+
+---- (b) KERN: resolve erbt '[macro]' -> '[wallclock,macro]' ----
+    resolve_live_measurement_combo_legend() = '[wallclock,macro]'
+  [OK]  (b) Rueckgabe ist die geerbte Legende '[wallclock,macro]'
+  [OK]  (b) Rueckgabe ist NICHT mehr die rohe Bestellung '[macro]' (das Erbe ist gelaufen)
+
+---- (c) STEMPEL: Glied-[3]-Zeile fuehrt wallclock ----
+    measurement_stamp_from_env() = 'measurement_tooling=wallclock@1.0.0.c;measurement_tooling=macro@1.0.0.c;[load_framework=ycsb@1.0.0.c]'
+  [OK]  (c) Zeile == Renderer der GEERBTEN Legende (EINE Aufloesung, keine zweite Wahrheit)
+  [OK]  (c) Zeile nennt wallclock (w im Tier-Stempel, weil die CEB es einbaut -- das SOLL)
+  [OK]  (c) Zeile != Renderer der ROHEN Bestellung (sonst verschwiege der Stempel w -- F2)
+
+---- (d) BAU: live-Defines tragen die geerbte wallclock-Deklaration ----
+    live_mess_achsen_defines() = -DCOMDARE_MEASUREMENT_ON=1 -DCOMDARE_CE_ENABLE_STATISTICS=1 -DCOMDARE_CE_ENABLE_SEGMENT_TIMING=0 -DCOMDARE_MEASUREMENT_TOOLING_WALLCLOCK=1 -DCOMDARE_MEASUREMENT_TOOLING_MACRO=1
+  [OK]  (d) -DCOMDARE_MEASUREMENT_TOOLING_WALLCLOCK=1 ist enthalten (geerbt)
+  [OK]  (d) live-Vektor == Vektor des w-nennenden Zwillings '[wallclock,macro]'
+
+---- (e) GLIED [8]: live-Vorhersage == Zwillings-Vorhersage ----
+    live_mess_gates_glied() = 'mg=m1;s1;st0;x1;tw1;tm1;tmi0;hm0;hmi0'
+  [OK]  (e) live == mess_gates_glied_for_legend('[wallclock,macro]')
+
+---- (f) WACHEN: Env-Synchronitaet gegen die ROHE Bestellung, unbewegt ----
+    Env FEHLT bei spezifischem CT-Einbau  ->  WURF
+  [OK]  (f) Env FEHLT bei spezifischem CT-Einbau wirft
+  [OK]  (f) Env FEHLT bei spezifischem CT-Einbau meldet die Fehlerklasse
+    Env LEER bei spezifischem CT-Einbau  ->  WURF
+  [OK]  (f) Env LEER bei spezifischem CT-Einbau wirft
+  [OK]  (f) Env LEER bei spezifischem CT-Einbau meldet die Fehlerklasse
+    Env traegt die GEERBTE Form statt der Bestellung  ->  WURF
+  [OK]  (f) Env traegt die GEERBTE Form statt der Bestellung wirft
+  [OK]  (f) Env traegt die GEERBTE Form statt der Bestellung meldet die Fehlerklasse
+    Env traegt die Vollmenge statt der Bestellung  ->  WURF
+  [OK]  (f) Env traegt die Vollmenge statt der Bestellung wirft
+  [OK]  (f) Env traegt die Vollmenge statt der Bestellung meldet die Fehlerklasse
+  [OK]  (f) GEGENPROBE: Env == rohe Bestellung '[macro]' geht durch
+
+== Fehler: 0 ==

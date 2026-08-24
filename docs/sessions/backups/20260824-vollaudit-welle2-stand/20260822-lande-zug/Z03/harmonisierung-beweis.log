@@ -1,0 +1,26 @@
+=== Harmonisierung tests/unit/CMakeLists.txt: Naht HEAD-Ende (7925-7930) ===
+    "COMDARE_TRAEGER_WURZEL=\"${PROJECT_SOURCE_DIR}/libs/traeger\"")
+set_tests_properties(test_s8_traeger_grenzwache PROPERTIES
+    LABELS "s8;traeger;grenzwache;wachen;koeder")
+
+# =============================================================================
+# S13-02 ZIEL-FILTER (#18/D-1, KON32-01, 2026-08-21): <writeback_methods> steuert
+=== Naht s13-Anfang (7928-7932 im Ergebnis) ===
+
+# =============================================================================
+# S13-02 ZIEL-FILTER (#18/D-1, KON32-01, 2026-08-21): <writeback_methods> steuert
+# die PERSISTENZ -- vier Faelle am ECHTEN run_profile, je Fall literales
+# Verzeichnis-Listing + Koeder-Abwesenheits-Pruefung (nicht deklarierte Datei
+=== Ergebnis-Zeilen: 8018 (7576 Basis + 351 HEAD + 91 s13) ===
+
+=== Harmonisierung profile_run_entry.hpp (1033-1042) ===
+    // fehlende PMC-Einrichtung). Sie reisen unten als KonstantenMeta-Zeilen in mappe.schliessen und
+    // stehen damit im INFO-Blatt der xlsx -- der Owner-Satz "Warnung in xlsx" woertlich.
+    // LANDE-HARMONISIERUNG (W2 4/10, messfenster x s13): der rohe csv-Strom der HEAD-Seite
+    // ("csv << r.resumed_csv_rows;") entfaellt nach S13-01 -- die resumed-Zeilen reisen unten
+    // ueber mappe.blob_aus_csv in die Mappe (CSV = Kind, D-2(2)); mess_warnungen bleibt.
+    std::vector<std::string> mess_warnungen;
+    auto                     emit = [&](ex::LazyRunResult const& r, std::size_t* row_sink) {
+        // #165-B (P-MD8, 2026-06-20): den statistischen Ausreißer-Flag VOR der Emission je Pass befüllen. Lokale,
+        // mutierbare Kopie der frisch gemessenen Zeilen (LazyRunResult bleibt unberührt); annotate_quality_flags
+        // setzt nur das additive quality_flag-Feld (0/1) je (binary_id, profile_name)-Gruppe — gate-frei, keine

@@ -1,0 +1,27 @@
+FLOOR-TREPPE Z10 5ddda4e5 2026-08-22T18:32:11Z
+--- SPROSSE avx512f (nativ) ---
+INVENTUR[avx512f]: Total=544 Listenlaenge=544 (Gegenprobe OK)
+RC_CONF_AVX2=0
+--- SPROSSE avx2 (erzwungen) ---
+INVENTUR[avx2]: Total=540 Listenlaenge=540 (Gegenprobe OK)
+RC_CONF_BASIS=0
+--- SPROSSE basis (erzwungen) ---
+INVENTUR[basis]: Total=538 Listenlaenge=538 (Gegenprobe OK)
+--- COMM beide Richtungen ---
+avx512f->avx2 VERLIERT:
+test_ap5_simd_extension_coherence
+test_buildvariant_dll_real
+test_simd_add_u64_carry_avx512
+test_simd_field_sum_dispatch_avx512
+avx2->avx512f GEWINNT (SOLL leer):
+avx2->basis VERLIERT:
+test_simd_add_u64_carry_avx2
+test_simd_field_sum_dispatch_avx2
+basis->avx2 GEWINNT (SOLL leer):
+--- RESTORE (cmake -U beide Variablen) ---
+RC_RESTORE=0
+INVENTUR[restore]: Total=544 Listenlaenge=544 (Gegenprobe OK)
+RESTORE_NAMENSLISTE=BYTE-GLEICH
+COMDARE_HOST_RUNS_AVX2:INTERNAL=1
+COMDARE_HOST_RUNS_AVX512F:INTERNAL=1
+FLOOR-TREPPE-ENDE 2026-08-22T18:32:13Z

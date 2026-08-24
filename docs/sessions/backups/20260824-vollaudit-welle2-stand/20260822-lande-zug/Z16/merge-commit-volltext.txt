@@ -1,0 +1,48 @@
+commit ff800699b14dc9862d920666ec7966500b3697c9
+Merge: 348f54f4 1e92b77e
+Author: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+Commit: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+
+    Merge bau/s13schema @ 1e92b77e in development -- super-Phase Merge 1 (Z16): H-6-Kopplung beidseitig eingeloest (L-03/S-2a)
+    
+    Strang: s13schema super-Haelfte (X-6 Kommentar-only-XSD, S13-01..03-Subset).
+    Tip: 1e92b77e (origin-gesichert; juengster Stand, S1-Synthese 8.1 + Dritt-Gate
+    24.08. bestaetigt; kein Ueberholt-Marker). Audit-Verdikt: audit-runde-2 SITZT
+    (2/2 BEHOBEN, 3 Inkarnationen 22./23.08.), LANDEREIF ce c76d3116 + super
+    1e92b77e; S1-7.6(5) LANDEREIF_MIT_AUFLAGEN "super-Haelfte an den Anfang der
+    super-Phase" -- dieser Merge ist exakt dieser Schritt.
+    
+    H-6/L-03: landet im SELBEN Lande-Ereignis wie die ce-Haelfte c76d3116 (bereits
+    in ce/development via lande/w2-s1s2, Z10-Push 5ddda4e5 -> heute 943c70ee,
+    CI 16150 SUCCESS) -- die vom Dritt-Gate als EINSEITIG befundene Kopplung ist
+    damit beidseitig.
+    
+    Inhalt (+17/-6, nur Kommentare an RunMethodologyType + WritebackMethodsType):
+    Registry = Single-Source der gueltigen ids (kRunMethodologyRegistry /
+    kWritebackMethodRegistry, seit A9-S3 inkl. xlsx, Count=4); stale Dreier-Liste
+    {csv/latex_table/comparison_metrics} gestrichen; HAERTE (unbekannte id =>
+    ERROR mit Zaehler) im Validator (validate_profile.hpp,
+    check_measurement_sub_axis); S13-02-Persistenz-Semantik {csv,xlsx} (KON32-01,
+    Default xlsx, Owner-KERN 26.07.). Kein Element/Typ/Attribut beruehrt;
+    Instanzen byte-unveraendert; kein Instanzen-/Spiegel-Nachzug noetig.
+    
+    Konfliktlage: merge-tree clean (68f6b2ef); dev-Seite hat die XSD seit
+    merge-base a7e8e151 nicht beruehrt. Gitlink Code/external/comdare-cache-engine
+    NICHT Teil dieses Merges (Bump = eigener Zug MIT np34-Patch, L-01/S-2e, Frist
+    Mi 26.08. 06:00). W-A/W-B eigene Nachmessung 24.08.: xmllint 4/4 validates
+    (Beweis: backups-workflow/20260822-lande-zug/Z16/).
+    
+    Restposten-Traeger (unveraendert, nichts gekuerzt): L-08g S13A-F2-Ledger-Satz
+    (Lead-docs-Zug) - S13-04 Export-Element + X-1..X-5/X-7..X-9 = Staffel 3 /
+    D-1-Di-25-Buendel (bis dahin KON32-01-Toleranz (a), Board #18 pending) - F-25
+    per_binary_mappe-Vollkette = Mess-Fenster - ph89-TEIL-6-Schema-Bedarfe
+    (7 Punkte, T11-4) an den s13-Buendel-Zug. KEIN eigener Push (R4; Phasen-Push
+    Z23).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+ Code/test_data_xml/experiment_schema.xsd | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+ff800699 Merge bau/s13schema @ 1e92b77e in development -- super-Phase Merge 1 (Z16): H-6-Kopplung beidseitig eingeloest (L-03/S-2a)
+348f54f4 docs(sessions): Nachtrag 9 — W2-Audit terminal voll verbucht: 19/19-Tafel, o2-Landung komplett 943c70ee (CI 16150 SUCCESS, F-126 zu), FUND-5-Slot geraeumt, Findings-Landkarte F-124..F-155, Fristen [ci skip]
+5260a704 docs(sessions): Nachtrag 8 — Resume nach 5h-Pause, 4/4 Straenge auf Fable (Modell-Wache 11:32) [ci skip]
