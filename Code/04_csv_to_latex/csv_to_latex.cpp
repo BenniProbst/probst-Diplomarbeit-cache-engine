@@ -984,19 +984,29 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
 
     if (de) {
         rows.push_back(
-            {"\\textbf{Cache-Misses (Kernmetrik):} L2 + Coherence strukturell 0; L1/L3/dTLB nur mit gesetztem "
+            {"\\textbf{Cache-Misses (Kernmetrik):} L2 + Coherence modell-gebunden real (Zen 5: "
+             "\\texttt{PERF\\_TYPE\\_RAW} 0x964/0x1443), sonst n/a; L1/L3/dTLB nur mit gesetztem "
              "PMC-Schalter erhoben; Energy best-effort",
              "Ohne \\texttt{COMDARE\\_ENABLE\\_PMC} (Build-Default OFF, damit \\texttt{test:unit} ohne "
              "HW-Zugriff baut) liefert \\texttt{NullPmcSource} available=false, und alle HW-Spalten bleiben 0 "
              "-- so entstanden die tabellierten Nullen. Mit dem Schalter erhebt \\texttt{LinuxPerfPmcSource} "
              "L1-, L3- (Last-Level) und dTLB-Misses real \\\"uber \\texttt{perf\\_event\\_open}(2) "
              "(Kernel-Syscall, keine Vendor-Lib, kein PAPI n\\\"otig -- PAPI bleibt optionaler "
-             "Sekund\\\"arpfad). L2 und Coherence-Invalidierungen bleiben mangels portablem generischem "
-             "Z\\\"ahler auch dann strukturell 0; L3 kann auf einzelnen AMD-Plattformen zus\\\"atzlich beim "
-             "\\\"Offnen des Z\\\"ahlers scheitern; Energie l\\\"auft best-effort \\\"uber RAPL-sysfs und "
-             "bleibt ohne Zonen-Leserecht leer. Der Intel-PCM-Windows-Treiber steht f\\\"ur die Windows-Lane "
-             "weiterhin aus (\\#26/P4). Die verbleibende L2/Coherence-L\\\"ucke ist nur indirekt \\\"uber den "
-             "Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op) beobachtbar."});
+             "Sekund\\\"arpfad). F\\\"ur L2 und Coherence-Invalidierungen existiert kein portabler generischer "
+             "Z\\\"ahler; sie werden modell-gebunden \\\"uber den RAW-Event-Katalog erhoben "
+             "(\\texttt{pmc\\_raw\\_event\\_katalog.hpp}; Zen 5, Family 26: "
+             "\\texttt{l2\\_cache\\_req\\_stat.ic\\_dc\\_miss\\_in\\_l2} = \\texttt{PERF\\_TYPE\\_RAW} "
+             "0x964 = Demand-IC+DC-Misses in L2 ohne L2-Prefetch; "
+             "\\texttt{ls\\_dmnd\\_fills\\_from\\_sys.remote\\_cache} = \\texttt{PERF\\_TYPE\\_RAW} 0x1443 "
+             "= Demand-Fills aus dem Cache eines anderen CCX, der Koh\\\"arenz-Beobachtbare des Core-PMU -- "
+             "ein w\\\"ortlicher Invalidierungsz\\\"ahler existiert im amdzen5-Satz nicht); Modelle ohne "
+             "Katalog-Eintrag tragen ehrlich n/a (per-Feld-Flag), nie eine geratene Kodierung. L3 kann auf "
+             "einzelnen AMD-Plattformen zus\\\"atzlich beim \\\"Offnen des Z\\\"ahlers scheitern; Energie "
+             "l\\\"auft best-effort \\\"uber RAPL-sysfs und bleibt ohne Zonen-Leserecht leer. Der "
+             "Intel-PCM-Windows-Treiber steht f\\\"ur die Windows-Lane weiterhin aus (\\#26/P4). Auf Modellen "
+             "ohne Katalog-Eintrag (heute traegt nur Zen 5 einen) bleibt die L2/Coherence-L\\\"ucke nur "
+             "indirekt \\\"uber den Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op) "
+             "beobachtbar."});
         rows.push_back({"14 gepinnte Achsen = 0 Austauschbarkeits-Belege",
                         "Nur 4 der 18 Kompositions-Achsen variieren (search\\_algo, node\\_type, memory\\_layout, "
                         "prefetch). Gepinnt (je 1 Wert): cache\\_traversal, mapping, path\\_compression, allocator, "
@@ -1079,18 +1089,27 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
                         "auf Messwerte (G5-Audit, PATTERN-MINOR-1..7)."});
     } else {
         rows.push_back(
-            {"\\textbf{Cache misses (core metric):} L2 + coherence structurally 0; L1/L3/dTLB only collected "
+            {"\\textbf{Cache misses (core metric):} L2 + coherence model-bound real (Zen 5: "
+             "\\texttt{PERF\\_TYPE\\_RAW} 0x964/0x1443), otherwise n/a; L1/L3/dTLB only collected "
              "with the PMC switch set; energy best-effort",
              "Without \\texttt{COMDARE\\_ENABLE\\_PMC} (build default OFF, so that \\texttt{test:unit} builds "
              "without HW access) \\texttt{NullPmcSource} reports available=false and all HW columns stay 0 --- "
              "that is how the tabulated zeros arose. With the switch, \\texttt{LinuxPerfPmcSource} collects "
              "L1, L3 (last-level) and dTLB misses for real via \\texttt{perf\\_event\\_open}(2) (kernel "
              "syscall, no vendor library, no PAPI required --- PAPI remains an optional secondary path). L2 "
-             "and coherence invalidations stay structurally 0 even then, for lack of a portable generic "
-             "counter; L3 can additionally fail to open on individual AMD platforms; energy runs best-effort "
-             "via RAPL sysfs and stays empty without read access to the zone. The Intel PCM Windows driver is "
-             "still pending for the Windows lane (\\#26/P4). The remaining L2/coherence gap is observable only "
-             "indirectly via the wall-clock proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+             "and coherence invalidations have no portable generic counter; they are collected model-bound "
+             "via the RAW event catalog (\\texttt{pmc\\_raw\\_event\\_katalog.hpp}; Zen 5, family 26: "
+             "\\texttt{l2\\_cache\\_req\\_stat.ic\\_dc\\_miss\\_in\\_l2} = \\texttt{PERF\\_TYPE\\_RAW} "
+             "0x964 = demand IC+DC misses in L2 without L2 prefetch; "
+             "\\texttt{ls\\_dmnd\\_fills\\_from\\_sys.remote\\_cache} = \\texttt{PERF\\_TYPE\\_RAW} 0x1443 "
+             "= demand fills from the cache of another CCX, the core-PMU coherence observable --- a literal "
+             "invalidation counter does not exist in the amdzen5 set); models without a catalog entry "
+             "honestly report n/a (per-field flag), never a guessed encoding. L3 can additionally fail to "
+             "open on individual AMD platforms; energy runs best-effort via RAPL sysfs and stays empty "
+             "without read access to the zone. The Intel PCM Windows driver is still pending for the "
+             "Windows lane (\\#26/P4). On models without a catalog entry (today only Zen 5 carries one) the "
+             "L2/coherence gap remains observable only indirectly via the wall-clock proxy "
+             "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
         rows.push_back(
             {"14 pinned axes = 0 exchangeability evidence",
              "Only 4 of the 18 composition axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). "
