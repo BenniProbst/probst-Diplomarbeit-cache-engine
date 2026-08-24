@@ -63,18 +63,16 @@ aus 20260817-OWNER-VORAB-15-restfragen.md; Antwort erbeten."
 Muster erweitern?) — beide Fristen Mi 12.08. verstrichen; sie blockieren die D3-4/D3-6-
 Nachzuege (Flaeche super/ci -> Lande-Zug). Entscheide erbeten."
 
-<!-- ORDNUNGSNOTIZ (VF-A2, 22.08.): D-12 nachgetragen 21.08. 09:26 per 8aae5cd2 — Reihenfolge
-     vor D-11 historisch, kein Versehen. -->
-### D-12 · R-1/OV-10 Steuerdock-Zahl (Synthese-Dedup-Pruefung, s8-Strang F-17) [ENTSCHEID]
-„Der S-8-Traegerbau hat SECHS Steuerdocks gebaut (C-6-Mandat/B-14, steuerdock.hpp); die aeltere
-OV-10-Lesart sagte ‚max. 4 erreichbar' — Bestaetigung der SECHS erbeten (genau EINE Code-Stelle,
-Registry-Aufzaehlung; Wortlaut-Vorlage in traegerbau-s8-ergebnis.md §6.3)."
-
 ### D-11 · Sammel: K2-P/E-Core-Platz + Alt-Owner-Posten (G20+G22) [KENNTNISNAHME/DISPOSITION]
 „(a) ICpuCore/CoreClass/CPUID-0x1A ohne Wellen-Posten — Platz-Entscheid erbeten.
 (b) Alt-Sammel zur Disposition: PA-3 (3 PRT-ART-Quelldateien) · ETA-avg_size_bytes ungenutzt ·
 'G13'-Kuerzel unzuordenbar · 2 unbenannte Owner-GOs (Roh-Transkript Z36292/Z42737) ·
 K-5-Dateien mit Teammate-Berichten trotz Owner-only · OD1-OD4 (§68d, seit 26.07.)."
+
+### D-12 · R-1/OV-10 Steuerdock-Zahl (Synthese-Dedup-Pruefung, s8-Strang F-17) [ENTSCHEID]
+„Der S-8-Traegerbau hat SECHS Steuerdocks gebaut (C-6-Mandat/B-14, steuerdock.hpp); die aeltere
+OV-10-Lesart sagte ‚max. 4 erreichbar' — Bestaetigung der SECHS erbeten (genau EINE Code-Stelle,
+Registry-Aufzaehlung; Wortlaut-Vorlage in traegerbau-s8-ergebnis.md §6.3)."
 
 ## SOFORT-ZEILEN (aus dem ENTWURF, unveraendert dringend)
 1. V-04: C-3a-Nachfassung d8b27633 (haertester Blocker, Frist 19.08. verstrichen).
