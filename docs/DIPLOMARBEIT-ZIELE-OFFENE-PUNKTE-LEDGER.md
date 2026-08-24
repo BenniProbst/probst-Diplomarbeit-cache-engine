@@ -16,6 +16,74 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON123 (24.08.2026 spaet, Lead an der Landung): W2-LANDE-ZUG TERMINAL 27/27 — ZUG-SCHLUSS-QUITTUNGEN Z25/Z26/Z27 + Endstaende + Nachlande-Tafel
+
+**KON123-01 (ZUG-SCHLUSS):** Alle 27 Ziele abgeschlossen — 26 GELANDET (Z01
+SCHON_ENTHALTEN), Z27 owner-gated VERTAGT (F-13). Endstaende 24.08. 20:1xZ je
+lokal==origin==github, porcelain 0, 0 running/pending: ce development 943c70ee
+(CI 16150 SUCCESS; K17-Endstand-Kombibau Z12-NEUFAHRT 4/4 Zellen je LITERAL
+"100% tests passed, 0 tests failed out of 545", J-1-SIEBEN + Facade real,
+Gates 6/6, Floor-Anker LIVE 545/541/539, TABU 0 in 4 Commits); prt-art
+development 16c90628 (CI 16184 SUCCESS 9/9, Pin-Log 6/6, W1L-4-Kombibau 4x
+224/224); super development 3cddc5b7 (CI 16207 SUCCESS 28/28 + 16200 SUCCESS
+38/38 inkl. Bruecken 16201/16202; Gitlinks ce 943c70ee + prt-art 16c90628
+COMMITTED, PZW 5/5 live). H-6 beidseitig; L-01-Frist Mi 26. 06:00 mit ~36h
+Vorlauf erfuellt. Beweisort 20260822-lande-zug/ZUGENDE-endstandpruefung/ +
+ZUG-BILANZ.md Abschn. 10. ENOSPC-Riss 17:2xZ (Z22-Fenster) per Wiederanlauf
+geheilt (RISS-Doku 20260822-lande-zug/RISS-ENOSPC-20260824-17xx.md).
+
+**KON123-02 (Z25-QUITTUNG VOLLAUDIT-BU):** W2-Wellen-Ende-BU vollzogen —
+Commit 3cddc5b7 (927 Dateien, +454838) nach docs/sessions/backups/20260824-
+vollaudit-welle2-stand/; gitleaks-Redaktion JE Datei 927/0 (EIN Echt-Fund
+runners_token Projekt 287 NUR im Commit-Spiegel maskiert, Original additiv in
+Z15/, remote nie); Echt-Scan "2 commits scanned." == rev-list 2, no leaks;
+CI 16207 28/28 inkl. lint:secrets SUCCESS. L-15/AB-09 (fixstrecke2 live 241
+Dateien) + 8/8 JB-2-Logs + V91-A1-Kopie + KON122-MERKPOSTEN-Fremd-Ordner
+cifix2-vl3debug (34 Dateien) + 21 Workflow-Journale mitgenommen. OFFEN daraus:
+Owner-Entscheid Token-Rotation 287.
+
+**KON123-03 (Z26-QUITTUNG RAEUMFENSTER super/prt):** 5 super-Worktrees
+geraeumt (s13schema/cidual/vorlagenfix/kampvor per worktree remove rc=0;
+w1luecken per rm+prune NACH bestandener rekursiver Nested-Pruefung: nested ce
+66de5c09 + nested prt-art d11781fa je gegen die ECHTEN Remotes der Hauptklone,
+alle Tips enthalten, nichts untracked) + prt-art build-landung/ 27M nach
+Doppel-Bedingung; df 19G->23G frei; wt-prt-pinduo bereits seit Z15;
+Inventur-Befund 5.5 (build-l4) UEBERHOLT.
+
+**KON123-04 (Z27-GATE-STAND MAIN-FF):** #19-Schlussglied BLOCKIERT auf F-13
+(einzige Restbedingung; 7 dokumentarische Quellen + Live-Transkript-Scan
+24.08. 20:04Z uebereinstimmend). FF-Bereiche vermessen: ce e114cabd..943c70ee
+= 308 Commits (255 non-merge), super 85dc85e8..3cddc5b7 = 415 (380), beide
+reine FF ohne Divergenz; ce lokal main b241a272 reiner Rueckstand, wird beim
+FF mitgezogen. Diff-Hygiene bewusst NICHT vorgefahren (Bereich waechst noch,
+z.B. #139 landereif — Vorab-Lauf waere falsches Gruen). NACHLANDEN-Pflicht
+(a)-(f) dokumentiert (Z27-Restposten); Board-#19-Metadaten stale
+(Lead-Korrektur vorgemerkt).
+
+**KON123-05 (T8b-REST):** Board #82 "6 static_asserts" -> "7" (Wortlaut-
+Vorlage pmcpaket/fix-runde-1.md) — Ledger-Haelfte seit Z21/KON122 gedeckt,
+NUR Board offen (Board-Tools z.Zt. getrennt, Nachzug vorgemerkt).
+
+**KON123-06 (UMFELD-VERMERK):** wt-ce-ph89 nach Z11-Loeschung von fremdem
+Kontext NEU erstellt; lokaler Branch bau/ph89 auf 3841d717 bewegt (origin
+unveraendert 2809e4d4) — vor Raeum-/Branch-Disposition Schreiber klaeren
+(K16/K20). Aufklaerungs-Stand Lead: die Bewegung entstammt dem W2-Audit-
+Umfeld (ph89-Fix-Kette r1-r3, wt-ce-ph89 traegt den byte-gesicherten
+FUND-4-Erst-Fixer-Edit, sha256 48c7be4c, dessen Inhalt via #139-Commit
+22c6c62e uebernommen ist); Saeuberung des Worktrees NACH #139-Landung.
+
+**KON123-07 (NACHLANDE-TAFEL, Traeger je benannt):** (1) #139 ce
+bau/w2-abschluss-fixes @ 926f8d70 LANDEREIF (12 Fixes; Lead-Landung nach
+Designplanung) · (2) Wellenplan-Branch bau/wellenplan-offene-punkte @ dec105ae
+(Lead, N-33-Gegenlese; kanalwerk A-KW-1/2 landen damit) · (3) FRIST Mi 26.
+06:00: #114 E07-Q1-Re-Run (<1h, Rezept b10-beweislauf/BEWEIS.md Par. 9) ·
+(4) Owner-Vorlagen-Stau: F-13 (main-FF) + F-17 Dock 6-vs-4 + F-18 R-01-
+Lesarten + S13A-F2 result.csv + GN-9/O4 (ENTBLOCKT) + Token-Rotation 287 +
+VO3-1 Vendor-O3 + EP-2/#138 C1-Gates · (5) Di-25: s13/D-1-Buendel + #96 +
+Board-Zuege · (6) Staffel 3: YAML-Zug ([C1]/[C2]-Spiegel-Treue) + golden-Zug
+E-11-Terminierung (vor Sa 29.) + L-06 Warnungs-Review + W1L-7/F-86 ·
+(7) Raeum-Reste je Lead-GO: wt-ce-lande/s19/messfenster + 4 K17-Baeume
+(BU liegt seit Z25!) + super build/ 3.2G + Strang-Branches.
 ## KON122 (24.08.2026 abends, W2-Lande-Zug #131 / Z24 "Ledger AN der Landung"): W2-LANDUNG KOMPLETT -- ce+prt-art+super GELANDET (CI 286/287/288 TERMINAL SUCCESS) + STRANG-/AUDIT-BUCHUNGEN L1-L21 + L-08a-j + E-6 + #112/Ledger-#44
 
 **Provenienz/Schreibweg:** Geschrieben vom Lande-Zug (Z24, Fahrplan Board #131 Phase 5a) via

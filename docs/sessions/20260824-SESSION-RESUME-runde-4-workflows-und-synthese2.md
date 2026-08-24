@@ -359,3 +359,54 @@ Gitlink+np34] · Wellenplan-Branch dec105ae [Lead, N-33-Gegenlese, HINTER Zug]
 Fix, EIN Push je Repo-Ereignis, Gates je Schritt).
 (3) LANDUNG nach dem Design (Lead-geführt bzw. Lande-Workflow), NIE-KUERZEN +
 GELOEST!=KONFORM + Diff-Hygiene-vor-main-FF beachtet.
+
+## 13. NACHTRAG ~20:4x: 🎉 W2-LANDE-ZUG TERMINAL 27/27 — VOLL GELESEN + VERBUCHT
+
+VOLLLESUNG (Owner-Order eingehalten; Nenner): FINAL-Result 223696 B untrunkiert
+(Kopie w6iwfoybk-FINAL-result-KOPIE.json) — Z01-Z20 cache-identisch zu frueheren
+Volllesungen, Z21-Z27 + endstand (13088 B) heute VOLL.
+
+### 13a. ZUG-BILANZ: 26 GELANDET + Z01 SCHON_ENTHALTEN + Z27 owner-gated VERTAGT
+
+Z21 docs-Sammel 3 Commits (par.25 OV-16/17, 12 W-Marker W11-zuerst, Ledger-
+NACHTRAG 129+) · Z22 np34-Wiederanlauf-Verifikation (16893298, REVERSE-APPLY-
+CHECK RC=0, RAW964=4/RAW1443=4, Dubletten-Verbot eingehalten) · Z23 GITLINK-
+BUMP ATOMAR a23e6cda (ce 943c70ee + prt-art 16c90628 + PZW live 5/5, Gates
+13/13 gruen + [C2]-cppcheck per Gegenstands-Beweis entkraeftet, gitleaks 5==5,
+Dual-Push, CI 16200 SUCCESS 38/38 inkl. Downstreams 16201/16202; L-01-FRIST
+MIT ~36h ERFUELLT) · Z24 KON122 via ledger_nachtrag.sh (14bf6658, +514 Z.,
+L1-L21 + L-08a-j + #112/Ledger-#44 + K-15/K-16-ZU) · Z25 W2-VOLLAUDIT-BU
+(3cddc5b7, 927 Dateien +454838, Redaktion JE Datei 927/0 mit EINEM maskierten
+runners_token-Fund, CI 16207 SUCCESS 28/28 inkl. lint:secrets) · Z26 RAEUMUNG
+(5 super-Worktrees + w1luecken rekursiv-geprueft rm+prune, prt-art
+build-landung, df 19G->23G) · Z27 main-FF BLOCKIERT auf F-13 (7 Quellen +
+Transkript-Scan; FF-Bereiche vermessen ce 308/super 415, beide reiner FF;
+Diff-Hygiene bewusst NICHT vorgefahren — waere falsches Gruen).
+
+### 13b. ENDSTAENDE (endstand.repo_endstaende, K18-gemessen 20:1xZ)
+
+ce dev 943c70ee == origin == github (CI 16150 SUCCESS; Kombibau-Kette r1/r3/
+r4/Z12-Neufahrt je 4/4) · prt-art dev 16c90628 (CI 16184 9/9) · super dev
+3cddc5b7 (CI 16207 28/28; Gitlinks committed) · alle porcelain 0, 0 running.
+W2-LANDUNG DAMIT KOMPLETT AN DEN REMOTES; einziges Schlussglied main-FF =
+Owner-Gate F-13.
+
+### 13c. VERBUCHUNG DIESES NACHTRAGS
+
+KON123 via ledger_nachtrag.sh eingespielt (33103 -> 33171 Z., Kopf Z.19;
+KON123-01..07: Zug-Schluss, Z25/Z26-Quittungen, Z27-Gate-Stand, T8b-Rest,
+wt-ce-ph89-Umfeld-Aufklaerung [= #139-Fix-Kette, kein fremder Eingriff],
+NACHLANDE-TAFEL mit Traegern). Board-Zuege (#82 6->7, #97 zweistufig, #122/
+#112/#91 schliessen, #114-Frist, #89-Metadata, #131-Haken, #19-stale-Fix,
+AB-03-Neuanlagen) VORGEMERKT — Board-Tools weiter getrennt. Dieser Push =
+docs-only-Welle OHNE ci.skip als F-34-Messkandidat (+6-Jobs-Nachweis;
+Pipeline-Terminal-Urteil folgt im naechsten Nachtrag).
+
+### 13d. NAECHSTE SCHRITTE (Owner-Order-Kette)
+
+(1) HINGEBUNGSVOLLE DESIGNPLANUNG (ultracode, Fable max) der Rest-Landung:
+#139-Branch 926f8d70 + Wellenplan-Branch dec105ae (N-33-Gegenlese) + main-FF-
+Vorbereitung (owner-gated F-13) + Lande-Reihenfolge/Harmonisierung/Komplex-Fix.
+(2) Landung alles Landefaehigen. (3) DANN Rueckfragen-Resume (wf_c37fb077,
+Fold-4ff). Owner-Handgriffe gesammelt: F-13 + Token-Rotation-287 + VO3-1 +
+EP-2 + F-17/F-18/S13A-F2/GN-9 (KON123-07(4)).
