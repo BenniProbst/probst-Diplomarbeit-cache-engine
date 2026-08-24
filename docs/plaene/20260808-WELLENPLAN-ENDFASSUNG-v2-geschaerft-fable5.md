@@ -4660,7 +4660,7 @@ seinen Gegenstand").
 
 ## 27.3 W2-ABSCHLUSS-GATE
 
-🔴 **Welle 2 gilt ERST als abgeschlossen, wenn diese Tafel (27.1.A-J) LEER ist ODER jeder
+!! **Welle 2 gilt ERST als abgeschlossen, wenn diese Tafel (27.1.A-J) LEER ist ODER jeder
 verbleibende Rest ein DOKUMENTIERTER, AKTUELLER Owner-Entscheid ist** (Kategorie-C-Doktrin,
 par.21.0/21.6 -- niemals eine Lead-Ableitung). Die Pruefung selbst ist eine
 Differenzmengen-Beweis-Pflicht, kein stilles Verschieben:
@@ -4688,3 +4688,149 @@ Differenzmengen-Beweis-Pflicht, kein stilles Verschieben:
 Querverweis: Designplan `docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md`
 par.13 traegt diesen Gate als Vertrags-Punkt der Testseite (T-13-Klasse, Workaround-
 Konformitaets-Pruefpflicht) -- s. dort.
+
+## 27.4 FABLE-MAX-ABNAHME DES par.27-NACHTRAGS (24.08.2026) -- ADDITIVE KORREKTUREN + ERGAENZUNGEN
+
+ANLASS (Lead-Order 24.08. ~08:00Z, Cache-Invalidierung): der Erst-Lauf dieses Nachtrags
+(Commits fc804971 par.27 / 6400f6dc Designplan-par.13 / 0c6ee745 Marker) fiel durch einen
+automatischen Credits-Fallback auf ein NIEDRIGERES Modell -- ordnungswidrig gegen die
+Owner-Order "Design IMMER mit Fable 5 max" (Memory-Anker
+feedback_stempel_strecke_immer_fable5_max_alle_workflow_teile / A1-Matrix Design-Zeile).
+Die Hinterlassenschaft bleibt ADDITIV stehen (Doku wird deprecatet, nie geloescht); dieser
+Abschnitt ist die Fable-5-max-ABNAHME am Objekt: Fehlendes ergaenzt, Falsches mit
+UEBERHOLT-Vermerk + korrekter Zeile DANEBEN, Richtiges unveraendert.
+
+PRUEFUMFANG (Nenner, selbst gemessen 24.08.):
+  * Eigene VOLL-Einlesung ZUERST, unabhaengig vom Erst-Lauf-Protokoll (Owner-Ausnahme:
+    die 4 /goal-Referenzdokumente VOLL): GOAL-v8 816/815 * dieser Wellenplan 4690/4690
+    (inkl. par.27 selbst) * Designplan 829/829 (Worktree-Fassung) * ARBEITSWEISE-GESAMT-
+    DOKTRIN 1264/1264. Schicht 2: 328/328 + 226/226. Schicht 3: 361/361 * 280/280 *
+    297/297 * 6 Board-JSONs * 322/322 + 90/90 * Result-JSON 108551 B python3-strukturiert
+    * ZUG-BILANZ Abschn. 4 + 7-9 (58+300 Z.) * 365/365 + 111/111.
+  * Zeilenpruefung der drei Erst-Lauf-Commits am Objekt: 478/478 Insertionen geprueft
+    (352 + 106 + 20), 0 Deletionen -> Additivitaet HAELT.
+  * ERGEBNIS: 6 inhaltliche Korrekturen (K-A..K-F) + 1 Form-Korrektur + 10 Ergaenzungen
+    (E-01..E-10). Alle uebrigen Zeilen des Erst-Laufs TRAGEN am Objekt unveraendert --
+    insbesondere die Quellen-Klassen 27.1.B (ph89), 27.1.C (GG2-1), 27.1.D (Vendor-O3),
+    27.1.E (#135, sieben Posten), 27.1.F (Z11R-1..5) und 27.1.H (48 N-Posten,
+    Fristklassen 7/11/26/4) sind am Objekt EXAKT bestaetigt.
+
+### 27.4.0 FORM-KORREKTUR (eigene Arbeit dieses Workflows, kein Bestands-Eingriff)
+
+par.27.3-Kopfzeile trug EIN Non-ASCII-Zeichen (U+1F534) -- Verstoss gegen die ASCII-only-
+Auflage DIESES Workflows. Geheilt: Zeichen durch "!!" ersetzt, Satz sonst byte-gleich.
+Gegenprobe: Non-ASCII-Zeilen ab Z.4340 = 0 (vorher 1); der Bestand des Dokuments fuehrt
+1375 Non-ASCII-Zeilen als HISTORIE -- die sind NICHT Gegenstand dieser Auflage und bleiben
+unberuehrt.
+
+### 27.4.1 KORREKTUREN (je: UEBERHOLT-Vermerk auf die Erst-Lauf-Zeile + korrekte Fassung daneben)
+
+**K-A [Nummern-Deklaration, 27.4-Kopfblock oben in diesem Paragraphen]** -- die WAHL par.27
+TRAEGT unveraendert (par.25 UND par.26 sind belegt), zwei ihrer BELEGSTELLEN sind es nicht:
+  * UEBERHOLT: "par.18.3/#38a2-Umfeld Z.2248" als par.25-Stelle. Am Objekt traegt Z.2248
+    den EINPLANUNGS-MARKER zu KON120-06 OHNE par.25-Bezug (grep "par\.25" trifft dort nicht).
+  * GILT: par.25 hat SECHS reale Fundstellen (Kopf-Marker "par.25 ist fuer die OV-16/17-
+    Buchung reserviert (RN-27)" * par.24-Kopf-Nummerndeklaration "faehrt als **par.25** im
+    Di-25-docs-Zug" * RN-27-Zeile "par.25 = OV-16/OV-17-BUCHUNG" * par.22.4-Kopf-Marker *
+    par.24.4 "Buchungs-Vermerk nach par.25 (E-9)" * par.24.6 "Naechste freie Nachtrags-
+    Nummer: par.25"). Zeilennummern bewusst NICHT zitiert (V14: sie sind allein durch den
+    0c6ee745-Marker um +11 gedriftet) -- die WORTLAUT-Anker oben sind die Belege.
+  * UEBERHOLT: "par.26 traegt ... zwei reale Reservierungs-Zeilen (par.21.2 Z.4082 ...)".
+    Am Objekt liegt diese Stelle in **par.24.1/RN-70** ("sonst namentlich in par.26-
+    Nachtrag"), NICHT in par.21.2; der par.21.2-Marker verweist auf par.24.3.2.
+  * GILT: par.26 hat ZWEI reale Stellen -- RN-70 (W4-Schluss-Gate) und par.24.6
+    ("par.26 = RN-70-Endstand-Nachtrag falls Differenzmengen nicht leer"). Beide Nummern
+    bleiben belegt; par.27 ist die naechste freie Nummer (V12: Gegenstand vor Nummer).
+
+**K-B [27.1.H, N-33-Zeile]** -- UEBERHOLT: "(a) par.24-Nachtrag VOLLZOGEN mit diesem Lauf"
+bzw. "(a) ERLEDIGT DURCH DIESEN NACHTRAG".
+  GILT: N-33(a) ist durch den **par.24-EINPLANUNGS-NACHTRAG vom 23.08.** erledigt --
+  geschrieben vom Einplaner-Lauf wf_c745729a (Commit-Kette 99a16a38 -> 577bc1b2 ->
+  b0eafbb6 -> fdfb5d9d, Beleg: EINPLANUNGS-REGISTER-Kopf "OBJEKT ... Commits:
+  99a16a38 (par.24-Nachtrag RN-01..RN-76 ...)"). par.27 vollzieht N-33(a) NICHT; er setzt
+  darauf auf. (Die NACHHOL-KARTE mass zu ihrem Stand 20:15 korrekt "par.24 = 0 Treffer" --
+  der Nachtrag entstand DANACH.) N-33(b) bleibt bereits-korrigiert, N-33(c)/(d)/(e)
+  bleiben offen wie im Erst-Lauf gefuehrt.
+
+**K-C [27.2, Zaehlwerk-Satz "NEU in dieser Tafel"]** -- UEBERHOLT: "N-13, N-18, N-19
+(3 Stueck) ... nicht vorher RN- oder Board-getragen".
+  GILT: alle drei stehen NAMENTLICH im Board-**#136**-Text, Abschnitt (7) ("N-13
+  (Test-Welt-Warn-Zug 279 TUs ohne -Wall), ... N-18 (#129-Vorspann: 2x georderte
+  WEB-RECHERCHE nie gefahren), N-19 (C2-Folge-Bau gated R2)"). Sie sind damit
+  SAMMEL-getragen; was fehlt, ist der SPEZIFISCHE Traeger (eigener Board-Task bzw.
+  RN-Feinplatzierung) -- den vergibt par.27 hiermit (E-08 unten). Die Aussage "kein
+  Posten dieser Tafel ist traegerlos" wird dadurch STAERKER, nicht schwaecher; korrigiert
+  wird allein ihr Nenner.
+
+**K-D [27.1.J, T12-Zeile "#114-B10-BEWEISLAUF ... [s. 27.1.J E07-Q1 unten]" + EP-3]** --
+UEBERHOLT: der Querverweis, der beide Laeufe als EINEN Gegenstand liest.
+  GILT: es sind **ZWEI** Laeufe desselben #114-Komplexes, beide mit Frist Mi 26.08. 06:00:
+  (i) **B10-BEWEISLAUF** (S2-Tip T12-1): B5.b-Emitter, Mini-Profil <= 8 Binaries,
+      XML-Differenz-Laeufe je Achsen-Familie, emittiert die ECHTEN E07_*-Zeilen -- "erst
+      damit kann das Gate GO werden"; eigener Traeger/Agent (p12-b10-beweislauf);
+  (ii) **E07-Q1-DEFAULT-A-RE-RUN** (Board-#131-Metadata e07_q1_rerun + ZUG-BILANZ
+      Abschn. 4 "#114-VORBEHALT danach"): <1h, Rezept b10-beweislauf/BEWEIS.md Par.9, auf
+      der FINAL eingefrorenen Trigger-Linie; der Vorlauf dieses Laufs "bewies trigfix
+      0f900dcf (Basis 66de5c09)" -- er ist also eine WIEDERHOLUNG auf neuer Linie.
+  ABNAHME: ob EIN Lauf beide Zwecke erfuellt, ist AM OBJEKT (BEWEIS.md Par.9) zu
+  entscheiden und zu protokollieren -- nicht anzunehmen. Traeger unveraendert: RN-34 +
+  #114/#131-Endstand-Anhang.
+
+**K-E [27.1.G-Kopf, CR-Tafel]** -- PRAEZISIERT (kein Sachfehler, aber Nenner-Pflicht):
+  Die Zuordnung der Z-NUMMERN Z13..Z27 zu ihren Gegenstaenden ist im Result NICHT belegt:
+  dort tragen Z12-Z27 nur die Kennung ("FEHLER | Z13" usw.), und die workflowProgress-
+  promptPreviews sind auf je 401 Zeichen gekuerzt und enthalten KEINEN Zieltext (selbst
+  nachgemessen 24.08.). BELEGT ist allein **Z12 = o2/E-7** (Agent a745560ba5c2f0c3b,
+  lastToolSummary "cd /home/comdare/wt-ce-o2std && git show f82dfaeb --stat").
+  Die GEGENSTAENDE der CR-2..CR-12 sind ihrerseits vollstaendig belegt (Board-#131-
+  Phasenliste + sollist.offene_posten_kurz 14 Zeilen + ZUG-BILANZ Abschn. 4/9d) -- nur die
+  NUMMERNZUORDNUNG ist eine Ableitung. V12 gilt: Gegenstand vor Nummer; beim Zug-Resume
+  ist die Nummerierung am Script zu verifizieren, nicht aus par.27 zu uebernehmen.
+
+**K-F [27.2, Klasse J]** -- PRAEZISIERT: "J (S2-Tips T9..T17 mit Unterpunkten, 14 Traeger-
+  Zeilen + 3 Einzelposten)" nennt den Traeger-Zaehler ohne den Posten-Nenner.
+  GILT: die S2-Restmenge ist **38 Posten** (ph89 8 + pinduo 8 + kanalwerk 3 + vollzug91 3
+  + trigfix 5 + skip97 2 + kampvor 5 + e11 4 + a19 0), getragen ueber 14 T-Zeilen --
+  Zaehlwerk unabhaengig bestaetigt durch GEGENLESE-GATE Teil I A.1 ("S2 38 Rest-Posten
+  (8+8+3+3+5+2+5+4+0) gegen T9..T17 -- 0 traegerlos").
+
+### 27.4.2 ERGAENZUNGEN -- W2-ABSCHLUSS-PFLICHT (Posten ohne Platz im Erst-Lauf)
+
+| # | Posten | Quelle | Traeger | Frist | Abnahme-Kriterium |
+|---|---|---|---|---|---|
+| E-01 | **T9b-CAVE SPANNUNG-5**: ob die bestehende Allowlist-Eintragung (287->ce) die FUENF neu gepinnten prt-art-Jobs automatisch deckt, ist in KEINER Quelle bestaetigt; greift sie nicht, ist die Allowlist-Einrichtung ein ZUSAETZLICHER Schritt VOR der Branch-CI | F2/T9b (soll-karte SPANNUNG 5) | RN-01 (prt-Phase, CR-7) | vor der prt-art-Branch-CI | Allowlist-Deckung am Objekt gemessen (deckt/deckt nicht) + literaler Beleg; bei "deckt nicht": Einrichtung VOR der CI vollzogen |
+| E-02 | **L-01-Zusatz F-40-Umhaengung**: die F-40-Fehl-Platzierung an BEIDEN Stellen der alten STAFFEL1-SYNTHESE.md ("Phase 4 -- Nachlanden" + "Folgepakete") auf die super-Lande-Phase umhaengen -- gehoert in denselben Zug wie der NP-34-Patch | F1/L-01 (zweiter Halbsatz) | RN-01 (CR-3, mit dem Gitlink-Commit-Zug) | vor Mi 26. 06:00 | beide Stellen tragen den super-Lande-Phase-Vermerk; Gegenprobe: 0 Rest-Treffer der alten Platzierung |
+| E-03 | **PmcProbeLebtOhneRiegel-MERKPOSTEN** ins Fallen-Register: die EINZIGE Stelle des Lande-Zugs, die im CI wieder von der Runner-PMU abhaengt -- kippt ein kuenftiger CI-Lauf genau dort, ist das ein **BEFUND, kein Testfehler** (Entschaerfungs-Nachtrag: `probe_gefahren=true` vor allen vier Rueckgabepfaden, damit strukturell lage-/PMU-unabhaengig) | ZUG-BILANZ 7c-Warnung + 9d-Merkposten (TEIL2 (d) 3) | RN-27 (Fallen-/Memory-Zug, Lead-only) -- am Objekt 0 Treffer im Wellenplan | Di-25-docs-Zug | Fallen-Register traegt den Satz; Gegenprobe grep im Memory-Register > 0 |
+| E-04 | **prt-art `bau/prtart-ladeweg-w0a` DIVERGIERT** origin 7c0c9975 vs. github a782c56e (Alt-Bestand, kein Zug-Gegenstand) -- ZWEITE Remote-Divergenz neben der ce-Divergenz (origin 27 vs. github 25, CR-11) | ZUG-BILANZ 9a (prt-art-Zeile) | RN-01 (Phase-5-Auflage, neben CR-11) | W2-Ende | Divergenz aufgeloest ODER mit Beleg als Alt-Bestand entlastet (beide Mengen genannt) |
+| E-05 | **Board-#134** (Spiegel der gerissenen Straenge + Workflow-Vollerhebung 698 Laeufe; Heilungs-Workflow GATED auf "alle laufenden Workflows terminal") traegt KEINE RN-Zeile -- das EINPLANUNGS-REGISTER schliesst neue Tasks ausdruecklich aus seinem Nenner aus (Vermerk V-4) | Register V-4 + NACHHOL-KARTE Pfad-Plan | RN-26 (#96-Feinplatzierung) + par.27 bis dahin | Di-25-Schnitt | #134 traegt eine namentliche RN-/Slot-Zeile; Gate-Bedingung "alle WF terminal" gemessen |
+| E-06 | **N-03-VOLLZUG (hiermit)**: W2-DRIFT-KORREKTUR-DESIGNS.md (898 Z., 8 Voll- + 7 Kurz-Designs + Zug-Ordnung, `~/backups-workflow/20260821-ultracode-explore/`) ist hiermit NAMENTLICH im Wellenplan verankert und PFLICHT-INPUT der Di-25-/W2-Zuege -- Risiko sonst: die Designs werden neu erarbeitet statt gehoben | NACHHOL-KARTE N-03 (Traeger-Vorschlag "EINE Zeile im Wellenplan-par.24-Nachtrag") | par.27 (diese Zeile) + Verweis in #120/#96-Metadata | Di-25 | RN-19/RN-26/RN-31-Zuege zitieren die Designs vor Neubau; Gegenprobe: Wellenplan-grep "W2-DRIFT" > 0 (heute erfuellt) |
+| E-07 | **K17-Endstand-Falle EXCLUDE_FROM_ALL**: die drei `*_registry_gen` (axis/measurement_axis/system_axis) sind EXCLUDE_FROM_ALL -- **nur die explizite J-1-Zeile deckt sie, ein "all"-Gruen beweist sie NICHT**; dazu das reale Facade-Target `comdare_profile_run_facade` (Alias "comdare_facade" existiert NICHT, ninja-RC=1, dreifach unabhaengig belegt) | F1/L-05 + F2/T11b-2/T17-1 | RN-18 (J-1-Rezeptfix) + RN-01 (K17-Endstand-Kombibau) | vor jedem Endstand-Lauf | J-1-Zeile mit den SIEBEN Werkzeugen LITERAL im Protokoll + Facade ueber das reale Target; Gegenprobe: kein "all"-Gruen als Ersatz-Beleg zitiert |
+| E-08 | **Spezifische Traeger fuer N-13 / N-18 / N-19** (bisher nur Sammel-Traeger #136(7), s. K-C): N-13 Test-Welt-Warn-Zug (279 tests/unit-TUs ohne `-Wall`, 2 Stufen gcc->clang nach Warnungs-Review-Doktrin) * N-18 D-04-WEB-RECHERCHE (zweimal geordert, nie gefahren -- Vorbedingung des #129-Designs) * N-19 C2-Folge-Bau (Testnamen-Union + `realm_axis_version_stamp.hpp`, aktiviert durch R2) | NACHHOL-KARTE N-13/N-18/N-19 + Board-#136(7) | RN-26 (#96) legt je einen Board-Task/Slot an; N-18 zusaetzlich als Vorspann-Zeile in #129-Metadata | Di-25 (Anlage); Bau je Fristklasse (N-13 W2, N-18/N-19 nach Trigger) | drei namentliche Traeger existieren; #136(7) verweist auf sie statt sie zu ersetzen |
+| E-09 | **trigfix-KLEIN-1 ist GELANDET, nicht offen**: die `ersetze()`-npos-Haertung (`pos = (nl == std::string::npos) ? proto.size() : nl + 1;`) sitzt am Endstand -- Verursacher **a84f1119** (Audit-r1-Fix IM Lande-Zug, ZUG-BILANZ 8a-Tafel, Zeile 1 der vier attribuierten Deltas). Die S2-Synthese fuehrt sie noch als offen, weil sie den Lande-Zug-Fix nicht kannte. OFFEN bleiben allein **KLEIN-2** (`setze()` end()-Guard, e07_gate_kriterien.hpp) und **KLEIN-3** (Testname/Variable "Unguelig" -> "Ungueltig") | ZUG-BILANZ 8a gegen F2/T12-2 | RN-31 / T-9-Codex-Pass (KLEIN-2/-3); KLEIN-1 = ERLEDIGT-DURCH-OBJEKT | KLEIN-2/-3: W2-Rest bzw. T-9-Folgewelle | KLEIN-1 mit Commit-Beleg als erledigt verbucht (nie erneut gebaut); KLEIN-2/-3 je eigener Ein-Zeilen-Fix + Gegenprobe |
+| E-10 | **FLOOR-GATE-UMSTELLUNG mit der o2-Landung**: der Endstand-Beweis fuehrt "Floor-Anker 544/540/538 bleibt gueltig" und Gate [5/6] als "544 == 544"; der Lead-Rescue-Merge **b3dc3e93** hebt ihn per +1-Regel (`test_o2_standard_opt_default`) auf **545/541/539** (LIVE `ctest -N` "Total Tests: 545"). Beim Push dieses Merges MUSS `scripts/ci_test_inventory_floor.txt` mitgezogen und die Gate-Erwartung auf 545 umgestellt werden -- sonst faellt Gate [5/6] falsch-rot bzw. deckt den falschen Nenner | ZUG-BILANZ 9b vs. Session-Nachverbuchung 9b (o2-Merge) | RN-01 (CR-1, im selben Zug wie K17 4/4 + Gates 6/6) | vor dem Dual-Push von b3dc3e93 | Gate [5/6] literal "545 == 545"; alle vier K17-Zellen literal 545; Floor-Restore byte-gleich |
+
+### 27.4.3 GEGENZAEHLUNG DIESER ABNAHME (beide Mengen genannt, V-8)
+
+    GEPRUEFT:      478/478 Insertionen der drei Erst-Lauf-Commits (352 par.27 + 106
+                   Designplan-par.13 + 20 Marker), 0 Deletionen.
+    KORRIGIERT:    6 inhaltlich (K-A Belegstellen der Nummern-Deklaration * K-B
+                   N-33(a)-Zuschreibung * K-C Nenner der "NEU"-Aussage * K-D
+                   B10-Beweislauf vs. E07-Q1-Re-Run * K-E Z-Nummern-Belegbarkeit *
+                   K-F J-Klassen-Nenner) + 1 formal (ASCII).
+    ERGAENZT:      10 Posten (E-01..E-10), alle mit Gegenstand/Quelle/Traeger/Frist/
+                   Abnahme; davon 3 am Objekt zuvor OHNE jeden Wellenplan-Treffer
+                   (E-03 PmcProbe, E-04 prtart-ladeweg, E-05 #134) und 1 hiermit
+                   VOLLZOGEN (E-06/N-03).
+    UNVERAENDERT:  alle uebrigen Zeilen des Erst-Laufs -- 27.1.A (Fenster-A-F-Deklaration),
+                   27.1.B (ph89-1/-2/-3), 27.1.C (GG2-1), 27.1.D (VO3-1), 27.1.E (W135-1..7
+                   + Prozess-Zeile), 27.1.F (Z11R-1..5), 27.1.G (CR-1..CR-12 in der Sache),
+                   27.1.H (N-01..N-48 inkl. Fristklassen 7/11/26/4), 27.1.I (L-01..L-20),
+                   27.1.J (T9..T17 + EP-1/EP-2/EP-3), 27.2, 27.3 (Gate).
+    OFFEN GEBLIEBEN (nicht einplanbar, mit Grund): s. Ergebnis-Rueckgabe dieses Laufs --
+                   die Z13..Z27-Nummernzuordnung bleibt bis zum Zug-Resume eine Ableitung
+                   (K-E), und die Frage "ein Lauf oder zwei" bei #114 (K-D) ist ein
+                   OBJEKT-Entscheid des Traegers, kein Planungs-Entscheid.
+
+**Damit gilt das par.27-Design als von Fable 5 max abgenommen** -- die Erst-Lauf-Substanz
+traegt, die sechs Korrekturen stehen additiv daneben, die zehn Ergaenzungen sind eingeplant.
+Das W2-ABSCHLUSS-GATE (27.3) gilt unveraendert und erfasst 27.4.2 mit.
