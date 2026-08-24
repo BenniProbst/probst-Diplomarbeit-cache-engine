@@ -171,3 +171,13 @@ ctest frisch, Slot-Claim neu) · (P3) W2-Audit S1/S2/Gate-Neufahrt-Vermerke
 resumed: w52g5xvgc (W2-Abschluss) · wd3iiuv9g (Lande-Zug) · wry7wqnzt
 (W2-Audit) · w3kdnx320 (Rueckfragen). MODELL-WACHE: erster Neuspawn
 (W2-Audit a5407b69) = fable-5; Rest sekundenfrisch, Wache laeuft mit.
+
+## 8. NACHTRAG 11:32 UTC: RESUME NACH 5h-LIMIT-PAUSE (Owner: "credits wieder frisch")
+
+Owner-/login + /model (Fable 5 max) VOR dem Resume bestaetigt (Pause-Doku-
+Vormerk eingehalten). Alle 4 Straenge resumed (R-A..R-D):
+wi630fc5e (W2-Abschluss wf_08c04723) · wjagljq3t (Lande-Zug wf_b546634b) ·
+wt5prn4ly (W2-Audit wf_98cabd77) · wikwy9yz3 (Rueckfragen wf_c37fb077).
+MODELL-WACHE 11:32:35: alle 4 Neuspawns AUSSCHLIESSLICH claude-fable-5
+(a3aab3c1=6 · a85c0e38=2 · a1b6c036=13 · a1e4eac5=11 Records, 0 Fremdmodell).
+Cache-Lage unveraendert wie Pause-Doku Abschn. 3; ce b3dc3e93 wartet auf Z12.
