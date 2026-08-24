@@ -50,8 +50,14 @@ design-und-deep-research.md (8 Festlegungen); docs/plaene/20260817-DESIGN-s13-bu
 - Politik-Befund am Objekt (fuer Abschnitt 4): `mess_arena.hpp:36-38` "GEBAUT: ZAEHLEN, MELDEN,
   WEITERMESSEN", `:213` kUeberlaufSlot, `:263-269` anhaengen() zaehlt ueber die Kapazitaet weiter.
   Dazu stale: `:222-224` nennt als Planer-Formel "n_ops * zeilen_je_op * 2 (Sicherheitsfaktor 2)"
-  -- verdrahtet ist `kapazitaet_zeilen_rechnen(n_ops, zeilen_je_op, drift_faktor)` mit
-  drift_faktor <= 18 (`checkpoint_speicher.hpp:131`; KON92-Delta C7).
+  -- verdrahtet ist `kapazitaet_zeilen_rechnen(n_ops, zeilen_je_op, sicherheitsfaktor)`
+  (`checkpoint_speicher.hpp:140-141`, frisch gemessen 24.08. @ 943c70ee-Kette; Formel-Zeile
+  `:117`, Faktor-Herleitung `:119-132`; Ledger-Name drift_faktor(<=18) KON94-02, ab
+  messfenster-Landung arena_gesamt_faktor=120; KON92-Delta C7).
+  [A-KW-1/K-01-Praezisierung 24.08.2026, W2-Abschluss-Fixzug #139: Parameter-Name am Objekt
+  ist sicherheitsfaktor, nicht drift_faktor -- der Ledger-Name bleibt als Zitat daneben;
+  Zeilen-Anker gegen den HEUTIGEN Stand neu gemessen (F3-13-Doktrin, alte S2-Anker :131-132
+  waren gedriftet).]
 - Deskriptor-Notiz: `mess_naht.hpp` bindet Soll-Design-OP-1 auf JA (EIN Deskriptor je Station);
   `mess_arena.hpp:88-91` fuehrt das 64-bit-Reservefeld noch als "OP-1/OP-2 NICHT entschieden,
   heute immer 0". Kein Defekt (Feld ist ehrlich reserviert), aber eine Kommentar-Divergenz,
@@ -300,7 +306,7 @@ Durchreichung) laufen als E1-E11-Traeger mit. Einbettung im Einzelnen (IST nach 
 | E7 | Zwei-Phasen an der Arena | S13-05-Umfeld |
 | E8 | PAAR-Muster landen (Warmup) | mit #38b/T-12b-Umfeld |
 | E9 | measure_storage produktiv anschliessen | NACH E11.1-3 |
-| E10 | Rest-Posten der KON92-Liste (im Ledger-Kopf nicht einzeln ausbuchstabiert -- Kern war E4-E9) | Quelle bei Bedarf: arena_kette_karte.md (Folge-BU-2, 20260816-folge-bu-kontext9) |
+| E10 | Rest-Posten der KON92-Liste (im Ledger-Kopf nicht einzeln ausbuchstabiert -- Kern war E4-E9) | Quelle bei Bedarf: arena_kette_karte.md (Folge-BU-2, 20260816-folge-bu-kontext8) |
 | E11 | 6-GB-Kapazitaets-Vollzug: Deckel + Abbruch + Thread-Slots + XML-Hebel + Planer-Verdrahtung (5 Teilposten, E11.1-3 VOR E9) | S13-05/S13-06/S13-07 + X-4 `<mess_speicher>` |
 
 - In der SUBSTANZ bereits gebaut (s13 4.2, am Objekt bestaetigt): B-05 (zwei Arenen, getrennte
