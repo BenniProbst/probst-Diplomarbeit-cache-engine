@@ -63,6 +63,12 @@ Nenner 49 Soll-Aussagen, alle am Objekt gemessen: ERFUELLT 8/49 (16 %) - TEILWEI
 - [s5-messen] S5-03: '--check-size' muss die HYBRID-Schicht mitrechnen (wirkt auf den Bauplan, nicht nur den Bauinhalt). — Erst S5-31 (--check-size ueberhaupt bauen), dann in dessen Ausgabe eine eigene HY-B-Zeile fuehren, die die Hybrid-Dock-Zahl x Tier-Ziele multipliziert. Ohne S5-02 gibt es dafuer keine Zahlenquelle.
 
 - [s5-messen] S5-06: Drift-Gate: >5 % Streuung ueber 3 Wiederholungen => GESAMTER Lauf neu; bis zu 5 Wiederholungen zulaessig. — Kein einziger realer Messwert laeuft heute durch das Drift-Gate. Bau-Paket: (a) drift_detector.hpp:109 Default max_reruns 3->5; (b) in harness/perm_runner.hpp bzw. cache_engine_builder_iterator.hpp measure_one_binary die Zeitnahme in run_with_drift_gate klammern (reps/threshold/max_reruns aus dem Profil-XML, nicht hartkodiert); (c) den 'ganzen Lauf neu'-Fall als eigene Stufe ueber der Zelle bauen (heute existiert nur Gruppen-Rerun) -- das ist die eigentliche Arbeit, weil ein mehrtaegiger Lauf einen Wiederaufsetzpunkt braucht (Batch-Reservierung freigeben + neu greifen).
+  > **[S5-06-KORREKTUR 24.08.2026, Z21-docs-Sammel (H-5-super-Anteil, messfenster-REST)]:** Bau-Paket-Teil (a)
+  > "drift_detector.hpp:109 Default max_reruns 3->5" ist FALSCH -- der Default max_reruns=3 ist seit KON26-04 der
+  > richtige Stand; die 5 gehoert zum BINARY-Retry (T-15b-Retry-Klammer: bis zu 5 Versuche des GESAMTEN
+  > Pruefdock-Durchlaufs), nicht auf die Drift-Achse. Objekt-Stand ce/development: drift_gated_cell.hpp
+  > max_reruns = 3, mess_retry_klammer.hpp max_versuche = 5, build_orchestrator.hpp bau_max_versuche = 5
+  > (messfenster-Audit, 3a746090 gelandet). Teile (b)/(c) der Zeile bleiben unberuehrt. Zeile bleibt.
 
 - [s5-messen] S5-13: checkpoint_measure(...,IN|OUT) ist EINE uniforme Funktion, IN/OUT ist ein Compile-Time-Tag, kein Laufzeit-Enum. — Die gesamte E2-Schritt-Instrumentierung existiert nur als Design-Dokument. Bau-Paket: libs/cache_engine/measurement/checkpoint_measure.hpp mit template<CheckpointTag Tag> checkpoint_measure(...) und if constexpr auf dem Tag, Aufruf-Zeilen an den Pruef-Dock-Interfaces (search_algorithm_dock/set/sequence/adapter/view). Das ist eine Tier-Binary-Aenderung -> Klasse TIER, invalidiert die Flotte.
 

@@ -247,7 +247,7 @@
 #   AF_CORPUS_ROOT    Rueckschreibe-Korpus                          (Default: measurement)
 #                     ACHTUNG: dieser Default zeigt am Repo-Root ins Leere, s.o.
 #   AF_RESULT_NAMEN   Namensformen der Mess-CSV, Leerzeichen-Liste
-#                     (Default: "result.csv *.result.csv" -- BEIDE, OV-17 offen)
+#                     (Default: "result.csv *.result.csv" -- BEIDE; OV-17 ERFUELLT, 6d2e3dce 09.08.2026; par.25)
 #   AF_GENERATOR      Pfad zur appendix-generator-Binary            (Default: leer)
 #   AF_WIDE_AGGREGAT  Pfad zur EINEN WIDE-Konkatenation
 #                     (Default: <verzeichnis dieser datei>/wide_aggregat.sh)

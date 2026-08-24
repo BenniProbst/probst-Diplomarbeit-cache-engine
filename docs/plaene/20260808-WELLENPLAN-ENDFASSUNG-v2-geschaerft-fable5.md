@@ -610,6 +610,10 @@ Reproduziert: Kopfzeilen-CSV und 0-Byte-CSV bestehen das golden-320-Gate (rc=0).
 | D3-6 | `anhang:forward`-Selektor findet **beide** Ablageformen (Produktions-`result.csv` + Archiv-`*.result.csv`, EIN Muster als Variable an 3 Stellen); NO-OP nur noch mit Nenner (`laufordner_geprueft/mit_material`) | 2,5 | W0b | Owner-Klärung Konvention (OV-17) |
 | D3-8 | Frische-Wache gegen die `GIT_CLEAN_FLAGS`-Ausnahme: Lauf-Kennung = `CI_PIPELINE_ID` (+JOB_ID als Zusatz, Retry-fest); `csv_dieser_lauf` getrennt von `csv_gesamt`; Altbestand **gemeldet, nie gelöscht** | 2 | W0b | zuletzt; scharf mit `ergebnis:holen` (W2) |
 
+> **[BUCHUNGS-VERMERK 24.08.2026, Z21/par.25]:** die D3-4/D3-5-(OV-16)- und D3-6-(OV-17)-
+> Anteile dieser Tafel sind seit 09.08.2026 GEBAUT und per par.25.2 GEBUCHT -- Alt-Text
+> hier nicht erneut als offen zitieren (par.25.3).
+
 **Tragende Abnahme:** Fake-Treiber-Doppel am emittierten Job-Rumpf (nur Kopfzeile vs. eine Datenzeile mit gewürfeltem `$K`): heute BEIDE `FAIL=0` — nach Heilung 1 rot / 1 grün, beide Ausgaben literal; persist-Beweis P1/P2 am Git-Zustand (`git status --porcelain measurement/` leer vs. genau eine Datei mit `$K`); Zwei-Lauf-Köder im selben Verzeichnis (Altzelle `$K1` mit Datenzeile, Neuzelle `$K2` leer) → rot mit `csv_dieser_lauf=0` und namentlicher Altbestandsliste — heute meldet das Existenz-Gate hier grün.
 
 ### D4 — Tote Messreihen gelten als gültig und nicht-signifikant (7 Posten, 12,5 h)
@@ -715,7 +719,7 @@ Statistik: **D4a → D4b → D4c** (Reihenfolge zwingend, D4c ist vorher blind),
 
 ### W3-MESS — DIE KAMPAGNE · Sa 29.08. 06:00–Do 03.09.; Rückschrieb Fr 04.09. = **F4** · USER-GO-STOPP davor
 
-##52 (Vor-Gate §59-SCHEMA + **zwei getrennte GOs**), ##53 (320er zuerst, dann gedeckelte Teilmatrix; **je Batch am Abend entschieden**: Bilanz `A+B==C`, Inhalts-Gate mit Marker, Frische `csv_dieser_lauf>=1` — ein Fehllauf wird am Abend seines Tages sichtbar und via Resume geheilt, nicht am 07.09. entdeckt), **HY-B** (Hybrid-Overhead-Kampagne: Stub-Heuristik am Hybrid-Prüfdock, Reroute-Overhead zu multiplen Tier-Zielen, eigene kleine Teilmatrix — die 4. Mess-Ebene liefert ihre Pflicht-Zahlen), ##54 (Auswertung NUR in Batch-Pausen, §61), ##55 (L3-Asymmetrie prod1-eigen: 2×128 MiB CCD, braucht kein prod2), ##56 (Rückschrieb WRITE-Token/NAS/minio inkl. xlsx; Commit nur bei `datenzeilen_gesamt>=1`, Zahl in PROVENANCE). ETA-Deckel 4,5 Maschinentage + 30 h Marge; **Sa 05./So 06.09. = benannter Resume-Puffer** (Entnahme wird gebucht).
+##52 (Vor-Gate §59-SCHEMA + **zwei getrennte GOs**), ##53 (320er zuerst, dann gedeckelte Teilmatrix; **je Batch am Abend entschieden**: Bilanz `A+B==C`, Inhalts-Gate mit Marker, Frische `csv_dieser_lauf>=1` — ein Fehllauf wird am Abend seines Tages sichtbar und via Resume geheilt, nicht am 07.09. entdeckt), **HY-B** (Hybrid-Overhead-Kampagne: Stub-Heuristik am Hybrid-Prüfdock, Reroute-Overhead zu multiplen Tier-Zielen, eigene kleine Teilmatrix — die 4. Mess-Ebene liefert ihre Pflicht-Zahlen), ##54 (Auswertung NUR in Batch-Pausen, §61), ##55 (L3-Asymmetrie prod1-eigen: 96+32 MiB (2 CCD) [KORR 24.08.2026 T14-1/T12b/K-1: vorher "2x128 MiB CCD"; reale L3-Topologie am Objekt nachgemessen, kampvor-Audit prod1-L3]; braucht kein prod2; Owner 07.08. VERDOPPLUNGS-SEMANTIK: Pinning dynamisch, Binary-Zahl unberuehrt, Messungen VERDOPPELT -- je Domaene EINMAL: CCD0-Pin 0-7,16-23 UND CCD1-Pin 8-15,24-31; VORMERK W3-Vorstaffel (F-114-Umfeld): CCD1-Menge = zweite SOLL-Deklaration), ##56 (Rückschrieb WRITE-Token/NAS/minio inkl. xlsx; Commit nur bei `datenzeilen_gesamt>=1`, Zahl in PROVENANCE). ETA-Deckel 4,5 Maschinentage + 30 h Marge; **Sa 05./So 06.09. = benannter Resume-Puffer** (Entnahme wird gebucht).
 **Parallelität 1** (Messung hält das Blech exklusiv — fremde Last kontaminiert Latenzen, und kontaminierte Daten sind die unheilbare Klasse; menschliche Textspur via Overleaf).
 **Blockiert durch:** W2 (F3); **beide GOs bis Sa 29.08. 06:00** (OV-15; jeder Verzugstag frisst 1:1 Fenster).
 
@@ -1059,6 +1063,11 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 | **OV-2 checkpoint_measure** | Bleibt es bei „spezifiziert, nicht gebaut" (W7)? | **ja** — ein Fingerprint-Bump ohne Konsument wäre die Klasse „gebaut, kein Konsument" im Identitätsfenster | vor Mo 24.08. |
 | **OV-15 GO-TERMIN** | Können beide Mess-GOs (320er + gedeckelte Teilmatrix) bis **Sa 29.08. 06:00** fallen, wenn die GO-VORLAGE Fr 28.08. mit Deckel-Zahl vorliegt — ja? | **ja erbeten** — jeder Verzugstag frisst 1:1 Messfenster; ab Ende-W2-Verzug kippt die Rückwärtsrechnung und W4 entfällt als Auswertungsfenster | Vorab-Zusage an F3 |
 | **OV-18 STREICHKASKADE** | Bestätigst du die neue Streich-Reihenfolge (Abschnitt 7, letzter Block) mit einem Satz? | ja erbeten — sie weicht von v1 ab, weil deren Position 2 (Hybrid) durch deinen KERN gefallen ist | Mo 17.08. |
+
+> **[BUCHUNGS-VERMERK 24.08.2026, Z21/par.25]:** OV-16 und OV-17 sind seit 09.08.2026 GEBAUT
+> (OV-16: ce a558e87c, Test #278, CMake-verdrahtet, Ancestor von development; OV-17: super
+> 6d2e3dce, AF_RESULT_NAMEN traegt beide Formen, Ancestor von HEAD) und in par.25 GEBUCHT --
+> diese Frontteil-Zeilen nicht erneut als offen zitieren (par.25.3).
 
 > ⚠️ **MARKER 12.08.2026 (KON39):** *PRÄZISIERT 12.08. zu OV-10: gegenstandslos NUR als Nenner-/6er-Frage; der Anordnungs-Gegenstand ist neu gefasst per KON37-03 (statische Anordnungs-Freigabe) → §17.2. Zu OV-13: Zeitbezug korrigiert — ‚eigenständig + Sync-Kanal' = SPÄTER, jetzt direkt/delegiert (KON36/KON21-01) → §17.5.*
 
@@ -3229,6 +3238,13 @@ K15-Memory-Neuzugaengen 22.2 T-14).** Audit-H4-OFFEN-Teil (Transkript Z70284): d
 K16-Stopp-Baustein (Schreiberwechsel-Protokoll) fehlt in der Session-Vorlage B.0; 0 Treffer in
 Board, par.18-21 und Register 12.4+13 (weder 'Stopp-Baustein' noch 'Session-Vorlage'/'B.0').
 
+> **[AB-07-VOLLZUG 24.08.2026, Z21-docs-Sammel]:** Ort festgelegt + angelegt (offene
+> Frage 7): die Session-Vorlage B.0 lebt ab jetzt als docs/sessions/20260824-SESSION-
+> VORLAGE-B0-neugruendung-und-schreiberwechsel.md; der K16-STOPP-BAUSTEIN ist dort
+> woertlich eingesetzt (Quelle: ablock/lande-auflagen.md Abschnitt 6; Kandidaten-
+> Abwaegung im Datei-Kopf). Buendelbar mit T-14-Memory-Neuzugaengen (12.4-Liste);
+> Quittung im Ledger-NACHTRAG (Z21).
+
 **U-5 WERKZEUG-WUNSCH JOURNAL-AGENT-LABELS (Faelligkeit: nach Abgabe / W7, unverbindlich;
 Traeger NEU: 22.5 C-1, Kategorie C -- nur per Owner-Satz).** Das Workflow-Journal traegt keine
 Agent-Labels (nur v2:-Step-Key-Hashes; meta.json nur agentType/spawnDepth) -- Label-Feld fuer
@@ -3625,3 +3641,71 @@ nicht stale' — BESTAETIGT; wf_d9d83069, B.3: 20260819-w93-endstand/vl12-unters
     Formabweichung als 'am Objekt getilgt' vermerken (HIERMIT vollzogen). Worktree nach
     Doktrin AUFRAEUMBAR (alle Bedingungen gemessen; kein Remote-Branch mehr, Submodul
     uninitialisiert) — Abbau bleibt im Aufraeum-Block nach den Landungen.
+
+---
+
+# 25. D-10-NACHHOL-SWEEP K15-K24 -- OV-16/OV-17-BUCHUNG (Nachtrag 24.08.2026, Z21-docs-Sammel)
+
+> NUMMERN-DEKLARATION (V12: Gegenstand vor Nummer, naechste FREIE Nummer): dieser Nachtrag war
+> in par.22.4/H-14 als "par.24-Nachtrag" angekuendigt (Entwurf WORTFERTIG:
+> ~/backups-workflow/20260822-explore-buendel-t2/d10-liegengebliebenes.md Abschnitt 5). Die
+> Nummer 24 ist durch den EINPLANUNGS-NACHTRAG des Zweigs bau/wellenplan-offene-punkte belegt
+> (dessen par.24.6-Kopf reserviert par.25 fuer GENAU diese Buchung; RN-27) -- daher faehrt die
+> Buchung hier als par.25. HARMONISIERUNGS-HINWEIS fuer die Landung des Zweigs: par.24
+> (Einplanung) ordnet sich VOR dieses par.25; beide Gegenstaende leben, keine Inhalts-Kollision.
+
+## 25.1 GEGENZAEHLUNG (Owner-Order KON120-02/D-10; K24-Transkript Zeile 80820: "wie konnten wir
+## das vergessen [...] hole das nach")
+
+241 rohe Kandidaten (104 K16-K24 frisch + 137 K15 wiederverwendet aus der K16-Neugruendung
+19.08.) -> 191 dedupliziert -> 189 GETRAGEN (davon 12 = die K15-Luecken L1-L12, alle bereits
+in par.23.5.1 geschlossen) -> 2 UNGETRAGEN.
+
+## 25.2 DIE ZWEI UNGETRAGENEN POSTEN -- BEIDE BEREITS GEBAUT, NUR NIE VERBUCHT
+
+    OV-16 `allow_failure` am CEB-Mess-Job -- GEBAUT 09.08.2026 11:17 UTC (ce
+        a558e87c, Test #278 in tests/unit/thesis_tiere/test_experiment_plan_
+        director.cpp:1204, CMake-verdrahtet, Ancestor von development/ed9f1a3c).
+        Ledger-Alt-Zeile (Fussende: "D3-4+D3-5 (OV-16)") ist damit UEBERHOLT --
+        vermerkt (UEBERHOLT-BANNER am Ledger-Fussteil, 24.08.). KEIN Bau-Bedarf
+        mehr, NUR Buchung.
+    OV-17 `result.csv`-Transportmuster -- GEBAUT 09.08.2026 07:41 UTC (super
+        6d2e3dce, ci/anhang_forward_core.sh:412 AF_RESULT_NAMEN traegt beide
+        Formen, Ancestor von HEAD/657003bb). Ledger-Alt-Zeile ("##20+D3-6
+        (OV-17)") ebenso UEBERHOLT -- vermerkt (ebd.). Kleinst-Nachzug: Zeile 250
+        desselben Skripts trug einen stalen Kommentar ("OV-17 offen") --
+        Ein-Zeilen-Korrektur IN DIESEM Commit vollzogen.
+
+## 25.3 URSACHE (keine Vorwurfs-, sondern System-Analyse)
+
+    Beide Fixes liegen ELF Tage VOR der Gruendung der systematischen Wellenplan-
+    par.21-23-/Register-Apparatur (K13, 18.08.) -- kein Audit seither prueft
+    rueckwirkend auf VOR der eigenen Gruendung bereits (still) erledigte
+    Alt-Posten. Empfehlung VOLLZOGEN (24.08.): die Alt-Text-Passagen im
+    Wellenplan-Frontteil (D3-Tafel + par.8-OV-16/17-Zeilen) UND der
+    Ledger-Fussteil tragen UEBERHOLT-/BUCHUNGS-Vermerke, die auf par.25.2
+    verweisen -- damit zitiert keine kuenftige Owner-Vorlage (wie K24-Zeile
+    79434, V-04) den Alt-Text erneut ungeprueft.
+
+## 25.4 K16-K24 SONST
+
+    12 inhaltstragende Kandidaten identifiziert, 10 direkt GETRAGEN via Task #81
+    (vl12)/#106 (CI-Dual)/#108-121 (Tranche-2-Block D-01 bis D-11 = ident. mit
+    #117-121)/Codex-Lens-Nachzug (in-Session ausgefuehrt). Eine kleine
+    Form-Abweichung: OG-1/OG-6-X-12-Wunsch nach EIGENEM Board-Task liegt
+    substanziell in #105 (Sammelposten) statt als eigene Nummer -- keine Aktion
+    noetig, nur Vermerk.
+
+## 25.5 GEGENPROBEN (Falsch-Null-Vermeidung)
+
+    3-Pfade-Rohzaehlung VOR Rausch-Filter zeigte 239/115/154 P3-Treffer
+    (K16-18/K24/K19-23) -- nach Abzug der <task-notification>-Automatik blieben
+    52/12/14 echte P3-Kandidaten; ein Blindtest mit dem sicher-treffenden Muster
+    "resume alle" traf in allen drei Fenstern (>=3 Treffer je Fenster),
+    bestaetigt die Extraktion greift.
+
+VOLLZUGS-VERMERK 24.08.2026 (Z21-docs-Sammel): (1) Ledger-Fussteil-D3-Bogen-Zeile traegt das
+UEBERHOLT-BANNER; (2) par.8-OV-16/17-Zeilen tragen den BUCHUNGS-VERMERK; (3) Frontteil-D3-Tafel
+traegt den BUCHUNGS-VERMERK; (4) Kleinst-Fix ci/anhang_forward_core.sh:250 in DIESEM Commit;
+(5) Ledger-Quittung = NACHTRAG im Ledger-Kopf (Z21). B-17-Ursachen-Kern fuer die Owner-Meldung:
+"seit 09.08. GEBAUT, nur die Buchung fehlte."

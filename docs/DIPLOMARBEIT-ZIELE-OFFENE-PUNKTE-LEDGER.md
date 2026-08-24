@@ -82,6 +82,12 @@ vollstaendig, du hast voellig den Faden verloren." VOLLZUG:
    startet je frei werdendem Bauslot · AB-02 (Par.59-MERGE-STEMPEL-Austragung, ZEITKRITISCH
    vor Mi 26.) + AB-03..AB-10 + OV-16/17-Buchung + par.24 = naechster dedizierter docs-Zug
    (Entwuerfe wortfertig in ablock/lande-auflagen.md + d10-Ergebnis).
+   > **[A2-4-PRAEZISIERUNG 24.08.2026, Z21-docs-Sammel]:** Traeger-Stand dieser Zeile heute:
+   > AB-02/AB-05/AB-06 per 38fd6270 AM ORT vollzogen; AB-04 (12 W-Marker) + AB-07 (B.0 +
+   > K16-Baustein) + OV-16/17-Buchung (Wellenplan par.25 statt par.24, Nummern-Deklaration
+   > dort) mit dem Z21-docs-Sammel vollzogen; AB-10 per Z13 vollzogen (Standalone-Klon auf
+   > development gedreht). OFFEN bleiben: AB-03 (Board, Lead) + AB-09 (fixstrecke2-BU,
+   > Wellen-Ende-Vollaudit).
 ## KON120-07 (22.08. frueh, Lead): Vollpruefungs-Order vollzogen — Zwischendoku + C3-Sichtung
 
 Owner-Order "gesamten Kontext pruefen, vergessene und offene Arbeit in reicher
@@ -244,6 +250,10 @@ Owner-Wort KON101-01 "SHA256".
   persistiert in fixr1_endquittung_fixstrecke2_vollstaendig.md Abschnitt 0); #38a2/P4
   steht in der 23.2-Freeze-Tafel als 18.6(3) DEKLARIERT. Eine spaetere Owner-Antwort
   aendert nur kuenftige Zuege.
+- F-A-KOMPLEX-FIX-NACHWEIS: die v4.3-Komplex-Fix-Rolle ist in der Lande-Merge-Botschaft
+  ea7df79b LITERAL deklariert (uebernommen durch A2.5-Fix-Strecken 1+2 + 4-Zellen-Voll-
+  Abnahmen); dieser Satz ist die KON119-Halbseite der F-A-Deklaration (W2-Zug A-16,
+  eingesetzt 24.08.2026 im Z21-docs-Sammel).
 - B3-SPEZ-ABWEICHUNGS-VERMERK (deklariert, kein Defekt): G5 baute das Legenden-ERBE
   (w vorn in der Tier-Legende, CT-Beweis Glied [3]) statt des m1-vorgesehenen neuen
   CEB-Stempel-Glieds -> golden-NEUTRAL (kein anatomy/-Byte, kein Lock-Record); der
@@ -3367,6 +3377,14 @@ KON74 vorher 0 Treffer. Alle 8 Straenge des Maximal-Parallel-2-Workflows TERMINA
     Zeile KON45-01) + Format 4->5 in EINEM Bruch, gebuendelt mit #38a2/#38d.
 
 ### KON74-04 -- W-E2: xlsx-SOLL GEHOBEN + MINIO-PRUEFPOSTEN GESCHLOSSEN (#55 KOMPLETT)
+
+    > **[SUPERSEDED-VERMERK 24.08.2026, W2-docs-Zug K7b-5 (Z21/A2-1b)]:** der Sheet-Namen-
+    > Teil dieses Abschnitts (S001..Snnn mixed-radix, V-A9-6 "Default A") ist seit 16.08.
+    > UEBERHOLT durch KON80-01/V3 (Owner: S001..Snnn ABGELEHNT, "Holzweg" -> Sheet-
+    > Hierarchisierung aus w/ma/mi) und das KON87-Design (Blatt-Schnitt = Traeger-Stufe x
+    > erhobene Messebene, SHEET-EBNF, V-A9-6 ENTSCHIEDEN, S001..Snnn ENTFAELLT) =
+    > FASSUNG 4 der Blattform. Der uebrige KON74-04-Inhalt (EINE Datei, INFO-Sheet,
+    > Spalten NUR aus lazy_csv_header(), MinIO-Befund) bleibt gueltig.
 
     xlsx-SOLL woertlich (Owner-KERN 26.07., Session 20260726:94-98): EINE Datei,
     EIN Sheet je gewaehlter Unter-Achsen-Permutation + INFO-Sheet (Sysinfo + Haupt-
@@ -32434,3 +32452,9 @@ gehalten, Selbstbiss 4 von 4 Mutanten gebissen, rc=0**. Die Selbsteinstufung des
 
 **W0b-1 / D3-3 ist damit ABGESCHLOSSEN.** Offen im D3-Bogen bleiben (unveraendert, mit Besitzer):
 D3-7, D3-1-Resthaelfte, D3-4+D3-5 (OV-16), ##20+D3-6 (OV-17), D3-8.
+
+> **[UEBERHOLT-BANNER 24.08.2026, W2-docs-Zug Z21/par.25]:** Die OV-16-/OV-17-Glieder der
+> D3-Bogen-Zeile oben sind seit 09.08.2026 GEBAUT (OV-16: ce a558e87c, Test #278, CMake-
+> verdrahtet, Ancestor von development; OV-17: super 6d2e3dce, AF_RESULT_NAMEN traegt beide
+> Formen, Ancestor von HEAD) und per Wellenplan par.25 GEBUCHT -- hier NICHT mehr als offen
+> zitieren (KON121 Punkt 2/D-10; d10-liegengebliebenes.md). Zeile bleibt als Historie.
