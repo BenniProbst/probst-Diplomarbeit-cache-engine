@@ -181,3 +181,83 @@ wt5prn4ly (W2-Audit wf_98cabd77) · wikwy9yz3 (Rueckfragen wf_c37fb077).
 MODELL-WACHE 11:32:35: alle 4 Neuspawns AUSSCHLIESSLICH claude-fable-5
 (a3aab3c1=6 · a85c0e38=2 · a1b6c036=13 · a1e4eac5=11 Records, 0 Fremdmodell).
 Cache-Lage unveraendert wie Pause-Doku Abschn. 3; ce b3dc3e93 wartet auf Z12.
+
+## 9. NACHTRAG ~12:05: W2-AUDIT TERMINAL (wt5prn4ly, 57/57) — VOLL GELESEN + VERBUCHT
+
+VOLLLESUNG (Owner-Order "erst vollstaendig lesen, dann verbuchen" eingehalten;
+Nenner): 4 Journal-Result-Volltexte (4618+4375+5132+3666 B; Result-Felder waren
+gekuerzt) + ph89/audit-runde-2 224/224 + audit-runde-3 243/243 + fix-runde-1
+94/94 + fix-runde-2 99/99 + SYNTHESE-S1 Abschn. 7+8 (Z.364-756) + GEGENLESE-
+GATE TEIL III (Z.300-500) + S2-DRITT-ABGLEICH komplett (Z.282-1008).
+
+### 9a. TERMINAL-TAFEL 19/19 (Dritt-Gate TRAEGT_MIT_FIXES)
+
+S1 10/10 SITZT (3x LANDEREIF: messfenster/s19/s8kopf · 7x MIT_AUFLAGEN · 0x
+NICHT). S2: 1x FIXES_NOETIG (ph89, 5 getragene Funde) · 5x SITZT · 3x
+DOKU_ONLY_SITZT. 22 offene S2-Fund-IDs + 24 S1-Rest-Posten JE MIT TRAEGER
+(0 traegerlos); Gate-Stichproben 17/17 EXAKT; GG3-1..4 (KLEIN, Korrekturen
+wortfertig im Gate). Alle Synthesen-/Gate-Rollen additiv + Fable-ratifiziert
+(S1-Abschn.-8: 23/23 Literale; S2: Neufahrt-Agent DECKT mit 0 Fehlern;
+Zweitfassungs-/Gate-Doppel-Schutz eingehalten, nichts ueberschrieben).
+
+### 9b. 🎉 KERN-LAGE: o2-LANDUNG KOMPLETT — ce dev == origin == github == 943c70ee
+
+Z12 GELANDET, DREIFACH belegt: r1-544er @5ddda4e5 · Z12-545er 07:27-07:43Z
+(4/4 Zellen "out of 545", Gates 6/6 GRUEN kumulativ 3841d717..943c70ee,
+gitleaks 0/41934 B, Floor live 545/541/539, Inventur 545==545) · Fable-
+Endabnahme-Kombibau 11:48:39Z FAIL=0. Kette 3841d717..943c70ee = 4 Commits
+(fa48a551, f82dfaeb, b3dc3e93 o2-Merge, 943c70ee axis-lock-Regen); alle 10
+Strang-Tips Ancestors. Damit EINGELOEST: s19-FUND-2, s8kopf-S8A-01,
+messfenster-A-1(1), L-05.
+
+### 9c. LEAD-VOLLZUEGE DIREKT NACH VOLLLESUNG (je fix_weg der Funde)
+
+(1) F-126 GESCHLOSSEN: CI **16150 SUCCESS** auf 943c70ee (created 07:47:32,
+Terminal-Status via API Projekt 286, glhdr.curlrc) + github traegt 943c70ee
+-> Push-Gruen-Doktrin fuer den neuen Endstand ERFUELLT; main-FF-Vorbedingung
+CI-seitig da (FF selbst = Lande-Zug/Lead, Diff-Hygiene ueber FF-Bereich noch
+faellig).
+(2) FUND-5/F-144 Phantom-Slot GERAEUMT: Todes-Beweis 3/3 frisch (0 build-
+Dateien seit 23.08. 21:10, keine Prozesse, credits-Tod dokumentiert) ->
+rm -rf slot1-ph89fix.d. NAHT-VERMERK (ehrlich): der #139-Fix-Fahrer raeumte
+SEKUNDENGLEICH per eigener Audit-Auflage (sein slot3-wer 12:00:03 "Claim nach
+F3-09-Raeumung slot1, Todes-Beweis verbucht in FIX-STAND.md") — zwei Akteure
+am selben toten Verzeichnis, idempotent, KEIN Schaden (kein lebender Claim
+beruehrt); Lehre: Raeum-Auftraege mit Doppel-Traeger ("Lead direkt, ersatzweise
+#139") künftig VOR Vergabe auf EINEN Traeger schneiden.
+(3) Slot-Lage 12:01: slot2.d = Z12-Fable (Claim erneuert 11:33:53) · slot3.d =
+#139-Fix-Fahrer (12:00:03, wt-ce-w2fix, max 1 Bau) -> Deckel-3 sauber, 1 frei.
+
+### 9d. FINDINGS-LANDKARTE (alle getragen; Traeger-Kurzform)
+
+S1: F-124 KLEIN Endstand-Nenner 545/541/539 (Ledger-/Docs-Zug, H-20) · F-125
+MILD Tafel-Nullen-Falle "Restfunde 0 != Rest-Posten 0" (Synthese/Lead-Lesart)
+· F-126 GESCHLOSSEN (9c). H-19 bewegliches Gitlink-Ziel · H-20 Zahlen-
+Harmonisierung · H-21 Anker-Drift durch o2.
+S2: F-140 MILD Kanon-Richtung (#139, laeuft) · F-141/F-142 KLEIN (#139) ·
+F-143 MILD liegender Erst-Fixer-Edit wt-ce-ph89 (Patch 193 Z. sha256 48c7be4c
+gesichert; #139 sichtet VOR Bau, danach Worktree-Saeuberung) · F-144
+GERAEUMT (9c) · F-145 KLEIN K11-Pipe-RC in ph89-Treppen-Log (Prozess:
+Protokollvorlage rc=PIPESTATUS[0]) · F-146 ERLEDIGT pinduo-T9 vollzogen
+(25bbf2e; nur noch W1L-1 echte Branch-CI beim #113-Zug) · F-147..F-153 KLEIN
+(Traeger je benannt) · F-154 MILD super bau/kampvor 025e0c42 UNGELANDET,
+Frist vor Sa 29. (NEU als S-2c in der super-Phase) · F-155 MILD F2-Fenster-
+D-04-Nachzug offen (Lead). Reihenfolge S-0(erledigt 9c)..S-6; W1L-1..W1L-9
+an #113; KON122-A..D + Board-Entwuerfe liegen wortfertig (S2 D-5).
+
+### 9e. FRISTEN-BLICK (aus den Synthesen, ~42 h)
+
+🔴 L-01/S-2e AKUT vor Mi 26 06:00: super-Gitlink-Bump 66de5c09 -> dev-Tip
+(heute 943c70ee) IM SELBEN Commit-Zug mit np34-Patch (Match RC=0 an 5260a704
+frisch belegt) — Traeger Lande-Zug super-Phase (laeuft, wjagljq3t). 🔴 #114
+B10-Beweislauf trigger-blockierend vor Mi 26 06:00. Di-25: #96-Buendel.
+Vor Sa 29: S-2c kampvor-super + golden-Zug E-11 (NICHT gestartet, Doppelfrist).
+
+### 9f. VERBUCHUNGS-RESTE (Board-Tools weg — NACHZUTRAGEN sobald zurueck)
+
+#89-Metadata F-140..F-145-Fortschreibung (Entwurf audit-runde-3 Abschn. 7) ·
+#122 pinduo-A3 schliessen · #97 Tip zweistufig + F-149-Anker · #114 Frist-
+Marke · #139 Eingangs-Auflagen F-143/F-144(erledigt) · NEU-Traeger kampvor-
+super (F-154) + golden-E-11-Terminierung · KON122-A..D via ledger_nachtrag.sh
+(Lead, im Sammel-Ledger-Zug S-5/L-08). W2-Audit-Workflow wf_98cabd77:
+TERMINAL, kein Resume mehr noetig.
