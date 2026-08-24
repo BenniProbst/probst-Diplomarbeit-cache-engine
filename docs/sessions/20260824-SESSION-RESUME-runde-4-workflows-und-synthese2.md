@@ -341,3 +341,21 @@ wird ab jetzt hochentropisch gefuehrt. Koordinations-Sperre 27.7.4: S-2f-
 T7-Docs-Schritt des Lande-Zugs MUSS A-KW-1/2 als ERLEDIGT-AM-BRANCH beachten
 (sonst Doppelbau). Board-Nachtraege (#139 komplett, #89 F-140ff, #137 EP-1
 GEFAHREN, #131 CR-Stand) vorgemerkt — Tools weiter getrennt.
+
+## 12. NACHTRAG ~13:20: OWNER-ORDER LANDE-SEQUENZ
+
+Owner verbatim: "Bitte lande alles Landefaehige nach Abschluss des Landezug
+workflows und einer hingebungsvollen Designplanung." PLAN (sequenziell):
+(1) Lande-Zug wf_b546634b laeuft zu Ende (Z16+ von Z27; Notification weckt).
+(2) Dessen Result VOLL lesen (Dauerregel), dann DESIGNPLANUNG als ultracode-
+Workflow (Fable 5 max Design + adversarischer Verify + A2.5; Owner-Dauerregel
+"ultracode immer frei" + A1-Matrix Design=Fable-max-nur-via-Workflow-Tool):
+Landefaehigkeits-Vollerhebung am Zug-Endstand (Kandidaten-Klassen: ce
+bau/w2-abschluss-fixes 926f8d70 landereif · super-Restzweige soweit der Zug
+sie nicht selbst landet [s13schema/cidual/kampvor/vorlagenfenster-Harmonisierung/
+Gitlink+np34] · Wellenplan-Branch dec105ae [Lead, N-33-Gegenlese, HINTER Zug]
+· prt-art durch Z15 fertig · main-FF NUR falls F-13 owner-entschieden — sonst
+[C]) + Lande-Reihenfolge nach A2.1a/b (sequentiell, Harmonisierung, Komplex-
+Fix, EIN Push je Repo-Ereignis, Gates je Schritt).
+(3) LANDUNG nach dem Design (Lead-geführt bzw. Lande-Workflow), NIE-KUERZEN +
+GELOEST!=KONFORM + Diff-Hygiene-vor-main-FF beachtet.
