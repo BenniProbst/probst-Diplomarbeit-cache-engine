@@ -273,3 +273,71 @@ e3fda9ac35a1/workflows/scripts/rueckfragen-synthese-2stufig-wf_c37fb077-ef7.js",
 resumeFromRunId: "wf_c37fb077-ef7"}) — fertige Folds aus Cache, naechster Fold
 liest KONSOLIDAT.md, danach Ledger-Finale + Gegenlese+A2.5. Weiter laufen:
 W2-Abschluss (wi630fc5e) + Lande-Zug (wjagljq3t).
+
+## 11. NACHTRAG ~13:15: W2-ABSCHLUSS-ZUG TERMINAL (wi630fc5e, 5/5) — VOLL GELESEN + VERBUCHT
+
+VOLLLESUNG VOR VERBUCHUNG (Nenner): Result untrunkiert 41981 B (design 8675 +
+fix 7194 + verify 8185 + a25 6513; Journal-Gegenprobe: keine Kuerzung) +
+FIX-STAND 86/86 + VERIFY-STAND 54/54 + A25-FIX-STAND 138/138 +
+A25-REVERIFY-STAND 123/123 + K18-Kernmessung eigenhaendig (Staende unten).
+Result-Kopie: 20260824-w2-abschluss-design/wi630fc5e-result-KOPIE.json.
+
+### 11a. ZUG-BILANZ — #139 ALLE 4 PHASEN KOMPLETT, A2.5 = NULL_NEUE_FUNDE
+
+DESIGN (Fahrt 3, nach 2 Modell-Faellen): 4 /goal-Referenzen VOLL gekippt
+(816+4836/5048+905/967+1264), Sonnet-Vorarbeit 478/478 geprueft (471 tragen,
+7 Korrekturen K-A..K-F+ASCII), Fahrt-2 223/223 bestaetigt, 30 Posten ergaenzt
+(E-01..E-10 + F3-01..F3-20); Wellenplan par.27.5 (4824b0ce) + Designplan
+par.13.5 (6196c90f) mit FABLE-MAX-ABNAHME — Design gilt als GEBAUT+ABGENOMMEN.
+FIX (12 [A]-Posten GEFAHREN): ce-Branch bau/w2-abschluss-fixes @ 926f8d70
+(Basis 943c70ee, 6 Commits: 22c6c62e ph89-1/2/3 [F-143-Patch UEBERNOMMEN,
+sha256 48c7be4c; rot zweifach] · b4c007db KLEIN-2 · c39a51c2 KLEIN-3 ·
+6285621f KLEIN-4/F-147 · 0ffec635 L-07 · 926f8d70 EP-1/#137/N-12 .stale-
+Erfolgspfad [rot-zuerst + Verdrahtungs-Wache-Biss]; je Commit literal
+"100% tests passed, 0 tests failed out of 545"; golden 0, ci.skip-Push 16183
+skipped) + super c70f23fc (T11c A-KW-1/2) + 25211eb4 (par.27.6-Rueckschrieb
+150/0). LANDEREIF-KANDIDAT, KEINE Landung (Lead hinter Lande-Zug).
+VERIFY: TRAEGT_MIT_FIXES — 12/12 Fix-Nachpruefungen CONFIRMED, 0 falsch-
+ERLEDIGTE; Differenzmenge GG3-1..4 als par.27.7-Tafel-Zeilen gefixt
+(71db791a); Additivitaet: Wellenplan 967+871/0, Designplan 253/0; einzige
+3 Deletionen = DESIGN-90-T11c-Ersetzung, dreifach konserviert + 27.7.3-
+deklariert; par.24/25/26 unversehrt.
+A2.5 RUNDE 1: 9 Funde = 5 BEHOBEN + 4 VERTAGT-mit-Platz (GG3-1..4 an EINEN
+S2-Nachtrag RN-27/Di-25, Task-Zeilen Z.5217-5220); RE-VERIFY: 9/9 eigen
+nachgemessen, VERDIKT NULL_NEUE_FUNDE (dec105ae, par.27.8). Doktrin-Schleife
+regelkonform beendet.
+
+### 11b. OWNER-ZIEL-STAND
+
+Die W2-ABSCHLUSS-PFLICHTTAFEL steht als Wellenplan par.27.0-27.8 (5322 Z.,
+26 Unterabschnitte, ~955 Z. additiv, dreifach Fable-abgenommen) + Designplan
+par.13-13.5: ALLE (auch kleinste) Regressionen/Nacharbeiten als PFLICHT
+verbucht; die direkt-fahrbaren SIND GEFAHREN; [B]-Posten traegt der Lande-Zug/
+Lead (CR-1..12, L-01..L-17, W1L-1..9, N-Posten, W135, Z11R), [C]-Posten die
+Owner-Vorlage. W2-Gate: Tafel leer ODER je Rest dokumentierter Entscheid.
+
+### 11c. OWNER-GATED-SAMMLUNG (fuer die naechste Vorlage; Quelle 27.6.3)
+
+VO3-1 Vendor-O3 (vor Mi 26 06:00, D-8) · EP-2/#138 C1-B1-B8 (mit #91/D-08
+vor Mi 26) · N-48/R-Tafel V3 SOFORT (R1-R8+R9/R10, F-09/F-10/F-13/F-16/
+F-18/F-19) · N-17(R5) · N-19(R2) · N-21/GN-9 · N-33(d) · N-47 · CR-9/F-13
+main-FF-Scope · L-20-Ownerteile · W135-Dritturteile · F3-17-SCHUTZ (D-04 ist
+owner-BEANTWORTET 21.08. 20:40 — Fenster-Nachzug Lead-Pflicht).
+
+### 11d. LANDE-ZUG-FORTSCHRITT (parallel, Lebendprobe 13:11)
+
+Journal 93/24 waechst; Z13/Z14 durch, Z15 prt-art-B14 GELANDET 12:29:53Z
+(Merge 16c9062, Kombibau 4x224 GRUEN, Dual-Push, CI 16184 SUCCESS 9/9,
+wt-prt-pinduo geraeumt), Z16+ laeuft; Beweisordner Z13-Z19 angelegt.
+super-Gitlink NOCH 66de5c09 — L-01 (Bump+np34, Frist Mi 26 06:00) kommt in
+spaeterem Z-Ziel, Zug faehrt sequentiell darauf zu.
+
+### 11e. LEHREN/NACHTRAEGE
+
+FALLEN-NEUFUND (Fix-Fahrer, an RN-27 + hier): All-K-Koeder ('glpat-'+20xK)
+beisst bei gitleaks 8.30.1 NICHT mehr (Entropie-Schwelle) — Hochentropie-
+glpat noetig; mein Session-Koeder KOEDERKOEDERKOEDER99 biss bisher (gemischt),
+wird ab jetzt hochentropisch gefuehrt. Koordinations-Sperre 27.7.4: S-2f-
+T7-Docs-Schritt des Lande-Zugs MUSS A-KW-1/2 als ERLEDIGT-AM-BRANCH beachten
+(sonst Doppelbau). Board-Nachtraege (#139 komplett, #89 F-140ff, #137 EP-1
+GEFAHREN, #131 CR-Stand) vorgemerkt — Tools weiter getrennt.
