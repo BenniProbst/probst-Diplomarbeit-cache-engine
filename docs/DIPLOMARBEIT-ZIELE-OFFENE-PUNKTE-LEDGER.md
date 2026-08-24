@@ -3422,6 +3422,10 @@ KON74 vorher 0 Treffer. Alle 8 Straenge des Maximal-Parallel-2-Workflows TERMINA
 unter docs/sessions/backups/20260815-folge-bu-kontext7/) + Explore-Workflows wf_9d604fea/
 wf_3337a24d/wf_59f82faf/wf_1f981ed4. KON73 vorher 0 Treffer. Schluss-GO Owner: "volles GO
 und volle Fahrt voraus. Volles GO maximal parallel."**
+> **[W7-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** VORBEHALT: "Volles GO maximal parallel" gilt UNBESCHADET v3.7 (Owner: MAXIMAL DREI
+> GLEICHZEITIGE VOLLBAUTEN prod1, unabhaengig vom df-Wert im Startmoment) -- verschiedene
+> Gegenstaende: KON73-F7 = CI-Job-Concurrency, v3.7 = lokale Vollbauten; BEIDE gelten
+> (Kosten-Beleg KON49-04: 2,9G freie Platte = drei stumme Agenten-Tode).
 
 ### KON73-01 -- PMC-GESAMTBILD FINAL (alle Fragen zu; Details Sammlung 12/14/19)
 
@@ -6356,6 +6360,10 @@ Bestätigungs-Prompt) · S-12/CI-Emission setzt `--auto`. **Offene Owner-Fragen:
     V-F2 DEFAULTS: rein informativ · WARN-Grenze und OOB-Grenze SEPARAT in der
       XML einstellbar · Standard = NUR delayed Warnung (Schwelle 6 GB, KON51-02)
       und KEINE Begrenzung (OOB aus).
+      > **[W1-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** KON93 (juengstes Owner-Wort) gilt fuer die GROESSE: Arena = 6 GB FEST/STATISCH,
+      > aenderbar nur ueber die Planer-Reservierung (KON94-02: SCHICHTUNG STATT ABLOESUNG).
+      > Die hiesige Warn-/OOB-KOMMANDO-Semantik bleibt EIGENES Objekt (XML-Schwellen);
+      > x5- und 2-vs-18-Pruefpunkte laufen im 10W-Explore (KON93). Zeile bleibt.
 
 ### KON52-02 — EINORDNUNG UND BAU-WIRKUNG
 
@@ -6436,6 +6444,8 @@ Bestätigungs-Prompt) · S-12/CI-Emission setzt `--auto`. **Offene Owner-Fragen:
     CEB:          AGGREGIERT im RAM nach einem Flush; RUECKSCHRIEB GESAMMELT,
                   wenn die Messung EINES Experimentes fertig ist
     🔴 SCHWELLE:  WARNUNG an den Planer, wenn die CEB > 6 GB RAM Messdaten haelt
+    > **[W1-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** KON93 gilt fuer die GROESSE (Arena 6 GB FEST/STATISCH, Planer-Reservierung);
+    > die Warn-KOMMANDO-Semantik dieser Zeile bleibt eigenes Objekt. Zeile bleibt.
 
 ### KON51-03 — DIE STUMMSCHALTUNG (Latenz-Hygiene der Mess-Phase)
 
@@ -7590,6 +7600,9 @@ WF8-Strecke als harter Termin-Anker.**
     gleichrangig -- Achsenaufruf / Gattungs-(Genus-)Aufruf sind AUFRUF-EBENEN,
     die LASTSEQUENZ ist eine FRAMEWORK-MESS-ACHSE (sie liegt SELBST auf einem
     Achsen-Interface) und wird dort einsortiert, nicht als dritte "Ebene".
+    > **[W4-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** UEBERHOLT durch KON64/65 (juengeres Owner-Wort): die Lastsequenz ist eine EIGENE
+    > Mess-Achse (10W-Explore vor Design); die hiesige Einsortierung "in die framework-
+    > Mess-Achse" gilt nicht mehr. Zeile bleibt als Historie.
 
 ---
 
@@ -8102,6 +8115,10 @@ sie freigeben.
     => je Stufe bleibt eine AUSWAHL-, keine Ordnungsfrage: 5 Schalter => 32 Belegungen.
     WARUM ES UNSICHTBAR BLIEB: der IST-Betrieb faehrt ausschliesslich [all] (die Combo
     wird nie gesetzt) -- IN DER VOLLMENGE SEHEN BEIDE MODELLE GLEICH AUS.
+    > **[W2-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** KON71 gewinnt -- die MESS-PERMUTATION ist DYNAMISCH (>32), NUR S-19 rechnet;
+    > der statische 32er-Nenner oben ist strukturelles Maximum der Schalter-Kombinatorik
+    > und S-19-EINGANGSHYPOTHESE (wie 12/4!); "24 oder 48" = S-19-AUSGANG (Owner nur,
+    > falls S-19 sie nicht determiniert). NIE statische Nenner vorlegen.
 
 **Hart und soft** (KON28-02):
 
@@ -8124,6 +8141,8 @@ sie freigeben.
     STUFE 2:          normal -- DIE UNGENAUEN ERGEBNISSE LOESCHEN, echt mit 1 THREAD.
     --debug ist das Flag QUER zum State-Pattern; gehoert in die PLANER-CLI/Shell.
     🔴 EINZIGE benannte AUSNAHME der Doktrin "Messdaten werden NIE geloescht".
+    > **[W10-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Umschaltpunkt praezisiert: T-3 gewinnt (KON37/KON41-01) -- --debug ENDET bei T-3
+    > (nicht erst zur Abgabe).
 
 🔴 **ZWEI EINANDER UNBEKANNTE MESS-ARCHITEKTUREN** (KON34-01):
 
@@ -8348,6 +8367,8 @@ IDENTITÄTS-FREEZE** · Bau-Trigger **Mi 26.08. 06:00** · Kampagne ab Sa 29.08.
     LIZENZ je Repo: super = Apache · PRT-ART + CacheEngine = frei fuer Forschung,
       proprietaer fuer Business/Einzelnutzung · Diplomarbeit = nur Copyright.   KON2 RANG C
     CHANGE DATE: die Cache Engine wird FUENF JAHRE nach dem 11.08.2026 frei (~2031). KON22
+      > **[W11-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4), LIZENZWIRKSAM]:** Change Date = 10.08.2031 FINAL (KON60/#56; Datums-Richtigstellung KON61-02:
+      > Entscheidtag ist der 10.08.2026, "11.08." NICHT weitertragen). Zeile bleibt als Historie.
     Research-and-Teaching-Klausel BLEIBT.                                        KON22
     PRUEFUNGSUNTERLAGEN (8 Exposes, 3 PDFs mit Betreuer-Mailverkehr, Anmeldeformular)
       werden beim Public-Release MITVEROEFFENTLICHT.                             KON22
@@ -8944,6 +8965,8 @@ Zeilendrift) · Kapazität 12-Perm (blockiert B-4).
 
     ENTSCHEID:      HEAVY-Worker-Deckel  24 -> 16   ("es gab Probleme")
     KOMPENSATION:   die Kette bis RELEASE faehrt mit --debug -- BIS ZUR ABGABE (15.09.)
+    > **[W10-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** T-3 gewinnt (juenger, KON37/KON41-01): --debug ENDET bei T-3, nicht erst zur Abgabe;
+    > die Stufe-2-Umschaltung haengt am T-3-Anker. Zeile bleibt als Historie.
 
 **Was `--debug` im Bestand IST** (`run_methodology_registry.hpp:54-80`, §61-MODI):
 
@@ -9699,6 +9722,8 @@ Ausfertigungsdatum.**
 nach 5 Jahren frei verfügbar ab heute."* Ein terminierter **Change-Date-Entscheid** (Übergang zu
 freier Verfügbarkeit **fünf Jahre ab Sessiontag**, d.h. ~11.08.2031), der in der gesamten
 RANG-C-Lizenzdokumentation fehlte. → in die Lizenz-Strecke (#66) einarbeiten.
+> **[W11-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4), LIZENZWIRKSAM]:** Change Date = 10.08.2031 FINAL (KON60/#56; KON61-02: Referenzdatum 10.08.2026,
+> "~11.08.2031" NICHT weitertragen). Zeile bleibt als Historie.
 
 **(3) Research-and-Teaching-Klausel BLEIBT** *(Z. 35912)* — *„C-4: Ja, die Research-and-Teaching-
 Klausel bleibt."* (0 Ledger-Treffer zuvor.)
@@ -14719,6 +14744,8 @@ unberührt.
 Realm angelegte Achse zieht die falsche Registry, den falschen Stempel und die falsche
 Freigabe-Mechanik nach sich. Vergleichbar mit `load_framework` = MESS-Realm (§69, `:8123`), das
 bereits drinsteht. *Wortlaut nicht mitgeführt.*
+> **[W6-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** KON64/65-F2 (juenger) gewinnt: Planer-HW-Erkennung NUR fuer PMC, System-Achse = Proxy;
+> die bindend-Klausel oben zieht damit auf die NEUE Realm-Verteilung nach. Zeile bleibt.
 
 #### KON-04 — LAYER-MODELL-STEMPEL: EINE BINARY HAT KEINE EIGENE VERSIONSNUMMER
 
@@ -15944,6 +15971,12 @@ echten Owner-Zeilen, `"prod2"` = 34 Rohtreffer, davon **0** mit `origin=human`.
 **„SPEZIFIZIERT, NICHT GEBAUT"** — dritte unabhaengige Bestaetigung des Nullbefunds, diesmal in
 einem inhaltlich voellig anderen Transkript. **Die checkpoint_measure-Erfindung ist endgueltig
 belegt.**
+> **[W16-AUSTRAGUNG 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Der "Erfindung"-Befund ist AUSGETRAGEN -- kein Sachwiderspruch: der Owner hat den
+> Namen checkpoint_measure bereits am 08.08. selbst gesetzt (r5-C1: Owner-Wort 08.08.,
+> C-1..C-17); KON60(iii) "Wallclock = CEB-seitiger checkpoint-measure-Wrapper" =
+> BESTAETIGUNG/Neuvergabe 14.08. -- aus der Behauptung wurde ein Owner-Entwurf. Die
+> Befund-Nebenstellen (Analyse-Passagen "Genau so ist die ... entstanden", "mutmassliche
+> Wurzel", "Bau-Posten stillgelegt") bleiben als Historie stehen und sind mitgemeint.
 ### DER 2-PASS-BEFUND 09.08.2026 23:20 — ein frischer Configure verschweigt vier Tests UND bleibt gruen
 
 **Unabhaengig reproduziert**, an einem anderen Gegenstand als D1, von einem Strang, der gar nicht
@@ -16755,6 +16788,9 @@ mein Fehler)"*). Das war vollständig **für den Single-Zweig** — und genau do
                                              gefahren GEGEN die 6 CEBs
     dazu, als eigene Achse:     Messfühler IN der Hybrid-Tier-Binary
                                              einmal MIT, einmal OHNE
+    > **[W3/W2-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Diese Hybrid-4-Ebenen-Rechnung LEBT (juengster Stand, KON118-Umfeld); ihre statischen
+    > Zahlen (3!=6, 4!=24) sind S-19-EINGANGSHYPOTHESEN (KON71: Mess-Permutation DYNAMISCH,
+    > NUR S-19 rechnet); die vierte Ebene erscheint in der Macro-Stufe als SPALTE (K5).
 
 **Beide Zahlen gelten nebeneinander** — der Owner sagt ausdrücklich „auch 4 fakultät **auch** 3
 fakultät". Die 6 fallen nicht weg; sie sind der Bezugspunkt, gegen den die 24 gemessen werden.
@@ -17276,6 +17312,10 @@ nicht einmal eine Gedächtnislücke — es war eine erfundene Antwort.
 Damit fällt auch die daran hängende Textzusage: der Satz *„vier gemessen, fünfte spezifiziert"* ist
 **gegenstandslos** — es sind fünf zu messen. Die Präsens-Zusagen-Wache (P-1) ist entsprechend
 nachzuziehen.
+> **[W3-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Einordnung der ZAEHLUNG: die FUENF hier zaehlt INSTRUMENTE, KEINE Mess-Ebenen.
+> Ebenen-Stand (K5, Owner): DREI Ebenen (w/ma/mi); im Hybrid-Fall wird eine VIERTE
+> dazwischengeschoben (KON71: 4! = 24 Rekombinationen, lebt); die vierte erscheint in
+> der Macro-Stufe als zusaetzliche SPALTE; PMC = Meta-Meta, KEINE Ebene.
 
 ### Warum das mit den beiden Kanal-KERNen zusammenfällt
 
@@ -18068,11 +18108,17 @@ zwei neue Wurzelebenen — **für alle Gattungen und Genera, nicht nur für Hybr
 **Dock-Anzahl:** so viele, wie die **gemessenen Break-Even-Grenzen im Standard-Einzel-Release** und
 **deren Überschnitte für Hybrid-compare** ergeben — mit einer **Obergrenze, die bei Hybrid-Anforderung
 IMMER in der XML stehen muss**, Default **32**.
+> **[W12-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Der Deckel-DEFAULT 32 ist WILLKUERLICH (KON41-03/KON71, mehrfach geruegt; juenger als
+> K5); die XML-Pflichtangabe bei Hybrid-Anforderung BLEIBT; per V7 gilt: Break-Even NUR
+> ueber Organ-Parameter der w/ma/mi; RF-C: Dock-Zahl STATISCH = Anzahl der Komponente-2-
+> Optimal-Bereiche, KEIN Auffuellen. Zeile bleibt.
 
 **Die vierte Ebene, konkret:** im `checkpoint_measure` wird **zusätzlich angegeben, welche
 Tier-Binary** (exakter Stempel über deren statisches Interface) **für diesen Funktionsaufruf
 verwendet wurde**. ⇒ **eine zusätzliche SPALTE** in der Macro-Benchmark-Stufe. „**Es sind dann
 4 statt 3, weil es ein weiteres Macro-Benchmarking gibt.**"
+> **[W3-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Diese K5-Zaehlung ist der GELTENDE Stand: vierte Ebene = SPALTE der Macro-Stufe beim
+> Hybrid; PMC = Meta-Meta, KEINE Ebene; der Single-Zweig bleibt bei drei Ebenen (w/ma/mi).
 
 **Overhead = Differenz, kein eigener Messkanal:**
 
@@ -18209,6 +18255,9 @@ mit der Stufenzuordnung **Planer → CEB = System → Tier = Organ**.
 **Das Stufen-Vererbungs-Gesetz** (05.08., vom Owner ausdrücklich „GESETZ" genannt): **Mess ist
 3-stufig, System und Organ sind 2-stufig.** Die System-Achsen sind final **drei**:
 `target_isa`, `operating_system`, `external_utils`.
+> **[W5-MARKER 24.08.2026, W2-docs-Zug 19.6 (AB-04/T4)]:** Die MENGE "final drei" ist UEBERHOLT (juengere Owner-Worte: Compiler = kuenftige
+> 5. System-Achse, KON55/56; Meta-Metas additiv); das 3/2/2-Stufigkeits-GESETZ selbst
+> LEBT (PMC dreiphasig bestaetigt es). Zeile bleibt.
 
 ### (4) Der Widerspruch, den ich melden muss
 
