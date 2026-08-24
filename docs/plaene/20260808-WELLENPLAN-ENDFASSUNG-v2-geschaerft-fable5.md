@@ -5196,3 +5196,99 @@ Owner-Kalibrier-Frage L-20/GN-9) * N-33(d) (O2-Standard-Owner-Entscheid) * N-47
     FALLEN-NOTIZ (fuer Fallen-Register-Zug, RN-27): gitleaks 8.30.1 -- der All-K-Koeder
                    "glpat-"+20x'K' beisst NICHT mehr (Entropie-Schwelle der Default-Regel);
                    wirksame Koeder-Form = glpat- + 20 gemischte Zeichen (RC=1 bewiesen).
+
+## 27.7 VERIFY-NACHTRAG DES ADVERSARISCHEN FABLE-MAX-VERIFY (#139 Phase 3, 24.08.2026 12:3x-13:0x UTC)
+
+ADDITIV: keine Zeile oberhalb geloescht oder veraendert. Gegenstand: (1) adversarische
+Vollzaehligkeits-Gegenzaehlung ALLER Findings-Quellen am Objekt, (2) Fix-Nachpruefung der
+12 [A]-Posten, (3) Additivitaet, (4) Widerspruchsfreiheit. URTEIL: TRAEGT_MIT_FIXES --
+die Fixes sind die Zeilen dieses Abschnitts. Riss-Schutz-Protokoll:
+~/backups-workflow/20260824-w2-abschluss-design/VERIFY-STAND.md.
+
+### 27.7.1 NACHGETRAGENE TAFEL-ZEILEN (Differenzmenge der Gegenzaehlung -- Quelle GEGENLESE-
+### GATE.md TEIL III "DRITT-GATE", mtime 11:56Z, KEINER Vorfahrt dieses Zugs bekannt)
+
+Das Dritt-Gate (Fable-max, Messfenster 11:43-12:05Z) entstand NACH der Design-Einlesung
+(Designer las das Gate bei 297 Zeilen; heute 500) und traegt VIER Funde ohne Tafel-Zeile.
+Hiermit nachgetragen (jede Zeile Posten * Quelle * Traeger * Frist * Abnahme):
+
+| # | Posten | Quelle | Traeger | Frist | Abnahme |
+|---|---|---|---|---|---|
+| GG3-1 | KLEIN: S2-Dritt-Abgleich D-0 kuendigt "6 neue Tips T18..T23" an, definiert ist KEIN T18..T23 (reale Traeger heissen S-0..S-6 + W1L-1..W1L-9) -- Falsch-Null-Klasse fuer Sucher; Korrektur WORTFERTIG im Dritt-Gate | GEGENLESE-GATE TEIL III Fundliste | naechster S2-Schreiber (S2-Fable-Neufahrt bzw. Lead-docs, RN-27-Umfeld; EIN Schreiber je Datei) | Di-25/W2 (mit GG3-2/GG3-3 in EINEM additiven S2-Nachtrag buendeln) | D-0-Stelle traegt den Korrektur-Vermerk; grep T18 trifft nur Ankuendigung+Vermerk |
+| GG3-2 | KLEIN: S2-D-6.5 nennt "89 Ordner-Dateien", D-6.1-Zerlegung und Objekt-Zaehlung ergeben 86 EXAKT -- Klasse KORR-GG2 (Zaehlfehler, Substanz unberuehrt) | dito | dito | dito | "89" -> "86"-Vermerk additiv in S2; Ledger-Zug zitiert 86 |
+| GG3-3 | KLEIN: S2-D-1 "22 offene Fund-IDs" zaehlt pinduo-audit-A-1 MIT, kampvor-K-1 (T14-1, fortbestehend) NICHT -- Inklusionsregel undeklariert; Korrektur: "23 (inkl. K-1)" ODER Regel EINMAL deklarieren. FORTSCHREIBUNG von F3-20: es sind DREI datierte Zaehlwerke (38 Rest-Posten @20:17 * 22 Fund-IDs @24.08.-S2 * 23 inkl. K-1 @Dritt-Gate) -- beim Zitieren Basis+Datum nennen | dito + F3-20 | dito | dito | S2 traegt Regel oder 23; kein Zitat ohne Basis+Datum |
+| GG3-4 | NOTIZ/Provenienz: S2-Dritt-Abgleich (mtime 08:17Z) liegt im Opus-Vorlauf-Fenster; Dritt-Gate ratifizierte 9 Kern-Komplexe (9/9 EXAKT), die S2-FABLE-NEUFAHRT des W2-Audit-Zugs gab RUECKGABE "DECKT mit 0 Fehlern" (Session-Doku 24.08. RESUME-runde-4 Abschn. 9a -- Ratifikation im Rueckgabe-Format, Zweitfassungs-Schutz liess die Datei unangetastet); ein Datei-Ratifikations-Abschnitt (Analogon S1-Abschn.-8) FEHLT weiterhin in S2 | dito + Session-Doku 9a | derselbe S2-Schreiber (traegt den Ratifikations-Vermerk MIT den GG3-1..3-Korrekturen ein) | Di-25/W2 | S2 traegt Fable-Ratifikations-Vermerk mit DECKT-Beleg; beide Mengen (9 gemessene + Rest per DECKT) genannt |
+
+### 27.7.2 STATUSWECHSEL AM OBJEKT (von diesem Verify selbst nachgemessen)
+
+**F3-06 / F-126 = GESCHLOSSEN (CR-1(a) ERFUELLT).** Der Lead holte den CI-Terminal-Beleg
+fuer 943c70ee: **CI 16150 SUCCESS** (created 07:47:32Z, Terminal-Status via API Projekt 286).
+GESICHERTE KOPIEN am Beweisort, von diesem Verify selbst gelesen:
+20260822-lande-zug/Z15/r4-pipelines-lage-vor-push.txt Zeile 3 ("16150 success development
+943c70ee 2026-08-24T08:33:56.855Z") + Z12/neufahrt-fable/ci-16150-jobs.json + Session-Doku
+RESUME-runde-4 Abschn. 9c(1). Die F3-06-/[B]-Zeilen oben bleiben als Momentaufnahme stehen;
+offen aus dem CR-1-/D-11-Umfeld bleiben NUR test_rcu-Beobachtung (F3-01b) und die
+Diff-Hygiene push-lokal ueber den FF-Bereich VOR dem main-FF (L-05-Rest/CR-9).
+**F3-09-NAHT-VERMERK.** Die Phantom-Slot-Raeumung geschah SEKUNDENGLEICH durch ZWEI Akteure
+(Lead 9c(2) + #139-Fix-Fahrer 12:00:03, je mit eigenem Todes-Beweis) -- idempotent, kein
+lebender Claim beruehrt, KEIN Schaden. Lehre (Session-Doku 9c(2), hier planseitig verankert):
+Raeum-Auftraege kuenftig VOR Vergabe auf EINEN Traeger schneiden, nie "X, ersatzweise Y".
+**LAGE-NOTIZ (kein Posten):** der Lande-Zug faehrt LIVE die super-Phase (Beweisordner Z13
+12:02Z / Z14 12:10Z / Z15 12:29Z) -- die [B]-Posten CR-2ff. sind bei ihrem Traeger in
+Vollzug; Rueckschrieb dieser Vollzuege gehoert dem Lande-Zug/Lead, nicht diesem Verify.
+Pipeline 16183 "skipped" @ 926f8d70 belegt den ci.skip-Push des Fix-Branches.
+
+### 27.7.3 ADDITIVITAETS-DEKLARATION DESIGN-90 (3 ersetzte Zeilen -- Ausnahme, konserviert)
+
+git diff fdfb5d9d..25211eb4: Wellenplan 871+/0- und Designplan 253+/0- (STRIKT additiv;
+kein par.25/par.26 angelegt, par.24/RN-01..RN-92 unangetastet und unverschoben); DESIGN-90
+9+/3- (Commit c70f23fc). Die 3 Minus-Zeilen sind die T11c-WORTFERTIGEN Ersetzungs-Fixwege
+A-KW-1 ("drift_faktor -> sicherheitsfaktor", 2 Zeilen) + A-KW-2 ("kontext9 -> kontext8",
+1 Zeile) -- ein Ein-Wort-/Anker-Fix ist im Zeilen-Diff zwangslaeufig Ersetzung. Der
+Alt-Wortlaut ist DREIFACH konserviert: Git-Blob d89c3d8f (DESIGN-90 vor dem Fix) +
+Tafel-Zeile 27.1.J/T11c + ERLEDIGT-Vermerk 27.6.1; der neue Text traegt den
+[A-KW-1]-Praezisierungs-Vermerk inline. Doku-nie-loeschen damit gewahrt (deprecation durch
+konservierten Alt-Wortlaut); die 0-Deletionen-Bilanz der PLAN-Dateien selbst haelt.
+
+### 27.7.4 KOORDINATIONS-SPERRE S-2f (gegen Doppelbau und Merge-Konflikt)
+
+A-KW-1 + A-KW-2 sind ERLEDIGT-AM-BRANCH `bau/wellenplan-offene-punkte` (c70f23fc), NICHT
+am super-development -- der S-2f-/T7-SAMMEL-DOCS-Schritt des laufenden Lande-Zugs findet
+DESIGN-90 am dev noch UNGEFIXT vor und darf die beiden KLEINs dort NICHT erneut bauen
+(sonst Merge-Konflikt bei der Landung dieses Branches, der sequentiell HINTER dem Lande-Zug
+landet, #136-Metadata). Abnahme: der S-2f-Vollzug zitiert diesen Vermerk ODER die Landung
+dieses Branches bringt den Fix nach dev, bevor S-2f die Stellen anfasst.
+
+### 27.7.5 VERIFY-GEGENZAEHLUNG (beide Mengen, V-8)
+
+    GEPRUEFT (alles am Objekt, K18): par.27 VOLL (4368-5198) + Designplan par.13 VOLL
+      (727-967) * Boards 89/131/135/136/137/138 VOLL * NACHHOL-KARTE 322/322 (48/48
+      N-Posten + Fristklassen 7/11/26/4 identisch nachgezaehlt, GATE-Nachtraege 1-3
+      gedeckt) * SYNTHESE-S1 756 (Abschn. 8 NEU: 0 neue Posten, Ratifikation) * S2 1009
+      (22 Fund-IDs alle tafel-gedeckt; FUND-4/5 = F-143/F-144; S-0..S-6, W1L-1..9,
+      KON122-A..D gedeckt) * GEGENLESE-GATE 500 (TEIL I GG2-1/GG2-2; TEIL III = 27.7.1)
+      * resume2-result python3-strukturiert (sollist 56/94/21 bestaetigt; 14
+      offene_posten_kurz alle gedeckt; K-E am Objekt: Z12-Z27 je 129-B-FEHLER ohne
+      Zieltext, Z07-Zieltext traegt KLEIN-1-Literal) * NACHVERBUCHUNG 328/328 +
+      REKONSTRUKTION-Quercheck + RESUME-runde-4 263/263 * ZUG-BILANZ Abschn. 4
+      Vertagte-Tafel (alle gedeckt; wt-ce-o2std bereits GERAEUMT, 19-Z.-Delta gesichert
+      unter untracked-sicherung/) * Fix-Nachpruefung 12/12 [A]-Posten CONFIRMED am
+      Diff/Log/Objekt (Testbilanz vierfach: 6x Bilanz-Literal 545, LastTest.log 12:17Z
+      545 Bloecke/541 Passed/0 Failed/RC_CTEST=0; LastTestsFailed.log 12:06Z als
+      Treppen-Stale-Artefakt erkannt: test_profile_roundtrip EXCLUDE_FROM_ALL
+      vor dem Sammelbau -- ctest-Stale-Falle beachtet) * Slots (slot1 weg, slot3
+      TERMINAL 12:20:50 + Uebergabe-Datei) * Additivitaet (27.7.3).
+    ERGEBNIS: Vollzaehligkeits-Differenzmenge = GENAU die 4 Zeilen 27.7.1 (alle Quellen
+      sonst DIFFERENZMENGE LEER gegen 27.1.A-J + 27.4.2 + 27.5.2 + 27.6); Fix-
+      Nachpruefung 12/12 CONFIRMED, 0 falsch-ERLEDIGTE, 0 zurueckzusetzen; Additivitaet
+      HAELT (Ausnahme deklariert 27.7.3); Widersprueche gegen GOAL-Grenze/NIE-KUERZEN/
+      GELOEST!=KONFORM/Fristenlage: 0 harte (2 Koordinations-Flaggen -> 27.7.2/27.7.4).
+    NICHT GEPRUEFT (Traeger benannt): CI-API live (nur gesicherte Kopien gelesen) *
+      Inhalte des LAUFENDEN Lande-Zugs Z13ff. (Traeger wjagljq3t/Lead) * Lead-only-
+      Schreibvollzuege (Ledger/Board/Memory -- Entwuerfe bleiben Auftraege) *
+      Owner-Antworten der [C]-Menge * die ~50 nicht gesampelten S2-D-Literale ueber
+      das DECKT-Result hinaus (GG3-4-Traeger).
+
+**VERIFY-VERMERK (Fable 5 max, adversarisch, 24.08.2026):** Tafel + Fixe TRAGEN am Objekt;
+mit den vier 27.7.1-Zeilen ist die Differenzmenge geschlossen. Das W2-ABSCHLUSS-GATE (27.3)
+gilt unveraendert und erfasst 27.7.1 mit.
