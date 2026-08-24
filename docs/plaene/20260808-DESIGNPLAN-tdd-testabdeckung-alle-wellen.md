@@ -903,3 +903,65 @@ deckt nur seinen Gegenstand"); ob ein einziger Lauf beide Zwecke erfuellt, ist a
 (T-11b bzw. T-12-Umfeld), keine neuen Katalog-Eintraege. T-13 bleibt wie in 13.2/D-10
 GEZAEHLT ausserhalb des 117er-Katalogs, addierbar erst mit dem Durchzaehlen der S-Strecke
 (par.10/D-4).
+
+---
+
+## 13.5 FABLE-MAX-ABNAHME FAHRT 3 (24.08.2026) + STATUS-FORTSCHREIBUNG D-11 + D-13
+
+**Status:** additive Abnahme; nichts geloescht, nichts an den Summen (117/386h, par.10/
+D-4-Summen-Regel). **Anlass:** die Fahrt, die par.13.4 schrieb (f79d4192), fiel um
+07:59:57Z STUMM auf Opus 5 (Consent-Prompt-Mechanik in Background-Sessions) -- ihr
+Abnahme-Vermerk war provenienz-tainted. Diese dritte Fahrt lief nach gespeicherter
+Fable-Consent-Wahl; Wellenplan-Schwester: par.27.5 (dort die volle Delta-Tafel
+F3-01..F3-20 und das Zeilenpruefungs-Urteil 701/701).
+
+**PRUEFUMFANG dieser Fahrt (Nenner):** par.13 (106/106 Insertionen) + par.13.4 (76/76) +
+par.9.5-Marker (9/9) am Objekt; Gegen-Quellen VOLL inkl. der GEWACHSENEN Fassungen, die
+keiner Vorfahrt vorlagen (SYNTHESE-S1-AUDIT 654/654 mit DRITT-ABGLEICH Abschn. 7,
+SYNTHESE-S2-AUDIT 1009/1009 mit DRITT-ABGLEICH D-0..D-6) + eigene Live-Messungen 24.08.
+11:3x UTC (B.3-Protokoll: ~/backups-workflow/20260824-w2-abschluss-design/ARBEITSSTAND.md).
+
+### 13.5.1 ABNAHME-URTEIL
+
+**Alle 7 Urteile aus 13.4.1 sowie D-11 und D-12 sind am Objekt BESTAETIGT -- 0 Fehler.**
+13.1 (Gate-Bindung), 13.2/D-7 (Floor 545/541/539, Einheiten-Trennung zu PZW), D-8
+(Vendor-O3 owner-gated, De-facto (a)), D-9 (M13-Absorption vorgezogen), D-10/T-13
+(sieben Posten, dreiwertiges Urteil), 13.3 (Summen-Regel), par.9.5-Marker: tragen
+unveraendert. D-12 (zwei #114-Beweislaeufe) traegt; die Entscheidung "ein Lauf oder
+zwei" bleibt ein OBJEKT-Entscheid des Traegers (BEWEIS.md Par.9).
+
+### 13.5.2 STATUS-FORTSCHREIBUNG D-11 -- DIE FLOOR-GATE-UMSTELLUNG IST VOLLZOGEN
+
+Eigene Messung 24.08. 11:3x: ce development lokal == origin == github == **943c70ee**
+(Kette f82dfaeb -> b3dc3e93 -> 943c70ee); der Z12-Lande-Lauf (24.08. 07:27-07:46Z,
+Beweisort ~/backups-workflow/20260822-lande-zug/Z12/) fuhr K17 4/4 Zellen je LITERAL
+"100% tests passed, 0 tests failed out of 545" und Gates 6/6 GRUEN mit [5/6] literal
+"545 == 545 (exakt)" -- **die D-11-Pflicht (Floor-Datei + Gate-Erwartung im selben Zug)
+ist damit AM OBJEKT ERFUELLT**; die D-11-Zeile bleibt als Vertrags-Regel fuer jede
+kuenftige +1-Landung stehen. OFFEN aus dem D-11-Umfeld: der CI-TERMINAL-Beleg fuer
+943c70ee (F-126-Klasse, fail-closed; juengster belegter Terminal-Lauf 16101 @ 3841d717)
+und die test_rcu-Beobachtung -- beide Wellenplan par.27.5.2/F3-01/F3-06.
+
+### 13.5.3 D-13 -- K17-TESTAT-STANDBINDUNG (NEU, Abnahme-Regel aus KORR-D7/H-19)
+
+Ein K17-/T-11b-Testat deckt NUR den Stand, an dem es gefahren wurde ("EIN GRUENES GATE
+deckt nur seinen Gegenstand"): ein Testat gegen 5ddda4e5 deckte den heutigen dev-HEAD
+nicht mehr, nachdem o2-Merge und axis-lock-Regen dahinter lagen (KORR-D7 des
+S2-DRITT-ABGLEICHS). **Design-Regel, hiermit Vertrags-Punkt der Testseite:** (a) jedes
+K17-Testat nennt seinen Commit-Stand im Protokoll-Kopf; (b) Abnahmen, die "am Endstand"
+fordern, binden an den dev-Tip AM ZUGTAG, frisch gemessen (H-19: das gilt insbesondere
+fuer das super-Gitlink-Bump-Ziel, dessen np34-Patch-Match-Probe bei jeder super-Bewegung
+zu wiederholen ist); (c) die Treppen-Protokollvorlage nutzt rc=${PIPESTATUS[0]} und
+explizite Build-Pfade (F-145-Klasse: eine Pipe-RC-Quittung ist KEIN Beweis; als
+Bilanz-Beleg zaehlt nur die literale ctest-Ausgabe). Traeger: T-11b/T-17-Ausfuehrung
+(Wellenplan RN-01/RN-18); kein neuer Katalog-Posten.
+
+### 13.5.4 SUMMEN-REGEL (unveraendert)
+
+117/386h bleiben unangetastet; D-13 ist eine Abnahme-Regel bestehender Posten (T-11b),
+kein Katalog-Eintrag; T-13 bleibt GEZAEHLT ausserhalb des 117er-Katalogs (13.2/D-10).
+
+**FABLE-MAX-ABNAHME-VERMERK (Fahrt 3, 24.08.2026):** Geprueft 191/191 Designplan-Legacy-
+Zeilen (106 + 76 + 9); Korrekturen an den Vorfahrten-Urteilen: 0 (alle bestaetigt);
+Fortschreibungen: D-11-Vollzugs-Vermerk (13.5.2) + D-13 (13.5.3). **Damit gilt der
+par.13-Nachtrag als von Fable 5 max GEBAUT UND ABGENOMMEN.**
