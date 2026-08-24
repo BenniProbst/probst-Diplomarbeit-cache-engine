@@ -712,3 +712,109 @@ Kuerzel-Pruefung wird ROT (Paar-Identitaet, r4 A-04/r5 A30).
 
 **Summen-Regel (unveraendert):** 117/386 h bleiben unangetastet; T-12a–e sind erst zu addieren,
 wenn die S-Strecke (§10/D-4) mit-durchgezaehlt wird — sonst der T-3-Fehler aus §9.
+
+---
+
+## 13. NACHTRAG -- W2-ABSCHLUSS-GATE + DESIGN-WIRKSAME NEUFUNDE SEIT 20.08.2026 (24.08.2026)
+
+**Status (KON19-00):** Fortschreibung von par.9/par.10/par.11/par.12 nach demselben Muster;
+nichts geloescht, nichts an den Summen (117/386h bleiben unangetastet, s. par.10/D-4-Summen-
+Regel). Anlass: Owner-Order 23.08.2026 spaet (verbatim-Kern: "Design bitte mit ultracode aus
+Rekonstruktion und nachverbuchung ... und ALLE (auch kleine) Regressionen und Nacharbeiten im
+Wellenplan als Pflicht fuer den Abschluss von Welle 2 verbucht ... OHNE JEGLICHE ... Regression
+an Welle 3 zu uebergeben") -- Volltext + Delta-Tafel im Wellenplan `docs/plaene/20260808-
+WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md` par.27. Dieser Designplan-Nachtrag traegt die
+TESTSEITEN-/DESIGN-Haelfte derselben Owner-Order (der Wellenplan die Wellen-/Traeger-Haelfte).
+
+### 13.1 -- DAS W2-ABSCHLUSS-GATE ALS VERTRAGS-PUNKT
+
+Wellenplan par.27.3 definiert das W2-ABSCHLUSS-GATE: Welle 2 gilt erst als abgeschlossen, wenn
+die dortige Delta-Tafel (par.27.1.A-J) leer ist ODER jeder Rest ein dokumentierter, aktueller
+Owner-Entscheid ist (Kategorie-C-Doktrin, par.21.0/21.6 des Wellenplans -- niemals eine Lead-
+Ableitung). **Dieser Designplan uebernimmt das Gate als eigenen Vertrags-Punkt der Testseite**,
+gleichrangig mit dem TDD-Vertrag T-1..T-9 (par.3) und den Wellen-Testlast-Regeln (par.4): kein
+Paket der W2-Abnahme gilt als abgenommen, solange sein Anteil an der Wellenplan-par.27-Tafel
+offen ist. Das ist keine Verdopplung des Gates, sondern seine Bindung an die Testabnahme, wo
+sie bisher fehlte (par.6 des Wellenplans, "Verifikationsvertrag", nannte bislang keine
+Testseiten-Kopplung fuer Nachtrags-Tafeln dieser Art).
+
+### 13.2 -- DESIGN-WIRKSAME NEUFUNDE SEIT 20.08.2026
+
+**D-7 -- O2-Standard-Landung aendert den Floor-Anker (Quelle: Wellenplan par.27.1.G/CR-1,
+Session-Dokumentation Abschn. 9b).** Die o2-standard-Landung (Strang-Tip **f82dfaeb**, Lead-
+Rescue-Merge lokal fertig als **b3dc3e93**, NOCH NICHT gepusht) traegt EINEN unbedingten neuen
+Test (`test_o2_standard_opt_default`) -- die **+1-Regel**: der Floor-Anker (ctest-Gesamtnenner
+je Host-Klasse, `scripts/ci_test_inventory_floor.txt`) steigt dadurch **544/540/538 ->
+545/541/539** (LIVE gemessen am Merge-Endstand, `ctest -N` literal "Total Tests: 545"). **Das
+ist NICHT dieselbe Zahl wie die PZW-Anker in par.9** (dort zaehlen STELLEN/DATEIEN/LITERAL die
+`lazy_csv_header()`-Aufrufstellen -- eine andere Einheit, gemessen am ce-Gitlink-Stand
+66de5c09, Nenner 530 Test-.cpp); der Floor-Anker ist der T-11b/T-17-Kombibau-Nenner
+(Wellenplan-Doktrin, Quer-Auflage G8/H5 der S2-Lande-Tips). **Wirkung auf diesen Designplan:**
+T-11b (par.11, KOMBIBAU-2x2-MATRIX ALS PRUEFNORM) und die "K17-Vollkombibau EINMAL am
+Endstand"-Quer-Auflage (Wellenplan-S2-Tip T17) muessen ab der o2-Landung den NEUEN Nenner
+545/541/539 fuehren, nicht mehr 544/540/538 -- der Kombibau-VERTRAG selbst (4 Zellen je
+literale ctest-Bilanz) aendert sich nicht, nur der erwartete Zahlenwert.
+
+> UEBERHOLT-MARKER 24.08.2026 (par.13): jede Stelle in par.9/par.11/par.12, die "544" bzw.
+> "540/538" als aktuellen ctest-Gesamtnenner referenziert (insbesondere die PZW-Historie-Tafeln
+> in par.9.5, zuletzt am Stand ce 66de5c09/Nenner 530 Test-.cpp gemessen -- ANDERE Einheit,
+> s.o.), bleibt als HISTORISCHE Momentaufnahme stehen; der lebende Floor-Wert NACH der
+> o2-Landung ist 545/541/539 (par.13.2/D-7). Kein Nachrechnen der PZW-Zahlen noetig -- die
+> betreffen die Schema-Stellen-Zaehlung, nicht den Floor.
+
+**D-8 -- Vendor-O3-Reichweiten-Frage ist owner-gated und beruehrt die Fingerprint-Doktrin
+(Quelle: Wellenplan par.27.1.D).** `CMAKE_CXX_FLAGS_RELEASE`-Default "-O3 -DNDEBUG" laesst
+Vendor-/FetchContent- und Direktblock-Test-Uebersetzungseinheiten effektiv mit -O3 bauen
+(**351 von 643 Treffern, messwirksam**). Das ist eine Design-Frage, keine reine Betriebs-
+Frage: die **Fingerprint-Doktrin** (GOAL-Dossier Teil VI.4, "Mess-Achsen + System-Achsen +
+Organ-Achsen identisch -> identische Binary -> identische Messdaten") haengt an genau dieser
+Optimierungsstufen-Konsistenz. Zwei Optionen liegen dem Owner vor (Wellenplan par.27.1.D
+VO3-1): (a) Vendor bleibt -O3 (deklarierte SYSTEM-Isolation, kein Fingerprint-Bruch) oder
+(b) global -O2 (Fingerprint-Neuberechnung noetig, moeglicherweise ALLE bestehenden Binary-
+Identitaeten aendernd). **Bis zur Owner-Antwort gilt (a) als De-facto-Stand** (nichts wurde
+stillschweigend gedreht) -- diese Fassung ist die dokumentierte Momentaufnahme, keine
+Entscheidung.
+
+**D-9 -- ph89-Kanon-Richtungs-Entscheid: M13-Absorption VOR erster produktiver Konsumierung
+(Quelle: Wellenplan par.27.1.B/ph89-1, Board #89).** `kBegriffsAliasRegistry` (ph89) und die
+M13-Registry kanonisieren die Ebene-0-Begriffe in ENTGEGENGESETZTER Richtung (4 von 7 Gruppen:
+ph89 deklariert `node4`/`w`/`ma`/`mi` als kanonisch, M13 kanonisiert `SPARSE_NODE4_ART`/
+`wallclock`/`macro`/`micro`) -- ein Test (Z.87) pinnt bewusst die Gegenrichtung. Das ist heute
+**folgenlos**, weil `kBegriffsAliasRegistry` noch **0 Produktions-Konsumenten** hat.
+**Design-Entscheidung, hiermit getroffen:** die M13-Absorption (Angleichung der ph89-Alias-
+Paare an den M13-Kanon, ODER umgekehrt -- Registry 7->8 Zeilen + `begriffe_disjunkt` + Asserts
++ CT-Kreuz-Wache) wird **VORGEZOGEN vor die erste produktive Konsumierung** von
+`kBegriffsAliasRegistry`, nicht erst "nach Trigger" wie der urspruengliche ph89-Bericht vorsah
+(T11-2 der Wellenplan-S2-Lande-Tips). Begruendung: ein zweiter Flip NACH dem ersten
+Konsumenten ist ein golden-brechender Nachtrag (dieselbe Klasse wie der Preimage-Bruch bei
+einer spaeten AxisKind-Drehung, Wellenplan par.17.5-Analogon); ein Flip VOR dem ersten
+Konsumenten ist ein reiner Registry-Edit ohne Bau-Ripple.
+
+**D-10 -- #135-Workaround-Konformitaets-Pruefpflicht wird EIGENE TDD-Testklasse T-13 (Quelle:
+Wellenplan par.27.1.E, Board #135 Owner-Dauerregel 23.08.2026).** Owner-Dauerregel, verbatim-
+Kern: *"'geloest' [heisst] nicht automatisch konform ... workarounds [muessen] konform nach
+Plan gegengeprueft und als Struktur-Regression behandelt werden."* Das ist eine STRUKTURELLE
+Ergaenzung des TDD-Vertrags (par.3), nicht nur eine Betriebsregel:
+
+    T-13  WORKAROUND-KONFORMITAET (NEU, 24.08.2026, Board #135): jeder Heilungs-/
+          Workaround-Commit einer CI-Rot-Kette braucht VOR seiner Abnahme ein
+          dokumentiertes Urteil KONFORM / REGRESSION / OWNER-ENTSCHEID gegen
+          Designplan + Wellenplan + GOAL v8 + die einschlaegigen KON-Entscheide.
+          CI-gruen allein ist KEIN Konformitaets-Beweis (GOAL-Teil-IV.1-Klasse, sinngemaess:
+          ein falsches Messgeraet faellt irgendwann auf, ein richtiges am falschen
+          Gegenstand nie -- es gibt nichts, was klappern koennte).
+          Koeder-/Abnahme-Form: das Urteil traegt eine Begruendungs-Zeile MIT
+          Zitat der geprueften Plan-Stelle -- ein Urteil ohne Zitat gilt als
+          nicht geprueft (dieselbe Form-Pflicht wie T-5, ORAKEL UNABHAENGIG).
+
+**Sieben Posten stehen heute unter T-13, keiner verdiktet** (vl3-Maskierung Form a/b/c, PMC-
+Riegel+AUSWEIS, B06-Test-Harmonisierung, TemplateWithUnknownRef-Haertung, stringop-overflow-
+Duldung, NSDMI-Fixmuster -- Einzelzeilen mit Traeger/Frist in Wellenplan par.27.1.E). **T-13
+gilt als eigene, GEZAEHLTE Testklasse ausserhalb des 117er-Katalogs** (dieselbe Summen-Regel
+wie T-11a-c/T-12a-e, par.10/D-4/par.11/par.12: erst zu addieren, wenn die S-Strecke mit-
+durchgezaehlt wird).
+
+### 13.3 -- SUMMEN-REGEL (unveraendert)
+
+117/386 h bleiben unangetastet; T-13 (wie T-11a-c/T-12a-e vor ihr) ist erst zu addieren, wenn
+die S-Strecke (par.10/D-4) mit-durchgezaehlt wird -- sonst der T-3-Fehler aus par.9.
