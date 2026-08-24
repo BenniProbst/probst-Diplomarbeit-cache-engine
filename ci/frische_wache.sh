@@ -75,8 +75,8 @@
 #   Datenzeile als Ausbeute dieses Laufs. Das ist der Kern des Befunds, und eine
 #   Wache, die nur Dateien zaehlt, sieht ihn nicht.
 #   Deshalb zaehlt sie DATENZEILEN je Herkunft und hat einen zweiten Ausgang:
-#     datenzeilen_dieser_lauf == 0 UND datenzeilen_altbestand > 0 UND die
-#     frischen Marker sagen modus=voll  ->  ROT.
+#     echte_dieser_lauf == 0 (Datenzeilen minus n/a, KON44-02 s.u.) UND
+#     datenzeilen_altbestand > 0 UND die frischen Marker sagen modus=voll -> ROT.
 #   Die drei Bedingungen sind bewusst eng. Ohne Altbestand faengt die
 #   Ausbeute-Wache den leeren voll-Lauf schon selbst; ohne modus=voll waere es
 #   ein provision_only-Lauf, der per Bauart nicht misst. Was diese Wache
@@ -104,6 +104,25 @@
 #   aus; die verworfene Menge faellt daraus als eigener NENNER ab
 #   (datenzeilen_verworfen), damit "0 Datenzeilen" von "0 Zeilen" unterscheidbar
 #   bleibt.
+#
+#   EINE n/a-ZEILE IST KEIN MESSWERT (KON44-02 / #38c-Rest, 21.08.2026). Die
+#   Mess-Ausbeute-Wache traegt diese Heilung seit dem 12.08.; HIER fehlte sie,
+#   und die Luecke war die D3-8-Klasse eine Stufe tiefer: eine frische Zelle
+#   aus NUR provisionierten n/a-Zeilen (n_ops/total_ns/ns_per_op, Felder 4/5/6
+#   laut Kopf, alle drei woertlich "n/a") hatte datenzeilen_dieser_lauf > 0 --
+#   das Maskierungs-Gate unten haengt an `== 0` und blieb still, waehrend die
+#   Ausbeute-Wache ihre ECHT-Summe aus den FREMDEN Zeilen der Altzelle deckte:
+#   BEIDE gruen ohne einen einzigen eigenen Messwert (ROT-zuerst am Objekt
+#   gemessen, 21.08.2026: Probe-Fall F6c riss mit rc=0 statt rc=1). Deshalb je
+#   CSV eine ZWEITE awk-Zaehlung (FS=';'; Kopf: ce
+#   cache_engine_builder_iterator.hpp:594, lazy_csv_header) -- BYTE-GLEICH zu
+#   ci/mess_ausbeute_wache.sh und ci/persist_sammler.sh, als EIGENES, zweites
+#   Programm neben dem geteilten PAAR-awk (das bleibt unangetastet). Das
+#   Maskierungs-Gate haengt seither an `echte_dieser_lauf == 0` (Datenzeilen
+#   dieses Laufs minus n/a). Die Heilung geht nur in die scharfe Richtung:
+#   echte <= datenzeilen, das Gate beisst also nur OEFTER, nie seltener. Die
+#   ','-Bestandszellen sind unberuehrt: mit FS=';' ist eine ','-Zeile EIN Feld,
+#   ihre n/a-Zaehlung ist 0.
 #
 # AUFRUF:
 #   sh ci/frische_wache.sh pruefen <wurzel> [<lauf-kennung>]
@@ -178,6 +197,9 @@ wache_pruefen() {
     Z_OHNE=0
     N_DIESER_VOLL=0
     Z_VERWORFEN=0
+    NA_DIESER=0
+    NA_ALT=0
+    NA_OHNE=0
     ALT_LISTE=''
     OHNE_LISTE=''
     while IFS= read -r F; do
@@ -188,10 +210,16 @@ wache_pruefen() {
         _paar=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$F")
         _zeilen=${_paar%% *}
         _daten=${_paar##* }
+        # KON44-02/#38c: ZWEITE Zaehlung, EIGENES Programm (das geteilte PAAR-awk oben bleibt byte-gleich).
+        # n/a-Zeile := Datenzeile, deren Felder 4/5/6 (n_ops/total_ns/ns_per_op laut Kopfzeile, ce
+        # cache_engine_builder_iterator.hpp:594, lazy_csv_header) alle drei woertlich "n/a" sind --
+        # provisioniert, keine Daten-Aussage.
+        _na=$(awk -F';' \
+            'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$F")
         if [ "$_zeilen" -gt 1 ]; then Z_VERWORFEN=$((Z_VERWORFEN + _zeilen - 1 - _daten)); fi
         _m="$(dirname "$F")/$MARKER_NAME"
         if [ ! -f "$_m" ]; then
-            N_OHNE=$((N_OHNE + 1)); Z_OHNE=$((Z_OHNE + _daten))
+            N_OHNE=$((N_OHNE + 1)); Z_OHNE=$((Z_OHNE + _daten)); NA_OHNE=$((NA_OHNE + _na))
             OHNE_LISTE="$OHNE_LISTE
     $F  ($_daten Datenzeile(n))"
             echo "  OHNE MARKER   $F  ($_daten Datenzeile(n))"
@@ -199,24 +227,27 @@ wache_pruefen() {
         fi
         _k=$(awk -F= '/^lauf_kennung=/{print $2; exit}' "$_m" 2>/dev/null || true)
         if [ -z "$_k" ]; then
-            N_OHNE=$((N_OHNE + 1)); Z_OHNE=$((Z_OHNE + _daten))
+            N_OHNE=$((N_OHNE + 1)); Z_OHNE=$((Z_OHNE + _daten)); NA_OHNE=$((NA_OHNE + _na))
             OHNE_LISTE="$OHNE_LISTE
     $F  (Marker ohne Feld lauf_kennung=, $_daten Datenzeile(n))"
             echo "  OHNE KENNUNG  $F  (Marker vorhanden, Feld lauf_kennung= fehlt)"
             continue
         fi
         if [ "$_k" = "$KENNUNG" ]; then
-            N_DIESER=$((N_DIESER + 1)); Z_DIESER=$((Z_DIESER + _daten))
+            N_DIESER=$((N_DIESER + 1)); Z_DIESER=$((Z_DIESER + _daten)); NA_DIESER=$((NA_DIESER + _na))
             _mod=$(awk -F= '/^modus=/{print $2; exit}' "$_m" 2>/dev/null || true)
             [ "$_mod" = voll ] && N_DIESER_VOLL=$((N_DIESER_VOLL + 1))
-            echo "  DIESER LAUF   $F  ($_daten Datenzeile(n), modus=${_mod:-?})"
+            echo "  DIESER LAUF   $F  ($_daten Datenzeile(n), davon $_na n/a, modus=${_mod:-?})"
         else
-            N_ALT=$((N_ALT + 1)); Z_ALT=$((Z_ALT + _daten))
+            N_ALT=$((N_ALT + 1)); Z_ALT=$((Z_ALT + _daten)); NA_ALT=$((NA_ALT + _na))
             ALT_LISTE="$ALT_LISTE
     $F  (lauf_kennung=$_k, $_daten Datenzeile(n))"
-            echo "  ALTBESTAND    $F  ($_daten Datenzeile(n), lauf_kennung=$_k)"
+            echo "  ALTBESTAND    $F  ($_daten Datenzeile(n), davon $_na n/a, lauf_kennung=$_k)"
         fi
     done < "$TMP"
+    # KON44-02/#38c: ECHT = Datenzeilen dieses Laufs ohne die n/a-/provisionierten --
+    # nur sie sind eine Daten-Aussage. echte <= datenzeilen: das Gate unten wird nur schaerfer.
+    ECHT_DIESER=$((Z_DIESER - NA_DIESER))
 
     echo "$TRENN"
     echo "NENNER (nie eine nackte Null):"
@@ -226,6 +257,9 @@ wache_pruefen() {
     echo "  csv_ohne_marker=$N_OHNE          datenzeilen_ohne_marker=$Z_OHNE"
     echo "  davon $N_DIESER_VOLL Datei(en) dieses Laufs mit modus=voll (nur die SOLLTEN messen)."
     echo "  datenzeilen_verworfen=$Z_VERWORFEN  (leer oder nur Leerraum -- kein Messwert)"
+    echo "  na_dieser_lauf=$NA_DIESER  na_altbestand=$NA_ALT  na_ohne_marker=$NA_OHNE"
+    echo "  (n/a = Felder 4/5/6 woertlich n/a -- provisioniert, kein Messwert; KON44-02/#38c)"
+    echo "  echte_dieser_lauf=$ECHT_DIESER  (datenzeilen_dieser_lauf minus n/a)"
     echo "  (die drei Teilmengen ergeben zusammen csv_gesamt -- keine Datei faellt"
     echo "   zwischen zwei Wachen hindurch.)"
     echo "$TRENN"
@@ -255,10 +289,13 @@ wache_pruefen() {
     # Zweiter Ausgang: FREMDE Zeilen maskieren den eigenen Leerlauf.
     # Eng gefasst -- ohne Altbestand faengt die Ausbeute-Wache den leeren
     # voll-Lauf schon selbst, und ohne modus=voll SOLL hier nicht gemessen werden.
-    if [ "$Z_DIESER" -eq 0 ] && [ "$Z_ALT" -gt 0 ] && [ "$N_DIESER_VOLL" -gt 0 ]; then
-        echo "FEHLER: dieser Lauf hat 0 Datenzeile(n) erzeugt, aber $Z_ALT Datenzeile(n)" >&2
-        echo "        aus FREMDEN Laeufen liegen im selben Verzeichnis." >&2
-        echo "        datenzeilen_dieser_lauf=0 / datenzeilen_altbestand=$Z_ALT" >&2
+    # KON44-02/#38c: das Gate haengt an ECHT_DIESER (nicht mehr Z_DIESER) -- eine frische
+    # Zelle aus NUR n/a-Zeilen ist derselbe Leerlauf, nur teurer verkleidet.
+    if [ "$ECHT_DIESER" -eq 0 ] && [ "$Z_ALT" -gt 0 ] && [ "$N_DIESER_VOLL" -gt 0 ]; then
+        echo "FEHLER: dieser Lauf hat 0 echte Datenzeile(n) erzeugt ($Z_DIESER Datenzeile(n)," >&2
+        echo "        davon $NA_DIESER n/a-/provisionierte -- keine Daten-Aussage, KON44-02)," >&2
+        echo "        aber $Z_ALT Datenzeile(n) aus FREMDEN Laeufen liegen im selben Verzeichnis." >&2
+        echo "        echte_dieser_lauf=0 / datenzeilen_altbestand=$Z_ALT" >&2
         echo "        ($N_DIESER_VOLL Datei(en) dieses Laufs stehen auf modus=voll -- er SOLLTE messen.)" >&2
         echo "        Die Ausbeute-Wache summiert ueber ALLE Dateien und liest die fremden" >&2
         echo "        Zeilen als Ausbeute dieses Laufs. Genau diese Maskierung ist der" >&2
@@ -266,7 +303,8 @@ wache_pruefen() {
         exit 1
     fi
 
-    echo "FRISCHE-WACHE: OK ($N_DIESER von $N_CSV CSV aus diesem Lauf, $Z_DIESER Datenzeile(n) davon)."
+    echo "FRISCHE-WACHE: OK ($N_DIESER von $N_CSV CSV aus diesem Lauf," \
+        "$Z_DIESER Datenzeile(n) davon, $ECHT_DIESER echte)."
     exit 0
 }
 

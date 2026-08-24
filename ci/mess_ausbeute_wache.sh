@@ -136,7 +136,7 @@
 #   Lauf. Eine n/a-Zeile ist aber keine Daten-AUSSAGE -- sie sagt "hier fehlt der
 #   Wert", nicht "hier ist einer". Deshalb je CSV eine ZWEITE awk-Zaehlung
 #   (FS=';'): eine n/a-Zeile ist eine Datenzeile, deren Felder 4/5/6
-#   (n_ops/total_ns/ns_per_op laut Kopf, ce cache_engine_builder_iterator.hpp:550)
+#   (n_ops/total_ns/ns_per_op laut Kopf, ce cache_engine_builder_iterator.hpp:594, lazy_csv_header)
 #   alle drei woertlich "n/a" sind. Das geteilte PAAR-awk bleibt dabei BYTE-GLEICH
 #   zu ci/persist_sammler.sh und ci/frische_wache.sh -- die n/a-Zaehlung ist ein
 #   EIGENES, zweites Programm, kein Umbau des geteilten.
@@ -270,7 +270,7 @@ while IFS= read -r F; do
     DATEN=${PAAR##* }
     # KON44-02 / D4d: ZWEITE Zaehlung, EIGENES Programm (das geteilte PAAR-awk oben bleibt byte-gleich).
     # n/a-Zeile := Datenzeile, deren Felder 4/5/6 (n_ops/total_ns/ns_per_op laut Kopfzeile,
-    # ce cache_engine_builder_iterator.hpp:550) alle drei woertlich "n/a" sind -- eine provisionierte
+    # ce cache_engine_builder_iterator.hpp:594, lazy_csv_header) alle drei woertlich "n/a" sind -- eine provisionierte
     # Zeile, keine Daten-Aussage.
     NA=$(awk -F';' \
         'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$F")

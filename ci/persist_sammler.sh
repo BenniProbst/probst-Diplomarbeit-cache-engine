@@ -46,6 +46,34 @@
 #   (leerzeilen_gesamt); ohne ihn waere nach der Heilung nicht mehr sichtbar, ob
 #   eine Datei leer war oder ob ihre Zeilen verworfen wurden.
 #
+#   EINE n/a-ZEILE IST KEIN MESSWERT (KON44-02 / #38c-Rest, 21.08.2026). Die
+#   Mess-Ausbeute-Wache traegt diese Heilung seit dem 12.08.; dem Sammler
+#   fehlte sie: ein Fenster aus NUR provisionierten n/a-Zeilen (n_ops/total_ns/
+#   ns_per_op, Felder 4/5/6 laut Kopf, alle drei woertlich "n/a") hatte
+#   datenzeilen_gesamt > 0 und OEFFNETE das Commit-Gate -- ein Laufordner OHNE
+#   einen einzigen Messwert waere additiv und unter der Nie-loeschen-Doktrin
+#   IRREVERSIBEL ins Mess-Archiv gelangt (exakt das Phantom aus dem Kopf, eine
+#   Verkleidung tiefer; ROT-zuerst am Objekt gemessen, 21.08.2026: Probe-Fall
+#   P16 committete gegen die Fassung vor der Heilung). Deshalb je CSV eine
+#   ZWEITE awk-Zaehlung (FS=';'; Kopf: ce cache_engine_builder_iterator.hpp:594,
+#   lazy_csv_header) -- BYTE-GLEICH zu ci/mess_ausbeute_wache.sh und
+#   ci/frische_wache.sh, als EIGENES, zweites Programm neben dem geteilten
+#   PAAR-awk (das bleibt unangetastet). Das COMMIT-GATE haengt seither an
+#   echt_zeilen_gesamt == 0 (Datenzeilen minus n/a); echt <= datenzeilen, das
+#   Gate wird also nur strenger, nie weicher. na_zeilen_gesamt und
+#   echt_zeilen_gesamt sind ADDITIVE Felder in Bilanz und PROVENANCE; die
+#   4/5/6-Regel gilt fuer ALLE *.csv des Selektors (per-Binary result.csv und
+#   __S001.csv tragen DENSELBEN lazy_csv_header-Kopf; ','-Altbestand ist mit
+#   FS=';' EIN Feld und zaehlt 0).
+#
+#   VERSIONS-SKEW sammeln/gate, ausdruecklich benannt: `gate` laeuft im YAML
+#   NACH einem checkout auf origin/development und kann eine NEUERE Fassung
+#   sein als das `sammeln`, das die PROVENANCE schrieb. Die Gegenprobe auf das
+#   NEUE Feld na_zeilen_gesamt= ist deshalb KONDITIONAL (fehlt das Feld:
+#   lauter HINWEIS, kein rc=2) -- die ENTSCHEIDUNG haengt nie an der Textdatei,
+#   das Gate zaehlt selbst nach. Das Alt-Feld datenzeilen_gesamt= bleibt harte
+#   Gegenprobe (unveraendert).
+#
 # XLSX IST DIE AUSGABE (P5, 09.08.2026) -- was sich geaendert hat und was nicht:
 #   Owner-KERN, mehrfach bestaetigt: "xlsx ist die Ausgabe. CSV wird NIE
 #   verwendet." Bis zu diesem Paket sammelten BEIDE find-Selektoren
@@ -91,7 +119,8 @@
 #
 # EXIT (sammeln): 0 = eingesammelt, Bilanz gedruckt und in PROVENANCE.txt
 # EXIT (gate):    0 = ein Commit wurde erzeugt -> der Aufrufer muss pushen
-#                10 = KEIN Commit (leeres Messfenster oder nichts einzuchecken);
+#                10 = KEIN Commit (leeres oder NUR-n/a-Messfenster oder nichts
+#                     einzuchecken);
 #                     das ist KEIN Fehler, der Job endet gruen ohne Rueckschrieb
 #                 2 = konnte nicht pruefen (Argument fehlt, kein Git-Baum,
 #                     Laufordner fehlt, Bilanz widerspricht der PROVENANCE) --
@@ -128,6 +157,7 @@ BK=measurement; DEST="$BK/$RUN_TS"
 
 CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
 LEERZEILEN_GESAMT=0
+NA_ZEILEN_GESAMT=0; ECHT_ZEILEN_GESAMT=0
 
 # SELBSTCHECK bilanz_zaehlen (P5, 2026-08-09):
 #   ZUGESICHERT: die Datenzeilen-Bilanz zaehlt weiterhin AUSSCHLIESSLICH *.csv;
@@ -137,16 +167,18 @@ LEERZEILEN_GESAMT=0
 #   das Gate CSV-basiert: eine Wache, die jede Binaerdatei als Messwert nimmt,
 #   kann nicht mehr beissen.
 #
-# Zaehlt die Datenzeilen im Laufordner $1. Setzt die vier Zahlen oben.
-# VIER ZAHLEN, nie eine nackte Null: "0 Datenzeilen" heisst etwas voellig
+# Zaehlt die Datenzeilen im Laufordner $1. Setzt die sechs Zahlen oben.
+# SECHS ZAHLEN, nie eine nackte Null: "0 Datenzeilen" heisst etwas voellig
 # anderes bei 0 gefundenen CSVs (der Messlauf lief gar nicht) als bei 40
 # gefundenen CSVs (40 Prueflinge haben nichts geliefert) -- und wieder etwas
 # anderes, wenn daneben eine Auswertungs-xlsx liegt (dann gibt es Material,
-# aber keinen zaehlbaren Messwert).
+# aber keinen zaehlbaren Messwert) oder wenn die Zeilen zwar da, aber
+# n/a-/provisioniert sind (dann gibt es Eintraege, aber keine Daten-Aussage).
 bilanz_zaehlen() {
-    local wurzel liste xliste zf paar zeilen daten
+    local wurzel liste xliste zf paar zeilen daten na
     CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
     LEERZEILEN_GESAMT=0
+    NA_ZEILEN_GESAMT=0; ECHT_ZEILEN_GESAMT=0
     liste=$(mktemp) || exit 2
     xliste=$(mktemp) || exit 2
     for wurzel in $ZAEHL_WURZELN; do
@@ -164,6 +196,12 @@ bilanz_zaehlen() {
         paar=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$zf")
         zeilen=${paar%% *}
         daten=${paar##* }
+        # KON44-02/#38c: ZWEITE Zaehlung, EIGENES Programm (das geteilte PAAR-awk oben bleibt byte-gleich).
+        # n/a-Zeile := Datenzeile, deren Felder 4/5/6 (n_ops/total_ns/ns_per_op laut Kopfzeile, ce
+        # cache_engine_builder_iterator.hpp:594, lazy_csv_header) alle drei woertlich "n/a" sind --
+        # provisioniert, keine Daten-Aussage.
+        na=$(awk -F';' \
+            'NR>1 && $0 ~ /[^[:space:]]/ && $4=="n/a" && $5=="n/a" && $6=="n/a" {n++} END{printf "%d\n", n+0}' "$zf")
         if [ "$zeilen" -gt 1 ]; then
             LEERZEILEN_GESAMT=$((LEERZEILEN_GESAMT + zeilen - 1 - daten))
         fi
@@ -171,7 +209,10 @@ bilanz_zaehlen() {
             CSV_MIT_DATENZEILE=$((CSV_MIT_DATENZEILE + 1))
         fi
         DATENZEILEN_GESAMT=$((DATENZEILEN_GESAMT + daten))
+        NA_ZEILEN_GESAMT=$((NA_ZEILEN_GESAMT + na))
     done < "$liste"
+    # KON44-02/#38c: ECHT = Datenzeilen ohne die n/a-/provisionierten -- nur sie sind eine Daten-Aussage.
+    ECHT_ZEILEN_GESAMT=$((DATENZEILEN_GESAMT - NA_ZEILEN_GESAMT))
     rm -f "$liste" "$xliste"
 }
 
@@ -182,6 +223,8 @@ bilanz_drucken() {
     echo "  datenzeilen_gesamt=$DATENZEILEN_GESAMT"
     echo "  leerzeilen_gesamt=$LEERZEILEN_GESAMT"
     echo "  xlsx_gesamt=$XLSX_GESAMT"
+    echo "  na_zeilen_gesamt=$NA_ZEILEN_GESAMT"
+    echo "  echt_zeilen_gesamt=$ECHT_ZEILEN_GESAMT"
 }
 
 if [ "$MODUS" = sammeln ]; then
@@ -267,6 +310,8 @@ fi
       echo "datenzeilen_gesamt=$DATENZEILEN_GESAMT"
       echo "leerzeilen_gesamt=$LEERZEILEN_GESAMT"
       echo "xlsx_gesamt=$XLSX_GESAMT"
+      echo "na_zeilen_gesamt=$NA_ZEILEN_GESAMT"
+      echo "echt_zeilen_gesamt=$ECHT_ZEILEN_GESAMT"
     } > "$DEST/PROVENANCE.txt"
     echo "-- Laufordner --"; find "$DEST" -type f | sort
     bilanz_drucken
@@ -274,6 +319,10 @@ fi
     if [ "$CSV_GESAMT" -gt 0 ] && [ "$CSV_MIT_DATENZEILE" -lt "$CSV_GESAMT" ]; then
         echo "BEFUND: $((CSV_GESAMT - CSV_MIT_DATENZEILE)) von $CSV_GESAMT CSV-Datei(en) tragen KEINE Datenzeile."
         echo "        Das ist ein Befund, kein Rauschen -- er gehoert in die Auswertung."
+    fi
+    if [ "$NA_ZEILEN_GESAMT" -gt 0 ]; then
+        echo "BEFUND: $NA_ZEILEN_GESAMT von $DATENZEILEN_GESAMT Datenzeile(n) sind n/a-/provisioniert"
+        echo "        (Felder 4/5/6 woertlich n/a; KON44-02/#38c -- kein Messwert, aber sichtbar)."
     fi
     if [ "$persisted" -eq 0 ]; then
         echo "WARNUNG: keine Auswertungs-Dokumente gefunden (nur PROVENANCE.txt)"
@@ -311,11 +360,33 @@ if [ "$PROV_N" -ne "$DATENZEILEN_GESAMT" ]; then
     echo "         Zwischen Sammeln und Gate hat sich der Laufordner veraendert. Kein Rueckschrieb." >&2
     exit 2
 fi
+# KON44-02/#38c: Gegenprobe auf das NEUE Feld -- KONDITIONAL, wegen des Versions-Skews sammeln/gate
+# (s. Kopf: `gate` kann eine neuere Fassung sein als das `sammeln`, das diese PROVENANCE schrieb).
+# Fehlt das Feld, ist das ein LAUTER HINWEIS und kein rc=2; die Entscheidung unten haengt an der
+# EIGENEN Nachzaehlung, nie an der Textdatei. Ist das Feld da und widerspricht, gilt dieselbe
+# Manipulations-Doktrin wie beim Alt-Feld: abbrechen, nicht raten.
+PROV_NA=$(awk -F= '/^na_zeilen_gesamt=/{print $2+0; found=1} END{if(!found) print "FEHLT"}' \
+    "$PROV" 2>/dev/null || echo FEHLT)
+if [ "$PROV_NA" = FEHLT ]; then
+    echo "HINWEIS: '$PROV' traegt kein Feld na_zeilen_gesamt= (sammeln lief mit einer Fassung"
+    echo "         vor KON44-02/#38c). Kein Abbruch: die Entscheidung haengt an der eigenen"
+    echo "         Nachzaehlung des Gates (na_zeilen_gesamt=$NA_ZEILEN_GESAMT)."
+elif [ "$PROV_NA" -ne "$NA_ZEILEN_GESAMT" ]; then
+    echo "ABBRUCH: Bilanz widerspricht der PROVENANCE: nachgezaehlt na=$NA_ZEILEN_GESAMT, PROVENANCE=$PROV_NA." >&2
+    echo "         Zwischen Sammeln und Gate hat sich der Laufordner veraendert. Kein Rueckschrieb." >&2
+    exit 2
+fi
 
 gate_verweigern() {
-    echo "KEIN COMMIT: das Messfenster traegt 0 Datenzeile(n)."
+    echo "KEIN COMMIT: das Messfenster traegt 0 echte Datenzeile(n)."
     echo "  csv_gesamt=$CSV_GESAMT  csv_mit_datenzeile=$CSV_MIT_DATENZEILE  datenzeilen_gesamt=$DATENZEILEN_GESAMT  xlsx_gesamt=$XLSX_GESAMT"
     echo "  leerzeilen_gesamt=$LEERZEILEN_GESAMT"
+    echo "  na_zeilen_gesamt=$NA_ZEILEN_GESAMT  echt_zeilen_gesamt=$ECHT_ZEILEN_GESAMT"
+    if [ "$NA_ZEILEN_GESAMT" -gt 0 ]; then
+        echo "  HINWEIS: $NA_ZEILEN_GESAMT Datenzeile(n) im Fenster sind n/a-/provisioniert (Felder"
+        echo "  4/5/6 woertlich n/a). Eine n/a-Zeile sagt 'hier fehlt der Wert', nicht 'hier ist"
+        echo "  einer' (KON44-02/#38c) -- vor dieser Heilung haetten genau sie dieses Gate geoeffnet."
+    fi
     if [ "$LEERZEILEN_GESAMT" -gt 0 ]; then
         echo "  HINWEIS: $LEERZEILEN_GESAMT Zeile(n) im Fenster sind leer oder tragen nur"
         echo "  Leerraum. Sie zaehlen seit D3-3b nicht mehr als Messwert -- vor der"
@@ -331,9 +402,13 @@ gate_verweigern() {
     echo "  nach '$( [ -n "${CI_COMMIT_BRANCH:-}" ] && echo "$CI_COMMIT_BRANCH" || echo development )' zurueckgeschrieben."
     exit 10
 }
-if [ "$DATENZEILEN_GESAMT" -eq 0 ]; then gate_verweigern; fi   # GATE-MUTATIONSMARKE
+# KON44-02/#38c: das Gate haengt an ECHT (nicht mehr an der rohen Datenzeilen-Summe) -- ein Fenster
+# aus NUR n/a-Zeilen ist dasselbe Phantom, nur teurer verkleidet. echt <= datenzeilen: nur strenger.
+if [ "$ECHT_ZEILEN_GESAMT" -eq 0 ]; then gate_verweigern; fi   # GATE-MUTATIONSMARKE
 
-echo "COMMIT-GATE OK: $DATENZEILEN_GESAMT Datenzeile(n) aus $CSV_MIT_DATENZEILE von $CSV_GESAMT CSV-Datei(en) -> Rueckschrieb."
+echo "COMMIT-GATE OK: $DATENZEILEN_GESAMT Datenzeile(n)" \
+    "($ECHT_ZEILEN_GESAMT echte, $NA_ZEILEN_GESAMT n/a-/provisionierte)"
+echo "                aus $CSV_MIT_DATENZEILE von $CSV_GESAMT CSV-Datei(en) -> Rueckschrieb."
 
 # --- BEGINN GEHOBENER BLOCK B (.gitlab-ci.yml 1105 + 1110-1112) ---------------
 # ZWEI Abweichungen vom gehobenen Rumpf, beide ausdruecklich benannt:
