@@ -60,3 +60,22 @@ Synthese-/Gate-Prompts aendern sich; alle 118 fertigen Schritte bleiben Hits.
 - ce dev LOKAL b3dc3e93 ungepusht (bewusst): Push kommt aus Lande-Zug-Z12
   nach K17-Kombibau + Gates 6/6 + gitleaks.
 - Peers o2-umbau + cifix-vl3-debug: idle/angehalten, unveraendert.
+
+## 5. NACHTRAG ~07:40: Owner-Frage "welche Workflows fehlen/nicht zu Ende gefuehrt"
+
+Vollerhebung ALLER Journale seit 21.08. (22 Runs) + Lebendproben:
+LAUFEND (4/4, keiner fehlt): wf_08c04723 W2-ABSCHLUSS = der vermisste
+Regressions-Fixer — LEBT (Design-Agent-Transkript 1.26 MB + ARBEITSSTAND.md
+7993 B, beide mtime 07:35; Fix-Agenten erscheinen erst NACH der Design-Phase,
+daher noch nicht sichtbar) · wf_b546634b Lande-Zug — Z12 faehrt LIVE den
+K17-Kombibau (cmake build-dbg -j24, PPID-Kette kombibau-z12-o2std.sh,
+Slot2-Claim 21:06Z) · wf_98cabd77 W2-Audit 159/119 waechst · wf_c37fb077
+Rueckfragen-2-stufig 12/2 waechst.
+GEWOLLT OFFEN (1): wf_bce0efd4 alte Rueckfragen-Synthese 168/117 — Owner-
+gestoppt 23.08., ERSETZT durch wf_c37fb077 (116 Kondensate wiederverwendet).
+TERMINAL+VERBUCHT (4 der letzten beiden Kontexte): wf_c745729a 9/6 ·
+wf_f3f75b60 37/30 · wf_23486ee9 20/10 · wf_bc7303ab 15/13 — Journal-
+Differenzen = Riss-NEUSTARTS derselben Schritte (jeder Start zaehlt), kein
+offenes Werk; Ergebnisse je voll gelesen+verbucht (Doku 23.08. Abschn. 3/7/8).
+AELTER (21.-22.08., 13 Runs): in der Limit-Pruefung 23.08. terminal befundet.
+FAZIT: KEIN fehlender Workflow; Differenzmenge LEER.
