@@ -226,8 +226,8 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 943c70ee52796da8dede7ace1bf3a370a0994d16
-PZW-SCHEMA-STELLEN = 44
+PZW-CE-SHA         = 2168f60c7077d1c316a9bf3e323c8a3b63ca0379
+PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
@@ -245,6 +245,24 @@ PZW-CI-ALTMUSTER   = 0
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
+> NACHZUG 24.08.2026 nachts (Rest-Landung L3/K3-Gitlink-Nachzug; Gitlink-Ziel ce
+> `2168f60c` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug;
+> WIE GEMESSEN, nicht gerechnet): SCHEMA-STELLEN 44 -> **45**, SCHEMA-DATEIEN
+> unveraendert **24** -- die neue Stelle traegt
+> `tests/unit/test_s13_03_per_binary_mappe.cpp:217` (W2-Abschluss-Fixes #139 Phase 2,
+> ce-Merge 2168f60c, CI 286: 16209 SUCCESS). Nenner unveraendert **564** Test-.cpp
+> (Kette 943c70ee..2168f60c, 7 Commits, 0 neue Test-.cpp); 64 Rohzeilen, Kommentar
+> abgezogen. LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 @ 2968 Z. .gitlab-ci.yml.
+> LIVE gemessen mit den Formeln der Wache selbst (git grep -F gegen den Baum
+> `2168f60c`); Kontroll-Lauf derselben Formeln am Alt-Baum `943c70ee` reproduziert
+> exakt die Alt-Anker 44/24/2/2/0 @ 564 Test-.cpp / 63 Rohzeilen. Gegenprobe ueber
+> den Bissproben-Kanal COMDARE_GITLINK_SHA nach dem Nachzug: '5 von 5 Ankern decken
+> sich mit dem Objekt'; Drift-Biss VOR dem Nachzug rc=2 belegt. Der PZW-Anteil des
+> Di-25-Vorbehalts der LANDE-STAND-Zeile oben ist damit HIER vollzogen (die Wache
+> koppelt den Plan-Anker an den Gitlink: ohne Nachzug im selben Commit waere
+> docs:plan-zahlen-wache rot); beim Di-25-docs-Zug verbleiben UEBERHOLT-MARKER-Prosa
+> und N-33(e)/RN-27. Beleg-Log: ~/backups-workflow/20260824-rest-landung/
+> L3-gitlink-nachzug/pzw_zaehlung_2168f60c.log. Vorheriger Nachzug darunter.
 > NACHZUG 24.08.2026 abends (W2-S1+S2-Lande-Zug/Z23, Fahrplan Board #131; Gitlink-Ziel ce
 > `943c70ee` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug, zusammen
 > mit dem prt-art-Gitlink `d11781fa` -> `16c90628`; WIE GEMESSEN, nicht gerechnet):
