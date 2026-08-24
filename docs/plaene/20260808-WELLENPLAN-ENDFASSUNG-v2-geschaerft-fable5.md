@@ -5046,3 +5046,153 @@ Fortschreibungen F3-01..F3-20 (namentlich oben, je mit Quelle/Traeger/Frist/Abna
 Substanz + Fahrt-2-Korrekturen tragen, die Fahrt-3-Tafel schreibt den Objektstand 24.08.
 11:3x fort. Das W2-ABSCHLUSS-GATE (27.3) gilt unveraendert und erfasst 27.4.2 UND 27.5.2
 mit; Designplan-Schwester: par.13.5.
+
+## 27.6 TAFEL-RUECKSCHRIEB DES FIX-ZUGS (#139 Phase 2, Fable 5 max, 24.08.2026 12:0x-12:3x UTC)
+
+ANLASS (Owner-Ergaenzung 23.08. spaet, verbatim-Kern): "Die Regressions-fixes nach dem
+Design auch direkt fahren um an Welle 3 zu uebergeben." Dieser Abschnitt ist ADDITIV: keine
+Tafel-Zeile geloescht oder veraendert -- je gefahrener [A]-Zeile ein ERLEDIGT-Vermerk MIT
+Beleg, alle [B]-/[C]-Zeilen bleiben OFFEN mit Traeger. Arbeitsobjekte: ce-Worktree
+/home/comdare/wt-ce-w2fix, Branch `bau/w2-abschluss-fixes` (Basis development 943c70ee, die
+b3dc3e93-o2-Kette); super dieser Worktree/Branch. KEINE Landung -- beide Branches sind
+LANDEREIF-KANDIDATEN fuer den Lead-Lande-Zug. Riss-Schutz-Protokoll:
+~/backups-workflow/20260824-w2-abschluss-design/FIX-STAND.md (+ fixlogs/ als Beweisort).
+
+### 27.6.1 GEFAHRENE [A]-POSTEN -- ERLEDIGT MIT BELEG (Branch-Stand, Landung = Lead)
+
+**ph89-1 [27.1.B] ERLEDIGT-AM-BRANCH** -- ce 22c6c62e: kBegriffsAliasRegistry auf
+M13-Kanon-Richtung gedreht (7->8 Zeilen, begriffe_disjunkt-Neufassung, CT-Kreuz-Wache gegen
+naming::kanon_of je geteilter Gruppe; Designplan-D-9-Weg VOR erster produktiver
+Konsumierung). F3-08-SICHTUNG VOLLZOGEN: liegender wg4nfrsb1-Edit sha256-identisch zum
+gesicherten Patch 48c7be4c25519be1..., als VORARBEIT UEBERNOMMEN (kein Frischbau, kein
+Doppel). Rot-Nachweis zweifach: gesichertes Erst-Fixer-Rot-Log + EIGENE Koeder-Probe
+(Registry-Zeile 1 zurueckgedreht -> RC=1, 'static assertion failed' Test :91/:92/:105,
+revertiert; fixlogs/fix1-ph89-koeder-probe.log). Bilanz literal: "100% tests passed,
+0 tests failed out of 545".
+**ph89-2 [27.1.B] ERLEDIGT-AM-BRANCH** -- ce 22c6c62e (gleicher Commit): Testkopf-Label
+T-2 -> T-3. Abnahme-grep auf dem Testkopf = 0 Treffer "T-2".
+**ph89-3 [27.1.B] ERLEDIGT-AM-BRANCH** -- ce 22c6c62e: 'daueber' -> 'darueber' in
+test_experiment_parser.cpp; grep daueber = 0.
+**trigfix KLEIN-2 [27.1.J T12-3 / E-09] ERLEDIGT-AM-BRANCH** -- ce b4c007db: setze()
+end()-Guard vor dem Index-Zugriff (e07_gate_kriterien.hpp; heute unerreichbar, Haertung;
+rot-zuerst als NICHT SINNVOLL verbucht: defensiver Guard ohne erreichbaren Pfad).
+Bilanz literal: "100% tests passed, 0 tests failed out of 545".
+**trigfix KLEIN-3 [27.1.J T12-4 / E-09] ERLEDIGT-AM-BRANCH** -- ce c39a51c2:
+Testname/Variable 'Unguelig' -> 'Ungueltig'; grep Unguelig = 0. Bilanz literal:
+"100% tests passed, 0 tests failed out of 545".
+**trigfix KLEIN-4 / F-147 [27.5.2 F3-12] ERLEDIGT-AM-BRANCH** -- ce 6285621f: honest-0-
+Deklarationszeile am rec{}-Zero-Init (experiment_driver.cpp, f15_compare/main.cpp:614-
+Muster). Kommentar-only, kein Verhaltens-Delta. Bilanz literal: "100% tests passed,
+0 tests failed out of 545".
+**L-07 [27.1.I] ERLEDIGT-AM-BRANCH** -- ce 0ffec635: Hinweis-Zeile Hybrid-Mehrfach-Aufbau
+(GOAL VI.2 / KON42-01(3)(4)) in simulations_bericht nach Hinweis 4; reiner o+=-String;
+Anker gegen HEUTIGEN Stand gemessen (F3-07). s19-Kurzlauf 2/2 + Bilanz literal
+"100% tests passed, 0 tests failed out of 545".
+**EP-1 / #137 / N-12 [27.1.J] ERLEDIGT-AM-BRANCH** -- ce 926f8d70: .stale-Rettung AUCH auf
+dem Erfolgs-Pfad (lazy_stale_rettung_vor_write spiegelt das Fehlzweig-fs::rename-Muster;
+fail-closed: bei Rettungs-Fehlschlag kein trunc, kein Stamp, Folgelauf misst neu).
+ROT-ZUERST: Test vor Helfer -> RC=1 "'lazy_stale_rettung_vor_write' is not a member of
+'ex'" (fixlogs/fix6-ep1-rot.log). VERDRAHTUNGS-WACHE (t15-Muster, liest Iterator-Quelle):
+Biss-Probe RC=1 bei mutiertem Aufruf-Token, gruen nach Revert. Kein Floor-Delta (neue
+TESTs in bestehender ctest-Registrierung test_s13_03_per_binary_mappe; 545 bleibt).
+Bilanz literal: siehe Vollzyklus-Vermerk am Ende von 27.6.1.
+**T11c A-KW-1 + A-KW-2 [27.1.J] ERLEDIGT** -- super c70f23fc (DESIGN-90): Parameter-Name
+sicherheitsfaktor praezisiert (Anker FRISCH: checkpoint_speicher.hpp:140-141; S2-Anker
+:131-132 waren gedriftet, F3-13-Doktrin) + kontext9 -> kontext8. Gegenproben: grep
+kontext9 = 0; grep drift_faktor = nur Ledger-Name-Zitat + S-19-Formel-Zeile (deklariert);
+BEIDE KLEINs in EINEM Commit (T11c-3-Vollzaehligkeits-Warnung beachtet).
+**F3-09 Phantom-Slot [27.5.2, SOFORT] ERLEDIGT** -- Raeumung slot1-ph89fix.d durch den
+#139-Fix-Agenten VOR seinem ersten Bau-Zyklus, sequenziell VOR dem eigenen Claim
+(slot3.d). Todes-Beweis verbucht (FIX-STAND.md): wer.txt-Claim 23.08. 21:05:30Z = 14h54m
+alt, 0 Prozesse, build-mtime 21:05:39, ListAgents ohne Halter. slot2.d (fremder
+Z12-Claim) UNANGETASTET.
+**F3-08 Sichtungs-Pflicht [27.5.2] TEIL-ERLEDIGT** -- SICHTUNG + UEBERNAHME vollzogen
+(s. ph89-1). OFFEN bleiben: wt-ce-ph89-Saeuberung (EIN SCHREIBER, erst nach Zug-Ende/
+Landung, Traeger Lead) + Board-#89-Metadata-Fortschreibung (Lead-only).
+**GG2-1 [27.1.C] TEIL-ERLEDIGT (der direkt-fahrbare Anteil)** -- Gegenprobe gefahren:
+keine weitere "53/53"-Altstelle in den super-Plandokumenten (einziger Treffer = die
+Tafel-Zeile selbst, die den Fehler beschreibt); SYNTHESE-S1 traegt [KORR-GG2]. OFFEN:
+KON122-Ledger-Vermerk "S1-Quellen-Deckung 53->52" (RN-27, Lead-only).
+
+BAU-DISZIPLIN-VERMERK (E-07/RN-18 GELEBT): jeder Zyklus fuhr die J-1-Werkzeugliste
+LITERAL (comdare-adhoc-emitter, comdare-anatomy-codegen-tool, comdare-catalog-codegen,
+is_original_validator, comdare_axis_registry_gen, comdare_measurement_axis_registry_gen,
+comdare_system_axis_registry_gen; dazu comdare_overlay_source_hash_gen und das reale
+Facade-Target comdare_profile_run_facade), dann RE-CONFIGURE (541 -> 545 Registrierungen:
+f15_compare_cli_smoke, test_d51_perzentil_kanon, test_v41_anatomy_adhoc_autobuilt_load,
+test_v5_measurement_snapshot), dann comdare_tests-Sammelbau (EXCLUDE_FROM_ALL-Klasse:
+test_profile_roundtrip). Kein "all"-Gruen wurde als Ersatz-Beleg zitiert. df-Gate je Bau
+>= 5G eingehalten (20G/16G-Messungen im FIX-STAND). RN-18 selbst bleibt beim Traeger
+#18-Vorlauf.
+VOLLZYKLUS-VERMERK EP-1: Bilanz literal "100% tests passed, 0 tests failed out of 545"
+(RC_NINJA=0, RC_CTEST=0; fixlogs/fix6-ep1-vollzyklus.log). Damit ALLE sechs ce-Zyklen
+gruen bei exakt 545 (avx512f-Anker der Floor-Datei; Floor-Restore byte-gleich, kein
+Floor-Delta durch diesen Zug).
+
+### 27.6.2 TRIAGE [B] -- LEAD-/LANDE-PFLICHTIG, OFFEN MIT TRAEGER (NICHT gefahren)
+
+Nach Auftrags-Definition NICHT von diesem Fix-Zug zu fahren; jede Zeile behaelt ihren
+Tafel-Platz und Traeger (Zitat der Zeilen-IDs, keine Doppelung):
+* 27.1.A Fenster-A-F-Deklaration (deklarativ; Vollzug je RN-01..RN-50-Traeger).
+* 27.1.E W135-1..W135-7 Konformitaets-Urteile: KON122-Zug mit #128, nach S1+S2-Landung,
+  VOR main-FF (drittes Urteil je Posten kann OWNER-ENTSCHEID sein -> dann [C]).
+* 27.1.F Z11R-1..Z11R-5: Branch-Loeschungs-GOs je Branch (Lead), Vollaudit-BU (RN-09),
+  wt-ce-lande erst Z27, build-l4 super-Phase.
+* 27.1.G CR-1-Rest (CI-Terminal-Beleg 943c70ee = F3-06, Token-gated fail-closed; test_rcu-
+  Beobachtung) + CR-2..CR-8, CR-10..CR-12 (Lande-Zuege RN-01, sequentiell O-6/O-8);
+  CR-9 traegt zusaetzlich den Owner-Rest F-13 (-> 27.6.3).
+* 27.1.H N-Posten ohne [A]-Anteil: N-01, N-02, N-04..N-11, N-13, N-14, N-15, N-18(Anlage
+  #129-Vorspann), N-20, N-22..N-32, N-33(c)(e), N-34, N-36, N-38..N-41, N-43..N-46 --
+  Traeger wie in der Tafel (RN-27/RN-26/RN-19/RN-05/RN-36/RN-07/RN-13/RN-17/RN-28);
+  N-37 bleibt beim S-13-Bau (Markertext (i)-(v) inhaltsabhaengig, Tafel weist den
+  Datei-Anfasser-Zug zu); N-42 bleibt bei RN-05 (die 3 Tagesdokumente liegen NICHT im
+  super-Repo -- grep "max. 4 Docks" trifft dort nur das Tafel-Zitat).
+* 27.1.I L-01..L-04, L-05-Rest (test_rcu + Diff-Hygiene vor main-FF), L-06 (Warnungs-
+  Review ZWEIMAL am gemergten Endstand), L-08, L-10..L-17 (Lande-/docs-/Board-Zuege;
+  L-13a-Anker frisch messen, F3-07).
+* 27.1.J T9-Folgeauflagen W1L-1..W1L-9 (T9(a)-(d) selbst: F3-11-SPERRE beachtet, NICHT
+  erneut ausgefuehrt), T9b, T10/T10b/T10c, T11-Rest (Bericht-Nenner 6->7, s13-Bedarfs-
+  liste, Board-#112, K-3-REST, T-9-Codex-Pass), T11b, T13 (+F3-13-Anker-Doktrin), T14,
+  T15-Rest (E11-A1/A3/A4 + E11-B1 -> golden-Zug-V0-Gegenlese/T7-Docs; Objekt =
+  e11-fehlerklassen-design.md in backups-workflow, F3-14-SPERRE zur F6-Notiz beachtet:
+  NICHT ausgefuehrt), T16, EP-3 (RN-34-Beweislauf).
+* 27.4.2 E-01, E-02, E-03 (Fallen-/Memory-Zug Lead-only), E-04, E-05, E-07 (Rezept-
+  Traeger #18-Vorlauf; Doktrin in diesem Zug GELEBT, s. 27.6.1), E-08, E-09-Rest
+  (KLEIN-1-Ledger-Verbuchung mit Beleg a84f1119).
+* 27.5.2 F3-06 (CI-Beleg, Token tabu), F3-08-Rest (Saeuberung + Board-Metadata, Lead),
+  F3-13 (F-106-Folge-Zug), F3-15 (golden-Zug-Terminierung in den #114-Zug, S-4),
+  F3-16-Rest (kampvor-super-Merge, CR-2), F3-17 (Lead-Pflicht VOR naechster Owner-
+  Vorlage: D-04 ist owner-BEANTWORTET).
+* GG2-1-Rest: KON122-Ledger-Vermerk (RN-27, Lead-only).
+
+### 27.6.3 TRIAGE [C] -- OWNER-GATED, OFFEN (NICHT gefahren)
+
+VO3-1 (27.1.D; Designplan D-8, Vorlage vor Mi 26. 06:00) * EP-2/#138/N-16 C1-B1-B8-
+Umfangs-Entscheid (faellt MIT #91/D-08 vor Mi 26. 06:00) * N-17 (D-01-Stufe-3, gated R5) *
+N-19 (C2-Folge-Bau, gated R2) * N-21 (GN-9-Eingangs-Korrektur: Auflage frische Messwerte,
+Owner-Kalibrier-Frage L-20/GN-9) * N-33(d) (O2-Standard-Owner-Entscheid) * N-47
+(D-11(b)-Wiedervorlage, RN-05) * N-48 (R-TAFEL V3, RN-05 SOFORT) * CR-9-Rest F-13
+(Codex-14-Klassen-Scope vor main-FF) * L-20-Ownerteile (F-71..F-77/F-123/R7; P5/OG-6
+64-vs-128-hex; GN-9/O4) * W135-Dritturteile soweit OWNER-ENTSCHEID.
+
+### 27.6.4 GEGENZAEHLUNG + LANDEREIF-VERMERK (beide Mengen, V-8)
+
+    GEFAHREN [A]:  12 Posten-Zeilen -- ph89-1/2/3, KLEIN-2, KLEIN-3, KLEIN-4(F-147),
+                   L-07, EP-1(#137/N-12), A-KW-1, A-KW-2, F3-09-Raeumung,
+                   F3-08-Sichtung+Uebernahme; dazu GG2-1-Gegenprobe als Teilvollzug.
+                   ce-Commits: 22c6c62e, b4c007db, c39a51c2, 6285621f, 0ffec635,
+                   926f8d70 (6 Commits, jeder Zyklus literal 545/545 gruen).
+                   super-Commits: c70f23fc (A-KW) + dieser Rueckschrieb-Commit.
+    NICHT GEFAHREN: [B]-Menge (27.6.2, mit Traegern) + [C]-Menge (27.6.3, Owner) --
+                   VOLLSTAENDIG benannt, nichts stillschweigend herausgefallen; die
+                   ERLEDIGT-DURCH-OBJEKT-/SPERR-Zeilen der Tafel (N-03/E-06, N-35, L-09,
+                   L-18/L-19, KLEIN-1/E-09, T9(a)-(d)/F3-11, F3-14-F6-SPERRE, D-11)
+                   wurden BEACHTET und nirgends doppelt gebaut.
+    LANDEREIF-KANDIDATEN (KEINE Landung durch diesen Zug, Landung = Lead im Lande-Zug):
+                   ce `bau/w2-abschluss-fixes` @ 926f8d70 (Basis 943c70ee) und
+                   super `bau/wellenplan-offene-punkte` (Designer-Kette fdfb5d9d..6196c90f
+                   + c70f23fc + Rueckschrieb; K16: Designer-Endstand unangetastet
+                   fortgeschrieben). Push je mit Koeder-Probe + gitleaks-Delta + ci.skip.
+    FALLEN-NOTIZ (fuer Fallen-Register-Zug, RN-27): gitleaks 8.30.1 -- der All-K-Koeder
+                   "glpat-"+20x'K' beisst NICHT mehr (Entropie-Schwelle der Default-Regel);
+                   wirksame Koeder-Form = glpat- + 20 gemischte Zeichen (RC=1 bewiesen).
