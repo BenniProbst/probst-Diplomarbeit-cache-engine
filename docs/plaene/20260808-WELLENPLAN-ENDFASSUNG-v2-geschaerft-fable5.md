@@ -5292,3 +5292,31 @@ dieses Branches bringt den Fix nach dev, bevor S-2f die Stellen anfasst.
 **VERIFY-VERMERK (Fable 5 max, adversarisch, 24.08.2026):** Tafel + Fixe TRAGEN am Objekt;
 mit den vier 27.7.1-Zeilen ist die Differenzmenge geschlossen. Das W2-ABSCHLUSS-GATE (27.3)
 gilt unveraendert und erfasst 27.7.1 mit.
+
+## 27.8 A2.5-FIX-STUFE RUNDE 1 -- QUITTUNGEN (#139 Phase 4, 24.08.2026 12:4x-13:0x UTC)
+
+ADDITIV: keine Zeile oberhalb geloescht oder veraendert. Eingang = Fund-Liste des
+27.7-Verify VOLLSTAENDIG (9 Funde; NOTIZ-/KLEIN-Klassen als volle Funde uebernommen,
+A2.5-Doktrin). Jede Quittung dreiwertig mit Objekt-Messung; Voll-Belege + Literal-Logs:
+~/backups-workflow/20260824-w2-abschluss-design/A25-FIX-STAND.md + fixlogs/a25-r1-*.log.
+
+| # | Fund | Quittung | Kern-Beleg |
+|---|---|---|---|
+| 1 | GG3-1 S2/D-0 T18..T23 dangelnd | VERTAGT | Defekt LIVE bestaetigt (grep T18 in S2 = genau 1 Ankuendigungs-Treffer Z.311); Grund: S2-Datei = Beweisort des W2-Audit-Zugs ausserhalb der Auftrags-Worktrees + EIN-Schreiber-je-Datei + Buendelung EIN S2-Nachtrag; Platz RN-27-Umfeld Di-25/W2; Task 27.7.1/GG3-1 |
+| 2 | GG3-2 S2/D-6.5 89->86 | VERTAGT | Defekt LIVE bestaetigt (S2 Z.991 "89" vs. eigene D-6.1-Zerlegung Z.957-959 "= 86" zweimal, Summe nachgerechnet 86); Grund/Platz/Task wie #1 (27.7.1/GG3-2) |
+| 3 | GG3-3 S2/D-1 22-vs-23 Fund-IDs | VERTAGT (S2-Seite) | Defekt LIVE bestaetigt (S2 Z.331+965 "22" ohne Inklusionsregel); Wellenplan-Seite bereits BEHOBEN (s. #9); Grund/Platz/Task wie #1 (27.7.1/GG3-3) |
+| 4 | GG3-4 S2-Voll-Ratifikation fehlt | VERTAGT | LIVE bestaetigt (kein Fable-Ratifikations-Abschnitt in S2, nur 2 Hermite-Fremdtreffer; mtime 08:17:45Z); Voll-Ratifikation ~50 D-Literale = eigene S2-Fable-Neufahrt/Lead-Abnahme, Abnahme-Spalte verlangt DENSELBEN Schreiber wie GG3-1..3; Platz RN-27-Umfeld Di-25/W2; Task 27.7.1/GG3-4 |
+| 5 | F3-06/F-126-Statuswechsel (27.7.2) | BEHOBEN | Rot/Gruen literal: Parent 25211eb4 "CI 16150 SUCCESS"=0, HEAD=1; Beleg-Kopien selbst gelesen (r4-pipelines-lage Z.3 "16150 success development 943c70ee" + ci-16150-jobs.json 27 Jobs {manual,success} 0 failed); Drittbestaetigung dev-Tip 348f54f4 "F-126 zu" |
+| 6 | F3-09-Naht-Vermerk (27.7.2) | BEHOBEN | Rot/Gruen: Parent "SEKUNDENGLEICH"=0, HEAD=1; Slot-Lage 12:51:59Z am Objekt: slot1 WEG, slot3.d wer 12:00:03 + TERMINAL 12:20:50 + Uebergabe, slot2.d fremd unangetastet (Z15 dort ABGESCHLOSSEN 12:29:53, CI 16184 SUCCESS 9/9) |
+| 7 | B-1 DESIGN-90-Deklaration (27.7.3) | BEHOBEN | Rot/Gruen: Parent "ADDITIVITAETS-DEKLARATION DESIGN-90"=0, HEAD=1; Dreifach-Konservierung gegen-gemessen: dev-DESIGN-90 traegt die 3 Alt-Zeilen LIVE (:53/:54/:303; dev-Historie seit fdfb5d9d LEER) + 27.1.J + 27.6.1; Verify-Commit 96/0 |
+| 8 | KF-1 S-2f-Doppelbau-Sperre (27.7.4) | BEHOBEN | Rot/Gruen: Parent "KOORDINATIONS-SPERRE S-2f"=0, HEAD=1; WIRKSAMKEIT LIVE 12:49-12:50Z: fetch origin/development=348f54f4, git log fdfb5d9d..dev -- DESIGN-90 = LEER (KEIN Doppelbau), 71db791a nicht ancestor -> konfliktfreie Merge-Lage; Rest-Retirement traeger+abnahme-gebunden in 27.7.4 selbst ([B] Lande-Zug/Lead) |
+| 9 | KF-2 F3-20-Zaehlwerk datiert (27.7.1) | BEHOBEN (Wellenplan-Seite) | Rot/Gruen: Parent "DREI datierte Zaehlwerke"=0, HEAD=1 (GG3-3-Zeile mit Basis+Datum-Pflicht); S2-seitige Regel-Deklaration = Bestandteil #3 |
+
+ZAEHLWERK RUNDE 1: 9 Funde = 5 BEHOBEN + 0 ENTLASTET + 4 VERTAGT (alle 4 mit Grund +
+Wellen-Platz RN-27-Umfeld Di-25/W2 + Task-Nummer 27.7.1/GG3-1..4; gebuendelt EIN
+additiver S2-Nachtrag durch den naechsten S2-Schreiber). ce-Branch: 0 Nacharbeiten
+(bleibt @ 926f8d70 LANDEREIF-KANDIDAT). NICHT quittungspflichtig: fix_nachpruefung
+12/12 CONFIRMED (Bestaetigungen) + unveraenderte [C]-Owner-Menge 27.6.3.
+A2.5-VERDIKT RUNDE 1: FUNDE_OFFEN (die 4 GG3-VERTAGT leben mit Platz+Traeger; im Zug
+selbst ist NICHTS mehr offen). Naechste A2.5-Runde erst nach dem S2-Nachtrag sinnvoll
+(Gegenstand laege sonst erneut ausserhalb der Auftrags-Worktrees).
