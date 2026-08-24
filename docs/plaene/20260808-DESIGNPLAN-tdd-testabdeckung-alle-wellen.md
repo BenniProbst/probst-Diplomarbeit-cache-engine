@@ -234,6 +234,17 @@ PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
+> UEBERHOLT-MARKER 24.08.2026 (par.13/D-7): die obige Ankertafel ist die PZW-Schema-Stellen-
+> Zaehlung (`lazy_csv_header()`-Aufrufstellen) und bleibt fachlich unveraendert gueltig -- sie
+> ist NICHT der ctest-Gesamtnenner (Floor-Anker). Der Floor-Anker (T-11b/T-17-Kombibau-Nenner,
+> `scripts/ci_test_inventory_floor.txt`) ist durch die o2-Standard-Landung (Strang f82dfaeb,
+> Lead-Merge b3dc3e93 lokal fertig/ungepusht) von 544/540/538 auf 545/541/539 gestiegen
+> (+1-Regel `test_o2_standard_opt_default`) -- s. par.13.2/D-7 fuer die Herleitung. Zwei
+> verschiedene Einheiten, zwei verschiedene Zahlen; wer sie verwechselt, wiederholt die
+> Fehlerklasse, die dieser par.9-Abschnitt selbst korrigiert.
+
+[LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
+
 > NACHZUG 24.08.2026 abends (W2-S1+S2-Lande-Zug/Z23, Fahrplan Board #131; Gitlink-Ziel ce
 > `943c70ee` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug, zusammen
 > mit dem prt-art-Gitlink `d11781fa` -> `16c90628`; WIE GEMESSEN, nicht gerechnet):
@@ -727,3 +738,247 @@ Kuerzel-Pruefung wird ROT (Paar-Identitaet, r4 A-04/r5 A30).
 
 **Summen-Regel (unveraendert):** 117/386 h bleiben unangetastet; T-12a–e sind erst zu addieren,
 wenn die S-Strecke (§10/D-4) mit-durchgezaehlt wird — sonst der T-3-Fehler aus §9.
+
+---
+
+## 13. NACHTRAG -- W2-ABSCHLUSS-GATE + DESIGN-WIRKSAME NEUFUNDE SEIT 20.08.2026 (24.08.2026)
+
+**Status (KON19-00):** Fortschreibung von par.9/par.10/par.11/par.12 nach demselben Muster;
+nichts geloescht, nichts an den Summen (117/386h bleiben unangetastet, s. par.10/D-4-Summen-
+Regel). Anlass: Owner-Order 23.08.2026 spaet (verbatim-Kern: "Design bitte mit ultracode aus
+Rekonstruktion und nachverbuchung ... und ALLE (auch kleine) Regressionen und Nacharbeiten im
+Wellenplan als Pflicht fuer den Abschluss von Welle 2 verbucht ... OHNE JEGLICHE ... Regression
+an Welle 3 zu uebergeben") -- Volltext + Delta-Tafel im Wellenplan `docs/plaene/20260808-
+WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md` par.27. Dieser Designplan-Nachtrag traegt die
+TESTSEITEN-/DESIGN-Haelfte derselben Owner-Order (der Wellenplan die Wellen-/Traeger-Haelfte).
+
+### 13.1 -- DAS W2-ABSCHLUSS-GATE ALS VERTRAGS-PUNKT
+
+Wellenplan par.27.3 definiert das W2-ABSCHLUSS-GATE: Welle 2 gilt erst als abgeschlossen, wenn
+die dortige Delta-Tafel (par.27.1.A-J) leer ist ODER jeder Rest ein dokumentierter, aktueller
+Owner-Entscheid ist (Kategorie-C-Doktrin, par.21.0/21.6 des Wellenplans -- niemals eine Lead-
+Ableitung). **Dieser Designplan uebernimmt das Gate als eigenen Vertrags-Punkt der Testseite**,
+gleichrangig mit dem TDD-Vertrag T-1..T-9 (par.3) und den Wellen-Testlast-Regeln (par.4): kein
+Paket der W2-Abnahme gilt als abgenommen, solange sein Anteil an der Wellenplan-par.27-Tafel
+offen ist. Das ist keine Verdopplung des Gates, sondern seine Bindung an die Testabnahme, wo
+sie bisher fehlte (par.6 des Wellenplans, "Verifikationsvertrag", nannte bislang keine
+Testseiten-Kopplung fuer Nachtrags-Tafeln dieser Art).
+
+### 13.2 -- DESIGN-WIRKSAME NEUFUNDE SEIT 20.08.2026
+
+**D-7 -- O2-Standard-Landung aendert den Floor-Anker (Quelle: Wellenplan par.27.1.G/CR-1,
+Session-Dokumentation Abschn. 9b).** Die o2-standard-Landung (Strang-Tip **f82dfaeb**, Lead-
+Rescue-Merge lokal fertig als **b3dc3e93**, NOCH NICHT gepusht) traegt EINEN unbedingten neuen
+Test (`test_o2_standard_opt_default`) -- die **+1-Regel**: der Floor-Anker (ctest-Gesamtnenner
+je Host-Klasse, `scripts/ci_test_inventory_floor.txt`) steigt dadurch **544/540/538 ->
+545/541/539** (LIVE gemessen am Merge-Endstand, `ctest -N` literal "Total Tests: 545"). **Das
+ist NICHT dieselbe Zahl wie die PZW-Anker in par.9** (dort zaehlen STELLEN/DATEIEN/LITERAL die
+`lazy_csv_header()`-Aufrufstellen -- eine andere Einheit, gemessen am ce-Gitlink-Stand
+66de5c09, Nenner 530 Test-.cpp); der Floor-Anker ist der T-11b/T-17-Kombibau-Nenner
+(Wellenplan-Doktrin, Quer-Auflage G8/H5 der S2-Lande-Tips). **Wirkung auf diesen Designplan:**
+T-11b (par.11, KOMBIBAU-2x2-MATRIX ALS PRUEFNORM) und die "K17-Vollkombibau EINMAL am
+Endstand"-Quer-Auflage (Wellenplan-S2-Tip T17) muessen ab der o2-Landung den NEUEN Nenner
+545/541/539 fuehren, nicht mehr 544/540/538 -- der Kombibau-VERTRAG selbst (4 Zellen je
+literale ctest-Bilanz) aendert sich nicht, nur der erwartete Zahlenwert.
+
+> UEBERHOLT-MARKER 24.08.2026 (par.13): jede Stelle in par.9/par.11/par.12, die "544" bzw.
+> "540/538" als aktuellen ctest-Gesamtnenner referenziert (insbesondere die PZW-Historie-Tafeln
+> in par.9.5, zuletzt am Stand ce 66de5c09/Nenner 530 Test-.cpp gemessen -- ANDERE Einheit,
+> s.o.), bleibt als HISTORISCHE Momentaufnahme stehen; der lebende Floor-Wert NACH der
+> o2-Landung ist 545/541/539 (par.13.2/D-7). Kein Nachrechnen der PZW-Zahlen noetig -- die
+> betreffen die Schema-Stellen-Zaehlung, nicht den Floor.
+
+**D-8 -- Vendor-O3-Reichweiten-Frage ist owner-gated und beruehrt die Fingerprint-Doktrin
+(Quelle: Wellenplan par.27.1.D).** `CMAKE_CXX_FLAGS_RELEASE`-Default "-O3 -DNDEBUG" laesst
+Vendor-/FetchContent- und Direktblock-Test-Uebersetzungseinheiten effektiv mit -O3 bauen
+(**351 von 643 Treffern, messwirksam**). Das ist eine Design-Frage, keine reine Betriebs-
+Frage: die **Fingerprint-Doktrin** (GOAL-Dossier Teil VI.4, "Mess-Achsen + System-Achsen +
+Organ-Achsen identisch -> identische Binary -> identische Messdaten") haengt an genau dieser
+Optimierungsstufen-Konsistenz. Zwei Optionen liegen dem Owner vor (Wellenplan par.27.1.D
+VO3-1): (a) Vendor bleibt -O3 (deklarierte SYSTEM-Isolation, kein Fingerprint-Bruch) oder
+(b) global -O2 (Fingerprint-Neuberechnung noetig, moeglicherweise ALLE bestehenden Binary-
+Identitaeten aendernd). **Bis zur Owner-Antwort gilt (a) als De-facto-Stand** (nichts wurde
+stillschweigend gedreht) -- diese Fassung ist die dokumentierte Momentaufnahme, keine
+Entscheidung.
+
+**D-9 -- ph89-Kanon-Richtungs-Entscheid: M13-Absorption VOR erster produktiver Konsumierung
+(Quelle: Wellenplan par.27.1.B/ph89-1, Board #89).** `kBegriffsAliasRegistry` (ph89) und die
+M13-Registry kanonisieren die Ebene-0-Begriffe in ENTGEGENGESETZTER Richtung (4 von 7 Gruppen:
+ph89 deklariert `node4`/`w`/`ma`/`mi` als kanonisch, M13 kanonisiert `SPARSE_NODE4_ART`/
+`wallclock`/`macro`/`micro`) -- ein Test (Z.87) pinnt bewusst die Gegenrichtung. Das ist heute
+**folgenlos**, weil `kBegriffsAliasRegistry` noch **0 Produktions-Konsumenten** hat.
+**Design-Entscheidung, hiermit getroffen:** die M13-Absorption (Angleichung der ph89-Alias-
+Paare an den M13-Kanon, ODER umgekehrt -- Registry 7->8 Zeilen + `begriffe_disjunkt` + Asserts
++ CT-Kreuz-Wache) wird **VORGEZOGEN vor die erste produktive Konsumierung** von
+`kBegriffsAliasRegistry`, nicht erst "nach Trigger" wie der urspruengliche ph89-Bericht vorsah
+(T11-2 der Wellenplan-S2-Lande-Tips). Begruendung: ein zweiter Flip NACH dem ersten
+Konsumenten ist ein golden-brechender Nachtrag (dieselbe Klasse wie der Preimage-Bruch bei
+einer spaeten AxisKind-Drehung, Wellenplan par.17.5-Analogon); ein Flip VOR dem ersten
+Konsumenten ist ein reiner Registry-Edit ohne Bau-Ripple.
+
+**D-10 -- #135-Workaround-Konformitaets-Pruefpflicht wird EIGENE TDD-Testklasse T-13 (Quelle:
+Wellenplan par.27.1.E, Board #135 Owner-Dauerregel 23.08.2026).** Owner-Dauerregel, verbatim-
+Kern: *"'geloest' [heisst] nicht automatisch konform ... workarounds [muessen] konform nach
+Plan gegengeprueft und als Struktur-Regression behandelt werden."* Das ist eine STRUKTURELLE
+Ergaenzung des TDD-Vertrags (par.3), nicht nur eine Betriebsregel:
+
+    T-13  WORKAROUND-KONFORMITAET (NEU, 24.08.2026, Board #135): jeder Heilungs-/
+          Workaround-Commit einer CI-Rot-Kette braucht VOR seiner Abnahme ein
+          dokumentiertes Urteil KONFORM / REGRESSION / OWNER-ENTSCHEID gegen
+          Designplan + Wellenplan + GOAL v8 + die einschlaegigen KON-Entscheide.
+          CI-gruen allein ist KEIN Konformitaets-Beweis (GOAL-Teil-IV.1-Klasse, sinngemaess:
+          ein falsches Messgeraet faellt irgendwann auf, ein richtiges am falschen
+          Gegenstand nie -- es gibt nichts, was klappern koennte).
+          Koeder-/Abnahme-Form: das Urteil traegt eine Begruendungs-Zeile MIT
+          Zitat der geprueften Plan-Stelle -- ein Urteil ohne Zitat gilt als
+          nicht geprueft (dieselbe Form-Pflicht wie T-5, ORAKEL UNABHAENGIG).
+
+**Sieben Posten stehen heute unter T-13, keiner verdiktet** (vl3-Maskierung Form a/b/c, PMC-
+Riegel+AUSWEIS, B06-Test-Harmonisierung, TemplateWithUnknownRef-Haertung, stringop-overflow-
+Duldung, NSDMI-Fixmuster -- Einzelzeilen mit Traeger/Frist in Wellenplan par.27.1.E). **T-13
+gilt als eigene, GEZAEHLTE Testklasse ausserhalb des 117er-Katalogs** (dieselbe Summen-Regel
+wie T-11a-c/T-12a-e, par.10/D-4/par.11/par.12: erst zu addieren, wenn die S-Strecke mit-
+durchgezaehlt wird).
+
+### 13.3 -- SUMMEN-REGEL (unveraendert)
+
+117/386 h bleiben unangetastet; T-13 (wie T-11a-c/T-12a-e vor ihr) ist erst zu addieren, wenn
+die S-Strecke (par.10/D-4) mit-durchgezaehlt wird -- sonst der T-3-Fehler aus par.9.
+
+---
+
+## 13.4 FABLE-MAX-ABNAHME DES par.13-NACHTRAGS (24.08.2026) + ZWEI NEUFUNDE
+
+**Status:** additive Abnahme nach demselben Muster wie par.9/par.13; nichts geloescht,
+nichts an den Summen (117/386h bleiben unangetastet, par.10/D-4-Summen-Regel).
+
+**Anlass:** der Erst-Lauf dieses par.13-Nachtrags (Commit 6400f6dc, 106 Insertionen) lief
+durch einen automatischen Credits-Fallback auf einem NIEDRIGEREN Modell als der Owner-Order
+"Design IMMER mit Fable 5 max" entspricht. Die Erst-Lauf-Fassung bleibt vollstaendig stehen;
+dies ist die Fable-5-max-Abnahme am Objekt. Wellenplan-Schwester: par.27.4.
+
+**PRUEFUMFANG (Nenner):** Designplan 829/829 Zeilen selbst voll gelesen (par.0-12 Bestand +
+par.13 Erst-Lauf + der par.9.5-Marker aus 0c6ee745); Gegen-Quellen: Wellenplan 4690/4690,
+GOAL 816/815, ARBEITSWEISE 1264/1264, Session-Nachverbuchung 328/328 (Abschn. 9b/9c-K/9d),
+ZUG-BILANZ Abschn. 4/7-9, Board-JSONs #89/#131/#135/#136/#137/#138.
+**Zeilenpruefung:** 106/106 Insertionen des par.13-Commits + 9/9 des par.9.5-Markers
+geprueft, 0 Deletionen.
+
+### 13.4.1 ABNAHME-URTEIL JE ABSCHNITT
+
+| Abschnitt | Urteil | Beleg der Gegenpruefung |
+|---|---|---|
+| 13.1 W2-Abschluss-Gate als Vertrags-Punkt | **TRAEGT** | Bindung an Wellenplan par.27.3 korrekt zitiert; die Feststellung "par.6 des Wellenplans nannte bislang keine Testseiten-Kopplung fuer Nachtrags-Tafeln dieser Art" am Objekt bestaetigt (V-1..V-8 tragen Wachen-/Paket-Formeln, keine Nachtrags-Tafel-Kopplung) |
+| 13.2 / D-7 Floor-Anker 544/540/538 -> 545/541/539 | **TRAEGT** | Session-Nachverbuchung 9b: Lead-Merge b3dc3e93, `ctest -N` LIVE "Total Tests: 545", +1-Regel `test_o2_standard_opt_default`; Einheiten-Trennung zu den PZW-Ankern (Schema-STELLEN, ce 66de5c09, Nenner 530 Test-.cpp) sauber gefuehrt |
+| 13.2 / D-8 Vendor-O3 owner-gated | **TRAEGT** | Board-#136-Metadata `owner_vorlage_zusatz_o2` woertlich: 351/643, Optionen (a)/(b), "kein stiller Dreh"; die De-facto-(a)-Feststellung ist als Momentaufnahme, nicht als Entscheid gefuehrt |
+| 13.2 / D-9 M13-Absorption vor erster Konsumierung | **TRAEGT** | Board-#89-Metadata: 4/7 Gruppen Gegenlauf, Test Z.87 pinnt die Gegenrichtung, "kein Produktiv-Konsument", Traeger "M13-Absorptions-/Staffel-3-Zug VORGEZOGEN vor erste produktive Konsumierung" -- die Design-Begruendung (Flip nach dem ersten Konsumenten = golden-brechend) ist eine zulaessige Ableitung und als solche formuliert |
+| 13.2 / D-10 + T-13 Workaround-Konformitaet | **TRAEGT** | Board-#135 fuehrt exakt die sieben Posten, das dreiwertige Urteil und den Satz "CI-16101-SUCCESS ist Loesungs-, NIE Konformitaets-Beweis"; die Erhebung zur eigenen GEZAEHLTEN Testklasse ausserhalb des 117er-Katalogs ist regelkonform (dieselbe Summen-Sperre wie T-11a-c/T-12a-e) |
+| 13.3 Summen-Regel | **TRAEGT** | 117/386h unberuehrt; T-13 nicht eingerechnet |
+| par.9.5-Marker (0c6ee745) | **TRAEGT** | die Trennung "PZW-Schema-Stellen != ctest-Floor" ist die richtige Fehlerklassen-Vermeidung; er bezeichnet die par.9-Ankertafel korrekt als weiterhin gueltig |
+
+**Keine UEBERHOLT-Korrektur am par.13-Text noetig** -- im Unterschied zur Wellenplan-Haelfte
+(dort 6 Korrekturen, par.27.4.1) hielt die Designplan-Haelfte der Objektpruefung vollstaendig
+stand. ERGAENZT werden zwei design-wirksame Neufunde, die der Erst-Lauf nicht fuehrte:
+
+### 13.4.2 D-11 -- DAS FLOOR-GATE MUSS MIT DER o2-LANDUNG UMGESTELLT WERDEN (Testseiten-Pflicht)
+
+Der Endstand-Beweis des Lande-Zugs fuehrt zwei Aussagen, die zusammen einen Handlungsposten
+ergeben, den bisher KEINE Seite als solchen fuehrte:
+  * ZUG-BILANZ 9b (Stand ce 3841d717): *"Floor-Anker 544/540/538 bleibt gueltig, Gate [5/6]
+    bleibt '544 == 544'"* -- begruendet mit dem Struktur-Befund, dass
+    `COMDARE_add_test` **ein add_test je Test-BINARY** registriert (nicht
+    `gtest_discover_tests`), weshalb neue gtest-FAELLE in bestehenden Binaries **null** neue
+    ctest-Eintraege erzeugen.
+  * Session-Nachverbuchung 9b (Lead-Rescue-Merge **b3dc3e93**): der o2-Strang bringt EINEN
+    **unbedingten neuen Test** (`test_o2_standard_opt_default`) -- also eine neue
+    Registrierung, nicht nur einen neuen Fall -> Floor **545/541/539**.
+**Design-Folge (T-11b-Anschluss):** beim Push von b3dc3e93 wird `scripts/ci_test_inventory_floor.txt`
+im SELBEN Zug mitgezogen und die Gate-Erwartung [5/6] auf **"545 == 545"** umgestellt; alle
+vier K17-Zellen tragen dann literal 545. Wird das vergessen, faellt das Gate falsch-rot bzw.
+prueft den falschen Nenner -- exakt die Klasse "geteilte Zaehlwerke EINMAL live messen, nie
+Deltas addieren" (ARBEITSWEISE A2.1b(3)). Traeger: Wellenplan RN-01/CR-1 (par.27.4.2 E-10).
+**Abnahme:** Gate [5/6] literal "545 == 545" + Floor-Restore byte-gleich + vier Zellen 545.
+
+### 13.4.3 D-12 -- ZWEI PFLICHT-BEWEISLAEUFE AN #114, NICHT EINER (T-12-Umfeld)
+
+Der Erst-Lauf las die beiden #114-Laeufe als einen Gegenstand. Am Objekt sind es zwei, beide
+mit Frist Mi 26.08. 06:00 (Volltext + Traeger: Wellenplan par.27.4.1/K-D):
+  (i) **B10-Beweislauf** (B5.b-Emitter, Mini-Profil <= 8 Binaries, XML-Differenz-Laeufe je
+      Achsen-Familie): emittiert die ECHTEN `E07_*`-Zeilen -- erst damit kann das Gate GO
+      werden. Testseite: der Pruefer steht und ist doppelt biss-bewiesen; was fehlt, ist der
+      GEFAHRENE Lauf (T-1-Klasse: eine gebaute Wache ohne gefahrenen Biss zaehlt nicht).
+  (ii) **E07-Q1-Default-A-Re-Run** (<1h, Rezept `b10-beweislauf/BEWEIS.md` Par.9) auf der
+      FINAL eingefrorenen Trigger-Linie -- eine WIEDERHOLUNG des Laufs, der trigfix 0f900dcf
+      auf Basis 66de5c09 bewiesen hat.
+**Design-Folge:** die Abnahme des Trigger-Gates nennt BEIDE Mengen (V-8 / "ein gruenes Gate
+deckt nur seinen Gegenstand"); ob ein einziger Lauf beide Zwecke erfuellt, ist am Objekt
+(BEWEIS.md Par.9) zu entscheiden und zu protokollieren, nicht anzunehmen.
+
+### 13.4.4 SUMMEN-REGEL (unveraendert)
+
+117/386h bleiben unangetastet; D-11/D-12 sind Abnahme-/Vertragspflichten bestehender Posten
+(T-11b bzw. T-12-Umfeld), keine neuen Katalog-Eintraege. T-13 bleibt wie in 13.2/D-10
+GEZAEHLT ausserhalb des 117er-Katalogs, addierbar erst mit dem Durchzaehlen der S-Strecke
+(par.10/D-4).
+
+---
+
+## 13.5 FABLE-MAX-ABNAHME FAHRT 3 (24.08.2026) + STATUS-FORTSCHREIBUNG D-11 + D-13
+
+**Status:** additive Abnahme; nichts geloescht, nichts an den Summen (117/386h, par.10/
+D-4-Summen-Regel). **Anlass:** die Fahrt, die par.13.4 schrieb (f79d4192), fiel um
+07:59:57Z STUMM auf Opus 5 (Consent-Prompt-Mechanik in Background-Sessions) -- ihr
+Abnahme-Vermerk war provenienz-tainted. Diese dritte Fahrt lief nach gespeicherter
+Fable-Consent-Wahl; Wellenplan-Schwester: par.27.5 (dort die volle Delta-Tafel
+F3-01..F3-20 und das Zeilenpruefungs-Urteil 701/701).
+
+**PRUEFUMFANG dieser Fahrt (Nenner):** par.13 (106/106 Insertionen) + par.13.4 (76/76) +
+par.9.5-Marker (9/9) am Objekt; Gegen-Quellen VOLL inkl. der GEWACHSENEN Fassungen, die
+keiner Vorfahrt vorlagen (SYNTHESE-S1-AUDIT 654/654 mit DRITT-ABGLEICH Abschn. 7,
+SYNTHESE-S2-AUDIT 1009/1009 mit DRITT-ABGLEICH D-0..D-6) + eigene Live-Messungen 24.08.
+11:3x UTC (B.3-Protokoll: ~/backups-workflow/20260824-w2-abschluss-design/ARBEITSSTAND.md).
+
+### 13.5.1 ABNAHME-URTEIL
+
+**Alle 7 Urteile aus 13.4.1 sowie D-11 und D-12 sind am Objekt BESTAETIGT -- 0 Fehler.**
+13.1 (Gate-Bindung), 13.2/D-7 (Floor 545/541/539, Einheiten-Trennung zu PZW), D-8
+(Vendor-O3 owner-gated, De-facto (a)), D-9 (M13-Absorption vorgezogen), D-10/T-13
+(sieben Posten, dreiwertiges Urteil), 13.3 (Summen-Regel), par.9.5-Marker: tragen
+unveraendert. D-12 (zwei #114-Beweislaeufe) traegt; die Entscheidung "ein Lauf oder
+zwei" bleibt ein OBJEKT-Entscheid des Traegers (BEWEIS.md Par.9).
+
+### 13.5.2 STATUS-FORTSCHREIBUNG D-11 -- DIE FLOOR-GATE-UMSTELLUNG IST VOLLZOGEN
+
+Eigene Messung 24.08. 11:3x: ce development lokal == origin == github == **943c70ee**
+(Kette f82dfaeb -> b3dc3e93 -> 943c70ee); der Z12-Lande-Lauf (24.08. 07:27-07:46Z,
+Beweisort ~/backups-workflow/20260822-lande-zug/Z12/) fuhr K17 4/4 Zellen je LITERAL
+"100% tests passed, 0 tests failed out of 545" und Gates 6/6 GRUEN mit [5/6] literal
+"545 == 545 (exakt)" -- **die D-11-Pflicht (Floor-Datei + Gate-Erwartung im selben Zug)
+ist damit AM OBJEKT ERFUELLT**; die D-11-Zeile bleibt als Vertrags-Regel fuer jede
+kuenftige +1-Landung stehen. OFFEN aus dem D-11-Umfeld: der CI-TERMINAL-Beleg fuer
+943c70ee (F-126-Klasse, fail-closed; juengster belegter Terminal-Lauf 16101 @ 3841d717)
+und die test_rcu-Beobachtung -- beide Wellenplan par.27.5.2/F3-01/F3-06.
+
+### 13.5.3 D-13 -- K17-TESTAT-STANDBINDUNG (NEU, Abnahme-Regel aus KORR-D7/H-19)
+
+Ein K17-/T-11b-Testat deckt NUR den Stand, an dem es gefahren wurde ("EIN GRUENES GATE
+deckt nur seinen Gegenstand"): ein Testat gegen 5ddda4e5 deckte den heutigen dev-HEAD
+nicht mehr, nachdem o2-Merge und axis-lock-Regen dahinter lagen (KORR-D7 des
+S2-DRITT-ABGLEICHS). **Design-Regel, hiermit Vertrags-Punkt der Testseite:** (a) jedes
+K17-Testat nennt seinen Commit-Stand im Protokoll-Kopf; (b) Abnahmen, die "am Endstand"
+fordern, binden an den dev-Tip AM ZUGTAG, frisch gemessen (H-19: das gilt insbesondere
+fuer das super-Gitlink-Bump-Ziel, dessen np34-Patch-Match-Probe bei jeder super-Bewegung
+zu wiederholen ist); (c) die Treppen-Protokollvorlage nutzt rc=${PIPESTATUS[0]} und
+explizite Build-Pfade (F-145-Klasse: eine Pipe-RC-Quittung ist KEIN Beweis; als
+Bilanz-Beleg zaehlt nur die literale ctest-Ausgabe). Traeger: T-11b/T-17-Ausfuehrung
+(Wellenplan RN-01/RN-18); kein neuer Katalog-Posten.
+
+### 13.5.4 SUMMEN-REGEL (unveraendert)
+
+117/386h bleiben unangetastet; D-13 ist eine Abnahme-Regel bestehender Posten (T-11b),
+kein Katalog-Eintrag; T-13 bleibt GEZAEHLT ausserhalb des 117er-Katalogs (13.2/D-10).
+
+**FABLE-MAX-ABNAHME-VERMERK (Fahrt 3, 24.08.2026):** Geprueft 191/191 Designplan-Legacy-
+Zeilen (106 + 76 + 9); Korrekturen an den Vorfahrten-Urteilen: 0 (alle bestaetigt);
+Fortschreibungen: D-11-Vollzugs-Vermerk (13.5.2) + D-13 (13.5.3). **Damit gilt der
+par.13-Nachtrag als von Fable 5 max GEBAUT UND ABGENOMMEN.**
