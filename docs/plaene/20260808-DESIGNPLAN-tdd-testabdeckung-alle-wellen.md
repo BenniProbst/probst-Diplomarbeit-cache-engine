@@ -827,3 +827,79 @@ durchgezaehlt wird).
 
 117/386 h bleiben unangetastet; T-13 (wie T-11a-c/T-12a-e vor ihr) ist erst zu addieren, wenn
 die S-Strecke (par.10/D-4) mit-durchgezaehlt wird -- sonst der T-3-Fehler aus par.9.
+
+---
+
+## 13.4 FABLE-MAX-ABNAHME DES par.13-NACHTRAGS (24.08.2026) + ZWEI NEUFUNDE
+
+**Status:** additive Abnahme nach demselben Muster wie par.9/par.13; nichts geloescht,
+nichts an den Summen (117/386h bleiben unangetastet, par.10/D-4-Summen-Regel).
+
+**Anlass:** der Erst-Lauf dieses par.13-Nachtrags (Commit 6400f6dc, 106 Insertionen) lief
+durch einen automatischen Credits-Fallback auf einem NIEDRIGEREN Modell als der Owner-Order
+"Design IMMER mit Fable 5 max" entspricht. Die Erst-Lauf-Fassung bleibt vollstaendig stehen;
+dies ist die Fable-5-max-Abnahme am Objekt. Wellenplan-Schwester: par.27.4.
+
+**PRUEFUMFANG (Nenner):** Designplan 829/829 Zeilen selbst voll gelesen (par.0-12 Bestand +
+par.13 Erst-Lauf + der par.9.5-Marker aus 0c6ee745); Gegen-Quellen: Wellenplan 4690/4690,
+GOAL 816/815, ARBEITSWEISE 1264/1264, Session-Nachverbuchung 328/328 (Abschn. 9b/9c-K/9d),
+ZUG-BILANZ Abschn. 4/7-9, Board-JSONs #89/#131/#135/#136/#137/#138.
+**Zeilenpruefung:** 106/106 Insertionen des par.13-Commits + 9/9 des par.9.5-Markers
+geprueft, 0 Deletionen.
+
+### 13.4.1 ABNAHME-URTEIL JE ABSCHNITT
+
+| Abschnitt | Urteil | Beleg der Gegenpruefung |
+|---|---|---|
+| 13.1 W2-Abschluss-Gate als Vertrags-Punkt | **TRAEGT** | Bindung an Wellenplan par.27.3 korrekt zitiert; die Feststellung "par.6 des Wellenplans nannte bislang keine Testseiten-Kopplung fuer Nachtrags-Tafeln dieser Art" am Objekt bestaetigt (V-1..V-8 tragen Wachen-/Paket-Formeln, keine Nachtrags-Tafel-Kopplung) |
+| 13.2 / D-7 Floor-Anker 544/540/538 -> 545/541/539 | **TRAEGT** | Session-Nachverbuchung 9b: Lead-Merge b3dc3e93, `ctest -N` LIVE "Total Tests: 545", +1-Regel `test_o2_standard_opt_default`; Einheiten-Trennung zu den PZW-Ankern (Schema-STELLEN, ce 66de5c09, Nenner 530 Test-.cpp) sauber gefuehrt |
+| 13.2 / D-8 Vendor-O3 owner-gated | **TRAEGT** | Board-#136-Metadata `owner_vorlage_zusatz_o2` woertlich: 351/643, Optionen (a)/(b), "kein stiller Dreh"; die De-facto-(a)-Feststellung ist als Momentaufnahme, nicht als Entscheid gefuehrt |
+| 13.2 / D-9 M13-Absorption vor erster Konsumierung | **TRAEGT** | Board-#89-Metadata: 4/7 Gruppen Gegenlauf, Test Z.87 pinnt die Gegenrichtung, "kein Produktiv-Konsument", Traeger "M13-Absorptions-/Staffel-3-Zug VORGEZOGEN vor erste produktive Konsumierung" -- die Design-Begruendung (Flip nach dem ersten Konsumenten = golden-brechend) ist eine zulaessige Ableitung und als solche formuliert |
+| 13.2 / D-10 + T-13 Workaround-Konformitaet | **TRAEGT** | Board-#135 fuehrt exakt die sieben Posten, das dreiwertige Urteil und den Satz "CI-16101-SUCCESS ist Loesungs-, NIE Konformitaets-Beweis"; die Erhebung zur eigenen GEZAEHLTEN Testklasse ausserhalb des 117er-Katalogs ist regelkonform (dieselbe Summen-Sperre wie T-11a-c/T-12a-e) |
+| 13.3 Summen-Regel | **TRAEGT** | 117/386h unberuehrt; T-13 nicht eingerechnet |
+| par.9.5-Marker (0c6ee745) | **TRAEGT** | die Trennung "PZW-Schema-Stellen != ctest-Floor" ist die richtige Fehlerklassen-Vermeidung; er bezeichnet die par.9-Ankertafel korrekt als weiterhin gueltig |
+
+**Keine UEBERHOLT-Korrektur am par.13-Text noetig** -- im Unterschied zur Wellenplan-Haelfte
+(dort 6 Korrekturen, par.27.4.1) hielt die Designplan-Haelfte der Objektpruefung vollstaendig
+stand. ERGAENZT werden zwei design-wirksame Neufunde, die der Erst-Lauf nicht fuehrte:
+
+### 13.4.2 D-11 -- DAS FLOOR-GATE MUSS MIT DER o2-LANDUNG UMGESTELLT WERDEN (Testseiten-Pflicht)
+
+Der Endstand-Beweis des Lande-Zugs fuehrt zwei Aussagen, die zusammen einen Handlungsposten
+ergeben, den bisher KEINE Seite als solchen fuehrte:
+  * ZUG-BILANZ 9b (Stand ce 3841d717): *"Floor-Anker 544/540/538 bleibt gueltig, Gate [5/6]
+    bleibt '544 == 544'"* -- begruendet mit dem Struktur-Befund, dass
+    `COMDARE_add_test` **ein add_test je Test-BINARY** registriert (nicht
+    `gtest_discover_tests`), weshalb neue gtest-FAELLE in bestehenden Binaries **null** neue
+    ctest-Eintraege erzeugen.
+  * Session-Nachverbuchung 9b (Lead-Rescue-Merge **b3dc3e93**): der o2-Strang bringt EINEN
+    **unbedingten neuen Test** (`test_o2_standard_opt_default`) -- also eine neue
+    Registrierung, nicht nur einen neuen Fall -> Floor **545/541/539**.
+**Design-Folge (T-11b-Anschluss):** beim Push von b3dc3e93 wird `scripts/ci_test_inventory_floor.txt`
+im SELBEN Zug mitgezogen und die Gate-Erwartung [5/6] auf **"545 == 545"** umgestellt; alle
+vier K17-Zellen tragen dann literal 545. Wird das vergessen, faellt das Gate falsch-rot bzw.
+prueft den falschen Nenner -- exakt die Klasse "geteilte Zaehlwerke EINMAL live messen, nie
+Deltas addieren" (ARBEITSWEISE A2.1b(3)). Traeger: Wellenplan RN-01/CR-1 (par.27.4.2 E-10).
+**Abnahme:** Gate [5/6] literal "545 == 545" + Floor-Restore byte-gleich + vier Zellen 545.
+
+### 13.4.3 D-12 -- ZWEI PFLICHT-BEWEISLAEUFE AN #114, NICHT EINER (T-12-Umfeld)
+
+Der Erst-Lauf las die beiden #114-Laeufe als einen Gegenstand. Am Objekt sind es zwei, beide
+mit Frist Mi 26.08. 06:00 (Volltext + Traeger: Wellenplan par.27.4.1/K-D):
+  (i) **B10-Beweislauf** (B5.b-Emitter, Mini-Profil <= 8 Binaries, XML-Differenz-Laeufe je
+      Achsen-Familie): emittiert die ECHTEN `E07_*`-Zeilen -- erst damit kann das Gate GO
+      werden. Testseite: der Pruefer steht und ist doppelt biss-bewiesen; was fehlt, ist der
+      GEFAHRENE Lauf (T-1-Klasse: eine gebaute Wache ohne gefahrenen Biss zaehlt nicht).
+  (ii) **E07-Q1-Default-A-Re-Run** (<1h, Rezept `b10-beweislauf/BEWEIS.md` Par.9) auf der
+      FINAL eingefrorenen Trigger-Linie -- eine WIEDERHOLUNG des Laufs, der trigfix 0f900dcf
+      auf Basis 66de5c09 bewiesen hat.
+**Design-Folge:** die Abnahme des Trigger-Gates nennt BEIDE Mengen (V-8 / "ein gruenes Gate
+deckt nur seinen Gegenstand"); ob ein einziger Lauf beide Zwecke erfuellt, ist am Objekt
+(BEWEIS.md Par.9) zu entscheiden und zu protokollieren, nicht anzunehmen.
+
+### 13.4.4 SUMMEN-REGEL (unveraendert)
+
+117/386h bleiben unangetastet; D-11/D-12 sind Abnahme-/Vertragspflichten bestehender Posten
+(T-11b bzw. T-12-Umfeld), keine neuen Katalog-Eintraege. T-13 bleibt wie in 13.2/D-10
+GEZAEHLT ausserhalb des 117er-Katalogs, addierbar erst mit dem Durchzaehlen der S-Strecke
+(par.10/D-4).
