@@ -4834,3 +4834,215 @@ UEBERHOLT: der Querverweis, der beide Laeufe als EINEN Gegenstand liest.
 **Damit gilt das par.27-Design als von Fable 5 max abgenommen** -- die Erst-Lauf-Substanz
 traegt, die sechs Korrekturen stehen additiv daneben, die zehn Ergaenzungen sind eingeplant.
 Das W2-ABSCHLUSS-GATE (27.3) gilt unveraendert und erfasst 27.4.2 mit.
+
+## 27.5 FABLE-MAX-ABNAHME FAHRT 3 + DRITT-ABGLEICH-NACHTRAG (24.08.2026, 11:3x-12:1x UTC)
+
+ANLASS (Lead-Order 24.08. ~08:25Z, zweite Cache-Invalidierung): Die Abnahme-Fahrt, die
+par.27.4 und Designplan-par.13.4 schrieb (Commits 302e4d7e + f79d4192), fiel um 07:59:57Z
+STUMM auf Opus 5 (Consent-Prompt-Mechanik in Background-Sessions) -- ihre ABNAHME-Vermerke
+sind damit provenienz-tainted und galten NICHT als Fable-Vollzug. Diese dritte Fahrt lief
+nach gespeicherter Fable-Consent-Wahl; ALLE Legacy-Zeilen (478 des Sonnet-Erst-Laufs + 223
+der Fahrt 2 = 701) wurden am Objekt neu geprueft, ALLE Quellen selbst voll gekippt
+(B.3-Protokoll: ~/backups-workflow/20260824-w2-abschluss-design/ARBEITSSTAND.md, Abschnitte
+"FAHRT 3"). Die Fahrt-2-Texte bleiben additiv stehen; dieser Abschnitt uebernimmt sie, wo
+sie tragen, und schreibt den Stand fort, wo die Quellen seither GEWACHSEN sind.
+
+### 27.5.1 ZEILENPRUEFUNGS-URTEIL (701/701 am Objekt)
+
+**ALLE 6 Korrekturen K-A..K-F und alle 10 Ergaenzungen E-01..E-10 der Fahrt 2 sind am
+Objekt BESTAETIGT** (je eigener Beleg dieser Fahrt): K-A per grep (par.25 = SECHS
+Wortlaut-Stellen, Z.2248 traegt den KON120-06-Marker OHNE par.25-Bezug; par.26 = ZWEI
+Stellen RN-70 + par.24.6) * K-B per Register-Kopf ("Commits: 99a16a38 (par.24-Nachtrag
+RN-01..RN-76 ...)" = Einplaner-Lauf) * K-C per Board-#136 Abschnitt (7) (N-13/N-18/N-19
+namentlich) * K-D per #131-Metadata e07_q1_rerun + T12-1 + ZUG-BILANZ Abschn. 4 (ZWEI
+Laeufe) * K-E per python3-Strukturlektuere des Result-JSON (Z13-Z27 ohne Zieltext) * K-F
+per GEGENLESE-GATE A.1 (S2 = 38 Rest-Posten) * E-01..E-10 je an F1/F2/ZUG-BILANZ/Register/
+Board nachgewiesen; ASCII ab Z.4340 = 0 nachgemessen. ZUSATZ-BELEG zu E-09: auch der
+Z07-ZIELTEXT des Lande-Zug-Results fuehrt die npos-Haertung woertlich ("inkl. der im
+Auftrag benannten ersetze()-npos-Haertung (KLEIN-1)") -- E-09 gilt damit AUCH gegen den
+juengeren S2-DRITT-ABGLEICH, der KLEIN-1 in seiner trigfix-Zaehlung weiterhin als offen
+fuehrt (dort nicht nachgezogen); real offen bei trigfix: KLEIN-2, KLEIN-3, KLEIN-4/F-147.
+**0 Fehler in den Fahrt-2-Urteilen gefunden; die Substanz von 27.4 gilt hiermit als von
+Fable 5 max geprueft und uebernommen.**
+
+### 27.5.2 DELTA-TAFEL FAHRT 3 -- STATUS-FORTSCHREIBUNGEN AUS DEN GEWACHSENEN QUELLEN
+
+Die beiden Synthese-Dateien sind seit der Task-Formulierung GEWACHSEN und keiner Vorfahrt
+bekannt gewesen: SYNTHESE-S1-AUDIT.md 361 -> **654** Zeilen (Abschnitt 7 "DRITT-ABGLEICH
+24.08.", Z.364-655) und SYNTHESE-S2-AUDIT.md 280 -> **1009** Zeilen (DRITT-ABGLEICH
+D-0..D-6, Z.283-1009). Beide VOLL gelesen; dazu eigene Live-Messungen 24.08. 11:3x UTC.
+Jede Zeile: Posten * Quelle * Traeger * Frist * Abnahme. STATUSWECHSEL ersetzen keine
+Erst-Lauf-Zeilen (die bleiben als Momentaufnahme), sie schreiben sie fort:
+
+**F3-01 [STATUSWECHSEL CR-1/E-10: Z12/o2-Landung ist VOLLZOGEN bis auf CI-Beleg].**
+Eigene Messung 11:3x: ce development lokal == origin == **github** == 943c70ee (Kette
+f82dfaeb -> b3dc3e93 -> 943c70ee axis-lock-Regen) -- der Dual-Push ist BEIDSEITIG erfolgt.
+K17 4/4 Zellen je LITERAL "100% tests passed, 0 tests failed out of 545" (Z12-Logs
+07:27-07:43Z), Gates 6/6 GRUEN inkl. [5/6] "545 == 545 exakt" -- **die E-10-/D-11-Floor-
+Umstellung ist damit AM OBJEKT VOLLZOGEN** (F1-Abschn. 7.3). OFFEN aus CR-1 nur noch:
+(a) CI-Terminal-Beleg fuer 943c70ee (s. F3-06), (b) test_rcu-Beobachtung unter
+Parallel-Last (Nachbar-Befund, kein Ausfall in Z12). Traeger RN-01 unveraendert.
+**F3-02 [STATUSWECHSEL L-05: K17-ENDSTAND-KOMBIBAU IST VOLLZOGEN -- ZWEIMAL].** 544er-Serie
+@5ddda4e5/3841d717 + 545er-Serie @b3dc3e93/943c70ee, je 4/4 Zellen literal, J-1 mit den
+SIEBEN Werkzeugen literal, Facade ueber das reale Target (F1-7.3). Damit EINGELOEST:
+s19-FUND-2, s8kopf-S8A-01, messfenster-A-1-Komponente-1 (die 7er-J-1-Auflagen der 27.1.I-
+L-05-Zeile). OFFEN aus L-05: test_rcu (s. F3-01b) + Diff-Hygiene push-lokal ueber den
+FF-Bereich VOR dem main-FF. **L-06 (Warnungs-Review ZWEIMAL) bleibt UNVERAENDERT OFFEN**
+-- kein neues Artefakt am Objekt (einziges bleibt 20260820-nachhol-kombibau/
+warnungs-review.md, bis c2da9d1a).
+**F3-03 [K17-/BUMP-BEZUGSPUNKT WANDERT -- KORR-D7/H-19].** Ein K17-Testat deckt nur seinen
+Stand: Bezugspunkt ist der dev-Tip AM ZUGTAG (24.08. frueh: 943c70ee), NICHT mehr
+5ddda4e5/3841d717. Der super-Gitlink-Bump-Zug (CR-4/L-01) misst sein Ziel AM ZUGTAG frisch
+und wiederholt die np34-Patch-Match-Probe, wenn super sich bewegt (Probe 24.08. erneut
+RC=0 @ super 80121632; super ist seither docs-only auf 5260a704 weitergewandert, Gitlink
+COMMITTED weiterhin 66de5c09 -- eigene Messung 11:3x). Traeger RN-01 (CR-3/CR-4).
+**F3-04 [F-124/H-20 Endstand-Nenner-Harmonisierung].** Lebender Floor = 545/541/539
+(scripts/ci_test_inventory_floor.txt @943c70ee); die in S1-Berichten/Board/Ledger-
+Entwuerfen stehenden 511/512/513/520/524/544 werden EINMAL im KON122-/Docs-Zug
+harmonisiert, nie je Dokument einzeln. Traeger RN-01/RN-27 (Ledger-Zug). Abnahme:
+Ledger-Zeile E-3 (F1-7.7) uebernommen.
+**F3-05 [F-125 Tafel-Nullen-Falle].** "Restfunde 0" (konvergenz-blockierende Funde) und
+"Rest-Posten 0" sind ZWEI Zaehlwerke -- die Skript-Tafel-Null laesst sonst 24 getragene
+S1-Posten (darunter fristgebundene L-01) aus dem Blick fallen. PFLICHT: Nullen nur mit dem
+Zusatz "konvergenz-blockierende Funde" zitieren; das 27.3-Gate prueft IMMER die
+Rest-Posten-Menge. Traeger: dieses Gate + RN-27 (Ledger-Merksatz).
+**F3-06 [F-126 CI-Terminal-Beleg fuer 943c70ee, UNGEPRUEFT-Klasse].** Juengster belegter
+Terminal-Lauf ist 16101 @ 3841d717; fuer 943c70ee liegt in den Beweisorten KEIN
+Terminal-Beleg (API braucht Token, fuer die Synthese-Laeufe TABU -- ausdruecklich
+UNGEPRUEFT, fail-closed). Traeger: Lande-Zug/Lead (Push->gruen-Doktrin) VOR dem main-FF.
+Abnahme: Pipeline-Terminal-Status als gesicherte Kopie.
+**F3-07 [H-21 Anker-Drift durch den o2-Merge].** Der o2-Zug beruehrt genau die Flaechen
+kuenftiger S1-Kleinst-Fixe (profile_run_entry.hpp, experiment_run_entry.hpp,
+experiment_plan_director.hpp + Testdatei). L-07 (s19-Hinweiszeile) und L-13a
+(main.cpp-Anker) werden gegen den HEUTIGEN Stand gesetzt, Zeilenanker vor dem Edit neu
+gemessen. Traeger unveraendert (L-07/L-13).
+**F3-08 [F-143 MILD: herrenloser Voll-Fix-Edit im wt-ce-ph89 -- LIVE 11:3x bestaetigt].**
+Der credits-tote Erst-Fixer wg4nfrsb1 hinterliess am 23.08. 21:05-21:07 (NACH der
+Z11-Loeschung des alten Strang-Worktrees 20:53Z -- neu angelegter Baum) einen
+uncommitteten Voll-Fix (3 M-Zeilen: paper_pruefling_registry.hpp,
+test_ph89_paper_prueflinge.cpp, thesis_tiere/test_experiment_parser.cpp; 68+/40-;
+sha256(git diff) == gesicherter Patch 193 Z. in 20260821-w2-audit-fixverify/ph89/).
+Inhalt = kompletter fix_weg zu ph89-1/-2/-3 (27.1.B). PFLICHT: der #139-/Traeger-Zug
+SICHTET den Patch VOR dem Bau (Uebernahme als Vorarbeit ODER bewusster Frischbau); NACH
+Zug-Gruen wt-ce-ph89 saeubern (EIN Schreiber); Board-#89-Metadata fortschreiben
+(Lead-only). Abnahme: Sichtungs-Vermerk + porcelain 0 nach Zug-Ende.
+**F3-09 [F-144 MILD, SOFORT-KLASSE S-0: Phantom-Bau-Slot slot1-ph89fix.d -- LIVE 11:3x
+bestaetigt].** wer.txt literal "ph89fix-runde1 2026-08-23T21:05:30+00:00 wt-ce-ph89",
+Halter credits-tot, > 14 h keine Bau-Aktivitaet; am Deckel 3 ist faktisch nur EIN Slot
+frei. PFLICHT VOR jedem weiteren Bau: Todes-Beweis gegenpruefen, `rm -rf .../slot1-
+ph89fix.d` durch EINEN bestimmten Akteur (Lead oder #139-Fix-Agent VOR seinem ersten
+Bau-Zyklus), Raeumung einzeilig verbuchen. NIE parallel zu einer eigenen Slot-Claim-
+Operation (K20-Doktrin: diese Fahrt hat NICHT geraeumt).
+**F3-10 [F-145 KLEIN: K11-Beweis-Hygiene ph89-Treppen-Log].** ph89/bau-treppe-gcc-
+release.log quittiert wegen Pipe-RC "RC_FACADE=0" trotz ninja-Fehler und "RC_CTEST=0"
+trotz "No tests were found!!!" -- das gruene 511/511 stammt aus den beiden separaten
+ctest-Logs. PFLICHT: (a) Log nicht editieren (Beweisort), (b) als 511/511-Beleg NUR die
+ctest-Logs zitieren, (c) jede kuenftige Treppen-Protokollvorlage nutzt
+rc=${PIPESTATUS[0]} + expliziten Build-Pfad. Traeger: RN-18 (J-1-Rezeptfix) + T17-1.
+**F3-11 [F-146 STATUSWECHSEL: pinduo-T9 IST VOLLZOGEN -- SPERRE gegen Doppelausfuehrung].**
+prt-art bau/pinduo @ 25bbf2e (22.08. 12:59, lizenz_audit.hpp 7+/2-, origin gesichert)
+erfuellt ALLE VIER T9-SPEC-Teile (exakter Name 'ce-pin' + Begruendung; K13 beidseitig aus
+gesicherter Kopie ROT 1/9 mit 343 Fremdtreffern -> GRUEN 9/9; voller ctest 224/224 im
+CI-Layout -- damit auch pinduo-A3 erfuellt, Board-#122-Posten schliessbar; .gitlab-ci.yml
+unberuehrt = Klon-Umzug abgelehnt). **Die 27.1.J-T9-Zeile und CR-7 sind entsprechend
+fortgeschrieben: T9(a)-(d) NICHT erneut ausfuehren.** Verbleibende prt-art-Auflagen =
+W1L-1..W1L-9 (S2-Dritt-Abgleich D-3.3): W1L-1 echte Branch-CI (Pin-Log 6/6 Jobs +
+Allowlist-Beleg; E-01-CAVE fail-closed) * W1L-2 Rezept #107 (pinduo ZUERST, B14-Konflikt
+zugunsten D-10a, einziger B14-Mehrwert Bau-Proben-Notiz) * W1L-3 Klon-Umzug ablehnen *
+W1L-4 prt-art-Kombibau (224er deckte nur gcc-Release-lokal -- beide Mengen nennen) *
+W1L-5 Stat "58+/5- (Summe 63)" * W1L-6 FINDINGS#13 ERLEDIGT-DURCH-OBJEKT (f1fc5d8) *
+W1L-7 F-86-Bump NUR mit XML-Byte-Beleg (Range GEWACHSEN: 41+ Commits, wird teurer) *
+W1L-8 YAML-Scope-Buchung (E-14/E-15, faktisch unbedingt, formale Buchung fehlt) *
+W1L-9 Standalone-Klon nach #113 + Submodul-Store-Fetch (stale d11781fa).
+**F3-12 [F-147 KLEIN: trigfix-KLEIN-4 -- T12 waechst 5 -> 6].** Alt-Treiber-Export
+emittiert nie-befuelltes bytes_in_use_peak undeklariert (experiment_driver.cpp:489 rec{}
+-> result_aggregator export_csv; offizielle Kampagnen-CSV traegt ehrlich "n/a"). KEIN
+Lande-Blocker; fix_weg = EINE Deklarations-Kommentarzeile nach f15-:614-Muster im
+T-9-/Karten-Pass. Traeger: T-9-Folgewelle (RN-31-Umfeld) + F-101-Karten-Konsolidierung.
+**F3-13 [F-148/F-149 KLEIN: skip97-Anker-Korrekturen -- KORR-D4].** Karten-Doku:
+skip97-Bloecke liegen LITERAL am Dateiende (Z.8172-8213 von 8213, kein "vorletzter
+Block"). Register-Anker des observe-Duos sind durch die Landung verschoben: iterator
+**:2354** / **:3269**, Produktions-Binder **:2382** (statt :2303/:3186/:2331) -- die
+F-106-Registerzeile (T13-1) wird mit den NEUEN Ankern oder zeilenfrei geschrieben, die
+alten NICHT mehr uebernommen. Traeger: Lead-Doku/#97 + F-106-Folge-Zug.
+**F3-14 [F-150 SPERRE + F-151 NEU: e11].** Die 27.1.J-T15-Klammer "+ F6-Notiz-Landung
+6fe69057" ist UEBERHOLT: die F6-Notiz liegt GETRACKT IM CE (6fe69057 + 8cd32a0d sind
+bewiesene Ahnen von ce/origin/development) -- der Lead-Auftrag "im super heben" ist
+GEGENSTANDSLOS und darf NICHT ausgefuehrt werden (Phantom-/Doppel-Arbeit). Was von T15-2
+bleibt: der V0-Gegenlese-Schritt (Existenz am dann gueltigen ce-HEAD pruefen). NEU
+**E11-B1** (F-151, KLEIN): der explizite (a)/(b)/(c)-Owner-Klassen-Abgleich fehlt in der
+Design-Prosa -- DREI Zeilen ergaenzen ((a) HW-Fehlen -> P3, (b) Compile-Fehler -> P1/P2,
+(c) Runtime-Algo -> P4). e11 bleibt bei 4 KLEIN: A1/A3/A4 + B1. Traeger: V0-Gegenlese des
+golden-Zugs bzw. T7-Docs (S-2f).
+**F3-15 [VERSCHAERFUNG: golden-Zug E-11 ist NICHT GESTARTET bei Doppelfrist].** Kein
+Branch, kein Worktree, alle 4 geplanten Neubauten fehlen am HEAD (eigene Gegenprobe des
+e11-Audits); Fristen "VOR W3" + "vor Sa 29.08." bei bisher datumsloser
+Staffel-3-Platzierung. PFLICHT: Terminierung in denselben Zug wie #114 (S-4). Traeger:
+RN-77/RN-78-Umfeld + Board-Traeger-Anlage (F2-D-5 Board-Entwuerfe).
+**F3-16 [F-152/F-153/F-154 kampvor].** Beweisordner-Luecke fuer die super-Haelfte durch
+das Audit selbst GEHEILT (5 Logs persistiert -- stehende Auflage: Proben-Ausgaben im
+SELBEN Zug als Datei sichern, nie als Zitat). Lint-Formel je Datei fuehren (sh-Datei ->
+sh -n, bash-Datei -> bash -n; ci/persist_sammler.sh reisst BESTANDS-bedingt an sh -n,
+kein Regress). Der super-Merge bau/kampvor @ 025e0c42 ist ein EIGENER, terminierter
+Lande-Schritt (E-9-Frist vor Sa 29.08.) -- in CR-2 bereits getragen, hiermit mit
+Frist-Vermerk bestaetigt (die S2-SYNTHESE-Fassung 20:17 hatte ihn in keiner OFFEN-Liste;
+F-154).
+**F3-17 [F-155 MILD, Lead: F2-VORLAGEN-FENSTER-Nachzug weiterhin offen].** Das Fenster-
+Dokument (mtime 22.08. 06:44:23 unveraendert) wuerde dem Owner die am 21.08. 20:40
+owner-beantwortete D-04-Frage erneut als offenen Entscheid vorlegen. PFLICHT VOR der
+naechsten Owner-Vorlage (RN-05, koppelt an N-42/N-44/N-48): D-04-Block in die
+ENTSCHIEDEN-Tabelle, nur die ERSATZ-ZEILE uebernehmen, F-122 per D04EXPL-Verweis
+ersetzen. Traeger: Lead (a19-L4/FOLGE-2).
+**F3-18 [KON122-BANK-ERWEITERUNG].** Zusaetzlich zum L1-L21-Entwurfsblock (CR-5) liegen
+jetzt WORTFERTIG: KON122-A (ph89-Zweitkette inkl. F-140..F-145 + Label-Cave), KON122-B
+(T9-Vollzug), KON122-C (F-145..F-155-Sammel), KON122-D (Endstand-Bezug 943c70ee +
+Gitlink-Lage) im S2-DRITT-ABGLEICH D-5 sowie E-1..E-7 (S1-DRITT-ABGLEICH 7.7; E-2/E-3 =
+K17-Quittung + Floor-Zeile). Der RN-01/RN-27-Ledger-Zug nimmt BEIDE Baenke zusaetzlich
+zur L1-L21-Quelle; Ledger-Kopf am 24.08. ~08:00 weiterhin KON121, naechste freie Nummer
+KON122 (F2-D-3.1, datierte Messung).
+**F3-19 [27.1.B-NENNER-FORTSCHREIBUNG: ph89-Strang = FIXES_NOETIG mit FUENF offenen
+Funden].** Die Erst-Lauf-Tafel 27.1.B (ph89-1..3) bleibt korrekt, ist aber seit der neuen
+ph89-Audit-Kette (audit r1 23.08. 20:57 -> fix r1 VERTAGT -> r2 -> r3, alle 24.08.) um
+F-143 (F3-08) und F-144 (F3-09) zu ergaenzen; F-145 (F3-10) ist der sechste, strang-
+zugehoerige Beweis-Hygiene-Posten. LABEL-CAVE bleibt: das ph89-interne "FUND-1" bezeichnet
+in der ERSTFASSUNG den KLEIN "6 vs 7 C++-Dateien" (weiterhin offen, T11-1), in der
+Fassung 23.08. den MILD F-140/ph89-1 -- nie gleichsetzen. Rot-Protokoll-Literal: 11
+static-assert-Fehler (nicht 12).
+**F3-20 [ZWEI S2-ZAEHLWERKE, beide datiert fuehren].** K-F-Nenner "38 Rest-Posten"
+(Fassung 20:17, Rest-Posten-Zaehlung inkl. getragener) UND Dritt-Abgleich-Nenner "22
+offene Fund-IDs" (24.08., nach Statuswechseln F-146/F-150 und Neufunden F-147/F-149/
+F-151) sind ZWEI Zaehlwerke zweier Zeitpunkte -- beim Zitieren Basis + Datum mitnennen
+(dieselbe Klasse wie F3-05).
+
+### 27.5.3 GEGENZAEHLUNG + ABNAHME-VERMERK FAHRT 3 (beide Mengen genannt, V-8)
+
+    GEPRUEFT:      701/701 Legacy-Zeilen (478 Erst-Lauf: 352 par.27 + 106 Designplan-
+                   par.13 + 20 Marker; 223 Fahrt 2: 147/1 par.27.4-ASCII + 76 par.13.4)
+                   -- am Objekt, gegen die VOLLE Quellen-Lage inkl. der gewachsenen
+                   Fassungen (F1 654/654, F2 1009/1009), die keiner Vorfahrt vorlag.
+    BESTAETIGT:    16/16 Fahrt-2-Urteile (K-A..K-F, E-01..E-10) + Form-Korrektur +
+                   alle 7 Designplan-13.4.1-Urteile + D-11/D-12. 0 Fehler gefunden.
+    FORTGESCHRIEBEN: 20 Posten (F3-01..F3-20) -- davon 5 STATUSWECHSEL (F3-01 o2-
+                   Landung vollzogen bis auf CI-Beleg, F3-02 L-05 vollzogen, F3-11
+                   T9 vollzogen + Sperre, F3-14 F6-Notiz-Sperre, F3-16 Beweisordner
+                   geheilt), 9 NEUE Posten (F3-06 CI-Beleg, F3-08 liegender Edit,
+                   F3-09 Phantom-Slot SOFORT, F3-10 K11-Log, F3-12 KLEIN-4, F3-13
+                   Anker, F3-14 E11-B1, F3-15 golden-Zug-Terminierung, F3-17 F2-
+                   Fenster-Nachzug), 6 PRAEZISIERUNGEN (F3-03/04/05/07/18/19/20).
+    LIVE GEMESSEN (11:3x UTC, eigene Messungen dieser Fahrt): ce dev lokal == origin ==
+                   github == 943c70ee * super dev 5260a704 (docs-only), Gitlink
+                   COMMITTED 66de5c09 * wt-ce-ph89 EXISTIERT mit exakt 3 M-Zeilen *
+                   slot1-ph89fix.d EXISTIERT (wer.txt 21:05:30) * bau/w2-abschluss-
+                   fixes existiert NICHT.
+    NICHT GEDECKT: CI-/Pipeline-Status (kein Token, F3-06 fail-closed offen) * die
+                   Inhalte des laufenden #139-Zugs * Lead-only-Schreibvollzuege
+                   (Ledger/Board/Memory -- Entwuerfe sind Auftraege, keine Beweise) *
+                   Z13..Z27-Nummernzuordnung (bleibt Ableitung bis Zug-Resume, K-E).
+
+**FABLE-MAX-ABNAHME-VERMERK (Fahrt 3, 24.08.2026):** Geprueft 701/701 Zeilen; Korrekturen
+dieser Fahrt: 0 an den Vorfahrten-Urteilen (16/16 + 7/7 bestaetigt), 20 Status-
+Fortschreibungen F3-01..F3-20 (namentlich oben, je mit Quelle/Traeger/Frist/Abnahme).
+**Damit gilt das par.27-Design als von Fable 5 max GEBAUT UND ABGENOMMEN** -- Erst-Lauf-
+Substanz + Fahrt-2-Korrekturen tragen, die Fahrt-3-Tafel schreibt den Objektstand 24.08.
+11:3x fort. Das W2-ABSCHLUSS-GATE (27.3) gilt unveraendert und erfasst 27.4.2 UND 27.5.2
+mit; Designplan-Schwester: par.13.5.
