@@ -226,14 +226,29 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 66de5c0972290ec1ae3d219988ecc207d8f5de6b
-PZW-SCHEMA-STELLEN = 42
-PZW-SCHEMA-DATEIEN = 23
+PZW-CE-SHA         = 943c70ee52796da8dede7ace1bf3a370a0994d16
+PZW-SCHEMA-STELLEN = 44
+PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
+> NACHZUG 24.08.2026 abends (W2-S1+S2-Lande-Zug/Z23, Fahrplan Board #131; Gitlink-Ziel ce
+> `943c70ee` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug, zusammen
+> mit dem prt-art-Gitlink `d11781fa` -> `16c90628`; WIE GEMESSEN, nicht gerechnet):
+> SCHEMA-STELLEN 42 -> **44**, SCHEMA-DATEIEN 23 -> **24** -- beide neuen Stellen traegt
+> `tests/unit/test_s13_03_per_binary_mappe.cpp` (S13-03 per-Binary-Mappe/Resume-Vertrag,
+> Lande-Merge 4/10 b283f86c). Nenner 530 -> **564** Test-.cpp (+34 der Kette
+> 66de5c09..943c70ee, 45 Commits: die 10 S1+S2-Merges s19/messfenster/s8kopf/s13schema/
+> pmcpaket/vollzug91/ph89/trigfix/skip97/kampvor + H-5/F-10-Nachzug + o2-standard/E-7 +
+> axis-lock-Regen); 63 Rohzeilen, Kommentar abgezogen. LITERAL/AUFRUFE/ALTMUSTER
+> unveraendert 2/2/0 @ 2968 Z. .gitlab-ci.yml. LIVE gemessen mit den Formeln der Wache
+> selbst (git grep -F gegen den Baum `943c70ee`); Kontroll-Lauf derselben Formeln am
+> Alt-Baum `66de5c09` reproduziert exakt die Alt-Anker 42/23/2/2/0 @ 530 Test-.cpp.
+> Gegenprobe ueber den Bissproben-Kanal COMDARE_GITLINK_SHA nach dem Nachzug: '5 von 5
+> Ankern decken sich mit dem Objekt'. Beleg-Log: ~/backups-workflow/20260822-lande-zug/
+> Z23/pzw_zaehlung_943c70ee.log. Vorheriger Nachzug darunter.
 > NACHZUG 20.08.2026 mittags (L4-super-Zug/KON119; Gitlink-Ziel ce `66de5c09` -- der Bump
 > faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug; WIE GEMESSEN, nicht gerechnet):
 > SCHEMA-STELLEN 41 -> **42**, SCHEMA-DATEIEN 22 -> **23** -- die neue Stelle traegt
