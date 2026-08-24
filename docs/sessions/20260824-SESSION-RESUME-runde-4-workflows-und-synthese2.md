@@ -115,3 +115,59 @@ PID 1821386 gehoert gitlab-runner (CI-Job) — unangetastet.
 LEHRE (Memory-Kandidat nach Wache-2): Workflow-Resumes NIE vor bestaetigt
 frischen Credentials/Credits starten; nach jedem Resume MODELL-WACHE am
 Agent-Transkript (grep '"model"'), denn der Harness-Fallback ist still+sticky.
+
+## 7. NACHTRAG ~08:25: 🔴 ZWEITER STILLER MODELL-FALL (Fable->Opus) — RECHERCHIERT + GEHEILT
+
+Owner-Meldung: "Fable 5 trotz verfuegbarem Kontingent auf Opus 5 zurueckgefallen,
+bitte recherchiere im Web und pruefe das."
+
+MESSUNG AM OBJEKT: Haupt-Session + alle 4 Workflow-Straenge fielen ~07:59:57Z
+STUMM von claude-fable-5 auf claude-opus-5 (Transkript-model-Records; KEINE
+Fehlermeldung in den Agenten — die 'spend limit'-grep-Treffer waren zitierte
+Doku-Inhalte). Nach Owner-/login + /model (08:14) lief die Haupt-Session ab
+08:14:29 wieder fable-5; neue Spawns ebenfalls (a04dae 16/16 fable). Die VOR
+08:14 gestarteten Agenten blieben sticky auf Opus. KONTAMINIERT (Opus-Anteile):
+3 Results im Journal-Cache (W2-Abschluss-DESIGNER 67f/67o · W2-Audit-SYNTHESE-S1
+16f/142o · Rueckfragen-FOLD-2 8f/6o) + 3 laufende Agenten (Lande-Zug-Z12
+42f/96o · SYNTHESE-S2 17f/110o · FOLD-3 0f/27o). SAUBER: ph89-Fix (85f), alle
+12 Stufe-1-Batches, Fold-1, alle Alt-Cache-Schritte.
+
+WEB-RECHERCHE (Kern):
+(1) OFFIZIELLE MECHANIK (code.claude.com/docs/model-config): Fable 5 kann je
+Plan auf usage credits billen; interaktiv kommt ein CONSENT-PROMPT. In
+Background-Sessions/Teammates haelt Claude Code den Prompt fuer dialogExpiry
+(5 min Default) — antwortet niemand, wird der Turn OHNE die Anfrage beendet
+bzw. mid-session AUF DEM DEFAULT-MODELL (Opus) FORTGESETZT; headless (-p/SDK)
+billt ohne zu fragen. Nach "continue on Fable using usage credits" wird die
+Wahl GESPEICHERT und der Prompt kommt nie wieder — genau das leistete das
+Owner-/model 08:14 ("Draws from usage credits"). Billing-Fehler triggern NIE
+die fallbackModel-Chain (nur Overload/Server-Fehler); der Credits-Pfad ist
+der Consent-Pfad. Sticky: "After a fallback, the session continues on the
+fallback model. To return, run /model."
+(2) BEKANNTER BUG anthropics/claude-code#79337: seit 20.07. (Fable standard
+auf Max) prueft der Entitlement-Check das Modell-Alias mit literalem
+[1m]-Suffix -> Max-Entitlement matcht nie -> "Fable 5 requires usage credits"
++ SILENT DOWNGRADE zu Opus TROTZ verfuegbarem Kontingent (<50% weekly). Issue
+geschlossen, Alias-Aufloesungsdefekt-Klasse; Workaround: kein [1m]-Suffix im
+gespeicherten model-Wert.
+(3) Releasebot: Fix fuer den First-Time-Credits-Prompt, der unter Remote
+Control nach 60 s ohne Antwort AUTOMATISCH das Fallback-Modell waehlte.
+(4) Abzugrenzen: content-basierter Safety-Fallback (Bio->Opus 5, Cyber->
+Opus 4.8) — hier NICHT der Fall (kein classifier-Notice im Transkript).
+
+DIAGNOSE: Unser 07:59:57-Fall = Consent-/Entitlement-Klasse (2)/(1): Die
+Workflow-Subagenten (Background, niemand am Terminal) liefen in den Credits-
+Consent -> Turn still auf Opus fortgesetzt; sticky bis Stop. Das Owner-/model
+mit gespeicherter Credits-Wahl heilt die SPAWN-Seite; laufende Agenten heilt
+nur Stop+Neufahrt.
+
+HEILUNG (Muster von heute frueh, 3. Anwendung): alle 4 Tasks gestoppt
+(bau-sicher: 0 eigene Bauten; der laufende build gehoerte gitlab-runner) ->
+4 GEZIELTE Cache-Invalidierungen: (P1) Designer-Prompt NEUFAHRT-3 · (P2)
+Lande-Zug z12neu-Zusatz (b3dc3e93 NICHT neu mergen, Teil-Bauten inkrementell,
+ctest frisch, Slot-Claim neu) · (P3) W2-Audit S1/S2/Gate-Neufahrt-Vermerke
+(Opus-Vorlauf verworfen, additive Opus-Abschnitte adversarisch pruefen) ·
+(P4) Fold-2..12-Neufahrt (Fold-1 + 12 Batches bleiben Cache) -> alle 4
+resumed: w52g5xvgc (W2-Abschluss) · wd3iiuv9g (Lande-Zug) · wry7wqnzt
+(W2-Audit) · w3kdnx320 (Rueckfragen). MODELL-WACHE: erster Neuspawn
+(W2-Audit a5407b69) = fable-5; Rest sekundenfrisch, Wache laeuft mit.
