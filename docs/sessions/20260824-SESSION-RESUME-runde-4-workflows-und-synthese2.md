@@ -79,3 +79,39 @@ Differenzen = Riss-NEUSTARTS derselben Schritte (jeder Start zaehlt), kein
 offenes Werk; Ergebnisse je voll gelesen+verbucht (Doku 23.08. Abschn. 3/7/8).
 AELTER (21.-22.08., 13 Runs): in der Limit-Pruefung 23.08. terminal befundet.
 FAZIT: KEIN fehlender Workflow; Differenzmenge LEER.
+
+## 6. NACHTRAG ~08:00: 5/5-Volllesung + 🔴 SONNET-FALLBACK ERKANNT UND GEHEILT
+
+Owner-Order: letzte 5 Sessions/Uebergaben voll einlesen + Referenz-Frage +
+"Design immer mit Fable 5 max". VOLLZUG: NACHVERBUCHUNG 328/328 + K30 135/135
+neu gelesen; RESUME 81 + PAUSE-2148 83 + REKONSTRUKTION 226 in diesem Fenster
+selbst verfasst (Volltext praesent) = 5/5.
+ANTWORT: JA — die Referenz ("kleinere Regressionen aus der Gesamt-Landung
+verbucht") meint die Posten aus NACHVERBUCHUNG 7a (#135-Workaround-Register) +
+9d (ph89 FUND-1/2/3) + 7c (GG2-1/2) + 9c-K (Z11-Restposten); Traeger = W2-
+ABSCHLUSS-ZUG wf_08c04723 (#139, Owner-Order 23.08. spaet "ALLE auch kleine
+Regressionen ... als Pflicht fuer W2-Abschluss" + "Fixes direkt fahren").
+
+🔴 BEFUND (Owner-Hinweis bestaetigt): Die 07:23-Resumes starteten VOR dem
+Owner-/login — Credits-Klemme loeste den AUTOMATISCHEN Modell-Fallback aus:
+W2-Abschluss-DESIGNER a01d16b3 fiel nach 3 Fable-Records auf Sonnet 5 (154
+Records, 2 Fallback-Marker) und lieferte sein Design-Result (13897 B) als
+SONNET — ordnungswidrig (STEMPEL-STRECKE=FABLE-MAX + explizite Design-Order);
+der Fix-Fahrer a08d04605b (selbst Fable) lief bereits auf dem Sonnet-Design.
+Lande-Zug-Z12-Agent a70a1039e1 ebenso gefallen (4 Fable -> 497 Sonnet, fuhr
+den K17-Kombibau auf Sonnet). W2-Audit + Rueckfragen-2stufig (nach /login
+gespawnt): rein Fable, nicht betroffen.
+HEILUNG: beide Tasks gestoppt (wmebq6e17/wpgs23ghr) -> Design-Prompt-Patch
+FABLE-MAX-NEUFAHRT (Cache-Invalidierung; Sonnet-Vorarbeit = 3 additive Commits
+fc804971/6400f6dc/0c6ee745 [par.27-Tafel/Designplan/Marker] + ARBEITSSTAND-
+Protokoll bleibt ERHALTEN, wird aber vom Fable-Designer selbst voll gegen-
+gelesen: eigene 4/4-Kipps, Zeile-fuer-Zeile-Pruefung, additive Korrekturen,
+FABLE-MAX-ABNAHME-Commit; Fix+Verify laufen durch die design-Interpolation
+automatisch neu) -> Resume beider: wui6xlur8 (W2-Abschluss) + ws7vr0qyt
+(Lande-Zug; Z12 ohne result -> laeuft neu, build-dbg inkrementell fortsetzbar).
+MODELL-WACHE: neuer Designer a7797062 = 3x claude-fable-5 (0 sonnet) ✅;
+Lande-Zug-Agent acc4a569 frisch (Wache folgt). NEBENBEFUND: laufender Bau
+PID 1821386 gehoert gitlab-runner (CI-Job) — unangetastet.
+LEHRE (Memory-Kandidat nach Wache-2): Workflow-Resumes NIE vor bestaetigt
+frischen Credentials/Credits starten; nach jedem Resume MODELL-WACHE am
+Agent-Transkript (grep '"model"'), denn der Harness-Fallback ist still+sticky.
