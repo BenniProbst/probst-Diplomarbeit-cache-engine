@@ -234,6 +234,15 @@ PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
 
+> UEBERHOLT-MARKER 24.08.2026 (par.13/D-7): die obige Ankertafel ist die PZW-Schema-Stellen-
+> Zaehlung (`lazy_csv_header()`-Aufrufstellen) und bleibt fachlich unveraendert gueltig -- sie
+> ist NICHT der ctest-Gesamtnenner (Floor-Anker). Der Floor-Anker (T-11b/T-17-Kombibau-Nenner,
+> `scripts/ci_test_inventory_floor.txt`) ist durch die o2-Standard-Landung (Strang f82dfaeb,
+> Lead-Merge b3dc3e93 lokal fertig/ungepusht) von 544/540/538 auf 545/541/539 gestiegen
+> (+1-Regel `test_o2_standard_opt_default`) -- s. par.13.2/D-7 fuer die Herleitung. Zwei
+> verschiedene Einheiten, zwei verschiedene Zahlen; wer sie verwechselt, wiederholt die
+> Fehlerklasse, die dieser par.9-Abschnitt selbst korrigiert.
+
 > NACHZUG 20.08.2026 mittags (L4-super-Zug/KON119; Gitlink-Ziel ce `66de5c09` -- der Bump
 > faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug; WIE GEMESSEN, nicht gerechnet):
 > SCHEMA-STELLEN 41 -> **42**, SCHEMA-DATEIEN 22 -> **23** -- die neue Stelle traegt

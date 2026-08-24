@@ -3751,6 +3751,17 @@ Betriebs-Kollisionen: s. 24.5.
            github 25 (P9, Phase-5-Auflage) + #19 main-FF beider Repos (Rest: F-13).
            Traeger #131/Lead. Auflagen T9/G8/H5/H-7/K17-Endstand-Kombibau/G2-V93/T12
            unveraendert. | Abh.: Landebahn exklusiv, nichts ueberholt.
+
+> W2-ABSCHLUSS-MARKER 24.08.2026 (par.27): *(zur RN-01-Zeile oben)* die Klammer "T8b/T8c/
+> T10b/T12b" ist STALE -- das sind Erst-Gate-Numerierungen (22.08.), von der S1/S2-Synthese-
+> Zweitfassung (23.08., nach Compact-Riss neu erstellt) laengst zu L-08b/L-08c/L-09/T12b
+> um-organisiert; die Zeile bleibt stehen (Ledger-Anker vor Nummer, V12), der KON122-Vollzug
+> fuehrt beim Schreiben die AKTUELLEN L-/T-Anker (par.27.1.I/J unten in diesem Dokument, KEIN
+> Neuschnitt). Ebenso praezisiert: "o2/E-7-Landung" ist TEILWEISE vollzogen (Lead-Rescue-
+> Merge lokal b3dc3e93, NICHT gepusht, K17+Gates+gitleaks ausstehend) und "Gitlink-Bump ATOMAR"
+> traegt zusaetzlich den NP-34-Patch (60fa5504) im selben Commit-Zug. Volltext + Abnahme-
+> Kriterien je Sub-Ziel: par.27.1.G (CR-1..CR-12).
+
     RN-02  Diesen par.24-Nachtrag landen (Branch bau/wellenplan-offene-punkte; Lead
            landet sequentiell HINTER dem Zug; Ledger-Spiegelzeile via ledger_nachtrag.sh).
     RN-03  P1-BAUZUG STARTEN: E-10/#38a2 + #86/ORG-19 Schritte 1-4 in EINEM Zug
