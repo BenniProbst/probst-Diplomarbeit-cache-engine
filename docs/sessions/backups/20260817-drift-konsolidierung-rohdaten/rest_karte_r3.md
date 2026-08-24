@@ -379,6 +379,20 @@ Anker: abend-3 F, Z22609 (Ueberblick A-7/A-8).
 andere Semantik: ein Datenbruch ohne Neubau, unsichtbar."
 → **Ziel: Task-Karte (vor Bau-Trigger) + Designplan-TDD**
 
+> **[C5-CLU-TEIL GEHEILT 24.08.2026, Z21-docs-Sammel/F-101 (Karten-Hygiene); Zeilen oben bleiben]:**
+> Die 64-Literal-Haelfte dieses Postens ist GEHEILT -- Commit c1c76c87 (06.08.2026, ZWEI Tage vor
+> dem Karten-Datum 17.08. dieser r3) ist per `git merge-base --is-ancestor c1c76c87 66de5c09`
+> Ancestor der W2-Strang-Basis; am Tip rechnet der CLU-Zweig in `system_axis.hpp`
+> `(field_bytes*100u)/(cache_lines*line_bytes)` aus axis_stats[5][2]/[5][3]/[5][5] mit
+> fail-closed `mark_source_unavailable()` bei 0-Werten; **kein 64-Literal im Code** (nur
+> Historien-Kommentar); CLU-Verifikations-Trio registriert (test_clu_per_layout,
+> test_m_contract_system_axis_wurzel, test_b14_layout_scan_line_subaxis). Beleg: trigfix-Audit
+> 21.-23.08. (~/backups-workflow/20260821-w2-audit-fixverify/trigfix/audit-runde-1.md, Annex
+> "CLU am Tip"; SPANNUNG 1 git-topologisch aufgeloest). Die bytes_in_use_peak-Haelfte dieses
+> Postens bleibt getragen: Kampagnen-CSV (WIDE) traegt ehrlich "n/a" (a8s3-W5-Wache); der
+> Alt-Treiber-Export-Rest ist F-147 (KLEIN, Deklarationszeile, Folge-/T-9-Pass) -- kein
+> Vor-Batch-Blocker mehr.
+
 **C6 — Bau-Zeit-Bilanz und Bau-Umfang: empirische Eingangsgroessen fuer S-19 (#7).**
 Anker: abend-1 N-3 (Z22790-22820) und N-4 (Z22824-22867).
 - Slice-Empirie (Job-Traces 306305/306306, 23.07.): **amd@32W 19,95 min**, **amd@24W 19,4 min**

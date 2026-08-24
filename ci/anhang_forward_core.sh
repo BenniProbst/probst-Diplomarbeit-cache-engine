@@ -401,11 +401,11 @@ AF_WIDE_AGGREGAT="${AF_WIDE_AGGREGAT:-$AF_SELBST_DIR/wide_aggregat.sh}"
 #       'std::filesystem::path const csv_p = dir / "result.csv"'.
 #     * '<stem>.result.csv' ist die ARCHIVFORM. Sie existiert real: 8 Dateien
 #       unter docs/architektur/measurement/erstbeleg-d03-20260726/.../per_binary/.
-#   NICHT zugesichert -- und das ist der Grund fuer die Doppelung: welche der
-#     beiden Formen die GEPLANTE ist. Das ist Owner-Frage OV-17 (Ledger:112).
-#     Bis zur Antwort werden beide genommen; das ist die einzige Richtung, die
-#     keinen Messwert verwerfen kann. Faellt der Entscheid, wird HIER eine Zeile
-#     geaendert und sonst nichts.
+#   ENTSCHIEDEN -- und damit ist die Doppelung die Endform: OV-17 (Owner,
+#     Wellenplan :1051, vor Frist 12.08.): '<stem>.result.csv' ist ein
+#     ARCHIV-Artefakt des handgefahrenen D-03-Erstbelegs; das Suchmuster
+#     nimmt BEIDE Formen dauerhaft. Am Default unten aendert sich nichts.
+#     (Kommentar-Nachzug 24.08.2026, Z21-docs-Sammel/par.25.2; d10-Order.)
 #   DER DEFEKT, den das heilt: '-name "*.result.csv"' verlangt mindestens ein
 #     Zeichen plus Punkt vor 'result.csv' und traf die reale Datei damit NIE --
 #     still, mit rc=0 und der Zeile "kein Korpus-Laufordner".
