@@ -16,6 +16,101 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON124 (24.08.2026 nachts, Rest-Landung L1-L3 an der Landung): REST-LANDUNG VOLLZOGEN -- ce-#139-Phase-2 + Wellenplan-Harmonisierung + Gitlink-Nachzug; N-33-Quittungen + par.27-Anker-Vermerk
+
+**KON124-01 (REST-LANDUNG VOLLZOGEN):** Drei Schritte, sequentiell, EIN Schreiber je
+Repo-Hauptklon, Beweisort ~/backups-workflow/20260824-rest-landung/{L1-ce-139,
+L2-super-wellenplan,L3-gitlink-nachzug}/: (L1) ce bau/w2-abschluss-fixes @ 926f8d70
+per --no-ff als Merge 2168f60c in ce development gelandet + beidseitig gepusht
+(K17-Kombibau 4 Zellen KALT je LITERAL '100% tests passed, 0 tests failed out of
+545', pre_push_lande_gates 6/6, gitleaks Nenner 7==7, CI 286: Pipeline 16209 @
+2168f60c SUCCESS, 27-Jobs-Klasse inkl. 1 manual is_original:relock; s19-FUND-1/
+L-07 formal geschlossen, wt-ce-w2fix geraeumt/Branch-Ref bleibt, wt-ce-ph89
+gesaeubert). (L2) super bau/wellenplan-offene-punkte @ dec105ae per --no-ff MIT
+HARMONISIERUNG als Merge da0bef4c in super development gelandet (Wellenplan
+harmonisiert 5406 Z., par-Ordnung 23<24<25<27, '^# 26.'=0; Designplan 984 Z.;
+beide Konfliktdateien STRIKT ADDITIV +255/+1695; DESIGN-90-Proben 0/3/2; N-33-
+Gegenlese VOR dem Merge dokumentiert; par.27.7.4-Sperre durch die Landung
+aufgeloest, A-KW-1/2 via c70f23fc in dev; wt-super-wellenplan geraeumt/Branch-Ref
+bleibt). (L3) Gitlink-Bump ce 943c70ee -> 2168f60c ATOMAR mit PZW-9.5-Nachzug als
+8a90e3fe (Z23-Muster a23e6cda; s. KON124-02) + EIN Phasen-Dual-Push
+ed636f8c..8a90e3fe (17 Commits) origin+github (vor_push_alle_wachen 13/26
+gefahren, alle gefahrenen GRUEN + [C2]-Gegenstands-Beweis rc=0/0 Befunde am
+git-archive-Baum von 8a90e3fe; gitleaks Koeder Laenge 26/Selbstbiss LITERAL
+'leaks found: 1'/Echt-Scan 0 Funde/Nenner 17==17) + CI 288: Pipeline 16210 @
+8a90e3fe SUCCESS TERMINAL, Nenner 36 Jobs + 1 Bruecke = 37, alle success;
+docs:plan-zahlen-wache SUCCESS; Bruecke trigger:cache-engine -> downstream
+ce-Pipeline 16211 SUCCESS. Klassen-Abweichung zur 16200-Referenz (36+2) am
+Objekt erklaert: nur der ce-Gitlink aenderte sich; trigger:prt-art ist
+changes-gated auf den prt-art-Pfad (.gitlab-ci.yml Z.1379ff) und feuert
+korrekt NICHT (Z23/16200 hatte BEIDE Gitlink-Bumps).
+
+**KON124-02 (PZW-TAFEL-NACHZUG 44->45 + Di-25-Abgrenzung):** Designplan par.9.5
+im SELBEN Commit wie der Bump (8a90e3fe): CE-SHA -> 2168f60c, SCHEMA-STELLEN
+44 -> 45 (+1 Code-Zeile tests/unit/test_s13_03_per_binary_mappe.cpp:217),
+DATEIEN/LITERAL/AUFRUFE/ALTMUSTER unveraendert 24/2/2/0, Nenner unveraendert
+564 Test-.cpp (0 neue Test-.cpp in 943c70ee..2168f60c), Rohzeilen 63->64,
+2968 Z. .gitlab-ci.yml. LIVE mit den Original-Formeln der Wache; Kontroll-Lauf
+am Alt-Stand 943c70ee rc=0 '5 von 5'; Drift-Biss VOR dem Nachzug rc=2 (Wache
+verweigert bei CE-SHA-Drift); Gegenprobe Bissproben-Kanal und Live-Lauf am neuen
+HEAD je rc=0 '5 von 5 Ankern'. Der PZW-Anteil des Di-25-Vorbehalts der LANDE-
+STAND-Zeile (Designplan Z.246) ist damit VOLLZOGEN (die Wache koppelt den
+Plan-Anker an den Gitlink; ohne Nachzug im selben Commit waere
+docs:plan-zahlen-wache rot). Beim Di-25-docs-Zug verbleiben: UEBERHOLT-MARKER-
+Prosa-Zahlen (der par.9.5-Marker nennt b3dc3e93 noch 'lokal fertig/ungepusht'
+-- laengst gelandet), N-33(e)/RN-27-Austragung, und er darf die KON124-/par.27-
+Anker-Zahlen nachziehen (FIX-2).
+
+**KON124-03 (ANKER-VERMERK par.27, FIX-2; additiv, KEIN Datei-Umbau):** Die
+par.27-Zeilenanker der W2-ABSCHLUSS-PFLICHTTAFEL referenzieren die BRANCH-
+Fassung dec105ae. Nach der L2-Harmonisierung gilt fuer Teil-A-Anker (ab
+'# 24.') der Offset +16 -- am Objekt bestaetigt: '# 24. EINPLANUNGS-NACHTRAG'
+branch Z.3695 -> harmonisiert Z.3711; Vorfeld-Anker (vor par.24) sind
+INDIVIDUELL zu pruefen (die 16 dev-Einfuegungen verteilen sich ungleich).
+Gegenstands-Doppelung im Text traegt: Anker IMMER via Wortlaut doppeln,
+Nummern-Delta ist dann unschaedlich.
+
+**KON124-04 (N-33-QUITTUNGEN mit exakten Suchmustern, FIX-4b):**
+(b) ERLEDIGT-BESTAETIGT: spezifischer par.24-EINPLANUNGS-MARKER = 1 Stelle
+(branch Z.2297 = harmonisiert HEAD Z.2306, Vorfeld-Offset hier +9 -- Beleg,
+dass Vorfeld-Anker INDIVIDUELL laufen; Wortlaut-Anker '^^ EINPLANUNGS-MARKER
+23.08.2026 (par.24): Fall-Deklarat UEBERHOLT (KON120-06 Doppel-JA)'). Die
+Muster-FAMILIE '^^ EINPLANUNGS-MARKER 23.08.2026 (par.24)' trifft harmonisiert
+2 Stellen (Z.2306 Fall-Deklarat + Z.2542 LABEL-KOLLISION; Zaehlweise
+deklariert) -- der SPEZIFISCHE KON120-06-Marker bleibt genau 1. Substring
+'KON120-06' = 10/0/0 branch/dev/basis (Nenner: ganze Datei je Fassung).
+(c) STALE-QUITTUNG: branch Z.4543 '(c) Z.718 CCD-Korrektur weiterhin offen'
+war bei der Landung STALE -- der dev-KORR lebt: Suchmuster
+'KORR 24.08.2026 T14-1' = 0/1/0 basis/dev/branch, Fundstelle dev-Fassung
+ed636f8c Z.722 = harmonisiert HEAD Z.726 (##55-Segment der Sammelzeile
+'##55 (L3-Asymmetrie prod1-eigen: 96+32 MiB (2 CCD) [KORR 24.08.2026
+T14-1/T12b/K-1: vorher "2x128 MiB CCD" ...]'; Alt-Wortlaut '2x128 MiB CCD'
+konserviert, 1 Treffer am HEAD, Doku additiv). KEINE Datei-Aenderung noetig;
+die Gegenlese-Zeile ist Historie der Branch-Fassung, diese Quittung ist die
+geforderte Austragung.
+(e) OFFEN-BESTAETIGT: 'KON60-04' Gegenstands-Stellen 2/2/2 (basis Z.3152/3383,
+dev Z.3161/3399, branch Z.3189/3425) + 1 Meta-Treffer branch Z.4544 (= die
+N-33-Gegenlese-Zeile selbst); harmonisiert HEAD: Gegenstands-Stellen
+Z.3198/3441 ('KON60-04-Spannung S-6 (stale, blockiert nicht)') + Meta Z.4628;
+beidseitig offen -> RN-27, Austragung Di-25.
+
+**KON124-05 (N-33(d) STAU-ZEILE, EIGENE):** STAU: O2-Standard-Owner-Entscheid
+weiterhin PLAN-LOS, owner-gated (s. Designplan par.13.2). Kein Bau-/Docs-Zug
+schliesst diesen Posten ohne Owner-GO; die Zeile bleibt hier sichtbar stehen,
+bis der Owner entscheidet.
+
+**KON124-06 (RESTPOSTEN + GATES NACH DER REST-LANDUNG):** (1) K4 main-FF
+ce+super weiter owner-gated F-13 (Z27-Beleg Gate-ZU; vor FF: Bereiche NEU
+messen, Diff-Hygiene ueber den VOLLEN FF-Bereich, TABU-Zaehlweise LITERAL
+deklarieren [FIX-4a], ce-lokal-main mitziehen). (2) [C2]-Spiegel-Treue-Luecke
+von scripts/vor_push_alle_wachen.sh bleibt beim gefuehrten Traeger
+(Z23-PROTOKOLL Abschn. 4 Restposten 1; Wachen-/YAML-Zug Staffel 3,
+YAML-Schreiber-Hoheit). (3) Di-25-docs-Zug s. KON124-02/-03/-04(e).
+(4) Board-Buchungen (#139/#136/#131-Haken) = Lead-Zug; ENTWUERFE liegen in den
+STAND-Dateien der Lande-Schritte. (5) KON-Nummer FRISCH gemessen vor
+Einspielung: Ledger-Kopf = KON123, Substring 'KON124' = 0 Treffer; Einspielung
+NUR via scripts/ledger_nachtrag.sh (Einfuegepunkt nach Kopf + Zeilen-Gegenprobe).
+
 ## KON123 (24.08.2026 spaet, Lead an der Landung): W2-LANDE-ZUG TERMINAL 27/27 — ZUG-SCHLUSS-QUITTUNGEN Z25/Z26/Z27 + Endstaende + Nachlande-Tafel
 
 **KON123-01 (ZUG-SCHLUSS):** Alle 27 Ziele abgeschlossen — 26 GELANDET (Z01
