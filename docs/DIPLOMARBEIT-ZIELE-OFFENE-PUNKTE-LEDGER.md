@@ -16,6 +16,85 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON126 (25.08.2026 mittags, A2.5-FIX Runde 2 der Rest-Landung): RE-VERIFY-FUNDE RV-01..RV-05 QUITTIERT -- Anker per Wortlaut/Block statt Zeilennummer (RV-01), TABU-Formel je Zahl (RV-04), RC-Datei-Auflage (RV-02), LastTest-Stub-Hinweis fuer K4 (RV-03), prunable Worktree in der Raeum-Liste (RV-05)
+
+**KON126-01 (RV-01 STALE ZEILENANKER -- Korrektur additiv; Anker ab jetzt per Wortlaut + KON-Block):** Die Quittung
+R-06-REST der Runde 1 (A25-STAND.md A2: 'Traeger W2-2/#106+#3 (Ledger Z.474/673)') nannte Zeilennummern des Standes
+dfd97102, gemessen VOR dem eigenen KON125-Nachtrag (ledger_nachtrag.sh fuegt am Kopf ein: +91 Z.). Am Objekt 33c8a50e
+liegen dieselben Wortlaute auf Z.565 und Z.764 (git show dfd97102: Z.474/673 = genau diese Zeilen); DIESER Nachtrag
+verschiebt sie erneut. GELTENDE ANKER (Wortlaut, je genau 1 Treffer im Ledger @ 33c8a50e): (a) KON122-06 STRANG-
+BUCHUNGEN, Absatz (3) ENTWURF-NACHTRAG 22.08. G2-Vollzug: 'STATUS: OFFEN + Traeger W2-2/#106+#3 UNVERAENDERT; die
+Endstand-Runde (L-06, gcc DANN clang) ist jetzt gegen 943c70ee zu fahren'; (b) KON122-09 RESTPOSTEN-TAFEL: '- Naechste
+Zuege: L-06 W2-2-WARNUNGS-REVIEW ZWEIMAL (gcc DANN clang) am 943c70ee (OFFEN-Umfang: Delta c2da9d1a->66de5c09 +
+Endstand-Runde; die zwei benannten Nebenbefunde gehoeren hinein ...)'. Sachstand unveraendert: Endstand-Runde BEHOBEN
+(KON125-01, ce d3b5a393), L-06-REST (Delta-Review c2da9d1a->66de5c09 + Nebenbefunde + Codex-Pass) VERTAGT beim Traeger
+W2-2/#106+#3. Gleiche Klasse: A25-STAND A2 super-Gates '.gitignore Z.105 Code/measure_out_*/' -- Z.105 ist die
+Kommentarzeile '# Bau-Ausgabe-Ordner des Mess-Treibers (Code/measure_out_*): reine Zwischenablage.', das Muster
+'Code/measure_out_*/' steht auf Z.116 (super .gitignore @ 33c8a50e; L2/L3 nannten '.gitignore:116' korrekt). REGEL
+(bestaetigt KON124-03): Zeilenanker IMMER mit Wortlaut doppeln; im Ledger zusaetzlich den KON-Block nennen, weil jeder
+Kopf-Nachtrag alle Zeilennummern darunter verschiebt. Belege a25-fix-r2/rv01_anker_wortlaute_r2.txt.
+
+**KON126-02 (RV-04 FORMEL-PRAEZISION zu KON125-05, additiv; FRISCH 25.08. 11:34Z @ ce d3b5a393 == 2168f60c, porcelain
+0):** KON125-05 fuehrt in der Kandidatenliste '394/849/926/444/819/838' die 394 unter der Wort-Ueberschrift; 394 ist die
+VERZEICHNIS-Formel. Je Zahl die Formel: WORT-Formel `git ls-files | grep -ci '<wort>'`: golden 16, heuristik 17,
+topics 395, axes 474, axis 893. VERZEICHNIS-Formel `git ls-files | grep -Ec '(^|/)<verz>/'`: topics 394, organ_axes 425,
+system_axes 17, mess_axes 2, Summe 838. Differenz topics 395 - 394 = 1 = tests/unit/test_v41_topics_fundament.cpp (Wort
+im Dateinamen, ausserhalb libs/cache_engine/topics/). ls-files -d 0, porcelain auf TABU-Pfaden 0; Kontrolle @ 2168f60c
+identisch (395/394/16/17). K4-AUFLAGE PRAEZISIERT: VOR dem main-FF BEIDE Formeln am dann geltenden SHA wiederholen und
+je Zahl die Formel nennen -- 394 (Verzeichnis) neben 395 (Wort) ist KEINE Drift. Beleg a25-fix-r2/fix4a_formeln_r2.txt.
+
+**KON126-03 (RV-02 BEWEIS-AUFLAGE / RV-03 K4-HINWEIS / RV-05 RAEUM-LISTE):** (RV-02) Der [C2]-Gegenstands-Beweis der
+Runde 1 (cppcheck am git-archive-Baum von 4b1a6eac) liegt als 0-Byte-Log OHNE persistierten RC vor (a25-fix-r1/cppcheck-
+ci-spiegel-getrackter-baum-a25.log; rc=0 nur in Prosa) -- die Re-Verify hat ihn eigenstaendig nachgeliefert (EXAKTER
+CI-Aufruf .lint-static am Archiv 33c8a50e:Code: a25-reverify-r1/cppcheck_rc.txt 'RC=0', 0 Befundzeilen). AUFLAGE ab
+jetzt fuer jeden Gegenstands-Beweis: RC-Datei neben dem Log (RC + Zeitstempel + Befundzaehler), nie nur Prosa; diese
+Runde haelt sie ein (a25-fix-r2/cppcheck_rc_r2.txt). (RV-03) build/a25-gcc-release/Testing/Temporary/LastTest.log ist
+seit Gate [5/6] (ctest -N 09:54:24Z) ein 121-B-Stub 'Start testing/End testing'; jedes ctest -N am Baum tilgt den
+Vollauf-Eintrag (Re-Verify 11:16:04Z erneut; diese Runde fuhr KEIN ctest am Baum). K4-/FF-DOSSIER-AUFLAGE: den
+K17-Vollauf-Beweis NUR als gesicherte Kopie zitieren (a25-fix-r1/zelle-gcc-release/LastTest.log 2706401 B, mtime
+09:53:41Z; ctest-voll.log Z.1093 '100% tests passed, 0 tests failed out of 545'); kein Handlungsbedarf am Baum (Floor-
+Gate-Baum bleibt stehen, ctest -N liefert weiter 'Total Tests: 545'). (RV-05) ce 'git worktree list' fuehrt 1 prunable
+Eintrag von 26 (FRISCH 11:34Z): /tmp/claude-1001/-home-comdare/46375cdc-.../scratchpad/ce-audit-7150cc51 (detached @
+7150cc51 = 'Merge branch development into w3-OS-U3' 02.08.; 'gitdir file points to non-existent location'; Admin-
+Eintrag .git/modules/.../worktrees/ce-audit-7150cc51 vom 17.08.); 7150cc51 ist Vorfahr von development (JA), 0 Branch-
+Refs zeigen darauf, Verzeichnis existiert nicht -> ein 'git worktree prune' verliert nichts. In die R-04-Raeumliste
+(KON123-07 (7), Lead-GO) AUFGENOMMEN; NICHT ausgefuehrt. Belege a25-fix-r2/rv03_lasttest_stub_r2.txt,
+rv05_prunable_worktree_r2.txt.
+
+**KON126-04 (RESTPOSTEN DREIWERTIG R2 -- die 17 Quittungen der Runde 1 hat die Re-Verify am Objekt BESTAETIGT, keine
+widerlegt):** BEHOBEN: RV-01 (-01), RV-04 (-02). ENTLASTET: RV-02 (Beweis nachgeliefert + Auflage verankert), RV-03
+(Hinweis verankert, kein Handlungsbedarf am Baum). VERTAGT mit Traeger + Platz: RV-05 (R-04 Lead-GO, s. -03); R-02/R-11
+Board-Buchungen (Lead; ENTWUERFE A25-STAND.md A6 + R2-Nachtrag); R-03 K4 main-FF (Owner F-13; Bereiche FRISCH 25.08.
+11:36Z: ce origin/main e114cabd..origin/development d3b5a393 = 317, super 85dc85e8..33c8a50e = 437 (+1 durch diesen
+Ledger-Commit), je is-ancestor JA; ce main lokal b241a272 = 638 hinter origin/development, beim FF mitziehen); R-04
+Raeumung (Lead-GO: build/gcc-release ALT 3.8G, build-dbg 8.1G, build-dbg-clang 3.3G, build-l1 3.8G, build-l1-clang 829M,
+super build/ 3.2G + prunable Worktree-Eintrag); R-08(b) N-33(e)-Austragung (RN-27, wortfertig a25-fix-r1/rn27_n33e_
+kon60_04_austragung_entwurf.txt); R-09 [C2]-Spiegel-Treue (Z23-PROTOKOLL Restposten 1 / Staffel 3, YAML-Hoheit); R-10
+N-33(d) (Owner, KON124-05); L-06-REST (W2-2/#106+#3, s. -01); K3 gtest-Fremdcode gtest-printers.h:524 (RN-28/#71 bzw.
+googletest-Bump); #114-Frist Mi 26.08. 06:00 (Owner: Ausfuehrender; KON122-09-Restposten-Tafel '#114-Frist-Marke +
+E07-Q1-Re-Run-Traeger (offene Frage 8, vor Mi 26.08. 06:00)'; Rezept b10-beweislauf/BEWEIS.md Par. 9 '< 1 h'; Lage
+FRISCH 11:36Z: build-b10-Beweisbaum (KON122 'BEHALTEN, 44 Mess-CSVs') existiert weder im ce-Hauptklon noch unter
+/home/comdare/wt-ce-* noch sonst unter /home/comdare (find maxdepth 5, 0 Treffer) -> Re-Run = frischer Configure-Bau
+nach Rezept, Wegwerf-Quellen b10-beweislauf/src/ 3 Dateien vorhanden; Rest 18 h ab 11:36Z); Codex-Login (Owner/Vault;
+FRISCH 11:33Z: auth.json 0 B, 'codex login status' rc=1 identisch). KON-Nummer FRISCH vor Einspielung: Kopf KON125,
+Substring 'KON126' = 0 Treffer; Einspielung NUR via scripts/ledger_nachtrag.sh; Beweisort ~/backups-workflow/
+20260824-rest-landung/{A25-STAND.md (Abschnitt Runde 2), a25-fix-r2/}. K4 main-FF NICHT ausgefuehrt; Board NUR ENTWURF.
+
+**KON126-05 (NEUER FUND R2-01, Messdaten-Doktrin -- build-b10-Beweisbaum WEG, Traeger Lead):** KON122 (Z.712 @ 33c8a50e:
+'build-b10 BEHALTEN (44 Mess-CSVs, P12/#114-Beweisbaum)') sicherte den Baum am 22.08. ausdruecklich; er lag in
+wt-ce-trigfix/build-b10 (A60.md Z.308). Lage FRISCH 25.08. 11:4xZ: wt-ce-trigfix ist weder Worktree noch Verzeichnis
+(ZUG-BILANZ.md Z.117 'wt-ce-trigfix (0f900dcf, build/ weg; #114-Vorbehalt beachten)'), build-b10 existiert nirgends
+unter /home/comdare (find maxdepth 5 = 0), und in den Beweisorten liegt KEINE CSV-Kopie (b10-beweislauf/ 0,
+20260822-lande-zug/ 0, backups-workflow ipath '*b10*'/'*trigfix*' je 0; BEWEIS.md Par. 10 listet keine csv). Code-Seite
+unversehrt (bau/trigfix 0f900dcf lokal+origin, Vorfahr von development, gelandet via f7b64039 = Z07). Ein Raeum-Beleg
+der Worktree-Loeschung fehlt in den Beweisorten (md|txt|log neuer als 24.08. 20:18Z mit 'wt-ce-trigfix': 1 = ZUG-BILANZ
+.md selbst, mtime 20:18:45Z; '*wache*'-Dateien mit 'trigfix': 2 = Z25-Push-Wachen-Logs zu docs-Kopien, KEIN
+worktree_remove_wache-Log). OFFEN beim Lead:
+(a) Raeum-Beleg der Doppel-Bedingung (0 tracked / 0 csv,xlsx) fuer build-b10 beibringen ODER die 44 CSVs als
+reproduzierbare Emitter-Ausgabe (kein measurement/-Bestand) deklarieren; (b) #114-Re-Run (Frist Mi 26. 06:00) setzt
+damit einen FRISCHEN Bau nach BEWEIS.md Par. 9 voraus (kein Beweisbaum mehr vorhanden). NICHT von dieser Runde
+geraeumt; nichts geloescht. Beleg a25-fix-r2/r2_01_build_b10_spur.txt.
+
 ## KON125 (25.08.2026 vormittags, A2.5-FIX Runde 1 der Rest-Landung): L-06 ENDSTAND-RUNDE GELANDET (10 Warnungen -> 0 in Haus-TUs) + Gitlink-Nachzug + Restposten-Register dreiwertig + KON124-Luecken + J-1-Kanon + TABU-Zaehlweise + Codex-Defekt
 
 **KON125-01 (A2.5-FIX-R1 VOLLZUG, Beweisort ~/backups-workflow/20260824-rest-landung/{A25-STAND.md,a25-fix-r1/}):**
