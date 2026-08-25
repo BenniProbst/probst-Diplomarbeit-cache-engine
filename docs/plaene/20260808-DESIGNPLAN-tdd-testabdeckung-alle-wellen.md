@@ -243,6 +243,8 @@ PZW-CI-ALTMUSTER   = 0
 > verschiedene Einheiten, zwei verschiedene Zahlen; wer sie verwechselt, wiederholt die
 > Fehlerklasse, die dieser par.9-Abschnitt selbst korrigiert.
 
+[PROSA-NACHTRAG 25.08.2026 (A2.5-FIX-R1, Di-25-docs-Anteil 'UEBERHOLT-MARKER-Prosa', L3-Restposten 2): der Klammer-Zusatz 'Lead-Merge b3dc3e93 lokal fertig/ungepusht' im UEBERHOLT-MARKER oben ist seit der o2-Standard-Landung UEBERHOLT -- b3dc3e93 (Merge bau/o2-standard, 23.08. 21:11Z) ist Vorfahr von ce development und beidseitig gepusht (Kette bis 943c70ee, CI 286 Pipeline 16150 @ 943c70ee SUCCESS; Floor-Anker LIVE 545/541/539, KON123-01). Der Marker-Kern (Ankertafel = PZW-Schema-Stellen, NICHT der Floor-Anker) gilt unveraendert. Additiv, nichts umgeschrieben; Beleg ~/backups-workflow/20260824-rest-landung/a25-fix-r1/ (Ancestry-Probe git merge-base --is-ancestor b3dc3e93 development = JA).]
+
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
 > NACHZUG 24.08.2026 nachts (Rest-Landung L3/K3-Gitlink-Nachzug; Gitlink-Ziel ce
