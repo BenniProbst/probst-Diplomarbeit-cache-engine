@@ -16,6 +16,616 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON129 (25.08.2026 abends, LEAD-NACHLAUF Phase 1): OWNER-KERNE -- A5/X1, PUBLIC, #114-KOEDER, VORTAFEL, EXPLORES
+
+**KON129-00 (UMFANG, QUELLEN, VORFLUG):** Lead-Nachlauf wf_8c890d9a Phase 1 (Fable 5 max, super-Schreiber = dieser Zug)
+nach dem Owner-Wiederanlauf 19:22:38Z. Quellen VOLL gelesen: SYNTHESE-OWNER-VORLAGE.md (583 Z.; Abschnitt 1.5 =
+KON129-ENTWURF, 2-7 Explores, 8 Antwortzeile) + LEAD-OWNER-ANTWORTEN-20260825-1430Z.md +
+SYNTHESE-ROHZITATE-20260825.md; Memories owner-kerne-20260825, trigger-vollbau4-vortafel, a5-synthese, pmc-dtlb-koeder,
+director-lane-parallelism, pre-push-gate-default, unterachse-und-permutation; Beweisorte STAND-114.md (103 Z.),
+VORTAFEL.md (136 Z.), STAND-RAEUMUNG.md, konformitaet kon-entwurf.txt + STAND.md, STAND-E07.md, BEFUND-T1-FINAL.md (329
+Z.), PAUSE-PROTOKOLL.md + PAUSE-PROTOKOLL-2.md, A25-STAND.md + A25-REVERIFY-STAND.md Abschnitt Runde 4
+(RV4-01..RV4-04), 20260825-public-gate/; Rohtranskript 5a19728e-*.jsonl (91.563 Z. @19:2xZ) fuer JEDES Owner-Verbatim
+dieses Blocks (Umlaute transliteriert, sonst wortgetreu inkl. Schreibweisen). VORFLUG 19:27:49Z: super
+HEAD==origin==github ec537aab, porcelain 0, MERGE_HEAD nein, Ledger 33651 Z., Kopf KON128, 'KON129' 0 Treffer,
+Einfuegepunkt Z.19, Gitlink ce d3b5a393, df / 46G frei; ce Hauptklon HEAD==origin d3b5a393, porcelain 0, 30
+Worktree-Zeilen / 1 prunable.
+
+**KON129-01 (A5 + X1 -- OWNER-VERBATIMS, SUPERSEDE, REAKTIVIERUNG):** A5 (Owner 12:17:37Z, 5a19728e:90479,
+human/typed): "A5: Er muss vor der Abgabe vollzogen sein und alle abhaengigen repos muessen um die restriktiven
+comdare-cache-engine lizenzen erweitert werden und muessen auf github und gitlab public gemacht werden. Wir benoetigen
+auslieferungs-faehige Ordnung mit den best practices web recherche fuer Projekt-Aufbau in C++ und Einhaltung der
+comdare Matrix Bauweise mit Layern und baselines mit Modules vs Products Struktur (bitte explore ueber 15 Wochen um das
+nachzulesen und mit Sonet 5 max zu finden)." = R-01-Lesart (P) VOLLZUG (die Lead-Frage 12:04Z, L90475, hatte 'F2' als
+'Anhang-Pipeline' bezeichnet; F2 = IDENTITAETS-FREEZE Fr 21.08. laut KON6-Fristenblock und war schon vorbei -- der
+bindende Rahmen ist die Abgabe Di 15.09.). SUPERSEDIERT (juengstes Owner-Wort gilt): Wellenplan v2
+(docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md) Z.771 '### W7 -- NACH DER ABGABE (Behaelter)',
+Z.2290 '#29-Rest voller Monolith-Split (#88-Familie)', Z.4123 'FENSTER J -- W7 / NACH ABGABE'; KON43-02 'Der volle
+Monolith-Split ist ein Aufraeum-Posten (#88-Familie) -- nicht vor F1/F2' + 'erzwungen'; Task-#96-Register 18.08.
+(Kategorie C). REAKTIVIERT: Ledger-Abschnitt 0-GOAL-MATRIX (26.07.; Owner-Auftrag 08.07. 'Bitte verankere das
+zusaetzliche matrix goal als Voll-Pfad Referenz im Ledger') Status-Zeile 'G5/Modul-Zergliederung erst am' +
+'Projektende (#274)' -> VOR der Abgabe. A5 = Reaktivierung des Owner-Matrix-Ziels 07.07. 08:43:05Z (46375cdc:10628:
+'Nun in Stein gemeisselt sollte eigentlich die Matrix Familien x Baseline-Stufen x Module sein ... die comdare cache
+engine ist ein Framework-Modul und die Diplomarbeit ist deren Produkt und Ausseninterface. PRT-ART ist auch ein Modul
+neben der cache-engine und das overleaf Projekt ist auch ein Produkt, aber ohne baseline Struktur'). X1 (Owner
+14:35:26Z, 5a19728e:91142, human/typed): "X1 -> Nun das Diplomarbeit super repo soll apache sein und enthaelt einen
+Anwendungsfall eines Forschungsprojektes durch die Diplomarbeit selbst, die die cache engine (die restriktiv lizensiert
+ist) verwendet - Die Diplomarbeit beweist sich als Anschauungsmaterial mit sich selbst. ce+prt_art tragen die Comdare
+Research license und sind kommerziell und fuer einzelpersonen zu bezahlen." => KON2-23 (10.08. 10:50Z: super Apache; ce
++ prt-art frei fuer Forschung, proprietaer fuer Business + Einzelnutzung; Thesis Copyright Benjamin-Elias Probst)
+BLEIBT; die KON66-02-'SPANNUNG DEKLARIERT' und das 07.08.-Wort 17:22:55Z (super eingeschlossen) sind
+AUFGELOEST/ueberholt; A5 'alle abhaengigen repos' schliesst super NICHT ein. Objekt ce d3b5a393 LICENSE = 'Comdare
+Research License, Version 1.0' (1.7 'Individual Use is NOT free of charge', 5.1 'Business Use and Individual Use are
+NOT licensed', Change Date 2031-08-10 -> Apache-2.0; heute gelesen) = deckungsgleich; prt-art identisch (OF-1 ded8157);
+super Apache-2.0 + Geltungsbereich (LICENSE:203-235) + NOTICE-Wache + test_ci_wache_lizenz_konsistenz. UMSETZUNG
+'erweitert' in super: CRL-Text als LICENSES/LicenseRef-Comdare-Research-1.0.txt + REUSE.toml fuer Code/external/* und
+ce-abgeleitete Artefakte (Anhang-Tabellen, Tier-Reports) + NOTICE-Wache auf Text statt Namensnennung (Delta D3a;
+Traeger d3a-d4 gestartet, s. -06). OFFEN (Owner): Thesis-LICENSE-Datei Copyright-only + CRL-Verweis fuer eingebettete
+ce-Mess-Anhaenge ja|nein (E1-Rest; Empfehlung ja, sonst zeigt GitHub 'no license').
+
+**KON129-02 (PUBLIC-LAGE + ZWEI BLOCKER + GITLEAKS-LAGE):** GitHub BenniProbst/{comdare-cache-engine, comdare-prt-art,
+probst-Diplomarbeit-cache-engine, 20260931-Overleaf-Diplomarbeit} 4/4 public (seit >= 08.08., Deploy-Key-KERN;
+Synthese-Messung 25.08.); Schreibzugriff lebt (github-Pushes 11:09/11:44/12:19/14:27Z RC=0); NUR
+Cluster/keys/github-token.txt (26.07.) stale 401 -> D7. GitLab: 409/409 Projekte der Gruppe comdare (ID 3, rekursiv)
+privat; 286/287/288/289 liegen in comdare/research (ID 6). BLOCKER 1: Projekt-Sichtbarkeit <= Gruppen-Sichtbarkeit
+('Private groups can have only private subgroups and projects'); Gruppen 3 + 6 privat; Umbrella comdare/projekte (ID 8,
+Gesamtplan) bleibt privat (Owner 10.08. 18:35Z 'den Gesamtplan ... stelle ich nicht ins internet'); Weg (a)
+Gruppenkette comdare -> comdare/research auf public (Minuten, root-PAT, restricted_visibility_levels=[],
+signup_enabled=False; private Geschwister bleiben unsichtbar) / (b) Transfer der 4 Projekte in eine neue public
+Top-Level-Gruppe (Pfadwechsel origin-URLs, .gitmodules, CI-Bridges POST /projects/288/pipeline, Doku-Anker; Tage).
+BLOCKER 2: Instanz LAN-only (gitlab.comdare.local 10.0.10.1; gitlab.comdare.de seit 13.07. bewusst abgeschaltet, kein
+oeffentlicher A-Record) -> Internet-Exposition = DNS + Reverse-Proxy + TLS + Sicherheitsreview ODER intranet-public
+(den Out-of-House-Zweck erfuellt der public GitHub-Spiegel = Owner 07.07. 'flache Out-of-House-Sicherung') ODER spaeter
+(kollidiert mit C-2 'NICHTS nach der Abgabe'). OFFEN (Owner): E2 a|b + Internet ja|nein|spaeter (Empfehlung a +
+nein/spaeter). Deploy-Key-Ortsregel HAELT (0 Treffer in 4 .gitlab-ci.yml; Include comdare/cluster/ci-templates 269
+privat). Bleiben privat (KON-51 26.07.: public = Diplomarbeit): Umbrella 8, Modules/comdare-cacheengine-all, ce-core
+294, ce-scratch-split-20260707 539 (1055 Commits/26 GB), ci-templates 269. GITLEAKS-LAGE: (i) Vollhistorie super 6538 +
+ce 3374 Commits --log-opts=--all 'no leaks found' am 10.08. 12:50-12:52Z (Owner-GO A-1 12:40:23Z; Secret-Scrub 02.08.
+776 gitlab-rrt-Treffer in EINEM Commit, Ref 10.08. geloescht; Thesis 15.08. filter-repo message-only KON76-01) -- die
+Lead-Zeile der X1-Tafel 14:21Z 'kein Voll-Historien-gitleaks-Scan belegt' war Falsch-Null (Synthese P-3). (ii)
+D6-VOLLSCAN GEFAHREN 25.08. 15:00-15:07Z (Teammate d6-gitleaks-vollhistorie; per Owner-Pause 15:00Z pausiert,
+Rueckgabe/Bewertung OFFEN; gitleaks 8.30.1, je Repo die eigene .gitleaks.toml per --config, --log-opts=--all, --redact,
+CWD neutral; Beweisort ~/backups-workflow/20260825-public-gate/): Koeder der glpat-Klasse im git- UND stdin-Modus je
+Repo 'leaks found: 1' (4/4 beissen); Echt-Scans rc=0 'no leaks found': super '6909 commits scanned' (rev-list --all
+7035 @ec537aab, 130 Refs, 846,75 MB), ce 3638 (rev-list 3870 @d3b5a393, 405 Refs), prt-art 126 (rev-list 140
+@16c90628), thesis 715 (rev-list 776 @c169fd22) + thesis-Separatklon 619 + Code/external-Kopie 671 je 'no leaks found';
+Differenz gescannt/rev-list = Commits ohne Zusaetze (gitleaks-Hinweis), Nenner-Klassifikation
+nenner-<repo>-nicht-gezaehlt.txt (super 2867 Zeilen = 2761 leer_ohne_diff + 106 merge_ohne_diff; ce 246; prt-art 14;
+thesis 73) deckt die Differenz NICHT eins-zu-eins -> Abgleich = D6-Rueckgabe. Zusatz B (useDefault ohne
+Repo-Allowlists, generic-api-key aus): 4/4 'no leaks found'. Zusatz C (REINE Default-Config INKL. generic-api-key):
+super 130 / ce 39 / thesis 60 / prt-art 0 Treffer = 229, ALLE Regel generic-api-key (Schwerpunkte: Datensatz P05-START
+eu-2005.urls 33 + 22, Session-Backup-JSON/JSONL, thesis sessions/ap-z1-z2-keymap.json 38, bestandslog_lock.hpp 2,
+axis_q1_queuing_lockfree_spsc.hpp 2) -> SICHTUNG dieser 229 Treffer VOR dem GitLab-Schalter D5 = D6-Rueckgabe (die
+Regel ist in den Repo-Configs seit 08.08. bewusst abgeschaltet, dokumentierte Entscheidung; Memory
+gitleaks-Push-Bereich). D6 blockiert D5 bis zur Sichtung; D10 Deploy-Key-/Vault-Recheck unmittelbar vor D5.
+
+**KON129-03 (MATRIX x TRAEGER, AUFMASS, DELTA D0-D10, ZEIT-KONFLIKT):** Versoehnung NICHT GEFUNDEN: Design #29
+(docs/plaene/20260813-DESIGN-zielstruktur-vier-traeger-unterprojekte.md) schneidet nach TRAEGERN, 'baseline' 0 Treffer
+(heute gezaehlt); der Ledger-Abschnitt 0-GOAL-MATRIX ordnet nach Baseline-Stufen ('Jede Diplomarbeits-Schicht hat GENAU
+ZWEI Adressen', Planer/CEB -> baseline_4-build-tools (+0-isa), Tier -> 2-core + 3-search-engine, Mess-Auswertung ->
+comdare-measurement-all b0-b3); GitLab Gruppe 344 comdare/modules/comdare-cacheengine + Projekt 294 (3 Commits, 07.07.)
++ lokal Modules/comdare-cacheengine-all (6 Skelett-Zellen, verletzt INV-1: keine baseline_N, keine Root-CMakeLists).
+OFFEN (Owner): E3 A (1 Design-Tag D8 VOR jedem Datei-Umzug: libs/traeger/* = Product-Zellen des Diplomarbeits-Products,
+jeder Traeger einer Baseline-Stufe zugeordnet; KON43-Stufenregel 'N+1 haengt nur an N' = INV-2 -> EINE Grenz-Wache;
+Empfehlung) | B (Traeger-Split zuerst, Matrix 'am Projektende' -> erfuellt A5 NICHT). AUFMASS ce d3b5a393
+(Synthese-Messung 25.08.): Monolith 1.338 Dateien / 167.697 Z. (+46 D. / +10.505 Z. seit 13.08.); libs/traeger 611 Z.
+in 4 Dateien (heute wc: 611; planner 3 / ceb 1 / tier 0 / hybrid 0) = 0,36 %; von den 61 verbotenen Include-Kanten
+(Design #29) ist 0 aufgeloest: K1 profile_facade->builder 49 (26 experiment_tree, 8 bestandslog, 6 build_orchestrator,
+2 driver_build_variant_signature, 2 codegen, je 1
+workload_driver/measure_storage/lager_ablage/ceb_version_stamp/artifact_transport), K3 6, K4 2 (Design: 1), App-Kanten
+2, K2 3 (nicht neu gezaehlt), TRAEGER-BRUECKE-Marker 3; SPDX-Koepfe ce 34/2.035 (1,7 %), super 26/109 (23,9 %), prt-art
+29/83 (34,9 %), thesis 0/80; REUSE.toml 0/4; Community-Health-Dateien 0/5 in allen 4 Repos; super ohne
+Top-Level-README, thesis ohne README + LICENSE. DELTA D0-D10 (Traeger/Frist Synthese 1.3, Wellen 1.4): D0 KON129
+(dieser Block) + Wellenplan-Herausnahme des Splits aus W7/Kategorie C + #274-Reaktivierung (Lead, docs, sofort) / D6
+gitleaks (gefahren, Sichtung offen, VOR D5) / D3a Lizenz-Dateien ohne Quelltext-Beruehrung
+(LICENSES/LicenseRef-Comdare-Research-1.0.txt in super + thesis nach E1-Rest, REUSE.toml je Repo, NOTICE-Wache Text,
+reuse lint als CI-Gate; ~0,5 T, identitaetsneutral) / D3b SPDX-Koepfe im Quellcode (ce ~2.000 hpp/cpp + 202 Skripte,
+super 83, prt-art 54, thesis 80 .tex; IDENTITAETSRELEVANT fuer ce/prt-art: im E-10/VO3-1(b)-Neustempel VOR dem Trigger
+ODER im Landefenster 04.-11.09. mit D9; super/thesis jederzeit) / D4 Community-Health
+(CONTRIBUTING/SECURITY/CODE_OF_CONDUCT/CHANGELOG/CITATION.cff je Repo + README super/thesis; Haus-Vorlagen
+Products/comdare-steuerrater-a/, Research/comdare-celm/; 0,5-1 T) / D5 GitLab-Sichtbarkeit 286-289 (nach E2 +
+D6-Sichtung + D3a; Infra-Agent, Minuten) / D7 Token-Hygiene (github-token.txt, Store-Token-Scope) / D8 Design-Tag
+Traeger-Split x Baseline-Matrix (nach E3=A; Fable 5 max, 1 T) / D9 Monolith-Split materiell (219 D./58.633 Z.
+Traeger-Substanz, 61 Kanten, tier/hybrid befuellen, 9 apps + 13 tools absorbieren, Tests umziehen, 4 Mini-Pipelines,
+Identitaetsbeweis; Fable-max-Traeger, eigener Worktree, 5-10 AT) / D10 Deploy-Key-Recheck. Schnittlinien
+(Bau-Reihenfolge KON43): S-1 Planer (K1 49 Kanten ueber die 3 TRAEGER-BRUECKE-Marker umdrehen, 2 App-Kanten) -> S-2 CEB
+(K2 Zyklus builder<->mess, K3 6 Querschnitt->CEB) -> S-3 Tier (K4 2) -> S-4 Hybrid -> Rand (apps/tools, file(GLOB) 32
+Stellen -> explizite Listen); Abnahme je Schnitt: Kombibau gcc+clang, ctest voll, Stempel-/Fingerprint-Identitaet der
+Kampagnen-Binaries byte-gleich (Beweiskopie), Pre-Push-Gates 6x, Diff-Hygiene ueber den vollen FF-Bereich; Modul-Zellen
+in Modules/ nur als Referenz-Ziel, NICHT vor der Abgabe befuellt (Flotte bleibt privat). WELLEN: W-A vor Trigger (bis
+Do 27./Fr 28.08.) / W-B parallel Kampagne Sa 29.08.-Do 03.09. (CI HEAVY-gesperrt, Bau lokal/Worktree, keine Landung) /
+W-C Landefenster Fr 04.09. (F4) - Fr 11.09. / W-D Sicherung Sa 12.-Di 15.09. (nur Verifikation + Doku); alles VOR
+15.09. (C-2 17.08. 'NICHTS nach der Abgabe'). ZEIT-KONFLIKT: Trigger fruehestens Do 27.08. (Vortafel 12:52Z), K-4-Kipp
+Fr 28.08. 06:00, Kampagne Sa 29.08.; 0/61 Kanten geloest -> Landung des Splits erst NACH der Kampagnen-Messung (W-C)
+mit Byte-/Stempel-Identitaetsbeweis, Bau parallel im Worktree; 'vor dem Trigger' ist mit 0 geloesten Kanten in < 48 h
+NICHT ehrlich zusagbar. OFFEN (Owner): T nach Kampagne | vor Trigger (Empfehlung nach Kampagne). Fristen-Quelle =
+Ledger-KON6-Fristenblock (F1 Fr 14.08. / F2 Fr 21.08. = IDENTITAETS-FREEZE / Bau-Trigger Mi 26.08. 06:00 / Kampagne ab
+Sa 29.08. / Abgabe Di 15.09.), NICHT docs/termine (dort nur Termin 1-11 bis 18.06.); Abgabe-minus-3-Tage-Reset
+(KON41-01) ~Sa 12.09. (nicht 'T-3' nennen: T-3 ist ein TDD-Vertrags-Posten).
+
+**KON129-04 (OWNER-KERNE 25.08. GESAMMELT -- Verbatim-Anker + Folgen):** 12:17:37Z (5a19728e:90479, human/typed): A1
+"Ja alle geplanten Klassen gehoeren zum Thesis scope also (a), weil wir nach der Diplomarbeit diese als direktes
+Lehrbeispiel wiederverwenden, um den Anwender direkt am Objekt zu schulen." -> F-13 = (a) ALLE DRIN, K01-K14
+(Codex-Lens-Audit #126) = Bau-Posten ab W3, main-FF beider Repos (#19/Z27) ENTSPERRT -> Lead-Nachlauf Phase 3 (Auflagen
+KON128-05). A2 "Korrekt, ja, volles GO, der Trigger bau muss gefahren werden, direkt so bald wie moeglich." -> #114
+(erfuellt, -05) + ##49 Voll-Bau-4 (technische Deckel -06; Mi 26. 06:00 = nur spaeteste Frist, Zeithorizont-Doktrin). A3
+"Ja, GO." (Token-Rotation Projekt 287; B9 "laeuft noch im infra Agenten."). A4 "Genau wie empfohlen, und ich HATTE das
+genau so bestaetigt, aber O3 muss angeboten werden. Also genau wie du es sagst." -> O2 = Standard-Optimierungsstufe
+BESTAETIGT, O3 als Achsenwert PFLICHT (die Lead-Zeile 'nie von dir bestaetigt' war falsch). A5 s. -01. A6 "Bitte 12
+Wochen explore zu allen Fragen, alle sind nicht mit genug Kontext belegt und daher teils beantwortet oder ungenau."
+(F-17/S13A-F2/GN-9 -> -08). B1 "Bitte jetzt nachziehen." (= S02/B-08 Release-Gate dev->main = main-FF beider Repos
+JETZT; Lead-Fehlbuchung 'SOLL-Doku' korrigiert 12:31Z). B2 "Ja genau wie empfohlen." (S02/B-16 Last-Mile: frische
+Anhang-.tex per CI automatisch ins Thesis-Submodul + Overleaf-Doppelzeiger-Wache). B3 "Ja, aber die Messreihen sollten
+in der Engangs-XML definiert sein und in der regel gibt es ein volles default mit allen Messreihen, man kann nur
+waehlen, was man NICHT anzeigen und auswerten will." -> Messreihen A/B/C in der Eingangs-XML definiert, Default = ALLE,
+Auswahl = OPT-OUT (XSD/Planer-Pruefposten). B4 "Bitte nachziehen, beachte die verschiedenen Achsen Kategorien."
+(SOLL-Doku 22 -> 26 Achsen). B5 "Volles GO." (Overleaf Anhaenge B/E + M-TH-01/02). B6 "Bitte 12 Wochen explore, diese
+Festlegung gibt es nicht, weil alle Achsen dynamisch sind und nur der Planer das festlegen kann." B7 "Bitte 12 Wochen
+explore, diese Frage ist beantwortet." B8 "Bitte 12 Wochen explore und dann schauen, was geliefert ist, dann das
+fehlende mit Fable 5 max nachliefern." B10 "Gesehen." (Infra-Quittungen). -- 12:37:30Z (90651, human/typed): Q1 "Das
+hatte ich so gewollt, bleibt so, du kannst es danach gezielt tief lesen. also nur die gefundenen Stellen direkt und
+gezielt tief lesen, nicht den scan an sich." (Explore-Scans auf Sonnet BLEIBEN, Fundstellen gezielt tief mit Fable;
+Memory explore-scan-sonnet-bleibt). Q3 "Bitte jeweils mit audit REKURSIV pruefen, ob der Baum gelandet ist und
+geloescht werden kann, volles GO dafuer." (-07). Q5 "Wir hatten innerhalb der letzten 5 Kontexte nochmal eine volle
+Festplatte und in der Panik koennte der Build geloescht worden sein und muss unter Messung der Festplatte neu gebaut
+werden und gemessen werden." (Konjunktiv = Vermutung; -05). -- 12:54:39Z (90809, human/queued): "T1: Wie empfohlen, das
+war eh der Plan, wenn du genau liest, das Buildsystem hat eine eigene Partition auf dem NAS, auf minio und noch
+irgendwo, bitte nochmal ein Sonet explore wo das war. T2: Das gilt sofort nach unserer fertigen landung und den owner
+fragen. T3: ja/ja/ja . T4: nach. T5: ja" -> T1 = (c) NFS-Anbindung gn_out als Freischalter + Push/Prune je Scheibe im
+Bau-Batch als Robustheit (T1-Explore -06); T2 HEAVY-/CI-Sperrfenster (beide Hosts heavy, NULL CI-/Agenten-Last ~1,5-2
+d) gilt SOFORT nach fertiger Landung + beantworteten Owner-Fragen; T3 R-04/#57 'Trigger IST der Lager-Baum-Vollausbau'
+(kein Vorbau) / E-04-Vollausbau herabgestuft (Owner-R9) / neue Kette S-9..S-13 unvollstaendig -> ALTER WEG (Kaskade)
+fuer diesen Trigger fahrbar; T4 #138 C1 B1-B8 NACH dem Trigger; T5 ##47 Kalibrierlauf GN_TOTAL=64 @O2 JA sobald CI frei
+(4 Perms x 64 = 256 DLLs, 2 Lanes, schreibt nach MinIO Ebene B; nach VO3-1(b)-Landung, s. -08). -- 14:35:26Z (91142,
+human/typed): "Q5: Bitte wie empfohlen A." -> KON127-04 = (A) Klassenregel (-05). "Frage 2: Ich laufe nach dieser Runde
+den codex login." -> Stau KON125-06 (Anker A='STAU: Codex-Login' B=' erneuern' L=26) bleibt bis zum Vollzug (auth.json
+0 B, mtime 24.08. 17:35:12Z, FRISCH 19:2xZ; Codex-Zweit-Lens weiter defekt). X1 s. -01. X2 "Ja, aber aus xlsx wird csv
+als factory, bitte explore dazu nach Claude Code Arbeitsweise mit Sonet 5 max very thourough, 12 wochen. CSV ist
+tatsaechlich Geschwister Repraesentation der Mappe und daher "analog" gespiegelt. CSV kann also anstatt oder
+zusaetzlich zu xlsx erstellt werden, je nach XML Konfigurtion im Eingang der Experiment Anforderung." -> S13A-F2 = (C)
+mit Factory-Semantik (-08). X3 "Bitte mehr Kontext dazu." -> Korrektur 14:43Z unten. X4 "(b) global O2 und nur auf XML
+Eingangswunsch O3 mit bauen (Unterachse kann mit permutiert werden auf verschiedene Versionen aller OX , default ist
+nur O2 gewaehlt)" -> VO3-1 = (b) GLOBAL O2: identitaetswirksam (Vendor-Allokator-Archive COMDARE_FACADE_PERM_LINK_LIBS
+werden IN die Tier-DLLs gelinkt; flagprobe 25.08. @build/a25-gcc-release: 720 TUs = 411 -O3 / 309 -O2),
+Fingerprint-Neuberechnung -> ce-Bauposten VOR dem Trigger im E-10-Fenster (Traeger wf_4cd99fd6, Worktree wt-ce-vo31
+Branch bau/vo3-1-global-o2 +0; Explore + configure-only Flagproben Ist / Soll(b) / Soll(b)+Vendor liegen); F-02
+Enum-Ordnung (Stempel-Bytes) im selben Posten klaeren (Owner X4 nennt F-02 nicht; Vorlage nur, falls eine Owner-Wahl
+bleibt); Opt-Level-Unterachse per XML ueber OX-Versionen permutierbar, Default NUR O2; N-33(d) damit vollstaendig
+owner-entschieden (-08). X5 "Wie empfohlen volles GO" -> B7 Welch = (a) Live-Sample-Pfad bestaetigt, E3 geschlossen
+(-08). -- 14:43:13Z (91215, human/typed) X3-KORREKTUR: "X3: Scheduling muss eine System-Unter-Achse sein, genau wie die
+Threads . Aber es ist eine Echte dynamische Permutations-Achse und das steht auch im Plan, muss also unter target_isa.
+Also Unter-Achse und Permutation schliessen sich nicht aus, bitte versuche das System nochmal zu verstehen" + 14:44:30Z
+(91230, queue-enqueue): "Du musst X3 bitte nochmal mit explore untersuchen und Verstehen, wie die Schichten aus
+Haupt-Achsen und Unter-Achsen aufgebaut sind, das ist sehr komplex" -> ZWEI Dimensionen je Achse: (1) Hierarchie-ORT
+(Organ vs System; Haupt- vs Unter-Achse unter target_isa; 18.07. 'OptO darf es ganz oben gar nicht geben'), (2)
+Permutations-ROLLE (per XML-Eingang permutiert ja/nein, Default-Einzelwert, Kopplung n_bau = organ_produkt x
+system_perms); Scheduling: Ort = System-Unter-Achse unter target_isa, Rolle = echte dynamische Permutations-Achse laut
+Plan; die Lead-Lesarten L1 'SUPERSEDED' (aus registry binary_id='never' abgeleitet) und L2 '27. Organ-Achse' waren
+BEIDE falsch gerahmt; Ist-Abweichung (system_axis_registry.xml sub_axis scheduling parent=target_isa binary_id="never",
+Abgangs-Wache) am Objekt gegen den Plan messen und heilen, nicht 'formell schliessen'; Explores X3 (wf_7f00b85f) +
+Schichtenmodell Haupt-/Unter-Achsen (wf_9720bb21) laufen (Memory unterachse-und-permutation). -- Owner-Order
+Pausen/Wiederanlauf s. -09.
+
+**KON129-05 (#114 RE-RUN GO + KOEDER-ROOT-CAUSE + FIX-BRANCH + KORREKTUR ZU KON128-03 (2)):** #114 E07-Q1 Default-A
+Re-Run: Lauf 2 GO 10/10 @ d3b5a393 (KON128-03; Re-Verify R4 12/12 Kern bestaetigt; Protokoll byte-gleich 22.08.;
+mess_csv/ 30/30 sha OK; Beweisbaum wt-ce-b10rerun/build-b10 204 csv/xlsx ausserhalb _deps, heute bestaetigt, TABU;
+Board-Entwurf 13-ERSATZ-3 = Lead). ROOT-CAUSE des Lauf-1-Kipps (Teammate diagnose-e07-2, 14:24-15:01Z, STAND-E07.md;
+instrumentiert src_diag/b10_k5_diag3_koeder.cpp): KEIN Multiplexing-Fall, sondern ein KOEDER-DEFEKT --
+libs/cache_engine/include/cache_engine/measurement/pmc_event_biss.hpp legt kSlots = kBytes / kStride = 16384 ELEMENTE
+std::size_t an (heute am Objekt d3b5a393 gelesen) -> Puffer 131072 B (128 KiB, 32 Seiten) statt der deklarierten 64
+MiB; Arbeitsmenge passt in jeden DTLB (Zen 5 L2-DTLB 4096 Eintraege); dtlb_misses (perf 'L1 DTLB misses with L2 DTLB
+misses' = page-table walks) zaehlte NUR Erstberuehrungs-Walks frischer Seiten (resident 1/33 -> 197 Walks; nach
+glibc-Chunk-Wiederverwendung im selben Prozess 33/33 -> 0 Walks) -> Biss geschichtsabhaengig (2./3. Erhebung im Prozess
+0); Kandidat 64 MiB echt: 110.353-132.793 Walks je Aufruf, mit Vorberuehrung >= 74k (geschichtsUNabhaengig);
+ausgeschlossen: Huge Pages, Zaehler-Reset/perf-fd, Schwelle, Multiplexing; Rot-Zeugen Alt-Koeder: 20/20 Prozesse
+ungleiche Bisse bei 8x Koeder je Prozess. PRODUKTIONSRELEVANZ: Erstaufruf frischer Prozesse auf prod1 0/269 gekippt (40
+ohne Last + 40 unter Last + 40 realer Planer 'plan dump' unter Last mit 40/40 Plan-Text byte-gleich + 3 + 20 + 160 + 3
++ 3) -> Trigger-Bau/Planer-Einzellauf (EINE Erhebung je Prozess, profile_run_facade.cpp:1125) heute NICHT betroffen;
+ABER CI 383091 (prod2 Intel, warmer gtest-Prozess) dtlb_misses=0 in 16/16 Probe-Zeilen -> die 10.08.-Owner-Ausnahme
+(pmc_befund host-lebendig, 'events=2/4 vs 3/4 zwischen prod1/prod2') koennte ganz oder teils DIESER Defekt gewesen
+sein, kein echter Host-Unterschied -> nach Landung Intel-vs-AMD-pmc_befund neu vergleichen (CI 286 / prod2); auf Intel
+beisst dtlb nach dem Fix erstmals (4/4 statt 3/4) -> pmc_befund-Zeile aendert sich (maskiert, keine golden). FIX auf
+Branch bau/pmc-dtlb-koeder (Worktree wt-ce-pmckoeder von origin/development d3b5a393; heute 'ahead 2' bestaetigt; NICHT
+gemergt, NICHT gepusht, porcelain 0): 6c0d423a T-1 ROT ZUERST (tests/unit/test_pmc_koeder_geschichtsunabhaengig.cpp,
+VierErhebungenImSelbenProzessBeissenIdentisch 5/5 rc=1, literal 'events=3/4' -> 'events=2/4'); 20d6dd2c FIX
+(kPmcKoederBytes 64 MiB / kPmcKoederSchritt 4096 / kPmcKoederSlots 16384 + static_asserts; Puffer per mmap +
+MADV_NOHUGEPAGE, ein Kettenglied je Seite, munmap; mmap-Fehler -> Sentinel fail-closed;
+Erkennung/Kriterium/Fenster-Mechanik unveraendert; Geometrie-Anker-Test; profile_run_facade.cpp:1099 Kosten 30-57 ms
+statt '~20 ms'; scripts/ci_test_inventory_floor.txt 546/542/540 nach +1-Regel) -> T-1 GRUEN 5/5 '[ PASSED ] 3 tests',
+Probe 4x im Prozess 4/4 events=3/4; gcc-Release-Zelle CI-Form KOMPLETT (PRUEFLINGE-Var, J-1 SIEBEN Werkzeuge,
+RE-CONFIGURE, all, comdare_tests, RECONFIGURE2): RC 0/0/0, 0 warning:, 'ctest -N' 'Total Tests: 546', ctest VOLL '100%
+tests passed, 0 tests failed out of 546' (LastTest.log VOR ctest -N kopiert); clang-format-22 konform; TABU-Manifest
+832/832 byte-gleich; Diff gegen origin/development 5 Dateien +217/-26. NICHT GEFAHREN (Wiederanlauf-Reihenfolge
+STAND-E07 'PAUSIERT'): (1) clang-22-Zelle der beruehrten TUs, (2) Floor-Sprossen avx2/basis LIVE, (3) Gates mit
+COMDARE_PRE_PUSH_BUILD_DIR=build/gcc-release im Worktree + vor_push_alle_wachen, (4) R-1-Bauprobe Emitter-v2 x20 unter
+Last. R-1 Emitter-v2 (b10_e07_emitter_v2.cpp: K5A auf den STABILEN Anteil, pmc_befund maskiert, pmc_zeilen 1==1) +
+BEWEIS.md Abschn. 9a liegen additiv (Original unveraendert, sha a903e11e...); R-2 Dossier-K5 = 'byte-gleich im stabilen
+Anteil'. Landung in der ce-Welle (-07); Floor-Anker 546 im PZW/Ledger nachziehen. KORREKTUR zu KON128-03 (2) (RV4-01
+mittel, additiv; KON128-03 bleibt als Historie stehen): (i) die Motiv-Zuschreibung 'Panik-Loeschung' wird
+ZURUECKGENOMMEN -- Owner Q5 12:37:30Z ist eine Vermutung ('koennte ... geloescht worden sein'); der Objekt-Beweis
+(RV2-01/KON127-01) sagt: build-b10 mit den 44 CSVs entfernte P12 SELBST am 22.08. 14:17:10Z nach der #114-Abnahme
+(rm-Kommando woertlich, Session-Doku 'regelkonform'), der Worktree fiel 23.08. 20:52Z regulaer durch Z11; die
+Owner-Panik-Loeschung 24.08. ~17:2xZ traf den ccache, golden blieb 16/16 intakt; der STAND-114-Lead-Nachtrag Z.95-103
+(14:20:50Z, VOR dem KON128-Commit 14:25:38Z; STAND-114 hatte am Commit 103 Z., nicht 93) traegt das gleichlautend. (ii)
+Der KON128-03-Satz mit Anker A='Klassenregel (A) NICHT gezogen' B=' (kein Owner-Wort dazu)' L=53 ist UEBERHOLT: Owner
+14:35:26Z 'Q5: Bitte wie empfohlen A.' = KON127-04 Option (A) KLASSENREGEL -- Beweislauf-Ausgaben sind reproduzierbar
+(Rezept < 1 h) und kein measurement/-Bestand; nach Beweis-Sicherung INKL. CSV-Kopie (+sha256) im Beweisort sind sie
+raeumbar; die Kopie-Pflicht ist am Re-Run bereits erfuellt; Memory owner-kerne-20260825 traegt die Klassenregel. (iii)
+Die Stau-Zeile KON127-04 (Anker A='STAU: Doktrin-' B='Wertung' L=21) ist damit AUSGETRAGEN (entschieden (A); die Zeile
+bleibt als Historie stehen, Voll-Zaehler unveraendert 1). Das Ergebnis 'ENTLASTET' aus KON128-03 (2) bleibt; Ursache
+der Fehlbuchung: A2.5-Fix-R4 las STAND-114 bis 14:17Z und vor dem Commit nicht erneut.
+
+**KON129-06 (TRIGGER-VORTAFEL KURZFORM + T1-SPEICHERORTE + LAUFENDE TRAEGER):** VORTAFEL (Teammate trigger-vortafel,
+Fable max, read-only, 12:30-12:45Z, VORTAFEL.md 136 Z.; Kernzahlen heute gegengelesen): ##49 Bau-Trigger = VOLL-BAU-4
+(Voll-Bau-3 = Pipeline 12713, 23.07. gecancelt) = POST /projects/288/pipeline ref=development mit
+COMDARE_BUILD_GOLDEN_N=true + COMDARE_STORAGE_CACHE=true + COMDARE_BESTANDSLOG=true (+DOC_KEY / OWNER_UUID als Literal
+/ MASCHINE; COMDARE_VARIANT_GATE in den Var-Satz; tote Vars und COMDARE_MEASURE_PROFILE NICHT setzen =>
+all_axes_golden); COMDARE_GN_TOTAL 131072 = super-CI-Default (.gitlab-ci.yml:156) = Per-Perm-Fensterwert; Kaskade
+planer:delegate (plan ci) -> planer:delegate-trigger -> Stufe-1-Child ceb:build/emit/trigger (tier ci) -> Stufe-2
+KONSTANT 4 Batch-Jobs je Lane (kGnBatchSlice=4096, timeout 7d, Lane-Routing avx512->amd, avx2->intel, sonst amd); DER
+TRIGGER BAUT, MISST NICHT (Mess-Jobs manual/inert); Kampagne Sa 29.08. = W3 Debug-GENERALPROBE, echte Messung W5 Sa
+12.-Mo 14.09. nach manuellem Reset. N aus dem Planer @ d3b5a393 (s19_simulate_all_axes_golden_d3b5a393.txt, heute
+gegengelesen): organ_produkt 131072 (prod ueber 18 Organ-Achsen) x system_perms 4 ({O2,O3} x {no_extension,avx2}) =
+n_bau 524288 (Owner-B6-konform: N = Planer-Ausgang), scheiben_aufgerundet 128; je Lane 262144 DLLs (amd/prod1
+no_extension, intel/prod2 avx2); die 12-Perm-Zahl 1.572.864 (V7.4) ist UEBERHOLT. LAGER: lager_bytes 524288 x 428.000 B
+= 224.395.264.000 B (~209 GiB) ohne Sidecars/Logs/build/ccache; S-19 'lager: GERISSEN (lager_bytes=224395264000 gegen
+--lager-budget-bytes=25000000000)', urteil ABGELEHNT rc=1; der Forecast '~58-65G' (Ledger 23.07.) GILT NICHT MEHR; 428
+KB/DLL = GN-9-Kalibrierwert 19.07. (Pipeline 11453, -O3), @O2 NICHT nachkalibriert. PLATZ prod1: 22G frei (12:45Z) ->
+44G nach Raeumung Q3 -> 46G (19:27Z); gn_out = im Director emittierter fester $CI_PROJECT_DIR-Pfad (Z.1558) auf
+derselben Platte wie /, Umleitungs-Schalter NICHT GEFUNDEN; Prune lokal->0 nur im Mess-Batch (Z.1881ff) -> Defizit >=
+~50 GB je Lane (~112 GB) selbst nach Vollraeumung; prod2 / 114G frei (T1 live); NFS /mnt/comdare-buildsystem 15T frei.
+DAUER (unkalibriert @O2; KON58-03 Pflicht-Nachkalibrierung beim ersten 4096er-Batch): 41,4 h einlanig (128 x 19,4 min
+Slice-1-Empirie @24 W), zweilanig ~1,5 Tage Wanduhr (Engpass prod2 ~34,4 h) + ##50 Zweitlauf; RAM prod1 60G/29G used +
+Swap 20G (Beweislauf lief) -> OOM-Doktrin NULL CI-/Agenten-Last waehrend des Baus (RN-39). ERFUELLT: #114 (GO; Re-Run <
+1 h nach jeder Linienbewegung PFLICHT), R-13 (bytes_in_use_peak/CLU-64 entlastet, Wellenplan-Zeile stale), D-08
+Emitter-Weiche Default A (RN-04; keine Owner-Antwort = Default), E-18 (F1 14.08.), KK-5 (Mess-Batch ohne
+allow_failure), B14-Golden-XML (validate rc=0: 18 Achsen, 35 Werte, 2 opt_levels, 2 simd, 7/7 base_tiers),
+AB-02/##34/#13. OFFEN als Dokument: C-01 VOLLBAU-GATE-Vorlage (4 Bedingungen: Lagerhaltungs-Mechanik gebaut +
+Vollausbau #57 = Trigger (T3); Stempel #15 gelandet, Ausnahme E-10; Algorithmen versioniert JA; Messung einbaubar JA),
+C-02 HEAVY-Signal (nicht gesendet; runner-mode.sh prod1 HEAVY_J=16, prod2 nproc=24; Termin T2), ##48
+Platten-Budget-Zeile (nicht gebaut; Ersatz = Tafel Abschn. 3), #91-Verbuchung E-1..E-10 (RN-37), E-04-Vollausbau
+traegerlos (herabgestuft T3). HARTE BLOCKER: (1) PLATZ 224 GB (Weg T1 unten); (2) E-10/#38a2 Stempel-Haelfte
+(organ_stamp_line JE COMP, Tripwire-Ersatz, required-Deklaration) + #86 ORG-19-IO Schritte 1-4 = identitaetswirksam,
+nicht gebaut; Trigger davor = Flotten-Neustempelung (Bau entwertet) -> #133-Zug (unten); (3) ##47 Kalibrierlauf
+GN_TOTAL=64 @O2 nicht gefahren (liefert Bau-s/DLL, Bytes/DLL @O2, Ebene-B-Push-Livebeweis nach der MinIO-Key-Rotation
+#10 14.08., Rerun-Rate, ##41b Kaskaden-Beleg; letzter GN_TOTAL=64-Lauf 11453 19.07. VOR Stempel-Bruch und VOR
+Key-Rotation). Konformitaets-Nebenfund director.hpp:777 (-07). FRUEHESTER PFAD ohne Kuerzung: (1) KON + Owner-Vorlage
+(dieser Block + Antwortzeile -08) -> (2) Raeumung (vollzogen -07) + main-FF beider Repos (Phase 3) -> (3) Platz-Weg
+(T1-Handout unten) + prod2 + HEAVY-Termin -> (4) #133 Designplan E-10 + Bauzug 7 Schritte (K17 4 Zellen, Gates 6/6,
+Landung + Gitlink-Bump + CI 286/288) zusammen mit VO3-1(b), konform und pmc-Koeder in EINER ce-Welle (-07) = final
+eingefrorene Trigger-Linie -> (5) #114-Re-Run auf der finalen Linie (< 1 h, Emitter-v2) -> (6) ##47 -> S-19 simulate
+mit gemessenen --bau-sekunden-je-dll / --bytes-je-dll / --lager-budget-bytes -> ##48 benoetigt/frei -> (7) C-01-Vorlage
+abgenommen + HEAVY-Signal beide Hosts + NULL CI-Last -> (8) POST; danach ##50 Zweitlauf. ZEIT: fruehestens Do 27.08.;
+Fr 28.08. 06:00 = K-4-KIPP-PUNKT (danach faellt das W4-Fangnetz); Mi 26.08. 06:00 nur mit Kuerzung (verboten). LUECKEN
+(NICHT GEFUNDEN / NICHT PRUEFBAR): Kampagnen-XML-Menge (RN-10), heavy-Ist prod1/prod2 (config root-only),
+Runner-Online-Ist (kein API-Token in der Session), ##48-Skript, C-01-Dokument, Ebene-B-Livebeweis nach Key-Rotation,
+GN-9-Werte @O2, Ebene-C-Token-Ist, E-04-Vollausbau-Traeger, G1 (#27 Alt-Board). T1-SPEICHERORTE (Owner T1;
+Sonnet-5-max-Scan BEFUND-SCAN.md 610 Z. 14:33Z + Fable-Tiefenlese BEFUND-T1-FINAL.md 329 Z. 14:54Z; 69
+Transkript-Fundstellen am Original nachgegriffen; live root read-only prod1/prod2/pve1 via Cluster/keys/cluster): der
+Owner hat recht -- DREI Orte MIT ROLLEN seit 11.08. 21:15 (KON13-04/KON15-05, Ledger-Abschnitt G): (1) 'auf minio' =
+minio.comdare.de (EINE Instanz hinter VIP 10.0.60.1; minio.comdare.local ist der OPNsense-Router, KON74-04): Ebene A
+generische Tools/Compiler 'hot zum Job geladen' LIVE in beiden Runner-config.toml ([runners.cache.s3]
+buildsystem-cache); Ebene B Bucket cache-engine-tier-binaries: Mechanik fertig, die 4 Variablen in 288 EXISTIEREN
+(KON58-04), Werte nach Scrub 02.08. entwertet -> Smoke rot -> NEUE MinIO-Keys noetig (mc admin = Infra;
+Vor-Trigger-Checkliste B9); (2) 'eigene Partition auf dem NAS' = nfs://10.0.20.241/nfs/Comdare-Buildsystem (backup1 =
+WD PR4100, Volume_2, exklusiv fuers Buildsystem, Owner 08.08.) = LAGER (CE-Lager-Items, Binaries und Messungen in 2
+Baeumen): prod1 gemountet /mnt/comdare-buildsystem 20T / 5,4T / 15T frei (28 %), fstab noauto+automount, Inhalt 2
+Dateien / 12 Verzeichnisse (kein Tier-Binary, kein CE-Lagerbaum); prod2 NICHT gemountet, KEIN fstab-Eintrag, KEIN
+nfs-common, KEIN V20-Bein (br0.20), NAS unerreichbar (ping 0/1, 2049/111 gefiltert; offen nur 10.0.10.243:2049 =
+V10-VIP); (3) 'noch irgendwo' = backup1 Cluster_NFS/cache-engine-experiment (derselbe PR4100, Volume_1) = AUSGABE-ORT
+('NUR die finale Zusammenfassung, Latex und PDF' + explizit per XML angeforderte Einzelnachweise; physisches Ziel des
+measure-drop-Filterpods): prod1 /mnt/backup1-nfs 19T / 3,5T frei, 313 Eintraege seit 21.07., juengste Aenderung 18.08.
+Executor = SHELL auf beiden Mess-Runnern (prod-baremetal-prod1 id 16, prod2 id 17, uid 996) -> Host-Mounts im Job
+direkt sichtbar; Podman-Runner id 56 (volumes /cache) traegt die Messkette nicht. HANDOUT gn_out -> NAS (prod1 UND
+prod2): gn_out = $CI_PROJECT_DIR/Code/gn_out/<slug>/<host>/perm<idx> (director :1512/:1558/:1637), nur per
+GIT_CLEAN_FLAGS -e am Leben, KEINE Env-Variable lenkt den Pfad um -> Bindung ist eine Dateisystem-Massnahme am Runner;
+Ziel /mnt/comdare-buildsystem/ci-runner/<host>/gn_out (ausserhalb der CE-Lager-Wurzeln binaries/measurement/artifacts
+fuer #57; EIN Ziel je HOST: Batch-Jobs sind je Host resource_group-serialisiert, Sidecar-Resume dll_is_current wird
+slot-uebergreifend wirksam); Variante A SYMLINK Code/gn_out -> Ziel, per Runner pre_build_script nach jedem Checkout
+gesetzt = EMPFOHLEN (git clean -ffdx und Clone-Swap entfernen hoechstens den Link, nie den Inhalt; Runner-GC
+unberuehrt); Variante B BIND-MOUNT innerhalb builds/ ABGERATEN (git clean ohne -e in Stufe-1-Jobs und rm -rf des
+Projektverzeichnisses DESZENDIEREN in den Mount = Klasse des 17.08.-Zwischenfalls 'ein rm DURCH haengende NFS-Mounts
+zerstoerte einen Backupstore', comdare-runner-gc.sh); C builds_dir auf NFS abgelehnt (Compile-Bremse); D Podman-Volume
+nicht Teil. prod1-Schritte < 15 min, kein Reboot, Fenster ohne laufenden Batch-Job; Job-Log-Marker '[gn_out-bind] ...
+-> /mnt/comdare-buildsystem/ci-runner/prod1/gn_out'. prod2-VORBEDINGUNGEN (fehlen heute; Reihenfolge strikt): P1
+nfs-common (Candidate 1:2.6.4-3ubuntu5.1); P2 Netzweg zum NAS -- V-A symmetrisch zu prod1 (br0.20 + freie V20-IP; .212
+und .213 sind Keepalived-VIPs 'NFS Gruppe B/C' auf pve1 -> Schema-Abweichung; vid20 tagged am prod2-Switch-Port =
+Lockout-Risiko, OOB nur seriell COM4) / V-B routed ueber OPN (Regel 10.0.60.212 -> 10.0.20.241 fuer 111/2049/mountd auf
+beiden OPN; kein Lockout, Cluster_NFS bleibt unerreichbar = fuer gn_out irrelevant) / V-C NFSv4 ueber VIP .243
+(unverifiziert; Infra-Doc 27.07. #233 offen; showmount ueber VIP hing 07.08.); P3 fstab wie prod1 (vers=3, soft,
+x-systemd.automount, idle-timeout 600); P4 Schreibprobe als gitlab-runner; P5 Symlink + Hook (prod2-Block hat heute
+KEIN pre_build_script); P6 Verifikation/Rollback. Platz-Nachweis: NAS 224 GB = 1,5 % von 15T (selbst 2.097.152 x 0,44
+MB ~ 0,9 TB = 6 %); prod1 43G / prod2 114G reichen NICHT; Runner-builds heute prod1 32G / prod2 20G. OFFEN (Owner,
+zwingend): D1 prod2-Netzweg V-A | V-B | V-C (Empfehlung V-A = prod1-Symmetrie, Owner-Symmetrie-Prinzip 21.07./09.08.;
+falls COM4-Lockout nicht absicherbar: V-B). Kenntnisnahmen: COMDARE_NFS_DROP_TOKEN FEHLT in 288 (Ebene C inert,
+KON58-04) + Ziel-Filter (nur Zusammenfassung/LaTeX/PDF) nicht gebaut (KON32-01); CE-seitiger Lager-Schreibpfad
+(lager_ziel_strategie.hpp LagerBackend nas_ablage + ZielKonfiguration nas_wurzel = 0 produktive Befueller;
+LagerBaumWriter 0 Aufrufer; Default-Matrix :160-172 Stand 26.07. aelter als KON67-02) = Bau #57 / Wellenplan A-4, kein
+Owner-Entscheid. LAUFENDE TRAEGER (Stand PAUSE-PROTOKOLL-2 15:01Z, Wiederanlauf 19:23Z): E-10/#133 wf_bc166beb (Explore
+TERMINAL ~14:45Z: EXPLORE-E10.md 600 Z., 22 Owner-Verbatims V-01..V-22, Nutzlast 0 Commits/270 Refs, Gate 2/2 erfuellt;
+Design D0-D6 erhoben 14:35-15:30Z (Board #133/#38/#86/#120/#131, Code-Nachpruefung, H-23, RECENCY-VERDIKT,
+Ledger-Fenster, Luecken L-1/L-1b/L-6/L-7/L-9/L-10/L-11/L-13), D7 Designplan-Datei 20260825-DESIGNPLAN-E10-38a2-ORG19.md
+in Arbeit (Designer-Instanz 2 nach Riss), D8 Gegenlesen offen; Lead-Auflagen der Landung: PZW-9.5-Nachzug im
+Gitlink-Bump, Floor-Datei bei neuen Tests, Lock-Regen-Commit, #114-Re-Run, prt-art 287 gegen den neuen ce-Stand, RN-37
+Ledger-Zeilen E-1..E-10, Vollaudit-BU); VO3-1(b) wf_4cd99fd6 (-04); X2 CSV-Factory wf_53d967b8
+(rohzitate-x2-eigene-verifikation.txt: 'factory pattern' bereits am 08.08. 13:33:46Z L19094, VOR dem 09.08.-'strategy
+pattern'-Satz L23301); X3-Scheduling wf_7f00b85f + Schichtenmodell wf_9720bb21 (Sonnet-Scans; Beweisorte 19:27Z noch
+leer); D6 gitleaks (-02); D3a/D4 Lizenz + Community-Health (Neustart 2 nach Riss 15:02Z, Schritt 0 Gedaechtnis;
+Worktrees wt-ce-a5reuse / wt-super-a5lizenz / wt-prt-a5reuse noch nicht angelegt); Rueckfragen-Fold wf_c37fb077 (20/16,
+Fold 4ff); Lead-Nachlauf wf_8c890d9a (Phase 1 = dieser Block; dann Phase 2 Commit + Gates + Dual-Push, Phase 3
+ASCII-Korrektur KON123 + main-FF ce -> super, dann ##47). HEAVY/T2 erst nach fertiger Landung + beantworteten
+Owner-Fragen.
+
+**KON129-07 (RAEUMUNG Q3 + KONFORMITAET GATE-DEFAULT/DIRECTOR + CE-LANDEWELLE):** RAEUMUNG Q3 (Owner Q3-GO 12:37:30Z;
+Teammate raeumung-q3 Fable max 12:39-12:50Z; Detail KON128-04; Beweisort 20260825-raeumung-q3/ mit SHA256SUMS 63/63):
+6/6 Bau-Baeume nach rekursivem Audit (a) Herkunfts-SHA + is-ancestor rc=0, (b) Beweiskopien benannt und byte-gleich in
+beiden Beweisorten, (c) ls-files 0 + csv/xlsx 0 (auch in _deps), (d) nested .git 0 + keine Worktree-Registrierung, (e)
+cwd/fd/maps/fuser/slot leer -- je EIN rm-Schritt (K14) mit df vor/nach literal: ce build-l1 (Z12-Neufahrt gcc-rel
+@943c70ee) 21G->25G, build-l1-clang 25G->26G, build-dbg 26G->34G, build-dbg-clang 34G->37G (je 545/545 belegt), ce
+build/gcc-release (L1-Zelle 4 @2168f60c, abgeloest durch build/a25-gcc-release) 37G->41G, super build (seg4-58-Vollbau
+@5ca82678 / ce 20c111c4 / prt-art d11781fa / thesis c169fd22, Provenance-Header) 41G->44G; alle rm_rc=0,
+'D'-Nachkontrolle 0, 0 Messdaten (CSV/xlsx 0/0 in allen sechs); TABU ce build/a25-gcc-release 3.8G (Floor-Gate-Baum
+d3b5a393) + wt-ce-b10rerun/build-b10 unangetastet; kein commit/push/merge/checkout/prune. NEU daraus: H-1 Gate-Default
+WEG (unten geheilt), L-1 Rest-Landungs-Beweise (20260824-rest-landung/, 20260825-*/) fehlen im Vollaudit-BU
+20260824-vollaudit-welle2-stand -> naechstes Wellen-Ende-BU (Lead/Owner, docs-only), H-2 zwei Baeume trugen nur
+121-B-LastTest-Stubs (Doktrin BEWEISORTE = GESICHERTE KOPIEN bestaetigt), H-3 prunable ce-audit-7150cc51 steht (RV-05,
+Lead-GO; ce worktree list heute 30 Zeilen / 1 prunable), H-4 ce .gitlab-ci.yml:1169/1178 'build-dbg' betrifft nur den
+Runner-Checkout. KONFORMITAET (Teammate konformitaet-gate-director-2, 14:13-14:40:19Z TERMINAL; Worktree wt-ce-konform
+Branch bau/konform-gate-director von d3b5a393, heute 'ahead 2' bestaetigt; NICHT gemergt, NICHT gepusht; Beweisort
+20260825-konformitaet-gate-director/; Vorlauf-Instanz starb 12:58Z ohne Ergebnis): (1) 4488d24f H-1 GELANDET-ENTWURF --
+scripts/pre_push_lande_gates.sh [5/6] FLOOR: COMDARE_PRE_PUSH_BUILD_DIR PFLICHT (Exit 2 ohne Var mit Hinweis-Liste der
+konfigurierten Baeume, nichts wird gewaehlt; Variante B 'juengster build/*gcc-release*-Baum' verworfen = Raten, ihr
+Frische-Kriterium wuerde durch ctest -N selbst zerstoert), drei Gegenstands-Proben (CMakeCache + CTestTestfile;
+CMAKE_HOME_DIRECTORY == Repo-Wurzel -> Worktree gegen Hauptklon-Baum = ABBRUCH; keine CMake-Datei juenger als die
+Registrierung), LastTest.log-Schutz um ctest -N (AM OBJEKT cmake 4.3.4: 'ctest -N' ueberschreibt
+Testing/Temporary/LastTest.log 612 B -> 121-B-Stub = der RV-03-Mechanismus); Aufrufer des Skripts: kein CI-Job, kein
+Hook, nur Lead-Rezepte; KOEDER VORHER (Skript @d3b5a393): Worktree-Lauf gegen den FREMDEN Hauptklon-Baum a25 -> 'GATE
+[5/6] GRUEN: 545 == 545 (exakt)' rc=0 = falscher Gegenstand als GRUEN; NACHHER: ABBRUCH rc=2 'gehoert zu einem ANDEREN
+Checkout'; ohne Var ABBRUCH rc=2; synthetischer Baum mit Zufalls-Marker-LastTest.log -> Gate ROT (1 < 545), Datei
+danach byteidentisch; Selbsttest NEU scripts/pre_push_lande_gates.selbsttest.sh (5 Faelle + 2 Beweis-Proben GRUEN;
+Mutationsprobe gegen das ALTE Gate rc=1, 5x ANDERS); CI-Zeile fuer den Selbsttest = Lead/PZW-Restposten R1; Lead-Rezept
+bis zur Landung: COMDARE_PRE_PUSH_BUILD_DIR=build/a25-gcc-release im Hauptklon (Probe 1 besteht) + LastTest.log-Kopie
+VOR ctest -N. (2) 41bf4c62 KON28-01-NACHZUG IM CODE --
+libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:777 lane_build_parallelism 'return host == "amd"
+? 24 : 24' (heute am Objekt d3b5a393 gelesen) emittierte export COMDARE_BUILD_PARALLEL="24" in Build- UND Mess-Batch je
+Lane (Z.1434/1655) = Bau-Pool-WORKER-Override (profile_run_entry.hpp:132-135,
+BuildOrchestrator::effective_parallelism), der den Runner-Wert CMAKE_BUILD_PARALLEL_LEVEL=16 des heavy-Modus
+UEBERSCHREIBT -> 24 Compile-Worker auf 16 Kernen genau in der Tier-Binary-Batch-Klasse (OOM/Swap-Klasse); Herkunft
+Owner 23.07. 'AMD worker bitte auf 24 Threads drosseln' (Commit 70da2e36b), 12.08. 08:13 'Er wird auf 16
+heruntergestuft, es gab Probleme' = KON28-01, dessen Korrekturliste runner-mode.sh:44 nannte, NIE den Director; Pins im
+Bestand pinnten GEGEN die Owner-Vorgabe (LaneBudgetLiteralsNoNproc "24" x4); Fix = benannte Single-Source-Konstanten
+kOwnerHeavyJAmd=16 / kOwnerHeavyJIntel=24 (runner-mode.sh:44/45 = prod2 nproc) OHNE Env-Override (Praezedenz
+kGnBatchSlice: ein Override liesse eine CI-Variable den Owner-Deckel still aushebeln = dieselbe Defektklasse);
+Pin-Tests rot vorher (3 FAILED: 24 vs 16u, {"24","24"} vs {"16","16"}, kein export ...="16") / gruen nachher (91/91);
+kein Achsen-/Stempel-/golden-Bezug (TABU-Manifest vorher==nachher 5 Dateien, topics/heuristik 416 identisch,
+axis_version.lock unveraendert); N-3/N-4 und die Vortafel rechnen bereits mit 16 W amd (KON58-03), keine Neurechnung;
+Design-Option R3 (Laufzeit-Kopplung an runner-mode) bewusst nicht gebaut. Beide Commits: 6 Dateien +287/-41; Gates 6/6
+GRUEN im Worktree gegen die eigene Zelle build/konform-gcc-release ([1] Diff-Hygiene, [2] clang-format 22.1.8
+Vollmenge, [3] gitleaks 8.30.1 '2 Commits, 38109 Bytes gescannt, 0 Funde' + Selbstbiss, [4] axis lock aus dem GENANNTEN
+Baum, [5] 'Inventur 545 (ctest -N, build/konform-gcc-release, konfiguriert aus /home/comdare/wt-ce-konform) ... 545 ==
+545 (exakt)', [6] TABU 5 byteidentisch; LastTest.log vor/nach Gate IDENTISCH); Warnungen gcc 15.3 0 / clang-22.1.8
+syntax-only ueber 10 beruehrte TUs 0; NICHT geprueft: cppcheck, Abdeckungs-Wache, clang-/Debug-Zellen (K17 4 Zellen
+kalt = Landung), CI. CE-LANDEWELLE (Reihenfolge bindend; PAUSE-PROTOKOLL-2 (5); Memory pmc-dtlb-koeder): konform
+41bf4c62 -> pmc-dtlb-koeder 20d6dd2c -> vo3-1 (b) -> e10 (#133) -- je Schritt Explore-Pflicht (strukturell + design +
+historisch) und Harmonisierung statt blossem Merge, SEQUENTIELL (O-8: nie gleichzeitig mergen; Caches je Schritt;
+laufende Beweisbaeume ausgenommen), dann EIN K17-Kombibau 4 Zellen kalt (Floor 546/542/540 nach dem pmc-Fix;
+PZW-9.5-Nachzug) + Gates 6/6 (Var PFLICHT) + EIN Push (1 Push = 1 Pipeline, CI 286 TERMINAL via API) + Gitlink-Bump
+super + EIN #114-E07-Q1-Re-Run (< 1 h, R-1 Emitter-v2 vorher) = final eingefrorene Trigger-Linie; danach ##47. Vor dem
+main-FF Diff-Hygiene push-lokal ueber den vollen FF-Bereich (ce 317 / super 440 Commits), Reihenfolge ce DANN super.
+
+**KON129-08 (EXPLORE-ERGEBNISSE ALS OWNER-VORLAGEN-STAU + WELCH-SUPERSEDE):** Synthese der 7 Owner-Explores
+(Sonnet-5-max-Kartierungen + Fable-5-max-Gegenlesen, Synthese Fable 5 max 14:5xZ; 6.942 Z. .md + Rohtranskript;
+SYNTHESE-OWNER-VORLAGE.md 583 Z., Beweisort 20260825-owner-explores/). F-17 DOCK-ZAHL: gebaut SECHS statisch
+(libs/traeger/planner steuerdock.hpp:188-196 dock_zahl() = 3! ueber Wallclock/Makro/Mikro per std::next_permutation,
+Test ASSERT_EQ 6u, 0 Produktions-Konsumenten; dormant mess/steuer_dock.hpp:234 static_assert 6 faellt mit C-7(a)); die
+Owner-Kette 08.-15.08. macht den Zaehl-Gegenstand dynamisch (09.08. 'damit hat der Planer 6 Steuerdocks - fuer jede CEB
+einen'; 12.08. 'Stop, das war falsch von mir ... daher 32 Permutationen'; 'Die statische Festlegung Wie viel ist
+technisch nicht umsetzbar ohne Planer Simulation'; 15.08. 'nur durch den Planer ... erst simuliert errechnen'; 25.08.
+B6); 'vier' nie Owner-Wort; 'Dock' = Steuerdock/Pruefdock/Hybrid-Pruefdock (das 'VOELLIG FALSCH' 12.08. 12:09 galt den
+Hybrid-Pruefdocks); die 6 kam ueber Plan-Posten (B-14 17.08. -> W2-ABFOLGE-DESIGN C-6) ohne die 12.08.-Worte in den
+Bau; Code-Kopf steuerdock.hpp:30 'R-1/OV-10 (OFFENE OWNER-FRAGE)' stale. VORLAGE-FERTIG (Q1-Regel, Owner-Antwort
+ausstehend): F-17: A (SECHS statisch wie gebaut; Registry zaehlt feste Anordnungen) | B (MAX. VIER statisch =
+Gate-Kette mess_achsen_naht.hpp; nie Owner-Wort) | C (DYNAMISCH je Planer: je CEB-Version ein Dock = 09.08.-Prinzip,
+CEB-Versionen = die vom Planer/S-19 aus der XML geforderten Belegungen je Traeger-Stufe, Anordnung statisch
+freigegeben, compile-time Default nach KON42-01(2), XML ueberschreibt; EMPFEHLUNG); kein Trigger-Blocker
+(Planer-intern, keine Golden-/Stempel-Wirkung); A = Lead docs-Zug L-14a an 5 Stellen (~1 h), B/C = Design + Bau ~0,5-1
+T im Registry-Neubau-Zug B1/F2-1 (C-7(b)) + S-9/S-10-Naht mit Koeder-Test gegen die alte 6. B6 ZIEL-N: 131072 war NIE
+Owner-Festlegung (Ur-Weisung 18.07. 18:43:17Z 'nimm diese neu ermittelte Zahl mit compile und test als neues golden
+Ziel', GO 19:13:48Z 'Das GO fuer das Ziel-N' ohne Zahl, Auslegung 19:15:56Z 'GO fuer N=2^17=131.072' = Assistent;
+Owner-REGEL 19.07. 04:59:15Z F1 'mindestens 2 zu permutierenden Algorithmen auf jeder verfuegbaren Achse ... mit dem
+vollen golden N'; 06.08. F5 verlangt das Gegenteil eines Kanons); am Objekt 14 harte Anker in 11 Dateien (9 ce:
+source_catalog.hpp:140/170/204/223, 4 Tests, gen_golden_fullpilot, pre_push_lande_gates.sh Gate 6/6,
+all_axes_golden.profile.xml:163; 3 super: experiment_golden_kern.xml:246, Code/tests/CMakeLists.txt:403
+-DEXPECTED_N=131072, .gitlab-ci.yml:156 COMDARE_GN_TOTAL "131072" = die Stelle, die den Bau real steuert); das Etikett
+'Owner-Kanon' lebt NUR in Code-Kommentaren (golden_n_consistency_check.cmake:4/476/484, experiment_schema.xsd:48,
+CMakeLists.txt:361 'Owner-N'; Ledger 0 Treffer); der Planer rechnet seit S-19 (20.08.) dynamisch: @d3b5a393
+organ_produkt 131072 = 17 Achsen freigabe=2 x persistence_target=1 (Q-1 FALL B), system_perms 4, n_bau 524288 --
+deckungsgleich mit den Ankern, aber UNVERDRAHTET (GN-DIVERGENZ nur HINWEIS, planner_simulation.hpp:629-631; Kopf
+'traegt bewusst KEIN einziges Nenner-Literal'). ZWEI N, die der Auftrag vermengt: (a) golden-REFERENZ
+(FullSourceCatalog 2^17 Identitaeten je System-Perm + CRC64-TABU kNewGolden131072Crc64, e24_g8-Negativliste, Snapshot;
+Bewegung nur als golden-Ereignis in EINEM Zug; Owner 19.07. 'nur der new golden Test unter Voll-Konfiguration ist ...
+ein legitimer Beweis') und (b) Bau-/Mess-NENNER der Kampagne (B-4-Zahl = Planer-Ausgang); B6 trifft (b) und die
+Framierung von (a) als 'Owner-Kanon'; Sonnets Lesart 'FullSourceCatalog aus S-19 generieren' wuerde beide verschmelzen
+und die TABU-Doktrin brechen -> korrigierte Lesart B = B1 (super-Wache vergleicht cap beider Traeger gegen
+comdare_experiment_planner simulate statt -DEXPECTED_N) + B2 (COMDARE_GN_TOTAL wird von planer:delegate aus simulate
+emittiert, Fallback 16 bleibt, GN-DIVERGENZ FATAL im Voll-Bau) + B3 (Referenz nur per golden-Ereignis mit TABU-GO =
+JETZT NICHT). VORLAGE-FERTIG: B6-F1 golden-Referenz-Snapshot + CRC-TABU bleibt Ganz-System-Regressions-Detektor?
+ja|nein (Empf. ja; 'nein' = golden-Ereignis, Thesis-Zahl 10x, Gate 6/6, 4 Tests -> vor 15.09. nur unter Verdraengung) /
+B6-F2 GO fuer B1 + B2 NACH dem Trigger? GO|nein (Empf. GO; W3, B2 ~1 Tag + CI-Beleg); Lesart A (Text-Nachzug
+'Owner-Kanon'/'Owner-N'/'feste Groesse' -> 'Planer-Referenzwert: S-19 organ_produkt der golden-Traeger, Aenderung NUR
+ueber Traeger-XML + Simulation' in golden_n_consistency_check.cmake:4-5,467-486, Code/tests/CMakeLists.txt:361,397-402,
+experiment_schema.xsd:44-48,370-371; kein Wert, kein Gate, kein TABU, Pruefung (5) bleibt Drift-Waechter) =
+Lead/super-Schreiber, naechster super-Push, kein Trigger-Blocker. B7 WELCH-DATENQUELLE: die a/b-Frage E3 vom 16.07. (a
+= WIDE-CSV / b = +16-col-Projektion) ist seit 06.-09.08. gegenstandslos -- Owner 16.07. 14:01:27Z 'Per Planung sind 3
+Wiederholungen je Messkonstellation Pflicht, ich verstehe die Frage nicht.'; danach 14 Owner-Saetze 06.-21.08. ('Es
+existiert kein CSV Lager. xlsx ist default.' 06.08. 11:15; 'compare als Stufe mit eigenen Optionen (lesend
+Messwertlager)' 07.08. 09:10; 'CSV wird NIE verwendet' 08.08. 13:31; 'was auf dem RAM liegt ist etwas voellig anderes'
+09.08.; 'die xlsx traegt in allen Tabellen die verfuegbaren CSV Spalten' 14.08.; 'alle 3 Werte EINZELN persistiert'
+12.08.; 'nur noch Lager-Ergebnisse lesen' 17.08. 20:27) -> Quelle = Messwertlager/ErgebnisMappe (RAM/xlsx), CSV NIE
+Eingang, 16-col/WIDE = Paritaet (WIDE-Freeze 189 Spalten inkl. repetition, schema_freeze.hpp:227-229), n=3 einzeln;
+Owner X5 'Wie empfohlen volles GO' auf '(a) Live-Sample-Pfad bestaetigen, E3 schliessen' -> E3 GESCHLOSSEN; Owner
+25.08. 'diese Frage ist beantwortet' war sachlich richtig (09.08. 'bitte pruefe nicht staendig, was laengst entschieden
+ist'). Am Code: Welch-Mathe welch_t_test.hpp (span-API) + In-Prozess-Konsumenten in 7 Aufrufer-Dateien (f15
+multi_compare.hpp:14, compare_engine_command.hpp:81-95, super stats_aggregator.hpp:104-113 Legacy MT-L8 kReps=10, v32 =
+E10-Irrweg), xlsx-Writer (A9-S3), offizielle CSV = Projektion der Mappe (S13-01); NICHT gebaut: der compare-Konsument,
+der aus Lager/Mappe/RAM-Tabellen liest und Welch (+ MWU/Holm/Cliff) rechnet (M-15 OFFEN; measure_to_latex 0 Code trotz
+'VOLLES GO' 09.08.; MeasureStorage-Vorfragen offen); Thesis-Text 03_state_of_the_art.tex:526-533 nennt Mann-Whitney-U +
+Holm + Cliff's delta, nicht Welch. WELCH-SUPERSEDE (Anker gebrochen; Zeilen @ec537aab; alle Zeilen bleiben als Historie
+stehen): (1) die E1-E16-Zeile 2026-07-16 (Owner-Entscheidungsrunde zur Bruecke, Ledger-Chronik) mit Anker
+A='Welch rechnet auf der' B=' WIDE-CSV' L=30 = Assistenten-Interpretation der 14:01Z-Antwort -> SUPERSEDED; (2) die
+zwei M-15/E2-Zeilen ([Mess]-Liste und Par. 50) mit Anker A='Welch-Konsument als eigene' B=' WIDE-CSV-Auswertungsstufe'
+L=52 -> SUPERSEDED durch 'CEB-compare-Konsument liest Messwertlager/ErgebnisMappe; CSV nie Eingang'; (3) die V-04-Zeile
+der Nach-Abgabe-Liste mit Anker A='rutscht V-04 hoch = ' B='OWNER-ENTSCHEID' L=35 -> ENTSCHIEDEN: Owner 06.08.
+19:37:43Z 'Frage 4: Ja bitte mit in die Abgabe ... Aber erst die Messdaten beheben' (Frage 4 = Auswertungs-Writer
+M-8/M-9/M-15), O-4 GO 07.08. 07:47Z, C-2 17.08. 10:48:23Z 'NICHTS nach der Abgabe', KON112-04 'KERNPROGRAMM VOR' + 'der
+Abgabe' -> M-15 = ABGABE-SCOPE nach Messdaten-Behebung (Synthese P-1: die Lead-Zeile 'M-15/E2 nach Abgabe' in
+LEAD-OWNER-ANTWORTEN 14:30Z war Fehlparaphrase, dort 14:55Z korrigiert; Memory-Korrektur: Frage 4 = M-8/M-9/M-15, nicht
+'Anhang A'); Bau M-15 = compare-Konsument in der CEB-Auswertungs-Bibliothek (KON110-04/KON111-02; Welch +
+MWU/Holm/Cliff aus Mappe/MeasureStorage-Arena, compare-sheet je Last-Rekombination; gated durch die 4
+MeasureStorage-Vorfragen + Stufen-Schnitt der 4-5 compare-Komponenten; V-07 COMPARE-Modus + measure_to_latex-Strang)
+Design 0,5 T + Bau 2-4 T, Landung W-C VOR 15.09.; Thesis-Text Welch neben MWU/Holm/Cliff + Datenquelle 'Lager/xlsx'
+statt CSV (DE fuehrend, O-4-GO); NICHT GEFUNDEN: welche der '4 bis 5 compare Komponenten' (21.08.) den
+Zwei-Engine-Signifikanztest traegt (Design-Sache). S13A-F2 RESULT.CSV: Owner-Satz 12.08. 08:53:37Z roh belegt ('Das
+kann nicht stimmen, weil es nur per Binary xlsx geben wird. Ich genehmige hiermit ausdruecklich uebergangsweise (a) bis
+wir (c) realisiert haben, der Kanal bleibt falsch und muss behoben werden wie definiert.'); die ALL-CAPS-Form 'ES WIRD
+NUR PER-BINARY-XLSX GEBEN' ist Assistant-Heredoc 08:54:26Z und steht als 'Owner-Wortlaut' an 6 Stellen (Ledger,
+Design-Kopf S13-03, ergebnis_mappe_naht.hpp:866, Iterator, Test-Kopf, audit-runde-1.md:141) -> U-1 Doku-Hygiene (Lead,
+30 min: durch L44609 ersetzen); 'result.csv' 0/264 Owner-Texte (VIER Quellen); sieben Owner-Saetze 06.-16.08. lassen
+CSV nur als Kind der xlsx zu; am Code (S13-03 b283f86c in d3b5a393) ist result.csv GESCHWISTER der Mappe (roh aus dem
+Mess-Blob, Iterator :3207 / Mappe :3272), der Wiederanlauf speist die Aggregat-Mappe AUS result.csv
+(mappe.blob_aus_csv, run_entry :292/:1053 = Richtung csv -> xlsx), der measure-drop-Kanal reicht je Binary NUR
+result.csv (:3281-3285), Mess-Bestandslog-Naht und Prune-Schutz haengen daran, super-CI liest result.csv (99 Zeilen/6
+Dateien), ce libs 83 Zeilen/11 Dateien (Nenner-Falle grep -v /build frisst builder/); Owner X2 = (C) mit
+Factory-Semantik: A uebergangsweise (Trigger + W3-Generalprobe), B verbindlich VOR dem Reset ~12.09.; Zielsemantik: die
+per-Binary-CSV ist ein Factory-Produkt der Mappe (gespiegelte Geschwister-Repraesentation, anstatt-oder-zusaetzlich per
+XML-Eingang der Experiment-Anforderung), keine formatfremde Roh-Ablage VOR der Mappe; Explore laeuft (wf_53d967b8) ->
+Design (Fable 5 max, Muster KON100-02) -> Bau B ce 7 Stellen (Arbiter :1412-1453, Schreibblock :3197-3260, Kanal
+:3281-3285, Mess-Bestandslog :3292-3304, Status planner_status_types.hpp:33-35 + Reader, Resume-Rueckfluss
+:2985-2994/:3404 -> run_entry, Prune-Schutz artifact_cache.hpp:114/:546) + super 5 Dateien + >= 4 Test-TUs, zusammen
+mit S13-04 Export-Element + S13-17 Namensgrammatik + U-2 Kanal-Haelfte 2 (~2-3 Slots ohne Reader; kein xlsx-Reader in
+ce = Skip-Resume mit Stamp-Sidecar an der Mappe als Design-Posten), Bau lokal waehrend HEAVY, Landung W-C Fr 04.09.-Fr
+11.09. (messdaten-kostenneutral, W3-Daten werden ohnehin geloescht KON41-01); Infra-Frage: nimmt Filterpod/NFS (Ziel 3)
+xlsx an? (aus ce/super NICHT ersichtlich); keine Owner-Frage mehr. GN-9/O4: 'O4' ist KEIN Opt-Level, sondern die
+Vorlage-Zeile s19-simulation-ergebnis.md:169 (20.08.: 'GN-9-1-Zellen-Kalibrierlauf VOR/IM Sa-Lauf ODER deklarierte
+Herabstufung') bzw. der Fail-closed-Wortlaut planner_simulation.hpp:424/453/467; '##47' = Wellenplan-Posten :1810/:1835
+(kein Board-#47, kein Par. 47); GN-9 = Feasibility-/Kalibrier-Gate vor dem Voll-Bau (ROADMAP.md:81/250/312), EINMAL
+gefahren (Pipeline 11453 19.07., 5025 s, 24/24 Zellen 578-776 s, ~428 KB/DLL, ~7,5 s/DLL, pre-O2, pre-variant-Audit);
+Opt-Level-Kette entschieden und im Code erfuellt (17.07. Ofast ueberholt -> 18.07. 09:22:03Z 'default -O3 statt -O2,
+das ist ja nicht dasselbe wie Ofast' -> 11:57:26Z 'OptO darf es ganz oben gar nicht geben' -> 21.08. 18:55:53Z 'O2 ist
+Standard fuer alle builds, O3 wird unter Warnung angeboten' -> ce f82dfaeb 23.08. 21:01Z / Merge b3dc3e93:
+DefaultOptLevelOption = OptO2Option + static_assert, COMDARE_OPT_O3 mit Configure-WARNING, XSD-Enum O0..Ofast, Planer
+walkt {O2,O3} x {no_extension,avx2} -> A4 -> T5 -> X4 (b)); Folge: VO3-1(b) als ce-Bauposten
+(CMAKE_CXX_FLAGS_RELEASE/Vendor-Flags auf -O2 inkl. selbst-pinnender Vendor-Projekte ext/traversal/P02-HOT, P10-SuRF;
+O3 nur als XML-Achsenwert; Fingerprint-Neuberechnung; K17-Zelle; ~0,5 T + Kombibau) VOR ##49 im E-10-Fenster, dann ##47
+EINMAL (nicht vorher, sonst Wiederholung; POST ref=development mit COMDARE_BUILD_GOLDEN_N=true, COMDARE_GN_TOTAL=64,
+COMDARE_STORAGE_CACHE=true, kein smoke-Profil, kein COMDARE_OPT_O3; Abnahme = S-19 verlaesst 'unbestimmbar'), dann S-19
+mit Messwerten; der KON124-05-Stau (Anker A='STAU: O2-Standard-' B='Owner-Entscheid' L=33; N-33(d)) ist durch A4 + X4
+ENTSCHIEDEN -> AUSGETRAGEN (Zeile bleibt als Historie, Voll-Zaehler unveraendert 1); Doku-Rest (Lead ~1 h): N-33(d)
+schliessen, S03/B-14 COMDARE_PILOT_OPT_LEVEL (0 getenv) gegenstandslos buchen, experiment_schema.xsd:435 'O3' -> 'O2',
+flagprobe-Pfade Wellenplan :4514 / Designplan :830 korrigieren; das Lead-Etikett 'VO3-1 [C] nach Abgabe' (12:04Z) war
+falsch ([C] = owner-gated OFFEN). B8/#37-A + MARK-ONES: #37-3 (hardware/locking/numa-vtable -> lebende CRTP-Organe;
+E13-Vorlage super 33d4a1ce 16.07. 14:15:11Z -> Owner 18:44:31Z 'S-1 bis S-7 alle wie empfohlen, bitte setze um.' -> Bau
+ce 452a1b6f 20:02:51Z), #35 (cache_engine-Fassade; Owner 16.07. 17:22:41Z 'F5: Ja genau so, das Feature muss repariert
+werden' -> 780459ec->a22007d6, 7/7 Tests), #38 (is_original-Macro -> ctsha; 17.07. 'F6 autonom nachziehen' -> Macro
+DEPRECATED, ctsha.hpp lebt) = alle GELIEFERT in der Reihenfolge Vorlage -> GO -> Bau (Zeitstempel belegt); #37-A NICHT
+gebaut durch Owner-Entscheide: 13.07. 14:56:53Z 'A wird eingebaut, das schliesst aber B nicht logisch aus. (Beides
+umsetzen mit Prioritaet auf A)' -> 16.07. Fork S-1 (b) 'Scheduling-SYSTEMACHSE jetzt, #37-A-Organ-Achse bleibt
+separater TABU-Entscheid' -> 17.07. 08:11:30Z 'Die Scheduling Achse ist erstmal eine Systemachse unter der die
+CacheEngineBuilder gebaut wird' -> F12III-Vorlage cd3dae34 -> VOLLES GO 08:40:06Z -> Bau ce 25594bbd 12:20:36Z, ABI
+4->5 14c6eaae -> 18.07. 10:03:08Z 'Wir loeschen die golden und die Messwerte und beginnen von vorn ... Bruch Freigabe.'
+(TABU-Objekt golden_320/ABI-4 existiert seither nicht mehr; heute golden 2^17, ABI-Major 9) -> 26.07. 11:37:42Z
+'scheduling (REGRESSION -> ist Unter-Achse von target_isa weil die CPU alle Daten auf einer Maschine managed und
+verschiebt) ... die neue Anordnung ... bindend ... verstoesse ... gelten in Dokumentation als Regressionen' ->
+16:16:46Z 'die System-Achsen steuern jetzt nur noch Kompilation, System und Scheduling fuer die Basics einer Binary ...
+alles andere ist veraltet.' -> 18:53:14Z OD-2 target_isa-Komplex-Wrapper -> Code 27.07. cc0ac4da/f6a5dc02
+(system_axis_order.hpp:105-106 static_assert(!is_known_system_axis("scheduling")), system_axis_registry.xml:29-37
+sub_axis scheduling parent=target_isa stage=ct unter binary_id="never", experiment_schema.xsd:587 verbietet den Namen);
+Synthese P-2: der 09.08.-Satz 'Permutations-Achse ist nur eine Unter-Achse in den Mess-Achsen' betrifft die
+HYBRID-Meta-Meta-Achse, nicht Scheduling (Kette lautet 13.07. -> 16.07. -> 17.07. -> 18.07. -> 26.07. (3x) -> Code
+27.07.); Sonnets '39 Tage ohne Statusnotiz' = Falsch-Null (Literal #37-A statt 'Scheduling'/'Systemachse'); nach dem
+26.07. kein Owner-Wort zu Scheduling in 81 jsonl -- BIS X3 14:43Z (-04): Ort UND Rolle -> die Synthese-Vorlage L1
+'formell SUPERSEDED (doku-only ~1 h)' | L2 '27. Organ-Achse' ist FALSCH gerahmt und wird NICHT gestellt; Fork-S-1-Rest
+(Ledger Fork-Zeile 16.07. + Status-Tafel), Dossier 23 Par. 7 Fork S-1 ('NICHT ausgefuehrt und NICHT verworfen ... neu
+vorzulegen'), KONSOLIDAT 24.08. S02/B-19+B-20 bleiben OFFEN, bis die Explores X3 + Schichtenmodell die Ist-Abweichung
+(binary_id='never' = keine Permutation je Tier-Binary vs Plan 'echte dynamische Permutations-Achse') am Objekt gemessen
+haben; #35/#37-3/#38/#37-B kein Delta; S-7 Upgradeable-Locking-Organ geparkt ('Lass S-7 kurz Ruhen').
+OWNER-ANTWORTZEILE (Stand 19:2xZ, alles offen; Vorlagen liegen in der Synthese Abschnitt 8 + BEFUND-T1-FINAL Abschnitt
+5): 'E2: a|b + Internet ja|nein|spaeter / E3: A|B / Thesis-LICENSE: ja|nein / T: nach Kampagne|vor Trigger / F-17:
+A|B|C / B6-F1: ja|nein / B6-F2: GO|nein / D1: V-A|V-B|V-C' (B8 L1|L2 durch X3 gestrichen); Empfehlungen: E2 a +
+nein/spaeter / E3 A / Thesis-LICENSE ja / T nach Kampagne / F-17 C / B6-F1 ja / B6-F2 GO / D1 V-A. Entschieden und
+nicht mehr gefragt: X1 Lizenz, X2 S13A (C + Semantik), X4 VO3-1 (b), X5 B7 (a), A4/T5 GN-9, A5 (Split vor Abgabe,
+public, Matrix), Q5 (A).
+
+**KON129-09 (PAUSEN/WIEDERANLAUF + LEAD-FEHLERLISTE + ANKER-ZAEHLER + EINSPIELUNG):** PAUSE 1: Owner 12:54:51Z /
+12:54:56Z (5a19728e:90818/90819, queue-enqueue) 'Bitte pausiere jetzt alle workflows' / 'lege eine abbruchsichere Pause
+ein' -> PAUSE-PROTOKOLL.md (~/backups-workflow/20260825-PAUSE-1305Z/; Lead-Messung 12:56Z: super 6f6a28c1 / ce d3b5a393
+/ prt-art 16c90628 je == origin, porcelain 0, kein halber Merge, keine Bau-/ctest-Prozesse, 44G; gestoppt A2.5
+wf_ccef7bcc 13/11 (r4 lief, gekillt ohne Repo-Schaden), Explores wf_082a9e40 14/9, E-10 wf_bc166beb 1/0; Teammates
+diagnose-e07 + konformitaet-gate-director 'graceful'; TERMINAL beweislauf-114, trigger-vortafel, raeumung-q3; Slots
+slot1 FREI, slot2 PAUSIERT-Zeile 12:56:54Z); Befund beim Wiederanlauf: beide Teammates starben 12:56/12:58Z am
+Session-Limit VOR dem ersten Atomschritt (kein Worktree, kein Commit; nur bestand_grep + ci/ + LEAD-HINWEISE.md
+H-1..H-4 im E07-Beweisort). WIEDERANLAUF 1: Owner 14:10:52Z (90895, human/typed) 'Die Pause ist vorbei, bitte resume
+und heile alle abgebrochenen und pausierten Agenten und Workflows, dann weiter wie gehabt.' -> 14:11-14:16Z Resumes aus
+dem Journal-Cache (A2.5 -> wc6h2wq24: Fix-R4 TERMINAL 14:30:19Z mit KON128 ec537aab, Re-Verify R4 TERMINAL 14:48:30Z
+FUNDE_OFFEN RV4-01 mittel + RV4-02/03/04 niedrig, alle mit Traeger; Explores -> wzl23ejzf: 5 Gegenlesen + Synthese
+TERMINAL 14:52Z; E-10 -> wbckk2xbf (Explore neu); Teammates diagnose-e07-2 + konformitaet-gate-director-2 mit
+WIEDERANLAUF-Prompt; NEU T1-Speicherorte w2swl8fu2 TERMINAL 14:55Z). PAUSE 2: Owner 14:59:49Z (91401, queue-enqueue)
+'Bitte pausiere alle workflows und Agenten und lege eine abbruchsichere Pause ein' -> PAUSE-PROTOKOLL-2.md
+(~/backups-workflow/20260825-PAUSE-1500Z/; 15:01Z: super ec537aab / ce d3b5a393 / prt-art 16c90628 je == origin,
+porcelain 0, keine Bau-/ctest-/gitleaks-Prozesse, 40G; 7 Workflows gestoppt: Lead-Nachlauf wf_8c890d9a 1/0
+(KON129-Schreiber lief kurz, NICHTS geschrieben, porcelain 0), Rueckfragen-Fold wf_c37fb077 20/16, X3 wf_7f00b85f 1/0,
+Schichtenmodell wf_9720bb21 3/0, X2 wf_53d967b8 1/0, VO3-1 wf_4cd99fd6 1/0, E-10 wf_bc166beb 3/1 (Explore gecacht,
+Design lief); Teammates diagnose-e07-2 (PAUSIERT 15:01:31Z sauber, Slot FREI), d6-gitleaks-vollhistorie,
+d3a-d4-lizenz-community-health pausiert; Branches ungemergt/ungepusht konform +2 / pmckoeder +2 / vo31 +0; Slots slot1
+diagnose-e07 Claim, slot2 + slot3 TERMINAL). WIEDERANLAUF 2: Owner 19:22:38Z (91503, human/typed) 'Bitte resume alle
+workflows und Agenten , die am spend limit gestorben oder eben Pausiert wurden, dann fahre wie gehabt mit offener
+Arbeit fort' -> 19:23Z Resumes in der Reihenfolge PAUSE-PROTOKOLL-2 (1)-(6); dieser Nachtrag = Lead-Nachlauf Phase 1
+(Memory pause2-20260825-1500z). LEAD-FEHLERLISTE 25.08. (Selbstaudit des Leads 12:31:07Z, 5a19728e:90600 'acht echte
+Fehler, davon drei gravierend', ergaenzt um Synthese- und Re-Verify-Funde; alle mit Traeger): (1) Entwarnung 'nichts
+fehlt' nach dem Owner-Panik-rm zu breit, build-b10-Loescher 'unbekannt' -> Objekt: P12 selbst 22.08. 14:17:10Z (RV2-01,
+KON127-01); (2) Trigger-Bau als Kleinigkeit vorgelegt (A2-Frage nannte nur #114 < 1 h) -> Vortafel (-06); (3) falsche
+Kontexte in der Entscheidungsvorlage: A5 'F2' = 'Anhang-Pipeline' (F2 = Identitaets-Freeze; -01), A6/GN-9
+'O2<->O4-Kalibrierlauf' fabriziert (O4 = Vorlagen-Zeile; -08), A4 'nie von dir bestaetigt' falsch, B1 als 'SOLL-Doku'
+fehlverbucht (-04); (4) Non-ASCII im eigenen KON123-Commit ed636f8c (24.08. 20:23:13Z; Lead-Zaehlung '24
+Nicht-ASCII-Zeilen im Commit, 11 davon im KON123-Block'); FRISCH am Objekt @ec537aab: Block '## KON123' Z.499-566 (68
+Z.) = 12 Zeilen mit Byte > 0x7F (grep -P; nach Entfernen des Paragraph-Zeichens ebenfalls 12; Em-Dash, Mittelpunkt) ->
+ASCII-Korrektur ueber die Wachen = Lead-Nachlauf Phase 3 (Zeichen-Ersatz NUR in EIGENEN Lead-Zeilen, Inhalt
+unveraendert; Doku bleibt additiv); (5) Push ohne Wachen: derselbe Commit ohne vor_push_alle_wachen.sh gepusht (nur
+gitleaks + R4) -- die Diff-Hygiene-Wache haette (4) gefangen (CI 16208 @ed636f8c SUCCESS 28/28 deckt .md nicht: die
+Wache laesst .tex/.md bewusst draussen); (6) Explore-Modellwahl 6/7 Kartierer auf Sonnet -> durch Owner Q1 12:37Z
+gedeckt ('Das hatte ich so gewollt, bleibt so'); (7) Runner-Volumes-Aussagen ('5 Token-Generationen',
+'Fremdprojekt-Jobs', 'lief frueher als root') = Inferenz ohne Messung (config.toml ohne sudo unlesbar; Infra-Beweis
+offen); (8) ENOSPC-Wurzel 24.08. (+13 G in Minuten, vermutlich Kombibau + covguard bei 97 %) unaufgeklaert; (9)
+Q5-Fehlzuschreibung 'Panik-Loeschung' als Motiv in KON128-03 (2) und '(A) NICHT gezogen' (RV4-01; korrigiert -05); (10)
+M-15 'nach Abgabe' Fehlparaphrase (P-1; -08); (11) B8 L1/L2-Fehlrahmung + Fehlverstaendnis 'Unter-Achse = nicht
+permutiert' (X3; -04); (12) X1-Tafel 'kein Voll-Historien-gitleaks belegt' = Falsch-Null (P-3; -02); (13)
+Fristen-Quelle docs/termine statt Ledger-KON6-Block; 12:04Z-Frage = L90475, nicht 90418 (Synthese-Entwurf KON129-09);
+(14) B8-Kette '13.07.->26.07.->09.08.' -- der 09.08.-Satz gehoert zur Hybrid-Achse (P-2); (15) Lage-Deltas in KON128-03
+(3)/KON128-06 (diagnose-e07 lief seit 14:24:07Z, nicht 'pausiert ohne STAND'; konformitaet TERMINAL 14:40:19Z;
+wt-ce-vo31 seit 14:38:47Z) = Nachfuehrung RV4-02 (hier -05/-06/-07); (16) non-ASCII-Deklaration ohne Muster-Nenner
+(RV4-04: Tab/ESC-Zeilen sind '[^ -~]', nicht Byte > 0x7F; in diesem Block je Zahl das Muster genannt). ANKER-ZAEHLER
+(Regel KON127-03 (1)-(3) + KON128-02 (4) + NEU (5) aus RV4-03: Teil A und Teil B stehen je UNGEBROCHEN in EINER Zeile
+-- fold VOR dem Zitat brechen --, sonst gilt ein Umbruch innerhalb der Anfuehrungszeichen als EIN Leerzeichen; L ist
+die Pruefsumme; in diesem Nachtrag eingehalten, Pruefung per Skript anker_zaehler.sh): VORHER @ec537aab 19:27Z (Muster
+(a)-(j) wortgleich aus KON128-02; Datei anker_vorher_ec537aab.txt): (a) 2 (b) 1 (c) 2 (d) 1 (e) 1 (f) 1 (g) 1 (h) 1 (i)
+1 (j) 1; dazu NEU (k) KON128-03 A='Klassenregel (A) NICHT gezogen' B=' (kein Owner-Wort dazu)' L=53 -> 1, (l) M-15/E2
+A='Welch-Konsument als eigene' B=' WIDE-CSV-Auswertungsstufe' L=52 -> 2, (m) V-04 A='rutscht V-04 hoch = '
+B='OWNER-ENTSCHEID' L=35 -> 1, (n) E1-E16 A='Welch rechnet auf der' B=' WIDE-CSV' L=30 -> 1; NACHHER (Arbeitsbaum nach
+Einspielung, anker_nachher.txt): alle 14 Voll-Zaehler UNVERAENDERT (2/1/2/1/1/1/1/1/1/1/1/2/1/1), Zeilen um den
+KON129-Umfang verschoben; Praefix-Zaehler nur-A steigen dort, wo dieser Nachtrag Teil A ungebrochen traegt (h, i, j, k,
+l, m, n) -- kein Anker-Zaehler. EINSPIELUNG: Nummer FRISCH vor Einspielung (Kopf KON128, Substring 'KON129' = 0
+Treffer), NUR via sh scripts/ledger_nachtrag.sh (Einfuegepunkt Z.19), Ledger 33651 -> 34261 Zeilen (= +610 EXAKT,
+Nachtrag 610 Zeilen inkl. 11 Leerzeilen), Block Z.19-628 == Entwurf (cmp), non-ASCII (Byte > 0x7F) im Einschub 0,
+Zeilen > 120 Zeichen 0, Kopf Z.1-18 unveraendert, Rest ab Z.629 == Alt ab Z.19 (reine Einfuegung); Beweisort
+~/backups-workflow/20260825-lead-nachlauf/phase1-kon129/ (vorflug.txt, gen_kon129.py, kon129_entwurf.md,
+anker_zaehler.sh, anker_vorher_ec537aab.txt, anker_nachher.txt, ledger_nachtrag.log, cmp_block.txt, STAND.md). KEIN
+Commit in Phase 1 (Phase 2 committet NUR den Ledger-Pfad, dann Wachen 13/26 + [C2]-Gegenstands-Beweis am
+git-archive-Baum MIT RC-Datei (R-09) + gitleaks 8.30.1 Koeder glpat- 26 Zeichen / Biss RC ohne Pipe 'leaks found: 1' /
+Echt-Scan origin/development..HEAD -m mit Nenner gescannt == rev-list + R4 286/287/288 vor dem Push + EIN Dual-Push
+origin+github + TERMINAL via API /jobs UNION /bridges), KEIN Bau, KEIN ctest, KEIN Board-Zug (nur Entwuerfe), KEIN
+prune, NICHTS geloescht, Messdaten unangetastet; ce Hauptklon unberuehrt (parallele Bau-Traeger in wt-ce-* schreiben
+nicht in den Hauptklon).
+
 ## KON128 (25.08.2026 nachmittags, A2.5-FIX Runde 4 der Rest-Landung, WIEDERANLAUF nach Owner-Pause 13:05Z): RE-VERIFY-R3-FUNDE RV3-01..RV3-03 QUITTIERT -- Nenner-Nachtrag zu KON127-01 (3 = maxdepth 8 ohne /tmp, 78 = maxdepth 10 mit /tmp), Anker-Regel (4) (Teil A + Teil B + Laenge), #114-Re-Run AUSGEFUEHRT (beweislauf-114, Lauf 2 GO 10/10, CSV-Kopien), Doktrin-Wertung durch Owner-Wort Q5 entlastet, R-04 Raeumung Q3 vollzogen (6/6, df 22G -> 44G), main-FF owner-entsperrt -> Lead-Zug, Restposten dreiwertig
 
 **KON128-01 (RV3-01 NENNER-NACHTRAG zu KON127-01 -- additiv, KON127-01 bleibt stehen):** Der KON127-01-Satz "...
@@ -496,9 +1106,9 @@ STAND-Dateien der Lande-Schritte. (5) KON-Nummer FRISCH gemessen vor
 Einspielung: Ledger-Kopf = KON123, Substring 'KON124' = 0 Treffer; Einspielung
 NUR via scripts/ledger_nachtrag.sh (Einfuegepunkt nach Kopf + Zeilen-Gegenprobe).
 
-## KON123 (24.08.2026 spaet, Lead an der Landung): W2-LANDE-ZUG TERMINAL 27/27 — ZUG-SCHLUSS-QUITTUNGEN Z25/Z26/Z27 + Endstaende + Nachlande-Tafel
+## KON123 (24.08.2026 spaet, Lead an der Landung): W2-LANDE-ZUG TERMINAL 27/27 -- ZUG-SCHLUSS-QUITTUNGEN Z25/Z26/Z27 + Endstaende + Nachlande-Tafel
 
-**KON123-01 (ZUG-SCHLUSS):** Alle 27 Ziele abgeschlossen — 26 GELANDET (Z01
+**KON123-01 (ZUG-SCHLUSS):** Alle 27 Ziele abgeschlossen -- 26 GELANDET (Z01
 SCHON_ENTHALTEN), Z27 owner-gated VERTAGT (F-13). Endstaende 24.08. 20:1xZ je
 lokal==origin==github, porcelain 0, 0 running/pending: ce development 943c70ee
 (CI 16150 SUCCESS; K17-Endstand-Kombibau Z12-NEUFAHRT 4/4 Zellen je LITERAL
@@ -512,7 +1122,7 @@ Vorlauf erfuellt. Beweisort 20260822-lande-zug/ZUGENDE-endstandpruefung/ +
 ZUG-BILANZ.md Abschn. 10. ENOSPC-Riss 17:2xZ (Z22-Fenster) per Wiederanlauf
 geheilt (RISS-Doku 20260822-lande-zug/RISS-ENOSPC-20260824-17xx.md).
 
-**KON123-02 (Z25-QUITTUNG VOLLAUDIT-BU):** W2-Wellen-Ende-BU vollzogen —
+**KON123-02 (Z25-QUITTUNG VOLLAUDIT-BU):** W2-Wellen-Ende-BU vollzogen --
 Commit 3cddc5b7 (927 Dateien, +454838) nach docs/sessions/backups/20260824-
 vollaudit-welle2-stand/; gitleaks-Redaktion JE Datei 927/0 (EIN Echt-Fund
 runners_token Projekt 287 NUR im Commit-Spiegel maskiert, Original additiv in
@@ -536,17 +1146,17 @@ Inventur-Befund 5.5 (build-l4) UEBERHOLT.
 = 308 Commits (255 non-merge), super 85dc85e8..3cddc5b7 = 415 (380), beide
 reine FF ohne Divergenz; ce lokal main b241a272 reiner Rueckstand, wird beim
 FF mitgezogen. Diff-Hygiene bewusst NICHT vorgefahren (Bereich waechst noch,
-z.B. #139 landereif — Vorab-Lauf waere falsches Gruen). NACHLANDEN-Pflicht
+z.B. #139 landereif -- Vorab-Lauf waere falsches Gruen). NACHLANDEN-Pflicht
 (a)-(f) dokumentiert (Z27-Restposten); Board-#19-Metadaten stale
 (Lead-Korrektur vorgemerkt).
 
 **KON123-05 (T8b-REST):** Board #82 "6 static_asserts" -> "7" (Wortlaut-
-Vorlage pmcpaket/fix-runde-1.md) — Ledger-Haelfte seit Z21/KON122 gedeckt,
+Vorlage pmcpaket/fix-runde-1.md) -- Ledger-Haelfte seit Z21/KON122 gedeckt,
 NUR Board offen (Board-Tools z.Zt. getrennt, Nachzug vorgemerkt).
 
 **KON123-06 (UMFELD-VERMERK):** wt-ce-ph89 nach Z11-Loeschung von fremdem
 Kontext NEU erstellt; lokaler Branch bau/ph89 auf 3841d717 bewegt (origin
-unveraendert 2809e4d4) — vor Raeum-/Branch-Disposition Schreiber klaeren
+unveraendert 2809e4d4) -- vor Raeum-/Branch-Disposition Schreiber klaeren
 (K16/K20). Aufklaerungs-Stand Lead: die Bewegung entstammt dem W2-Audit-
 Umfeld (ph89-Fix-Kette r1-r3, wt-ce-ph89 traegt den byte-gesicherten
 FUND-4-Erst-Fixer-Edit, sha256 48c7be4c, dessen Inhalt via #139-Commit
@@ -554,14 +1164,14 @@ FUND-4-Erst-Fixer-Edit, sha256 48c7be4c, dessen Inhalt via #139-Commit
 
 **KON123-07 (NACHLANDE-TAFEL, Traeger je benannt):** (1) #139 ce
 bau/w2-abschluss-fixes @ 926f8d70 LANDEREIF (12 Fixes; Lead-Landung nach
-Designplanung) · (2) Wellenplan-Branch bau/wellenplan-offene-punkte @ dec105ae
-(Lead, N-33-Gegenlese; kanalwerk A-KW-1/2 landen damit) · (3) FRIST Mi 26.
-06:00: #114 E07-Q1-Re-Run (<1h, Rezept b10-beweislauf/BEWEIS.md Par. 9) ·
+Designplanung) / (2) Wellenplan-Branch bau/wellenplan-offene-punkte @ dec105ae
+(Lead, N-33-Gegenlese; kanalwerk A-KW-1/2 landen damit) / (3) FRIST Mi 26.
+06:00: #114 E07-Q1-Re-Run (<1h, Rezept b10-beweislauf/BEWEIS.md Par. 9) /
 (4) Owner-Vorlagen-Stau: F-13 (main-FF) + F-17 Dock 6-vs-4 + F-18 R-01-
 Lesarten + S13A-F2 result.csv + GN-9/O4 (ENTBLOCKT) + Token-Rotation 287 +
-VO3-1 Vendor-O3 + EP-2/#138 C1-Gates · (5) Di-25: s13/D-1-Buendel + #96 +
-Board-Zuege · (6) Staffel 3: YAML-Zug ([C1]/[C2]-Spiegel-Treue) + golden-Zug
-E-11-Terminierung (vor Sa 29.) + L-06 Warnungs-Review + W1L-7/F-86 ·
+VO3-1 Vendor-O3 + EP-2/#138 C1-Gates / (5) Di-25: s13/D-1-Buendel + #96 +
+Board-Zuege / (6) Staffel 3: YAML-Zug ([C1]/[C2]-Spiegel-Treue) + golden-Zug
+E-11-Terminierung (vor Sa 29.) + L-06 Warnungs-Review + W1L-7/F-86 /
 (7) Raeum-Reste je Lead-GO: wt-ce-lande/s19/messfenster + 4 K17-Baeume
 (BU liegt seit Z25!) + super build/ 3.2G + Strang-Branches.
 ## KON122 (24.08.2026 abends, W2-Lande-Zug #131 / Z24 "Ledger AN der Landung"): W2-LANDUNG KOMPLETT -- ce+prt-art+super GELANDET (CI 286/287/288 TERMINAL SUCCESS) + STRANG-/AUDIT-BUCHUNGEN L1-L21 + L-08a-j + E-6 + #112/Ledger-#44
