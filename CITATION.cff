@@ -1,0 +1,36 @@
+# CITATION.cff -- Citation File Format 1.2.0 (https://citation-file-format.github.io/)
+# ASCII-only; the thesis is the preferred citation, the repository the software record.
+cff-version: 1.2.0
+message: "If you use this repository, please cite the diploma thesis below (preferred-citation)."
+type: software
+title: "probst-diplomarbeit-cache-engine"
+abstract: "Umbrella repository of the diploma thesis 'Active Cache-Aware Hardware Adaptation: Cache Engine for Trie-Based Index Structures' at Technische Universitaet Dresden: measurement driver, CSV/LaTeX pipeline, CI guards, documentation, vendored research literature; embeds the Comdare Cache Engine and PRT-ART as submodules."
+authors:
+  - family-names: Probst
+    given-names: Benjamin-Elias
+    affiliation: "Technische Universitaet Dresden"
+license: Apache-2.0
+repository-code: "https://github.com/BenniProbst/probst-Diplomarbeit-cache-engine"
+keywords:
+  - cache engine
+  - trie
+  - index structures
+  - hardware adaptation
+  - cache-aware
+  - diploma thesis
+  - C++23
+preferred-citation:
+  type: thesis
+  title: "Active Cache-Aware Hardware Adaptation: Cache Engine for Trie-Based Index Structures"
+  authors:
+    - family-names: Probst
+      given-names: Benjamin-Elias
+      affiliation: "Technische Universitaet Dresden"
+  thesis-type: "Diplomarbeit"
+  institution:
+    name: "Technische Universitaet Dresden"
+    city: Dresden
+    country: DE
+  year: 2026
+  notes: "German title: Aktive cache-bewusste Hardware-Adaption: Eine Cache-Engine fuer Trie-basierte Indexstrukturen."
+notes: "The repository's own code is Apache-2.0. The embedded Comdare Cache Engine and PRT-ART are licensed under the Comdare Research License 1.0 (rights holder BEP Venture UG (haftungsbeschraenkt), trademark Comdare); their license text is in LICENSES/LicenseRef-Comdare-Research-1.0.txt. The thesis text is Copyright Benjamin-Elias Probst."

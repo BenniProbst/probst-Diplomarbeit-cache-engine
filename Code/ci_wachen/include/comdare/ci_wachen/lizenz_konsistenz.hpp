@@ -44,6 +44,17 @@
 //       LIZENZ_MARKER_MIN_ZEICHEN Zeichen und kein Baustein, den jeder Text
 //       ohnehin traegt (LIZENZ_MARKER_GEGENPROBE). Ein Marker aus einem
 //       Leerzeichen steht in praktisch jeder Datei und kann nie reissen.
+//   (8) Jede WACHE: LIZENZTEXT-Zeile benennt eine KOPIE eines Lizenztextes
+//       unter LICENSES/ (LIZENZ_TEXTE_WURZEL, REUSE-Spezifikation 3.3) und
+//       ihre QUELLE im Baum. Die Kopie liegt da und ist BYTE-GLEICH zur
+//       Quelle -- nicht "aehnlich", nicht "traegt denselben Marker". Liegt
+//       die Quelle in einem nicht ausgecheckten Submodul, wird nur die Kopie
+//       verlangt und der Verzicht als SKIP protokolliert (dieselbe Regel wie
+//       bei den Submodul-Zeilen). GRUND (25.08.2026, Owner X1): super bleibt
+//       Apache-2.0 und wird "um die restriktive ce-Lizenz ERWEITERT" -- der
+//       Volltext der Comdare Research License liegt deshalb als Kopie hier,
+//       damit ein Leser dieses Repos ihn OHNE Submodul-Checkout sieht. Eine
+//       Kopie kann veralten; genau das misst diese Zusicherung.
 //
 // WAS SIE NICHT ZUSICHERT -- TESTKRITIK (T-9), ausdruecklich statt verschwiegen:
 //   * Der Marker ist eine SUBSTRING-PROBE, keine juristische Textanalyse. Sie
@@ -136,6 +147,10 @@ inline constexpr std::size_t LIZENZ_ZEILE_MAX_BYTE = 120;
 // Das Verzeichnis des vendorten Forschungscodes.
 inline constexpr std::string_view LIZENZ_VENDOR_WURZEL = "Forschungsarbeiten/code";
 
+// Das Verzeichnis der Lizenztext-KOPIEN nach REUSE-Spezifikation 3.3 (Zusicherung
+// 8). Der Name ist von der Spezifikation vorgegeben, nicht vom Haus gewaehlt.
+inline constexpr std::string_view LIZENZ_TEXTE_WURZEL = "LICENSES";
+
 // DIE UNTERGRENZE DER MARKER-AUSSAGEKRAFT, in Zeichen nach Rand-Trimmung.
 // DREI ist die Laenge der kuerzesten wirklichen Lizenz-Bezeichnung ueberhaupt
 // (MIT, ISC, GPL, BSD); kuerzer kann ein Marker nicht sein und trotzdem eine
@@ -201,17 +216,27 @@ inline constexpr std::string_view LIZENZ_SPDX_SKIP_FEST = "external";
 // Zusammengesetzt wird an EINER Stelle: lizenzdatei_pfad() weiter unten. Kern
 // und Sammler benutzen dieselbe Funktion -- eine Abschrift waere eine
 // Gelegenheit zur Divergenz.
+//
+// Die VIERTE Zeilenform (25.08.2026, Zusicherung 8) bindet eine Lizenztext-KOPIE
+// an ihre Quelle:
+//   * <datei>   ein NACKTER Dateiname unter LIZENZ_TEXTE_WURZEL (kein '/'):
+//               die Kopie MUSS dort liegen, sonst ist sie fuer REUSE unsichtbar.
+//   * <quelle>  repo-relativ, so wie der Leser sie im Baum findet -- meist die
+//               LICENSE eines Submoduls. Zusammengesetzt wird die Kopie in
+//               lizenztext_pfad(), aus demselben Grund wie oben.
 enum class NoticeArt {
     Submodul,                // WACHE: SUBMODUL <pfad> LIZENZ "<marker>" DATEI <relpfad>
     SubmodulOhneLizenzdatei, // WACHE: SUBMODUL <pfad> KEINE-LIZENZDATEI
     Vendor,                  // WACHE: VENDOR <pfad> LIZENZ "<marker>" DATEI <relpfad>
+    Lizenztext,              // WACHE: LIZENZTEXT <datei> BYTEGLEICH <quelle>
 };
 
 struct NoticeEintrag {
     NoticeArt   art = NoticeArt::Submodul;
-    std::string pfad;
-    std::string marker;      // leer bei SubmodulOhneLizenzdatei
-    std::string lizenzdatei; // relativ zu `pfad`; leer bei SubmodulOhneLizenzdatei
+    std::string pfad;        // bei Lizenztext: der nackte Dateiname unter LICENSES/
+    std::string marker;      // leer bei SubmodulOhneLizenzdatei und Lizenztext
+    std::string lizenzdatei; // relativ zu `pfad`; leer bei SubmodulOhneLizenzdatei und Lizenztext
+    std::string quelle;      // NUR bei Lizenztext: repo-relativer Pfad der Quelle
     std::size_t zeile       = 0;
     bool        wohlgeformt = false; // false = die Zeile trug WACHE:, war aber unlesbar
 };
@@ -260,7 +285,12 @@ struct LizenzEingang {
     // DATEI-Bindung fragt "ist die BENANNTE Datei eine davon?" -- eine Auswahl
     // haette diese Frage vorweggenommen.
     std::map<std::string, std::vector<std::string>> vendor_am_baum;
-    // REPO-RELATIVER Pfad (Ergebnis von lizenzdatei_pfad) -> Dateiinhalt
+    // REPO-RELATIVER Pfad (Ergebnis von lizenzdatei_pfad) -> Dateiinhalt.
+    // Seit Zusicherung 8 liegen hier auch die Lizenztext-KOPIEN (Schluessel aus
+    // lizenztext_pfad, also LICENSES/<datei>) und ihre QUELLEN (Schluessel =
+    // <quelle> der Zeile). Eine Quelle, die am Baum fehlt oder in einem nicht
+    // ausgecheckten Submodul liegt, hat hier KEINEN Eintrag -- der Pruefkern
+    // unterscheidet die beiden Faelle ueber submodule_am_baum.
     std::map<std::string, std::string> dateiinhalt;
     std::vector<SpdxFund>              spdx_funde;
     // Wieviele regulaere Dateien der SPDX-Scan ueberhaupt angefasst hat. Der
@@ -302,6 +332,11 @@ enum class BefundArt {
     WurzelLizenzOhneApacheMarker,
     WurzelLizenzOhneKlauselMarker,
     SpdxAbweichler,
+    // Zusicherung 8: die Lizenztext-Kopie unter LICENSES/ fehlt, ihre Quelle
+    // fehlt am (ausgecheckten) Baum, oder Kopie und Quelle sind nicht byte-gleich.
+    LizenztextFehlt,
+    LizenztextQuelleFehlt,
+    LizenztextAbweichend,
     NennerNull,
 };
 
@@ -325,6 +360,10 @@ struct LizenzErgebnis {
     std::size_t nenner_code_dateien    = 0;
     std::size_t nenner_notice_submodul = 0;
     std::size_t nenner_notice_vendor   = 0;
+    // Zusicherung 8. Bewusst KEIN NennerNull-Fall: die Zeilenform ist juenger als
+    // die In-Memory-Faelle K1-K19, die ihre NOTICE von Hand bauen; die Pflicht
+    // "mindestens eine LIZENZTEXT-Zeile am Objekt" haelt der Fall O7 am echten Baum.
+    std::size_t nenner_notice_lizenztext = 0;
 };
 
 // -- Der Pruefkern: drei reine Funktionen, kein Dateizugriff -------------------
@@ -341,6 +380,11 @@ std::vector<NoticeEintrag> parse_notice(std::string_view text);
 // Stelle, an der die relativen Angaben der Zeile zusammengesetzt werden -- vom
 // Pruefkern UND vom Sammler benutzt. Leer, wenn der Eintrag keine Datei nennt.
 std::string lizenzdatei_pfad(const NoticeEintrag& eintrag);
+
+// Der REPO-RELATIVE Pfad der von einer LIZENZTEXT-Zeile benannten KOPIE, also
+// LIZENZ_TEXTE_WURZEL/<datei>. Leer fuer jede andere Zeilenform. Dieselbe
+// Ein-Stellen-Regel wie bei lizenzdatei_pfad.
+std::string lizenztext_pfad(const NoticeEintrag& eintrag);
 
 // Traegt dieser Marker ueberhaupt eine Zusicherung? Siehe Zusicherung (7).
 // Oeffentlich, damit der Test das Orakel DIREKT fahren kann und nicht ueber den

@@ -225,8 +225,18 @@ Sie deckt ausdruecklich NICHT alles, was in diesem Baum liegt.
    dieser Datei, NOTICE und der Lizenzdatei einer Komponente Unterschiede, gilt
    die Lizenzdatei der Komponente.
 
+4. LIZENZTEXTE UNTER LICENSES/ (REUSE-Spezifikation 3.3, seit 25.08.2026): dort
+   liegt der Volltext jeder Lizenz, unter der Dateien dieses Baums stehen --
+   darunter die byte-gleiche Kopie der Comdare Research License, Version 1.0
+   des cache-engine-Submoduls. Entscheid des Eigentuemers vom 25.08.2026: super
+   bleibt Apache-2.0 und wird um die restriktive Lizenz der cache engine
+   ERWEITERT, damit sie ein Leser dieses Repositoriums ohne Submodul-Checkout
+   sieht. Die Zuordnung je Pfad steht in REUSE.toml. Beides ordnet zu und
+   lizenziert nichts um; Punkt 3 gilt unveraendert.
+
 Die Zuordnung in NOTICE ist maschinell bewacht: der Test
 test_ci_wache_lizenz_konsistenz paart die Eintraege gegen .gitmodules und gegen
-den Arbeitsbaum und prueft, ob der genannte Marker woertlich in der genannten
-Lizenzdatei steht. Wer eine Komponente hinzufuegt, austauscht oder umlizenziert,
+den Arbeitsbaum, prueft, ob der genannte Marker woertlich in der genannten
+Lizenzdatei steht, und ob jede Kopie unter LICENSES/ Byte fuer Byte ihrer
+Quelle gleicht. Wer eine Komponente hinzufuegt, austauscht oder umlizenziert,
 ohne NOTICE nachzuziehen, bekommt einen roten Test.

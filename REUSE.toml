@@ -1,0 +1,194 @@
+# REUSE.toml -- probst-diplomarbeit-cache-engine (super, Umbrella)        (2026-08-25)
+# =============================================================================
+# REUSE-Spezifikation 3.3 (https://reuse.software/spec-3.3/). Diese Datei ORDNET
+# ZU, sie lizenziert nichts um: massgeblich ist je Komponente ihre eigene
+# Lizenzdatei (LICENSE, Abschnitt GELTUNGSBEREICH, Punkte 3 und 4; NOTICE).
+#
+# Owner-Entscheid X1 (25.08.2026): super = Apache-2.0 fuer den Eigencode und
+# "um die restriktive ce-Lizenz ERWEITERT". Die Kopie
+# LICENSES/LicenseRef-Comdare-Research-1.0.txt ist byte-gleich zu
+# Code/external/comdare-cache-engine/LICENSE; NOTICE bindet sie per Zeile
+# "WACHE: LIZENZTEXT ... BYTEGLEICH ..." daran, der Test
+# test_ci_wache_lizenz_konsistenz (Zusicherung 8) misst es Byte fuer Byte.
+#
+# REGELN DIESER DATEI
+#   * Passen mehrere [[annotations]] auf eine Datei, gilt die LETZTE (Spec 3.3).
+#     Die Reihenfolge geht deshalb vom Allgemeinen zum Besonderen.
+#   * precedence "closest" (Vorgabe): traegt eine Datei selbst SPDX-Angaben,
+#     gelten diese; nur Dateien ohne eigene Angaben bekommen die Tabelle.
+#   * precedence "override" steht NUR an Dokumentations- und Rohdaten-Pfaden,
+#     die fremde SPDX-Zeilen ZITIEREN (Transkripte, Vorlagen, Logs): dort waere
+#     das Zitat eine Falschaussage ueber die Datei selbst.
+#   * Git-Submodule sind fuer `reuse lint` keine Covered Files (Spec 3.3); ihre
+#     Eintraege unten stehen fuer den Leser dieses Repositoriums.
+#   * Rechtstraeger-Schreibweise wie in NOTICE: "BEP Venture UG
+#     (haftungsbeschraenkt)" und "Benjamin-Elias Probst" sind zwei verschiedene
+#     Rechtstraeger; "BEP" allein bezeichnet keinen von beiden.
+#   * Pfade mit Nicht-ASCII-Zeichen werden per Glob getroffen, damit diese
+#     Datei ASCII-only bleibt.
+# PRUEFUNG: `reuse lint` an der Repo-Wurzel (z.B. `uvx --from reuse reuse lint`).
+# ASCII-only.
+version = 1
+SPDX-PackageName = "probst-diplomarbeit-cache-engine"
+SPDX-PackageSupplier = "Person: Benjamin-Elias Probst"
+SPDX-PackageDownloadLocation = "https://github.com/BenniProbst/probst-Diplomarbeit-cache-engine"
+SPDX-PackageComment = "Diplomarbeit (Technische Universitaet Dresden) von Benjamin-Elias Probst. Eigencode Apache-2.0 (Rechte: BEP Venture UG (haftungsbeschraenkt), Marke Comdare). Die eingezogene Comdare Cache Engine und PRT-ART stehen unter der Comdare Research License 1.0 (LICENSES/LicenseRef-Comdare-Research-1.0.txt); vendorter Forschungscode und Literatur behalten ihre eigene Lage."
+
+# -- 1. EIGENCODE: Vorgabe fuer alles, was unten nicht anders zugeordnet ist ---
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), Marke Comdare"
+SPDX-License-Identifier = "Apache-2.0"
+
+# -- 2. DOKUMENTATION UND ROHDATEN: Eigencode-Texte, die fremde SPDX-Zeilen ----
+#       ZITIEREN (Session-Transkripte, Vorlagen, Lint-Logs). override, weil
+#       das Zitat sonst als Lizenzangabe der Datei selbst gelesen wuerde.
+[[annotations]]
+path = "docs/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), Marke Comdare"
+SPDX-License-Identifier = "Apache-2.0"
+
+# -- 2b. ce-ABGELEITETE ARTEFAKTE im Umbrella: Quelltext, der fuer die cache ---
+#        engine geschrieben und als Fehlbau-Referenz hier archiviert wurde
+#        (#31 Schritt 2, 09.07.2026). Er traegt die Lizenz der cache engine.
+[[annotations]]
+path = ["docs/artefakte/20260709-31-fehlbau-referenz-regime-idee-measurement_category_axis.hpp",
+        "docs/artefakte/20260709-31-fehlbau-referenz-regime-idee-test_31b_measurement_category_axis.cpp"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), owner of the registered trademark Comdare"
+SPDX-License-Identifier = "LicenseRef-Comdare-Research-1.0"
+
+# -- 3. PRUEFUNGSUNTERLAGEN (NOTICE: Teil der Diplomarbeit, keine Software) ----
+[[annotations]]
+path = ["2026*.docx", "2026*.pdf", "Formular-Anmeldung-Abschlussarbeit.pdf"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Benjamin-Elias Probst"
+SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"
+
+[[annotations]]
+path = "E-Mail *.pdf"
+precedence = "closest"
+SPDX-FileCopyrightText = ["2026 Benjamin-Elias Probst",
+                          "2026 the respective e-mail correspondents (Technische Universitaet Dresden)"]
+SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"
+
+# -- 4. THESIS-MATERIAL im Umbrella (Entwuerfe, Grosser Beleg, kompilierte PDFs)
+[[annotations]]
+path = ["thesis/_archiv_entwurf1/**", "thesis/20250917_Gro*er_Beleg.pdf",
+        "measurement/thesis_compiles/**/diplomarbeit.pdf"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Benjamin-Elias Probst"
+SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"
+
+# ZIH-LaTeX-Vorlage (TU Dresden) und die DIN-1505-BibTeX-Stile: ohne Lizenzdatei.
+[[annotations]]
+path = "thesis/ZIHLatexVorlage/**"
+precedence = "closest"
+SPDX-FileCopyrightText = ["2012 Guido Juckeland, Zentrum fuer Informationsdienste und Hochleistungsrechnen (ZIH), Technische Universitaet Dresden",
+                          "2000 Klaus F. Lorenzen (alphadin.bst, plaindin.bst)"]
+SPDX-License-Identifier = "LicenseRef-Third-Party-No-License-File"
+
+# -- 5. FORSCHUNGSLITERATUR (PDF): Fremdwerke, keine Lizenz aus diesem Repo -----
+[[annotations]]
+path = ["Forschungsarbeiten/*.pdf", "Forschungsarbeiten/**/*.pdf"]
+precedence = "closest"
+SPDX-FileCopyrightText = "the respective authors and publishers of each publication"
+SPDX-License-Identifier = "LicenseRef-Third-Party-No-License-File"
+
+# -- 6. VENDORTER FORSCHUNGSCODE unter Forschungsarbeiten/code (NOTICE, WACHE: --
+#       VENDOR). Je Projekt der Klon; STATUS.md und Inventare daneben bleiben
+#       Eigencode. Dateien mit eigenem SPDX-Kopf (userspace-rcu, catch.hpp, ...)
+#       behalten ihn (closest); die Tabelle deckt nur kopflose Dateien.
+[[annotations]]
+path = "Forschungsarbeiten/code/P01-ART/unodb/**"
+SPDX-FileCopyrightText = "2019-2026 UnoDB contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "Forschungsarbeiten/code/P02-HOT/hot/**"
+SPDX-FileCopyrightText = "2018 Robert Binna"
+SPDX-License-Identifier = "ISC"
+
+# MIT plus W3C-Namensklausel -- kein SPDX-Listenbezeichner; Volltext in LICENSES/.
+[[annotations]]
+path = "Forschungsarbeiten/code/P03-Masstree/masstree-beta/**"
+SPDX-FileCopyrightText = ["2011-2019 President and Fellows of Harvard College",
+                          "2010-2011 Regents of the University of California",
+                          "2010-2013 Massachusetts Institute of Technology"]
+SPDX-License-Identifier = "LicenseRef-Masstree"
+
+# GPL-3.0-only: LICENSE = GPLv3-Text, README "under the terms of the GNU General
+# Public License v3.0"; keine "or later"-Erklaerung der Autoren am Objekt.
+[[annotations]]
+path = "Forschungsarbeiten/code/P04-CoCo-trie/CoCo-trie/**"
+SPDX-FileCopyrightText = "Antonio Boffa and the CoCo-trie contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+[[annotations]]
+path = "Forschungsarbeiten/code/P05-START/START/**"
+SPDX-FileCopyrightText = "2020 Michael Jungmair"
+SPDX-License-Identifier = "MIT"
+
+# B2-Tree / BART: privat erhalten (TUM Database Group, 08.05.2026), keine Lizenzdatei.
+[[annotations]]
+path = ["Forschungsarbeiten/code/P06-B2tree/b2-tree-master/**",
+        "Forschungsarbeiten/code/P06-B2tree/bart-master/**",
+        "Forschungsarbeiten/code/P06-B2tree/*.tgz", "Forschungsarbeiten/code/P06-B2tree/*.zip"]
+SPDX-FileCopyrightText = "Josef Schmeisser, Maximilian E. Schuele, Viktor Leis, Thomas Neumann, Alfons Kemper (Technische Universitaet Muenchen)"
+SPDX-License-Identifier = "LicenseRef-Third-Party-No-License-File"
+
+[[annotations]]
+path = "Forschungsarbeiten/code/P07-Wormhole/wormhole/**"
+SPDX-FileCopyrightText = "Xingbo Wu and the Wormhole contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+[[annotations]]
+path = "Forschungsarbeiten/code/P10-SuRF/SuRF/**"
+SPDX-FileCopyrightText = "2018 Carnegie Mellon University"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "Forschungsarbeiten/code/P20-BTreesAreBack/leanstore/**"
+SPDX-FileCopyrightText = "2021 FSU Jena and the LeanStore contributors"
+SPDX-License-Identifier = "MIT"
+
+# Mahling/Weisgut/Rabl (HPI): README bittet um Zitation, keine Lizenzdatei.
+[[annotations]]
+path = "Forschungsarbeiten/code/P25-Mahling-FillBuffer/prefetching/**"
+SPDX-FileCopyrightText = "Fabian Mahling, Marcel Weisgut, Tilmann Rabl (Hasso-Plattner-Institut, Universitaet Potsdam)"
+SPDX-License-Identifier = "LicenseRef-Third-Party-No-License-File"
+
+[[annotations]]
+path = ["Forschungsarbeiten/code/P27-Zhang-ASPLOS-Hierarchical/hp-soft/**",
+        "Forschungsarbeiten/code/P27-Zhang-ASPLOS-Hierarchical/hp-soft.zip"]
+SPDX-FileCopyrightText = "the authors of Hierarchical Prefetching (T. Zhang et al., ASPLOS 2025)"
+SPDX-License-Identifier = "LicenseRef-Third-Party-No-License-File"
+
+# Userspace RCU ist selbst REUSE-konform (Koepfe je Datei, LICENSES/ im Klon);
+# die Tabelle deckt nur die wenigen kopflosen Dateien mit der Bibliothekslizenz.
+[[annotations]]
+path = "Forschungsarbeiten/code/P29-RCU-McKenney/userspace-rcu/**"
+SPDX-FileCopyrightText = "Mathieu Desnoyers, Paul E. McKenney and the Userspace RCU contributors"
+SPDX-License-Identifier = "LGPL-2.1-or-later"
+
+# haz_ptr: keine Lizenzdatei, aber MIT-Erlaubnistext im Kopf jeder Quelldatei.
+[[annotations]]
+path = "Forschungsarbeiten/code/P30-Hazard-Pointers/haz_ptr/**"
+SPDX-FileCopyrightText = "2019 Jiahua Huang"
+SPDX-License-Identifier = "MIT"
+
+# -- 7. SUBMODULE: fuer `reuse lint` keine Covered Files, fuer den Leser bindend
+#       (NOTICE, WACHE: SUBMODUL). Die Comdare-Submodule tragen die Comdare
+#       Research License 1.0 (Kopie in LICENSES/); die Diplomarbeit selbst ist
+#       Copyright Benjamin-Elias Probst ohne Lizenzdatei.
+[[annotations]]
+path = ["Code/external/comdare-cache-engine/**", "Code/external/comdare-prt-art/**"]
+SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), owner of the registered trademark Comdare"
+SPDX-License-Identifier = "LicenseRef-Comdare-Research-1.0"
+
+[[annotations]]
+path = ["thesis/diplomarbeit/**", "Code/external/20260931-overleaf-diplomarbeit/**"]
+SPDX-FileCopyrightText = "2026 Benjamin-Elias Probst"
+SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"

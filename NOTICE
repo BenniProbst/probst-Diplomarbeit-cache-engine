@@ -48,7 +48,7 @@ Objekt als HOHL nachgewiesen hatte. Vier Dinge kommen dazu, weil
     Die Diff-Hygiene-Wache ueberspringt beide Dateien namentlich;
     ohne diese Zusage pruefte sie niemand.
 
-Spalte 0 bindet: die drei Muster-Zeilen gleich darunter stehen
+Spalte 0 bindet: die vier Muster-Zeilen gleich darunter stehen
 EINGERUECKT und sind deshalb Text, kein Eintrag. Genau dadurch kann
 diese Datei ihre eigene Grammatik erklaeren, ohne sich dabei selbst
 mitzuzaehlen. Die Zeilenformen:
@@ -56,10 +56,16 @@ mitzuzaehlen. Die Zeilenformen:
   WACHE: SUBMODUL <pfad> LIZENZ "<marker>" DATEI <relpfad>
   WACHE: SUBMODUL <pfad> KEINE-LIZENZDATEI
   WACHE: VENDOR <pfad> LIZENZ "<marker>" DATEI <relpfad>
+  WACHE: LIZENZTEXT <datei> BYTEGLEICH <quelle>
 
 <pfad> ist bei SUBMODUL repo-relativ (wie in .gitmodules), bei VENDOR
 relativ zu Forschungsarbeiten/code. <relpfad> ist IMMER relativ zu
 <pfad>, also zur Wurzel der genannten Komponente.
+
+<datei> ist bei LIZENZTEXT ein nackter Dateiname unter LICENSES/,
+<quelle> ist repo-relativ. Die Wache prueft, dass die Kopie unter
+LICENSES/ liegt und Byte fuer Byte gleich der Quelle ist (Abschnitt
+"LIZENZTEXTE UNTER LICENSES/" unten, seit 25.08.2026).
 
 Wer eine dieser Zeilen aendert, ohne dass der Baum dazu passt, wird
 rot. Wer den Baum aendert, ohne die Zeile nachzuziehen, ebenfalls.
@@ -101,6 +107,38 @@ dafuer ist die Wache da.
 Nicht ausgecheckte Submodule (ein Klon ohne `git submodule update`)
 werden nur GEPAART, nicht inhaltsgeprueft; die Wache protokolliert den
 Verzicht als SKIP-Zeile.
+
+
+-------------------------------------------------------------------
+LIZENZTEXTE UNTER LICENSES/ UND DIE REUSE.toml
+-------------------------------------------------------------------
+
+Owner-Entscheid vom 25.08.2026 (X1): super bleibt Apache-2.0 und wird
+"um die restriktive ce-Lizenz ERWEITERT". Umgesetzt ist das so:
+
+  * LICENSES/ traegt nach REUSE-Spezifikation 3.3 den Volltext JEDER
+    Lizenz, unter der Dateien dieses Baums stehen -- darunter
+    LICENSES/LicenseRef-Comdare-Research-1.0.txt, die BYTE-GLEICHE
+    Kopie der LICENSE des cache-engine-Submoduls. Wer dieses Repo
+    liest, sieht die restriktive Lizenz damit OHNE Submodul-Checkout.
+  * REUSE.toml an der Wurzel ordnet jedem Pfad Rechteinhaber und
+    SPDX-Bezeichner zu: Eigencode Apache-2.0, die beiden Comdare-
+    Submodule LicenseRef-Comdare-Research-1.0, Fremdcode und
+    Pruefungsunterlagen je nach ihrer eigenen Lage. REUSE.toml
+    lizenziert nichts um: massgeblich bleibt je Komponente ihre
+    eigene Lizenzdatei (LICENSE, Geltungsbereich, Punkt 3).
+  * Eine Kopie kann veralten. Deshalb bindet die Zeile unten die Kopie
+    an ihre Quelle, und die Wache prueft Byte fuer Byte. Ist das
+    Submodul nicht ausgecheckt, wird nur die Kopie verlangt und der
+    Verzicht als SKIP protokolliert.
+
+WACHE: LIZENZTEXT LicenseRef-Comdare-Research-1.0.txt BYTEGLEICH Code/external/comdare-cache-engine/LICENSE
+
+Wer den Gitlink der cache engine auf einen Stand mit anderer LICENSE
+setzt, bekommt hier einen roten Test -- und zieht die Kopie nach.
+Die prt-art-LICENSE ist derselbe Lizenztext mit anderem Repository-
+Namen in Zeile 11 und eigenem Abschnitt 8/9; sie liegt deshalb nicht
+als zweite Kopie hier, sondern im Submodul selbst.
 
 
 -------------------------------------------------------------------

@@ -20,6 +20,9 @@ constexpr std::string_view kFormVendor   = "VENDOR ";
 constexpr std::string_view kFormKeine    = "KEINE-LIZENZDATEI";
 constexpr std::string_view kFormLizenz   = "LIZENZ \"";
 constexpr std::string_view kFormDatei    = " DATEI ";
+// Zusicherung 8 (25.08.2026): WACHE: LIZENZTEXT <datei> BYTEGLEICH <quelle>
+constexpr std::string_view kFormLizenztext = "LIZENZTEXT ";
+constexpr std::string_view kFormBytegleich = "BYTEGLEICH ";
 
 std::string_view rand_weg(std::string_view s) {
     const std::size_t a = s.find_first_not_of(" \t\r\n");
@@ -211,6 +214,9 @@ std::vector<NoticeEintrag> parse_notice(std::string_view text) {
         } else if (rest.rfind(kFormVendor, 0) == 0) {
             eintrag.art = NoticeArt::Vendor;
             rest        = rest.substr(kFormVendor.size());
+        } else if (rest.rfind(kFormLizenztext, 0) == 0) {
+            eintrag.art = NoticeArt::Lizenztext;
+            rest        = rest.substr(kFormLizenztext.size());
         } else {
             eintraege.push_back(eintrag); // wohlgeformt bleibt false
             continue;
@@ -223,6 +229,25 @@ std::vector<NoticeEintrag> parse_notice(std::string_view text) {
         }
         eintrag.pfad = std::string(rest.substr(0, leer));
         rest         = rand_weg(rest.substr(leer + 1));
+
+        if (eintrag.art == NoticeArt::Lizenztext) {
+            // <datei> ist ein NACKTER Dateiname unter LICENSES/. Ein Pfad mit '/'
+            // wuerde die Kopie irgendwohin legen, wo REUSE sie nicht sieht -- das
+            // ist kein Eintrag, sondern eine unlesbare Zeile (nie ein stiller Skip).
+            if (eintrag.pfad.find('/') != std::string::npos || rest.rfind(kFormBytegleich, 0) != 0) {
+                eintraege.push_back(eintrag);
+                continue;
+            }
+            const std::string_view quelle = rand_weg(rest.substr(kFormBytegleich.size()));
+            if (quelle.empty()) {
+                eintraege.push_back(eintrag);
+                continue;
+            }
+            eintrag.quelle      = std::string(quelle);
+            eintrag.wohlgeformt = true;
+            eintraege.push_back(eintrag);
+            continue;
+        }
 
         if (rest == kFormKeine) {
             if (eintrag.art == NoticeArt::Submodul) {
@@ -268,6 +293,11 @@ std::string lizenzdatei_pfad(const NoticeEintrag& eintrag) {
         return std::string(LIZENZ_VENDOR_WURZEL) + "/" + eintrag.pfad + "/" + eintrag.lizenzdatei;
     }
     return eintrag.pfad + "/" + eintrag.lizenzdatei;
+}
+
+std::string lizenztext_pfad(const NoticeEintrag& eintrag) {
+    if (eintrag.art != NoticeArt::Lizenztext || eintrag.pfad.empty()) { return {}; }
+    return std::string(LIZENZ_TEXTE_WURZEL) + "/" + eintrag.pfad;
 }
 
 bool marker_ist_aussagekraeftig(std::string_view marker) {
@@ -339,6 +369,9 @@ std::string befund_name(BefundArt art) {
         case BefundArt::WurzelLizenzOhneApacheMarker: return "WurzelLizenzOhneApacheMarker";
         case BefundArt::WurzelLizenzOhneKlauselMarker: return "WurzelLizenzOhneKlauselMarker";
         case BefundArt::SpdxAbweichler: return "SpdxAbweichler";
+        case BefundArt::LizenztextFehlt: return "LizenztextFehlt";
+        case BefundArt::LizenztextQuelleFehlt: return "LizenztextQuelleFehlt";
+        case BefundArt::LizenztextAbweichend: return "LizenztextAbweichend";
         case BefundArt::NennerNull: return "NennerNull";
     }
     return "UNBEKANNT"; // fail-closed, wie exit_code_von in ergebnis.hpp
@@ -362,6 +395,7 @@ std::string ergebnis_bericht(const LizenzErgebnis& ergebnis) {
         << " gescannten Dateien unter Code/\n";
     aus << "  NENNER NOTICE SUBMODUL-Zeilen: " << ergebnis.nenner_notice_submodul << "\n";
     aus << "  NENNER NOTICE VENDOR-Zeilen  : " << ergebnis.nenner_notice_vendor << "\n";
+    aus << "  NENNER NOTICE LIZENZTEXT-Zln : " << ergebnis.nenner_notice_lizenztext << "\n";
     for (const std::string& skip : ergebnis.skips) { aus << "  SKIP    " << skip << "\n"; }
     for (const Befund& b : ergebnis.befunde) { aus << "  BEFUND  [" << befund_name(b.art) << "] " << b.text << "\n"; }
     if (ergebnis.befunde.empty()) { aus << "  0 Befunde.\n"; }
@@ -396,6 +430,10 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
     for (const NoticeEintrag& e : eintraege) {
         if (e.art == NoticeArt::Vendor) {
             ++ergebnis.nenner_notice_vendor;
+        } else if (e.art == NoticeArt::Lizenztext) {
+            // Eine LIZENZTEXT-Zeile ist KEINE Submodul-Zeile: sie darf die Paarung
+            // .gitmodules <-> NOTICE nicht verschieben (Fall K23 haelt das fest).
+            ++ergebnis.nenner_notice_lizenztext;
         } else {
             ++ergebnis.nenner_notice_submodul;
         }
@@ -442,7 +480,7 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
         // ist grammatisch tadellos und steht in praktisch jeder Datei -- er ist
         // eine Zusicherung, die nie reissen kann (gemessen 11.08., Koeder aus
         // einer gewuerfelten Position der echten Lizenzdatei).
-        if (e.art == NoticeArt::SubmodulOhneLizenzdatei) { continue; }
+        if (e.art == NoticeArt::SubmodulOhneLizenzdatei || e.art == NoticeArt::Lizenztext) { continue; }
         if (!marker_ist_aussagekraeftig(e.marker)) {
             melde(BefundArt::MarkerOhneAussagekraft,
                   "Marker ohne Aussagekraft in NOTICE-Zeile " + std::to_string(e.zeile) + ": \"" + e.marker +
@@ -459,10 +497,13 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
     // SUBMODUL-Zeilen 5 gegen NENNER .gitmodules 4 -- und 0 Befunde.
     std::map<std::string, std::size_t> notice_submodul_je_pfad;
     std::map<std::string, std::size_t> notice_vendor_je_pfad;
+    std::map<std::string, std::size_t> notice_lizenztext_je_datei;
     for (const NoticeEintrag& e : eintraege) {
         if (!e.wohlgeformt) { continue; }
         if (e.art == NoticeArt::Vendor) {
             ++notice_vendor_je_pfad[e.pfad];
+        } else if (e.art == NoticeArt::Lizenztext) {
+            ++notice_lizenztext_je_datei[e.pfad];
         } else {
             ++notice_submodul_je_pfad[e.pfad];
         }
@@ -494,7 +535,7 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
         }
     }
     for (const NoticeEintrag& e : eintraege) {
-        if (e.art == NoticeArt::Vendor || !e.wohlgeformt) { continue; }
+        if (e.art == NoticeArt::Vendor || e.art == NoticeArt::Lizenztext || !e.wohlgeformt) { continue; }
         if (std::find(gitmodule.begin(), gitmodule.end(), e.pfad) == gitmodule.end()) {
             melde(BefundArt::NoticeZeileOhneSubmodul,
                   "NOTICE-Zeile nicht in .gitmodules: " + e.pfad + " (Zeile " + std::to_string(e.zeile) + ")");
@@ -503,7 +544,7 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
 
     // -- Inhaltspruefung der Submodul-Zeilen -------------------------------------
     for (const NoticeEintrag& e : eintraege) {
-        if (e.art == NoticeArt::Vendor || !e.wohlgeformt) { continue; }
+        if (e.art == NoticeArt::Vendor || e.art == NoticeArt::Lizenztext || !e.wohlgeformt) { continue; }
         const auto am_baum = eingang.submodule_am_baum.find(e.pfad);
         if (am_baum == eingang.submodule_am_baum.end() || !am_baum->second.ausgecheckt) {
             // NICHT AUSGECHECKT: nur die Paarung oben gilt. Der Verzicht wird
@@ -586,6 +627,59 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
         } else if (in_notice > 1) {
             melde(BefundArt::NoticeZeileMehrfach, "NOTICE nennt denselben VENDOR-Pfad " + std::to_string(in_notice) +
                                                       " mal, zugesichert ist GENAU EINE: " + pfad);
+        }
+    }
+
+    // -- Lizenztext-Kopien unter LICENSES/ (Zusicherung 8) -----------------------
+    // super ist Apache-lizenziert und zieht die restriktiv lizenzierte cache engine
+    // als Submodul ein. Owner X1 (25.08.2026): super wird "um die restriktive
+    // ce-Lizenz ERWEITERT" -- der Volltext liegt deshalb als Kopie unter LICENSES/,
+    // damit ihn ein Leser dieses Repos OHNE Submodul-Checkout sieht. Eine Kopie
+    // kann veralten; deshalb Byte fuer Byte gegen die Quelle, nie "aehnlich".
+    for (const auto& [datei, n] : notice_lizenztext_je_datei) {
+        if (n > 1) {
+            melde(BefundArt::NoticeZeileMehrfach, "NOTICE nennt denselben LIZENZTEXT " + std::to_string(n) +
+                                                      " mal, zugesichert ist GENAU EINE: " + datei);
+        }
+    }
+    for (const NoticeEintrag& e : eintraege) {
+        if (e.art != NoticeArt::Lizenztext || !e.wohlgeformt) { continue; }
+        const std::string ziel  = lizenztext_pfad(e);
+        const auto        kopie = eingang.dateiinhalt.find(ziel);
+        if (kopie == eingang.dateiinhalt.end()) {
+            melde(BefundArt::LizenztextFehlt, "Lizenztext fehlt: " + ziel + " (NOTICE-Zeile " +
+                                                  std::to_string(e.zeile) + ", Quelle " + e.quelle + ")");
+            continue;
+        }
+        // Liegt die Quelle in einem NICHT ausgecheckten Submodul, gilt dieselbe
+        // Regel wie bei den Submodul-Zeilen: kein Rot auf dem frischen Klon, aber
+        // ein PROTOKOLLIERTER Verzicht -- nie ein stilles Gruen. Die Kopie selbst
+        // ist oben bereits verlangt worden; der Verzicht gilt nur der Byte-Probe.
+        bool quelle_nicht_ausgecheckt = false;
+        for (const auto& [pfad, zustand] : eingang.submodule_am_baum) {
+            if (!zustand.ausgecheckt && e.quelle.rfind(pfad + "/", 0) == 0) { quelle_nicht_ausgecheckt = true; }
+        }
+        if (quelle_nicht_ausgecheckt) {
+            ergebnis.skips.push_back("Lizenztext-Quelle nicht ausgecheckt, nur Kopie geprueft: " + e.quelle);
+            continue;
+        }
+        const auto quelle = eingang.dateiinhalt.find(e.quelle);
+        if (quelle == eingang.dateiinhalt.end()) {
+            melde(BefundArt::LizenztextQuelleFehlt,
+                  "Lizenztext-Quelle fehlt am Baum: " + e.quelle + " (NOTICE-Zeile " + std::to_string(e.zeile) + ")");
+            continue;
+        }
+        if (kopie->second != quelle->second) {
+            const std::string& a = kopie->second;
+            const std::string& b = quelle->second;
+            std::size_t        i = 0;
+            while (i < a.size() && i < b.size() && a[i] == b[i]) { ++i; }
+            // Das ERSTE abweichende Byte steht im Fehltext: wer den Befund liest,
+            // soll die Stelle finden, nicht erst einen Diff fahren muessen.
+            melde(BefundArt::LizenztextAbweichend,
+                  "Lizenztext nicht byte-gleich: " + ziel + " (" + std::to_string(a.size()) + " Byte) gegen " +
+                      e.quelle + " (" + std::to_string(b.size()) + " Byte), erste Abweichung bei Byte " +
+                      std::to_string(i + 1));
         }
     }
 
@@ -686,6 +780,16 @@ LizenzEingang sammle_vom_baum(const std::filesystem::path& wurzel) {
     // lizenzdatei_pfad(), also aus DERSELBEN Funktion, die der Pruefkern zum
     // Nachschlagen benutzt -- zwei Fassungen waeren eine stille Divergenz.
     for (const NoticeEintrag& e : parse_notice(eingang.notice_text)) {
+        if (e.art == NoticeArt::Lizenztext) {
+            // Zusicherung 8: Kopie UND Quelle, beide byte-genau (lies_datei liest
+            // binaer). Eine fehlende Datei bekommt KEINEN Eintrag -- der Pruefkern
+            // unterscheidet "fehlt" von "nicht ausgecheckt" ueber submodule_am_baum.
+            if (!e.wohlgeformt) { continue; }
+            const std::string ziel = lizenztext_pfad(e);
+            if (const auto inhalt = lies_datei(wurzel / ziel)) { eingang.dateiinhalt.emplace(ziel, *inhalt); }
+            if (const auto inhalt = lies_datei(wurzel / e.quelle)) { eingang.dateiinhalt.emplace(e.quelle, *inhalt); }
+            continue;
+        }
         const std::string voll = lizenzdatei_pfad(e);
         if (voll.empty()) { continue; }
         if (const auto inhalt = lies_datei(wurzel / voll)) { eingang.dateiinhalt.emplace(voll, *inhalt); }
