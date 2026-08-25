@@ -226,7 +226,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 2168f60c7077d1c316a9bf3e323c8a3b63ca0379
+PZW-CE-SHA         = d3b5a3936d1136c86003bdbabff668a21a85378f
 PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
@@ -247,6 +247,22 @@ PZW-CI-ALTMUSTER   = 0
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
+> NACHZUG 25.08.2026 vormittags (A2.5-FIX-R1 der Rest-Landung; Gitlink-Ziel ce
+> `d3b5a393` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug;
+> WIE GEMESSEN, nicht gerechnet): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN
+> unveraendert **24** -- der gelandete Merge d3b5a393 (L-06 Warnungs-Review Endstand-
+> Runde: 10 Compiler-Warnungen in 3 Test-TUs geheilt, Fix-Commit 1aee9a1f; ce-CI 286:
+> 16213 SUCCESS) beruehrt KEINE `lazy_csv_header()`-Aufrufstelle (git diff
+> 2168f60c..d3b5a393 -- 'tests/*.cpp' | grep -c lazy_csv_header = 0). Nenner unveraendert
+> **564** Test-.cpp (Kette 2168f60c..d3b5a393, 2 Commits, 0 neue Test-.cpp); 64 Rohzeilen,
+> Kommentar abgezogen. LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 @ 2968 Z. .gitlab-ci.yml.
+> LIVE gemessen mit den Formeln der Wache selbst (git grep -F gegen den Baum
+> `d3b5a393`); Kontroll-Lauf derselben Formeln am Alt-Baum `2168f60c` reproduziert
+> exakt 45/24/2/2/0 @ 564 Test-.cpp / 64 Rohzeilen. Drift-Biss VOR dem Nachzug rc=2 belegt;
+> Gegenprobe ueber den Bissproben-Kanal COMDARE_GITLINK_SHA nach dem Nachzug: '5 von 5
+> Ankern decken sich mit dem Objekt'. Nur der CE-SHA der Ankertafel wandert. Beleg-Log:
+> ~/backups-workflow/20260824-rest-landung/a25-fix-r1/pzw_zaehlung_d3b5a393.log.
+> Vorheriger Nachzug darunter.
 > NACHZUG 24.08.2026 nachts (Rest-Landung L3/K3-Gitlink-Nachzug; Gitlink-Ziel ce
 > `2168f60c` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug;
 > WIE GEMESSEN, nicht gerechnet): SCHEMA-STELLEN 44 -> **45**, SCHEMA-DATEIEN
