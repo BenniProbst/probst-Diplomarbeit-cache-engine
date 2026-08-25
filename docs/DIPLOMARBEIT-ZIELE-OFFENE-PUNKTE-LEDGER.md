@@ -16,6 +16,97 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON125 (25.08.2026 vormittags, A2.5-FIX Runde 1 der Rest-Landung): L-06 ENDSTAND-RUNDE GELANDET (10 Warnungen -> 0 in Haus-TUs) + Gitlink-Nachzug + Restposten-Register dreiwertig + KON124-Luecken + J-1-Kanon + TABU-Zaehlweise + Codex-Defekt
+
+**KON125-01 (A2.5-FIX-R1 VOLLZUG, Beweisort ~/backups-workflow/20260824-rest-landung/{A25-STAND.md,a25-fix-r1/}):**
+Eingang = Restposten der Lande-Schritte L1/L2/L3 (11 Register-Posten R-01..R-11, dedupliziert) + alle
+STAND-Dateien. Vorlauf-Agent starb 24.08. 23:4xZ am Fable-Limit ohne Repo-Wirkung (porcelain 0, 0 Commits nach
+dfd97102/2168f60c; WIEDERANLAUF aus A25-STAND.md). VOLLZOGEN: (1) L-06 Warnungs-Review ZWEIMAL (gcc DANN clang)
+am Endstand 2168f60c aus den GESICHERTEN K17-Zellen-Logkopien (Bau der Tests, 4 Zellen): gcc-Debug 0, gcc-Release
+1 (-Wfree-nonheap-object new_allocator.h:172 inlined aus tests/unit/test_d51_perzentil_kanon.cpp:342), clang-Debug
+10 == clang-Release 10 (9x -Wunused-const-variable test_s8kopf_planner_kopf.cpp Z.75-77/86-88/97-98 +
+test_axis_kind_kategorien_zuordnung.cpp:77; 1x gtest-printers.h:524 -Wcharacter-conversion aus dem gtest-
+Bibliotheksbau = Fremdcode googletest 1.15.2/clang 22, seit c2da9d1a deklarierter Bestand). URSACHE der 9: die
+Concept-Konjunkte (naht_nachrichten.hpp Z.142-145/155: Whitelist zuerst; organ_meta_meta_axis.hpp:71: requires
+unbewertet) lesen die Marker der Negativproben nie. HEILUNG (ce Branch bau/a25-l06-warnungen, Fix 1aee9a1f,
+Merge --no-ff d3b5a393, 3 Test-TUs +36/-5): static_assert-Pins lesen die Marker (Aussage statt Anwesenheit, T-2)
+und dokumentieren das entscheidende Konjunkt; d51: benannter Vektor + push_back statt braced Temporaer, Semantik
+unveraendert. KEINE Warnstufen-Senkung, KEINE Unterdrueckung. T-1/T-11c-Koeder ohne Vollbau mit Original-Flags
+(compile_commands.json): VORHER 8/1/0 clang + 1 gcc-O3 = 10 Rot gesehen, NACHHER 6/6 Proben 0. (2) K17-ENDSTAND-
+KOMBIBAU 4/4 Zellen KALT am gemergten d3b5a393 (volle Treppe J-0b/J-1 SIEBEN literal/J-2/J-3/J-4/RECONFIGURE2/
+comdare_tests/Voll-ctest --no-tests=error): je LITERAL '100% tests passed, 0 tests failed out of 545', 'Total
+Tests: 545', 6 AKTIV/0 UEBERSPRUNGEN, LastTest.log-mtimes 09:37:33Z/09:42:12Z/09:47:57Z/09:53:41Z, LastTestsFailed
+.log je nicht existent. WARNUNGS-BILANZ je Zelle vorher->nachher (gleiche Erhebungsstufe): gcc-debug 0->0,
+gcc-release 1->0, clang-debug 10->1, clang-release 10->1 (Rest = nur der gtest-Fremdcode-Fund; Haus-TUs 0 in 4/4).
+(3) pre_push_lande_gates 6/6 GRUEN (Bereich 2168f60c..d3b5a393 = 2 Commits; Floor 545==545 EXAKT am NEUEN Floor-
+Gate-Baum build/a25-gcc-release; Lock Exit 0 mit explizit gebautem Binary; TABU 5 byteidentisch) + gitleaks separat
+(Koeder glpat-+20 Laenge 26, Selbstbiss RC=1 LITERAL 'leaks found: 1', Echt-Scan -m 0 Funde, '2 commits scanned.',
+NENNER 2==2). R4 286 AKTIV=0 vor Push; Dual-Push origin+github 2168f60c..d3b5a393 RC=0; GENAU 1 neue Pipeline:
+CI 286 Pipeline 16213 @ d3b5a393 SUCCESS TERMINAL (Nenner 27 Jobs + 0 Bridges; 26 success + 1 manual is_original:relock, Klasse 16209). (4) super: Designplan par.9.5 UEBERHOLT-MARKER-Prosa nachgezogen (c588e475, +2 Z., L3-
+Restposten 2 / Di-25-docs-Anteil (a)) + Gitlink-Bump ce 2168f60c -> d3b5a393 ATOMAR mit PZW-9.5-Nachzug als
+4b1a6eac (Z23-Muster: Live-Formeln am neuen Baum 45/24/2/2/0 @ 564 Test-.cpp/64 Rohzeilen/2968 Z. yml =
+UNVERAENDERT, 0 lazy_csv_header-Delta, 0 neue Test-.cpp; Kontroll-Lauf Alt-Baum 2168f60c identisch; Drift-Biss
+rc=2 vor dem Nachzug; Gegenprobe Bisskanal + Live am neuen HEAD je '5 von 5 Ankern'); EIN Dual-Push dfd97102..
+4b1a6eac (2 Commits) mit vor_push_alle_wachen + gitleaks (Nenner 2==2) + R4; CI 288
+Pipeline 16214 @ 4b1a6eac SUCCESS TERMINAL (Nenner 36 Jobs + 1 Bruecke = 37, alle success; docs:plan-zahlen-wache SUCCESS; Bruecke trigger:cache-engine -> Downstream 16215 ce main @ e114cabd SUCCESS 24 Jobs). Endstand beidseitig: ce development origin==github==d3b5a393 == Gitlink@super-HEAD; super development
+origin==github==4b1a6eac (vor diesem Ledger-Commit).
+
+**KON125-02 (RESTPOSTEN-REGISTER DREIWERTIG, Quelle A25-STAND.md A1-A5):** BEHOBEN: R-06 L-06-Endstand-Runde
+(Erhebung+Bewertung+Heilung K1/K2), R-07 J-1-Kanon (s. -03), R-08(a) UEBERHOLT-Prosa (c588e475), FIX-4a Zaehlweise
+(s. -05), KON124-Luecken (s. -04). ENTLASTET: R-01 (K2/K3/Phasen-Push/KON124 durch L2/L3 erfuellt, am Objekt:
+Gitlink 2168f60c @ dfd97102, KON124 Kopf, 16210 success), R-05 (build-w2fix-Vermerk dokumentarisch), R-08(c)
+(KON124-03 Wortlaut-Doppelung), R-08(d) (PZW-Anteil durch L3). VERTAGT mit Traeger+Platz: R-02/R-11 Board-
+Buchungen (Lead; ENTWUERFE konsolidiert in A25-STAND.md A6), R-03 K4 main-FF (Owner F-13; FF-Dossier STAND-DESIGNER
++ FIX-4a; Bereiche NEU messen: ce e114cabd..d3b5a393, super 85dc85e8..HEAD), R-04 Raeumung (Lead-GO; build/gcc-
+release ALT @2168f60c = Raeum-Kandidat Nr. 1, NEU build/a25-gcc-release = Floor-Gate-Baum d3b5a393; Alt-Baeume +
+super build/), R-08(b) N-33(e)-Austragung (RN-27 Lead-Zug, wortfertig a25-fix-r1/rn27_n33e_kon60_04_austragung_
+entwurf.txt), R-09 [C2]-Spiegel-Treue (Z23-PROTOKOLL Restposten 1 / Staffel 3), R-10 N-33(d) (Owner), L-06-REST
+(Delta-Review c2da9d1a->66de5c09 + Nebenbefunde + Codex-Pass; Traeger W2-2/#106+#3), K3 gtest-Fremdcode (RN-28/#71
+bzw. googletest-Bump), #114-Frist Mi-26 06:00 (Owner: Ausfuehrender), Codex-Login (Owner/Vault, s. -06).
+
+**KON125-03 (J-1-KANON-KLAERUNG, L1-Restposten 7):** Kanon = die SIEBEN (comdare_adhoc_emitter_cli,
+comdare_limits_generated_source_catalog, comdare_axis_registry_gen, comdare_system_axis_registry_gen,
+comdare_measurement_axis_registry_gen, comdare_gen_golden_fullpilot, comdare_anatomy_codegen_cli; Memory-VOLLLISTE
+19.08. == Wellenplan F3-01/L-05 == L1 == A2.5-R1 je 4/4 Zellen literal). comdare_overlay_source_hash_gen ist KEIN
+J-1-Kandidat: cmake/overlay_source_hash.cmake haengt es per add_custom_target(... ALL) + add_dependencies an das
+all-Ziel (ninja -t query all: 1 Treffer) -> laeuft in jedem Vollbau implizit. comdare_gen_golden_fullpilot ist
+EXCLUDE_FROM_ALL (query all: 0) und hat am HEAD KEINEN ctest-Konsumenten (git grep tests/** cmake/**: nur
+Kommentare/README) -> seine Auslassung bewegt N nicht; es bleibt im Kanon fuer die Golden-CRC-Gegenprobe. Die
+23.08.-Variante (overlay statt gen_golden) war eine folgenlose Abweichung; Ergebnis-Gates (N==545 EXAKT + 0
+UEBERSPRUNGEN + 6 AKTIV) decken beide Formen.
+
+**KON125-04 (KON124-LUECKEN NACHGETRAGEN -- Designer Schritt 3 verlangte sie, KON124 traegt sie nicht):**
+(a) F-34-BELEG LITERAL: Vor-cidual-Referenz Pipeline 16087 @ 93542880 (22.08., docs-only, SUCCESS) = 22 Jobs + 0
+Bridges; 16208 @ ed636f8c (24.08., SUCCESS) = 28 + 0; DELTA EXAKT +6, WEG 0; die 6 neuen Jobs: build:clang,
+test:unit, test:unit:clang, test:unit:clang:debug, test:unit:debug, verify:submodules; Doppel-Beleg 16207 @
+3cddc5b7 28/28 (Designer P2 + Verify V-1 unabhaengig reproduziert, einstieg-ci/ + verify-v1-ci/). (b) KOMPLEX-
+FIX-BILANZ BEIDER MENGEN der Rest-Landung (Designer-Sammelliste): ERLEDIGT-in-der-Welle = 6 Posten (A-KW-1/2-
+Ankunft S-2f, N-33(a), N-33(b), par.25-Buchung vereint, #139-Landung, Gitlink/PZW-Zaehlwerk EINMAL live);
+VERTAGT-mit-Traeger = 5 Gruppen (GG3-1..4 -> S2-Schreiber/Di-25; 27.6.2-[B]-Reste W135-1..7/Z11R-1..5/CR-2..8+10..12/
+N-Posten/L-01..L-17-Reste/T9-W1L-1..9; 27.6.3-[C] owner-gated VO3-1/EP-2/N-17/N-19/N-21/N-33(d)/N-47/N-48/CR-9-
+F-13/L-20; KON123-07 (3)-(7); N-33(e)+Token-Rotation 287) -- davon in A2.5-R1 bewegt: L-06 (Endstand-Runde
+BEHOBEN, Rest vertagt), N-33(e) (wortfertig), wt-ce-ph89 (L1).
+
+**KON125-05 (FIX-4a TABU-ZAEHLWEISE DEKLARIERT, fuer K4):** Formel `git ls-files | grep -ci '<wort>'` am benannten
+SHA (2168f60c == d3b5a393 identisch): golden 16, heuristik 17; TABU-Flaeche per Verzeichnis (getrackt): topics 394 +
+organ_axes 425 + system_axes 17 + mess_axes 2 = 838; ls-files -d 0, porcelain auf TABU-Pfaden 0, find == ls-files
+(keine untracked Dateien). Die Designer-Zahl 'topics/axis 479' und die Verify-Zahl 'heuristik 18' sind mit keiner
+ls-files-Formel reproduzierbar (Kandidaten gemessen: 394/849/926/444/819/838 bzw. 17) -> ab jetzt NUR die hier
+deklarierte Formel; VOR dem FF am geltenden SHA wiederholen, BEIDE Zahlen nennen.
+
+**KON125-06 (CODEX-LENS DEFEKT -- Ersatz-Lens-Klausel angewandt, frische Proben im selben Fenster):** ~/.codex/
+auth.json = 0 Bytes (mtime 24.08. 17:35); 6 Proben: codex exec Volltext x2, Minimal x3 (je RC=1 'EOF while parsing
+a value at line 1 column 0'), MCP read-only (401 Unauthorized). Review der Fix-Strecke daher: Fable-Eigenreview
+F1-F3 am Objekt (A25-STAND.md) + K17 4/4 + Gates 6/6 + CI; ein unabhaengiger Fable-Zweitagent war dem Subagenten
+nicht verfuegbar (deklarierte Luecke). OWNER-VORLAGE (EIGENE Stau-Zeile): STAU: Codex-Login erneuern (auth.json
+leer; Credentials = Vault/Owner) -- bis dahin gilt die Codex-Lens als defekt, jede Ersatz-Lens-Nutzung braucht die
+frische Defekt-Probe im selben Fenster.
+
+**KON125-07 (RAEUM-/SLOT-LAGE):** wt-ce-a25l06 nach rekursiver Doktrin geraeumt (worktree_remove_wache), Branch-Ref
+bau/a25-l06-warnungen bleibt @ 1aee9a1f; build/a25-gcc-release STEHT als Floor-Gate-Baum d3b5a393 (Doppel-Bedingung
+bei Anlage 0 tracked / 0 csv,xlsx); build/gcc-release (ALT, 2168f60c) unangetastet = Raeum-Kandidat je Lead-GO;
+Zwischen-Zellen je nach Doppel-Bedingung 0/0 geraeumt. slot2.d: eigene Claim-Zeile + TERMINAL-Zeile. K4 main-FF
+NICHT ausgefuehrt (F-13). Board-Zuege NUR als ENTWURF (A25-STAND.md A6).
 ## KON124 (24.08.2026 nachts, Rest-Landung L1-L3 an der Landung): REST-LANDUNG VOLLZOGEN -- ce-#139-Phase-2 + Wellenplan-Harmonisierung + Gitlink-Nachzug; N-33-Quittungen + par.27-Anker-Vermerk
 
 **KON124-01 (REST-LANDUNG VOLLZOGEN):** Drei Schritte, sequentiell, EIN Schreiber je
