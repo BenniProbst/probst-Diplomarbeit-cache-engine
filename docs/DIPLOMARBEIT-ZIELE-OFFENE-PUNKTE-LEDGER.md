@@ -16,6 +16,132 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON128 (25.08.2026 nachmittags, A2.5-FIX Runde 4 der Rest-Landung, WIEDERANLAUF nach Owner-Pause 13:05Z): RE-VERIFY-R3-FUNDE RV3-01..RV3-03 QUITTIERT -- Nenner-Nachtrag zu KON127-01 (3 = maxdepth 8 ohne /tmp, 78 = maxdepth 10 mit /tmp), Anker-Regel (4) (Teil A + Teil B + Laenge), #114-Re-Run AUSGEFUEHRT (beweislauf-114, Lauf 2 GO 10/10, CSV-Kopien), Doktrin-Wertung durch Owner-Wort Q5 entlastet, R-04 Raeumung Q3 vollzogen (6/6, df 22G -> 44G), main-FF owner-entsperrt -> Lead-Zug, Restposten dreiwertig
+
+**KON128-01 (RV3-01 NENNER-NACHTRAG zu KON127-01 -- additiv, KON127-01 bleibt stehen):** Der KON127-01-Satz "...
+'measurements.csv' 3 Treffer, 0 unter build-b10/b10_work" nennt als einzigen Nenner 'find /home/comdare /tmp -xdev
+-maxdepth 10'; die 3 stammen aus a25-fix-r3/c1d_csv_existenz_praezise.txt mit 'find /home/comdare -xdev -maxdepth 8'
+(ohne /tmp). FRISCH 25.08. 12:51:08Z (a25-fix-r4/d1_rv301_nenner_frisch.txt) und erneut 14:17:36Z
+(d1b_rv301_nenner_frisch_wiederanlauf.txt, identisch): Formel F8 'find /home/comdare -xdev -maxdepth 8 -name
+measurements.csv' = 23 gesamt, davon GENAU 3 mit mtime vor 12:11Z
+(Desktop/DIPLOMARBEIT-PLAIN-BACKUP/.../Code/measure_out_d03/e4_xml, super Code/measure_out_d03/e4_xml,
+backups-workflow/20260807-ungesicherte-arbeit/measure_out_d03/e4_xml -- alle e4_xml, keine Beweislauf-Ausgabe) + 20
+neuer (10 wt-ce-b10rerun/build-b10/b10_work, 10 20260825-114-beweislauf-rerun/mess_csv = der #114-Re-Run, KON128-03);
+Formel F10 'find /home/comdare /tmp -xdev -maxdepth 10 -name measurements.csv' = 98 gesamt, davon 78 mit mtime vor
+12:11Z (61 unter /tmp, 12 unter ~/.claude, 2 Projekte, 2 Desktop, 1 backups-workflow) + 20 neuer. Unter
+build-b10/b10_work mit mtime vor 12:11Z: 0 (beide Formeln); /home/comdare/wt-ce-trigfix existiert NICHT; die 5
+Zeitstempel-Basenames 20260822-13{2637,2723,2809,2841,2912}__S001.csv und das Muster '20260822-13*__S001.csv' je 0
+(F10). GILT: die Zahl 3 war fuer F8 richtig, der Satz nannte F10 (dort 78); der tragende Satz (0 unter dem
+22.08.-Baum, wt-ce-trigfix nicht existent, Zeitstempel-CSVs 0) bleibt wahr. A25-STAND.md Z.617-618 (R3 C1)
+gleichlautend additiv nachgetragen (Abschnitt Runde 4, D1).
+
+**KON128-02 (RV3-03 ANKER-REGEL (4) -- additiv zu KON127-03 (1)-(3); in diesem Nachtrag eingehalten):** (4) Je Anker
+wird das Zaehl-Muster als Teil A + Teil B + Laenge L (Zeichen) genannt; das Voll-Muster ist A und B NAHTLOS
+zusammengesetzt (Formel grep -cF), und der Nachtrag traegt es NIE zusammenhaengend -> der Zaehler ist ohne Beleg-Datei
+reproduzierbar. Praefix-Zaehlungen (nur Teil A) sind KEINE Anker-Zaehler: sie steigen mit jedem Zitat (RV3-03: @
+6f6a28c1 vom Ledger-Praefix aus 3 statt 2, 3 statt 1, 3 statt 1, 4 statt 2). VORHER @ 6f6a28c1 (33525 Z.;
+a25-fix-r4/d2_anker_zaehler_vorher.txt 12:51:23Z, erneut 14:16:53Z identisch): (a) KON122-06 A='STATUS: OFFEN +
+Traeger W2-2/#106+#3' B=' UNVERAENDERT' L=49 -> 2 (Z.115 Zitat in KON126-01, Z.732 Original); (b) KON122-09 A='-
+Naechste Zuege: L-06 W2-2-WARNUNGS-REVIEW' B=' ZWEIMAL (gcc DANN clang)' L=68 -> 1 (Z.932); (c) KON122-08 A='build-b10
+BEHALTEN (44 Mess-CSVs,' B=' P12/#114-Beweisbaum)' L=54 -> 2 (Z.173 Zitat in KON126-05, Z.880 Original); (d) KON122-09
+A='#114-Frist-Marke + E07-Q1-' B='Re-Run-Traeger' L=40 -> 1 (Z.917); (e) KON124-05 A='KON124-05 (N-33(d) STAU-ZEILE,'
+B=' EIGENE)' L=38 -> 1 (Z.356); (f) KON126-05 A='der Worktree-Loeschung fehlt' B=' in den Beweisorten' L=47 -> 1
+(Z.179); (g) KON126-05 A='Raeum-Beleg der Doppel-Bedingung (0 tracked / 0 csv,xlsx)' B=' fuer build-b10 beibringen'
+L=83 -> 1 (Z.182); (h) KON125-06 A='STAU: Codex-Login' B=' erneuern' L=26 -> 1 (Z.269); (i) KON124-05 A='STAU:
+O2-Standard-' B='Owner-Entscheid' L=33 -> 1 (Z.356); (j) KON127-04 A='STAU: Doktrin-' B='Wertung' L=21 -> 1 (Z.77).
+Praefix-Treffer nur-A 3/2/4/2/2/2/1/3/3/1; NACHHER 3/2/4/3/3/3/2/4/3/3 (steigen nur dort, wo ein Zitat dieses
+Nachtrags den Teil A ungebrochen traegt -- erwartet und irrelevant, weil kein Anker-Zaehler). NACHHER am Commit: alle
+zehn Voll-Zaehler UNVERAENDERT, Zeilen um den KON128-Umfang verschoben -- Messung
+a25-fix-r4/d4_anker_zaehler_nachher.txt.
+
+**KON128-03 (RV3-02 #114-RE-RUN AUSGEFUEHRT -- Nachfuehrung zu KON127-05 und KON127-04; Wertung/Abnahme = Lead):**
+beweislauf-114 (Fable 5 max, slot1.d 12:22:15Z, Worktree /home/comdare/wt-ce-b10rerun detached d3b5a393, Beweisort
+~/backups-workflow/20260825-114-beweislauf-rerun/ mit STAND-114.md 93 Z.) fuhr das Rezept BEWEIS.md Par. 9: frischer
+Bau 12:22:29-12:23:34Z RC=0 (Lead 25.08.: 'Trigger-Linie = d3b5a393'; 2168f60c ist Vorfahre, Differenz 1aee9a1f = 3
+Test-TUs); Lauf 1 12:24:05-12:29:58Z RC_EMITTER=0, Protokoll RC=2 'E07_GATE_KRITERIEN_ERFUELLT=9/10', 'E07_GATE=NO-GO'
+-- einzige Abweichung E07_PLAN_BYTE_EQUAL=0, Ursache literal gefangen: die Owner-lebendige PMU-Zeile 'pmc_befund=amd
+events=3/4' vs 'events=2/4' (Owner-Ausnahme 10.08., pmc_stdout_maskierung.hpp) kippt in-process unter Last 160/300
+(kippender Koeder dtlb_misses 1->0, einziger Byte-Unterschied Offset 353), der Wegwerf-Emitter K5A vergleicht Rohtext
+-> NO-GO = korrekte fail-closed Folge, KEIN Produktivcode-Defekt der Trigger-Linie; Lauf 2 12:32:39-12:38:18Z
+RC_EMITTER2=0, VERDIKT b10_e07_pruefer RC=0 'E07_GATE_KRITERIEN_ERFUELLT=10/10', 'E07_GATE_PFLICHT_LITERALE=23/23',
+'E07_GATE_BEFUNDE=0', 'E07_GATE=GO', Protokoll byte-gleich zum 22.08.; TABU-SHAs 832/832 vorher==nachher; Hauptklon
+nie beruehrt. Mess-CSV-Kopien mess_csv/ 30 Dateien (10 Laeufe x 3, sha256-Liste, cmp 0 Abweichungen) VOR jeder
+Raeumung; Bau-Baum wt-ce-b10rerun/build-b10 (204 csv/xlsx ausserhalb _deps, 169M) + Worktree BLEIBEN (Messdaten).
+TERMINAL 12:38:47Z; UEBERGABE an diagnose-e07 12:41:35Z (Lead-Order Root-Cause + Haertung, Claim 12:46:07Z;
+Owner-Pause 13:05Z: pausiert OHNE STAND-E07.md, Fix-Worktree wt-ce-pmckoeder nie angelegt, Beweisort nur
+LEAD-HINWEISE.md H-1..H-4 + Bestands-grep; Resume = Lead). FOLGEN: (1) KON127-05 '#114-Frist Mi 26.08. 06:00 (Owner:
+Ausfuehrender = offene Frage 8; ...' UEBERHOLT -- Ausfuehrender war beweislauf-114 (Owner A2 25.08.: '#114 ... VOLLES
+GO, direkt so bald wie moeglich'; Mi 26. 06:00 = nur spaeteste Frist); der Pflicht-Re-Run < 1 h nach jeder weiteren
+Linienbewegung bleibt (VORTAFEL Posten 1). (2) Stau-Zeile KON127-04 ('STAU: Doktrin-' + 'Wertung'): durch Owner-Wort
+Q5 25.08. SACHLICH BEANTWORTET ('build-b10-Verlust = Panik-Loeschung bei einer weiteren vollen Platte in den letzten 5
+Kontexten; Neubau + Messung UNTER FESTPLATTEN-MESSUNG (= #114-Re-Run 25.08.)', Memory owner-kerne-20260825,
+sinngemaess) = Option (B) vollzogen (Verlust gebucht; Ersatz-CSVs mit Kopie im Beweisort; df-Reihe STAND-114 Z.67-74
+mit 2 deklarierten Luecken). Q5 nennt das MOTIV; Akteur und Zeitpunkt bleiben wie KON127-01 (P12, 22.08. 14:17:10Z,
+objektmessung Z.29-33) -- Ergaenzung, kein Widerspruch. Klassenregel (A) NICHT gezogen (kein Owner-Wort dazu) ->
+Stau-Zeile ENTLASTET; formale Austragung + Memory-Klassenregel = Lead-KON. (3) STAND-114 Restposten R-1
+(Wegwerf-Emitter K5A auf den stabilen Anteil umstellen), R-2 (Dossier-Formulierung K5 'stabiler Anteil'), R-3 (Linie
+d3b5a393 bestaetigt), R-4 (Beweisbaum + Worktree stehen, nur per Lead/Owner-GO) = VERTAGT, Traeger Lead. Abnahme des
+Re-Runs = Lead (PAUSE-PROTOKOLL: 'beweislauf-114 (GELANDET, E07 GO 10/10)').
+
+**KON128-04 (R-04 ENTLASTET -- RAEUMUNG Q3 VOLLZOGEN durch Traeger raeumung-q3, Owner-Q3-GO 25.08. 'VOLLES GO Raeumung
+der 6 Bau-Baeume ... JEDER Baum vorher REKURSIV auditieren'):** slot1.d 12:39:53Z-12:50:08Z; Beweisort
+~/backups-workflow/20260825-raeumung-q3/ (STAND-RAEUMUNG.md, raeum_schritt.sh, loesch-*.log, belege-*/ 23M,
+SHA256SUMS-BEWEISORT.txt). Audit je Baum: (a) Herkunfts-SHA + is-ancestor rc=0 (ce
+build-l1/build-l1-clang/build-dbg/build-dbg-clang = Z12-Neufahrt-Zellen @ 943c70ee je 545/545; build/gcc-release =
+L1-Zelle 4 @ 2168f60c, abgeloest durch build/a25-gcc-release; super build = seg4-58-Vollbau @ 5ca82678 mit ce 20c111c4
+/ prt-art d11781fa / thesis c169fd22 aus dem Provenance-Header), (b) Beweiskopien benannt, Z12-Belege byte-gleich in
+beiden Beweisorten, (c) ls-files 0 + csv/xlsx 0 (6/6), (d) nested .git 0, (e) cwd/fd/maps/fuser/worktree/slot leer;
+K14 ein Baum je Schritt mit df vor/nach literal: build-l1 12:49:02Z 21G->25G, build-l1-clang 12:49:08Z 25G->26G,
+build-dbg 12:49:15Z 26G->34G, build-dbg-clang 12:49:22Z 34G->37G, build/gcc-release 12:49:32Z 37G->41G, super build
+12:49:41Z 41G->44G; je rm_rc=0, 'D'-Nachkontrolle 0, 0 Messdaten. AM OBJEKT 12:52:43Z + 14:13:46Z: alle 6 Pfade WEG,
+ce build/ = NUR a25-gcc-release 3.8G (Floor-Gate-Baum d3b5a393), df / 44G frei; wt-ce-b10rerun/build-b10 TABU
+unangetastet. -> R-04 ENTLASTET; KON127-05 'R-04 Raeumung (Lead-GO, FRISCH 12:14Z: ...' UEBERHOLT. NEU aus der
+Raeumung, VERTAGT mit Traeger: H-1 ce scripts/pre_push_lande_gates.sh:351 Default BD=build/gcc-release ist WEG ->
+jeder Gate-Lauf MUSS COMDARE_PRE_PUSH_BUILD_DIR auf einen vollen gcc-Release-Baum setzen (Hauptklon
+build/a25-gcc-release @ d3b5a393; Worktree: eigene K17-gcc-Release-Zelle), sonst Gate 4 + 5 rot; Default-Hebung =
+ce-Konformitaets-Commit, Traeger konformitaet-gate-director (Wiederanlauf 14:13:23Z, slot2.d, Worktree wt-ce-konform
+Branch bau/konform-gate-director; dazu director.hpp:777 lane_build_parallelism 24 vs Owner HEAVY_J 16, KON28-01); L-1
+die Beweise der Rest-Landung (20260824-rest-landung/, 20260825-*/) liegen NICHT im Vollaudit-BU
+20260824-vollaudit-welle2-stand -> naechstes Wellen-Ende-BU (Lead/Owner, docs-only); H-2 zwei der sechs Baeume trugen
+nur 121-B-LastTest-Stubs (Doktrin BEWEISORTE = KOPIEN bestaetigt). RV-05 prunable ce-audit-7150cc51 STEHT (Lead-GO,
+nicht geprunt); ce 'git worktree list' 14:13Z = 28 Zeilen / 1 prunable (26 @ 12:20Z + wt-ce-b10rerun 12:22Z +
+wt-ce-konform 14:13Z; Zeitstaende, keine Fehlquittung).
+
+**KON128-05 (R-03 K4 main-FF -- Owner-Gate F-13 OFFEN, Ausfuehrung = Lead-Zug):** Owner 25.08. A1 'F-13 = (a) ALLE
+DRIN ... Folge: main-FF (#19/Z27) ENTSPERRT' + B1 'main-FF beider Repos JETZT fahren' (Memory owner-kerne-20260825,
+sinngemaess). Fuer diese Runde bleibt die Task-Order 'main-FF NICHT ausfuehren (owner-gated F-13)' bindend -> VERTAGT,
+Traeger = Lead nach A2.5-TERMINAL (PAUSE-PROTOKOLL Wiederanlauf-Reihenfolge (3) 'KON + ASCII + main-FF'), NICHT mehr
+owner-gated. Bereiche FRISCH 14:2xZ: super origin/main 85dc85e8..origin/development 6f6a28c1 = 439 (440 nach diesem
+Nachtrag), ce origin/main e114cabd..origin/development d3b5a393 = 317, je is-ancestor JA (reiner FF); ce main lokal
+b241a272 = 638 hinter (mitziehen). Auflagen unveraendert: Diff-Hygiene push-lokal ueber den VOLLEN Bereich unmittelbar
+vor dem FF, FIX-4a-Formeln je Zahl (KON126-02), K17-Vollauf NUR als Kopie zitieren (KON126-03), H-1
+COMDARE_PRE_PUSH_BUILD_DIR vor jedem ce-Gate-Lauf (KON128-04), Reihenfolge ce DANN super, beide Remotes, 1 Push = 1
+Pipeline, CI 286 + 288 main TERMINAL via API.
+
+**KON128-06 (RESTPOSTEN DREIWERTIG R4 + PAUSE/WIEDERANLAUF -- die 12 Quittungen der Runde 3 hat die Re-Verify R3 am
+Objekt nachgemessen: 12/12 BESTAETIGT, 3 neue Funde niedrig):** BEHOBEN: RV3-01 (-01 + A25-STAND-Nachtrag), RV3-03
+(-02, Regel (4) hier eingehalten), RV3-02 (-03 Nachfuehrung; Board-Entwurf 13 ERSATZ-2 + Nr. 17 als ENTWURF in
+A25-STAND.md Runde 4). ENTLASTET: R-04 (-04), Doktrin-Wertung KON127-04 (-03 (2)). VERTAGT mit Traeger + Platz: R-03
+main-FF (Lead, -05); RV-05 prunable (R-04-Rest, Lead-GO); H-1 Gate-Default + director 24/16
+(konformitaet-gate-director, aktiv); L-1 Vollaudit-BU (Lead/Owner); diagnose-e07 Root-Cause/Haertung + STAND-114
+R-1..R-4 (Lead-Resume); R-02/R-11 Board-Buchungen (Lead; ENTWUERFE A25-STAND A6 + B7 + R3 Nr. 13-ERSATZ/16 + R4 Nr.
+13-ERSATZ-2/17); R-08(b) N-33(e) (RN-27, wortfertig a25-fix-r1/rn27_n33e_kon60_04_austragung_entwurf.txt); R-09
+[C2]-Spiegel-Treue (Staffel 3 / YAML-Hoheit; in R4 erneut einziges ROT der Wachen, 8/8 untracked measure_out_d03,
+Gegenstands-Beweis am Archiv-Baum mit RC-Datei cppcheck_rc_r4.txt); R-10 N-33(d) (Owner, KON124-05); L-06-REST + K3
+gtest-Fremdcode (W2-2/#106+#3 bzw. RN-28/#71); Codex-Login (Owner/Vault; FRISCH 14:2xZ auth.json 0 B mtime 24.08.
+17:35:12Z, 'codex login status' rc=1 'EOF while parsing a value at line 1 column 0' -> auch in R4 kein Codex-Pass,
+deklariert); RV-03 LastTest-Stub (K4-Dossier; 121 B mtime 11:16:04Z unveraendert, kein ctest in R4). ABLAUF: Vorlauf
+R4 12:46:08Z-12:54Z (D0-D3) durch die Owner-Pause 13:05Z gestoppt (PAUSE-PROTOKOLL.md
+~/backups-workflow/20260825-PAUSE-1305Z/: 'gekillt, ohne Repo-Schaden: porcelain 0'; kein KON128, kein Commit),
+WIEDERANLAUF 14:11:42Z (D0-D3 am Objekt frisch reproduziert, dann D4-D7); Slots: slot2.d PAUSIERT-Zeile 12:56:54Z
+(Lead), Wiederanlauf-Claim in slot3.d 14:17:46Z (slot2.d seit 14:13:23Z AKTIV konformitaet-gate-director, slot1.d
+diagnose-e07 pausiert; kein Alt-Claim ueberschrieben). KON-Nummer FRISCH vor Einspielung: Kopf KON127, Substring
+'KON128' = 0 Treffer; Einspielung NUR via scripts/ledger_nachtrag.sh; Beweisort
+~/backups-workflow/20260824-rest-landung/{A25-STAND.md (Abschnitt Runde 4), a25-fix-r4/}. KEIN Bau, KEIN ctest, KEIN
+main-FF, KEIN Board-Zug (nur ENTWURF), KEIN prune, NICHTS geloescht, Messdaten unangetastet; ce unberuehrt.
+Lead-Buchungen (Owner-KERNe A1-A6/B1-B10/T1-T5, Vortafel, Trigger-Zeit, Raeumung als Lead-Sicht) NICHT hier ->
+Lead-KON nach A2.5-TERMINAL.
+
 ## KON127 (25.08.2026 mittags, A2.5-FIX Runde 3 der Rest-Landung): RE-VERIFY-R2-FUNDE RV2-01..RV2-03 QUITTIERT -- KON126-05 KORRIGIERT (Raeum-Beleg der wt-ce-trigfix-Loeschung EXISTIERT, Z11 23.08.; build-b10 fiel 22.08. 14:17Z durch P12 selbst), NACHTRAG zur KON122-08-Zeile build-b10 (seit 22.08. 14:17Z ueberholt), Anker-Hygiene-Regel (RV2-02), Doktrin-Wertung als EIGENE Stau-Zeile, Restposten dreiwertig
 
 **KON127-01 (RV2-01 KORREKTUR zu KON126-05 -- Sachverhalt am Objekt nachgemessen 25.08. 12:11Z; KON126-05 bleibt als
