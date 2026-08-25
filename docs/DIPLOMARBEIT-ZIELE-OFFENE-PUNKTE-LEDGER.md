@@ -16,6 +16,95 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON127 (25.08.2026 mittags, A2.5-FIX Runde 3 der Rest-Landung): RE-VERIFY-R2-FUNDE RV2-01..RV2-03 QUITTIERT -- KON126-05 KORRIGIERT (Raeum-Beleg der wt-ce-trigfix-Loeschung EXISTIERT, Z11 23.08.; build-b10 fiel 22.08. 14:17Z durch P12 selbst), NACHTRAG zur KON122-08-Zeile build-b10 (seit 22.08. 14:17Z ueberholt), Anker-Hygiene-Regel (RV2-02), Doktrin-Wertung als EIGENE Stau-Zeile, Restposten dreiwertig
+
+**KON127-01 (RV2-01 KORREKTUR zu KON126-05 -- Sachverhalt am Objekt nachgemessen 25.08. 12:11Z; KON126-05 bleibt als
+Historie stehen, dieser Nachtrag gilt):** KON126-05 traegt zwei falsche Teilaussagen. (i) 'Ein Raeum-Beleg der
+Worktree-Loeschung fehlt ...' (KON126-05 @ 92166461 Z.89-90) ist FALSCH: der Beleg liegt in ~/backups-workflow/
+20260822-lande-zug/Z11/ (23.08. 20:49-20:53Z): loesch-6-trigfix.log (71 B, mtime 2026-08-23T20:52:24Z) 'remove-rc=0' +
+'verzeichnis-weg=JA'; z11-abnahme.log Z.56 'wt-ce-trigfix WEG', Z.65 'bau/trigfix = 0f900dcf...'; z11-sweep-8wt.log
+Z.48-56 (HEAD 0f900dcf, 'status-rc=0 zeilen=0', 'nested-gits-anzahl=0', 'build-verzeichnisse (maxdepth1):' LEER,
+'wt-groesse=188M'); z11-pruef2-ignored-messdaten.log (20:51:12Z) Z.152/179-181 'csv/xlsx-ganzer-baum-ausser-_deps:
+getrackte+untracked gesamt=8' / 'davon-getrackt-im-index=8' / 'UNGETRACKTE-messdateien=0'; ZUG-BILANZ.md Abschn. 10c
+Z.833 '| Z11 | ce-Raeumfenster 8 Strang-Worktrees | GELANDET | -- | 8/8 remove rc=0 (34->26 worktree-Eintraege), ...'.
+Die in KON126-05 zitierte ZUG-BILANZ-Zeile 'Z11-RAEUMFENSTER (nie gefahren; ...)' (Z.114) ist Historie (Abschn. 1-9;
+Z.768 'fortgeschrieben haben, gilt dieser Abschnitt.'); die R2-Suche war auf mtime > 24.08. 20:18Z und die Namen
+'*wache*'/'*.csv' gefiltert, der Beweisort des 23.08. fiel durch beide Siebe. (ii) Die Worktree-Loeschung kostete
+NICHT die 44 CSVs: zum Z11-Zeitpunkt stand kein build-b10 mehr (Pruef-2 oben). build-b10 wurde am 22.08. 14:17:10Z
+von P12 SELBST nach der #114-Abnahme entfernt: objektmessung-20260822.txt (~/backups-workflow/20260822-anschluss-leser/
+H2-11-beweis/, 22.08. 16:42:23Z) Z.29 '== (c-NACHTRAG) build-b10: am 13:52 BEHALTEN, INZWISCHEN durch P12 selbst
+geraeumt ==', Z.30 'wt-ce-trigfix/build-b10: ENTFERNT (Worktree-Root-mtime 2026-08-22 14:17:10)', Z.32 'CMD: cd
+/home/comdare/wt-ce-trigfix && rm -rf build-b10 && echo "build-b10 GELOESCHT"; ...', Z.33 '(nach git-ls-files-Pruefung,
+BEWEIS.md 14:16 lag vor; Board #114 completed)'; H2-11-HEILUNG.md (16:44:05Z) Z.64-68 + Z.139-141; GETRACKTE Session-
+Doku docs/sessions/20260822-SESSION-beide-leser-vollliste-gebrochene-straenge-und-offenes.md Z.86-87 'build-b10 von
+P12 selbst regelkonform entfernt', Z.223-224 'H2-04 ... [UEBERHOLT: P12 raeumte build-b10 nach #114-Abnahme selbst
+regelkonform; ...'. Chronologie 22.08.: 13:26-13:29Z Beweislauf (emitter_lauf2.log, 5 Laeufe basis/rerun/k3a/n2/
+fenster), 14:16:57Z BEWEIS.md fertig, 14:17:10Z rm -rf build-b10 (P12), 17:44:30Z Z07-Merge f7b64039; 23.08. 20:52Z
+Z11-Worktree-Loeschung. FOLGE fuer KON126-05 (a) ('Raeum-Beleg der Doppel-Bedingung ... beibringen ODER ...
+deklarieren'): FALSCH ADRESSIERT -- ein Doppel-Bedingungs-Beleg fuer build-b10 ist nicht beizubringen; Bedingung 1
+(git ls-files = 0) stand vor der Loeschung (objektmessung Z.33), Bedingung 2 (0 csv/xlsx) war per Definition NICHT
+erfuellt (44 CSVs). Die 44 CSVs (10 im Emitter-Log benannte Pfade: 5x build-b10/b10_work/laeufe/{basis,rerun,k3a,n2,
+fenster}/20260822-13xxxx__S001.csv + 5x .../measurements.csv) wurden NICHT kopiert: FRISCH 25.08. 12:11Z die 5
+Zeitstempel-Basenames je 0 Treffer (find /home/comdare /tmp -xdev -maxdepth 10), 'measurements.csv' 3 Treffer, 0 unter
+build-b10/b10_work; b10-beweislauf/ 32 Dateien, 0 csv; find 'build-b10*'/'wt-ce-trigfix*'/'b10_work*' (maxdepth 6) 0.
+Offen bleibt NUR die Doktrin-Wertung ('Messdaten NIE loeschen' vs. reproduzierbare Beweislauf-Ausgabe; die Session-
+Doku 22.08. wertet 'regelkonform') -> EIGENE Stau-Zeile KON127-04 (Lead/Owner). KON126-05 (b) bleibt RICHTIG:
+#114-Re-Run = frischer Bau nach BEWEIS.md Par. 9 (Z.184; Abschn. 8 Z.174 'Harness steht, Rezept ...'), der Re-Run
+war nie an den Baum gebunden. Nichts geloescht, nichts geraeumt. Belege ~/backups-workflow/20260824-rest-landung/
+a25-fix-r3/c1a_z11_belege.txt, c1b_b10_loeschung_22_08.txt, c1c_beweis_md_fs.txt, c1d_csv_existenz_praezise.txt.
+
+**KON127-02 (NACHTRAG zur KON122-08-Zeile 'build-b10 BEHALTEN (44 Mess-CSVs, ...)' -- additiv, die Zeile bleibt als
+Historie stehen):** KON122-08 E-6-NACHBUCHUNGEN Punkt 2 (Z.791 @ 92166461; Z24/kon122-nachtrag.md 24.08. 19:20Z Z.440
+wortgleich) buchte den Stand 13:52Z des 22.08. (zweite Raeumung, build-b10 damals BEHALTEN, P12 lief). Seit 14:17:10Z
+ist die Zeile ueberholt; H2-11-HEILUNG.md Z.139-141 (22.08. 16:44Z) forderte den Nachtrag 'damals BEHALTEN; nach
+#114-Abnahme durch P12 entfernt', den KON122 (Z24, 24.08.) nicht trug -- KON122 buchte damit einen Baum als lebend, der
+nicht mehr existierte. NACHTRAG: build-b10 damals BEHALTEN; nach #114-Abnahme 14:17:10Z durch P12 selbst entfernt,
+ohne Kopie der 44 CSVs (Belege s. KON127-01). Anker-Zaehler des vollen KON122-08-Wortlauts (grep -cF): 2 vor und 2
+nach diesem Nachtrag (KON126-05-Zitat + KON122-08-Original), weil er hier absichtlich gebrochen zitiert wird.
+
+**KON127-03 (RV2-02 ANKER-HYGIENE-REGEL, additiv zu KON124-03/KON126-01):** KON126-01 zitierte die Wortlaut-Anker
+(a)/(b) im Klartext; dadurch hat Anker (a) (KON122-06 'STATUS: OFFEN + Traeger W2-2/#106+#3 UNVER...') am Objekt
+92166461 2 Treffer (Z.26 Zitat + Z.643 Original) statt 'je genau 1' (die KON126-01-Aussage bezog sich auf 33c8a50e und
+war dort wahr); ebenso KON122-08 'build-b10 BEHALTEN (44 Mess-CSVs, ...)' 2 Treffer (Z.84 Zitat + Z.791). Eindeutig
+bleibt nur KON-Block + Wortlaut. REGEL fuer jeden Nachtrag ab jetzt: (1) Anker gebrochen zitieren (Auslassung '...'
+oder Bindestrich-Umbruch), (2) Anker stets als KON-Block + Wortlaut fuehren, (3) je Nachtrag die Zaehler VORHER und
+NACHHER messen (grep -cF) und beide nennen. DIESER Nachtrag haelt sie ein: VORHER @ 92166461 (a) 2 / (b) KON122-09
+'- Naechste Zuege: L-06 W2-2-WARNUNGS-REVIEW ...' 1 / b10 2 / KON122-09 '#114-Frist-Marke + E07-Q1-...' 1 /
+'KON124-05 (N-33(d) STAU-ZEILE, ...)' 1 / KON126-05 'der Worktree-Loeschung fehlt ...' 1 / KON126-05 (a) 'Raeum-Beleg
+der Doppel-Bedingung ...' 1 / 'STAU: Codex-Login ...' 1 / 'STAU: O2-Standard-...' 1; NACHHER (am Commit gemessen):
+identisch, s. Belege a25-fix-r3/c2_anker_zaehler_vorher.txt + c4_anker_zaehler_nachher.txt.
+
+**KON127-04 (DOKTRIN-WERTUNG build-b10-CSVs -- OWNER-/LEAD-VORLAGE, EIGENE Stau-Zeile):** STAU: Doktrin-Wertung
+build-b10-CSVs (44 Beweislauf-Ausgaben des #114-E07-Q1-Laufs, 22.08. 14:17:10Z durch P12 nach #114-Abnahme ohne Kopie
+entfernt; 'Messdaten NIE loeschen' vs. reproduzierbare Emitter-Ausgabe (Re-Run-Rezept BEWEIS.md Par. 9); Session-Doku
+22.08. wertet 'regelkonform'; KON122-08 buchte BEHALTEN) -- Lead/Owner; Platz neben 'STAU: Codex-Login ...' (KON125-06)
+und 'STAU: O2-Standard-...' (KON124-05), NICHT verschmolzen. Entscheid-Optionen: (A) Beweislauf-Ausgaben gelten als
+reproduzierbar (Rezept < 1 h) und sind kein measurement/-Bestand -> Klassenregel im Memory nachziehen; (B) Verlust
+buchen -> der Re-Run nach Par. 9 liefert Ersatz-CSVs, diesmal mit Kopie in den Beweisort VOR jeder Raeumung.
+
+**KON127-05 (RESTPOSTEN DREIWERTIG R3 -- die 12 Quittungen der Runde 2 hat die Re-Verify R2 am Objekt nachgemessen:
+11 BESTAETIGT, R2-01 TEILWEISE WIDERLEGT):** BEHOBEN: RV2-01 (-01/-02; Board-Entwurf 13 ERSETZT + A25-STAND-Nachtrag,
+beides in A25-STAND.md Abschnitt Runde 3), RV2-02 (-03 Regel verankert + eingehalten), RV2-03 (A25-STAND.md Korrektur-
+Nachtrag additiv: Vorflug R2 '27 Eintraege' -> Objekt 26 Zeilen == 26 porcelain-Eintraege, 1 prunable; FRISCH 12:09Z
+26/1). R2-01: BEHOBEN im Ledger-Anteil (-01/-02; Lead-Auflage KON126-05 (a) entfaellt), VERTAGT im Doktrin-Anteil
+(-04). VERTAGT mit Traeger + Platz: Doktrin-Wertung (-04, Lead/Owner); RV-05 prunable Eintrag ce-audit-7150cc51 (R-04
+Lead-GO, KON126-03; FRISCH 12:14Z steht, 26 Eintraege/1 prunable); R-02/R-11 Board-Buchungen (Lead; ENTWUERFE
+A25-STAND.md A6 + B7 [Nr. 13 ersetzt] + R3 Nr. 16); R-03 K4 main-FF (Owner F-13; Bereiche FRISCH 12:14Z: ce origin/main
+e114cabd..origin/development d3b5a393 = 317, super 85dc85e8..92166461 = 438 (+1 durch diesen Ledger-Commit), je
+is-ancestor JA; ce main lokal b241a272 = 638 hinter, beim FF mitziehen); R-04 Raeumung (Lead-GO, FRISCH 12:14Z: ce
+build/ 7.6G = gcc-release ALT 3.8G [tracked 0 / csv,xlsx 0] + a25-gcc-release 3.8G Floor-Gate-Baum, build-dbg 8.1G,
+build-dbg-clang 3.3G, build-l1 3.8G, build-l1-clang 829M, super build/ 3.2G; df / 23G); R-08(b) N-33(e)-Austragung
+(RN-27, wortfertig a25-fix-r1/rn27_n33e_kon60_04_austragung_entwurf.txt); R-09 [C2]-Spiegel-Treue (Z23-PROTOKOLL
+Restposten 1 / Staffel 3, YAML-Hoheit; in dieser Runde erneut einziges ROT der Wachen, Gegenstands-Beweis mit RC-Datei);
+R-10 N-33(d) (Owner, KON124-05); L-06-REST (W2-2/#106+#3, Anker KON122-06/-09 s. -03) + K3 gtest-Fremdcode (RN-28/#71
+bzw. googletest-Bump); #114-Frist Mi 26.08. 06:00 (Owner: Ausfuehrender = offene Frage 8; Rest 17 h 48 min ab 12:11Z;
+frischer Bau nach Par. 9, ccache WEG -> kalt; Harness b10-beweislauf/src/ 3 Dateien); Codex-Login (Owner/Vault; FRISCH
+12:14Z auth.json 0 B, 'codex login status' rc=1 'EOF while parsing a value at line 1 column 0' -> auch in R3 kein
+Codex-Pass, deklariert); RV-03 LastTest-Stub (FRISCH 12:14Z 121 B mtime 11:16:04Z unveraendert, kein ctest in R3).
+KON-Nummer FRISCH vor Einspielung: Kopf KON126, Substring 'KON127' = 0 Treffer; Einspielung NUR via scripts/
+ledger_nachtrag.sh; Beweisort ~/backups-workflow/20260824-rest-landung/{A25-STAND.md (Abschnitt Runde 3), a25-fix-r3/}.
+KEIN Bau, KEIN ctest, KEIN main-FF (F-13), KEIN Board-Zug (nur ENTWURF), KEIN prune, NICHTS geloescht; ce unberuehrt.
+
 ## KON126 (25.08.2026 mittags, A2.5-FIX Runde 2 der Rest-Landung): RE-VERIFY-FUNDE RV-01..RV-05 QUITTIERT -- Anker per Wortlaut/Block statt Zeilennummer (RV-01), TABU-Formel je Zahl (RV-04), RC-Datei-Auflage (RV-02), LastTest-Stub-Hinweis fuer K4 (RV-03), prunable Worktree in der Raeum-Liste (RV-05)
 
 **KON126-01 (RV-01 STALE ZEILENANKER -- Korrektur additiv; Anker ab jetzt per Wortlaut + KON-Block):** Die Quittung
