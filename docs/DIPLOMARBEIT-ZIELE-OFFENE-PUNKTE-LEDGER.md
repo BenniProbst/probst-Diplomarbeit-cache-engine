@@ -16,6 +16,132 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON132 -- OWNER-ANTWORT-TRANCHE 26.08. (13:00:03.999Z) + CODEX-LOGIN + ABSICHERUNGS-SYNTHESE (8 Scans + 8 FINALs)
+
+KON132-01 QUELLE: Owner 26.08.2026 13:00:03.999Z (5a19728e:92783, human/typed, 3281 Zeichen) auf die
+  Entscheidungs-Tafel A-F (L92779, 06:23:02.781Z). Absicherung owner-beauftragt ("Bitte sichere auch alle
+  deine Fragen von eben durch explores gegen meine neuen Antworten ab, es war alles schon beantwortet"):
+  8 Sonnet-Scans + 8 Fable-FINALs in ~/backups-workflow/20260826-absicherung-owner-tranche/ (Synthese =
+  ABSICHERUNGS-TAFEL.md). Bilanz: 16/29 Zeilen mit belegtem Vorlaeufer (2 davon vollzogen: V8/V9),
+  9/29 frische 1-Tages-Fragen, 1/29 DELTA, 3/29 echt offen. ZEITEN OBJEKTFEST: Tafel 06:23Z, Antwort
+  13:00Z, Codex 13:03Z (Memory-Etiketten "~06:1xZ"/"~11:03Z" = Fehlkonversionen, korrigieren).
+KON132-02 TRIGGER-PFAD: OS-1 = R1 bestaetigt (XML {O2,O3} bleibt; n_bau 524288 / 128 Scheiben).
+  F-X3-1 = (A) VOR dem Trigger. KN-1..4 volles GO. NEU-AUFTRAG "vergessenen Stempel Teil 2 suchen und mit
+  implementieren vor dem Trigger" -> Referent per Explore: B-7/RN-78-EMITTER-HAELFTE (Teil 1 = A-11-Loader
+  gelandet 19.08.; Teil 2 = Emission: Hybrid-Makro 6 Symbole ohne Stempel, 1/7 Emissionsorte produktiv);
+  unter Emitter-Weiche A (RN-04-Default, in Kraft) identitaets-/golden-neutral; eigener Board-Task;
+  Bestaetigungszeile in der Rest-Vorlage. T (Split-Landung) blieb UNBEANTWORTET -- Arbeitsannahme "nach
+  Kampagne", Bestaetigungszeile folgt.
+KON132-03 OS-2: "hartes CMake-Gate nachbestellen" + Bootstrap-Auftrag (Systemcompiler -> Tool-Compiler ->
+  Code "correkt originalgetreu"). Gate = #145 S5 (cmake/vo31_optflag_gate.cmake, 3-Punkt-Gate + Koeder);
+  Bootstrap = #130 SCHARF, eigener Designplan (Bestand: cmake/compiler_cache.cmake+paper_binary.cmake+
+  tools_cache.cmake, P2.A 26.05., 0 Aufrufer -- AKTIVIEREN statt Neubau); KON129-:518-Wortlaut ("inkl.
+  selbst-pinnender Vendor-Projekte") BESTAETIGT, Bauplan-Abweichung "nur Doktrin-Vermerk" VERWORFEN;
+  Doktrin-Wurzeln: F7-Kanon 08.05., User-Direktive 26.05., Aufgabenstellung de.tex:65-66 (19.06.), Owner
+  16.07. "S-6 ... System-Compiler Verfuegbarkeit"; "originalgetreu" > "Compiler-Version egal" (Termin 7).
+  Traeger fuer den Vendor-EINZUG fehlt -> Board-Posten anlegen; Empfehlung: Einzug+Bootstrap-Bau NACH
+  Trigger (fingerprint-neutral), Gate/Designplan sofort.
+KON132-04 PUBLIC/LIZENZ: E2 = (a) Gruppenkette public MIT VORARBEIT History-REDAKTION der geleakten
+  Schluessel (Reihenfolge: Redaktion -> GitHub public -> GitLab public LAN-only -> Internet SPAETER).
+  E1 = thesis LICENSE Apache-2.0 MIT Copyright-Vermerk Benjamin-Elias Probst -- SUPERSEDIERT KON2-23-
+  Thesis-Zeile "SOLL: nur Copyright-Vermerk" (Wortlaut dort gedoppelt belassen). E3 = (A) 1 Design-Tag.
+  Lizenzpunkte: EULA-Zellen bleiben; Paper-PDFs/Pruefungsunterlagen public (Risiko-Vermerke bleiben
+  dokumentiert); Rechtetraeger docs/ = BEP Venture UG unter Marke Comdare (super ueberall BEP); P06/P25
+  dokumentiert belassen + "apache annehmen" als Nutzungs-Vermerk (Deklaration No-License-File NICHT
+  umschreiben); docs/email public.
+KON132-05 TECHNIK: F-17 = beide Ebenen SCHON BEANTWORTET -- Satz 1 wiederholt die PRUEFDOCK-Doktrin
+  (CEB=1 Pruefdock [10.08. B-1], Hybrid dynamisch <=32 [09.08. K-5]); Schlusssatz "Aber korrekt ist
+  dynamisch je Planer" = OPTION C der vorgelegten Steuerdock-Zeile. SOLL: je geplanter CEB-Version EIN
+  Steuerdock, N dynamisch je Planer; KON122-09-/KON120-06(3)-Zeilen "owner-gesetzt SECHS" damit UEBERHOLT
+  (Wortlaut bleibt gedoppelt); Bau-Rest C-7(b)+C-7(a)/B4+Koeder-auf-N+L-14a; kein Trigger-Blocker.
+  B6-F1/B6-F2: --simulate-Ruege trifft SICHTBARKEIT+B1/B2-VERDRAHTUNG -- S-19 simulate ist GEBAUT 20.08.
+  (a1b348ae) UND GELANDET 22.08. 13:48Z (merge 881d1a15; Kampagnen-Lauf 25.08.: summe_n_bau=524288
+  urteil=ok); der Lead-Befund "NICHT GELANDET" (owner-kerne:53) ist am Objekt widerlegt und wird
+  korrigiert. Workflow "explore + Designplan" beauftragt -> FINAL-b6 D0-D7; B1 sofort, B2-Landung vor
+  Einfrieren der Trigger-Linie oder nach Trigger ("W3" = spaeteste Frist). D1 = V-A volles GO; KORREKTUR
+  KON129-06-Praemisse: prod2-Trunk vid20 liegt seit <=02.08. an, enp5s0-vid20 seit 28.07. -> V-A = reine
+  Host-Aenderung, KEIN Lockout, KEIN COM4/#535-Gate; Variante N gegenstandslos (28.07. vollzogen);
+  Sondierung 26.08.: .214-.240 = 27/27 frei; offen NUR F-D1-IP (.214 sofort [Empf.] vs .212 nach
+  VIP-Raeumung).
+KON132-06 BLOCK D: Alle volles GO. WG: Purge-GO Weg (a) auf Scope NUR 0891fcf43cbf/Blob 71670a3d
+  (Support-Nachtrag zu Ticket 4603424); Rotations-VOLLZUGSBELEG weiter ausstehend = Public-Blocker Nr. 1.
+  gitleaks-Regel-Einbau 4x .toml GO (nach main-FF; #142-Rest). A-3 = SESSION-Auftrag ("runner Token
+  rotierst DU ... in den cred vault") -- supersediert B9-Akteur Infra (25.08.); Gegenstand: 287-
+  runners_token + 390er-Altbestand. V8 = vollzogen 16.-22.08. (KON93-03/KON120-05); V9 = vollzogen 16.08.
+  (KON93-01) -- beide Tafel-Zeilen waren stale, keine neuen Auftraege.
+KON132-07 BLOCK E: CODEX-LOGIN VOLLZOGEN 26.08. 13:03:36Z (Owner-Callback-Code lokal angenommen, HTTP 302,
+  auth.json 4224 B, "Logged in using ChatGPT"; Owner-Bestaetigung 13:08:45Z) -- STAU KON125-06 ZU;
+  Einsatz-Gate-Smoke je Session bleibt. Aufgabenblatt: Erklaerung geliefert (Posten war Session-Konstrukt
+  seit 01.06./01.08., keine Owner-Zusage; Thesis-Abgabe nicht blockiert); PDF/Existenzfrage = Owner-
+  Bringschuld. Thesis-Sync #121 volles GO (nach Code-Fertigstellung); Overleaf-Restkommentare 3/90 +
+  F-16-Etiketten weiter ausstehend.
+KON132-08 BLOCK F (nach 12W-Absicherung): 24-oder-48 ENTFAELLT (A-49 12.08.; nur S-19 rechnet); OV-4-Rest
+  = Session-Zahlen-Vorlage; V32-Fork entschieden (16.07., Rueckbau-Bauposten); E-A..E-F entschieden
+  (07.08., Bau); R7/V-12 gegenstandslos (Doku-Austragung RN-05/Vortafel-21/:1877). ECHT OFFEN NUR:
+  #29-Fork AP-15(3) (Empf. A/Doc 37) + S-19-O2/O3-SCHEMA (n_ops/drift_gate; Traeger S13-05/X-4b liegt).
+  Rest-Vorlage gebuendelt nach ABSICHERUNGS-TAFEL Abschnitt 2 (RF-1..RF-8).
+
+## KON131 -- ##47 KALIBRIERLAUF GEFAHREN + BLOCKER CE_SUBMODULE_TOKEN
+
+**KON131-01 (##47 GN-9/O4-KALIBRIERLAUF GEFAHREN 26.08., Owner T5=ja; ROTES GATE = SCRUB-REGRESSION):** POST auf
+/projects/288/pipeline ref=development source=api HTTP 201 -> Pipeline 16244 @ 54b25e2f mit COMDARE_BUILD_GOLDEN_N=true
++ COMDARE_GN_TOTAL=64 + COMDARE_STORAGE_CACHE=true + COMDARE_BESTANDSLOG=true + COMDARE_BESTANDSLOG_DOC_KEY=
+bestandslog/binary_bestand.xml (KEIN COMDARE_MEASURE_PROFILE, KEIN COMDARE_OPT_O3; tote Vars COMDARE_GN_INCLUDE_AVX512
++ COMDARE_GN_RANGE NICHT gesetzt; OWNER_UUID/MASCHINE bewusst NICHT gesetzt -> ci/comdare_bestandslog_activation.sh
+setzt CI_JOB_ID@host je Job, K3(i)-konform). Kette: planer:delegate 385811 SUCCESS -> STUFE-1-Child 16248 ->
+ceb:build:[all] Job 385854 FAILED "bash: line 235: CE_SUBMODULE_TOKEN: unbound variable" (exit 1) -> ceb:trigger:[all]
+skipped -> KEIN Grandchild, Grandchild-Nenner 0 (tier-build-batch). ROOT CAUSE: Projekt 288 hat CE_SUBMODULE_USER=
+gitlab+deploy-token-39, aber die CI-Var CE_SUBMODULE_TOKEN FEHLT (11 Vars API-gemessen; Gruppen 3/6/8 ohne);
+Deploy-Token 39 (Gruppe 6 super-submodule-fetch, read_repository) LEBT (revoked/expired=False), Secret creation-only
++ im Vault nicht auffindbar (blinde Struktur-Suche 0 Treffer, keine Werte ausgegeben) -> Scrub-Regression 02.08.
+derselben Klasse wie die MinIO-Ebene-B-Keys; #10 heilte nur MinIO. Der reine BAU (Klon jedes ceb:build) ist blockiert,
+unabhaengig von STORAGE_CACHE -> Fallback-Klausel greift NICHT. STOPP-Doktrin: kein Retry/Force/Skip. LAUFZIELE n/a
+(Bau-s/DLL, Bytes/DLL@O2, Rerun-Rate, Ebene-B-Livebeweis).
+**KON131-02 (HEILUNG = OWNER-GO NOETIG, GEGENSTANDS-GENAU):** Token 39 rotieren -> Secret als 288-CI-Var
+CE_SUBMODULE_TOKEN (unprotected) + Vault-Commit (Muster #10/#47) -> ##47 erneut. A-3 ('runner Token rotierst DU ...',
+Tranche 26.08. Block D: 287-runners_token + 390er-Altbestand) deckt Deploy-Token 39 NICHT -> gegenstands-genaues
+Owner-GO einholen. VO3-1-KOPPLUNG: ##47-Re-Run idealerweise erst auf O2-Stand (VO3-1 zuerst landen; 428000 = @-O3).
+**KON131-03 (S-19/##48-TAFEL, GESCHAETZTER NENNER):** S-19 @ ce d3b5a393 mit GESCHAETZTEM bytes_je_dll=428000:
+n_bau=524288 (131072 organ_produkt x 4 system_perms), lager_bytes=224395264000 B (224.4 GB / 209.0 GiB),
+bau_eta_h_einlanig UNBESTIMMBAR (kein @O2-Trace). TAFEL ##48 (df LITERAL 26.08.): benoetigt 224.4 GB gesamt / 112.2 GB
+je Lane (262144) vs frei prod1 19.9 GB (GERISSEN 11.3x gesamt / 5.6x je Lane) vs NAS /mnt/comdare-buildsystem 15824.6
+GB (HAELT, S-19 urteil=ok gegen 15T). Platz-Weg Owner T1=(c) NFS-Bind gn_out + Push/Prune = ##49-Vorbedingung, NICHT
+##47. Beweisort ~/backups-workflow/20260825-lead-nachlauf/kalibrierlauf/ (traces/385854-*, api/*, s19_*.txt,
+tafel_48.txt, STAND.md); Vorflug super 54b25e2f==origin porcelain 0, ce d3b5a393, Kopf bei Einspielung KON130.
+
+## KON130 -- MAIN-FF BEIDER REPOS 26.08.
+
+**KON130-01 (MAIN-FF BEIDER REPOS GEPUSHT 26.08., Phase 3 Lead-Nachlauf, 3 Instanzen; Owner A1 F-13 ALLE DRIN + B1
+'jetzt nachziehen'):** ce main e114cabd -> d3b5a3936d1136c86003bdbabff668a21a85378f (317 Commits, 262 non-merge,
+is-ancestor rc=0 = reiner FF) auf origin+github 05:38Z, lokal main mitgezogen (war b241a272, reiner Rueckstand), CI
+16239 @ main TERMINAL success (27 = 26 success + 1 manual is_original:relock, 0 Bridges, 2657 s); super main 85dc85e8
+-> 54b25e2f451a1d6493aa2d26544da2859720d2cc (441 Commits, 405 non-merge, reiner FF) auf origin+github 13:23Z, lokal
+main mitgezogen, CI 16240 @ main TERMINAL FAILED -- NUR ueber die Bruecke trigger:prt-art (strategy depend): super-
+Jobs 36/36 success, trigger:cache-engine -> 16242 (ce main d3b5a393) success 26+1 manual, trigger:thesis -> 16243
+success 4/4, trigger:prt-art -> 16241 (prt-art main @ c6f07540, STALE 23 Commits hinter prt-art dev 16c90628,
+reiner FF moeglich) failed in build:registry-roundtrip: ungepinnter Geschwister-Checkout ../comdare-cache-engine =
+Runner-Slot-Zufallsstand, jetzt POST-F5 (ce d3b5a393: 0 Dateien unter axes/, e114cabd: 380) -> 'fatal error:
+axes/path_compression/axis_02_path_compression_patricia.hpp' = Schein-Gruen-Klasse K7b-3 (prt-art dev 6a1041f), auf
+prt-art dev seit 777fff7/f1fc5d8/3710ac4 per ce-SHA-Pin + job-lokalem ce-Klon geheilt, main nie nachgezogen; KEIN
+Defekt in super/ce; KEIN Retry/Force/Skip (STOPP-Doktrin, Befund vor Fix). Je Repo VOR Push: Diff-Hygiene push-lokal
+ueber den VOLLEN FF-Bereich mit der CI-Formel GRUEN (ce Gate [1/6] KUMULATIV 317 Commits, 51143 Zusatzzeilen geprueft
+0 Nicht-ASCII; super --seit-basis origin/main 2x RC=0 05:40Z+13:23Z; golden-homes-re-wrapped-Klasse #16/N3: 0 Funde,
+Wache misst Diff-Zuwachs) / TABU KON126-02 BEIDE Formeln @ d3b5a393: Wort golden 16/heuristik 17/topics 395,
+Verzeichnis topics 394/organ_axes 425/system_axes 17/mess_axes 2 (395-394 = 1 Dateiname = KEINE Drift), ce+super
+ls-files -d 0, porcelain TABU 0 / ce pre_push_lande_gates 6/6 (COMDARE_PRE_PUSH_BUILD_DIR=build/a25-gcc-release +
+COMDARE_AXIS_LOCK_BIN nach Q3-Raeumung; Lauf 1 Exit 2 = Werkzeug-Standort axis_lock-Binary, KEIN rotes Gate; Floor 545
+== 545; LastTest.log-Stub-Kopie nach KON126-03, Vollauf 545/545 NUR als Kopie a25-fix-r1 zitiert) / super
+vor_push_alle_wachen 13/26 gefahren 0 rot, Werkzeug-Gates [C1] 2 Format-Abweichungen NUR in getrackten Beweiskopien
+docs/sessions/backups/.../audit_probe_e07.cpp (CI lint:format 385701 success = CI-neutral) + [C2] R-09-Klasse
+measure_out_d03 mit Gegenstands-Beweis cppcheck RC=0/0 Befunde MIT RC-Datei am git-archive-Baum 54b25e2f / gitleaks
+8.30.1 je Repo: Koeder glpat-+20 L=26 RC=1 'leaks found: 1' VOR Echt-Scan -m ueber den FF-Bereich RC=0 'no leaks
+found', NENNER gescannt==rev-list ce 317==317 / super 441==441 (comm 0/0) / R4 vor JEDEM Push 286/287/288 AKTIV=0,
+1 Push = 1 Pipeline / Nachmessung ls-remote main==development 4/4 (beide Repos, beide Remotes, 18:05Z) / REST (eigener
+Zug, Lead-Entscheid): prt-art main-FF c6f07540 -> 16c90628 (Gates eigen: Hygiene, gitleaks Bereich 23 Commits, R4,
+Dual-Push), danach super-main-Gruen-Nachweis (Bruecken-Retry in 16240 ODER neue main-Pipeline) -- Board #19 bleibt
+in_progress; Beweisort ~/backups-workflow/20260825-lead-nachlauf/phase3-main-ff/ (STAND.md; Instanz 1 riss 05:48Z im
+16239-Poller, Instanz 2 riss ~13:45Z im 16240-Poller, Instanz 3 18:04Z Rekonstruktion ohne Push).
+
 ## KON129 (25.08.2026 abends, LEAD-NACHLAUF Phase 1): OWNER-KERNE -- A5/X1, PUBLIC, #114-KOEDER, VORTAFEL, EXPLORES
 
 **KON129-00 (UMFANG, QUELLEN, VORFLUG):** Lead-Nachlauf wf_8c890d9a Phase 1 (Fable 5 max, super-Schreiber = dieser Zug)

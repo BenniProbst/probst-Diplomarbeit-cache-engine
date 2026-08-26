@@ -3794,7 +3794,7 @@ Betriebs-Kollisionen: s. 24.5.
     RN-04  P2-ENTSCHEID: D-08-Emitter-Weiche A/B, Default A — Owner-Vorlage liegt
            (p4-Strang); Entscheid-Zeile vor Mi 26. 06:00, 0 Bau-h; bei Ausbleiben gilt
            der deklarierte Default A (Vorlage-Text). Traeger #91/E-8/p4. | Abh.: keine.
-    RN-05  OWNER-VORLAGEN-STAU als EINE Nachricht (H2-09-Minimalantwort): F-01, F-02/R7
+    RN-05  OWNER-VORLAGEN-STAU als EINE Nachricht (H2-09-Minimalantwort): F-01, F-02/R7 [ERLEDIGT 17.08./gebaut 57865666/gelandet ea7df79b]
            (Enum-Ordnung, VOR Mi 26 — Stempel-Bytes!), F-03..F-08, F-09 (S-19-Schema,
            vor Di-25-Schema-Schnitt), F-10 (Root-GO, ueberfaellig), F-11..F-15, F-16
            (Thesis 3/90), F-17, F-18 (D-08-ABI), F-19 (#91-E-Punkte), G-1-Rest (F-G1-8
