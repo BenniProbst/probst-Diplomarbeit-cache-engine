@@ -4,11 +4,12 @@ Dies ist die LEBENDE DICHTE FASSUNG dieses Referenzdokuments (Owner-Order 26.08.
 die GESAMTE geltende Substanz des Originals plus alle Nachtraege; ueberholte Zwischenstaende stehen nur als
 datierte Historie-Verweise. Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
 NUMMERN-NACHTRAG 27.08.2026 (V12, additiv AM ORT): "KON130" in der Zeile oben meint die KONSOLIDIERUNGS-KON
-der Owner-Order 26.08. 13:28Z (O-12) laut SCHREIB-SPEZIFIKATION (D); seit super c778ed7b (27.08., ungepusht)
-sind KON130 = MAIN-FF BEIDER REPOS, KON131 = ##47 + BL-1, KON132 = OWNER-TRANCHE 26.08. belegt und KON133 ist
-durch den Lead-Entwurf (RF-Tranche/PAUSE 5, Abschnitt KON133-07 DICHTE FASSUNGEN; Stand 27.08. 17:3xZ
-KON133-01..10 ENTWURF, nicht im Ledger) reserviert -> der Ledger-
-Anker dieser Fassung ist "KON13x-KONSOLIDIERUNG" = naechste freie Nummer bei Einspielung durch den Lead
+der Owner-Order 26.08. 13:28Z (O-12) laut SCHREIB-SPEZIFIKATION (D); seit super c778ed7b (committet 26.08.
+18:59Z, GEPUSHT 27.08. 12:0xZ = origin/development; KORREKTUR 27.08. A2.5-Fix F-02: hier stand "27.08.,
+ungepusht") sind KON130 = MAIN-FF BEIDER REPOS, KON131 = ##47 + BL-1, KON132 = OWNER-TRANCHE 26.08. belegt und
+KON133 ist durch den Lead-Entwurf (RF-Tranche/PAUSE 5, Abschnitt KON133-07 DICHTE FASSUNGEN; Stand 27.08.
+17:3xZ KON133-01..10 ENTWURF, nicht im Ledger) reserviert -> der Ledger-Anker dieser Fassung ist
+"KON13x-KONSOLIDIERUNG" = naechste freie Nummer bei Einspielung durch den Lead
 (vergebene Nummer -> naechste freie); Owner-Order und Gegenstand bleiben unveraendert (Gegenstand vor Nummer).
 STAND-KOPF: Original 08.08.2026 (docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md,
 5406 Z., juengster Datei-Commit c778ed7b [26.08. 18:59Z, RN-05-F-02/R7-ERLEDIGT-Vermerk; GEPUSHT 27.08.
@@ -231,7 +232,8 @@ A5  #96 Wiederaufnahme-Register (22 VERTAGT + 34 GESTRICHEN/UEBERHOLT): Dauerpos
     Trigger-Pflichtposten. Platz RN-26/#96.
 A6  Absicherungs-Owner-Tranche wf_dfd17e9b: 8 Scans FERTIG (S1-S8), Tiefenlese+Synthese fuer EINE
     Rest-Fragen-Tafel LAEUFT. Beweisort 20260826-absicherung-owner-tranche. NACHTRAG: TERMINAL (s. A3);
-    KON132 traegt die Synthese (c778ed7b, ungepusht).
+    KON132 traegt die Synthese (c778ed7b, committet 26.08. 18:59Z; GEPUSHT 27.08. 12:0xZ = origin/development;
+    KORREKTUR 27.08. A2.5-Fix F-02: hier stand "ungepusht").
 A7  Konsolidierung+Dichte-Fassungen wf_e4c580a2 (DIESE Datei): Meta-Doku-Zug, kein Bau-Gate. Board #146.
     NACHTRAG 27.08.: Schreiber-Wiederanlauf nach Spend-Limit-Riss; Z1/Z3/Z4 geschrieben (WIP b51da1d6 /
     dcba5fa), Z2 = diese Datei; Verify x2 + Fix folgen; Landung sequentiell HINTER wf_607d23d9. NACHTRAG 27.08.
@@ -402,7 +404,8 @@ W-1.3 ERKENNTNIS-DOKTRIN (par.11.1-11.6, woertlich-kern)
 S-029 11.1: "eine Korrektur ist kein Endzustand. Der Verifikationsvertrag (par.6) gilt ab sofort auch fuer
       Widerrufe, Richtigstellungen und Klassifikationen -- nicht nur fuer Befunde." (32,5 % der Widerrufe
       hielten nicht; 9 von 9 Bestaetigungen mit Schaerfungsbedarf; Etiketten in 4 von 9 ersetzt.)
-S-036 11.2 DER STELLVERTRETER: "etwas Benachbartes, Billigeres wird fuer den Gegenstand genommen."
+11.2  DER STELLVERTRETER (ohne eigene W-Nummer; = K3-goal S-036 / GOAL-DICHT D-5; Korrektur 27.08. A2.5-Fix
+      L-2: hier stand "S-036"): "etwas Benachbartes, Billigeres wird fuer den Gegenstand genommen."
       Der Satz, der die Abnahmen aendert: "Ein falsches Messgeraet faellt irgendwann auf. Ein richtiges
       Messgeraet am falschen Gegenstand nie -- es gibt nichts, was klappern koennte." Diese Fehlerklasse
       erzeugt kein Fehlersignal.
@@ -469,8 +472,9 @@ S-035 FLOOR-+1-REGEL: je neuem Test Floor-Datei scripts/ci_test_inventory_floor.
       SELBEN Push (E-10/D-11); Floor-Reihe datiert: 511/512/513/520/524 -> 544 -> 545/541/539 (o2, 24.08.)
       -> 546/542/540 (pmc-dtlb-Branch) -> 548 (vo3-1-Branch 01dc3122) -> Merge-Endstand LIVE (F3-04:
       Harmonisierung EINMAL im Ledger-Zug, nie je Dokument).
-S-036b #114-E07-Q1-RE-RUN nach JEDER Linienbewegung (<1 h, R-1 Emitter-v2 auf den stabilen Anteil, pmc_befund
-      maskiert; EP-3); Lauf 2 GO 10/10 + 23/23 @ trigfix 0f900dcf = NICHT die finale Linie.
+S-036 #114-E07-Q1-RE-RUN nach JEDER Linienbewegung (<1 h, R-1 Emitter-v2 auf den stabilen Anteil, pmc_befund
+      maskiert; EP-3); Lauf 2 GO 10/10 + 23/23 @ trigfix 0f900dcf = NICHT die finale Linie. [Nummer 27.08.
+      A2.5-Fix L-2: hier stand "S-036b"]
 S-037 EISERNE REGEL (par.19.1 A-13): nichts unter axes/ topics/ heuristik/ ohne golden-Ereignis mit TABU-GO;
       TABU-Manifest byte-gleich vorher/nachher (832/832; mit E-10 833).
 S-038 A-14 (par.19.1): KEINE 123 Literal-Bumps; Stempel-UNTERSTUETZUNG genuegt.
@@ -706,7 +710,9 @@ S-079 LAGER-DOKTRIN: ZWEI NEUE WURZELEBENEN Gattung -> Genus -> Binary | Messung
 S-080 XLSX IST DIE AUSGABE; CSV = Kind/Geschwister der Mappe (X2-Factory, S-068); Welch/M-15 = compare-
       Konsument aus Messwertlager/ErgebnisMappe (Welch + MWU/Holm/Cliff), CSV NIE Eingang, 16-col/WIDE =
       Paritaet (WIDE-Freeze 189 Spalten), n=3 einzeln; M-15 = ABGABE-SCOPE nach Messdaten-Behebung (Owner
-      06.08. "Frage 4: Ja bitte mit in die Abgabe ... Aber erst die Messdaten beheben" + C-2; KON129-08
+      06.08. 19:37:43Z, woertlich: "Frage 4: Ja bitte mit in die Abgabe. Mit Parallelisierung schaffen wir es
+      heute Nacht noch. Aber erst die Messdaten beheben." [Vollzitat 27.08. A2.5-Fix F-06 statt "..."; Quelle
+      docs/sessions/backups/20260806-session-transkript-verbatim/ + GESAMTDOSSIER 07.08.] + C-2; KON129-08
       WELCH-SUPERSEDE der 16.07.-Zeilen "Welch rechnet auf der WIDE-CSV"); Owner X5 25.08. "Wie empfohlen
       volles GO".
 S-081 MESSREIHEN A/B/C (Owner B3 25.08., woertlich): "Ja, aber die Messreihen sollten in der Engangs-XML
@@ -898,11 +904,14 @@ Status 26./27.08. je Teil; Original-Definition = par.14.2-Tafel (Teil | Quelle |
 Quelle: Original par.24.1 (RN-01..RN-92 inkl. Ergaenzungs-Staffeln), par.24.2 (P1-P10), par.24.3 (Massen-
 Bloecke = Container-Verweise, Beweisorte AUSSERHALB des Repos unter ~/backups-workflow/ = NICHT versioniert),
 par.24.5 (Betriebs-Kollisions-Aufloesung), par.24.6 (Vollzaehligkeits-Gegenzaehlung). Der RN-Text ist BYTE-
-GETREU aus dem Original uebernommen (nur Nicht-ASCII transliteriert: Gedankenstrich -> "--", Mittelpunkt ->
-"*"); je RN-Zeile ist ein STATUS-Feld ergaenzt (Stand K3-Messung 26.08. ~18:4xZ + Lead-Objektstand
-26.08. 18:5x-19:0xZ / 27.08. 11:23Z; V11: vor Verwendung neu messen). PFLEGE: neue Status-Aenderungen an DIE
-Zeile (additiv, datiert), nie hinten anfuegen. Fenster-Etiketten = SPAETESTE Fristen (Owner 20.08.);
-Fenster A-D kalendarisch verstrichen -> sofort der Reihe nach (Owner 23.08.).
+GETREU aus dem Original @ super 54b25e2f uebernommen (nur Nicht-ASCII transliteriert: Gedankenstrich -> "--",
+Mittelpunkt -> "*"). NACHTRAG 27.08. A2.5-Fix (L-4/F-08): der juengere Datei-Commit c778ed7b (development)
+traegt als EINZIGEN Hunk (git diff 54b25e2f c778ed7b) in der RN-05-Zeile den Inline-Vermerk "[ERLEDIGT 17.08./
+gebaut 57865666/gelandet ea7df79b]" -- hier im RN-05-STATUS-Feld nachgezogen (Zeilenbreite <= 120); der RN-
+Wortlaut ist sonst byte-gleich zu c778ed7b. Je RN-Zeile ist ein STATUS-Feld ergaenzt (Stand K3-Messung 26.08.
+~18:4xZ + Lead-Objektstand 26.08. 18:5x-19:0xZ / 27.08. 11:23Z; V11: vor Verwendung neu messen). PFLEGE: neue
+Status-Aenderungen an DIE Zeile (additiv, datiert), nie hinten anfuegen. Fenster-Etiketten = SPAETESTE Fristen
+(Owner 20.08.); Fenster A-D kalendarisch verstrichen -> sofort der Reihe nach (Owner 23.08.).
 Nummernkreis-Warnung: Board-#40 != v1-Paket ##40; Wellenplan-D-08 (Doku-Nachzug 8->15 Stationen) !=
 KON120-D-08 (Emitter-Weiche); par.13.3-#87 (Stufigkeit) != Board-#87 (Talos-Lane); Ledger-#44 != Board-#44.
 
@@ -983,7 +992,9 @@ Betriebs-Kollisionen: s. 24.5.
            Abh.: nach Lande-Bilanz (R-Tafel-V2 liegt).
            STATUS 26.08./27.08.: Stau grossteils BEANTWORTET: Tranchen 25.08. (A1-B10, Q1/Q3/Q5, T1-T5,
            X1-X5) + 26.08. 13:00Z (OS-1/OS-2/F-X3-1/KN/E1-E3/Lizenz/F-17/B6/D1/Bloecke D-F) + RF-1..RF-9
-           26.08. ~19:0xZ (verbatim W-9). F-02/R7 ERLEDIGT-Vermerk am Ort (c778ed7b). Weiter OWNER: P1
+           26.08. ~19:0xZ (verbatim W-9). F-02/R7 ERLEDIGT-Vermerk am Ort (c778ed7b; Inline-Wortlaut der
+           Original-RN-05-Zeile: "[ERLEDIGT 17.08./gebaut 57865666/gelandet ea7df79b]"; nachgezogen 27.08.
+           A2.5-Fix L-4). Weiter OWNER: P1
            AxisKind (W-12/W-9), OV-14 vs C-2 (W-2), RN-75 (W-3), golden-GO (W-14). META-Regel: Rest-Fragen
            NUR nach 12W-Absicherung (X-17).
     RN-06  P3-GLIED 2: GN-9-Kalibrierlauf ##47 in O2-Zielform (nach o2-Landung;
@@ -1137,7 +1148,8 @@ Betriebs-Kollisionen: s. 24.5.
            Dual, T4-8 NIE-KUERZEN, T4-9 Vollaudit-BU, T4-10 Zeithorizont, T4-1 12-W).
            Traeger #85 + Lead-Ledger (Lead-only-Hotspots beachtet). | Abh.: RN-01.
            STATUS 26.08./27.08.: TEIL-VOLLZOGEN: par.25 + AB-07 + Z21 (24.08.), ASCII-Korrektur + KON129
-           (26.08.), RN-05-F-02/R7-Vermerk (c778ed7b 27.08., ungepusht); REST: AB-04 12-W-Marker-Tafel,
+           (26.08.), RN-05-F-02/R7-Vermerk (c778ed7b committet 26.08. 18:59Z, GEPUSHT 27.08. 12:0xZ; KORREKTUR
+           27.08. A2.5-Fix F-07: hier stand "27.08., ungepusht"); REST: AB-04 12-W-Marker-Tafel,
            N-/GG3-Nachtraege, E-03-Fallen-Merkposten, Designplan-par.13-Marker (D-8 Text), U-1-Doku-Hygiene
            (6 Heredoc-Stellen).
     RN-28  #71 Triage-Sammel (+D-18/R49-Wachen-Nachbar: 3 allow_failure GEGEN Doktrin
@@ -1747,6 +1759,20 @@ W-7.3 OFFENE ZEILEN DER TAFEL (je Posten: Gegenstand * Traeger * Frist * Abnahme
   4 nach-Trigger = 48/48): ERLEDIGT: N-12 = #137 GELANDET (KON124) * N-16 = #138 ENTSCHIEDEN per T4 25.08.
   ("NACH dem Trigger") * N-33(a) par.24-Nachtrag / (b) 18.6(3)-Korrektur / (d) O2-Standard (A4+X4, Stau
   ausgetragen KON129-08) * N-35 Board-#131-Text * N-46 Ursachen-Antwort formuliert (Kontrolle RN-27).
+  NACHTRAG 27.08. A2.5-Fix (L-1; danach 48/48 namentlich): ERLEDIGT: N-14 V-F3 da_unit-Nenner je Baum 406/406
+  @8edc34a0 -> RN-01 (an w1luecken-super-Merge geheftet; mit RN-01 KOMPLETT, KON122). LEBEND (RN-27 docs-Zug
+  P8, OFFEN 27.08. = RN-27-REST "N-/GG3-Nachtraege"): N-01 ERRATA-VOLLLISTE (44 Errata additiv in Beweis-
+  Schnappschuss + VERMERK.md, Regel "A3 nie ohne Z1") * N-02 F2-VORLAGEN-FENSTER-ENTWURF (481 Z., unversioniert
+  landen) * N-03 W2-DRIFT-KORREKTUR-DESIGNS (898 Z., 0 Traeger-Verweis; Vermerk in wf_c745729a/#120/#96, war
+  N-33(a)) * N-04 13-Punkte-Selbstbeantwortung (nur 6/13 dem Owner genannt; KON122 5.9, N-08) * N-05 3 W1L-
+  ENTWURF-Zeilen (B01/X-11 + B03/NE-10-522er + B13/T-16; KON122-PHASE-5, NAMENTLICH) * N-06 verify-93 3 Ledger-
+  ENTWUERFE (C-9-Bilanz + N5N6-Rest + V93-A1-Verweis; KON122) * N-07 F-A-KON119-Halbsatz + K7b-5-Echo
+  (KON122) * N-08 10 Nachbuchungs-ENTWUERFE rueckfragen-verbuchung 5.1-5.10 (WORTFERTIG, inkl. 4 Ledger-
+  Nulltreffer; KON122, COPY-FERTIG) * N-09 5 UEBERHOLT-/Erledigt-Vermerke K-01..K-07 (mit N-05..N-08
+  buendeln) * N-10 3 Quittungs-Nachtraege L9/a11 + X-5-rcu + JB-3-hy-a (H-14) * N-11 F6-Frage "warum doppelt"
+  (in K25 beantwortet) + #134-Vollerhebung verbuchen (KON122, 1 Absatz; + GATE-NACHTRAG-Kleinst-Zeile
+  F3-Ruege). Wortlaut je Posten: Original par.27.1.H (Board #136; Quelle ~/backups-workflow/20260822-opus-6k-
+  sweep/NACHHOL-KARTE.md).
   LEBEND (je Traeger): N-21 GN-9-Auflage (##47 reicht IMMER frische Messwerte, NIE 1282.5; RN-06) *
   N-33(c) CCD-Korrektur GESETZT (T14-1) / (e) KON60-04-stale austragen (RN-27) * N-42 "max. 4 Docks"-
   Austragung mit F-17-Neuform (RN-05; die 3 Tagesdokumente liegen nicht im super-Repo) * N-43 Project-
@@ -1990,7 +2016,7 @@ S-120 par.22.1 U-1..U-5: U-1 J-1-Rezeptfix = RN-18 (gelebt); U-2 Platten-Raeumun
   AxisKind OFFEN/OWNER; P2 E-6-Satz vollzogen (KON118; B4 26 Achsen); P3 KON60-04-stale = RN-27/N-33(e); P4
   C-3a ZU (Doppel-JA KON120-06); P5 V-08R-Form ERLEDIGT (#95 64-Hex); P6 golden-Nachposten-Satz -> Stempel
   Teil 2 / golden-Ereignis (B5-golden-GO #120, OWNER); P7 NP-02 -> RN-05; L-A OF-4-PAT-Kette + A-3-Rotation
-  = SESSION-Auftrag (Owner 26.08. "runner Token rotierst DU und notierst sie mit commit+push in den cred
+  = SESSION-Auftrag (Owner 26.08. "runner Token rotierst du und notierst sie mit commit+push in den cred
   vault", RN-36); L-B V8 VOLLZOGEN; L-C V9 = Loesch-GO 26.08. (Vollzug offen); L-D node6/id56/id18 RN-36.
   par.22.4 Z-1..Z-15 (Abhak-Instanz #96/RN-26): Z-1 RN-18; Z-2 = #104 completed; Z-3/Z-4 #105; Z-5 V-02R;
   Z-6 = #123; Z-7 #24/B4-Text; Z-8 in L-06 aufgegangen; Z-9 #28; Z-10 HDR vor Sa 29.; Z-11/Z-12 RN-27; Z-13
@@ -2009,6 +2035,16 @@ S-123 TASK-TAFELN par.13.3/18.2-18.5 = HISTORIE-REGISTER mit lebenden Ausnahmen:
   selektiver Rebuild = C-13/#97 (Rest RN-45); #22 --debug-CLI-Haelfte (RN-13); #24 B1/B4/B5 (RN-77); #28
   (RN-28); #40 (RN-29/RN-44); #57 (RN-20); #38a3 IO-Vollausbau (RN-75, OWNER W-3); #29-Rest Monolith-Split
   "W7 per Owner-Wort" SUPERSEDIERT durch A5 25.08. (VOR der Abgabe; Landung nach Kampagne per RF-1).
+  NIE-FALLEN-/NICHT-STREICHBAR-LISTEN (woertlich; Nachtrag 27.08. A2.5-Fix L-3): par.7 "NICHT streichbar: die
+  drei Praesens-Zusagen, HY-A/HY-B (Owner "Alles Pflicht"), D5-1+D4-Trio (sonst sind die Kennzahlen falsch
+  gerechnet), die W0a/W0b-Wachen" * par.13.3-W1 "Nie fallen darf: #87, #78, #86, KON9-05-Stempelzeile, HY-A." *
+  par.18.x "NIE FALLEN: #87 #78 #86 * KON9-05-Stempelzeile * HY-A * #15 * #16/#17 * B3 (Owner-Datum KON34-04) *
+  #38d (Pflicht-Buendel)". Die Listen gelten fort (Streichkaskade STILLGELEGT par.21.0; W-13 par.7). STATUS
+  27.08. je Posten in dieser Fassung: #87/#78 = S-6 GELANDET; KON9-05-Stempelzeile = S-3/S-7 GELANDET; HY-A
+  GELANDET (#80, S-15); HY-B W3 (RN-52); #15 GELANDET (H2, #15-Bump-Buendel 20.08.); #16 golden-Fenster + #17
+  System/Organ-Semantik GELANDET (S-18/S-3); B3 Hybrid-Gates GELANDET (#15, KON119-02); #38d Preimage-Budget im
+  #15-Bump-Buendel (H2); D5-1 (W0a) + D4a-d GELANDET (W-H.1/H2); W0a/W0b-Wachen GELANDET (W0a/W0b, Z3 D4);
+  Praesens-Zusagen = P-1-Wache LEBEND (S-094/S-140); einziger offener Posten #86 = E-10 (H6 LAEUFT, S3).
 S-124 PAKETNUMMERN ##01-##62 der v1 bleiben gueltig; offene: ##15-EMITTER/TEMPLATE (RN-31), ##16/##17 D-04-
   Anschluss (RN-31), ##19 (RN-60), ##20-B COPIED_LIST-Restbau (RN-31; git >= 2.25), ##21-H2 object_stat
   (RN-47), ##24 (RN-65), ##31-Vollform (RN-31), ##42-##45-Reste (RN-65), ##46 (RN-79), ##47..##62 (W-4);
@@ -2323,7 +2359,7 @@ par.5           Kritischer Pfad + Defizit-Arithmetik/Saldo -> Kette ab ##25 = W-
 par.6           Verifikationsvertrag -> V-1..V-8 + Je-Welle-Nenner LEBEND (W-2); Stellvertreter-Durchgang 09.08.
                 (56 Formeln) = Historie, gehaertete Formeln Vertragsbestandteil.
 par.7           "WAS FAELLT"-Tabelle + 8 Marker -> Streichkaskade STILLGELEGT (par.21.0); NICHT-streichbar-Liste
-                gilt fort; Zeilen einzeln aufgeloest (A-035; Traeger in W-8).
+                gilt fort (Wortlaut: W-8 S-123, 27.08.); Zeilen einzeln aufgeloest (A-035; Traeger in W-8).
 par.8           OV-1..OV-18 -> Tafel HISTORIE; Entscheide LEBEND (A-036); OV-14/OV-5b OWNER-GATED (W-9).
 par.9/10        Risiken R-1..R-9 + Annahmen An-2..An-13 -> W-10 (Kurzform + lebende Annahmen).
 Kurzfassung     "Zehn Zeilen" (08.08.) -> HISTORIE (##40->W7, Streichungen aufgehoben).
@@ -2331,7 +2367,8 @@ par.11          Erkenntnis-Session -> Doktrin LEBEND (W-1.3); Zahlen (381/316/40
 par.12          Test-Kritik -> T-1..T-9 + Codex-Regeln + 117er-Sperre LEBEND (W-2); Testlast-/Kapazitaets-
                 Tafeln 12.4/12.5 + Band-Semantik HISTORIE (Baender in W-8); 12.7 Bewusst-nie-Liste (W-8).
 par.13          Aufgabenstand 11.08. -> Klassen-Regel 13.2 LEBEND (W-1.2); Zuordnungs-Tabellen/Behaelter/
-                Bilanz HISTORIE (S-123); 13.4(c) Owner "volles Risiko" LEBEND; 13.5 Ledger-Anker-Regel LEBEND.
+                Bilanz HISTORIE (S-123); 13.3-W1 "Nie fallen darf"-Liste LEBEND (Wortlaut W-8 S-123); 13.4(c)
+                Owner "volles Risiko" LEBEND; 13.5 Ledger-Anker-Regel LEBEND.
 par.14          Traeger-Baukette -> 14.1 Zielbild + 14.2 Teileliste + 14.5 Kipp-Punkte LEBEND (W-3/W-5/W-4);
                 14.3-Graph/14.4-Kalender/14.6-Verdraengung/14.7-CI-Explore/14.8 HISTORIE (A-056..A-061).
 par.15          Korrekturen 11.08. -> 15.1-15.9 LEBEND (W-3); 15.10 HISTORIE.
@@ -2340,7 +2377,8 @@ par.16          KON16-23 -> 16.1/16.2 Teile-Delta LEBEND (W-5); 16.3 Wellen-Wirk
 par.17          KON24-38 -> 17.0 Fable-max, 17.2 Nenner-Regel, 17.3 System A/B, 17.4 T-15b/OD-7/T-3/Gen-2,
                 17.5 Konzepte LEBEND (W-1/W-3); 17.1 Tabellen + 17.6 HISTORIE (TEST-KONSOLIDIERUNG lebt #28).
 par.18          Task-Zuordnung 13.08. -> 18.1 Klassen-Regel + 18.7 dauerhafte Regeln + 18.8 Doktrinen LEBEND;
-                Task-Tafeln 18.2-18.6 HISTORIE mit lebenden Ausnahmen (S-123).
+                Task-Tafeln 18.2-18.6 HISTORIE mit lebenden Ausnahmen (S-123); 18.x "NIE FALLEN"-Liste LEBEND
+                (Wortlaut W-8 S-123).
 par.19          Drift-Konsolidierung 16.08. -> Koerbe A-D + FJ/E1-E11 + W1-W18 + R-01..R-38 = Register
                 (W-8/W-3); 19.1-Bruch-Stand HISTORIE (#15 gelandet).
 par.20          Nachholarbeit 17.08. -> 20.1-20.4 Staende HISTORIE (gelandet); 20.5 P-A..P-K Status (A-091);

@@ -34,7 +34,9 @@ ROLLE: Haupt-Referenzdokument der Testseite (KON19-00); ergaenzt den Wellenplan-
 Testseite, ersetzt nichts. NOTATION: Posten-IDs MT=Messkette-Treiber, ST=Statistik-Glied, PK=Perzentil-
 Kanon, PE=Planer-Emission, LG=Lagerhaltung, AS=Achsen-Stempel, PM=PMC-Messfuehler, AG=Anatomie-Gattung,
 XL=xlsx-Ausgabe, HY=Hybrid; je Posten [Band Welle h]; Band A = landet im Fenster, B = nur bei freiem Slot,
-C = Herkunftsklasse "W7" -- GELTEND seit par.21.3: Band C = W2/W4 fahrbar, W7 ist KEIN Endlager.
+C = Herkunftsklasse "W7" -- GELTEND seit par.21.3: Band C = W2/W4 fahrbar, W7 ist KEIN Endlager. `*` an der
+Welle (z.B. W1*) = die Welle weicht per Einfuege-Regel (D4) vom Wellen-Etikett des Materials ab (Original
+par.4 "`*` im Register"; I-01 `*`-Verschiebungsregel; Nachtrag 27.08. A2.5-Fix L-6).
 META-REGEL 26.08. (T26-9): vor JEDER Testseiten-Rueckfrage an den Owner 12W-Absicherungs-Explore.
 
 ## D1 PRUEFNORM (par.1, woertlich-kern)
@@ -112,12 +114,18 @@ CSV-Factory-Semantik (XML-abhaengig; Design-Eingang B0-B10 -> #18, Fenster 04.-1
 
 Gilt fuer jedes Paket aller Wellen; ergaenzt V-1..V-7 des Wellenplans. Deckungsfrage: "was erzwingt das
 Halten?" -- zulaessig nur ein Werkzeug oder eine benannt ungedeckte Stelle.
-T-1 ROT ZUERST: Test am ersten Tag rot ODER Biss per protokollierter Wegwerf-Mutation bewiesen; ein Test,
-    der am gesunden Objekt nie gruen wird, ist ebenso unzulaessig (Daueralarm).
+NACHTRAG 27.08. A2.5-Fix (L-8): T-1 und T-3 unten woertlich (Original par.3); T-2/T-4/T-8/T-9 woertlich-kern
+ohne Verlust; weggelassen sind nur Beleg-Beispiele -> Archiv par.3: T-5 (die "184 Spalten" sind unverifiziert;
+K13), T-6 (die Meta-Stufe fand einen erheblichen Teil ihrer 62 Funde genau so), T-7 (Belegstand: 4
+unregistrierte Dateien, 27 unsichtbare Faelle, F15-if-Block).
+T-1 ROT ZUERST: der Test ist am ersten Tag rot, ODER sein Biss ist per protokollierter Wegwerf-Mutation
+    bewiesen (Rot gesehen, dann zurueckgenommen). Beides fehlt = kein Test. Ebenso unzulaessig: ein Test, der am
+    gesunden Objekt nie gruen werden kann (Daueralarm -- die Klasse P99IstNichtDasMaximum).
 T-2 AUSSAGE, NICHT ANWESENHEIT: find(), Existenz, Exit 0, "wirft nicht" sind keine Zusicherungen --
     Wert, Position, Menge, Klasse.
-T-3 NENNER, FREMD: Grundgesamtheit aus anderer Quelle als dem Pruefling; ASSERT auf die Zahl VOR der
-    Schleife.
+T-3 NENNER, FREMD: jeder Test nennt seine Grundgesamtheit und bezieht sie aus einer anderen Quelle als dem
+    Pruefling (Konstante neben dem Enum, Quelltext-Scan, eingefrorene Literalliste); ASSERT auf die Zahl VOR
+    der Schleife.
 T-4 GEGENEINGANG: zu jeder Zusicherung ein Eingang, bei dem sie nicht gilt; Randfall nur auf
     Absturzfreiheit ist keiner.
 T-5 ORAKEL UNABHAENGIG: Sollwerte im Test gerechnet oder eingefroren -- nie aus der geprueften Funktion,
@@ -170,8 +178,9 @@ T-12d FULL-JOIN-SCHEMA-TESTS FJ-1..FJ-10 [Traeger #18/s13schema ad5c6d66 gelande
 T-12e S-3-KOMBIBAU-NACHWEIS: (1) 2x2-Matrix einmal real [ERFUELLT: K17 522/522 21./22.08. + 545er-Serie
     24.08.]; (2) Aktivierungs-Beweis "gebaut UND inert" mit ZWEI Zahlen [2 Produktions-Treffer bestaetigt,
     inert wird gemessen]; (3) Koeder (token, eltern)-flache Kuerzel-Pruefung -> ROT [offen].
-T-13 WORKAROUND-KONFORMITAET (24.08., Board #135; Owner-Dauerregel 23.08. verbatim-Kern: "'geloest'
-    [heisst] nicht automatisch konform ... workarounds [muessen] konform nach Plan gegengeprueft und als
+T-13 WORKAROUND-KONFORMITAET (24.08., Board #135; Owner-Dauerregel 23.08. 20:41Z, woertlich [Vollzitat seit
+    27.08. A2.5-Fix F-06, V13; Rohtranskript 5a19728e, Umlaute transliteriert]: "Bitte bedenke, dass "geloest"
+    nicht automatisch konform heisst, daher muessen workarounds konform nach Plan gegengeprueft und als
     Struktur-Regression behandelt werden."): jeder Heilungs-/Workaround-Commit braucht VOR Abnahme ein
     dokumentiertes Urteil KONFORM / REGRESSION / OWNER-ENTSCHEID gegen Designplan + Wellenplan + GOAL v8 +
     KONs, MIT Zitat der geprueften Plan-Stelle (Urteil ohne Zitat = nicht geprueft); CI-gruen allein ist
@@ -187,7 +196,8 @@ sind erst zu addieren, wenn die S-Strecke (D-4) mit-durchgezaehlt wird -- sonst 
 
 ## D4 TESTARBEIT JE WELLE (par.4 verdichtet; Postenlisten s. D2)
 
-EINFUEGE-REGELN (woertlich-kern): (1) die Landung eines Begleit-Tests folgt der Bauwelle seines
+EINFUEGE-REGELN gegenueber den Wellen-Etiketten des Materials (`*` im Register = D0 NOTATION; woertlich-kern):
+(1) die Landung eines Begleit-Tests folgt der Bauwelle seines
 Gegenstands (Tests entstehen frueher, landen atomar); (2) W3-MESS ist blechexklusiv -- alles "W3-MESS"
 landet BIS F3, in W3 laufen nur die Gates; (3) HY-A-Vertraege VOR den Bau (TDD-Fall; GELTEND-Vermerk D-1:
 der Vertrag PINNT kGenusCount, definiert nicht grundauf). Sonderfall PM-NichtGelesen: Seam-/HW-Teil
@@ -396,11 +406,12 @@ neue Owner-Frage -> 26.08. ~19:0xZ OWNER-ENTSCHIEDEN RF-2 (B-7/RN-78-Emitter-Hae
 {O2,O3} (T1 = (c) NFS; prod2 .214 vollzogen 27.08., prod1-Haelfte offen, df 12G; Testseite: K17 + Re-Run vor
 Trigger).
 
-## D14 HISTORIE-VERWEISE (nur im Beleg-Archiv)
+## D14 HISTORIE-VERWEISE (nur im Beleg-Archiv) + LEHR-SAETZE (LEBEND, I-27)
 
-par.0-Zahlenprosa * par.9.1-9.4-Berichtigungsprosa (B-1..B-4) * par.9.5-Nachzugskette (22 Nachzuege) *
-par.13.4/13.5-Abnahmevermerke (TRAEGT-Urteile, Pruefumfaenge 829/191/701) * W-1..W1-Wellentermine *
-par.8-Kapazitaetsrechnung * Marker-Wortlaute (UEBERHOLT/WIEDERAUFNAHME/EINPLANUNG) * Lehr-Saetze am Ort:
-"Prosa wird nicht rot" / "Zwei Einheiten, zwei Zahlen" / "gefallen heisst nicht erledigt" / L-4 "jede
-'existiert nicht'-Aussage traegt ein Verfallsdatum" / "Registrierung IST Teil des Tests" / "ein gruenes
-Gate deckt nur seinen Gegenstand".
+HISTORIE (nur im Beleg-Archiv): par.0-Zahlenprosa * par.9.1-9.4-Berichtigungsprosa (B-1..B-4) * par.9.5-
+Nachzugskette (22 Nachzuege) * par.13.4/13.5-Abnahmevermerke (TRAEGT-Urteile, Pruefumfaenge 829/191/701) *
+W-1..W1-Wellentermine * par.8-Kapazitaetsrechnung * Marker-Wortlaute (UEBERHOLT/WIEDERAUFNAHME/EINPLANUNG).
+LEHR-SAETZE (LEBEND, I-27: tragend, woertlich zu erhalten; eigene Ueberschrift seit 27.08. A2.5-Fix L-5, vorher
+unter der Archiv-Ueberschrift gefuehrt; Belegstellen am Ort im Archiv): "Prosa wird nicht rot" / "Zwei
+Einheiten, zwei Zahlen" / "gefallen heisst nicht erledigt" / L-4 "jede 'existiert nicht'-Aussage traegt ein
+Verfallsdatum" / "Registrierung IST Teil des Tests" / "ein gruenes Gate deckt nur seinen Gegenstand".

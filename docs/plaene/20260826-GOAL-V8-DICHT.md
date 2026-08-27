@@ -52,8 +52,9 @@ nicht umgekehrt; nichts wird geloescht, Ueberholtes traegt datierte Marker):
      @ 54b25e2f, inkl. par.24 EINPLANUNG 23.08. + par.27 W2-PFLICHTTAFEL 24.08.).
   3. DESIGNPLAN TDD: 20260826-DESIGNPLAN-TDD-DICHT.md (Archiv: 20260808-DESIGNPLAN-tdd-*, 1021 Z.).
   4. ARBEITSWEISE v4.4 (17.08., 1264 Z.): lebt im UMBRELLA /home/comdare/Projekte/docs/ARBEITSWEISE-
-     GESAMT-DOKTRIN.md (+ DICHT-Fassung daneben); super docs/ traegt NUR einen 53-Z.-Zeiger -- FALLE:
-     Zeilenzahl messen, zweistellig = Zeiger (Owner 10.08.: "Die Arbeitsweise gilt universell.").
+     GESAMT-DOKTRIN.md (+ DICHT-Fassung daneben); super docs/ traegt NUR einen 55-Z.-Zeiger (27.08.: 53 Z. +
+     Zusatzzeile a716a661 auf die DICHT-Fassung; Zahl 27.08. A2.5-Fix F-05) -- FALLE: Zeilenzahl messen,
+     zweistellig = Zeiger (Owner 10.08.: "Die Arbeitsweise gilt universell.").
 Stand-Quelle: Ledger docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md -- lebender Stand = LEDGER-KOPF =
 juengste KON (26.08.: KON129 + Owner-Tranche 26.08., KON130-ENTWURF ausstehend; NACHTRAG 27.08.: Ledger-Kopf =
 KON132 @ c778ed7b origin, KON133 = Lead-ENTWURF, Konsolidierungs-KON = naechste freie Nummer); Nachtraege OBEN,
@@ -332,8 +333,8 @@ TRIGGER-KERN (Voll-Bau-4 ##49): POST /projects/288/pipeline ref=development (COM
 + STORAGE_CACHE + BESTANDSLOG; Kaskade planer:delegate -> ceb -> 4 Batch-Jobs je Lane; DER TRIGGER BAUT,
 MISST NICHT). n_bau = 524288 = organ_produkt 131072 x system_perms 4 ({O2,O3} x {no_extension,avx2});
 Owner OS-1 26.08. (woertlich): "Ja, die ausdrueckliche definition von O2 UND O3 ist von mir gewollt. Der
-default waere auch nur O2. Wir bleiben dennoch bei O2 und O3 zum Testen." Lager ~209-224 GB (S-19-
-Probewert 26.08.: 224.395.264.000 B; GN-9-Kalibrierwert @-O3, @O2 unkalibriert) -> Platz-Weg T1 (c).
+default waere auch nur O2. Wir bleiben dennoch bei O2 und O3 zum Testen." Lager ~224 GB (= ~209 GiB;
+S-19-Probewert 26.08.: 224.395.264.000 B; GN-9-Kalibrierwert @-O3, @O2 unkalibriert) -> Platz-Weg T1 (c).
 VOR-TRIGGER-LANDEWELLE (Reihenfolge bindend, KON129-07): konform -> pmckoeder -> vo3-1 -> e10; OHNE
 Zwischen-Push, EIN K17 am zusammengesetzten Endstand; danach EIN #114-E07-Q1-Re-Run (<1 h) auf der final
 eingefrorenen Linie (VORBEHALT, kein optionaler Schritt), dann ##47-Kalibrierlauf GN_TOTAL=64 @O2 (Owner
@@ -383,9 +384,11 @@ SIEBEN TESTKLASSEN (117 Posten, 386 h): keine-negativprobe 29 | anwesenheit-stat
 kein-nenner 23 | unerreichbarer-block 16 | test-zementiert-defekt 10 | zwei weitere 12 | Einzelfaelle 2.
 Jeder Posten traegt Band (A = im Fenster / B = freier Slot / C = NUR mit Owner-Satz -- die alte Lesart
 "C = W7 nach Abgabe" ist durch C-2/A5/F-13 UEBERHOLT), Welle und Stundenschaetzung.
-TDD-VERTRAG: T-1..T-9 (rot-zuerst, Nenner fremd, Biss, Registrierung, Negativprobe, ...; Namensliste im
-Designplan) + T-11a-c (13.08.) + T-12a-e (16.08.) + T-13 Workaround-Konformitaet (24.08., #135, 7 Posten
-unverdiktet); Summen-Regel: 117/386 h bleiben unangetastet, Zusaetze werden SEPARAT gezaehlt.
+TDD-VERTRAG: T-1..T-9 = T-1 ROT ZUERST * T-2 AUSSAGE, NICHT ANWESENHEIT * T-3 NENNER, FREMD * T-4 GEGENEINGANG *
+T-5 ORAKEL UNABHAENGIG * T-6 SCHWESTERPFLICHT * T-7 REGISTRIERUNG IST TEIL DES TESTS * T-8 ATOMARE LANDUNG *
+T-9 TESTKRITIK (Namensliste komplett 27.08. A2.5-Fix L-7; Volltext DESIGNPLAN-TDD-DICHT D3) + T-11a-c (13.08.) +
+T-12a-e (16.08.) + T-13 Workaround-Konformitaet (24.08., #135, 7 Posten unverdiktet); Summen-Regel: 117/386 h
+bleiben unangetastet, Zusaetze werden SEPARAT gezaehlt.
 META-ZAHLEN: 157 Behauptungen -> 117 bestaetigt, 40 gefallen, 62 Funde erst durch die Meta-Stufe; 13 der
 40 waren Fehler der ersten Schaerfungsstufe selbst -- "Ein Testentwurf ist eine Behauptung wie jede
 andere."
