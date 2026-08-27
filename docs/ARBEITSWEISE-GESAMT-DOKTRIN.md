@@ -5,6 +5,8 @@
 > nichts wurde geloescht (Pflege-Regel 3: „Nichts loeschen — Ueberholtes als
 > UEBERHOLT markieren").
 
+> DICHTE LESE-/RITUAL-FASSUNG ab 26.08.2026: Umbrella docs/ARBEITSWEISE-GESAMT-DOKTRIN-DICHT.md (Geltung: Vollfassung).
+
 ## Der geltende Ort
 
 ```
