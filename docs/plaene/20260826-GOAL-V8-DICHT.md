@@ -3,11 +3,18 @@
 Dies ist die LEBENDE DICHTE FASSUNG dieses Referenzdokuments (Owner-Order 26.08.2026, KON130). Sie traegt
 die GESAMTE geltende Substanz des Originals plus alle Nachtraege; ueberholte Zwischenstaende stehen nur als
 datierte Historie-Verweise. Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
+NUMMERN-NACHTRAG 27.08.2026 (V12, additiv AM ORT): "KON130" in der Zeile oben meint die KONSOLIDIERUNGS-KON der
+Owner-Order 26.08. 13:28Z (O-12) laut SCHREIB-SPEZIFIKATION (D); seit super c778ed7b (gepusht 27.08. 12:0xZ) sind
+KON130 = MAIN-FF BEIDER REPOS, KON131 = ##47 + BL-1, KON132 = OWNER-TRANCHE 26.08. belegt, KON133 = Lead-ENTWURF
+27.08. (01..10) -> der Ledger-Anker dieser Fassung ist "KON13x-KONSOLIDIERUNG" = naechste freie Nummer bei
+Einspielung durch den Lead (vergebene Nummer -> naechste freie); Owner-Order und Gegenstand bleiben unveraendert.
 STAND-KOPF: Original 08.08.2026 (docs/plaene/20260808-GOAL-V8-DOSSIER-alle-wellen-am-stueck-bis-abgabe.md,
-816 Z., juengster Datei-Commit 4901f808, 17.08.) + Nachtraege bis KON129 (Ledger 25.08.) + Owner-Tranche
-26.08. (memory/project_owner_kerne_20260825_a1_a6_b1_b10_scope_split_public.md, verbatim) + 3-Kontexte-
+816 Z., juengster Datei-Commit 4901f808, 17.08.) + Nachtraege bis KON129 (Ledger 25.08.) + KON130-132 (c778ed7b,
+gepusht 27.08.) + KON133-ENTWURF (Lead 27.08., nicht im Ledger) + Owner-Tranche 26.08. 13:00Z + RF-Tranche 26.08.
+~19:0xZ (memory/project_owner_kerne_20260825_a1_a6_b1_b10_scope_split_public.md, verbatim) + 3-Kontexte-
 Verbuchung 26.08. (Beweisort ~/backups-workflow/20260826-konsolidierung-dichte-fassungen/, K1a/K1b/K1c/K2/
-K3-*). Objekt-Anker: super 54b25e2f / ce-Gitlink d3b5a393 (26.08.).
+K3-*) + PAUSE-PROTOKOLL-5/-6 (27.08.). Objekt-Anker: super 54b25e2f / ce-Gitlink d3b5a393 (26.08.); 27.08.
+~18:xxZ (Schreiber-3, ls-remote): super development c778ed7b (origin+github), main 54b25e2f; ce dev==main==d3b5a393.
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung (Datum + juengste KON + Quellen-Ereignis in den STAND-KOPF nachziehen); das Original bleibt
 unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder Abschnitt traegt seine Quell-Anker
@@ -17,6 +24,17 @@ Marker-Ketten 12./15./16./17.08. am Ort). Historie, Anlassfaelle, Beleg-Zahlen u
 NUR dort; diese Fassung verweist praezise.
 Status-/Zahlen-Felder sind datierte Momentaufnahmen (V11): vor Verwendung am Objekt neu messen;
 Quelle-zitierte Staende sind als solche markiert (V1).
+VERIFY-NENNER dieser Fassung (K3-goal-drift.md Abschnitt 3, S-001..S-102, Zuordnung = K3-Spalte "-> D-x"; jede Nummer
+einzeln): D-0 (Kopf): S-001 S-002 S-003 S-014 S-015 * D-1: S-002 S-006 S-027 * D-2: S-016 S-017 S-018 S-019 S-020
+S-021 S-022 S-023 S-024 * D-3: S-008 S-025 S-026 S-028 S-029 S-030 S-031 S-032 S-033 S-034 S-102 * D-4: S-035 * D-5:
+S-036 S-037 S-038 S-039 * D-6: S-040 S-041 S-042 * D-7 (7.1-7.6): S-004 S-005 S-009 S-011 S-012 S-043 S-044 S-045
+S-046 S-047 S-048 S-049 S-050 S-051 S-052 S-053 S-054 S-055 S-056 S-057 S-058 S-059 S-060 S-061 S-062 S-063 S-093
+S-095 * D-8: S-007 S-010 S-013 S-064 S-065 S-066 S-067 S-068 S-069 S-070 S-071 S-072 * D-9: S-073 S-074 S-075 S-076
+S-077 S-078 * D-10: S-079 S-080 S-081 S-082 * D-11: S-083 S-084 * D-12: S-086 S-087 S-088 S-089 S-090 S-091 S-092
+S-093 S-094 S-095 S-096 S-097 S-098 S-099 S-100 S-101 S-095 S-102 * D-14: S-012 S-014 * D-15: S-085 * D-13: W-01 W-02
+W-03 W-04 W-05 W-06 W-07 W-08 W-09 W-10 W-11 W-12 (= V-G01..V-G12). Querschnitts-Doktrin (DD-1) primaer in
+ARBEITSWEISE-DICHT + WELLENPLAN-DICHT W-1; Trigger-Zahlen (DD-4) primaer WELLENPLAN-DICHT W-4/W-H; hier verdichtet mit
+Verweis.
 GELTUNG: v8, gesetzt 08.08.2026, gueltig bis 15.09.2026 (Abgabe); supersedet v1..v6 (v7 nie vergeben;
 Vorgaenger nur deprecatet, nie geloescht). AUTORITAET (Owner-KERN 08.08., woertlich): "direktes blanko
 volles GO alle zukuenftigen Phasen autonom abzuarbeiten...wirklich ALLE am Stueck". Was v8 anders macht:
@@ -37,8 +55,9 @@ nicht umgekehrt; nichts wird geloescht, Ueberholtes traegt datierte Marker):
      GESAMT-DOKTRIN.md (+ DICHT-Fassung daneben); super docs/ traegt NUR einen 53-Z.-Zeiger -- FALLE:
      Zeilenzahl messen, zweistellig = Zeiger (Owner 10.08.: "Die Arbeitsweise gilt universell.").
 Stand-Quelle: Ledger docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md -- lebender Stand = LEDGER-KOPF =
-juengste KON (26.08.: KON129 + Owner-Tranche 26.08., KON130-ENTWURF ausstehend); Nachtraege OBEN, NUR per
-scripts/ledger_nachtrag.sh. Erfahrungsgrundlage: 20260808-SESSION-ERKENNTNISSE-* (Verweis).
+juengste KON (26.08.: KON129 + Owner-Tranche 26.08., KON130-ENTWURF ausstehend; NACHTRAG 27.08.: Ledger-Kopf =
+KON132 @ c778ed7b origin, KON133 = Lead-ENTWURF, Konsolidierungs-KON = naechste freie Nummer); Nachtraege OBEN,
+NUR per scripts/ledger_nachtrag.sh. Erfahrungsgrundlage: 20260808-SESSION-ERKENNTNISSE-* (Verweis).
 Repo-Rollen (KON71-73): ce = Framework/Hauptstrang; super = Installations-Code + Anwender-XML + CI-
 Einstieg; prt-art/thesis = Ausbrueche.
 RANGFOLGE OWNER > PLAN > THESIS (Fassung 09.08.; ersetzt die falsche Ordnung "THESIS > OWNER > PLAN");
@@ -277,7 +296,8 @@ T-15a und T-15b GETRENNT (12.08.): T-15a = Drift-Gate 5 % ueber 3 Wiederholungen
 (fremder Verbraucher aktiv, abwarten); T-15b = Build UND Messung duerfen JE 5-mal scheitern; Erfolg =
 3 Werte je Parameter+Binary EINZELN persistiert, nie gemittelt (KON37-06). Der Befund "die 5 sitzt falsch
 auf der Drift-Achse" ist GEHEILT (messfenster 3a746090 Ancestor von dev: mess_retry_klammer, Drift-Default
-3, mess_warmup_paar 2x3 = 6 Laeufe/3 Werte, C-11 hart/soft, arena_gesamt_faktor 12x2x5=120). Ein
+3, mess_warmup_paar 2x3 = 6 Laeufe/3 Werte (--debug-Zweig genau 1x kalt), C-11 hart/soft, arena_gesamt_faktor
+12x2x5=120). Ein
 gescheiterter Algorithmus schreibt "failed" in die Zelle -- nie null, nie leer -- und der Lauf misst
 weiter: "In der Wissenschaft geht nicht immer alles glatt, aber das muss SICHTBAR sein."
 DRIFT-DEBUG-AUSNAHME WEITER OFFEN (Objektprobe 26.08.: RunMethodology in drift_detector.hpp = 0 Treffer)
@@ -288,7 +308,8 @@ Debug-Zahlen NIE ins Messwertlager (AdmissionStatus existiert).
 KEIN ZUFALL ausser fuer Koeder; k-Wahl = Silhouette + Elbow + Domaenen-Anker k ~ 6..14 (Anker gemeldet,
 nie erzwungen). PMC-STAND: dtlb-Koeder-Defekt (128 KiB statt 64 MiB, geschichtsabhaengig) -- Fix 20d6dd2c
 auf Branch (Floor danach 546/542/540), NICHT in dev; PMC-Fail-loud + RAW-Katalog GELANDET (1d38263b);
-nach Landung Intel-vs-AMD-pmc_befund NEU vergleichen (10.08.-Ausnahme evtl. dieser Defekt).
+nach Landung Intel-vs-AMD-pmc_befund NEU vergleichen (10.08.-Ausnahme evtl. dieser Defekt). NACHTRAG 27.08.
+~12:1xZ: 20d6dd2c lokal gemergt (wt-ce-lande3 lande/identitaet-2708 Merge 2/4, cc85bb91), Push offen (D-8).
 MESSDATEN NIE LOESCHEN; zwei deklarierte Ausnahmen: Reset-Debug-Ausschuss (KON29-01) + Beweislauf-
 Klassenregel A (KON127-04: nach Beweis-Sicherung inkl. CSV-Kopie+sha256 raeumbar).
 
@@ -320,9 +341,24 @@ T5 ja), dann S-19 mit Messwerten -> ##48, dann C-01-VOLLBAU-GATE-Vorlage (KON22:
 Algorithmen versioniert + Messung einbaubar; Bau-Reihenfolge KON17-04) + HEAVY-Signal beide Hosts, dann
 POST. Frist: fruehestens Do 27.08.; K-4-KIPP Fr 28.08. 06:00 (danach faellt das W4-Fangnetz ersatzlos).
 Jede Trigger-Zeile traegt den Vorbehalt "erst nach Landewelle + #114-Re-Run eingefroren" (W-11).
+NACHTRAG 27.08. ~17:3xZ (KON133-ENTWURF 03/04/05/08/09/10 + PAUSE-6; Volltafel WELLENPLAN-DICHT W-H): main-FF-CI-
+Rest GRUEN 27.08. 12:05Z (prt-art main-FF 16c90628, Bruecken-Retry -> super 16240 SUCCESS 36/36 + 3/3; #19
+completed); VO3-1(b) GEBAUT 01dc3122 (K17 4x548, Gates 6/6, OS-2-Gate) LANDEREIF; E-10 S1-S3 GEBAUT (3f360d85,
+502a5979, 826cad5c), S4-S7 + Bau-Verify OFFEN (Korridor = Lande-Verbot); Lande-Zug: konform -> pmc-dtlb-koeder ->
+vo3-1 -> a5-reuse LOKAL gemergt (wt-ce-lande3 cc85bb91, Floor provisorisch 549/545/543, TABU 832/832), Komplex-Fix
++ EIN K17 + Push + Gitlink OFFEN; ##47 GEFAHREN 26.08. -> ROT (BL-1 CE_SUBMODULE_TOKEN, Scrub-Regression 02.08.)
+-> GEHEILT 18:56Z (Deploy-Token id=138, #150) -> RE-RUN offen (auf O2-Stand); Stempel Teil 2 = B-7/RN-78-Emitter-
+Haelfte (RF-2, #147, WIP 442030db); prod2 .214 VOLLZOGEN (#151); RF-1..RF-9 ALLE beantwortet 26.08. ~19:0xZ (D-12);
+df prod1 12G (96 %); K-4-Kipp Fr 28.08. 06:00 = vom 27.08. 17:3xZ aus < 13 h -- Riss-Meldung an den Owner faellig.
 HEAVY/T2 (Owner 25.08.): Sperrfenster gilt SOFORT nach fertiger Landung + beantworteten Owner-Fragen;
 waehrend Bau und Kampagne NULL CI-/Agenten-Last auf BEIDEN Hosts (RN-39: kontaminierte Daten sind die
-unheilbare Klasse); Textarbeit ueber Overleaf-Remote. HEAVY_J: amd/prod1 = 16, intel/prod2 = 24 (W-12).
+unheilbare Klasse); Textarbeit ueber Overleaf-Remote. HEAVY_J: amd/prod1 = 16, intel/prod2 = 24 (W-12);
+Drei-Bereiche-Concurrency (par.18.8: CI-normal 3/2 je 4 Kerne, CI-heavy Deckel 16, ce-Build floor((T-4)/4)x4,
+--debug-Messung Tx1) + Director-Single-Source-Konstanten ohne Env-Override: WELLENPLAN-DICHT S-065.
+BETRIEBS-WAHRHEIT VOR W3 (je Objekt-Blick, Stand 27.08.): C-09 Drift-Debug-Ausnahme OFFEN (D-7.6/#125) | C-10
+Zweilanigkeit nachmessen (unten) | C-02 HEAVY-Signal NICHT gesendet | Token-Stand: A-3-Runner-Rotation = Session-
+Auftrag (Block D), Deploy-Token id=138 gesetzt (BL-1 geheilt 26.08.), Runner-Auth-Tokens 17+56 -> Rotation #152 |
+PMC-Stand D-7.6.
 BETRIEBSREGELN: Abnahme-Serialitaet (EIN-BLECH) + daneben PARALLEL BAUEN, SEQUENTIELL LANDEN (max 3
 Vollbauten prod1, 6+ disjunkte Straenge, 1 Schreiber je Worktree, Pipelines streng sequentiell); je
 Landung K17-Kombibau 4 Zellen {gcc,clang}x{Release,Debug} + Gates 6/6 (COMDARE_PRE_PUSH_BUILD_DIR
@@ -354,7 +390,8 @@ META-ZAHLEN: 157 Behauptungen -> 117 bestaetigt, 40 gefallen, 62 Funde erst durc
 40 waren Fehler der ersten Schaerfungsstufe selbst -- "Ein Testentwurf ist eine Behauptung wie jede
 andere."
 CODEX: stehender Kritiker (read-only), nie Zusammenfasser, IMMER mit nachgeschalteter Objektpruefung;
-Betriebsstand 26.08.: Login geheilt (11:03Z); Rezept: klein schneiden + IMMER zweiter Lens parallel;
+Betriebsstand 26.08.: Login geheilt (13:03:36Z; KON132-01: das Etikett "~11:03Z" war eine Fehlkonversion);
+Rezept: klein schneiden + IMMER zweiter Lens parallel;
 bwrap defekt -> codex exec mit Volltext im Prompt; Einsatz-Gate-Smoke je Session.
 
 ## D-10 STAND DER DEFEKTE (Tafel neu gezogen, 26.08.)
@@ -413,22 +450,40 @@ ins Werkzeug, nicht in den Kopf."
   OS-2 hartes CMake-Gate + Original-Compiler-Nachweis (Bootstrap: Systemcompiler -> Tool-Compiler ->
       Code; #130 scharf). KN-1..KN-4: "alle genau wie empfohlen durchziehen. Volles Go." (E-10-Zug).
   E1  Thesis-Apache+(C) Probst | E2 = (a) MIT Redaktions-VORARBEIT (geleakte Schluessel redigieren, dann
-      public github+gitlab; gitlab vorerst nicht internet-exponiert) | E3 Design-Tag wie empfohlen.
+      public github+gitlab; gitlab vorerst nicht internet-exponiert; Reihenfolge (1) History-REDAKTION
+      0891fcf43cbf + Tag backup/pre-p0-sync-20260722 (2) GitHub public (3) GitLab LAN-public (4) Internet SPAETER;
+      F.6 WG-Rotations-VOLLZUGSBELEG = Public-Blocker Nr. 1, Owner/Infra-Bringschuld) | E3 Design-Tag wie empfohlen.
   F-17 CEB = EIN Pruefdock (s. D-7.3). D1 = V-A/V-B/V-C symmetrisch volles GO + NAS-Routen-Explore.
-  Block D: ALLE volles GO; Runner-Token rotiert die SESSION + Vault-Commit; V8 vollzogen; V9 Loesch-GO.
-  Block E: Codex-Login vollzogen; Aufgabenblatt-PDF-Erklaerung GESCHULDET; Thesis-Sync-ultracode nach
-      Code-Fertigstellung volles GO (#121). Block F: META-REGEL Absicherungs-Explores (s. D-2).
+  Block D: ALLE volles GO; Runner-Token rotiert die SESSION + Vault-Commit (287-runners_token + 390er-Altbestand);
+      V8 vollzogen; V9 Loesch-GO; WG-Purge-GO Scope NUR 0891fcf43cbf/Blob 71670a3d (70fab9ff ENTLASTET);
+      gitleaks-Regel-Einbau 4x .toml (#142; ce-Seite in cc85bb91 gemergt 27.08.); Q3 Raeumung vollzogen 6/6;
+      Q5 = (A) Klassenregel KON127-04.
+  Block E: Codex-Login vollzogen; Aufgabenblatt-PDF-Erklaerung GESCHULDET -> RF-8a 26.08. ~19:0xZ ERLEDIGT
+      ("[...] Teil von Thesis im Diplomarbeit Text unter Latex ganz am Anfang als eigenes Kapitel - erledigt.";
+      Ledger-C4 austragen); Thesis-Sync-ultracode nach Code-Fertigstellung volles GO (#121; RF-8b GROSSES GO,
+      strikt sequentiell vorn->hinten). Block F: META-REGEL Absicherungs-Explores (s. D-2).
+  RF-TRANCHE 26.08. ~19:0xZ (verbatim WELLENPLAN-DICHT W-9.4 + KON133-01-Entwurf; alle 9 beantwortet): RF-1 T =
+      NACH Kampagne FIX ("Ja, korrekt, GO.") | RF-2 Stempel Teil 2 = B-7/RN-78-Emitter-Haelfte -> #147 | RF-3
+      #29-Fork AP-15(3) = (A) backing_structure-Achse per Doc 37 | RF-4 S-19-Schema n_ops/drift_gate = S13-05/X-4b |
+      RF-5 prod2 10.0.20.214 SOFORT (#151, vollzogen 27.08.) | RF-6 E2 = alle Tafel-Empfehlungen (#149, serieller
+      Slot) | RF-7 Vendor: Gate VOR Trigger, Einzug+Bootstrap-Bau NACH Trigger (#148/#130) | RF-8a s. Block E |
+      RF-8b #121 GROSSES GO | RF-9 Deploy-Token-Rotation GO -> BL-1 GEHEILT (#150). DOKTRIN VERSCHAERFT (Owner):
+      "Bitte lies alle Rueckkehrer stets vollstaendig oder hole das nach."
 
 ## D-13 OFFENE OWNER-PUNKTE + WIDERSPRUECHE (nie selbst entscheiden; Vorlage nach Absicherungs-Explore)
 
   W-01 Rechtstraeger-Scope super (Probst-Vermerk fuer GESAMTES Repo oder nur Diplomarbeits-Dokumente?).
   W-02 Frage T Split-Landung (nach Kampagne | vor Trigger) in der 26.08.-Tranche nicht namentlich
-       beantwortet -- nicht unterstellen, absichern.
+       beantwortet -- nicht unterstellen, absichern. OWNER-ENTSCHIEDEN 26.08. ~19:0xZ RF-1 "Ja, korrekt, GO."
+       = NACH Kampagne (W-C) FIX; Zeile bleibt als datierte Historie.
   W-03 ergebnis:holen-Ausnahme: Owner-Deckung nicht belegt (bis dahin: deklarierte Ausnahme fuehren).
   W-04 Lager-Integritaetsfrage je Maschine (s. D-7.2) -- explore-pflichtig.
   W-05..W-12 (aufgeloeste Wortwahl-/Retter-/Verify-Posten): Volltext K3-goal-drift.md Abschnitt 4
        (Beweisort 20260826-konsolidierung-dichte-fassungen); darunter W-06 S-19-Rettung, W-08 Board-
-       Drift, W-10 Nachmess-Posten D2/D5, W-11 Trigger-Linien-Vorbehalt.
+       Drift, W-10 Nachmess-Posten D2/D5, W-11 Trigger-Linien-Vorbehalt. Stand 27.08.: W-06 VOLLZOGEN (Memory
+       owner-kerne KORREKTUR 26.08. ~18:4xZ, Board #7, KON132-05: S-19 GELANDET 22.08., Ruege trifft Sichtbarkeit +
+       B1/B2); W-08 Lead-Nachzug LAEUFT (#19/#151 completed; 3 Landewellen-Zweige lokal gemergt cc85bb91, Push offen);
+       W-11 Vorbehalt bleibt (Linie erst nach Komplex-Fix + K17 + #114-Re-Run eingefroren).
 
 ## D-14 HISTORIE-VERWEISE
 

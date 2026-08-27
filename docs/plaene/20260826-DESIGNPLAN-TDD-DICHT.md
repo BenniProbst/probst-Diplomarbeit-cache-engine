@@ -3,11 +3,19 @@
 Dies ist die LEBENDE DICHTE FASSUNG dieses Referenzdokuments (Owner-Order 26.08.2026, KON130). Sie traegt
 die GESAMTE geltende Substanz des Originals plus alle Nachtraege; ueberholte Zwischenstaende stehen nur als
 datierte Historie-Verweise. Bei Widerspruch: Owner-Wort schlaegt alles, Neueres schlaegt Aelteres.
+NUMMERN-NACHTRAG 27.08.2026 (V12, additiv AM ORT): "KON130" in der Zeile oben meint die KONSOLIDIERUNGS-KON der
+Owner-Order 26.08. 13:28Z (O-12) laut SCHREIB-SPEZIFIKATION (D); seit super c778ed7b (gepusht 27.08. 12:0xZ) sind
+KON130 = MAIN-FF BEIDER REPOS, KON131 = ##47 + BL-1, KON132 = OWNER-TRANCHE 26.08. belegt, KON133 = Lead-ENTWURF
+27.08. (01..10) -> der Ledger-Anker dieser Fassung ist "KON13x-KONSOLIDIERUNG" = naechste freie Nummer bei
+Einspielung durch den Lead (vergebene Nummer -> naechste freie); Owner-Order und Gegenstand bleiben unveraendert.
 STAND-KOPF: Original 08.08.2026 (docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md, 1021 Z.,
-Marker-Kette par.9 -> 10 -> 11 -> 12 -> 13.1-13.5) + Nachtraege bis KON129 (Ledger 25.08.) + Owner-Tranche
-26.08. (memory/project_owner_kerne_20260825_a1_a6_b1_b10_scope_split_public.md, verbatim) + 3-Kontexte-
-Verbuchung 26.08. (Beweisort ~/backups-workflow/20260826-konsolidierung-dichte-fassungen/). Objekt-Anker:
-super 54b25e2f / ce-Gitlink d3b5a393 (26.08.).
+juengster Datei-Commit 4b1a6eac 25.08. [A2.5-FIX-R1 ATOMAR: Gitlink ce -> d3b5a393 + PZW-9.5-Nachzug];
+Marker-Kette par.9 -> 10 -> 11 -> 12 -> 13.1-13.5) + Nachtraege bis KON129 (Ledger 25.08.) + KON130-132 (c778ed7b,
+gepusht 27.08.) + KON133-ENTWURF (Lead 27.08.) + Owner-Tranche 26.08. 13:00Z + RF-Tranche 26.08. ~19:0xZ
+(memory/project_owner_kerne_20260825_a1_a6_b1_b10_scope_split_public.md, verbatim) + 3-Kontexte-Verbuchung 26.08.
+(Beweisort ~/backups-workflow/20260826-konsolidierung-dichte-fassungen/) + PAUSE-PROTOKOLL-5/-6 (27.08.).
+Objekt-Anker: super 54b25e2f / ce-Gitlink d3b5a393 (26.08.); 27.08. ~18:xxZ (Schreiber-3, ls-remote): super
+development c778ed7b (origin+github), main 54b25e2f; ce dev==main==d3b5a393; ce-Lande-Worktree cc85bb91 (lokal).
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung; das Original bleibt unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder
 Abschnitt traegt seine Quell-Anker (par./KON/Symbol).
@@ -16,6 +24,12 @@ Nachzugs-Ketten und der par.9-Berichtigungs-Apparat am Ort). Historie, Anlassfae
 Marker-Wortlaute leben NUR dort; diese Fassung verweist praezise.
 Status-/Zahlen-Felder sind datierte Momentaufnahmen (V11): vor Verwendung am Objekt neu messen; Quelle-
 zitierte Staende sind als solche markiert (V1).
+VERIFY-NENNER dieser Fassung (K3-designplan-drift.md Abschnitt 3, I-01..I-27 + Abschnitt 4 W-1..W-11 + Abschnitt 5
+T26-1..T26-9): I-01 -> D0 * I-02 -> D1 * I-03 -> D2 (7 Postenlisten woertlich) * I-04/I-05/I-06/I-07/I-08/I-15/
+I-23 -> D3 * I-09/I-10/I-24 -> D4 * I-11 -> D5 * I-12 -> D6 * I-13 -> D7 * I-14/I-16/I-17 -> D8 * I-18/I-19/I-20/
+I-21 -> D9 * I-22 -> D10 * I-25 (01)-(18) -> D11 * I-26 + T26-1..T26-9 -> D12 * W-1..W-11 (V-D01..V-D11) -> D13
+(W-3/W-4/W-7/W-8 als Statusvermerke an D10/D7/D3) * I-27 -> D14. Owner-Kerne 25./26.08. (DD-2): primaer GOAL-DICHT
+D-12 + WELLENPLAN-DICHT W-9; hier NUR die Testseiten-Wirkung.
 ROLLE: Haupt-Referenzdokument der Testseite (KON19-00); ergaenzt den Wellenplan-Verifikationsvertrag um die
 Testseite, ersetzt nichts. NOTATION: Posten-IDs MT=Messkette-Treiber, ST=Statistik-Glied, PK=Perzentil-
 Kanon, PE=Planer-Emission, LG=Lagerhaltung, AS=Achsen-Stempel, PM=PMC-Messfuehler, AG=Anatomie-Gattung,
@@ -122,7 +136,10 @@ T-11a WARMUP-PAAR-PFLICHTTEST (KON47-04; Status: GEBAUT, harness/mess_warmup_paa
     persistierten Satz (Koeder: Lauf 1 gespeichert -> ROT).
 T-11b KOMBIBAU-2x2 ALS PRUEFNORM (KON55): {clang,gcc} x {Debug,Release} = 4 Zellen je J-1..J-4 + ctest,
     je LITERALE Bilanz; EIN Bau-Slot bei sequentiellen Zellen; Abnahme-Regel je Stempel-/Mess-Paket.
-    Nenner = Floor 545/541/539 (Datei-Stand 26.08.; 546/542/540 am pmckoeder-Branch, ungelandet).
+    Nenner = Floor 545/541/539 (Datei-Stand 26.08.; 546/542/540 am pmckoeder-Branch, ungelandet). NACHTRAG
+    27.08.: 548/544/542 am vo3-1-Branch 01dc3122 LIVE (c1ad6093); Merge-Endstand wt-ce-lande3 cc85bb91 (konform +
+    pmckoeder + vo3-1 + a5-reuse) = 549/545/543 PROVISORISCH (Vorgaenger+3, NICHT gemessen; Kaltbaum-Vorprobe 544
+    vs Basis 540 = +4 stuetzt es); LIVE-Messung A-F3 im Komplex-Fix; E-10 kommt danach obendrauf.
     D-11 (+1-Regel): Floor-Datei + Gate-Erwartung im SELBEN Zug jeder +1-Landung (vollzogen 24.08. Z12:
     4/4 Zellen "545", Gate [5/6] exakt). D-13 K17-STANDBINDUNG: (a) Commit-Stand im Protokoll-Kopf,
     (b) Endstand = dev-Tip am Zugtag (frisch), (c) rc=${PIPESTATUS[0]} + explizite Build-Pfade.
@@ -162,6 +179,9 @@ T-13 WORKAROUND-KONFORMITAET (24.08., Board #135; Owner-Dauerregel 23.08. verbat
     Harmonisierung, TemplateWithUnknownRef, stringop-overflow-Duldung, NSDMI-Fixmuster; Wellenplan
     par.27.1.E) -- Stand 26.08.: 0/7 verdiktet, Frist "VOR main-FF" GERISSEN (W-2); Nachtrags-Kandidaten
     Gate-Default H-1 + Director-Fix (KON129-07) noch NICHT im Register.
+W2-ABSCHLUSS-GATE-BINDUNG (par.13.1 + Wellenplan par.27.3, 5 Punkte; Punkt 4 = die T-13-Verdikte als EIGENER Teil
+    des Gates; Gate OFFEN 27.08., Erst-Pruefung an der W2-Freitagslieferung Fr 28.08.): Volltext WELLENPLAN-DICHT
+    W-7.2; Testseite haelt fest: CI-gruener Endstand allein genuegt NICHT.
 SUMMEN-REGEL (unveraendert, mehrfach gesetzt): 117/386 h bleiben unangetastet; T-11a-c, T-12a-e und T-13
 sind erst zu addieren, wenn die S-Strecke (D-4) mit-durchgezaehlt wird -- sonst der T-3-Fehler aus par.9.
 
@@ -174,6 +194,9 @@ der Vertrag PINNT kGenusCount, definiert nicht grundauf). Sonderfall PM-NichtGel
 getrennt; GELTEND: prod2 ist als Intel-CI-Host aktiv, der HW-Teil ist fahrbar (Platz via #96 zuweisen).
 W-1/W0a/W0b/W1 = GELANDET (W-1 super ca901c50/ce 1f88cfec; F1 14.08. KON63; F2/Freeze 21.08.; Details +
 Posten-Slots: Archiv par.4). Landestand JE POSTEN existiert im Designplan nicht = offene Verify-Tafel.
+TESTLAST-SOLL JE WELLE (par.4-Tafel, Zahlen = Planung 08.08.): W-1 A1/3 h * W0a A3/9 h + B1/5 h * W0b A15/40 h +
+B9/21,5 h * W1 A23/99 h + B22/62 h * W2 A8/21 h + B23/67 h * W3 0 h * W4 A3+Ebene4b/34 h + B4/11 h * W5 0 *
+W7(C) 5/13 h -- die gelandeten Wellen sind Historie, die Zahlen der offenen Wellen leben unten.
 W2 (Mo-Fr 24.-28.08., F3) LAEUFT: Band A 8 Posten/21 h = Kampagnen-Wahrheit (MT-L1, MT-L2, MT-L6, MT-L7,
 PM-m3v2Zero, PM-RAPL, PM-Scaled, PM-NichtGelesen-Seam), Landung bis F3 als Teil der GO-Vorlage; Band B
 23/67 h nur bei freiem Slot. Trigger-Termin = SPAETESTE Frist (A2 volles GO "direkt so bald wie moeglich").
@@ -211,8 +234,9 @@ nie Zitat -- jede tragende Referenz selbst lesen; keine Codex-Zeile/-Zahl ungepr
 (3) Pflicht-Meta-Stufe (einstufig faellt ein Viertel); (4) je Welle ein Codex-Pass ueber die NEUEN Tests
 der Vorwelle (T-9); (5) NICHT einsetzen fuer Aufwandsschaetzung, Wellen-Zuordnung, Owner-Entscheide.
 BETRIEB 26.08.: bwrap DAUERHAFT defekt -> Plan-B codex exec CLI mit Diff-VOLLTEXT im Prompt; Ersatz-Lens-
-Klausel nur mit frischer Defekt-Probe; Login GEHEILT 26.08. ~11:03Z ("Logged in using ChatGPT");
-Einsatz-Gate-Smoke je Session Pflicht. Befund-Historie (SHAs 85847715/7bcf353b): Archiv par.6.
+Klausel nur mit frischer Defekt-Probe; Login GEHEILT 26.08. 13:03:36Z ("Logged in using ChatGPT"; KON132-01:
+das Etikett "~11:03Z" war eine Fehlkonversion); Einsatz-Gate-Smoke je Session Pflicht. Befund-Historie (SHAs
+85847715/7bcf353b): Archiv par.6.
 
 ## D7 WAS NICHT GETESTET WIRD (par.7)
 
@@ -270,6 +294,9 @@ D-6 PMC-Vertragsfolge: Paket #82/#83 gelandet (fail-loud, n/a-Token); dtlb-Koede
 D-7 Floor-Anker-Einheit: o2-Landung hob 544/540/538 -> 545/541/539 (+1-Regel); PZW != Floor.
 D-8 Vendor-O3: OWNER-ENTSCHIEDEN X4/OS-1 = (b) GLOBAL O2, O3 nur auf XML-Wunsch; "(a) De-facto" =
     HISTORIE; Bau laeuft (VO3-1 @ 9c75bad0, B1-B4 erledigt); Text-Marker im Archiv-par.13.2 ausstehend.
+    NACHTRAG 27.08.: GEBAUT 01dc3122 (K17 4x548/548, Gates 6/6, OS-2-Gate cmake/vo31_optflag_gate.cmake) LANDEREIF;
+    lokal gemergt als Merge 3/4 in wt-ce-lande3 cc85bb91 (2 Konflikte floor.txt + CMakeLists.txt HARMONISIERT),
+    Komplex-Fix/K17/Push offen (KON133-03/-10-Entwurf).
 D-9 M13-Absorption VOR erster produktiver Konsumierung von kBegriffsAliasRegistry (Design-Entscheid
     24.08.; Praemisse "0 Konsumenten" = Stand 24.08., vor Bau neu messen).
 D-10 T-13 (s. D3). D-11 Floor-Gate-Zug (s. T-11b). D-12 #114-Beweislaeufe: Lauf 1 NO-GO 9/10 (Ursache =
@@ -283,7 +310,8 @@ D-13 K17-Testat-Standbindung (s. T-11b).
 (02) T-12a Drift-Gate-Debug-Ausnahme BAUEN (vor W3-Generalprobe 29.08.; #125)
 (03) T-12c-Heilung Arena harter Abbruch (mess_arena.hpp; S13-05/07-Traeger)
 (04) T-13-Verdikte W135-1..7 (0/7; Frist war "VOR main-FF" -- gerissen, s. D13/W-2)
-(05) T-13-Nachtraege Gate-Default H-1 + Director-Fix (KON129-07; Urteile + Landung)
+(05) T-13-Nachtraege Gate-Default H-1 + Director-Fix (KON129-07; Urteile + Landung) [27.08.: konform 41bf4c62
+     lokal gemergt (Merge 1/4, cbd76635), Urteile weiter offen]
 (06) test_rcu unter Parallel-Last (F3-01b)
 (07) D3-7b dritter Modus pruef_only in der Treiber-Bilanzzeile
 (08) MT-L5(b) CI-Job COMDARE_V32_DRIVER_ENABLE=ON -- Stand erheben (entsperrt MT-L10/L12)
@@ -292,16 +320,27 @@ D-13 K17-Testat-Standbindung (s. T-11b).
 (11) D-5-Wache: T-3-Posten mit thesis_profiles-Nenner (11)
 (12) D-6 CEB->Tier-CT-Vertragsanpassungs-Posten
 (13) OS-2: hartes CMake-Gate (Vendor-Toolchain-Deklaration, FATAL_ERROR) + Original-Compiler-Nachweis-
-     System (#130 SCHARF; Reichweiten-Frage W-9)
+     System (#130 SCHARF; Reichweiten-Frage W-9) [27.08.: Gate GEBAUT = #145 S5 cmake/vo31_optflag_gate.cmake
+     (Configure FATAL, 3 Fangnetze, Probe 4/4 rot-zuerst; am Merge-Stand 692 Ziele / 0 Verstoesse, 1 gedeckte
+     Ausnahme test_all19); Bootstrap-Kette #130 + Vendor-Einzug #148 NACH Trigger (RF-7 "Wie empfohlen - so war
+     es geplant."); W-9 s. D13]
 (14) S-19-Verdrahtung: golden_n-Wache + COMDARE_GN_TOTAL aus simulate-Ausgang (T-3 FREMD), GN-Divergenz
      FATAL statt Hinweis (Owner B6-F1; B1 EXPECTED_N hart / B2 YAML-Literal)
 (15) F-17-Umbau: Koeder-Tests test_s8kopf_planner_kopf + test_ck1_messkette_koeder ROT-ZUERST auf 1 Dock;
      static_assert(anzahl==6) faellt (#24/B4-Scope)
 (16) X3-S8 Scheduling-Stempel-Glied [11] + "Stempel Teil 2" (Kandidat B-7/RN-78; Objekt-Abgleich vor Bau)
-     -- VOR dem Trigger (Owner F-X3-1 = A)
+     -- VOR dem Trigger (Owner F-X3-1 = A) [26.08. ~19:0xZ RF-2 "Volles GO": Referent = B-7/RN-78-EMITTER-Haelfte
+     (Weiche A, identitaets-/golden-neutral) -> #147; 27.08.: WIP 442030db (2 Header, ungebaut, keine Tests);
+     Testseite: T-1 rot-zuerst + T-11c je Header + K17 am Ende]
 (17) VO3-1-Testseite: T-1-Koeder O2-Dreh + Glied [5] vendoropt (Bau B1-B4 @ 9c75bad0; REST B5-B7 +
      OS-2-Gate + K17) + pmc-dtlb-Koeder-Landung (20d6dd2c) mit Floor 546/542/540 + PZW-/Ledger-Nachzug
+     [27.08.: VO3-1 GEBAUT 01dc3122 -- T-A/T-B1 rot-zuerst, 3 neue Tests test_vo31_global_o2_flags/
+     test_vo31_vendoropt_glied/test_vo31_optflag_gate_probe, K17 4 Zellen je "0 tests failed out of 548",
+     Floor 548/544/542 LIVE; pmc-dtlb + vo3-1 lokal gemergt (wt-ce-lande3), Floor provisorisch 549/545/543;
+     PZW-/Ledger-Nachzug = Gitlink-Bump (XSD:435 + super .gitlab-ci.yml:1218-1219)]
 (18) EIN K17 am zusammengesetzten Landewellen-Endstand + EIN #114-Re-Run (KON129-07; T-11b/D-13/D-12)
+     [27.08.: Merge-Stand cc85bb91 ohne E-10 (S3 gebaut, S4-S7 offen); K17 = Komplex-Fix des Lande-Zugs OFFEN
+     (Riss 2); #114-Re-Run danach, Manifest 833/833 erst mit E-10 (E-10-F-6)]
 FUSSNOTE (Stand-Verbuchung 26.08.): E-10-FIX-1..7 und VO3-1-FIX-1..5 (3-Lenses-/2-Lenses-Verifies,
 TRAEGT_MIT_FIXES) leben als Bau-Auflagen in den gepatchten Workflow-Skripten (K1c F-04/F-05) und werden
 nach Bau-Ende als T-13-/Board-Nachtraege verbucht (Boards #133/#145 tragen noch die Kurzform).
@@ -312,6 +351,8 @@ T26-1 OS-1 = R1: "Ja, die ausdrueckliche definition von O2 UND O3 ist von mir ge
       auch nur O2. Wir bleiben dennoch bei O2 und O3 zum Testen." -> Trigger-XML {O2,O3}, n_bau 524288.
 T26-2 F-X3-1 = (A) VOR dem Trigger + "bitte auch den vergessenen Stempel Teil 2 suchen und mit
       implementieren vor dem Trigger." -> zwei Vor-Trigger-Bauposten mit T-1/T-11c-Pflicht (D11/(16)).
+      NACHTRAG RF-2 26.08. ~19:0xZ "Volles GO" = Referent B-7/RN-78-Emitter-Haelfte (#147); kein Objekt-Abgleich
+      mehr als Owner-Frage, nur als Bau-Vorstufe.
 T26-3 KN-1..KN-4: "alle genau wie empfohlen durchziehen. Volles Go." -> E-10-Bau #133; EIN K17 am
       Endstand, Floor +N (D11/(17)(18)).
 T26-4 OS-2: hartes CMake-Gate nachbestellt + "selbst dafuer sorgen, dass die compiler und tools auf einer
@@ -327,7 +368,8 @@ T26-6 B6-F1 (verbatim-Kern): "es gibt ohne die Planer Direktive wie im PLAN BESC
       VERDRAHTUNG (B1/B2, GN-Divergenz FATAL) = T-3-/T-2-Pflichtposten (D11/(14)).
 T26-7 B6-F2: "hart ist in diesem System nichts, es ist ALLES dynamisch und muss ausgerechnet werden."
       -> Widerspruch W-1 zu T-12c(1)/(2) -- OWNER-GATED, nichts drehen (D13).
-T26-8 CODEX-LOGIN VOLLZOGEN 26.08. ~11:03Z -> D6 (Zweit-Lens einsatzfaehig; Gate-Smoke Pflicht).
+T26-8 CODEX-LOGIN VOLLZOGEN 26.08. 13:03:36Z (KON132-01; "~11:03Z" = Fehlkonversion) -> D6 (Zweit-Lens
+      einsatzfaehig; Gate-Smoke Pflicht).
 T26-9 META-REGEL: "Bitte Block F erst durch explores ueber 12 Wochen absichern und dann nur die wirklich
       offenen Fragen fragen. [...] es war alles schon beantwortet." -> Prozessregel jeder Rueckfrage.
 Nicht testseiten-wirksam: E1/E2/E3 + Lizenzpunkte (Testseite nur als kuenftiges reuse-CI-Gate D3b),
@@ -341,13 +383,18 @@ W-1 [OWNER-GATED] T-12c(1)/(2) "6 GB FEST/STATISCH, compile-time" (16.08.) vs. B
 W-2 [REGRESSIONS-BEFUND] W135-Verdikte 0/7 trotz vollzogenem main-FF (Frist "VOR main-FF" gerissen) --
     Heilung = Verdikte nachholen (#135/#128), KEINE Ausbuchung; Kenntnisnahme-Zeile in die Owner-Vorlage.
 W-9 [OWNER-GATED nach Explore] OS-2-Gate-Reichweite: nur ext/traversal/P0x-Original-Papers oder AUCH
-    vendorierte Allokatoren A01/A04/A05/A07/A08? Owner-Vorlage vor dem Bau, kein Rateversuch.
+    vendorierte Allokatoren A01/A04/A05/A07/A08? Owner-Vorlage vor dem Bau, kein Rateversuch. Stand 27.08.:
+    das gebaute Gate prueft ALLE Release-Ziele des Baums (692/0, "inkl. selbst-pinnender Vendor-Projekte" =
+    KON129-:518-Wortlaut, KON133-03-Entwurf); ob damit die Reichweiten-Frage owner-gedeckt ist, entscheidet
+    NICHT diese Fassung -- Lead prueft gegen RF-7 + Bauplan, sonst Vorlage.
 W-11 [QUELLEN-DIVERGENZ] Band-B/W1-Namensliste Wellenplan par.21.3 vs. Designplan-Katalog (Summe je 22
     Posten/62 h, Namensmengen weichen ab) -- massgeblich = Designplan-Katalog; #96 nennt BEIDE Mengen.
 Weitere (aufgeloest/Lead-Posten): W-3 D-8-Text-Marker ausstehend | W-5 Summen-Sperre ungeheilt seit
 12.08. | W-6 F-17-Folgefragen S3-L1/L2/L3 nach 12W-Explore | W-7 mess_arena-Kommentar != Doktrin |
 W-8 HDR-Zeile veraltet (Statusvermerk gesetzt) | W-10 "Stempel Teil 2"-Referent: Objekt-Abgleich, keine
-neue Owner-Frage | W-4 Platz vs. {O2,O3} (T1 = (c) NFS; Testseite: K17 + Re-Run vor Trigger).
+neue Owner-Frage -> 26.08. ~19:0xZ OWNER-ENTSCHIEDEN RF-2 (B-7/RN-78-Emitter-Haelfte, #147) | W-4 Platz vs.
+{O2,O3} (T1 = (c) NFS; prod2 .214 vollzogen 27.08., prod1-Haelfte offen, df 12G; Testseite: K17 + Re-Run vor
+Trigger).
 
 ## D14 HISTORIE-VERWEISE (nur im Beleg-Archiv)
 
