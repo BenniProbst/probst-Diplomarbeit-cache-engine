@@ -1,3 +1,10 @@
+> LEBENDE DICHTE FASSUNG: docs/plaene/20260826-DESIGNPLAN-TDD-DICHT.md (Owner-Order 26.08.2026, KON130).
+> Dieses Dokument ist ab 26.08.2026 BELEG-ARCHIV: nichts geloescht; der 117er-Katalog und die
+> Marker-/Nachzugs-Ketten par.9 bleiben hier als Beleg. Neue Nachtraege NUR in der DICHT-Fassung
+> (additiv AM ORT mit Datum); Einlese-Ritual ueber die DICHT-Fassung.
+> [V12-Nachtrag 27.08.2026: "KON130" = Konsolidierungs-KON der Owner-Order; im Ledger ist KON130 seit c778ed7b
+> MAIN-FF -- die Konsolidierungs-KON erhaelt die naechste freie Nummer bei Einspielung durch den Lead.]
+
 # DESIGNPLAN ERWEITERTE TESTABDECKUNG — TDD ÜBER ALLE WELLEN
 **Stand 08.08.2026 abends · fügt sich in den Wellenplan v2 (`docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md`) ein, Abschnitte 3 und 6 sind bindend; dieses Dokument ergänzt dessen Verifikationsvertrag um die Testseite, es ersetzt nichts.** **[STAND-HINWEIS 12.08.: Drift gegen KON15–KON38 in §10; betroffene Stellen tragen [D-n → §10]-Marker.]**
 

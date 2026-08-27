@@ -1,3 +1,10 @@
+> LEBENDE DICHTE FASSUNG: docs/plaene/20260826-GOAL-V8-DICHT.md (Owner-Order 26.08.2026, KON130).
+> Dieses Dokument ist ab 26.08.2026 BELEG-ARCHIV: nichts geloescht, alle Marker-Ketten bleiben am Ort.
+> Neue Nachtraege NUR in der DICHT-Fassung (additiv AM ORT mit Datum); Einlese-Ritual laeuft ueber die
+> DICHT-Fassung, dieses Archiv dient dem Beleg-Nachschlag (Historie, Anlassfaelle, Marker-Wortlaute).
+> [V12-Nachtrag 27.08.2026: "KON130" = Konsolidierungs-KON der Owner-Order; im Ledger ist KON130 seit c778ed7b
+> MAIN-FF -- die Konsolidierungs-KON erhaelt die naechste freie Nummer bei Einspielung durch den Lead.]
+
 # GOAL v8 — ALLE WELLEN AM STÜCK BIS ZUR ABGABE
 
 > **Version:** v8 · **Gesetzt:** 08.08.2026 abends · **Gültig bis:** 15.09.2026 (Abgabe)

@@ -1,3 +1,10 @@
+> LEBENDE DICHTE FASSUNG: docs/plaene/20260826-WELLENPLAN-V2-DICHT.md (Owner-Order 26.08.2026, KON130;
+> traegt Hauptstrang-Karte, RN-01..RN-92-Status, W2-Resttafel, Stand-Verbuchung 24.-26.08.).
+> Dieses Dokument ist ab 26.08.2026 BELEG-ARCHIV: nichts geloescht; par.-Anker gelten weiter als
+> Beleg-Quelle. Neue Nachtraege NUR in der DICHT-Fassung (additiv AM ORT mit Datum).
+> [V12-Nachtrag 27.08.2026: "KON130" = Konsolidierungs-KON der Owner-Order; im Ledger ist KON130 seit c778ed7b
+> MAIN-FF -- die Konsolidierungs-KON erhaelt die naechste freie Nummer bei Einspielung durch den Lead.]
+
 # GESAMT-WELLENPLAN BIS 15.09.2026 — ENDFASSUNG v2
 
 **Architekt-Entscheid, Stand Sa 08.08.2026 abends.** Grundlage: die Endfassung v1 vom 08.08. (803 Zeilen, 369 SOLL-Posten, 211 IST-Prüfungen, 39 Regressionen, 46 Einwände), dazu **35 am Objekt geschärfte Defekt-Posten** (fünf Familien D1–D5, Summe ~76 h, jede Zahl heute gemessen) und **drei unabhängige Wellendesigns** (Frist zuerst / Risiko zuerst / Kette zuerst). Alle mit `LIVE` markierten Zahlen sind am 08.08. erhoben; Erhebungs-Referenz steht jeweils dabei.
