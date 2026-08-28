@@ -676,10 +676,10 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
             while (i < a.size() && i < b.size() && a[i] == b[i]) { ++i; }
             // Das ERSTE abweichende Byte steht im Fehltext: wer den Befund liest,
             // soll die Stelle finden, nicht erst einen Diff fahren muessen.
-            melde(BefundArt::LizenztextAbweichend,
-                  "Lizenztext nicht byte-gleich: " + ziel + " (" + std::to_string(a.size()) + " Byte) gegen " +
-                      e.quelle + " (" + std::to_string(b.size()) + " Byte), erste Abweichung bei Byte " +
-                      std::to_string(i + 1));
+            melde(BefundArt::LizenztextAbweichend, "Lizenztext nicht byte-gleich: " + ziel + " (" +
+                                                       std::to_string(a.size()) + " Byte) gegen " + e.quelle + " (" +
+                                                       std::to_string(b.size()) + " Byte), erste Abweichung bei Byte " +
+                                                       std::to_string(i + 1));
         }
     }
 

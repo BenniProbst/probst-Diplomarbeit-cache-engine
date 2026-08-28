@@ -835,9 +835,9 @@ TEST(LizenzKern, FehlenderLizenztextIstRotMitLiteralFehltext) {
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, AbweichenderLizenztextIstRotUndNenntDasErsteByte) {
     {
-        LizenzEingang e     = gesunder_satz();
-        std::string&  kopie = e.dateiinhalt["LICENSES/LicenseRef-Alpha-1.0.txt"];
-        kopie[6]            = 'X'; // "Alpha Public" -> "Alpha Xublic": Byte 7, gezaehlt ab 1
+        LizenzEingang e        = gesunder_satz();
+        std::string&  kopie    = e.dateiinhalt["LICENSES/LicenseRef-Alpha-1.0.txt"];
+        kopie[6]               = 'X'; // "Alpha Public" -> "Alpha Xublic": Byte 7, gezaehlt ab 1
         const LizenzErgebnis r = pruefe(e);
 
         EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextAbweichend)) << ergebnis_bericht(r);
@@ -853,8 +853,7 @@ TEST(LizenzKern, AbweichenderLizenztextIstRotUndNenntDasErsteByte) {
         const LizenzErgebnis r        = pruefe(e);
 
         EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextAbweichend)) << ergebnis_bericht(r);
-        EXPECT_THAT(ergebnis_bericht(r),
-                    testing::HasSubstr("erste Abweichung bei Byte " + std::to_string(erwartet)));
+        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("erste Abweichung bei Byte " + std::to_string(erwartet)));
     }
     // T-4-GEGENEINGANG: der gesunde Satz traegt die byte-gleiche Kopie und bleibt gruen.
     EXPECT_FALSE(hat_befund(pruefe(gesunder_satz()), BefundArt::LizenztextAbweichend));
