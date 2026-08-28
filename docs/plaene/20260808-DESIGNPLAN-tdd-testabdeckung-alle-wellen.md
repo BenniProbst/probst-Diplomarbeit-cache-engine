@@ -233,7 +233,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = d3b5a3936d1136c86003bdbabff668a21a85378f
+PZW-CE-SHA         = bd55942ad12fdbbcda497b21f028c64e74915212
 PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
@@ -254,6 +254,20 @@ PZW-CI-ALTMUSTER   = 0
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
+> NACHZUG 28.08.2026 abends (super-/prt-art-Lande-Zug #153, Gitlink-Bump ce d3b5a393 ->
+> `bd55942a` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug; WIE
+> GEMESSEN, nicht gerechnet, mit den Formeln der Wache selbst ueber COMDARE_PLAN-Kopie +
+> COMDARE_GITLINK_SHA): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN unveraendert
+> **24**, LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 -- die gelandete Identitaets-Kette
+> d3b5a393..bd55942a (24 Commits: konform 41bf4c62 + pmc-dtlb-koeder 20d6dd2c + vo3-1
+> 01dc3122 + a5-reuse 8c861759 + gitleaks-Regel cc85bb91 + Komplex-Fix 60d997a6/63edf870/
+> e5cc566d + Heilung bd55942a) beruehrt KEINE `lazy_csv_header()`-Aufrufstelle. Nenner
+> **567** Test-.cpp (vorher 564 @ d3b5a393: +3 Test-TUs der Kette), 64 Rohzeilen, Kommentar
+> abgezogen; .gitlab-ci.yml-Nenner im Commit selbst um den VO3-1-Nachtrag-Kommentar gewachsen.
+> Drift-Biss VOR dem Nachzug rc=2 belegt ('Plan=d3b5a393... Gitlink=bd55942a...'); Kontroll-
+> Lauf am Alt-Baum d3b5a393 reproduziert 45/24/2/2/0 @ 564. Nur der CE-SHA der Ankertafel
+> wandert. Beleg-Logs: ~/backups-workflow/20260827-lande-reif/super-zug/super/pzw-*.log.
+> Vorheriger Nachzug darunter.
 > NACHZUG 25.08.2026 vormittags (A2.5-FIX-R1 der Rest-Landung; Gitlink-Ziel ce
 > `d3b5a393` -- der Bump faehrt ATOMAR im selben Lande-Commit wie dieser Nachzug;
 > WIE GEMESSEN, nicht gerechnet): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN

@@ -432,7 +432,7 @@
        deren <option>-Kinder die Stufen O0..Ofast tragen (Optionen der Unter-Achse, KEINE eigenen Achsen).
        Haupt-Achse 'external_utils' (6., Q2 Option C) traegt die Unter-Achse 'simd' (EIN Container), deren
        <option>-Kinder die Auspraegungen no_extension/avx2/avx512 tragen (symmetrisch zu compiler/opt_level).
-       Alles additiv (minOccurs=0); leer = CEB-Default (O3/no_extension).
+       Alles additiv (minOccurs=0); leer = CEB-Default (O2/no_extension; O2-Standard seit 22.08.2026, historisch O3).
        Der Planer permutiert die Optionen SELBST (opt-g). -->
   <xs:complexType name="SystemAxesType">
     <xs:sequence>

@@ -1222,6 +1222,12 @@ test:unit:
 # wegoptimierten Koeder. JEDE Beobachtbarkeits-Zusage ist unter -O0 SCHWAECHER als in der
 # CI -- deshalb muessen dieselben Tests in BEIDEN Stufen laufen.
 #
+# NACHTRAG 28.08.2026 (super-Zug #153, Gitlink ce bd55942a): seit VO3-1(b) gilt Release = -O2 -DNDEBUG
+# (CMAKE_C/CXX_FLAGS_RELEASE per CACHE-FORCE, OS-2-Gate cmake/vo31_optflag_gate.cmake, O2-Standard seit
+# 22.08.2026; ce 07039be5/94886aac). Der Messbefund 15437 oben (-O3, 09.08.) bleibt als Historie
+# unveraendert stehen; die Begruendung der Debug-Zweitstufe gilt fort: -O0 ist schwaecher als jede
+# Release-Stufe, auch als -O2.
+#
 # ZWEI JOBS STATT EINES SEQUENTIELLEN LAUFS: eine Compile-Regression zeigt sich damit als
 # GENAU EIN roter Job. Die Stufen-Attribution steht in der Pipeline-UI, nicht im Log-Grep.
 # EIGENES BAUVERZEICHNIS (Code/build-test-debug): zwei Stufen im selben Baum
