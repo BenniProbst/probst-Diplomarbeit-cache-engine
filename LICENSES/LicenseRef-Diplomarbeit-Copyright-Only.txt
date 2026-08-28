@@ -1,0 +1,22 @@
+Diplomarbeit -- Copyright Only (no license granted)
+
+Copyright (c) 2026 Benjamin-Elias Probst. All rights reserved.
+
+The files marked with this identifier are part of the diploma thesis
+(Diplomarbeit) of Benjamin-Elias Probst at Technische Universitaet Dresden:
+the thesis text and its drafts, compiled thesis PDFs, and the examination
+documents (exposes, registration forms, supervisor correspondence). They are
+the personal examination work of a natural person. They are not software and
+they carry no software license.
+
+No license is granted by this file. Reading, assessment, reproduction and
+archival by the examiners and archives of Technische Universitaet Dresden are
+governed by that institution's examination regulations; quotation and
+scientific citation are governed by applicable copyright law. Any other use
+requires the prior written permission of Benjamin-Elias Probst.
+
+This identifier records the decision of the copyright holder of 2026-08-10
+("Diplomarbeit ist nur copyright von Benjamin-Elias Probst"), confirmed on
+2026-08-25. Benjamin-Elias Probst (a natural person) and BEP Venture UG
+(haftungsbeschraenkt) (a company, rights holder of the Comdare Cache Engine)
+are two different legal persons; "BEP" on its own denotes neither of them.

@@ -95,8 +95,10 @@ using comdare::ci_wachen::GitignoreMuster;
 using comdare::ci_wachen::hat_befund;
 using comdare::ci_wachen::LizenzEingang;
 using comdare::ci_wachen::LizenzErgebnis;
+using comdare::ci_wachen::lizenztext_pfad;
 using comdare::ci_wachen::marker_ist_aussagekraeftig;
 using comdare::ci_wachen::NoticeArt;
+using comdare::ci_wachen::NoticeEintrag;
 using comdare::ci_wachen::parse_gitignore;
 using comdare::ci_wachen::parse_gitmodules;
 using comdare::ci_wachen::parse_notice;
@@ -122,7 +124,10 @@ LizenzEingang gesunder_satz() {
     e.notice_text       = "Beispiel-NOTICE\n"
                           "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
                           "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-                          "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+                          "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n"
+                          // Zusicherung 8 (25.08.2026): die Kopie unter LICENSES/ ist an
+                          // ihre Quelle im Submodul gebunden -- BYTE-GLEICH.
+                          "WACHE: LIZENZTEXT LicenseRef-Alpha-1.0.txt BYTEGLEICH ext/alpha/LICENSE\n";
     e.gitmodules_text   = "[submodule \"ext/alpha\"]\n"
                           "\tpath = ext/alpha\n"
                           "\turl = ../alpha.git\n"
@@ -141,6 +146,8 @@ LizenzEingang gesunder_satz() {
     e.dateiinhalt    = {
         {"ext/alpha/LICENSE", "Alpha Public License\nAlle Rechte irgendwem.\n"},
         {"Forschungsarbeiten/code/P99-Gamma/klon/LICENSE", "Gamma License\nVersion 1.\n"},
+        // Die Kopie nach Zusicherung 8: byte-gleich zu ext/alpha/LICENSE.
+        {"LICENSES/LicenseRef-Alpha-1.0.txt", "Alpha Public License\nAlle Rechte irgendwem.\n"},
     };
     e.spdx_funde = {SpdxFund{"Code/a.cpp", "Apache-2.0"}, SpdxFund{"Code/b.hpp", "Apache-2.0"}};
     // Die GRUNDGESAMTHEIT des SPDX-Zaehlers. Ein Zaehler ohne sie ist eine nackte
@@ -165,6 +172,7 @@ TEST(LizenzKern, GesunderSatzLiefertNULLBefundeUndGRUEN) {
     EXPECT_EQ(r.nenner_code_dateien, 7U);
     EXPECT_EQ(r.nenner_notice_submodul, 2U);
     EXPECT_EQ(r.nenner_notice_vendor, 1U);
+    EXPECT_EQ(r.nenner_notice_lizenztext, 1U);
     EXPECT_EQ(r.skips.size(), 0U) << "Im gesunden Satz ist alles ausgecheckt -- kein SKIP erwartet.";
     // Der Nenner steht in der AUSGABE, nicht nur im Feld -- und mit seiner
     // Grundgesamtheit. "2" allein ist eine Zahl ohne Herkunft.
@@ -332,10 +340,16 @@ TEST(LizenzKern, NichtAusgecheckesWirdNurGepaartUndProtokolliert) {
                                             << "machen -- sonst waere sie auf jedem frischen Klon konstant "
                                             << "rot und damit wertlos.\n"
                                             << ergebnis_bericht(r);
-    ASSERT_EQ(r.skips.size(), 1U) << "Der Verzicht MUSS protokolliert sein. Ein stiller Verzicht ist genau "
+    // ZWEI Verzichte, beide protokolliert: die Paarung der Submodul-Zeile UND die
+    // Byte-Probe der LIZENZTEXT-Zeile (Zusicherung 8), deren Quelle in demselben
+    // Submodul liegt. Am 25.08. gemessen: mit der neuen Zeile im gesunden Satz
+    // meldete dieser Fall "1 != 2" -- der zweite Verzicht ist gewollt, nicht Rauschen.
+    ASSERT_EQ(r.skips.size(), 2U) << "Der Verzicht MUSS protokolliert sein. Ein stiller Verzicht ist genau "
                                   << "die verdeckte Null, gegen die diese Wache gebaut ist.\n"
                                   << ergebnis_bericht(r);
-    EXPECT_THAT(r.skips.front(), testing::HasSubstr("ext/alpha"));
+    EXPECT_THAT(r.skips, testing::Each(testing::HasSubstr("ext/alpha")));
+    EXPECT_THAT(r.skips, testing::Contains(testing::HasSubstr("Submodul nicht ausgecheckt, nur gepaart")));
+    EXPECT_THAT(r.skips, testing::Contains(testing::HasSubstr("Lizenztext-Quelle nicht ausgecheckt")));
 
     // T-4-GEGENEINGANG: die PAARUNG gilt weiter. Nimmt man die NOTICE-Zeile des
     // nicht ausgecheckten Submoduls heraus, wird es trotzdem rot.
@@ -442,7 +456,7 @@ TEST(LizenzKern, ParseGitmodulesLiestGenauDiePathZeilen) {
     EXPECT_THAT(pfade, testing::ElementsAre("ext/a", "ext/b"));
 }
 
-TEST(LizenzKern, ParseNoticeUnterscheidetDieDreiZeilenformen) {
+TEST(LizenzKern, ParseNoticeUnterscheidetDieVierZeilenformen) {
     const std::string text = "Kopf ohne Marke\n"
                              "WACHE: SUBMODUL p/eins LIZENZ \"M1\" DATEI LICENSE\n"
                              "WACHE: SUBMODUL p/zwei KEINE-LIZENZDATEI\n"
@@ -476,6 +490,28 @@ TEST(LizenzKern, ParseNoticeUnterscheidetDieDreiZeilenformen) {
     ASSERT_EQ(leer.size(), 1U);
     EXPECT_FALSE(leer[0].wohlgeformt) << "Ein leerer Marker stuende als Substring in JEDER Datei -- "
                                       << "er waere eine Zusicherung, die nie reissen kann.";
+
+    // DIE VIERTE FORM (Zusicherung 8): <datei> nackt unter LICENSES/, <quelle> repo-relativ.
+    const auto vier = parse_notice("WACHE: LIZENZTEXT LicenseRef-X-1.0.txt BYTEGLEICH a/b/LICENSE\n");
+    ASSERT_EQ(vier.size(), 1U);
+    EXPECT_EQ(vier[0].art, NoticeArt::Lizenztext);
+    EXPECT_TRUE(vier[0].wohlgeformt);
+    EXPECT_EQ(vier[0].pfad, "LicenseRef-X-1.0.txt");
+    EXPECT_EQ(vier[0].quelle, "a/b/LICENSE");
+    EXPECT_TRUE(vier[0].marker.empty());
+    EXPECT_EQ(lizenztext_pfad(vier[0]), "LICENSES/LicenseRef-X-1.0.txt");
+    // GEGENEINGAENGE: ohne BYTEGLEICH, ohne Quelle, mit Pfad statt Dateiname -- alle unlesbar,
+    // keine davon stillschweigend verworfen (Nenner bleibt 1).
+    for (const char* kaputt : {"WACHE: LIZENZTEXT LicenseRef-X-1.0.txt GLEICH a/b/LICENSE\n",
+                               "WACHE: LIZENZTEXT LicenseRef-X-1.0.txt BYTEGLEICH\n",
+                               "WACHE: LIZENZTEXT sub/LicenseRef-X-1.0.txt BYTEGLEICH a/b/LICENSE\n"}) {
+        const auto k = parse_notice(kaputt);
+        ASSERT_EQ(k.size(), 1U) << kaputt;
+        EXPECT_FALSE(k[0].wohlgeformt) << kaputt;
+    }
+    // lizenztext_pfad ist fuer die drei alten Formen LEER -- sie benennen keine Kopie.
+    EXPECT_TRUE(lizenztext_pfad(e[0]).empty());
+    EXPECT_TRUE(lizenztext_pfad(e[2]).empty());
 }
 
 // =============================================================================
@@ -732,7 +768,9 @@ TEST(LizenzKern, ProsazeilenVonNoticeUndLicenseHaltenAsciiUndLaenge) {
         e.notice_text += "Eine Prosazeile mit einem Umlaut: \xc3\xa4\n"; // UTF-8 'ae'
         const LizenzErgebnis r = pruefe(e);
         EXPECT_TRUE(hat_befund(r, BefundArt::TextZeileNichtAscii)) << ergebnis_bericht(r);
-        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("NOTICE-Zeile 5 traegt Byte 0xC3"));
+        // Zeile 6, nicht 5: der gesunde Satz traegt seit Zusicherung 8 eine fuenfte
+        // Zeile (WACHE: LIZENZTEXT ...); die Prosazeile haengt dahinter.
+        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("NOTICE-Zeile 6 traegt Byte 0xC3"));
         EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
     }
     {
@@ -762,6 +800,133 @@ TEST(LizenzKern, ProsazeilenVonNoticeUndLicenseHaltenAsciiUndLaenge) {
         e.notice_text += "\tEingerueckte Prosa mit Tabulator.\n";
         EXPECT_FALSE(hat_befund(pruefe(e), BefundArt::TextZeileNichtAscii));
     }
+}
+
+// =============================================================================
+// ZUSICHERUNG (8), 25.08.2026 -- Owner X1: super bleibt Apache-2.0 und wird "um
+// die restriktive ce-Lizenz ERWEITERT". Der Volltext der Comdare Research
+// License liegt deshalb als Kopie unter LICENSES/ (REUSE 3.3), und NOTICE bindet
+// die Kopie per WACHE: LIZENZTEXT ... BYTEGLEICH ... an ihre Quelle im Submodul.
+// K20-K23 sind die permanenten Koeder dieser Bindung; der Rot-Lauf am ECHTEN
+// Baum (Kopie fehlt, dann Kopie mit einem gewuerfelten Byte) steht im Kopf von O7.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// K20 -- DIE KOPIE FEHLT. Genau der Zustand VOR diesem Paket: NOTICE nannte die
+// Comdare Research License zweimal beim Namen, ihr Text lag nirgends im Baum.
+// -----------------------------------------------------------------------------
+TEST(LizenzKern, FehlenderLizenztextIstRotMitLiteralFehltext) {
+    LizenzEingang e = gesunder_satz();
+    e.dateiinhalt.erase("LICENSES/LicenseRef-Alpha-1.0.txt");
+    const LizenzErgebnis r = pruefe(e);
+
+    EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextFehlt)) << ergebnis_bericht(r);
+    EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("Lizenztext fehlt: LICENSES/LicenseRef-Alpha-1.0.txt"));
+    EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
+    // T-4-Gegeneingang: die Quelle ist da und die Submodul-Zeile gesund -- nur die
+    // Kopie fehlt. Ein Test, der hier noch andere Befunde saehe, traefe nicht die Kopie.
+    EXPECT_EQ(r.befunde.size(), 1U) << ergebnis_bericht(r);
+}
+
+// -----------------------------------------------------------------------------
+// K21 -- DIE KOPIE WEICHT AB. "Aehnlich" ist kein Zustand: ein Byte genuegt, und
+// der Fehltext nennt das erste abweichende Byte, damit niemand einen Diff fahren
+// muss. Zweite Haelfte: die GEKUERZTE Kopie -- jedes Byte stimmt, die Laenge nicht.
+// -----------------------------------------------------------------------------
+TEST(LizenzKern, AbweichenderLizenztextIstRotUndNenntDasErsteByte) {
+    {
+        LizenzEingang e     = gesunder_satz();
+        std::string&  kopie = e.dateiinhalt["LICENSES/LicenseRef-Alpha-1.0.txt"];
+        kopie[6]            = 'X'; // "Alpha Public" -> "Alpha Xublic": Byte 7, gezaehlt ab 1
+        const LizenzErgebnis r = pruefe(e);
+
+        EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextAbweichend)) << ergebnis_bericht(r);
+        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("erste Abweichung bei Byte 7"));
+        EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
+        EXPECT_FALSE(hat_befund(r, BefundArt::LizenztextFehlt)) << "Die Kopie LIEGT -- sie ist nur falsch.";
+    }
+    {
+        LizenzEingang e     = gesunder_satz();
+        std::string&  kopie = e.dateiinhalt["LICENSES/LicenseRef-Alpha-1.0.txt"];
+        kopie.pop_back();
+        const std::size_t    erwartet = kopie.size() + 1;
+        const LizenzErgebnis r        = pruefe(e);
+
+        EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextAbweichend)) << ergebnis_bericht(r);
+        EXPECT_THAT(ergebnis_bericht(r),
+                    testing::HasSubstr("erste Abweichung bei Byte " + std::to_string(erwartet)));
+    }
+    // T-4-GEGENEINGANG: der gesunde Satz traegt die byte-gleiche Kopie und bleibt gruen.
+    EXPECT_FALSE(hat_befund(pruefe(gesunder_satz()), BefundArt::LizenztextAbweichend));
+}
+
+// -----------------------------------------------------------------------------
+// K22 -- DIE QUELLE. (a) In einem NICHT ausgecheckten Submodul: kein Rot auf dem
+// frischen Klon, aber ein PROTOKOLLIERTER Verzicht -- und die Kopie bleibt
+// verlangt. (b) Ausgecheckt, aber weg: rot.
+// -----------------------------------------------------------------------------
+TEST(LizenzKern, LizenztextQuelleNichtAusgecheckIstSkipUndFehlendeQuelleIstRot) {
+    {
+        LizenzEingang e                  = gesunder_satz();
+        e.submodule_am_baum["ext/alpha"] = SubmodulAmBaum{false, {}};
+        e.dateiinhalt.erase("ext/alpha/LICENSE"); // am Baum waere die Datei ebenfalls weg
+        const LizenzErgebnis r = pruefe(e);
+
+        EXPECT_EQ(r.status, WacheStatus::Gruen) << ergebnis_bericht(r);
+        EXPECT_FALSE(hat_befund(r, BefundArt::LizenztextQuelleFehlt)) << ergebnis_bericht(r);
+        EXPECT_THAT(r.skips, testing::Contains(testing::HasSubstr("Lizenztext-Quelle nicht ausgecheckt")));
+
+        LizenzEingang ohne_kopie = e;
+        ohne_kopie.dateiinhalt.erase("LICENSES/LicenseRef-Alpha-1.0.txt");
+        EXPECT_TRUE(hat_befund(pruefe(ohne_kopie), BefundArt::LizenztextFehlt))
+            << "Nicht ausgecheckt heisst NUR: keine Byte-Probe. Die Kopie bleibt verlangt.";
+    }
+    {
+        LizenzEingang e = gesunder_satz();
+        e.notice_text += "WACHE: LIZENZTEXT LicenseRef-Weg-1.0.txt BYTEGLEICH ext/beta/LICENSE-WEG\n";
+        e.dateiinhalt["LICENSES/LicenseRef-Weg-1.0.txt"] = "Weg License\n";
+        const LizenzErgebnis r                           = pruefe(e);
+
+        EXPECT_TRUE(hat_befund(r, BefundArt::LizenztextQuelleFehlt)) << ergebnis_bericht(r);
+        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("Lizenztext-Quelle fehlt am Baum: ext/beta/LICENSE-WEG"));
+        EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// K23 -- GRAMMATIK UND "GENAU EINE" der vierten Zeilenform, und die Trennung von
+// den Submodul-Zeilen: eine LIZENZTEXT-Zeile darf die Paarung .gitmodules <->
+// NOTICE nicht verschieben.
+// -----------------------------------------------------------------------------
+TEST(LizenzKern, LizenztextZeileGrammatikGenauEineUndKeineSubmodulZeile) {
+    {
+        LizenzEingang e = gesunder_satz();
+        e.notice_text += "WACHE: LIZENZTEXT LicenseRef-Alpha-1.0.txt BYTEGLEICHzz ext/alpha/LICENSE\n";
+        const LizenzErgebnis r = pruefe(e);
+        EXPECT_TRUE(hat_befund(r, BefundArt::NoticeZeileUnlesbar)) << ergebnis_bericht(r);
+    }
+    {
+        // Ein Pfad statt eines Dateinamens: die Kopie MUSS unter LICENSES/ liegen.
+        LizenzEingang e = gesunder_satz();
+        e.notice_text += "WACHE: LIZENZTEXT ext/alpha/LICENSE BYTEGLEICH ext/alpha/LICENSE\n";
+        const LizenzErgebnis r = pruefe(e);
+        EXPECT_TRUE(hat_befund(r, BefundArt::NoticeZeileUnlesbar)) << ergebnis_bericht(r);
+    }
+    {
+        LizenzEingang e = gesunder_satz();
+        e.notice_text += "WACHE: LIZENZTEXT LicenseRef-Alpha-1.0.txt BYTEGLEICH ext/alpha/LICENSE\n";
+        const LizenzErgebnis r = pruefe(e);
+        EXPECT_TRUE(hat_befund(r, BefundArt::NoticeZeileMehrfach)) << ergebnis_bericht(r);
+        EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("NOTICE nennt denselben LIZENZTEXT 2 mal"));
+        EXPECT_EQ(r.nenner_notice_lizenztext, 2U);
+        EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
+    }
+    const LizenzErgebnis g = pruefe(gesunder_satz());
+    EXPECT_EQ(g.nenner_notice_submodul, 2U) << "Die LIZENZTEXT-Zeile darf nicht als Submodul-Zeile zaehlen.";
+    EXPECT_EQ(g.nenner_notice_lizenztext, 1U);
+    EXPECT_FALSE(hat_befund(g, BefundArt::NoticeZeileOhneSubmodul));
+    EXPECT_FALSE(hat_befund(g, BefundArt::MarkerOhneAussagekraft)) << "Ihr leerer Marker ist kein Marker.";
+    EXPECT_THAT(ergebnis_bericht(g), testing::HasSubstr("NENNER NOTICE LIZENZTEXT-Zln : 1"));
 }
 
 // =============================================================================
@@ -940,6 +1105,71 @@ TEST_F(LizenzAmObjekt, JederMarkerDerEchtenNoticeTraegtAussagekraft) {
             << "NOTICE-Zeile " << e.zeile << " traegt den Marker \"" << e.marker
             << "\" -- er faellt unter die Untergrenze der Aussagekraft.";
     }
+}
+
+// -----------------------------------------------------------------------------
+// O7 -- DER COMDARE-LIZENZTEXT AM ECHTEN BAUM (Zusicherung 8). NOTICE muss die
+// Kopie LICENSES/LicenseRef-Comdare-Research-1.0.txt an die LICENSE des
+// cache-engine-Submoduls binden; die Kopie muss liegen; ist das Submodul
+// ausgecheckt, muss sie byte-gleich sein. Der Nenner (Zahl der LIZENZTEXT-Zeilen)
+// steht in der Ausgabe, der ASSERT auf die Zahl VOR jeder Schleife.
+//
+// DER ROT-LAUF VOR DER HEILUNG (25.08.2026, Worktree bau/a5-lizenz-community,
+// ce-Submodul ausgecheckt @ d3b5a393; Literale im Beweisort
+// ~/backups-workflow/20260825-a5-lizenz-community/wache-rot-{1,2}-*.txt):
+//   Lauf 1, LICENSES/ existiert nicht: "88% tests passed, 4 tests failed out of
+//     32", BEFUND [LizenztextFehlt] Lizenztext fehlt:
+//     LICENSES/LicenseRef-Comdare-Research-1.0.txt (NOTICE-Zeile 135, Quelle
+//     Code/external/comdare-cache-engine/LICENSE) -- dieser Fall und O2 rot.
+//   Lauf 2, Kopie mit EINEM gewuerfelten Byte (R=1278807404 aus /dev/urandom,
+//     POS0 = R mod 15810 = 15554, Byte 15555 ' ' -> '#'; cmp: "differ: byte
+//     15555, line 320"): BEFUND [LizenztextAbweichend] Lizenztext nicht
+//     byte-gleich: LICENSES/LicenseRef-Comdare-Research-1.0.txt (15810 Byte)
+//     gegen Code/external/comdare-cache-engine/LICENSE (15810 Byte), erste
+//     Abweichung bei Byte 15555 -- die Wache nennt genau das gewuerfelte Byte.
+//   Lauf 3, byte-treue Kopie (sha256 608b94b0...): O2 und O7 gruen.
+// -----------------------------------------------------------------------------
+TEST_F(LizenzAmObjekt, NoticeBindetDenComdareLizenztextByteGleichAnDasCeSubmodul) {
+    ASSERT_TRUE(eingang_->notice_vorhanden) << "Ohne NOTICE hat dieser Fall keinen Gegenstand.";
+    const auto           eintraege   = parse_notice(eingang_->notice_text);
+    std::size_t          lizenztexte = 0;
+    const NoticeEintrag* comdare     = nullptr;
+    for (const auto& e : eintraege) {
+        if (e.art != NoticeArt::Lizenztext || !e.wohlgeformt) { continue; }
+        ++lizenztexte;
+        if (e.pfad == "LicenseRef-Comdare-Research-1.0.txt") { comdare = &e; }
+    }
+    ASSERT_GT(lizenztexte, 0U) << "NENNER 0 LIZENZTEXT-Zeilen in NOTICE -- die Bindung waere leer.";
+    ASSERT_NE(comdare, nullptr) << "NOTICE bindet LICENSES/LicenseRef-Comdare-Research-1.0.txt an keine Quelle.";
+    EXPECT_EQ(comdare->quelle, "Code/external/comdare-cache-engine/LICENSE");
+    std::cerr << "O7 NENNER: " << lizenztexte << " LIZENZTEXT-Zeile(n); Comdare-Quelle " << comdare->quelle << "\n";
+
+    const std::string ziel = lizenztext_pfad(*comdare);
+    ASSERT_TRUE(std::filesystem::is_regular_file(wurzel_ / ziel)) << "Die Kopie fehlt am Baum: " << ziel;
+
+    const auto am_baum = eingang_->submodule_am_baum.find("Code/external/comdare-cache-engine");
+    ASSERT_NE(am_baum, eingang_->submodule_am_baum.end()) << "Das ce-Submodul steht nicht in .gitmodules.";
+    if (!am_baum->second.ausgecheckt) {
+        // Frischer Klon ohne `git submodule update`: die Byte-Probe entfaellt,
+        // der Verzicht steht in der Ausgabe -- und in den SKIPs des Pruefkerns.
+        std::cerr << "O7 SKIP: ce-Submodul nicht ausgecheckt -- Byte-Probe entfaellt, Kopie liegt.\n";
+        EXPECT_THAT(pruefe(*eingang_).skips,
+                    testing::Contains(testing::HasSubstr("Lizenztext-Quelle nicht ausgecheckt")));
+        return;
+    }
+    const auto kopie  = eingang_->dateiinhalt.find(ziel);
+    const auto quelle = eingang_->dateiinhalt.find(comdare->quelle);
+    ASSERT_NE(kopie, eingang_->dateiinhalt.end()) << "Der Sammler hat die Kopie nicht gelesen: " << ziel;
+    ASSERT_NE(quelle, eingang_->dateiinhalt.end()) << "Der Sammler hat die Quelle nicht gelesen: " << comdare->quelle;
+    ASSERT_GT(quelle->second.size(), 0U) << "NENNER 0 Byte in der Quelle -- ein Vergleich mit nichts.";
+    std::cerr << "O7 NENNER: Kopie " << kopie->second.size() << " Byte, Quelle " << quelle->second.size() << " Byte.\n";
+    EXPECT_EQ(kopie->second.size(), quelle->second.size());
+    EXPECT_TRUE(kopie->second == quelle->second) << "Kopie und Quelle sind nicht byte-gleich.";
+
+    const LizenzErgebnis r = pruefe(*eingang_);
+    EXPECT_FALSE(hat_befund(r, BefundArt::LizenztextFehlt)) << ergebnis_bericht(r);
+    EXPECT_FALSE(hat_befund(r, BefundArt::LizenztextQuelleFehlt)) << ergebnis_bericht(r);
+    EXPECT_FALSE(hat_befund(r, BefundArt::LizenztextAbweichend)) << ergebnis_bericht(r);
 }
 
 } // namespace
