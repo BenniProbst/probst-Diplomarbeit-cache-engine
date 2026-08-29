@@ -195,3 +195,32 @@ Extrakt `~/.claude/jobs/5a19728e/tmp/fold_r2_rueckkehrer_extrakt.txt`; MEMORY-Ba
 `~/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1.jsonl` (traegt Tokens -> nie committen).
 
 Selbstcheck: ASCII-only, Zeilen <= 120, alle Zahlen aus Messungen dieses Kontexts (17:06Z), keine Vorhersagen.
+
+## WIEDERANLAUF-NACHTRAG 29.08. 17:14-17:22Z (Owner: "Die Pause ist vorbei, bitte resume ALLE Agenten und Workflows
+## und fahre wie gehabt mit der offenen Arbeit fort. Bitte vollziehe ausserdem als erstes das bekannte Kipp-Einlese-Ritual")
+
+Ritual VOLL (Nenner): ARBEITSWEISE-DICHT 704/704 Z. (58227 B, 3 Portionen bis Dateiende) * Memories mtime >= 27.08.
+19/19 (17 in 2 Batches + kontextuebergabe-20260825 + kontextende-1715Z) * GOAL-V8-DICHT 506/506 * WELLENPLAN-DICHT
+W-0/W-H (Z.1-321) + W-6 (Z.900-1679) * DESIGNPLAN-DICHT D0 (Z.1-41) + D11 (Z.317-357) * Ledger-Kopf KON133 (Z.1-45,
+34849 Z.) * PAUSE-PROTOKOLL-9 116/116 * Session-Doc pause9 197/197 * KON134-ENTWURF 193/193 * Uebergabe 1715Z (eigener
+Text) * Objekt-Ist (pgrep, df 20G, Journale). X-19: Fold-R2-Extrakt 97028 B / 336 Z. VOLL gelesen (7 Reduce-Results +
+KONSOLIDAT-C-Map; Nebenfunde b02: Owner-B-Serie 25.08. L282-291 annotiert; K1271 E18-Ort widerlegt durch L28891/L28894).
+X-15-Probe 17:14:49Z: pgrep wf_c37fb077 leer, Journal 359 Z. mtime 12:55:12Z unveraendert -> Resume zulaessig.
+NOT-ABGABEN-PATCH (Owner-Doktrin 29.08.): reduce2/reduce-{03,05,06,08,09,11,12,15}.md, refute2/refute-{01,02,04,14}.md,
+zusatz2/ZUSATZ-NACHTRAEGE.md + arbeit/ -> je .riss2 umbenannt (reduce-16 hatte nie geschrieben); Script-Patch (Backup
+~/.claude/jobs/5a19728e/tmp/fold-vor-riss2-patch-2917.js.bak): RISS2={3,5,6,8,9,11,12,15,16} + Prompt-Marker NUR fuer
+diese Batches (Map-Bereich Z.100-135 byteidentisch = Cache der 20 Map- + 7 Reduce-Results bleibt), Refuter-/Zusatz-
+Prompts mit .riss2-Klausel (alle 7 Refuter + Zusatz waren FAILED, Cache irrelevant).
+RESUME 17:19:50Z Fold-R2 wf_c37fb077-ef7 (Task wa6msl3pa): Journal 359 -> 375 Z., 16 frische Agenten (Cap 16 = 9 Reduce
++ Zusatz + 6 Refuter der Cache-Batches, 1 wartet), Modell-Wache 16/16 "claude-fable-5".
+START 17:21:06Z verify-47 wf_401a0ff3-a98 (Task weowlst9w; Script gepatcht: args.kal_pfad = Datei
+47-kalibrier/KALIBRIER-RESULT-a1a1451f.json + LAGE47-Block "TRAEGT nur fuer amd, intel kontaminiert/offen"); 1 Agent
+claude-fable-5.
+START 17:21:17Z E-10/Stempel-2-Lande-Zug wf_bf22ab45-485 (Task wtuxmfa2p; Script gepatcht P1 R6 = JOB-Listung (Zombie
+288/16275 ohne Jobs = keine Host-Last), P2 Reihenfolge E10 -> Review -> Stempel2 -> #114-Re-Run-2 -> EIN super-Bump auf
+der finalen Linie, P3 R4-Zombie 288 = Commit lokal + Wachen, KEIN Push, stopp "R4-ZOMBIE" nicht-fatal -> Verify/Fix;
+Backup lande-e10-stempel2-2908.js.bak-vor-p1p3); 1 Agent claude-fable-5. Bauslots: 1 von 3 belegt (E-10 K17), Fold +
+verify-47 = read-only.
+OFFEN (Owner, je ein Satz): E-1 Zombie 16275/16280 canceln oder Design-Fix; E-2 prod2-Speicherbremse + C-02; E-3 codex
+login. Board: #159/#160/#133/#147 nachgezogen. Zeit-Korrektur: die Uebergabe-Zeilen "17:0xZ/17:1xZ" sind exakt
+17:04-17:15Z; der Resume lag bei 17:19Z (nicht 17:5xZ, wie im Board-Text #133 geschrieben).
