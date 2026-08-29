@@ -196,8 +196,9 @@ Extrakt `~/.claude/jobs/5a19728e/tmp/fold_r2_rueckkehrer_extrakt.txt`; MEMORY-Ba
 
 Selbstcheck: ASCII-only, Zeilen <= 120, alle Zahlen aus Messungen dieses Kontexts (17:06Z), keine Vorhersagen.
 
-## WIEDERANLAUF-NACHTRAG 29.08. 17:14-17:22Z (Owner: "Die Pause ist vorbei, bitte resume ALLE Agenten und Workflows
-## und fahre wie gehabt mit der offenen Arbeit fort. Bitte vollziehe ausserdem als erstes das bekannte Kipp-Einlese-Ritual")
+## WIEDERANLAUF-NACHTRAG 29.08. 17:14-17:22Z (Owner: "Die Pause ist vorbei, bitte resume ALLE Agenten und
+## Workflows und fahre wie gehabt mit der offenen Arbeit fort. Bitte vollziehe ausserdem als erstes das bekannte
+## Kipp-Einlese-Ritual")
 
 Ritual VOLL (Nenner): ARBEITSWEISE-DICHT 704/704 Z. (58227 B, 3 Portionen bis Dateiende) * Memories mtime >= 27.08.
 19/19 (17 in 2 Batches + kontextuebergabe-20260825 + kontextende-1715Z) * GOAL-V8-DICHT 506/506 * WELLENPLAN-DICHT
