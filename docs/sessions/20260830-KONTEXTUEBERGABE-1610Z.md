@@ -182,8 +182,8 @@ Uebrig aus Abschn. 0.1c: nichts -- Punkt (c) ist erledigt; es LEBEN nur noch die
    K17 @ dd0f56d3 lief DETACHED (nohup, alle4fix.sh): Stand 21:10Z 3/4 Zellen GRUEN je LITERAL
    '100% tests passed, 0 tests failed out of 555', Zelle 4 gcc-rel lief; Terminal-Marker ALLE4_RC= in
    fix-landung/k17/alle4fix.out; Lead-Watcher bt5t0eksh wartet darauf.
-3. REST = LEAD-VOLLZUG nach Rezept (a)-(g) in ~/backups-workflow/20260829-lande-e10-stempel2/fix-landung/STAND.md (BO = ~/backups-workflow/
-   20260829-lande-e10-stempel2; alle Skripte liegen bereit): (b) review_fix.sh Warnungen 2x 0 NEU ->
+3. REST = LEAD-VOLLZUG nach Rezept (a)-(g) in BO/fix-landung/STAND.md (BO ab hier =
+   ~/backups-workflow/20260829-lande-e10-stempel2; alle Skripte liegen bereit): (b) review_fix.sh Warnungen 2x 0 NEU ->
    (c) floor/treppe_fix.sh build-k17-gcc-rel fix (555/551/549 unveraendert) -> (d) tabu_nachher_fix.sh +
    Lock Einzeltarget-Bau (cmake --build build-k17-gcc-rel --target comdare_axis_version_lock; --check
    719/713) + SA-Pin #554/#555 aus k17-Logs -> (e) gates/gates.sh fix-dd0f56d3 (6/6) + gitleaks_fix.sh
@@ -231,8 +231,8 @@ Uebrig aus Abschn. 0.1c: nichts -- Punkt (c) ist erledigt; es LEBEN nur noch die
   CI-Literalen, 0 weitere) -> Fix-Commit dd0f56d3 (6 NSDMI nach Bestandsidiom: '= false'/'= nullptr'/
   '= 0'; +7/-7; Aggregat-Braced-Init-Verwendungen mit vollen Feldlisten bleiben gueltig) -> T-1 GRUEN
   rc=0 + clang-format-22 --dry-run -Werror rc=0 -> TABU-VORHER identisch -> K17 detached.
-- Beweisorte: ~/backups-workflow/20260829-lande-e10-stempel2/fix-landung/ (STAND.md + t1-rot/-gruen + fix-diff.patch + k17/ + Skripte) +
-  ~/backups-workflow/20260829-lande-e10-stempel2/stempel2-landung/ (voll) + ~/backups-workflow/20260829-lande-e10-stempel2/stempel2-review/ (Erhebung/Bewertung/Codex-Probe).
+- Beweisorte (je unter BO/): fix-landung/ (STAND.md + t1-rot/-gruen + fix-diff.patch + k17/ + Skripte) +
+  stempel2-landung/ (voll) + stempel2-review/ (Erhebung/Bewertung/Codex-Probe).
 
 ### N2.2 Lehren dieses Fensters (fuer den naechsten Kontext)
 
