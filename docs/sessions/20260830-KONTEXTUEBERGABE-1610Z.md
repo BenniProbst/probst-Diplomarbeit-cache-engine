@@ -112,7 +112,7 @@ gegen owner-kerne, KON134-09/10.
 2 Runden: R1 TRAEGT_MIT_FIXES (6 Funde) -> Fixes; R2 TRAEGT_MIT_FIXES (F-7 df-Zeitetiketten BEHOBEN, F-8
 Planer-s19_kampagne-Zeile VERTAGT mit Kenntnisnahme). amd-Ernte TRAEGT (0.521 s/DLL 'Fenster-0:64 @16W ccache'
 n=128, Obergrenze 302.9 h; 457198 B n=500; 239.7 GB; Ebene-B +1616; gn_out 4/4). intel kontaminiert (earlyoom
-frisch 09:52Z reproduziert). 🔴 F-3: R-8 Drift-Gate-Rerun-Rate des MESSWEGS = ##49-GO-VORBEDINGUNG (braucht
+frisch 09:52Z reproduziert). WICHTIG F-3: R-8 Drift-Gate-Rerun-Rate des MESSWEGS = ##49-GO-VORBEDINGUNG (braucht
 Messlauf/Re-Run-3). F-6 (PMC_VENDOR=amd beide Grandchilds) + F-8 = Lead-Posten naechste ce-Welle.
 
 ## 5. Kontext-Chronik 30.08. (fuer KON135-Entwurf)
