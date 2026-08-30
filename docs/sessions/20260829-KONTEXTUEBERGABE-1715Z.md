@@ -225,3 +225,15 @@ verify-47 = read-only.
 OFFEN (Owner, je ein Satz): E-1 Zombie 16275/16280 canceln oder Design-Fix; E-2 prod2-Speicherbremse + C-02; E-3 codex
 login. Board: #159/#160/#133/#147 nachgezogen. Zeit-Korrektur: die Uebergabe-Zeilen "17:0xZ/17:1xZ" sind exakt
 17:04-17:15Z; der Resume lag bei 17:19Z (nicht 17:5xZ, wie im Board-Text #133 geschrieben).
+
+## WIEDERANLAUF-NACHTRAG 2 -- 30.08. 09:2x-09:32Z (nach Riss 3 + K27-Befund)
+
+Riss 3 (Fable-Limit 29.08. ~17:3xZ) traf alle 3 Laeufe. K27 (Owner-Befund bestaetigt): Workflow-Cache ist
+PRAEFIX-basiert -- der Zusatz-Sichter-Prompt-Patch (Call VOR der Reduce-pipeline) brach den Praefix, alle 16
+Reduce liefen frisch (7 doppelt, ~2,3M Tokens; Memory reference_workflow_cache_ist_praefix_basiert). Ertrag von
+Lauf 3: 7 Reduce regulaer fertig; verify-47-R1 TRAEGT_MIT_FIXES (6 Funde, F-3 MITTEL: R-8-Rerun-Rate vor ##49
+erheben); E-10 bis Merge 5e03c2cc + K17-Zelle 1 GRUEN 553/553. HEILUNG 30.08.: Fold = NEUER datei-basierter Run
+wf_fe1cf67c-94e (fold-rest-3008.js: Reduce-Rest 9 in 3 Wellen a <=4, Refuter 16 in 4 Wellen a 4, Zusatz W1,
+Assembleur, Final-Wache; Eingaenge aus Journal als Dateien extrahiert; reduce-14 bereinigt; .riss3-Umbenennung);
+verify-47 + E-10 als Resume mit byte-unveraenderten Scripts (Verify kam aus dem Cache = Praefix-Regel bewiesen;
+E-10-Fahrer frisch mit WIEDERANLAUF-Klausel ab K17-Zelle 2). Alle neuen Agenten claude-fable-5. E-1/E-2/E-3 offen.
