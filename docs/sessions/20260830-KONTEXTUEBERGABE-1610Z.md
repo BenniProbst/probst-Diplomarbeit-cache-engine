@@ -169,3 +169,81 @@ CI 286/16286 (ce main @ 5e03c2cc) = SUCCESS 16:21:51Z (27 Jobs = 26 success + 1 
 development+main == 5e03c2cc. E-10-PHASE 1 DAMIT RESTLOS KOMPLETT (Kette V3 voll belegt); STAND.md
 abgeschlossen. Der laufende Stempel-2-Lande-Fahrer findet die 286-Jobliste jetzt frei (sein Vorflug-Gate).
 Uebrig aus Abschn. 0.1c: nichts -- Punkt (c) ist erledigt; es LEBEN nur noch die zwei Workflows (a) + (b).
+
+## NACHTRAG 2 (~21:15Z, vor Compact): STEMPEL-2-LANDUNG + CI-ROT-HEILUNG + RISS 5 -- LEBENDER STAND
+
+### N2.0 Was JETZT gilt (ersetzt Abschn. 0 fuer den naechsten Kontext)
+
+1. ce origin==github: development==ffb512a6 (Stempel-2-Merge, Pipeline 16287 ROT s.u.), main==5e03c2cc (GRUEN,
+   unberuehrt). Lokal in /home/comdare/wt-ce-lande4: HEAD dd0f56d3 = ffb512a6 + cppcheck-Fix-Commit, UNGEPUSHT.
+2. FIX-ZUG wf_e1751971-949 (Script ~/.claude/jobs/5a19728e/tmp/fix-stempel2-3008.js, vom Lead VOLL gelesen
+   120 Z./32880 B, TRAEGT; Gate-Patch: Fortsetzer-Gate TURN-ENDE-durchlaessig): Run TERMINAL nach 2 Agenten
+   (Fahrer + Fortsetzer, je Turn-Ende bei laufendem K17 -- 3x belegtes Muster 'Agent stirbt am Warten').
+   K17 @ dd0f56d3 lief DETACHED (nohup, alle4fix.sh): Stand 21:10Z 3/4 Zellen GRUEN je LITERAL
+   '100% tests passed, 0 tests failed out of 555', Zelle 4 gcc-rel lief; Terminal-Marker ALLE4_RC= in
+   fix-landung/k17/alle4fix.out; Lead-Watcher bt5t0eksh wartet darauf.
+3. REST = LEAD-VOLLZUG nach Rezept (a)-(g) in ~/backups-workflow/20260829-lande-e10-stempel2/fix-landung/STAND.md (BO = ~/backups-workflow/
+   20260829-lande-e10-stempel2; alle Skripte liegen bereit): (b) review_fix.sh Warnungen 2x 0 NEU ->
+   (c) floor/treppe_fix.sh build-k17-gcc-rel fix (555/551/549 unveraendert) -> (d) tabu_nachher_fix.sh +
+   Lock Einzeltarget-Bau (cmake --build build-k17-gcc-rel --target comdare_axis_version_lock; --check
+   719/713) + SA-Pin #554/#555 aus k17-Logs -> (e) gates/gates.sh fix-dd0f56d3 (6/6) + gitleaks_fix.sh
+   (NENNER 1==1) -> (f) r4_check_fix.sh -> Dual-Push dd0f56d3...:refs/heads/development origin+github,
+   ls-remote 2/2, EINE Pipeline -> ci_poller_fix.sh -> N-O27-Jobliste namentlich (lint:static,
+   test:coverage-guard, test:unit(+debug), build:clang, test:unit:clang(+debug)) + FUND-QUITTUNG additiv ->
+   (g) main-FF: Diff-Hygiene kumulativ origin/main..HEAD (6 Commits: 360fe107 7c945f11 70bc2228 bb5b6949
+   ffb512a6 dd0f56d3, LIVE bestaetigt) + gitleaks 6==6 + R4 + Push VOLLE SHA + CI main terminal +
+   Nachmessung 4/4. DANACH: Workflow({scriptPath: fix-stempel2-3008.js, resumeFromRunId: 'wf_e1751971-949'})
+   -> Fahrer+Fortsetzer replayen aus Cache, Zug laeuft in #114-Re-Run-2 -> super-Bump (R4-ZOMBIE E-1
+   nicht-fatal, Commit lokal) -> Verify <=3 + Fix.
+4. FOLD wf_fe1cf67c-94e LEBT (Task wh5l1lje3): Fix-r2 b01/b03/b04 + Refuter-Wellen 2-4 -> Assembleur ->
+   Final-Wache. NIE doppelt resumen; bei Riss byte-unveraendert (K27).
+5. super development LOKAL jetzt 9 docs-Commits vor origin 8be694ef (+ d21ccbd0 16286-Nachtrag + dieser);
+   Push weiter E-1-gated. Owner offen: E-1 (Zombie 16275/16280), E-2 (prod2-Speicher + C-02), E-3
+   (codex login -- Lens fiel 15:43:32Z erneut mit frischer Probe aus).
+
+### N2.1 Chronik 16:2x-21:15Z (Kern, chronologisch)
+
+- 16:2x-16:31Z Kipp-Ritual VOLL (DICHT-Form: ARBEITSWEISE 704/704, GOAL 506/506, Wellenplan W-0+W-H+W-6,
+  Designplan D0+D11, Ledger-Kopf KON133, diese Uebergabe 171/171, Memories 3 Tage 21/21 = 1512 Z.).
+- RISS 5 (Session-Limit, Reset 20:30Z) traf genau 4 Agenten: Fold fix:b01/b03/b04:r2 + Stempel-2-Lande-
+  Fahrer (beim Start). Wellen-/Kaskaden-Struktur hielt; STOPP-Returns planmaessig.
+- Rueckkehrer VOLL verbucht (X-19): Stempel-2-REVIEW komplett -- Codex-Lens AUSFALL ('Not logged in'
+  rc=1 15:43:32Z, Binary ok 0.146.0, CODEX-AUSFALL-PROBE-20260830.md; Ersatz-Lens A2.6 = Opus+Fable),
+  Opus-ERHEBUNG 39 Befunde O-01..O-39 (11/11 Dateien, Diff 2190+3, TABU 0/832, Weiche-A 9/9 0-Diff),
+  Fable-BEWERTUNG urteil=TRAEGT 0 MUSS / 14 SOLL / 25 ENTLASTET (O-32/O-33 = Lande-Handgriffe; 11
+  SOLL-Posten in stempel2-landung/FUND-QUITTUNG.md). FOLD: Reduce 16/16 + Refuter-WELLE 1 komplett
+  (B2 FERTIG NULL_NEUE_FUNDE, 3 R1-Funde BEHOBEN-nachgemessen; B1 4 Funde / B3 2 / B4 4, alle MILD/
+  KLEIN, KEIN Urteils-Kipp); Zusatz-Sichter 234 -> 168 entlastet / 58 NACHTRAEGE / 8 verworfen
+  (zusatz2/ZUSATZ-NACHTRAEGE.md).
+- 20:33Z beide Resumes byte-unveraendert (X-15 2x-Probe, Pseudo-Grep 0/26, Fortschreib-Duplikat-Check:
+  Ziel-Dateien der Toten unberuehrt).
+- STEMPEL-2-LANDUNG (Fahrer-Kaskade ueber Riss 5, nichts doppelt): Merge ffb512a6 (--no-ff bb5b6949 auf
+  5e03c2cc; O-32 CMakeLists BEIDE Bloecke sequentiell +54/-0, O-33 Floor RELATIV +2 = 555/551/549 LIVE
+  per Treppe + T-1 UEBER/UNTER), K17 4/4 KALT je '555/555' (SA-Pin #554/#555), TABU 832+833 sha
+  vorher==nachher, Lock 719/713, Gates 6/6, gitleaks 5==5, Dual-Push dev -> CI 286/16287 FAILED
+  17:35:00Z: Job 386485 lint:static (cppcheck 2.21.0, allow_failure=false) = 6x [uninitMemberVarNoCtor]
+  (apps/modul_emitter/main.cpp:121 ManifestZeile::gestempelt + tests/unit/test_stempel2_vertragspaare.cpp
+  :40/41/43/44/45 Fixture-Member; deterministisch, Klasse CODE; cppcheck = weder Pre-Push-Gate noch
+  Compiler-Warnflaeche, Codex-Lens war aus -> exakt die ungedeckte Luecke, die CI fing als Zweitlens);
+  22 success + 3 clang-Folge-skips; STOPP doktringemaess, KEIN main-FF, kein eigenmaechtiger Fix.
+- FIX-ZUG (Lead-GO, Defekt-Doktrin): T-1 ROT literal (lint:static-Formel aus ci-templates
+  base-pipeline.yml; lokales cppcheck 2.21.0 == CI, KEIN Versions-Delta; rc=2 mit GENAU den 6
+  CI-Literalen, 0 weitere) -> Fix-Commit dd0f56d3 (6 NSDMI nach Bestandsidiom: '= false'/'= nullptr'/
+  '= 0'; +7/-7; Aggregat-Braced-Init-Verwendungen mit vollen Feldlisten bleiben gueltig) -> T-1 GRUEN
+  rc=0 + clang-format-22 --dry-run -Werror rc=0 -> TABU-VORHER identisch -> K17 detached.
+- Beweisorte: ~/backups-workflow/20260829-lande-e10-stempel2/fix-landung/ (STAND.md + t1-rot/-gruen + fix-diff.patch + k17/ + Skripte) +
+  ~/backups-workflow/20260829-lande-e10-stempel2/stempel2-landung/ (voll) + ~/backups-workflow/20260829-lande-e10-stempel2/stempel2-review/ (Erhebung/Bewertung/Codex-Probe).
+
+### N2.2 Lehren dieses Fensters (fuer den naechsten Kontext)
+
+- 'Agent stirbt am Warten' ist STRUKTURELL (3x heute: E-10-Fahrer-3 an 16286, Fix-Fahrer + Fortsetzer an
+  K17): lange Waits (CI ~45 min, K17 ~22 min) gehoeren in DETACHED-Prozesse + Lead-Watcher; Workflow-
+  Agenten fahren die kurzen, dichten Phasen. NICHT-FATAL-stopp + Lead-Uebernahme = bewaehrtes Muster.
+- K27-Praxis bestaetigt: Resume byte-unveraendert cachte 22+4 Results exakt; Logik-Patches (Gates,
+  neue Calls NACH dem Praefix) brechen nichts; die 2 Assemblier-Fehler des neuen Scripts (ende()-
+  Falscheinschub via index() statt rindex; konst-Block trug REGELN schon) wurden VOR dem Start gefangen
+  -- Owner-Order 'Script voll lesen' als Pflichtschritt nach jedem Script-Bau uebernehmen.
+- cppcheck-Luecke als Posten: lint:static ist in keinem lokalen Gate -- Kandidat Gate 7 oder
+  Pre-Push-Zusatzlauf (Lead-Posten, mit O-12/O-29-Familie buendeln).
+
+Selbstcheck N2: ASCII 0 nicht-ASCII, Zeilen <= 120, Zahlen aus Messungen 21:10Z oder mit Zeitstempel.
