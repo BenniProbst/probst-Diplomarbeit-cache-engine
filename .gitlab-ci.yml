@@ -94,7 +94,7 @@ cache:
 # extern: COMDARE_STATIC_SMOKE_FALLBACK -- Zusatzschalter des statischen Smoke-Zweigs,
 #         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1848, :1849)
 # extern: COMDARE_BUILD_GOLDEN_N -- Gate des NEUEN golden-N-Standardpfads; dreifach inert
-#         (Variable + when:manual + _bot_-never) (gatet :2686, :2690, :2777, :2780, :2811)
+#         (Variable + Marken-rules-Skip [E-1/F7] + _bot_-never) (gatet :2686, :2690, :2777, :2780, :2811)
 # extern: COMDARE_DYNAMIC_PLANER_CI -- isoliertes Opt-in NUR der Planer-Delegation
 #         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2691, :2781)
 # extern: COMDARE_DURCHSTICH -- Opt-in der F1-Durchstich-Welle; ausdruecklich DISJUNKT zu
@@ -108,8 +108,9 @@ cache:
 # extern: COMDARE_SWEEP_ZOMBIES -- Not-Werkzeug: raeumt Waisen-Prozesse, nur per
 #         API-Trigger zusammen mit SWEEP_TAG=amd|intel (gatet :228)
 # extern: COMDARE_MEASURE_PROFILE -- smoke|full-Marke der Mess-Welle, per Trigger oder
-#         manuellem Start gesetzt; gatet drei echte Regeln (:1849, :2686, :2777).
-#         Die Weiterreichung :2766 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
+#         manuellem Start gesetzt; gatet vier echte Regeln (:1849, :2686, :2777, :2952
+#         ergebnis:holen-Marken-Skip [E-1/F7]).
+#         Die Weiterreichung :2906 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
 #         SETZT sie nicht -- sie gibt den Eltern-Wert an die Child (CI-INV 11.08.2026)
 #
 # NICHT GEDECKT UND BEWUSST SO: Variablen, die nur in `script:`-Rumpf oder in
@@ -2933,7 +2934,8 @@ planer:delegate-trigger:
 #    zurueckgeschriebenen CSVs (measure_out/) und reicht sie an persist:measurements (der bestehende Writeback-
 #    Mechanismus, #22/§11-G) weiter. SKELETT auf der persist:measurements-Grundlage: heute dokumentiert es den
 #    Fluss + prueft die Artefakt-Naht; der scharfe Sammel-/Delegations-Aufruf ist GN-11/320er-gated (kein
-#    Auto-Messlauf). INERT-by-default (DREIFACH: COMDARE_BUILD_GOLDEN_N-Gate + when:manual + _bot_-never).
+#    Auto-Messlauf). INERT-by-default via rules-Skip (E-1/F7 01.09.2026): Mess-Marke smoke|full UND
+#    Kaskaden-Gate (BUILD_GOLDEN_N oder DYNAMIC_PLANER_CI) noetig; kein when:manual, kein allow_failure.
 ergebnis:holen:
   stage: planer
   tags: [baremetal]
@@ -2947,14 +2949,14 @@ ergebnis:holen:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
-      when: manual                                 # GN-11/320er-Gate: das scharfe Ergebnis-Holen ist opt-in
-      # DEKLARIERTE AUSNAHME (NE-20-Triage 13.08.2026) von der Owner-Doktrin 06.07. ("kein allow_failure"):
-      # unter rules: gilt fuer when:manual der Default allow_failure:false -- jede GN-11-Pipeline stuende
-      # BLOCKED, bis jemand dieses SKELETT (Job seit 19.07., 18a99200, §42 W10-B) von Hand spielt. Das Flag
-      # heisst hier "darf ungespielt bleiben", nicht "Fehler egal". Beim Scharfschalten des Sammel-Aufrufs
-      # (GN-11/320er) diese Ausnahme NEU triagieren -- ein scharfer Sammler ist ZELLE=Warnung/JOB=rot.
-      allow_failure: true
+    - if: '$COMDARE_MEASURE_PROFILE != "smoke" && $COMDARE_MEASURE_PROFILE != "full"'
+      when: never  # ohne Mess-Marke (auch ungesetzt/Tippfehler) kein Sammler -- E-1-DESIGN-FIX F7 01.09.2026
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # Kaskade-Gate 1 (wortgleich planer:delegate/-trigger)
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # Kaskade-Gate 2 (wortgleich planer:delegate/-trigger)
+    - when: never
+  # when:manual + allow_failure:true (NE-20-Ausnahme 13.08.) ENTFERNT mit E-1 (ce 53150058): rules-Skip statt
+  # manual -- die Mess-Marke ist der Entscheid; ein kuenftiger scharfer Sammler ist ZELLE=Warnung/JOB=rot
+  # (Owner 06.07./09.08.), W-03 damit gegenstandslos.
   script:
     - |
       set -euo pipefail
