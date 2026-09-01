@@ -226,3 +226,22 @@ bei Widerspruch gilt ER (Doku-nie-loeschen: Bestand oben bleibt als Momentaufnah
    ist dann alle4.out NEU (alte = alle4-r1.out); Lens-Beweisort lenses/ (ERHEBUNG-OPUS.md 27827 B, BEWERTUNG-
    FABLE.md, codex-probe.txt, FIX-QUITTUNG-r1.md).
 4. Volllesung jetzt 98/98; Lesequittung 267 Z. (Abschnitt 11). super lokal = 6 ungepushte Commits (+ dieser).
+
+## 11. NACHTRAG 15:5xZ -- OWNER-DAUERREGEL 'SOLL = PFLICHT' + SOLL-INVENTAR mit Traegern
+OWNER-WORT (verbatim, ~15:2xZ, nach meiner Meldung 'urteil=TRAEGT, muss=[], 6 SOLL'): "Alle Soll Fehler sind IMMER
+auch PFLICHT zu beheben" -> DAUERREGEL, Memory feedback_soll_funde_sind_immer_pflicht_wie_muss.md (MEMORY.md-Index
+verlinkt). Geltung: jeder SOLL-Fund aus Lens/Verify/Refute/Review wird wie MUSS behandelt (Fix-Schleife, Rot-zuerst,
+dreiwertig; VERTAGT nur mit Grund + Board-Traeger + Fenster, als Zwischenzustand). Urteil TRAEGT mit offenen SOLL ist
+KEIN Landefreibrief. Berichte etikettieren SOLL nie als Nebenbefund/Folgezug/Owner-Entscheid.
+SOLL-INVENTAR (Nachlese, alle jetzt mit Traeger):
+- E-1 S-1..S-6: Fix R1 des Workflows behandelt MUSS+SOLL (Script-Pflicht); S-5-Rest prod2-Emissions-Kreuzprobe =
+  Board #164 (vom Fixer angelegt) -> ausfuehren.
+- Stempel-2 FUND-QUITTUNG (20260829-lande-e10-stempel2/stempel2-landung/, 14 SOLL: 3 im Zug vollzogen, 11 'an Lead'):
+  O-04, O-12+O-29, O-19, O-20, O-23 = ce-Fixup-Zug nach E-1-Landung (A); O-03/O-18 (OP-1), O-09/O-36, O-13 (OP-2)
+  = wellengebunden, aber PFLICHT (C) -> Board #165.
+- Verify-R1 (verify/VERIFY-R1.md): V-1 + V-2 HEUTE VOLLZOGEN (Lead, 15:50Z): fix-landung/lock_check_fix.out additiver
+  Erklaerungs-Marker (3 Beweisorte des 719/713-Literals je 1 Treffer nachgemessen; Sicherung .vor-V1-marker.bak) +
+  fix-landung/ls-remote-nachmessung-dd0f56d3-0109-V2.txt (4/4 Ref-Zeilen == dd0f56d3, origin+github). V-3 cppcheck-
+  Wache auf git-ls-files-Scope = #165 (B), eigener kleiner super-Zug nach dem #157-Push (Explore vorher).
+Reihenfolge #165: (D) erledigt -> (B) -> (A) -> (C); nie stillschweigend weiterschieben. Ledger: KON136-Entwurf traegt
+die Regel als Owner-Verbatim (Einspielung im naechsten docs-Zug). super lokal = 7 ungepushte Commits (+ dieser).
