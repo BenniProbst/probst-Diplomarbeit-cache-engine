@@ -251,3 +251,66 @@ dann (h) + Wachen/gitleaks/R4/Dual-Push/CI 288/main-FF. GROSSORDER: unveraendert
 4. PARALLEL: E-1-Lande-Run wf_6a56ad4d (S-13-Fix-Phase). Wiederanlauf-Leser: Journal-Deltas jetzt
    wf_1fcc434d ab Z.1 + wf_6a56ad4d ab Z.4; NIE doppelt resumen (K27); nach Gesamtbild-Terminal:
    Ergebnis VOLL lesen -> Owner-Vorlage A2.3a -> KON137+.
+
+## 14. NACHTRAG 21:1xZ -- KONTEXTENDE-UEBERGABE (Owner-Order 'der Kontext endet jetzt'); JUENGSTER STAND GILT
+
+Owner-Worte seit Nachtrag 13 (chronologisch): ~19:2xZ 14-Tage-Konsolidierungs-Order (VOLLZOGEN, Nachtrag 12
++ KON136) -- darin bestaetigt: Grossorder 'immer noch so gewuenscht und aktuell'; /login + 2x /model (Fable 5
+gehalten); ~21:1xZ 'Bitte erstelle eine reiche und elaborate Kontextuebergabe, der Kontext endet jetzt.'
+
+### 14.1 WIEDERANLAUF-REZEPT (Reihenfolge verbindlich; ersetzt Abschnitt 0 wo abweichend)
+1. Kipp-Ritual: ARBEITSWEISE-GESAMT-DOKTRIN-DICHT (Umbrella, jetzt 720 Z. inkl. X-20) VOLL + MEMORY.md +
+   Memories letzte 3 Tage + Ledger-Kopf (KON136/135/134 ab Z.19) + DIESE Uebergabe VOLL (Nachtraege 11-14
+   zuerst, juengster gilt). Bei Owner-Erwartung: alle 4 DICHTs voll (Praezedenz Nachtrag/Lesequittung 15).
+2. JOURNAL-DELTAS ZUERST (X-19): wf_1fcc434d-23e (30-Kontexte) ab Z.83 und wf_6a56ad4d-494 (E-1-Landung)
+   ab Z.8 -- Stand 21:09Z: wf_1fcc434d 82 Z. / 40 Results (Map-Phase: 30 Opus-Leser + 4 Scans, gut haelfte
+   durch), wf_6a56ad4d 7 Z. / 3 Results (Z.6 = Bewertung r5 TRAEGT muss=[] soll=[] -> Z.7 = LANDUNG A2.1a
+   GESTARTET: Merge lande/ci-zombie-fix-0109, Gates 6/6, gitleaks, R4/R6, Dual-Push ce dev, CI 286,
+   main-FF, Nachmessung 4/4 -- autonom). JEDEN Rueckkehrer VOLL lesen + in der Lesequittung verbuchen.
+3. NIE doppelt resumen (K27): beide Runs laufen als Background-Tasks weiter (Tasks w4njtyz0s + wgy1kcv1s);
+   vor jedem Eingriff pgrep + Journal-Wachstum 2x/20 s; Scripts byte-unveraendert; Pseudo-Results greppen.
+4. (!) PLATTEN-WARNUNG: df / = 6,3G frei (21:09Z) -- KNAPP ueber dem 5G-Gate der Lande-Gates/K17-Zellen.
+   Faellt der Lande-Fahrer mit df-Befund, ZUERST raeumen (rm -rf ~/.cache/uv/builds-v0; Bau-Baeume nur nach
+   Belegpruefung; NIE Beweis-/Messbaeume), dann Resume byte-unveraendert.
+5. NACH E-1-LANDE-TERMINAL (Lead, in dieser Reihenfolge): (a) Rueckkehrer voll lesen; (b) DAS EINE
+   PUSH-FENSTER: super 14 lokale docs-Commits (24df1135..9a99a56b) + Umbrella 6ae5771 -- Wachen 13/26
+   ([C2] deklariert), gitleaks Koeder+Echt (Bereich, Nenner rev-list), R4 7-Status + R6, Dual-Push
+   development, CI 288 Terminal, main-FF + Nachmessung 4/4; (c) #157(h) E-1-Doku-Nachzug (WELLENPLAN-DICHT
+   'Mess-Jobs manual/inert' + GOAL-DICHT NE-20-Ausnahme + super-Register :112) + super S8-S10
+   (ergebnis:holen Vier-Regel-Form aus f7_entscheid + Gitlink-Bump auf die ce-Lande-SHA).
+6. NACH 30-KONTEXTE-TERMINAL: Ergebnis VOLL lesen (Gesamtbild Q1-Q5 + EINGANG-A2.3a-OWNER-VORLAGE.md +
+   EINGANG-KON136.md + Nachfold-KOPIE nachfold/NEUER-LEDGER-NACHFOLD-0109.md + Kipp-Vorschlags-Tafel =
+   Lead-Entscheid je Kipp) -> Owner-Vorlage A2.3a buendeln (dringlich: S08/B-10 Allowlist-Frist 15.09.,
+   Wache ROT ab 16.09.; S04/B-04 libcpuid; S12/B-11; S06/B-21(ii); S06/B-25; Mid-Line 09cc7286 A/B) ->
+   KON137+ einspielen. 'Danach wie gehabt' (Owner).
+
+### 14.2 OBJEKT-IST (21:09Z gemessen)
+- super: HEAD 9a99a56b, porcelain 0, origin/development 9b6b4ae9, 14 UNGEPUSHTE docs-Commits (24df1135,
+  8cffbc60, b4725578, 1ec3f9d3, 5cff2fc2, 4d19c580, ab386c96, 8a09a8a6, 52a72a3d, b14e444f, 8f7b065c,
+  c6dc9b3e, cf478ced, 9a99a56b; +15. = dieser Nachtrag). Push NUR im Fenster 14.1-5b.
+- Umbrella: 6ae5771 lokal (X-20 + K27-Vermerk); origin 9afec8b. ce: dev==main==dd0f56d3 beide Remotes;
+  E-1-Kette 10 Commits bef74b1c..cb790b45 im Worktree wt-ce-zombiefix (Landung laeuft). thesis:
+  dev==main==cbefa617 (GitHub public). prt-art: b539d6ee. Ledger-Kopf = KON136 (35288 Z.).
+- FOLD: TERMINAL, NEUER-LEDGER final 18345 Z. (157-Gate: 97W/60R/0/0; md5-Kette 2f1b2c91 -> 86f2b032 ->
+  +Lead-Nachfix; Original NUR LESEN -- der 30-Kontexte-Nachfold schreibt in die KOPIE).
+- Boards: #159 completed (Fold), #168 NEU (30-Kontexte-Run), #160 = E-1 (Landung laeuft), #157 bis auf
+  (h)+Push komplett, #167 (j) vollzogen / (k) NEU #211-Tilgung; offen u.a. #162/#163/#164/#165/#166.
+
+### 14.3 HEUTE VOLLZOGEN 14:2x-21:1xZ (Kurzbilanz; Details Nachtraege 11-13 + Lesequittung 12-17)
+X-19-Volllesungen bis 236/236 Fold + 23 E-1 + Output/riss5 * SOLL=PFLICHT verankert (X-20) + sofort
+vollzogen * 30-Kontexte-Vorbereitung (Extraktor, K048-K077, Herkunft, merged Script) * E-1: Bau-Workflow
+terminal (12 Fixes S-1..S-12), S-13-Lande-Run mit K17 r5 gruen + Bewertung r5 TRAEGT 0 Funde -> Landung
+laeuft * alle 4 DICHTs voll gelesen (4036 Z.) * 14-Tage-Konsolidierung (29 Nachtrag-Bloecke b14e444f,
+#157(a)/(g) 8f7b065c, KON136 c6dc9b3e, Umbrella 6ae5771) * Fold-Terminal + Lead-Nachfix riss5 (4 Funde) *
+30-Kontexte-Workflow gestartet (wf_1fcc434d, #168) * Turnus-Defekt #166 * Uebergabe-Dokument (dieses, 5
+Nachtraege) * Task-Board 159/160/157/167/168 nachgefuehrt.
+
+### 14.4 REGELN-KURZLISTE (unveraendert; Voll: Abschnitt 9 + Memories + ARBEITSWEISE-DICHT X-01..X-20)
+X-19 Volllesung / SOLL=PFLICHT (X-20) / K27 nie patchen + nie doppelt resumen / Pseudo-Results greppen /
+glhdr.curlrc nur --config, stirbt mit Job (dann blind aus Vault) / Vault nie greppen / Koeder maskieren /
+K20 nie fremde Sessions killen / Thesis trailer-frei, ALT-Refs nie pushen / backup/-Branches nie pushen /
+Remote-Loeschung+Cancel nur mit GO / Transkripte nie committen / Messdaten+Doku nie loeschen / ASCII+<=120 /
+Ein-Schreiber super, 1 Push = 1 Pipeline / Dual-Push, Push->gruen / nie rebase / sequentiell landen /
+NEUER-LEDGER-Original nur lesen / .riss* = Lead-only (konsumiert 01.09.).
+
+-- ENDE. Naechster Kontext: 14.1 befolgen; beide Workflows melden sich als Task-Notifications.
