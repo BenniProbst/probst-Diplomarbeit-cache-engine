@@ -15,6 +15,10 @@ gepusht 27.08.) + KON133-ENTWURF (Lead 27.08., nicht im Ledger) + Owner-Tranche 
 Verbuchung 26.08. (Beweisort ~/backups-workflow/20260826-konsolidierung-dichte-fassungen/, K1a/K1b/K1c/K2/
 K3-*) + PAUSE-PROTOKOLL-5/-6 (27.08.). Objekt-Anker: super 54b25e2f / ce-Gitlink d3b5a393 (26.08.); 27.08.
 ~18:xxZ (Schreiber-3, ls-remote): super development c778ed7b (origin+github), main 54b25e2f; ce dev==main==d3b5a393.
+STAND-KOPF-BUMP 01.09.2026 ~19:4xZ (Lead; 14-Tage-Konsolidierung): + KON133-01..22 IM LEDGER (8be694ef) + KON134-01..10
++ KON135-01..11 (24df1135, lokal; Kopf = KON135). Objekt-Anker 01.09.: super dev==main==9b6b4ae9 (origin+github; LOKAL
++10 docs-Commits) / ce dev==main==dd0f56d3 / thesis dev==main==cbefa617 (GitHub public seit 01.09. 13:30Z) / prt-art
+b539d6ee. Ereignis-Delta seit 27.08. kompakt im D-8-NACHTRAG 01.09.; D-13-Stand ebd.
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung (Datum + juengste KON + Quellen-Ereignis in den STAND-KOPF nachziehen); das Original bleibt
 unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder Abschnitt traegt seine Quell-Anker
@@ -360,6 +364,21 @@ BETRIEBS-WAHRHEIT VOR W3 (je Objekt-Blick, Stand 27.08.): C-09 Drift-Debug-Ausna
 Zweilanigkeit nachmessen (unten) | C-02 HEAVY-Signal NICHT gesendet | Token-Stand: A-3-Runner-Rotation = Session-
 Auftrag (Block D), Deploy-Token id=138 gesetzt (BL-1 geheilt 26.08.), Runner-Auth-Tokens 17+56 -> Rotation #152 |
 PMC-Stand D-7.6.
+NACHTRAG 01.09. ~19:4xZ (KON133/134/135; Boards #153/#133/#147/#158/#160/#161): Landewelle KOMPLETT GELANDET als
+bd55942a (konform + pmckoeder + vo3-1 + a5-reuse + Heilung; CI 16263/16269) -> E-10 5e03c2cc (16281/16286) -> Stempel-2
++ cppcheck-Fix dd0f56d3 (16293/16294); super-Zug 8be694ef (KON133 im Ledger) -> super-Bump 8b9ca7c9 (16297/16299) ->
+Thesis-Gitlink 9b6b4ae9 (16301/16303); main-FFs aller drei Repos CI-gruen; #114-Re-Run-2 E07=GO @bd55942a (Linie danach
+bewegt -> Re-Run-Pflicht vor ##49 bleibt); ##47-Wiederholung 288/16275: amd GRUEN + KALIBRIERT (0.521 s/DLL, 457198
+B/DLL, Lager 239.7 GB gemessen, Ebene-B-Livebeweis, gn_out-Beweis beide Hosts) / intel ROT earlyoom prod2 -> E-2 + C-02
+vor Re-Run-3; K-4-Kipp GERISSEN (Fangnetz-Protokoll WELLENPLAN-DICHT W-H.4); T-ENTSCHEID #158: ##49 -> Funktionsnachweis
+-> W7/#88-Split -> Rest-Wellen. E-1: 'when: manual' am Mess-Batch erzeugte 69,8-h-Zombie -> Owner-Cancel + echter Fix
+(rules-Skip + Marken-Wache + Fail-fast, 9 Commits @ba6e532f; Lande-Run wf_6a56ad4d laeuft; die D-10-NE-20-Ausnahme super
+ergebnis:holen wird nach der ce-Landung durch die Vier-Regel-Form ersetzt = S8-S10/#157(h), W-03 dann gegenstandslos).
+E-4 Thesis-Rewrite cbefa617 (Owner-Laptop-Rejoin geheilt; Mid-Line 09cc7286 A/B = Owner-Entscheid; #161). E-5 root-PAT
+id 62 = #162. SOLL=PFLICHT-Dauerregel (Owner 01.09.) = ARBEITSWEISE-Anhang X-20. FOLD: NEUER-LEDGER 18323 Z. (97 WANDERT
+/ 60 REST = 157-Gate), Final-Wache r3 -> danach A2.3a-Vorlage + merged 30-Kontexte-Workflow (Owner 18:21Z, gated auf
+Fold-Terminal). Neue Traeger #163 (A-54 gruen->main-Automatik, Owner 08.08., nie gebaut), #164/#165 (SOLL-Pakete), #166
+(Rotations-Turnus 290 defekt: Lauf 01.09. 04:03Z brach vor Mutation ab, kein Drift), #167 (Fold-Nachlese).
 BETRIEBSREGELN: Abnahme-Serialitaet (EIN-BLECH) + daneben PARALLEL BAUEN, SEQUENTIELL LANDEN (max 3
 Vollbauten prod1, 6+ disjunkte Straenge, 1 Schreiber je Worktree, Pipelines streng sequentiell); je
 Landung K17-Kombibau 4 Zellen {gcc,clang}x{Release,Debug} + Gates 6/6 (COMDARE_PRE_PUSH_BUILD_DIR
@@ -476,9 +495,13 @@ ins Werkzeug, nicht in den Kopf."
 ## D-13 OFFENE OWNER-PUNKTE + WIDERSPRUECHE (nie selbst entscheiden; Vorlage nach Absicherungs-Explore)
 
   W-01 Rechtstraeger-Scope super (Probst-Vermerk fuer GESAMTES Repo oder nur Diplomarbeits-Dokumente?).
+NACHTRAG 01.09. (#157(d)): BEIDE Scopes dokumentiert -- docs/-Rechtetraeger = 'die BEP Venture UG unter der Marke
+       Comdare' (Owner 26.08.), super-Diplomarbeit ueberall Benjamin-Elias Probst (27.08.); das Scope-DETAIL (gesamtes
+       Repo vs. nur Dokumente) bleibt OWNER-GATED.
   W-02 Frage T Split-Landung (nach Kampagne | vor Trigger) in der 26.08.-Tranche nicht namentlich
        beantwortet -- nicht unterstellen, absichern. OWNER-ENTSCHIEDEN 26.08. ~19:0xZ RF-1 "Ja, korrekt, GO."
        = NACH Kampagne (W-C) FIX; Zeile bleibt als datierte Historie.
+NACHTRAG 01.09.: #158 bestaetigt+praezisiert (Owner 28.08. 'Ich bleibe bei letzterem').
   W-03 ergebnis:holen-Ausnahme: Owner-Deckung nicht belegt (bis dahin: deklarierte Ausnahme fuehren).
   W-04 Lager-Integritaetsfrage je Maschine (s. D-7.2) -- explore-pflichtig.
   W-05..W-12 (aufgeloeste Wortwahl-/Retter-/Verify-Posten): Volltext K3-goal-drift.md Abschnitt 4
@@ -487,6 +510,8 @@ ins Werkzeug, nicht in den Kopf."
        owner-kerne KORREKTUR 26.08. ~18:4xZ, Board #7, KON132-05: S-19 GELANDET 22.08., Ruege trifft Sichtbarkeit +
        B1/B2); W-08 Lead-Nachzug LAEUFT (#19/#151 completed; 3 Landewellen-Zweige lokal gemergt cc85bb91, Push offen);
        W-11 Vorbehalt bleibt (Linie erst nach Komplex-Fix + K17 + #114-Re-Run eingefroren).
+NACHTRAG 01.09.: W-08-Nachzug KOMPLETT (alle Landewellen-Zweige gelandet, #153); W-11: Re-Run-2 GO @bd55942a, Linie
+       danach bewegt (5e03c2cc / dd0f56d3 / E-1-Landung folgt) -> #114-Re-Run-Pflicht VOR ##49 bleibt LEBEND.
 
 ## D-14 HISTORIE-VERWEISE
 

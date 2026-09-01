@@ -35,6 +35,16 @@ Status-/Zahlen-Felder sind datierte Momentaufnahmen (V11): vor Verwendung am Obj
 zitierte Staende sind als solche markiert (V1). Messfenster dieser Fassung: K-Agenten 26.08. ~18:1x-18:5xZ
 + Lead-Objektstand 27.08. 11:23Z (PAUSE-PROTOKOLL-5) + 27.08. ~17:3xZ (PAUSE-PROTOKOLL-6 + Schreiber-3-Messung
 ls-remote/df); jede juengere Zeile traegt ihr Datum.
+STAND-KOPF-BUMP 01.09.2026 ~19:4xZ (Lead 5a19728e; 14-Tage-Soll-Ist-Konsolidierung auf Owner-Order): + KON133-01..22 IM
+LEDGER (super 8be694ef) + KON134-01..10 + KON135-01..11 (Einspielung 24df1135, lokal; Ledger-Kopf = KON135) + Boards
+#153..#167. Objekt-Anker 01.09.: ce dev==main==dd0f56d3 / super dev==main==9b6b4ae9 (origin+github; LOKAL +10
+docs-Commits, Push = EIN docs-Zug #157) / thesis dev==main==cbefa617 (GitHub public) / prt-art b539d6ee.
+Quellen-Ereignisse seit 27.08.: #153-Lande-Zug bd55942a (CI 16263/16269; super-Zug 8be694ef CI 16265; main-FFs
+16269/16270/16271), ##47-Wiederholung 16275 (amd GRUEN kalibriert / intel ROT earlyoom), E-10-Landung 5e03c2cc
+(16281/16286), Stempel-2+cppcheck dd0f56d3 (16293/16294), super-Bump 8b9ca7c9 (16297/16299), E-4-Thesis-Rewrite cbefa617
++ Gitlink 9b6b4ae9 (16301/16303), E-1-Zombie-Fix ba6e532f (Lande-Run wf_6a56ad4d laeuft), T-Entscheid #158,
+SOLL=PFLICHT-Dauerregel 01.09., Fold-NEUER-LEDGER 18323 Z. (157-Gate). Details: NACHTRAG-Bloecke 01.09. an W-H.2 / W-H.4
+/ W-6-RN-Zeilen / W-7.2 / W-S / W-12.
 LESE-ANWEISUNG (Einlese-Ritual): W-0 (dieser Kopf) + W-H (Hauptstrang) + W-6-Statusfeld ZUERST; Rest
 gezielt als Nachschlag. HINWEIS (W-15): par.26 EXISTIERT NICHT im Original (reserviert fuer den bedingten
 RN-70-Endstand-Nachtrag) -- kein Loch, eine Falsch-Null-Falle fuer Sucher.
@@ -208,6 +218,23 @@ H12 gefahren-rot/BL-1 geheilt/Re-Run offen -> H15 Owner-Fragen erfuellt -> H16 u
 NACHTRAG 27.08. ~17:3xZ: H5 GELANDET + CI-GRUEN (16240 SUCCESS) -> H6 3/3 Identitaets-Zweige + a5-reuse LOKAL
 gemergt (wt-ce-lande3 cc85bb91; E-10 S3 gebaut, draussen) -> H7 K17 = Komplex-Fix OFFEN -> H8..H16 OFFEN; H6b WIP;
 df 12G; Kipp in < 13 h.
+NACHTRAG 01.09. ~19:4xZ (KON133/134/135; Boards #153/#133/#147/#160/#161): H5-H10 GELANDET+CI-GRUEN -- H6-Kette komplett
+als bd55942a (inkl. a5-reuse + Heilung; CI 16263, main-FF 16269); H6b/#147 Stempel-2 GELANDET (ffb512a6 -> cppcheck-Fix
+dd0f56d3, CI 16293/16294); E-10 GELANDET 30.08. (5e03c2cc, CI 16281/16286; Floor 553/549/547, nach Stempel-2
+555/551/549); H7 K17 mehrfach vollzogen (zuletzt 4x'555/555' @ba6e532f); H8 Dual-Pushes vollzogen; H9 super-Bump
+8b9ca7c9 (Gitlink dd0f56d3 + E-10-XSD + PZW 5/5; CI 16297/16299) + Thesis-Gitlink 9b6b4ae9 (16301/16303); H10 prt-art
+b539d6ee + Lizenz-Merge im super-Zug (#143-Rest super/prt-art-toml offen); H11 #114-Re-Run-2 E07=GO @bd55942a -- Linie
+danach bewegt (5e03c2cc/dd0f56d3/E-1) -> Re-Run-Vorbehalt LEBT; H12 ##47-Wiederholung 288/16275 (29.08.): amd-Lane GRUEN
+250/250, S-19 KALIBRIERT (0.521 s/DLL; 457198 B/DLL -> Lager 239.7 GB GEMESSEN statt 224.4 geschaetzt; NAS haelt),
+Ebene-B-Livebeweis +1616 Objekte, gn_out-CI-Beweis beide Hosts / intel-Lane ROT = earlyoom prod2 -> Re-Run-3 NUR nach
+Owner E-2 (Speicherbremse) + C-02 (#160-S11); H13 amd-kalibriert, intel offen; H14 C-01-Vorlage offen (Eingang = A2.3a
+nach Fold-Terminal); H15 HEAVY offen (E-2/C-02); H16 Trigger weiter NICHT gefahren -- Blocker jetzt: E-1-ce-Landung
+(Lande-Run wf_6a56ad4d: S-13-Fix -> K17 r5 -> Landung A2.1a), intel-Heilung E-2, C-01/C-02; K-4 GERISSEN (W-H.4).
+T-ENTSCHEID #158 (Owner 28.08. verbatim 'Ich bleibe bei letzterem'): Reihenfolge ##49-Trigger -> Funktionsnachweis
+(Bau+Kampagne) -> W7/#88-Split -> restliche Wellen-Einarbeitung. NEU E-1-KLASSE: Mess-Batch 'when: manual' erzeugte
+69,8-h-Zombie (16275/16279/16280; Owner-Cancel 01.09. 09:50Z) -> Fix = rules-Skip (smoke|full -> on_success, sonst
+never) + Marken-Wache + Fail-fast, 9 Commits @ba6e532f; der S-086-Text 'Mess-Jobs manual/inert' wird mit der Landung
+UEBERHOLT (Doku-Nachzug #157(h)).
 
 ### W-H.3 ABZWEIGE A1-A12 (dienen der Kette nicht direkt; jeder mit benanntem Platz -- NIE-KUERZEN)
 
@@ -289,6 +316,16 @@ R11 (NEU 27.08.) SPEND-LIMIT-RISS-KLASSE: alle 7 Workflows starben 26.08. ~19:1x
     lesen (Objektstand kann weiter sein als das Journal), Partial-Baeume als WIP committen, Prompts auf den
     Objektstand patchen, nie blind resumen. 27.08. ~12:1xZ RISS 2 derselben Klasse (Fable-5-Limit, 6 Workflows;
     PAUSE-6 = Sicherung WIP a1e396e1 dicht / 442030db stempel2 + Volllesung aller 7 Journale untrunkiert).
+NACHTRAG 01.09. (Risiken-Stand): R2 ZU (E-10 + Stempel-2 gelandet). R3 HALB ZU (GN-9 @O2 amd kalibriert; intel offen ->
+E-2). R4/K-4 GERISSEN: Trigger bis Fr 28.08. 06:00 NICHT gestartet -> W4-Fangnetz laut par.5 ERSATZLOS GEFALLEN; Zahl
+protokolliert: Trigger-Verzug >= 4,5 Tage (Stand 01.09. 19:00Z), W3-Kampagnenfenster Sa 29.08.-Do 03.09. nicht
+angetreten -- NIE-KUERZEN gilt: kein Posten faellt, Kampagne+Auswertung ruecken nach dem Trigger in die W4/W5-Fenster
+(Reihenfolge #158); Riss-Meldungen an den Owner erfolgt (Uebergaben 29.08.-01.09.). R5/R6 ZU. R10: Fold 01.09.:
+NEUER-LEDGER 18323 Z. (97 WANDERT / 60 REST / 0 / 0 = 157), Final-Wache r3 laeuft = Terminal nah; danach A2.3a-Vorlage +
+merged 30-Kontexte-Workflow (Owner-Order 18:21Z, gated). R11-Klasse wiederholte sich (Risse 3-5 28.-30.08. +
+Session-Limit-Tod 01.09. ~10:53Z, 4 Workflows geheilt 12:19Z) -> Lehren verankert: K27-Praefix-Cache (Resume NUR
+byte-unveraendert, sonst neuer Run mit Datei-Eingaengen), Pseudo-Result-Klasse (Schema-Pflicht an jedem agent()), 'Agent
+stirbt am Warten' (Vordergrund-Warteskripte, detached + Marker).
 
 ### W-H.5 DRIFT-KLASSEN ORIGINAL 08.08. -> HEUTE (je mit Owner-Kern + Anker)
 
@@ -974,6 +1011,8 @@ Betriebs-Kollisionen: s. 24.5.
            Go' (Owner 26.08.). NEU F-X3-1: Stempel Teil 2 = eigener Zug #147 (RN-78).
            NACHTRAG 27.08. ~17:3xZ (KON133-10): S3 826cad5c GEBAUT; S4-Bauer am Fable-Limit gestorben (porcelain 0);
            S4-S7 + Bau-Verify OFFEN; wf_bc166beb beim naechsten Resume bei S4.
+NACHTRAG 01.09.: KOMPLETT -- E-10 GELANDET 30.08. als 5e03c2cc (CI 16281 dev + 16286 main; KON135-01); RN-03/RN-11 damit
+           ZU.
     RN-04  P2-ENTSCHEID: D-08-Emitter-Weiche A/B, Default A -- Owner-Vorlage liegt
            (p4-Strang); Entscheid-Zeile vor Mi 26. 06:00, 0 Bau-h; bei Ausbleiben gilt
            der deklarierte Default A (Vorlage-Text). Traeger #91/E-8/p4. | Abh.: keine.
@@ -1005,6 +1044,9 @@ Betriebs-Kollisionen: s. 24.5.
            -> Child 16248 ceb:build FAILED 'CE_SUBMODULE_TOKEN: unbound variable' = BL-1 (KON131); BL-1
            GEHEILT 26.08. 18:56Z (Deploy-Token id=138, 288-Var, Vault 2e3c4ff, Lebendprobe rc=0; #150).
            RE-RUN OFFEN nach VO3-1-Landung auf O2-Stand (T5 JA); Alt-Token 39 Widerruf NACH ##47-Gruen.
+NACHTRAG 01.09.: Re-Run GEFAHREN 29.08. (288/16275): amd-Lane GRUEN 250/250 + KALIBRIERT (0.521 s/DLL, 457198 B/DLL),
+           intel-Lane ROT (earlyoom prod2) -> Re-Run-3 nach Owner E-2 + C-02 (#160-S11); Alt-Token-39-Widerruf weiter
+           offen (haengt an ##47-VOLL-Gruen).
     RN-07  H-6-Kleinsthandgriffe: (a) Monitore bcqxqdilc/bc9dtvlef Stopp-Verifikation,
            (d) build-l4/-untracked im super pruefen/raeumen. Traeger Lead-klein.
            STATUS 26.08./27.08.: VOLLZOGEN (Slots geraeumt 26.08. 18:02Z, Log wiederanlauf-1802Z.log);
@@ -1026,12 +1068,15 @@ Betriebs-Kollisionen: s. 24.5.
            STATUS 26.08./27.08.: OFFEN (nach ##47-Re-Run, mit GN-9-Werten @O2). Heutiger Probewert (S-19 @
            d3b5a393, bytes_je_dll=428000 GESCHAETZT @-O3): n_bau 524288, lager_bytes 224.395.264.000 B;
            bau_eta UNBESTIMMBAR ohne @O2-Trace (KON131-03).
+NACHTRAG 01.09.: amd-@O2-Trace liegt (16275: 0.521 s/DLL, 457198 B/DLL -> Lager 239.7 GB gemessen; #153); intel-Werte
+           fehlen (E-2) -> S-19-Echtlauf-Rest nach intel-Heilung.
     RN-11  P1-LANDUNG: E-10/#86-Zug landet (RN-03-Fortsetzung; K17-Kombibau,
            Byte-Gegenprobe, atomar T-8). SPAETESTENS vor Mi 26. 06:00. | Abh.: RN-01.
            STATUS 26.08./27.08.: OFFEN (Landung nach S3-S7 + Bau-Verify; Reihenfolge der Lande-Kette
            KON129-07: konform -> pmc-dtlb-koeder -> vo3-1 -> e10). NACHTRAG 27.08. ~12:1xZ: konform/pmc-dtlb-
            koeder/vo3-1/a5-reuse lokal gemergt (wt-ce-lande3 cc85bb91), E-10 bleibt draussen bis S4-S7 + Bau-
            Verify -> danach eigener Merge + Komplex-Fix + EIN K17 (H6).
+NACHTRAG 01.09.: VOLLZOGEN -- E-10 als eigener Zug gelandet (5e03c2cc, K17 4/4 '553/553'; s. RN-03-Nachtrag).
     RN-12  W2-Mo-Slots: ##32+##33-Reste (Bump-Buendel-Nachzuege; ##34-Wache = S-14a
            GELANDET, Restpruefung) + NULL-Bump-Wache-Vollzugsreste OV-2/OV-3 + ##35
            Resume-Beweis + ##36 T-15+D4-Verdrahtung + ##37/##38/##39/##41.
@@ -1236,6 +1281,10 @@ Betriebs-Kollisionen: s. 24.5.
            Board #151 completed (P0-P6, Cluster 71552c09, 6 offene Punkte O-1..O-6); O-1 Runner-Auth-Tokens 17+56
            einmalig sichtbar -> Rotation #152 (A-3-Fenster) + LEAKED-SECRETS-ROTATION-LOG; prod1-Haelfte + Reboot-
            Probe prod2 + CI-Hook-Beweis + .214-Oktett-Abweichung bis VIP-Raeumung OFFEN.
+NACHTRAG 01.09.: prod1-Haelfte VOLLZOGEN 27.08. 17:45-17:59Z -> #151 KOMPLETT beide Hosts; gn_out-CI-Beweis beide Hosts
+           im 16275-Lauf erbracht; Rest = #154 (a)-(f) + #152-Rotation (inkl. 289-runners_token NEU) + N-43-Turnus:
+           Schedule 290 id=1 lief scharf 01.09. 04:03Z und brach VOR jeder Mutation ab (GNU date -d fehlt im
+           alpine-Image) = #166; kein Drift, Fix vor 01.10.
     RN-37  #91-VERBUCHUNG (completed-Buchung + Identitaets-Entscheide E-1..E-10 als
            Ledger-Zeilen) + E-6-EMITTER-AUDIT-GREP (Klammer-Form-Kanon, #120-D-07-GO,
            klein, read-only + Schreiber-Fixe mit Minor) + E-9/AB-02-KONTROLLE (W18/
@@ -1249,6 +1298,9 @@ Betriebs-Kollisionen: s. 24.5.
            aus: MORGEN); Vorbedingungen = Trigger-Pfad 1-8 (W-4); BL-1 geheilt; HART OFFEN: Platz-Weg T1=(c)
            NAS (df prod1 16G frei 27.08.), E-10-Landung, ##47-Re-Run. 27.08. ~17:3xZ: df 12G (96 %); Landewelle
            lokal gemergt (cc85bb91), Komplex-Fix/K17/Push/Gitlink/#114/##47-Re-Run OFFEN; Kipp in < 13 h (W-10).
+NACHTRAG 01.09.: K-4 GERISSEN (Fangnetz-Protokoll W-H.4-Nachtrag); Landewelle/E-10/Stempel-2/Bump/#114-Re-Run-2/##47-amd
+           inzwischen VOLLZOGEN (W-H.2-Nachtrag); Rest-Vorbedingungen: E-1-ce-Landung (laeuft), intel-##47 (E-2/C-02),
+           C-01-Vorlage (A2.3a-Eingang), HEAVY-Signal; Reihenfolge nach T-Entscheid #158.
 
 ### FENSTER E -- Mi 26. bis Fr 28.08. (BAU-FENSTER EXKLUSIV; F3 = Fr 28.)
 
@@ -1471,6 +1523,8 @@ Betriebs-Kollisionen: s. 24.5.
            GO' = B-7/RN-78 EMITTER-Haelfte (Teil 1 = A-11-Loader gelandet 19.08.; Teil 2 = Emission, Weiche
            A identitaets-/golden-neutral) -> Board #147, wf_8cf07321 (27.08. resumed, wt-ce-stempel2 noch
            nicht angelegt); golden-Anteil bleibt B5-golden-GO (W-14).
+NACHTRAG 01.09.: GELANDET als #147 (Stempel-2-Emitter-Haelfte inkl. hybrid_modul_emitter in dd0f56d3, CI 16293/16294;
+           Review TRAEGT); golden-Anteil weiter B5-golden-GO-gated.
     RN-79  [Di 25.] ##46 Anker-3-Spiegel + ##48 Paragraph-66-Platten-Budget + ##41b
            Kaskade (W2-Di-Slots aus par.3/par.7). Traeger W2-Di/#96.
            STATUS 26.08./27.08.: OFFEN (W2-Di-Slots).
@@ -1712,6 +1766,11 @@ genuegt NICHT. 5. Traeger: Lead, spaetestens im #128-Soll-Ist-Abgleich (RN-17/RN
 Ende von W2. STAND 27.08.: Gate OFFEN (Tafel nicht leer: W135 x7, RN-A-F-Reste, GG3 x4); Erst-Pruefung an der
 W2-Freitagslieferung Fr 28.08. (RN-42); W-4: Frist "VOR main-FF" der W135-Urteile ist GERISSEN, durch Owner
 B1 ("Bitte jetzt nachziehen") gedeckt -- Urteile bleiben PFLICHT, Abweichung im Gate ausweisen.
+GATE-AUSWEIS-NACHTRAG 01.09. (Posten #157(b), W-4): Stand unveraendert -- W135-1..7 weiter 0/7 verdiktet; die
+Frist-Abweichung bleibt durch Owner B1 gedeckt und HIER ausgewiesen; Verdikte = PFLICHT am #135/#128-Traeger.
+NACHTRAGS-KANDIDATEN (Register-Aufnahme am #135-Traeger, kein Verdikt hier): Gate-Default H-1 4488d24f + Director-Fix
+41bf4c62 sind via konform-Zweig in bd55942a GELANDET; dazu V-3-cppcheck-Wachen-Scope (git ls-files statt Baum; aus
+Verify wf_e1751971) als W135-Kandidat.
 
 W-7.3 OFFENE ZEILEN DER TAFEL (je Posten: Gegenstand * Traeger * Frist * Abnahme; ERLEDIGTE als Einzeiler)
 27.1.B ph89-Restfunde: ph89-1..3 ERLEDIGT-AM-BRANCH (27.6.1, ce 22c6c62e) + per Rest-Landung GELANDET
@@ -1963,6 +2022,8 @@ Z-16 BOARD-DRIFT: 6 von 6 geprueften W2-Straengen (s19 a1b348ae, messfenster 3a7
      (S-19-Zahlen 18->120, Register-S5-06, Intel-Kreuzprobe, Ausweis-Host) leben als Posten weiter. 27.08. ~17:3xZ:
      #19 + #151 completed (KON133-08/09); NICHT auf origin (3 von 3 + a5-reuse): konform/pmckoeder/vo3-1/a5-reuse
      = LOKAL in wt-ce-lande3 cc85bb91 gemergt, Push nach Komplex-Fix + K17 (H6).
+NACHTRAG 01.09.: Push VOLLZOGEN als bd55942a-Kette (#153; alle 4 Zweige + a5-reuse Ancestor von ce dev+main) ->
+     Board-Drift Z-16 ZU; Boards #133/#145/#147/#153 tragen die Endstaende.
 W-S.3 PLAENE-ABGLEICH (Z-66; Vollzugsstand der 3 Fenster, KEINE Neuerhebung -- Details K1a/K1b/K1c)
 Z-66 K1a P-1..P-16 ALLE VOLLZOGEN (Beleg je Posten K1a Abschnitt 3: Rueckfragen-Pause, W2-Abschluss-Zug
      #139, Pausen 1+2, 2-stufige Rueckfragen-Architektur, "kein Workflow fehlt", ARBEITSWEISE-Kipp mit 2
@@ -2098,6 +2159,11 @@ S-127 BAU-BRANCH-BESTAND (27.08., PAUSE-5): wt-ce-konform 41bf4c62 (+2) LANDEREI
   (first-parent d3b5a393 -> cbd76635 -> a9872d1f -> 07039be5 -> f52712c2 -> cc85bb91; Floor provisorisch 549/545/
   543; Komplex-Fix/K17/Push OFFEN) / wt-ce-e10 826cad5c (S1-S3 GEBAUT, S4 tot, porcelain 0) / wt-ce-stempel2
   442030db (WIP 2 Header, ungebaut) / wt-super-dicht a1e396e1 -> Folge-Commits Schreiber-3 (diese Fassung).
+NACHTRAG 01.09. (S-127): wt-ce-lande3/lande4-Staende GELANDET (bd55942a -> 5e03c2cc -> ffb512a6 -> dd0f56d3 via
+  #153/#133/#147; alle Ancestor von ce dev+main). LEBEND: wt-ce-zombiefix bau/ci-zombie-fix-0109 @ ba6e532f (E-1;
+  Lande-Run wf_6a56ad4d -> lande/ci-zombie-fix-0109); Fold-Arbeitsflaeche
+  ~/backups-workflow/20260824-rueckfragen-synthese2/ (NEUER-LEDGER 18323 Z.) NUR LESEN bis Terminal;
+  Worktree-Loeschungen weiter nur nach Doktrin (gruen+gemergt+rekursive Nested-Pruefung).
 
 ## W-9 OWNER-TAFEL (deckt S-128..S-139; par.21.6/8/22.3 + KON129-08 + Tranchen 25./26.08. + RF 26.08.)
 
@@ -2285,6 +2351,8 @@ S-150 OWNER-RUEGEN-KONTEXT B6-F1 (--simulate): Code GEBAUT + GELANDET (a1b348ae 
 W-1  T SPLIT-LANDUNG (nach Kampagne | vor Trigger): in der 26.08.-13:00Z-Tranche NICHT beantwortet (S1-Scan
      0 Treffer); A5 verlangt nur "vor der Abgabe". -> OWNER-ENTSCHIEDEN 26.08. ~19:0xZ RF-1 "Ja, korrekt,
      GO." = NACH Kampagne FIX (W-C, KON129-03); KEIN Split-Vollzug vor dem Trigger.
+NACHTRAG 01.09.: durch #158 BESTAETIGT+PRAEZISIERT (Owner 28.08. verbatim 'Ich bleibe bei letzterem'): ##49 ->
+     Funktionsnachweis -> W7/#88-Split -> restliche Wellen-Einarbeitung; Split blockiert ##49 NICHT.
 W-2  OV-14 PAPER-KOPPLUNG "nach der Abgabe" (Owner 17.08.-Runde) vs C-2 "NICHTS nach der Abgabe" (Owner
      17.08.): beide Owner-Worte; par.21.6 fuehrt OV-14 als Kategorie C. -> OWNER-GATED (Klaerungs-Zeile in die
      Rest-Fragen-Tafel; bis dahin OV-14 unveraendert). Stand 27.08.: nicht in RF-1..RF-9 enthalten -> offen.
@@ -2323,6 +2391,9 @@ W-10 KALENDER-RISS: Trigger fruehestens Do 27.08. + zweilanig ~1,5 d Bau + ##50 
      Re-Run offen); Spend-Limit-Riss kostete ~16 h; K-4 = morgen frueh -> Riss-Meldung ist faellig. Stand 27.08.
      ~17:3xZ: Riss 2 kostete weitere ~5 h; Landewelle lokal gemergt (cc85bb91), Komplex-Fix/K17/Push offen; Kipp
      in < 13 h -- Frist-Folge MELDEN, W4-Fangnetz-Zahl protokollieren, NIE kuerzen.
+NACHTRAG 01.09.: K-4 GERISSEN; Fangnetz-Zahl protokolliert (W-H.4-Nachtrag: Verzug >= 4,5 Tage, W3-Fenster nicht
+     angetreten); Riss-Meldungen an den Owner erfolgt (Uebergaben 29.08.-01.09.); Neuterminierung der Kampagne folgt aus
+     #158 nach dem Trigger.
 W-11 "22 vs 26 ACHSEN": par-Texte tragen 22 (Phantom, 20.10) und 18/19/26-Zensus; Owner B4 25.08.: SOLL-Doku
      auf 26 nachziehen, KATEGORIEN beachten. -> ENTSCHIEDEN (Doku-Posten; Zensus-Zahlen je Kategorie fuehren).
 W-12 RECHTETRAEGER-SCHREIBWEISE: Lizenz-Punkt 3 (26.08.) "Rechtetraeger docs/ = BEP Venture UG unter der

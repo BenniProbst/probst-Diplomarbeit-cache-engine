@@ -16,6 +16,11 @@ gepusht 27.08.) + KON133-ENTWURF (Lead 27.08.) + Owner-Tranche 26.08. 13:00Z + R
 (Beweisort ~/backups-workflow/20260826-konsolidierung-dichte-fassungen/) + PAUSE-PROTOKOLL-5/-6 (27.08.).
 Objekt-Anker: super 54b25e2f / ce-Gitlink d3b5a393 (26.08.); 27.08. ~18:xxZ (Schreiber-3, ls-remote): super
 development c778ed7b (origin+github), main 54b25e2f; ce dev==main==d3b5a393; ce-Lande-Worktree cc85bb91 (lokal).
+STAND-KOPF-BUMP 01.09.2026 ~19:4xZ (Lead; 14-Tage-Konsolidierung): Objekt-Anker ce dev==main==dd0f56d3 / super
+dev==main==9b6b4ae9 (LOKAL +10 docs-Commits) / Ledger-Kopf = KON135 (24df1135, lokal). Ereignisse: Landewelle bd55942a +
+E-10 5e03c2cc + Stempel-2 dd0f56d3 GELANDET (CIs 16263..16294 SUCCESS); K17-Nenner-Reihe 549/545/543 -> 553/549/547 ->
+555/551/549 (Floor-Datei Z.999-1001); E-1-Zombie-Fix @ba6e532f (+2 Tests: Director 95, vl3 11; Lande-Run laeuft);
+Details an den D10-/D11-Zeilen (NACHTRAG 01.09.).
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung; das Original bleibt unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder
 Abschnitt traegt seine Quell-Anker (par./KON/Symbol).
@@ -148,6 +153,9 @@ T-11b KOMBIBAU-2x2 ALS PRUEFNORM (KON55): {clang,gcc} x {Debug,Release} = 4 Zell
     27.08.: 548/544/542 am vo3-1-Branch 01dc3122 LIVE (c1ad6093); Merge-Endstand wt-ce-lande3 cc85bb91 (konform +
     pmckoeder + vo3-1 + a5-reuse) = 549/545/543 PROVISORISCH (Vorgaenger+3, NICHT gemessen; Kaltbaum-Vorprobe 544
     vs Basis 540 = +4 stuetzt es); LIVE-Messung A-F3 im Komplex-Fix; E-10 kommt danach obendrauf.
+NACHTRAG 01.09.: LIVE-Reihe VOLLZOGEN: 549/545/543 (bd55942a, #153) -> 553/549/547 (E-10 5e03c2cc) -> 555/551/549
+    (Stempel-2 dd0f56d3; Datei-Anker Z.999-1001); E-1-Zweig bewegungslos (4 K17-Runden je 4x'555/555'
+    @bef74b1c..ba6e532f).
     D-11 (+1-Regel): Floor-Datei + Gate-Erwartung im SELBEN Zug jeder +1-Landung (vollzogen 24.08. Z12:
     4/4 Zellen "545", Gate [5/6] exakt). D-13 K17-STANDBINDUNG: (a) Commit-Stand im Protokoll-Kopf,
     (b) Endstand = dev-Tip am Zugtag (frisch), (c) rc=${PIPESTATUS[0]} + explizite Build-Pfade.
@@ -301,12 +309,15 @@ D-4 S-Strecke (S-6, S-13, S-14, S-17..S-21, +S-22) OHNE Testposten im 117er-Kata
 D-5 xlsx-Nenner: 0 von 11 xlsx-blind (15.08.); T-3-Profil-Nenner-Wache offen; X2-Factory -> #18.
 D-6 PMC-Vertragsfolge: Paket #82/#83 gelandet (fail-loud, n/a-Token); dtlb-Koeder-Fix auf Branch;
     CEB->Tier-CT-Vertragsanpassung weiter OHNE Katalog-Posten.
+NACHTRAG 01.09.: dtlb-Koeder-Fix GELANDET (pmckoeder-Zweig in bd55942a, #153); Intel-vs-AMD-pmc_befund-Neuvergleich
+    haengt am intel-##47-Re-Run-3 (E-2/C-02).
 D-7 Floor-Anker-Einheit: o2-Landung hob 544/540/538 -> 545/541/539 (+1-Regel); PZW != Floor.
 D-8 Vendor-O3: OWNER-ENTSCHIEDEN X4/OS-1 = (b) GLOBAL O2, O3 nur auf XML-Wunsch; "(a) De-facto" =
     HISTORIE; Bau laeuft (VO3-1 @ 9c75bad0, B1-B4 erledigt); Text-Marker im Archiv-par.13.2 ausstehend.
     NACHTRAG 27.08.: GEBAUT 01dc3122 (K17 4x548/548, Gates 6/6, OS-2-Gate cmake/vo31_optflag_gate.cmake) LANDEREIF;
     lokal gemergt als Merge 3/4 in wt-ce-lande3 cc85bb91 (2 Konflikte floor.txt + CMakeLists.txt HARMONISIERT),
     Komplex-Fix/K17/Push offen (KON133-03/-10-Entwurf).
+NACHTRAG 01.09.: GELANDET (vo3-1 in bd55942a -> ce dev+main, CI 16263/16269; #153) -- D-8-Drift ZU.
 D-9 M13-Absorption VOR erster produktiver Konsumierung von kBegriffsAliasRegistry (Design-Entscheid
     24.08.; Praemisse "0 Konsumenten" = Stand 24.08., vor Bau neu messen).
 D-10 T-13 (s. D3). D-11 Floor-Gate-Zug (s. T-11b). D-12 #114-Beweislaeufe: Lauf 1 NO-GO 9/10 (Ursache =
@@ -322,6 +333,8 @@ D-13 K17-Testat-Standbindung (s. T-11b).
 (04) T-13-Verdikte W135-1..7 (0/7; Frist war "VOR main-FF" -- gerissen, s. D13/W-2)
 (05) T-13-Nachtraege Gate-Default H-1 + Director-Fix (KON129-07; Urteile + Landung) [27.08.: konform 41bf4c62
      lokal gemergt (Merge 1/4, cbd76635), Urteile weiter offen]
+NACHTRAG 01.09.: konform-Zweig GELANDET (bd55942a, #153); die T-13-Urteile bleiben offen (#135-Register;
+     W-7.2-Gate-Ausweis 01.09. im Wellenplan).
 (06) test_rcu unter Parallel-Last (F3-01b)
 (07) D3-7b dritter Modus pruef_only in der Treiber-Bilanzzeile
 (08) MT-L5(b) CI-Job COMDARE_V32_DRIVER_ENABLE=ON -- Stand erheben (entsperrt MT-L10/L12)
@@ -333,6 +346,8 @@ D-13 K17-Testat-Standbindung (s. T-11b).
      System (#130 SCHARF; Reichweiten-Frage W-9) [27.08.: Gate GEBAUT = #145 S5 cmake/vo31_optflag_gate.cmake
      (Configure FATAL, 3 Fangnetze, Probe 4/4 rot-zuerst; am Merge-Stand 692 Ziele / 0 Verstoesse, 1 gedeckte
      Ausnahme test_all19); Bootstrap-Kette #130 + Vendor-Einzug #148 NACH Trigger (RF-7 "Wie empfohlen - so war
+NACHTRAG 01.09. (zu (13)): OS-2-Gate GELANDET (vo3-1-Zweig in bd55942a, #153); Bootstrap/#130 + Vendor-Einzug/#148
+     unveraendert NACH Trigger.
      es geplant."); W-9 s. D13]
 (14) S-19-Verdrahtung: golden_n-Wache + COMDARE_GN_TOTAL aus simulate-Ausgang (T-3 FREMD), GN-Divergenz
      FATAL statt Hinweis (Owner B6-F1; B1 EXPECTED_N hart / B2 YAML-Literal)
@@ -342,15 +357,20 @@ D-13 K17-Testat-Standbindung (s. T-11b).
      -- VOR dem Trigger (Owner F-X3-1 = A) [26.08. ~19:0xZ RF-2 "Volles GO": Referent = B-7/RN-78-EMITTER-Haelfte
      (Weiche A, identitaets-/golden-neutral) -> #147; 27.08.: WIP 442030db (2 Header, ungebaut, keine Tests);
      Testseite: T-1 rot-zuerst + T-11c je Header + K17 am Ende]
+NACHTRAG 01.09.: GELANDET als #147 (Stempel-2 in dd0f56d3, CI 16293/16294; Review TRAEGT; K17 4x'555/555').
 (17) VO3-1-Testseite: T-1-Koeder O2-Dreh + Glied [5] vendoropt (Bau B1-B4 @ 9c75bad0; REST B5-B7 +
      OS-2-Gate + K17) + pmc-dtlb-Koeder-Landung (20d6dd2c) mit Floor 546/542/540 + PZW-/Ledger-Nachzug
      [27.08.: VO3-1 GEBAUT 01dc3122 -- T-A/T-B1 rot-zuerst, 3 neue Tests test_vo31_global_o2_flags/
      test_vo31_vendoropt_glied/test_vo31_optflag_gate_probe, K17 4 Zellen je "0 tests failed out of 548",
      Floor 548/544/542 LIVE; pmc-dtlb + vo3-1 lokal gemergt (wt-ce-lande3), Floor provisorisch 549/545/543;
      PZW-/Ledger-Nachzug = Gitlink-Bump (XSD:435 + super .gitlab-ci.yml:1218-1219)]
+NACHTRAG 01.09.: GELANDET (vo3-1 in bd55942a; XSD/PZW im super-Zug 8be694ef, PZW 45/24/2/2/0; #153).
 (18) EIN K17 am zusammengesetzten Landewellen-Endstand + EIN #114-Re-Run (KON129-07; T-11b/D-13/D-12)
      [27.08.: Merge-Stand cc85bb91 ohne E-10 (S3 gebaut, S4-S7 offen); K17 = Komplex-Fix des Lande-Zugs OFFEN
      (Riss 2); #114-Re-Run danach, Manifest 833/833 erst mit E-10 (E-10-F-6)]
+NACHTRAG 01.09.: VOLLZOGEN -- EIN K17 je Endstand mehrfach gefahren (zuletzt 4x'555/555' @ba6e532f), #114-Re-Run-2
+     E07=GO @bd55942a, 833er-Manifest LIVE (sha 03987563); Linie seither bewegt -> Re-Run-Pflicht vor ##49 bleibt
+     (D-12).
 FUSSNOTE (Stand-Verbuchung 26.08.): E-10-FIX-1..7 und VO3-1-FIX-1..5 (3-Lenses-/2-Lenses-Verifies,
 TRAEGT_MIT_FIXES) leben als Bau-Auflagen in den gepatchten Workflow-Skripten (K1c F-04/F-05) und werden
 nach Bau-Ende als T-13-/Board-Nachtraege verbucht (Boards #133/#145 tragen noch die Kurzform).
