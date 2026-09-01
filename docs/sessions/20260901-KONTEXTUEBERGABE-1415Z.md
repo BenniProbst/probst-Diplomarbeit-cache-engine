@@ -245,3 +245,50 @@ SOLL-INVENTAR (Nachlese, alle jetzt mit Traeger):
   Wache auf git-ls-files-Scope = #165 (B), eigener kleiner super-Zug nach dem #157-Push (Explore vorher).
 Reihenfolge #165: (D) erledigt -> (B) -> (A) -> (C); nie stillschweigend weiterschieben. Ledger: KON136-Entwurf traegt
 die Regel als Owner-Verbatim (Einspielung im naechsten docs-Zug). super lokal = 7 ungepushte Commits (+ dieser).
+
+## 12. NACHTRAG 18:5xZ -- OWNER-ORDER 30-KONTEXTE-EXPLORE (gated auf Fold-Terminal) + TURNUS-BEFUND + Stand
+OWNER-ORDERS (verbatim-nah transliteriert): 18:21Z "Bitte starte einen Explore Agenten je Kontext, um vergessene
+Arbeit ueber die letzten 30 Kontexte und den dazu aequivalenten session log zu finden und unsere aktuelle Arbeit
+in den Gesamten Arbeitskontext zu setzen [...] Wo kam diese Anfrage her und aus welchen Beweggruenden? Wie kamen
+wir an diesen Punkt und muss der fold rest ueber diese Kontexte erweitert werden, um owner Fakten mit aufzunehmen?
+Wenn ja, welche? Was steht nach dem fold rest an Arbeit an [...] um die uebrigen Wellen/Phasen der 4 dichten
+/goal Referenzdokumente zu meistern? Bitte lass fold rest auslaufen, dann merge den letzten dazu geplanten Folge
+workflow mit meiner hierigen Anfrage" + 18:3xZ mid-turn: "Bitte warte auf die Fertigstellung des fold rest um
+darauf aufzubauen" / "Also danach wie gehabt". VOLLZUG: KEIN Start vor Fold-Terminal; alles vorbereitet.
+1. VORARBEIT (Beweisort ~/backups-workflow/20260901-30-kontexte-vergessene-arbeit/): Transkript vermessen (651 MB,
+   102131 Z., 76 ECHTE Kompaktierungs-Grenzen = 77 Kontexte; 101 Roh-Treffer enthielten 25 Zitate in tool_use/
+   tool_result); letzte 30 = K048-K077 (20.08. 06:49Z - jetzt). kontext-extraktor.py (Vier-Quellen-Rezept Q1-Q4,
+   maskiert) -> kontexte/K048.md..K077.md (53-425 KB) + INDEX.txt; KONTEXTE.json (Kontext->Session-Doc-Zuordnung,
+   113 Zuordnungen/28 Docs); HERKUNFT-OWNER-VERBATIMS.md (17 Owner-Nachrichten 21.08.-01.09. mit L-Ankern);
+   BOARD via TaskList in den Agenten; Trace-Script-Kopie rueckfragen-trace-0109-wf_50f25326-cd6.js.kopie.
+2. MERGED FOLGE-WORKFLOW liegt: MERGED-FOLGEWORKFLOW-rueckfragen-trace-30kontexte-0109.js -- Phasen: Map (30
+   Kontext-Leser Opus 5 max [Owner-Praezedenz 22./23.08.] + 4 Trace-Scans Sonnet 5 max [Owner-Scan-Regel 25.08.];
+   Scan-1 mit Vier-Quellen-Filter inkl. queue-operation) -> Reduce Fable max (R1 vergessene Arbeit / R2 Herkunft+
+   Weg+Rewrite-Verluste = Trace-Synthese / R3 Owner-Fakten fuer den Nachfold / R4 Wellen-Soll-Ist mit 4 DICHT-
+   Lesern) -> Refute/Fix (2 Runden, SOLL=PFLICHT) -> NACHFOLD (fehlende Owner-Fakten additiv in eine KOPIE
+   nachfold/NEUER-LEDGER-NACHFOLD-0109.md, Kipp-Vorschlaege als Lead-Tafel, Original unberuehrt) -> GESAMTBILD
+   (Q1-Q5 in Owner-Reihenfolge) + EINGANG-A2.3a + EINGANG-KON136. START: nach Fold-Terminal + Lead-Volllesung.
+3. HERKUNFT (Kurzantwort, voll im Workflow-Ergebnis): Die Rueckfragen-Aufgabe ist eine Owner-Order-Kette
+   21.08. 17:06 (12W-Explore; 'Leider kann ich in dieser Knappheit nichts entscheiden') -> 22.08. 11:38 ('letzte
+   6 Kontexte durchkaemmen, vergessene Arbeit finden'; 'unkontrolliert zu schnelles Arbeiten mit mehreren
+   compacts') -> 23.08. 08:36 Vollbild ('je Kontext einzeln mit Opus 5 max'; 'Die Fragen waren erneut
+   zusammenhangslos') -> 23.08. 21:39 Pause ('die eine Synthese ist voellig ueberfordert') -> 24.08. 06:19
+   Synthese-2 ('neuer Ledger [...] zum Schluss nur die Fragen uebrig [...], die sich nicht beantworten lassen')
+   -> 28.08. 20:00 Fold ('>= 15 Kontexte, zu gross fuer eine einzelne Synthese') -> 29.08. 05:46 ('Audit
+   abgebrochen [...] schwerwiegender defekt') -> 01.09. 08:40 Trace-back-Order -> 01.09. 18:21 diese Order.
+4. FOLD-STAND 18:34Z: Welle 4 komplett (3 Runden; Endstaende b13 9W/1R, b14 7W/3R, b15 6W/4R, b16 3W/4R);
+   ASSEMBLEUR FERTIG: NEUER-LEDGER-konsolidiert-owner-antworten.md 17778 Z., 97 WANDERT / 60 REST / 0 WIDERSPRUCH
+   / 0 NICHT_GEPRUEFT = 157/157; FINAL-WACHE R1 5 Funde (F-1..F-5) -> final-fix:r1 laeuft -> Wache r2/r3 ->
+   TERMINAL. KERNBEFUND b15-R3: Owner-Worte existieren z.T. NUR in der queue-operation-Klasse des Transkripts
+   (Z.10529/Z.23253/Z.63583/Z.79404) -- Vier-Quellen-Regel Q4 bestaetigt, Methoden-Regel in den Prueflingen.
+5. E-1-STAND: drei Fix-Runden BEHOBEN (u.a. S-10 DESIGN-NACHTRAG Fail-fast: Wache stage tier-build + Build-
+   Batches needs optional; S-11 Test B pinnt den Wache-Block als Literale), K17 4x GRUEN @ba6e532f (7 Commits);
+   Bewertung r4 laeuft -> bei 0 Funden LANDUNG A2.1a (Dual-Push ce dev, CI 286, main-FF) autonom im Workflow.
+6. TURNUS-BEFUND (#166 NEU): Rotations-Schedule 290 id=1 AKTIV (seit KON84 16.08.), erster scharfer Lauf 01.09.
+   04:03Z FAILED VOR JEDER MUTATION ('GNU date -d fehlt', busybox) -> kein Drift, Fix vor 01.10. (Cluster-Script).
+7. NEUE TRAEGER: #166 (Turnus-Fix) + #167 (Lead-Nachlese Fold-Runden: NP-09 Planer-Preimage-Konformitaet,
+   NP-35/36, #37-Fortbestand, P6/B-7<->E-B-CRC, Subset-Fixture-Bein #74, Infra-Handout-Luecke, E-4-Rest-Zeile,
+   axis_version_stamp-Rename = A2.3a). Volllesung 132/132 (Lesequittung 359 Z., Abschn. 12+13).
+8. WIEDERANLAUF-PRAEZISIERUNG zu Abschnitt 0: nach Fold-Terminal-Notification ZUERST final-fix/Wache-Results
+   voll lesen, dann Lead-Nachfix reduce-08 (#167(j)), DANN den merged Workflow starten (Script byte-so lassen;
+   NEUER Run, kein Resume); E-1-Landung laeuft parallel autonom; super lokal = 8 ungepushte docs-Commits.
