@@ -233,7 +233,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = dd0f56d3e34b072c1409700dd2467f8cd298ae41
+PZW-CE-SHA         = 5315005849fb145cb80dfde71f3f384b4b0b6a38
 PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
@@ -254,6 +254,17 @@ PZW-CI-ALTMUSTER   = 0
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
+> NACHZUG 01.09.2026 abends (super-Gitlink-Bump E-1-Zombie-Fix, ce dd0f56d3 -> `53150058` -- der Bump
+> faehrt ATOMAR im selben Commit wie dieser Nachzug; WIE GEMESSEN mit den Formeln der Wache selbst ueber
+> COMDARE_PLAN-Kopie): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN unveraendert **24**,
+> LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 -- die gelandete Kette dd0f56d3..53150058 (11 Commits:
+> E-1-Fixe bef74b1c..cb790b45 [10, nur ci_yaml_emission-Familie + Test-TU-Erweiterung + Kommentare] +
+> Lande-Merge 53150058) beruehrt KEINE `lazy_csv_header()`-Aufrufstelle. Nenner **573** Test-.cpp
+> UNVERAENDERT (E-1 erweiterte eine bestehende Test-TU um 2 TESTs, keine neue Datei); .gitlab-ci.yml-Nenner
+> 2974 -> 2976 (+2 durch den ergebnis:holen-F7-Umbau im selben Zug, kein Anker). Drift-Biss VOR dem
+> Nachzug rc=2 belegt ('Plan=dd0f56d3... Gitlink=53150058...', wachen-lauf.log). Nur der CE-SHA der
+> Ankertafel wandert. Beleg-Logs: ~/backups-workflow/20260901-push-fenster/pzw-kontrolllauf.log +
+> wachen-lauf2.log. Vorheriger Nachzug darunter.
 > NACHZUG 01.09.2026 vormittags (super-Gitlink-Bump E-10 + Stempel-2 + cppcheck-Fix, ce bd55942a ->
 > `dd0f56d3` -- der Bump faehrt ATOMAR im selben Commit wie dieser Nachzug und der E-10-XSD-Patch
 > (E-4); WIE GEMESSEN, nicht gerechnet, mit den Formeln der Wache selbst ueber COMDARE_PLAN-Kopie +
