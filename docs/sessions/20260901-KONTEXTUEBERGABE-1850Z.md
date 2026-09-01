@@ -210,3 +210,25 @@ Rueckkehrer voll, vollziehe zuerst das Einlese-Kipp-Ritual'. VOLLZUG:
    E-1-NEU wf_6a56ad4d-494 ab Z.1; nach Lande-Terminal folgt Lead super S8-S10 + #157(h+).
 6. super lokal = 9 ungepushte docs-Commits (dieser eingeschlossen); Push weiterhin EIN Dual-Push
    im #157-Zug. Reihenfolge der Owner-Gates unveraendert (Abschnitt 0.5).
+
+## 12. NACHTRAG 19:3xZ -- Owner-Order 14-TAGE-SOLL-IST-KONSOLIDIERUNG: VOLLZOGEN (Grossorder bleibt aktuell)
+
+Owner ~19:2xZ (verbatim-Kern): 'Bitte vergleiche den nun eingelesenen Stand gegen den aktuell ueber die
+letzten 14 Tage gebuchten Fortschritt und konsolidiere die Buchungen zuerst selbst, danach [...] meine
+Anforderungen aus dem letzten Kontext. Das ist auch immer noch so gewuenscht und aktuell.' Vorher (19:1xZ):
+alle 4 DICHT-Referenzen VOLL gelesen (705+507+417+2407 Z.; Lesequittung Abschn. 15).
+VOLLZUG (4 Commits, alle lokal):
+1. b14e444f: 29 additive NACHTRAG-Bloecke 01.09. AM ORT in alle 3 super-DICHTs (116 Z.; Stand-Kopf-Bumps,
+   WELLENPLAN W-H.2/W-H.4/RN-Zeilen/W-7.2/W-S/W-12, GOAL D-8/D-13, DESIGNPLAN Kopf/T-11b/D10/D11) --
+   inkl. K-4-Fangnetz-Protokoll (Verzug >= 4,5 Tage, W3-Fenster nicht angetreten; NIE-KUERZEN haelt).
+2. 8f7b065c: #157(a) Lesefassung-DEPRECATED-Kopf + #157(g) RITUAL-KARTE-Repo-Fassung
+   (docs/plaene/20260901-RITUAL-KARTE.md; Original im Beweisort unveraendert).
+3. c6dc9b3e: KON136-01..03 im Ledger (Konsolidierung + Z-06-Blip-Verbatims 25.08. + Lage; Kopf = KON136,
+   35288 Z.). 4. Umbrella 6ae5771 (lokal): ARBEITSWEISE-DICHT X-20 SOLL=PFLICHT + A2.4-GELTEND
+   K27-Praefix-Cache/Pseudo-Result + Stand-Kopf-Bump.
+BILANZ: Board #153..#167 + KON133-135 deckten den Fortschritt; NUR die DICHT-Statusfelder (Stand 27.08.)
+waren nachzuziehen -- jetzt geschehen. #157 damit bis auf (h) + den EINEN Push-Zug KOMPLETT. PUSH-PLAN:
+super (jetzt 12 lokale Commits) + Umbrella werden in EINEM Fenster NACH Lande-Run-Terminal gepusht
+(R6: eine 288-/Umbrella-CI wuerde die K17-r5-Zellen des Lande-Runs auf beiden Runnern blockieren);
+dann (h) + Wachen/gitleaks/R4/Dual-Push/CI 288/main-FF. GROSSORDER: unveraendert gated auf Fold-Terminal
+(Wache r3 laeuft) -> Volllesung -> Lead-Nachfix reduce-08 -> merged 30-Kontexte-Workflow -> A2.3a.
