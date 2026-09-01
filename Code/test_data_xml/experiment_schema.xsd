@@ -80,6 +80,15 @@
              Wertraums das Schema nicht bricht. -->
         <xs:element name="organ_subaxes"        type="OrganSubAxesType" minOccurs="0"/>
         <xs:element name="system_axes"          type="SystemAxesType" minOccurs="0"/>
+        <!-- E-10/ORG-19 (26.08.2026, #86/#133 Schritt 1e): organ_meta_meta_axes = der deklarative
+             Grammatik-Slot der Organ-Meta-Meta-Achsen (heute GENAU disk_io mit Option staging).
+             DEKLARATIV nach dem 'active'-Muster (s.u.): parse_experiment_profile liest den Block NICHT,
+             kein Bestands-XML aendert sich, das Laufzeit-Verhalten aendert sich um kein Bit. V10/KON80:
+             Aufnahme in ein Profil NUR unter expliziter XML-Anfrage; Q-1 Fall B (DiskWritebackTarget
+             enabled=false) bleibt unberuehrt. WERTRAUM-AUTORITAET ist der Code (DiskIoOrganMetaMeta::
+             kSubAxisOptions): "staging" = einziger heutiger Wert (has_device_writeback_path()==false);
+             "device" folgt erst mit dem echten Geraetepfad. -->
+        <xs:element name="organ_meta_meta_axes" type="OrganMetaMetaAxesType" minOccurs="0"/>
         <xs:element name="workloads"            type="xs:string"/>
         <!-- KERN #48-S5: datasets jetzt OPTIONAL (v2) - eine reine Achsen-KERN-golden braucht keine Mess-Inputs. -->
         <xs:element name="datasets"             type="DatasetsType" minOccurs="0"/>
@@ -598,6 +607,32 @@
                     </xs:complexType>
                   </xs:element>
                 </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- E-10/ORG-19 (26.08.2026): Organ-Meta-Meta-Achsen. Haupt-Achse disk_io traegt ihre gleichnamige
+       Unter-Achse (die Familie spannt sie); die <option>-Kinder tragen heute GENAU staging. Additiv,
+       DEKLARATIV (kein Parser-Konsum in diesem Zug; Praezedenz 'active'); C14N bestehender XMLs
+       unberuehrt (0 Treffer 'organ_meta_meta' im Bestand vor diesem Slot). -->
+  <xs:complexType name="OrganMetaMetaAxesType">
+    <xs:sequence>
+      <xs:element name="disk_io" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="value" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="staging"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
