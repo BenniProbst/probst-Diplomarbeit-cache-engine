@@ -197,3 +197,32 @@ bei Widerspruch gilt ER (Doku-nie-loeschen: Bestand oben bleibt als Momentaufnah
    Lesequittung und Journale gehalten (Owner-Worte, Objekt-SHAs, Kartierung (a)-(g), Owner-Entscheide,
    Beweisorte, Wiederanlauf-Rezept unveraendert gueltig). Naechster Schritt unveraendert Abschnitt 0
    Punkt 2; fuer Fold gilt: naechste Rueckkehrer = Fixer b09-b12 R2 (danach ggf. Refute R3, DANN Welle 4).
+
+## 10. NACHTRAG 15:1xZ -- Owner-Order 'letzten Rueckkehrer vollstaendig lesen': 13 Results, Welle 4 GESTARTET
+1. FOLD-STAND 15:05Z: Journal 180 Z. / 75 Results (alle gelesen, Lesequittung Abschnitt 11). WELLE 3 KOMPLETT
+   nach drei Refute-Runden: R2-Fixer b09-b12 9/9 BEHOBEN, R3-Refuter b09 1E+3M / b10 3M+1K / b11 2K / b12 NULL,
+   R3-Fixer b09/b10/b11 10/10 BEHOBEN; Endstaende FINAL b09 5W/5R, b10 6W/4R, b11 4W/6R, b12 8W/2R (0 Kipps).
+   Runden-Deckel: R3-Fixes NICHT mehr refutiert -> Lead-Entscheid ANGENOMMEN (eigene Vor-Fix-Messungen, byte-
+   additiv, 0 Statuseffekt); Stichprobe nach Terminal. Z.177-180 = WELLE 4 RUNDE 1 (Refuter b13-b16) seit
+   ~15:04Z -- damit ist Abschnitt 9 Punkt 1 ('noch nicht begonnen') UEBERHOLT. Neue Erkenntnisse fuer A2.3a:
+   S06/B-25 Akteur-Frage (a) Infra-Rotationsliste / (b) Session gebuendelt mit #152 (KON132-06 26.08.
+   supersediert S10/A-18); E-13 MIT R4-R-Tafel (RISC-V/Pi5, Formal-Beweis) in EINER Vorlage; FK-7-Etiketten
+   MIT Fuenftes-Token 'Ort unbekannt' (KON-13) in EINER Vokabular-Vorlage; S01/B-14 MIT S06/B-21(ii) buendeln.
+2. RETTUNG (traegerlos, Board-Task angelegt): S07/A-54 = Owner-Order 08.08. 14:50 verbatim 'main ist ein Vorfahr
+   von development und gehoert bei gruen IMMER nachgezogen. Bitte richte in der CI ein, dass gruen gleich push
+   auf main bedeutet am ende der Pipeline wenn alles gruen.' -- Automatik NIE GEBAUT (super .gitlab-ci.yml 0
+   Treffer push/promote/auto-ff; alle main-FFs seit 09.08. manuell; prt-art 26.08. 23 Commits STALE). Design-
+   Punkte: Gitflow-Doktrin (nie rebase), Bruecken-Ziel-Ref A/B (S06/B-21(ii)) haengt daran, 1 Push = 1 Pipeline.
+   Hinweis an #86/#88: Etikett 'T19' ist seit 17.08. an persistence_target vergeben -- Value-Filter-Achse
+   (S06/B-26, Deep-Research 05.08.) braucht den naechsten freien Slot.
+3. E-1-STAND 15:07Z: Journal 11 Z. / 4 Results (alle gelesen). LENSES FERTIG: Opus-Erhebung O-01..O-27 (17
+   bestaetigt, 3 Praezisionen, 3 Beobachtungen, 4 Nebenbefunde; Determinismus 4/4 sha d04e48d6) + Fable-
+   Bewertung urteil=TRAEGT, muss=[], 6 SOLL (S-1 Wache-Emitter-Koeder, S-2 Par.62-B ASCII, S-3 STAND.md-Hygiene,
+   S-4 Folge-Test leere Emission = 1 Wache, S-5 Kopf 'host-unabhaengig' vs PMC-Sonde + prod2-Kreuzprobe, S-6
+   stdout->stderr profile_run_facade.cpp:1197); Codex-Probe 14:34Z rc=1 5x HTTP 401 -> Ersatz-Lens A2.6 (E-3
+   bleibt offen). FIX R1 LAEUFT seit 14:44Z (Script: MUSS+SOLL alle Pflicht): Worktree traegt bereits c20d17e4
+   (S-4 Test-Pin) + 3d241343 (S-2+S-5), porcelain 1; danach K17 NEU DETACHED (alle4-r1.out, Marker frisch) ->
+   k17-r2-Abnahme -> Re-Bewertung r2 -> ggf. Fix r2/r3 -> Landung A2.1a. Wiederanlauf-Leser: K17-Marker-Datei
+   ist dann alle4.out NEU (alte = alle4-r1.out); Lens-Beweisort lenses/ (ERHEBUNG-OPUS.md 27827 B, BEWERTUNG-
+   FABLE.md, codex-probe.txt, FIX-QUITTUNG-r1.md).
+4. Volllesung jetzt 98/98; Lesequittung 267 Z. (Abschnitt 11). super lokal = 6 ungepushte Commits (+ dieser).
