@@ -1,5 +1,10 @@
 # GOAL v8 — ALLE WELLEN AM STÜCK BIS ZUR ABGABE
 
+> **DEPRECATED/SUPERSEDED (01.09.2026, #157(a)):** Diese 241-Z.-Lesefassung ist ueberholt durch
+> docs/plaene/20260826-GOAL-V8-DICHT.md (LEBENDE DICHTE FASSUNG). Sie traegt u.a. die VI.4-csv-Korrektur
+> NICHT (GOAL-DICHT W-09) -- NICHT als Einstieg nutzen; das Einlese-Ritual laeuft ueber die DICHT-Fassung.
+> Der folgende Text bleibt additiv als historischer Stand vom 08.08.2026 erhalten (Doku nie loeschen).
+
 > **Version:** v8 · **Gesetzt:** 08.08.2026 · **Gültig bis:** 15.09.2026 (Abgabe)
 > **Dossier:** `super docs/plaene/20260808-GOAL-V8-DOSSIER-alle-wellen-am-stueck-bis-abgabe.md` (`e26ba1d3`)
 > **Autorität:** Owner-KERN, wörtlich: *„direktes blanko volles GO alle zukünftigen Phasen autonom abzuarbeiten…wirklich ALLE am Stück"*
