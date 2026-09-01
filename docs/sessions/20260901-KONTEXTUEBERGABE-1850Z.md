@@ -232,3 +232,22 @@ super (jetzt 12 lokale Commits) + Umbrella werden in EINEM Fenster NACH Lande-Ru
 (R6: eine 288-/Umbrella-CI wuerde die K17-r5-Zellen des Lande-Runs auf beiden Runnern blockieren);
 dann (h) + Wachen/gitleaks/R4/Dual-Push/CI 288/main-FF. GROSSORDER: unveraendert gated auf Fold-Terminal
 (Wache r3 laeuft) -> Volllesung -> Lead-Nachfix reduce-08 -> merged 30-Kontexte-Workflow -> A2.3a.
+
+## 13. NACHTRAG 20:0xZ -- FOLD TERMINAL, LEAD-NACHFIX VOLLZOGEN, 30-KONTEXTE-WORKFLOW GESTARTET
+
+1. FOLD wf_fe1cf67c-94e TERMINAL ~19:4xZ (108/108 Agenten, 0 Fehler, 21,06M Tokens): Final-Wache r3 =
+   NULL_NEUE_FUNDE; NEUER-LEDGER final (157-Gate exakt: 97 W / 60 R / 0 / 0; Journal 236/236 + Output +
+   riss5 434/434 VOLL gelesen; Lesequittung Abschn. 17; Board #159 completed).
+2. LEAD-NACHFIX #167(j) VOLLZOGEN 19:44Z: 4 riss5-R3-Funde verarbeitet (reduce-08.md 1536->1592 Z. +
+   KORREKTUREN-LEAD-NACHFIX; NEUER-LEDGER 18323->18345 Z., +4 VERMERK-Bloecke, diff-Beweis 0 veraendert);
+   NEU #167(k) = #211-Limitierungs-Zeilen-TILGUNG (le_limitierung de+en :30 + csv_to_latex :1044-1055/
+   :1144 ff. + wahrer Kopf; honest-100%/K93; Thesis-/super-Bau-Posten).
+3. 30-KONTEXTE-WORKFLOW GESTARTET 20:0xZ als NEUER Run: wf_1fcc434d-23e (Task w4njtyz0s; Script
+   MERGED-FOLGEWORKFLOW-rueckfragen-trace-30kontexte-0109.js; einziger Vor-Start-Fix: stale Eingangs-Fakt
+   '17778 Z.' -> '18345 Z. nach Final-Wache-Fixes + Lead-Nachfix', K27-neutral da Erststart). Phasen:
+   Map 30x Opus-max + 4 Sonnet-Scans -> Reduce R1-R4 -> Refute/Fix -> Nachfold (Ledger-KOPIE) ->
+   Gesamtbild Q1-Q5 + EINGANG-A2.3a + EINGANG-KON136. Owner-Reihenfolge damit exakt eingehalten
+   ('warte auf fold rest' -> Volllesung -> Lead-Nachfix -> merge/Start -> 'danach wie gehabt').
+4. PARALLEL: E-1-Lande-Run wf_6a56ad4d (S-13-Fix-Phase). Wiederanlauf-Leser: Journal-Deltas jetzt
+   wf_1fcc434d ab Z.1 + wf_6a56ad4d ab Z.4; NIE doppelt resumen (K27); nach Gesamtbild-Terminal:
+   Ergebnis VOLL lesen -> Owner-Vorlage A2.3a -> KON137+.
