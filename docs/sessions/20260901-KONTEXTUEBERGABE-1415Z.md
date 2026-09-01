@@ -150,3 +150,50 @@ backup/-Branches nie pushen / Messdaten/Doku nie loeschen / [C2]-Wachen-Klasse d
 
 Selbstcheck: ASCII-only, Zeilen <= 120, alle Zahlen aus Messungen 14:0x-14:11Z (git/Journale/API/alle4.out),
 Owner-Zitate verbatim. NAECHSTER SCHRITT im Wiederanlauf = Abschnitt 0 Punkt 2 (Journale zuerst).
+
+## 9. NACHTRAG 14:3xZ -- VOLLSTAENDIGKEITS-PRUEFUNG (Owner-Order 14:2xZ) + KORREKTUREN + neue Staende
+Owner-Order nach der Kompaktierung: "bitte lies den letzten Rueckkehrer vollstaendig und pruefe die
+Kontextuebergabe auf Vollstaendigkeit, lies sie komplett" -> VOLLZOGEN. Dieser Abschnitt korrigiert additiv;
+bei Widerspruch gilt ER (Doku-nie-loeschen: Bestand oben bleibt als Momentaufnahme 14:11Z stehen).
+1. KORREKTUR zu Abschnitt 3/Z.47+51 (FEHLDEUTUNG): Journal Z.147-150 waren NICHT 'Welle 4 (b13-b16)',
+   sondern die RUNDE-2-REFUTER der WELLE 3 (b09-b12) -- am Script verifiziert (fold-rest-3008.js md5
+   7b777e8e: refuterWellen [[1-4],[5-8],[9-12],[13-16]], JE Welle Runden-Schleife <= 3x Refute->Fix;
+   Welle 4 startet erst nach Welle-3-Rundenende). Batch-Inhalte lt. Script: b13 = S09/B-13 + S10/B-03..14,
+   b14 = S10/B-15..23 + S11/B-06 + S12/B-01, b15 = S12/B-02..11 (traegt S12/B-11), b16 = S12/B-12..18
+   (nur 7 IDs; Zaehl-Nenner 157 = 15x10 + 7). Dieselbe Fehldeutung steht in Lesequittung Abschnitt 8;
+   Abschnitt 9 der Lesequittung korrigiert sie dort.
+2. FOLD-STAND 14:22Z: Journal 158 Z. / 68 Results. R2-Refuter b09-b12 FERTIG, alle 4 voll gelesen -- ALLE
+   Endstaende halten (0 Status-Kipps): b09 5W/5R (aber 1 ERNST: S06/B-20 Teilfrage (3) ist per Owner-D-1
+   17.08. S10/A-24 BEREITS ENTSCHIEDEN 'volle Wohlgeformtheit ... deklarierte Grenze nur als Uebergang'
+   K680/L3722-L3724 -- Halb-Zitat-Falle, Fixer streicht (3) -> Kenntnisnahme; REST haelt allein wegen (1));
+   b10 6W/4R (1 MILD: juengster B-14-Owner-Rahmen 17.08. L2879-L2906 3-Komponenten-System/top-ranking-32
+   nachtragen; 2 KLEIN); b11 4W/6R (2 KLEIN Anker; Frist-Wache-Beleg test_pa1 '16.09. code 1 ROT'
+   bestaetigt); b12 8W/2R (1 MILD B-19-Glied (3) praezisieren, 2 KLEIN). Z.155-158 = FIXER b09-b12 RUNDE 2
+   LAUFEN. Assembleur-Anmerkung aus b09-R2: S01/B-14 (K804) mit S06/B-21(ii) in EINE Owner-Vorlage buendeln.
+3. KORREKTUR zu Abschnitt 3 (Z.74-76): Der Explore-Subagent ist NICHT gestorben -- er kehrte 14:13Z zurueck
+   (Result voll in der Task-Notification; Gegenprobe am persistierten Transkript bymi50mr1.txt: Ende byte-
+   gleich, nichts trunkiert). Die Kartierung in Abschnitt 4 IST sein Ergebnis; im Wiederanlauf NICHTS neu
+   erheben. Der Satz 'Kartierung im Wiederanlauf NEU erheben' ist UEBERHOLT.
+4. E-1-STAND 14:14Z: Journal 7 Z. / 3 Results. K17-ABNAHME FERTIG GRUEN (Z.6 voll gelesen): alle4_rc=0,
+   4 Zellen je '100% tests passed, 0 tests failed out of 555'; Floor-Treppe 555/551/549 UNVERAENDERT ==
+   ci_test_inventory_floor.txt Z.999-1001 (KEIN Nachzug, KEIN Commit; comm-Verluste exakt 4+2, GEWINNT
+   leer); Warnungen 0 NEU (nur bekannter gtest-printers-Vorbestand clang); TABU 832/833 nachher==vorher
+   (8f56e4e3/03987563); Lock '719 Dateien ... deckt 713 von 713' exakt. Z.7 started = LENS-STUFE laeuft
+   (Opus-max-Erhebung; danach Fable-max-Bewertung, Fix-Schleife <= 3, ce-Landung A2.1a wie Abschnitt 3).
+5. OBJEKT-PRAEZISIERUNG zu Abschnitt 2: super lokal jetzt FUENF ungepushte docs-Commits = 24df1135 /
+   8cffbc60 / b4725578 / 1ec3f9d3 (diese Uebergabe) / der Nachtrag-Commit. Volllesung jetzt 85/85 (80 + 4
+   R2-Refuter + K17-Abnahme); Lesequittung 217 Z. (Abschnitte 8+9 nachgetragen).
+6. SICHERHEITS-NACHTRAG zu Abschnitt 8 (fehlte oben; Quellen: Memories + Board #152/#161): Vault-Dateien
+   Cluster/keys NIE greppen/ausgeben -- blind per mapfile, nur Laenge/Hash/Ort / GitHub-Purge-Scope NUR
+   Commit 0891fcf43cbf + Blob 71670a3d (Owner-Freigabe eng) / Workflow-Transkripte mit Live-Tokens NIE
+   committen: wf_78955b71/agent-a11b87990b7092c3e.jsonl (prod2-Runner-Tokens 17+56) + wf_4fc4b8d9-Transkript
+   (289-runners_token) -> Rotation #152 / codex 'ac_'-Auth-Code NIE persistieren / 'gitlab-runner list' NIE,
+   config.toml NIE ausgeben, Cluster _infra/ci-templates TABU / nie rebase, kein 'git add -A', kein Force-
+   Push ohne Owner-GO / K20: fremde/interaktive Sessions NIE killen (TTY-idle beweist nichts) / lokale
+   Thesis-ALT-Refs NIE pushen: main-alt 95db7793, b-thesis-o4-nachzug, backup/pre-rescrub, w2-E02-Ledger,
+   alte Tags, rescue/owner-laptop-merge-20260831, probe-*.git / Koeder-Literale auch in DIESEM Doc-Umfeld
+   maskiert halten (glpat-Muster nie ausschreiben).
+7. PRUEF-FAZIT: Abschnitte 0-8 sonst VOLLSTAENDIG gegen Board #157/#159/#160/#162, Ledger-Kopf KON135,
+   Lesequittung und Journale gehalten (Owner-Worte, Objekt-SHAs, Kartierung (a)-(g), Owner-Entscheide,
+   Beweisorte, Wiederanlauf-Rezept unveraendert gueltig). Naechster Schritt unveraendert Abschnitt 0
+   Punkt 2; fuer Fold gilt: naechste Rueckkehrer = Fixer b09-b12 R2 (danach ggf. Refute R3, DANN Welle 4).
