@@ -16,6 +16,54 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON136 -- 01.09.: 14-TAGE-SOLL-IST-KONSOLIDIERUNG DER 4 DICHT-REFERENZEN (Owner-Order ~19:2xZ), Z-06-BLIP-
+## VERBATIMS 25.08. NACHGESPIELT, E-1-BAU TERMINAL -> LANDE-RUN, FOLD FINAL-WACHE R3 (Lead 01.09.)
+
+**KON136-01 (KONSOLIDIERUNG; Owner verbatim ~19:2xZ: "Bitte vergleiche den nun eingelesenen Stand gegen den
+aktuell ueber die letzten 14 Tage gebuchten Fortschritt und konsolidiere die Buchungen zuerst selbst, danach
+erinnerst du dich ja sicher noch an meine Anforderungen aus dem letzten Kontext. Das ist auch immer noch so
+gewuenscht und aktuell" [Anforderungen = Grossorder 18:21Z, gated auf Fold-Terminal]):** Vorab alle 4
+DICHT-Referenzen VOLL gelesen (Umbrella-ARBEITSWEISE 705 + GOAL 507 + DESIGNPLAN 417 + WELLENPLAN 2407 Z.;
+Lesequittung Abschn. 15). VOLLZUG: 29 additive NACHTRAG-Bloecke 01.09. AM ORT (super b14e444f, 116 Zeilen:
+Stand-Kopf-Bumps aller drei + WELLENPLAN W-H.2/W-H.4/RN-03/-06/-10/-11/-36/-38/-78/W-7.2/W-S-S-127/Z-16/
+W-12-W-1/W-10 + GOAL D-8/D-13-W-01/W-02/W-11 + DESIGNPLAN Kopf/T-11b-Floor/D10-D-6/D-8/D11-(5)(13)(16)(17)
+(18)) + #157(a) Lesefassung-DEPRECATED-Kopf + #157(g) RITUAL-KARTE-Repo-Fassung (8f7b065c) + Umbrella
+X-20/K27-Pseudo-Result-Vermerk (6ae5771, lokal). SOLL-IST-BILANZ: (i) Board #153..#167 + KON133-135 decken
+den 14-Tage-Fortschritt vollstaendig; die DICHT-Statusfelder trugen Stand 27.08. ~17:3xZ und sind jetzt
+nachgezogen (Kernbewegungen: Landewelle bd55942a, E-10 5e03c2cc, Stempel-2+cppcheck dd0f56d3, super-Bump
+8b9ca7c9, Thesis-Rewrite cbefa617 + Gitlink 9b6b4ae9, ##47-Wdh. 16275 amd-kalibriert/intel-rot,
+T-Entscheid #158, E-1-Kette ba6e532f, SOLL=PFLICHT-Dauerregel). (ii) K-4-FANGNETZ-PROTOKOLL (par.5-Pflicht,
+als Zahl): Trigger-Verzug >= 4,5 Tage (Fr 28.08. 06:00 -> 01.09. ~19:00Z offen), W3-Kampagnenfenster Sa
+29.08.-Do 03.09. nicht angetreten; NIE-KUERZEN haelt, Neuordnung = #158-Reihenfolge nach Trigger. (iii)
+#157-Posten (b)/(c)/(d)/(f) durch die Nachtraege ERLEDIGT ((c) NULL-Bump-Marker war bereits am Ort [W-5];
+(f) KF-F-23-Zahlen 549/545/543 = HISTORIE, lebender Floor 555/551/549 am Designplan-T-11b-Nachtrag); REST
+#157 = (h) E-1-Doku-Nachzug (nach ce-Landung) + EIN Dual-Push-Zug (Wachen 13/26, gitleaks Koeder+Echt,
+R4/R6, CI 288, main-FF) NACH Lande-Run-Terminal (R6: eine 288-CI wuerde die K17-r5-Zellen des Lande-Runs
+blockieren; 11 lokale super-Commits + 1 Umbrella-Commit bis dahin NUR lokal). (iv) Einspiel-Reste
+geprueft: Z-07/Z-09/Z-11-Kerne durch KON132/133/134/135 GEDECKT (O-12-Verbatim im Ledger: 1 Treffer);
+Z-06 = KON136-02.
+
+**KON136-02 (Z-06-NACHSPIEL: drei Prozess-Blip-Owner-Verbatims 25.08., bislang an keiner Ledger-Stelle;
+Quelle W-S Z-06 [Wellenplan-DICHT, transliteriert] + Roh-Transkript 5a19728e):** Z.91831 20:18:33Z: "alt
+bleibt Lead. Bitte schreibe den infra Agenten bezueglich des leaks, dass er den wireguard key rotieren
+muss und das von dir dann gleich redigierte repo uebernimmt, stelle selbst die Diplomarbeit super auf
+github private, der PAT laesst das zu. Notiere diesen Plan nur in einer Session, ich wechsle jetzt in
+den alten lead Prozess" / Z.91889 20:25:19Z: "Das Problem ist jetzt: Du bist alt und solltest weiter
+arbeiten, auf der Uhr dieser Session stehen 19 Tage. Lies den kompletten Kontext einmal ein, dann siehst
+du es. Bitte pruefe den juengeren claude Prozess und beende ihn wieder, es gab einen blip mit claude
+und es oeffnete sich ein zweiter Prozess, ich wollte aber nur einen laufen" / Z.91901 20:26:30Z: "Ja, ich
+moechte den Prozess mit den workflows die hier zu sehen sind behalten". Objekt-Befund (25.08.): EIN Lead
+PID 984989, zwei Session-IDs = Kinder desselben Daemon-Baums, "es gibt nichts zu beenden"; alle 7
+Workflows starben ~20:16Z im Schritt. Damit ist die W-S-Z-06-Einspielpflicht VOLLZOGEN.
+
+**KON136-03 (LAGE ~19:5xZ):** E-1-Bau-Workflow wf_d102ab04 TERMINAL MIT STOPP (Bewertung r4: muss=[],
+soll=[S-13 Doku-Konsistenz]) -> SOLL=PFLICHT-Lande-Run wf_6a56ad4d LAEUFT (S-13-Fix -> K17 r5 ->
+Re-Bewertung [Deckel 2] -> ce-Landung A2.1a inkl. main-FF). Fold wf_fe1cf67c: NEUER-LEDGER 18323 Z.
+(97 WANDERT / 60 REST / 0 / 0 = 157-Gate; final-fix r1+r2 = 6 Funde BEHOBEN, Additiv-Beweis 0 veraendert),
+Final-Wache r3 LAEUFT = letzte Runde vor Terminal. Volllesung 135/135 Journal-Results + E-1-Task-Output
+997 Z. (Lesequittung 20260901-volllesung-4-workflows/, Abschn. 14-16). 30-Kontexte-Workflow BEREIT +
+GATED (Owner 18:21Z + "Bitte warte auf die Fertigstellung des fold rest um darauf aufzubauen" + "Also
+danach wie gehabt" + ~19:2xZ "immer noch so gewuenscht und aktuell").
 ## KON135 -- 30.08.-01.09.: E-10 + STEMPEL-2 GELANDET, cppcheck-FIX, SUPER-BUMP 8b9ca7c9, E-1 ZOMBIE-CANCEL + DESIGN +
 ## BAU, E-4 THESIS-REWRITE, E-5 PAT-EXPOSITION, SESSION-LIMIT-TODE + HEILUNG (Lead 30.08.-01.09.)
 
