@@ -16,6 +16,397 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON135 -- 30.08.-01.09.: E-10 + STEMPEL-2 GELANDET, cppcheck-FIX, SUPER-BUMP 8b9ca7c9, E-1 ZOMBIE-CANCEL + DESIGN +
+## BAU, E-4 THESIS-REWRITE, E-5 PAT-EXPOSITION, SESSION-LIMIT-TODE + HEILUNG (Lead 30.08.-01.09.)
+
+**KON135-01 (E-10-LANDUNG KOMPLETT 30.08.; 3-Fahrer-Kaskade wf_bf22ab45 ueber Risse 3+4; Beweisort
+~/backups-workflow/20260829-lande-e10-stempel2/e10-landung/):** Merge 5e03c2cc (bd55942a + 2e9b8697, 9 Commits, 0
+Konflikte); K17 4/4 KALT SEQUENTIELL je '100% tests passed, 0 tests failed out of 553'; Floor LIVE per Treppe
+553/549/547 + T-1-Gate-5 UEBER/UNTER literal rot -> gruen; TABU 832/832 sha 8f56e4e3 vorher==nachher + 833er-Manifest
+03987563 (F-6, deklarierte Datei axis_disk_io_organ_meta_meta.hpp); Lock --check '719 Dateien ... deckt 713 von 713';
+Warnungen 0 NEU (clang 1 Vorbestand gtest-printers); Gates 6/6 LITERAL (9 Commits); gitleaks Selbstbiss rc=1 + Echt
+9==9; dev-CI 286/16281 SUCCESS 10:38:53Z; main-FF (Diff-Hygiene kumulativ bd55942a..5e03c2cc GRUEN, gitleaks 9==9, R4
+0) -> CI 286/16286 SUCCESS 16:21:51Z (27 Jobs = 26 success + 1 manual is_original:relock, 0 Bridges); Nachmessung 4/4
+Refs == 5e03c2cc. Nebenbefund 16278 (main @ bd55942a coverage-guard) = Vorbestand earlyoom prod2, kein Blocker. Riss 4
+(Session-Limit 30.08. ~10:25/10:40Z): E-10-Fahrer 2 starb NACH dem 16281-SUCCESS-Log; Fahrer 3 (15:3xZ Resume,
+byte-unveraendert) fuhr main-Push 15:38Z; Gate-Logik-Patch (kein Prompt) -> Resume 15:41Z: e10 aus Cache
+(K27-Bestaetigung).
+
+**KON135-02 (STEMPEL TEIL 2 REVIEW + LANDUNG + CI-ROT 30.08.; Beweisort stempel2-review/ + stempel2-landung/):**
+Review = Opus-ERHEBUNG 39 Befunde O-01..O-39 (11/11 Dateien, Diff 2190+3, TABU 0/832, Weiche-A 9/9 0-Diff) +
+Codex-Lens AUSFALL ('Not logged in' rc=1 15:43:32Z, Binary 0.146.0, frische Defekt-Probe
+CODEX-AUSFALL-PROBE-20260830.md -> Ersatz-Lens A2.6 Opus+Fable; E-3 codex login = Owner-Handgriff offen) +
+Fable-BEWERTUNG urteil=TRAEGT 0 MUSS / 14 SOLL / 25 ENTLASTET (O-32/O-33 = Lande-Handgriffe; 11 SOLL-Posten in
+FUND-QUITTUNG.md). Landung: Merge ffb512a6 (--no-ff bb5b6949 auf 5e03c2cc; O-32 CMakeLists BEIDE Bloecke sequentiell
++54/-0; O-33 Floor RELATIV +2 = 555/551/549 LIVE per Treppe + T-1 UEBER/UNTER), K17 4/4 KALT je '555/555' (SA-Pin
+test_stempel2_vertragspaare #554/#555), TABU 832+833 sha vorher==nachher, Lock 719/713, Gates 6/6, gitleaks 5==5,
+Dual-Push dev -> CI 286/16287 FAILED 17:35:00Z: Job 386485 lint:static (cppcheck 2.21.0, allow_failure=false) = 6x
+[uninitMemberVarNoCtor] (apps/modul_emitter/main.cpp:121 ManifestZeile::gestempelt +
+tests/unit/test_stempel2_vertragspaare.cpp:40/41/43/44/45 Fixture-Member), 22 success + 3 clang-Folge-skips. STOPP
+doktringemaess, kein main-FF, kein eigenmaechtiger Fix. LUECKEN-BEFUND: cppcheck ist weder Pre-Push-Gate (6 Gates)
+noch Compiler-Warnflaeche; Codex-Lens war aus -> exakt die ungedeckte Klasse, die die CI als Zweitlens fing = Kandidat
+Gate 7 /Pre-Push-Zusatzlauf (Lead-Posten, mit O-12/O-29-Familie buendeln).
+
+**KON135-03 (cppcheck-FIX-ZUG wf_e1751971, 30.08. 20:5xZ -> 01.09.; Beweisort fix-landung/):** T-1 ROT literal (lint:
+static-Formel aus ci-templates base-pipeline.yml; lokales cppcheck 2.21.0 == CI; rc=2 mit GENAU den 6 CI-Literalen) ->
+Fix-Commit dd0f56d3 (6 NSDMI nach Bestandsidiom '= false'/'= nullptr'/'= 0', 2 Dateien +7/-7, Aggregat-Braced-Init mit
+vollen Feldlisten bleibt gueltig) -> T-1 GRUEN rc=0 + clang-format-22 rc=0 -> K17 DETACHED (nohup, alle4fix.sh
+CI-Form) 4/4 je '555/555' (ALLE4_RC=0, 20:54-21:15Z). Fahrer + Fortsetzer starben je an der Turn-Grenze bei laufendem
+K17 (Lehre KON135-09). LEAD-PHASEN 30.08. 21:1xZ + 01.09. 08:2xZ: (b) Warnungen 0 NEU beidseitig, (c) Treppe
+555/551/549 RESTORE BYTE-GLEICH, (d) TABU 832/833 sha unveraendert + Lock 713, (e) Gates 6/6 dev-Bereich +
+main-FF-Bereich (6 Commits), gitleaks 1==1 + 6==6, (f) R4 286/287 = 0, Dual-Push dd0f56d3 08:30:54Z (ls-remote 2/2) ->
+CI 286/16293 SUCCESS 09:14Z (N-O27-Jobs namentlich gruen, lint:static geheilt; FUND-QUITTUNG N-O27 BEHOBEN), (g)
+main-FF 09:17Z -> CI 286/16294 SUCCESS 10:03Z (26 success + 1 manual relock, 0 Bridges), Nachmessung 4/4 == dd0f56d3.
+Verify (wf_e1751971 verify-r1, 01.09. ~13:0xZ) TRAEGT: V-1/V-2 Beweis-Hygiene (lock_check_fix.out Usage-only ->
+Vermerk + Standalone-Nachlage 01.09.; Push-/ls-remote-Literalkopien nachgelegt push/ls-remote-nachtraeglich-0109.txt),
+V-3 GELOEST != KONFORM: super vor_push_alle_wachen.sh RC=1 ausschliesslich [C2] cppcheck ueber Code/measure_out_d03
+(.gitignore:116, git ls-files 0) -> cppcheck-Wache auf git-ls-files-Scope begrenzen (#135-Register), bis dahin jeder
+super-Push formal 'rote Wache + Erklaerung'; V-4 STAND-Batch-Nachtrag statt je Schritt; V-5 H-2 LastTest.log
+bestaetigt; V-6 Bruecken-Form (s. -04).
+
+**KON135-04 (#114-RE-RUN-2 + SUPER-BUMP 8b9ca7c9 01.09.; Beweisort 114-rerun2/ + super-bump2/):** #114-E07-Q1-Re-Run-2
+auf dd0f56d3 (wt-ce-114rerun2, 09:4x-10:22Z): E07_GATE=GO 10/10 + 23/23, 3 Koeder rot-zuerst literal, K5A stabil
+1314/1314, TABU 833/833 sha vorher==nachher, Plan-Kopf-Delta 18 -> 18+1 deklariert, porcelain 0, kein Commit.
+super-Bump (Fahrer 1 10:2x-10:35Z): Vorflug origin==github development, 11 Lead-docs-Commits vor origin (fuhren mit);
+ce-Hauptklon ff auf dd0f56d3 (is-ancestor bd55942a/2e9b8697/bb5b6949/5e03c2cc rc=0, Kette 15 Commits); XSD-Patch E-4
+experiment_schema.xsd 2/2 Hunks (@80 Slot organ_meta_meta_axes, @610 OrganMetaMetaAxesType; +35/-0, 693 -> 728 Z.;
+O2-Wortlaut :435 unangetastet; xmllint --schema 5/5 validates, fixture_schema_subset_check 2/2, xml-wellformed 67/67);
+PZW-9.5: Drift-Biss rc=2 literal, Nachzug nur CE-SHA-Anker (+15/-1), rc=0 '5 von 5 Ankern' (45/24/2/2/0 @ 573
+Test-.cpp); EIN atomarer Commit 8b9ca7c9 (3 Dateien +51/-2); Wachen 13/26 0 rot (RC=1 = [C2]-Klasse), Diff-Hygiene 12
+Commits/7 Dateien GRUEN, gitleaks Koeder rc=1 + Echt 12==12; R4 286/287/288 AKTIV=0, R6 0 -> Dual-Push 10:34:23Z -> CI
+288/16297 SUCCESS 11:23:10Z (36/36 Jobs + Bruecke trigger:cache-engine -> 286/16298 success @ dd0f56d3). Fahrer 1
+starb am Session-Limit (~10:53Z) VOR dem main-FF, mit Riss-Schutz-Rezept in STAND.md; Fahrer 2 (Resume 12:19Z mit
+Wiederanlauf-Klausel NUR im Bump-Prompt, K27-neutral) fuhr main-FF 8be694ef -> 8b9ca7c9 12:22Z (Diff-Hygiene +
+gitleaks 12==12 Bereich, R4 0) -> CI 288/16299 SUCCESS 13:08:22Z (36/36 + Bruecke -> 286/16300 success) -> Nachmessung
+13:09:55Z 4/4 == 8b9ca7c9. FORM-BEFUND: trigger:thesis + trigger:prt-art in beiden Push-Formen NICHT instanziiert
+(rules changes.paths nur bei Gitlink-/YAML-Aenderung; Referenz 16265 hatte 3 Bruecken) = regelkonform, kein Rot. super
+development==main==8b9ca7c9 beide Remotes.
+
+**KON135-05 (E-1 ZOMBIE-KASKADE: OWNER-GO CANCEL + URSACHE + DESIGN + REFUTE + BAU, 01.09.; Owner verbatim 'E-1: ja
+canceln und echt reparieren. Wie empfohlen.'; Beweisort ~/backups-workflow/20260901-e1-ci-zombie-fix/):** Cancel
+09:50:2xZ 288/16280 + 16279 + 16275 (HTTP 200 x3, alle terminal), R4 288 AKTIV=0 -> super wieder pushbar. URSACHE
+(Explore 2x Sonnet-Kartierung + Fable-Design 492 Z., am Objekt + GitLab 19.1.4 Doku/Quelle): ce-Emitter
+TierCiYamlBuilder::emit_batch_measure_job (experiment_plan_director.hpp @dd0f56d3 Z.1697-1700) emittiert rules 'smoke
+-> on_success' + Catch-all 'when: manual' OHNE never; GitLab: rules:allow_failure Default false + 'allow_failure:
+false combined with when: manual in rules causes the pipeline to wait'; strategy:depend vererbt 'manual' nicht
+(bridge.rb kennt nur success/canceled/failed/skipped) -> Bruecken bleiben running -> Parent/Child 'running' ohne Jobs.
+Zeitleiste Job 386389: created 29.08. 12:01:12Z -> canceled 01.09. 09:50:26Z = 251354 s = 69,8 h (Refute F3;
+Design-Wert 254954 s war 1 h zu hoch). Normale Pushes unbetroffen (planer:delegate ohne
+BUILD_GOLDEN_N/DYNAMIC_PLANER_CI nicht instanziiert). NE-20 ergebnis:holen (super :2947-2957 when:manual +
+allow_failure:true) = gleiche Klasse, nicht Ursache; Owner F5 27.08. 'heilen' -> mitheilen. ZIELBILD: Z1 TERMINAL
+(jeder BUILD_GOLDEN_N-Lauf endet ohne Owner-Handlung success/failed), Z2 RULES-SKIP (Mess-Batches + Sammler nur bei
+COMDARE_MEASURE_PROFILE smoke|full -> on_success, sonst when: never), Z3 kein allow_failure. Doktrin-Konflikte K1-K7
+aufgeloest (Par.41-320er-Gate = Owner-Direktive zu Umfang/Zeitpunkt, kein Klick-Gate; is_original:relock +
+build:arm64-smoke bleiben deklarierte ce-Statik-Ausnahmen ausserhalb E-1 = Lead-Posten gleicher Klasse). REFUTE
+(Fable, REFUTE-DESIGN.md 210 Z.) TRAEGT_MIT_FIXES F1-F10: F1 Stufe-2-Emission ist env-frei -> Lint-Bisse per Injektion
+in den globalen variables:-Block (2/4/4 Jobs), F2 stille Null bei ungueltigem Marken-Wert -> emittierter Wache-Job
+hart rot (Owner 09.08. 'Wenn dann muss ein Fehler sauber mit einer Warnung an den Anwender angezeigt [...]'), F3
+Zeitzahl, F4 Bruecken-Bilanz (trigger:cache-engine 16278 FAILED seit 29.08. 12:16Z), F5 EIN Stand dd0f56d3 + Nenner
+22+14 TEST(), F6 Doku-Nachzug WELLENPLAN-DICHT Z.778-779 / GOAL-DICHT Z.418-420, F7 Sammler-Regel
+DYNAMIC_PLANER_CI-Symmetrie, F8 R4-Skript-Ort, F9 7d-Timeout-Kenntnisnahme, F10 T17 nur als Vorlage-Zitat belegt. BAU
+wf_d102ab04-ba6 (Start 12:5xZ, Script e1-zombie-fix-bau-0109.js 137 Z., Lead voll gelesen): Design-Fix A2.5 -> Bau
+S1-S4 in wt-ce-zombiefix (bau/ci-zombie-fix-0109; Test rot-zuerst, Emitter-Fix + Wache-Job, Emission + 4 Lint-Bisse
+2/4/4/3) + K17 detached mit R6-Schleife je Zelle -> K17-Abnahme/Floor/TABU/Lock -> Opus-max-Erhebung +
+Fable-max-Bewertung (+Codex-Probe) -> Fix-Schleife bis NULL neue Funde (max 3) -> ce-Landung A2.1a
+(lande/ci-zombie-fix-0109 --no-ff, Gates, Dual-Push dev, CI 286, main-FF). super-Haelfte S8-S10 (ergebnis:holen rules
+ohne manual/allow_failure + Gitlink-Bump) = Lead-Hotspot nach der ce-Landung; S11 Live-Biss = ##47-Re-Run-3 NACH Owner
+E-2 (prod2-Speicherbremse) + C-02 HEAVY-Signal.
+
+**KON135-06 (E-4 THESIS 289: VOR-REWRITE-HISTORIE ZURUECK, AUDIT, KAPPEN, REFUTE r1/r2, FIXES, GITHUB PUBLIC, GITLINK;
+Owner 01.09. verbatim 'Bitte sync alle branches aller 4 Diplomarbeit Projekte, ich habe gestern manuell mit dem admin
+laptop gemerged. [...]' + 'E-4: Wir hatten hier ein secret leak, bitte schicke einen Agenten los, der gegen den
+gesamten cred vault prueft, dann die hostory rewrite wieder bereinigt und dann force push, die Aenderungen muessen
+dennoch unbedingt erhalten bleiben, daher github kurz private stellen, angleichen und dann beide einheitlich mit
+history rewrite bereinigen.'; Beweisort ~/backups-workflow/20260901-thesis-sync/):** BEFUND 09:3xZ: thesis origin
+development==main== b591266a = 3 Owner-Merges vom Admin-Laptop (31.08.) einer Linie mit der
+VOR-Trailer-Rewrite-Historie (367 Commits ab 14.06., 97 Standalone-Trailer + 1 Mid-Line; #61 vom 15.08. unterlaufen:
+ein Klon ohne Fetch des Rewrites mergte origin hinein); Inhalts-Diff nur 5 Dateien +39/-19 (Owner-Text); CI
+16290/16291 rot nur chktex 01_einleitung.tex:177; GitHub 17165aa2/dad2d52c sauber. super/ce/prt-art synchron (lokale
+mains nachgezogen). SICHERUNG: Bundle thesis-origin-b591266-dev-main. bundle (sha256 2634097a...) +
+refs/rescue/owner-laptop-merge-20260831 (lokal, nie pushen). GITHUB 10:0xZ PATCH private: true (Token blind aus git
+credential fill; Vault github-token.txt = 'Bad credentials'). AUDIT (Fable, wf_4fc4b8d9): 782 Commits / 1510/1510
+Textblobs beider Remotes, gitleaks 8.30.1 git --all + dir-Modus 'no leaks found' (Default-Config 30 generic-api-key =
+BibTeX-/Cache-Key-FPs), Vault-Blindprobe 13872 Kandidaten -> 80 Treffer, 0 Credential-Klasse -> Bedarf = KAPPEN (kein
+filter-repo). REWRITE 10:33Z: Force-Push --force-with-lease development+main beider Remotes b591266a -> cbefa617 (=
+17165aa2 + 21e9baf Owner-Text [Autor Owner, Patch 173 Z.] + cbefa617 chktex-Fix 'bzw.\ die'); Protection main
+temporaer allow_force_push, byteidentisch restauriert; Alt-Refs (rescue/gate8, overleaf, Tags) unangetastet; CI 289
+16295 (dev) + 16296 (main) je 4/4 success; Nachmessung Bare-Klone beider Remotes 413/413 Commits, Standalone-Trailer
+0/413 (nur Mid-Line 09cc7286 18.06.), gitleaks '380 commits scanned' 'no leaks found', Owner-Text-Probe 'drei Ebenen'
+1, Tree f9224ec0 == cbefa617. REFUTE r1 TRAEGT_MIT_FIXES (F-1 Alt-Linie per SHA fetchbar = keep-around/dangling, F-2
+Laptop-Rezept fehlte, F-3 audit/tmp-Rest, F-4 Nenner 97+1) -> FIX r1 (F-2..F-5 BEHOBEN, F-1 VERTAGT Lead/Infra);
+REFUTE r2 TRAEGT_MIT_FIXES (R2-F1 = KON135-07, R2-F2 = F-1, R2-F3 Rezept 'checkout -B <branch> cbefa617') -> FIX r2
+(R2-F3 BEHOBEN mit 3 simulierten Faellen; R2-F1/F2 VERTAGT an Lead/Owner). LEAD 13:30:27Z: GitHub PATCH private:false
+HTTP 200, unauth API + HTML 200 13:32:16Z (visibility public); KENNTNISNAHME: die gekappte Alt-Linie bleibt per SHA
+auf beiden Remotes fetchbar (GitLab keep-around ueber 776/800 Pipelines seit 30.06., GitHub dangling nach dem
+Angleich-Push) -- sie war Juni-15.08. ohnehin public und traegt 0 Secrets -> keine neue Exposition; GitHub-Support-GC
++ GitLab-Cleanup (Ref-Loeschung nur mit Owner-GO) = optionale Infra-Posten. OWNER-REZEPT Laptop-Klon
+(OWNER-REZEPT-LAPTOP-UND-RESTRISIKEN-E4.md): git fetch --all --prune; git checkout -B development
+cbefa617aa54b17cec0933b3853d2b2bfdd7e22e (main dito); Kontrolle log -3 + Trailer-Zaehlung 1 (09cc7286); NIE merge
+origin/main in einem Alt-Klon, NIE force-push vom Laptop. OFFEN OWNER: Mid-Line-String 09cc7286 in allen Refs (A
+belassen [Lead-Empfehlung] / B Message-only-Rewrite ueber alle Refs). GITLINK 13:3xZ: super 9b6b4ae9 = BEIDE
+Thesis-Zeiger 17165aa2 -> cbefa617 ATOMAR (Paritaetswache --quelle index --erwartet rc=0; V3: Ancestor rc=0 2/2 +
+Kind-Pipelines 16295/16296 gruen), Wachen 13/26 0 rot (RC=1 = [C2]-Klasse), gitleaks Koeder rc=1 + Echt 1==1, R4 288
+AKTIV=0, R6 0 -> Dual-Push development 13:34:09Z -> CI 288/16301 SUCCESS (36/36 + Bruecke trigger:thesis -> 289/16302
+success) -> main-FF 8b9ca7c9 -> 9b6b4ae9 (Diff-Hygiene + gitleaks Bereich, R4 0) -> CI 288/16303 SUCCESS 13:43:39Z
+(36/36 + Bruecke -> 289/16304 success) -> Nachmessung 13:46Z ls-remote origin+github dev+main 4/4 == 9b6b4ae9
+(Beweisort gitlink/); Board #161 COMPLETED. Memory reference_thesis_laptop_merge_bringt_vor_rewrite_historie_zurueck
+(Lehre: nach jedem History-Rewrite ALLE Fremdklone neu setzen; 'sync' nie blind = Trailer + Bereich messen).
+
+**KON135-07 (E-5 PAT-EXPOSITION 01.09. 12:51:50-12:52:05Z, Klasse Credential-Drittempfang; OWNER-ENTSCHEID):** der
+E-4-Refuter Runde 2 (Fable, wf_4fc4b8d9 Agent a7125a68) sandte 14 curl-Requests MIT dem Header aus glhdr.curlrc an
+https://gitlab.com/api/v4/projects/289/... (Host geraten statt aus 'git remote -v' gelesen) -> 14x HTTP 401 (Beleg nur
+im Agent-Transkript; Fix-Nachmessung fix/f1-transkript-zaehler-r2.txt: 14/14 401, 0x 200). Credential =
+root/Administrator-PAT id 62 'keeper-root-rotation-20260725-r20260801' (Scopes api+read_repository+write_repository,
+angelegt 01.08., Ablauf 2026-10-30, laut KON33 12.08. blind aus dem Vault geholt; curlrc mtime 17.08., seit dem
+Vorfall NICHT rotiert). Exposition: TLS-verifiziert an das echte gitlab.com (Cloudflare-Edge), kein 'insecure';
+Ziel-Instanz 10.0.10.1 (RFC1918) von aussen unerreichbar -> Token extern unbrauchbar, 14x 401 = kein Abfluss aus 289;
+root+api-Drittempfang bleibt Rotationsgrund (Doktrin 'Leak = rotieren'). EMPFEHLUNG (Handout
+fix/HANDOUT-R2-F1-ROTATION-LEAD-OWNER.md, Docs-verifiziert): Owner rotiert PAT id 62 (Keeper + Vault Cluster/keys
+blind nachziehen; personal_access_tokens/self/rotate mit expires_at, revokes previous), Lead setzt glhdr.curlrc blind
+neu + 401-Beweis fuer den alten Token. REGEL (Memory/ARBEITSWEISE-Kandidat): API-Host IMMER aus 'git remote -v'
+ableiten, nie raten; Auftragstexte nennen den Host explizit.
+
+**KON135-08 (SESSION-LIMIT-TOD 01.09. ~10:53Z + HEILUNG 12:19Z, 4 Workflows; Owner: /login + 'Bitte resume alle
+Agenten und workflows und fahre mit offener Arbeit fort. Bitte heile die am spend limit gestorbenen workflows, es
+muessten 4 gewesen sein.'):** Tote (Journale: type=failed, keine Pseudo-Results dank Schema-Pflicht): Fold refute
+b07:r3 + b08:r3, Fix-Zug super-bump (Fahrer 1), E-1 refute-design, E-4 refute-r1. A2.4-Lehre angewandt: je Agent
+Transkript-Ende + Objekt gemessen (Fold/E-1 0 Schreibzugriffe; E-4 nur Beweisort-Arbeitsdateien ->
+refute/_vorlauf-limit-tot-1050Z/; Bump-Fahrer = dev-Push + CI gruen bereits vollzogen, STAND.md-Riss-Schutz). Heilung:
+Fold Resume 3 byte-unveraendert (K27) mit Not-Abgaben-Hygiene (refute-08.md auf R2-Stand 749 Z., fertiger R3 als
+.riss5-nicht-konsumiert gesichert; Praefix-Cache re-ran b08:r3); Fix-Zug Resume mit Wiederanlauf-Klausel NUR im
+Bump-Prompt (3 Vorgaenger gecacht, neuer Key bestaetigt); E-1 + E-4 Resume byte-unveraendert. X-15 (0 Altprozesse,
+Journale stabil), X-16 Modell-Wache 5/5 claude-fable-5. Alle 4 terminal bis 13:2xZ (E-1 Refute, E-4 Refute+Fix,
+Fix-Zug Bump+Verify) bzw. laufend (Fold). Die zuvor erteilte Pause-Order ('Dann pausiere alle Agenten und lege eine
+abbruchsichere Pause ein') wurde durch die Resume-Order ueberholt; keine Pause gelegt. Kipp-Einlese-Ritual DICHT-Form
+01.09. 12:2x-12:4xZ voll (ARBEITSWEISE-DICHT 704/704, MEMORY.md, 9/9 Memories >= 29.08., Ledger-Kopf KON133-01..22,
+Uebergabe 1610Z 249/249, PAUSE-PROTOKOLL-10 66/66); MEMORY.md-Index war ueber dem Ladelimit (24,5 KB) -> auf 24,8 KB
+gekuerzt (Detail in den Themen-Dateien).
+
+**KON135-09 (LEHREN 30.08.-01.09., Register-Kandidaten):** (1) 'AGENT STIRBT AM WARTEN' (3x 30.08. + Bump 01.09.): ein
+Workflow-Agent, der per Monitor/Background-Task auf ein Ereignis wartet und den Turn beendet, wird nicht wieder
+aufgeweckt (Turn-Ende = Abgabe, Orchestrator erzwingt StructuredOutput) -> Waits NUR im Vordergrund ueber wiederholte
+<= 580-s-Aufrufe (warte_marker.sh / warte_jobs_idle.sh / warte_pipeline.sh, Bash-timeout 600000 ms), lange Laeufe
+(K17, CI) detached mit Marker-Datei; alternativ NICHT-FATAL-stopp + Lead-Uebernahme (bewaehrt). (2) K27-Praefix-Cache
+bestaetigt (KON134-09): Wiederanlauf-Klausel nur im LETZTEN offenen Prompt ist cache-neutral. (3) cppcheck als
+ungedeckte Lens-Klasse (Gate-7-Kandidat) + super-Wache [C2] auf ignoriertem Baum (#135). (4) Bruecken-Form: trigger:
+thesis/prt-art per changes:-Gate -> '3 Bridges' ist keine Konstante, Jobmenge = /jobs UNION /bridges je Push-Bereich.
+(5) History-Rewrite: alle Fremdklone (Laptop!) neu setzen, sonst Rejoin; 'sync' nie blind. (6) API-Host aus 'git
+remote -v' (KON135-07). (7) Beweisort-Hygiene: STAND je Schritt VOR dem naechsten Schritt (V-4),
+Push-/ls-remote-Literale immer als Kopie (V-2). (8) MEMORY.md-Index unter ~24,4 KB halten (Ladelimit), Detail in
+Themen-Dateien.
+
+**KON135-10 (OFFENE OWNER-ENTSCHEIDE, Stand 01.09. 13:5xZ, je ein Satz genuegt):** E-2 prod2-Speicherbremse (VMs im
+HEAVY-Fenster pausieren / kOwnerHeavyJIntel 24 -> 16 / earlyoom-Ausnahme fuer gitlab-runner) + C-02 HEAVY-Signal VOR
+##47-Re-Run-3 und ##49; E-3 codex login (Codex-Lens faellt sonst weiter als deklarierter Ersatz-Lens aus); E-5
+Rotation root-PAT id 62 (KON135-07); E-4-Rest Mid-Line 09cc7286 A/B; B-04-Vorlage libcpuid-Eigenweg A/B (Fold, nach
+Terminal). Selbstcheck: ASCII-only, Zeilen <= 120, Zahlen aus Messungen 01.09. (Journale/API/git) mit Nenner,
+Owner-Zitate verbatim.
+
+**KON135-11 (OWNER-ORDER 01.09. 13:4xZ + VOLLLESUNG DER LETZTEN 4 WORKFLOWS, Lead 13:46-13:55Z; Beweisort
+~/backups-workflow/20260901-volllesung-4-workflows/):** Owner verbatim "Bitte lies immer alle rueckkehrer
+vollstaendig, merke dir das. Bitte lies die letzten 4 Workflows vollstaendig und werte sie aus." (dritte Setzung nach
+22./23.08.; Memory feedback_agenten_ergebnisse_immer_vollstaendig_lesen.md Regeln 8-10: persistierte tool-results bis
+zur letzten Zeile, 'auswerten' = Lesequittung im Beweisort, nach Compact nachlesen). VOLLZUG: 76/76 Results der
+Journale gelesen (Fold wf_fe1cf67c 60, Fix-Zug wf_e1751971 5, E-4 wf_4fc4b8d9 6, E-1-Design wf_38c58b96 4, E-1-Bau
+wf_d102ab04 1; Extraktor ohne Kuerzung, Tranchen <= 37 KB; Volltexte + MD5SUMS gesichert). AUSWERTUNG
+(LESEQUITTUNG-VOLLLESUNG-4-WORKFLOWS-0109.md, 149 Z.): Fix-Zug KOMPLETT/Verify TRAEGT; E-4 VOLLZOGEN, Refute r1/r2
+TRAEGT_MIT_FIXES, Reste E-5 + Alt-Linie-Kenntnisnahme; E-1-Design TRAEGT_MIT_FIXES F1-F10 (im Bau-Run behoben), Bau
+laeuft; Fold 60 Results: Batches 1-8 bis Runde 3 zu (Endstaende 4W/6R, 6W/4R, 8W/2R, 6W/4R, 6W/4R, 9W/1R, 6W/4R,
+4W/6R; 6 Status-Kipps am Objekt), Welle-3-Refute R1 b09-b12 (3+0+0+3 ERNST: S06/B-21 Bruecken-Ziel-Ref = neue
+Owner-Frage; S08/B-22 E04-Volltext existiert in ~/.claude/history.jsonl 11.08.; S08/B-19 Bestandslog lief nie
+zweimaschinig; S09/B-06 floor((T-4)/4) owner-bestaetigt 15.08. 09:34:26Z), b15: S12/B-11 einziger WIDERSPRUCH
+(Formal-Beweis VOR/NACH Abgabe + RISC-V/Pi5). RETTUNGEN verbucht: Owner 15.08. L56453 'Es darf grundsaetzlich nie
+allow_failure geben, wenn dann konfigurieren wir gezielt neue nodes hinzu.' (bislang nicht im Memory) ->
+feedback_allow_failure_verboten...; Allowlist-Frist 2026-09-15 der 4 PA-3-Waisen = Wache ROT ab 16.09. (S08/B-10,
+Owner-Vorlage); Board #159/#160/#161; Owner-Vorlage-Kandidatenliste (35 Posten) fuer A2.3a in der Quittung Abschnitt 5
+(Buendelung erst nach Fold-Terminal).
+
+## KON134 -- 29.08.: OWNER-FUNDE PSEUDO-RESULT/NOT-ABGABEN, LANDE-PRUEFUNG TRAEGT, MAIN-FFs ALLER DREI REPOS CI-GRUEN,
+## FOLD-R2 MAP-REDUCE, SESSION-LIMIT-RISS + RESUME (Lead 29.08.)
+
+**KON134-01 (OWNER-FUNDE 29.08. ~01:5x-05:5xZ, verbatim; Klasse PSEUDO-RESULT + NOT-ABGABEN):** "Das Rueckfragen Audit
+ist gestern abgebrochen, es waren nur 8 Agenten der dritten Stufe komplett, bitte ueberpruefe alle workflows, das ist
+ein schwerwiegender defekt" + "Ich habe die restlichen workflows not-gestoppt, sie behandelten ueber 25 Agenten als
+abgeschlossen, die gestern ab spend limit gestorben sind" + "Ich sehe immer noch keine Verbuchung oder wiederanlaufen
+dieser workflows, bitte lies auch alle Rueckkehrer workflows stets vollstaendig. [...] Die 20 Map Agenten WAREN NIE
+FERTIG, ich habe beobachtet wie sie starben, bitte wiederhole sie alle. Ja fold war durch, aber doch nicht das landen
+und rueckfrage audit. Das Landen muss geprueft und wiederholt werden". BEFUND (Forensik 6 Journale): wf_027ac946 trug
+2 PSEUDO-Results (schema-lose Agenten superzug/kalibrier47: letzter Zwischentext 'Ich warte auf das Terminal-Event
+...' als Result, Lauf 'completed 0 error'); Map-Erstlauf (map/) = NOT-ABGABEN (Owner-Live-Beobachtung schlaegt
+Journal-/Datei-Bilanz; 157/157-Zaehler beweisen STRUKTUR, nicht SUBSTANZ). HEILUNG (Doktrin, Memory
+reference_pseudo_result_klasse_schema_pflicht_workflow_agenten.md): schema an JEDEM agent() + Kontrakt-Wache im
+Script; Limit-tote Stufen KOMPLETT wiederholen (Cache-Bruch-Marker [WIEDERHOLUNGS-RUNDE-2], neues Ausgabeverzeichnis
+map2/, Erstlauf nur als DELTA-Vergleich); Landungen nach Riss-Laeufen bekommen einen UNABHAENGIGEN adversarischen
+Pruefer (Default TRAEGT_NICHT) als Gate VOR weiteren Pushes. Lehre BESTAETIGT 29.08. 06:52Z: beim naechsten Limit-Riss
+meldete die Kontrakt-Wache 'main-ff-rest: KEIN valides Schema-Result (AUSFALL/Pseudo-Klasse)' + '47-kalibrier: ...'
+statt eines Pseudo-Erfolgs. Owner-Frage 'Hast du diesen Workflow vollstaendig gelesen [Lande-Zug wf_027ac946]' ->
+ehrlich 6/8, 2 Results (R1/R2/R5/R7-Klasse) aus journal.jsonl nachgeholt = 8/8 (X-19).
+
+**KON134-02 (LANDE-PRUEFUNG TRAEGT, wf_d27fc8f0 Lande-Pruefer aac425485 05:57-06:08Z, Fable 5 max adversarisch,
+Default TRAEGT_NICHT; Beweisort ~/backups-workflow/20260827-lande-reif/lande-pruefung/PRUEFBERICHT.md 201 Z.):** P1
+ce-Kette 6 Commits (41bf4c62 konform / 20d6dd2c pmckoeder / 01dc3122 vo3-1 / 8c861759 a5-reuse / e5cc566d / bd55942a
+Heil) x 4 Refs = 24/24 is-ancestor rc=0, ls-remote 4/4 == bd55942a; P2 CI 286/16263 dev + 16269 main je success
+26+1manual/0 Bridges, Rot-Gegenstand 16260/385992 (gcc-Debug prod2 Test #541 pmc-Koeder) am Objekt geheilt (386098
+prod1 546/546; 386084 clang-dbg prod2 542/542 'Test #541 Passed'); P3 super dev 8be694ef 2/2 Remotes, first-parent
+dd66a3cc -> b3e9b7b7 (Merge 67367dd6) -> bf9647ec -> 8be694ef, Gitlinks ce bd55942a + prt-art b539d6ee per ls-tree an
+2 Staenden, KON133 Kopf Z.19 = 22/22 IDs + 2 deklarierte NACHTRAG-Bloecke (24 Marker), +462 Z. exakt, Anker 17/17
+unabhaengig reproduziert (anker_zaehler.sh), XSD:435 'O2/no_extension', .gitlab-ci.yml:1225 NACHTRAG, CI 16265 36/36 +
+3/3 Bridges; P4 prt-art dev b539d6ee, Merge 23ec686a (Parents 16c90628 + ce804e41), CI 287/16264 success; P5 mains je
+Repo origin==github (6/6 Werte, 0 halbe Pushes); P6 TABU 832/832 frisch @ bd55942a, cmp rc=0 gegen vorher (d3b5a393)
+UND nachher_final, Listen-sha 8f56e4e3...; P7 Beweisorte 12/12 Stichproben deckungsgleich. FUNDE F-1..F-4 =
+Praezisierungen ohne Objekt-Fix: F-1 prt-art-FF war zur Messzeit bereits vollzogen (Auftrags-SOLL 16c90628 ueberholt);
+F-2 Rot-Zelle gcc-Debug x prod2 in 16263/16269 nicht am identischen Host wiederholt (Heilung auf prod2 in der
+clang-Debug-Zelle bewiesen; optionale prod2-gepinnte Wiederholung, kein Blocker); F-3 Nenner 24 statt 16 Proben, 22
+IDs / 24 Marker; F-4 Topologie 67367dd6 via Merge b3e9b7b7 (nicht Ancestor von dd66a3cc). URTEIL TRAEGT, kein STOPP.
+Nicht ausgefuehrt (deklariert): kein Push/Fetch/Merge/Pipeline-Aktion/gitleaks; E07-Gate nicht neu gefahren.
+
+**KON134-03 (MAIN-FFs ALLER DREI REPOS VOLLZOGEN + CI-GRUEN 29.08., FF-Fahrer wf_d27fc8f0 [a27cc0acb 05:4xZ +
+afdbdbadfd 06:1xZ]; Beweisort mainff-rest/ STAND.md 66 Z., prtart_push.log, super_push.log, wache_*, gitleaks_*, r4_*,
+nachmessung_1.log):** ce d3b5a393 -> bd55942a (02:04Z; CI 286/16269 main success 02:46:50Z 26+1manual). prt-art
+16c90628 -> b539d6ee (Push 05:47Z origin rc=0 + github rc=0, Bereich rev-list 3, is-ancestor rc=0; Diff-Hygiene:
+prt-art hat KEINE eigene Wache (#155-Klasse deklariert), Ersatzfahrt super-Wache --stdin ueber den FF-Diff 35109 B/8
+Dateien GRUEN 662/662 out-of-scope, 0 Verstoesse; gitleaks Koeder len=26 rc=1 'leaks found: 1' + Echt Nenner 3==3
+dump-commits 70022 B rc=0 'no leaks found'; R4 287 AKTIV=0; CI 287/16270 main success 05:49:48Z 9/9). super 54b25e2f
+-> 8be694ef (Push 06:11:43Z origin rc=0 + github rc=0, Bereich 15 Commits/49 Dateien; Diff-Hygiene kumulativ
+scripts/ci_diff_ascii_width_guard.sh --bereich rc=0: 389 Scope-Zeilen, 0 Nicht-ASCII, 0 >120, 6501 out-of-scope in 46
+Dateien namentlich; gitleaks Koeder rc=1 + Echt Nenner rev-list 15 == 15 unique SHAs (17 commit-Zeilen wegen -m je
+Merge-Elter) 1818298 B rc=0 'no leaks found'; R4 288 AKTIV=0; CI 288/16271 main success 06:57:40Z: 36/36 Jobs +
+Bridges trigger:thesis -> 16274 success 4/4, trigger:prt-art -> 16272 success 9/9, trigger:cache-engine -> 16273
+success 26+1manual [Lead-API-Messung 06:49Z + 11:36Z]). Nachmessung 1 06:12:06Z = 6/6 main==development
+(super/ce/prt-art x origin/github). Der FF-Fahrer starb 06:52:48Z am Session-Limit WAEHREND des 16271-Pollings
+(Objektstand weiter als Journal = X-19-/KON133-06-Klasse; Kontrakt-Wache: AUSFALL); Rest = Nachmessung 2 +
+CI-JSON-Belege im Resume 11:4xZ (Prompt auf den Objektstand gepatcht, kein Push). ##47-Kalibrier-Fahrer (ae08bfbb)
+starb 06:52:48Z mit 0 Tool-Uses: KEIN POST erfolgt (288 development ohne neue Pipeline seit 16265) -> Re-Run im selben
+Resume. KETTE V3 fuer alle drei FFs damit KOMPLETT belegt (dev-Push -> Pipeline gruen -> main-FF -> Gitlink ->
+Zweit-Repo-Pipeline).
+
+**KON134-04 (FOLD-R2 / MAP-REDUCE, wf_c37fb077, 29.08. 05:4x-07:03Z; Owner 28.08. verbatim 'das Ledger sicher nur
+verarbeitet werden kann, wenn mindestens 15 Kontexte parallel zur Verfuegung stehen, es ist gigantisch und zu gross
+fuer eine einzelne Synthese'):** Wiederholungs-Runde 2 (Owner-Order, Cache-Bruch): 19/20 Map-Leser REGULAER beendet
+(je StructuredOutput-Abschluss + Journal-Result 06:12-07:02Z, map2/map-*.md mit BILANZ-Nenner 'Zeilen a-b voll',
+157/157 je Result; seg-01..17 + KON133-ENTWURF + KONSOLIDAT-A 96 KB); KONSOLIDAT-C-Leser (a358e4ce, 1.0 MB Transkript)
++ 16 Reduce-Richter + Zusatz-Sichter + Assembleur + Final-Wache am Session-Limit 07:03:45Z gestorben (20 failed, 0
+Pseudo-Results dank Schema-Pflicht). Lauf-Bilanz Harness: 63 Agenten (43 done / 20 error), 10.48M Subagent-Tokens, 695
+Tool-Uses. SCRIPT-HAERTUNG 29.08. 11:4xZ (NIE-KUERZEN): Map < 20/20 Segmente ODER != 157/157 je Segment => STOPP mit
+Befund statt 'NICHT gelesen'-Weiterlauf im Reduce-Nenner. Resume 11:4xZ: 19 Map-Results aus dem Journal-Cache
+(regulaere Abschluesse VOR dem Riss, je Transkript-Ende geprueft), KONSOLIDAT-C + Reduce/Refute/Fix + Zusatz +
+Assembleur + Final-Wache frisch. Session-Limit-Riss-Klasse (R11) damit zum 3. Mal (26.08. Spend, 27.08. Fable, 29.08.
+Session 06:52/07:03Z, Reset 11:00Z).
+
+**KON134-05 (EINLESE-RITUAL 29.08. ~06:40-06:53Z, Owner-Order 'Bitte vollziehe das Einlese-Ritual durch Kippen der
+dichten Referenzdokumente [...] Bitte lies die Kontextuebergabe vollstaendig. Bitte lies memory.'):**
+ARBEITSWEISE-DICHT 705/705 Z., MEMORY.md 141 Z., 20/20 Memories mit mtime >= 26.08., Ledger-Kopf KON133 Z.1-480
+(Befund: NACHTRAG-Bloecke KON133-19 und KON133-05/10 sind in bf9647ec ENTHALTEN -> kein KON-Nachzug dafuer),
+Uebergaben 0610Z (100 Z.) + 1900Z (108 Z.), GOAL-V8-DICHT 506/506, WELLENPLAN-V2-DICHT W-0/W-H (Z.1-321) + W-6
+(Z.900-1679); Objekt-Ist (3 Repos, Board, df / 24G, pgrep, 2 Workflow-Journale, CI per API). Owner-Frage 'warum gibt
+es kein Konsolidat-B' beantwortet: Sektion B = die 157 Fragen selbst (FRAGEN-B.md = Eingang 1 jedes Lesers; A/C =
+Beleg-Segmente; P = Protokoll, kein Segment).
+
+**KON134-06 (##47-KALIBRIERLAUF WIEDERHOLUNG 29.08. ROT; POST 11:51:13Z -> 288/16275 @ 8be694ef source=api; Fahrer
+wf_d27fc8f0 Phase 47-Kalibrier; Lead-API-Messung 12:24-12:3xZ; Board #160):** Parent 37/38 Jobs success; Bridges
+thesis 16277 + prt-art 16276 success, cache-engine 16278 FAILED (286 main @ bd55942a: test:coverage-guard 386372 prod2
+12:08:16-12:09:34 'g++-15: fatal error: Terminated signal terminated program cc1plus' beim TU
+profile_run_facade.cpp.o, 4x --parallel 2, exit status 4; derselbe Job auf 16273 06:57Z success);
+planer:delegate-trigger -> Child 16279 2/2 success -> Grandchild 16280 'manual': tier:build-batch:amd 386387 prod1
+SUCCESS (Erstdurchgang 64/64 in 34 s, 0 FEHLER-TESTAT), tier:build-batch:intel 386388 prod2 12:01:16-12:21:07 FAILED
+(Zelle [O2,avx2] Fenster 0:64 Erstdurchgang '[BILANZ-TESTAT] gebaut_neu=16 ... fehl=48 dauer_s=74.352', Nachbau 12/36
+-> 14/22 -> 13/9 -> 9/0 bis '[PRUEF-BILANZ] ok=64 fehl=0 faelle=64/64'; [O3,avx2] gleiches Muster; je Zelle
+'[FEHLER-TESTAT] ... phase=pruef fenster=0:64' -> 'ERROR: Job failed: exit status 1'); measure-Jobs manual/skipped
+(Lauf BAUT nur). Artefakt-Logs: 132x '[pruef-fail] binary_id=... Bau-Fehler (status=1) -> nicht pruefbar' (perm1 67 +
+perm3 65), pruef-only-Lauf '[E4] fertig: exit=1', perm1_bau_0.log '[Infra-Fehler: artefakt_io] object_fetch
+fehlgeschlagen: bestandslog/binary_bestand.xml.lock'. Zeitueberlappung prod2: coverage-guard 12:08-12:09 WAEHREND des
+intel-Batches 12:01-12:21; KEIN HEAVY-Signal C-02 (RN-33) gesendet; die ##47-POST-Form startet neben planer:delegate
+die volle 288-Jobmenge + 3 Bruecken (ce-Vollpipeline 27 Jobs) auf denselben Runnern. Fahrer-Nachposten (STAND.md
+12:28-12:30Z): ##48-Tafel GEMESSEN @457198 B je DLL: benoetigt 239.7 GB gesamt / 119.9 GB je Lane vs prod1 / 21.0 GB
+(GERISSEN 11.4x / 5.7x) vs NAS 15808.7 GB (HAELT); C-01-Entwurf c01_vorlage_entwurf.md (kein Versand); Alt-Token 39
+NICHT widerrufen; prod2-Speicherbremse (VMs pausieren / kOwnerHeavyJIntel senken / earlyoom-Ausnahme) VOR ##49; Poller
+beendet 12:30:22Z, Kaskade terminal (16280 'manual'). HYPOTHESEN (#160-Explore, NICHT entschieden):
+Kontention/Speicher prod2 (earlyoom-Klasse: SIGTERM an cc1plus + status=1 je DLL), Ebene-B-/NFS-Aussetzer
+(artefakt_io-Literal, NFS-soft T1 4.5), Buchhaltungs-Naht (pruef-only liest status=1-Marken des Erstdurchgangs trotz
+64/64 Nachbau). FOLGEN: intel-Lane-Ernte kontaminiert (RN-39-Klasse), nur amd-Ernte belastbar; STOPP-Doktrin (kein
+Retry/Cancel); Heilung = #160 (Explore -> Fix -> C-02 HEAVY-Signal -> ##47-Re-Run-3 -> verify-47); Lead-Befund
+K26-Kandidat: Kalibrierlauf ohne das Owner-T2-Sperrfenster gestartet.
+
+**KON134-07 (ZWISCHEN-SESSION + PAUSE 9, Owner 29.08. ~12:2xZ verbatim 'Bitte lege nach der Rueckkehr beider audits
+eine abbruchsichere Pause ein und schreibe jetzt bitte eine elaborate Zwischen-Dokumentations-Session. Wir lassen die
+Audits auslaufen, aber ich moechte gerne den Fortschritt ueberwachen, bin aber ab jetzt nicht mehr am Rechner.'):**
+docs/sessions/20260829-SESSION-zwischenstand-lande-rest-fold-r2-47-rot-pause9.md (197 Z., ASCII 0, >120 0) als
+super-Commit 6abc121a LOKAL auf development (origin 8be694ef, ahead 1; Push im Wiederanlauf nach R4-Fenster -- R4 288
+durch 16275 'running' mit manuellem Grandchild 16280 blockiert = Owner-Entscheid, Pipelines nie canceln). Vorbereitete
+Zuege (nicht gestartet): verify-47-ernte-2908.js, lande-e10-stempel2-2908.js. PushNotification an den Owner 3x vom
+Harness als 'Terminal aktiv -> nicht gesendet' verworfen (Fortschritt = Session-Doc + PAUSE-PROTOKOLL-9 + Board +
+Beweisorte). Pause-9-Protokoll folgt nach Terminal beider Audits (Kalibrier-Fahrer stopp-Befund + Fold-R2
+NEUER-LEDGER).
+
+**KON134-08 (##47-ERNTE DER WIEDERHOLUNG, Kalibrier-Fahrer a1a1451f 11:44-12:31Z, Result 12.6 KB VOLL gelesen;
+Beweisort 47-kalibrier/):** Kaskade: planer:delegate 386338 + ceb:build 386384 (BL-1-Heilung greift) + ceb:emit 386385
+success; amd-Lane 386387 GRUEN (16 Worker, 250 DLLs = 2 Perms x [64 Fenster + 61 Sweep], 0 Fehlbauten, PRUEF 2/2,
+737.9 s); intel-Lane 386388 ROT (24 Worker, 96/250 SIGTERM-Opfer = 38.4 %, PRUEF 0/2). URSACHE (Fahrer-Messung am
+prod2-Journal, Kopie prod2-earlyoom-journal-auszug.txt): earlyoom 12:04:14-12:20:07Z 1410x 'low memory! at or below
+SIGTERM limits: mem 8.00%' + SIGTERM an cc1plus (VmRSS ~430 MiB), avail ~5064 von 63708 MiB; RSS-Top = 5 laufende VMs
+(qemu 18739 + 12345 + 10201 + 6064 + 1615 MiB), used 49390 / avail 14318 MiB; 24 Worker (kOwnerHeavyJIntel=24,
+director.hpp:786) x ~450 MiB reissen die Schwelle; prod1 earlyoom inactive. KLASSE INFRA (deterministisch), kein
+Kettendefekt; gleiche Klasse 286/16278 coverage-guard. S-19 KALIBRIERT: bytes_je_dll 457198 GEMESSEN (n=500, Median
+455432; ersetzt 428000 @-O3), lager_bytes 239703425024 (239.7 GB; je Lane 119.9 GB), n_bau 524288, Scheiben 128;
+sekunden_je_dll amd 0.521 (Fenster 0:64 kalt, PRIMAER) / intel 1.176 (gestoert) / Lane-Wanduhr 2.080 / 2.504; bau_eta
+einlanig 75.9 h, zweilanig amd 37.9 h + intel 85.6 h; Urteil ok gegen NAS 15808.7 GB (haelt), GERISSEN gegen prod1
+lokal 21.0 GB (11.4x); Zeit-Deckel nicht rechenbar (--sekunden-je-op fehlt, 0 Messungen, R-8 n/a). ##48-TAFEL (df
+12:28:28Z): benoetigt 239.7 GB gesamt / 119.9 GB je Lane; prod1 GERISSEN 11.4x / 5.7x; NAS HAELT (Reserve 15569 GB);
+gn_out-bind CI-BEWIESEN beide Hosts (#154a: 386387 Z.35 prod1, 386388 Z.34 prod2; NAS ci-runner/{prod1,prod2}/gn_out
+je 250 perm.dll, NAS -254 MB, / nicht durch gn_out). EBENE-B-LIVEBEWEIS nach Key-Rotation JA (blind, Keys nie
+ausgegeben): Bucket buildsystem-cache 48 -> 1664 Objekte (+1616 = 404 perm.dll + 404 .algos + 404 .fingerprint + 404
+.version); amd 250/250, intel 154/250 (96 fehlen = earlyoom-Opfer); 1x transient '[Infra-Fehler: artefakt_io]
+object_fetch fehlgeschlagen: bestandslog/binary_bestand.xml.lock' ohne Abbruch. C-01-VORLAGEN-ENTWURF
+c01_vorlage_entwurf.md (Zahlen, kein Versand). BLOCKER (Owner/Infra): BL-NEU prod2-Speicher (VMs im HEAVY-Fenster
+pausieren ODER kOwnerHeavyJIntel senken ODER earlyoom-Ausnahme fuer gitlab-runner) VOR ##49; R4-BLOCKER: Parent 16275
++ Child 16279 bleiben 'running' (Grandchild 16280 'manual' wegen measure:[all]:batch:amd manual) -> 288 AKTIV != 0
+fuer jeden weiteren Push/POST bis der manual-Job gespielt/beendet wird, Cancel NUR mit Owner-GO (Design-Fix #160:
+Mess-Jobs im Bau-Lauf per rules skippen statt manual). Nachposten: Alt-Token 39 Widerruf erst nach ##47-GRUEN beider
+Lanes; F-07-Beobachtung intel-Grandchild cmake -DCOMDARE_PMC_VENDOR=amd (Emissions-Host prod1), Treiber lage=intel 4/4
+-- keine Bau-Wirkung, Lead-Posten; Ebene C inert (COMDARE_NFS_DROP_TOKEN fehlt). Board: #153 COMPLETED (Landung + FFs +
+Pruefung + amd-Ernte), Rest ##47-intel = #160; #154a ERLEDIGT; #7 S-19 kalibriert.
+
+**KON134-09 (RISS 2 + RISS 3 + K27 PRAEFIX-CACHE, 29.08. ~12:5xZ / ~17:3xZ -> 30.08. 09:2xZ; Owner 29.08. verbatim
+'Die 7 regulaeren wurden nicht replayed aus dem journal cache oder sehe ich das falsch?' + 30.08. '7 Millionen Tokens
+im Klo runter gespuelt, ich denke wir sollten den reduce besser in 4 Batch Phasen bauen. [...] Bitte heile das und
+resume dann wieder alle Agenten und workflows.'):** Riss 2 (Session-Limit ~12:48-12:55Z + 2 API-Fehler) traf den
+Fold-R2 wf_c37fb077 in der Reduce-Stufe (7/16 Reduce regulaer, 9 + alle Refuter/Zusatz/Assembleur/Wache tot;
+Not-Abgaben reduce2/*.riss2 nach Owner-Doktrin 'Limit-tote Stufen komplett wiederholen, nie fortsetzen'). Wiederanlauf
+17:19Z mit Prompt-Markern NUR fuer die 9 gefallenen Batches (Annahme: Cache-Schluessel je (prompt,opts)) -> Riss 3
+(Fable-Limit ~17:3xZ, 3 Laeufe). BEFUND K27 (Owner sah richtig): der Workflow-Resume-Cache ist PRAEFIX-basiert ueber
+die Aufruf-Reihenfolge ('the longest unchanged prefix of agent() calls returns cached results instantly; the first
+edited/new call and everything after it runs live') -- der Prompt-Patch am Zusatz-Sichter (Call VOR der
+Reduce-pipeline) brach den Praefix, alle 16 Reduce liefen frisch (7 doppelt, ~2,3M Tokens). HEILUNG 30.08.
+09:2x-09:32Z: neuer datei-basierter Run wf_fe1cf67c-94e (fold-rest-3008.js: Reduce-Rest 9 in 3 Wellen a <= 4, Refuter
+16 in 4 Wellen a 4 mit <= 3 Runden Refute -> Fix, Zusatz-Sichter, Assembleur mit 157-Gate, Final-Wache; Eingaenge als
+DATEIEN aus dem Journal extrahiert [reduce_eingang/, reduce_results/, zusatz_eingang.json, batch_tafel.json];
+reduce-14 Doppellauf-Abschnitte bereinigt, Rohkopie .roh-doppellauf-lauf2und3; .riss3-Umbenennung); verify-47 +
+E-10-Zug als Resume mit BYTE-UNVERAENDERTEN Scripts (verify-47 kam aus dem Cache = Praefix-Regel bewiesen). REGEL
+(Memory reference_workflow_cache_ist_praefix_basiert): Resume nur byte-unveraendert (failed rerunnen automatisch,
+completed cachen); substanzielle Patches = NEUER Run mit Datei-Eingaengen; grosse Fan-outs in sequentielle Wellen;
+Ziel-Dateien der Toten vor Wiederholungen umbenennen. Bestaetigt 01.09. 12:1xZ am Objekt: der fehlende Result eines
+Refuters (b07:r3) riss den bereits fertigen b08:r3 (Result Journal-Z.112) aus dem Praefix -> Re-Run; Logik-Patches
+NACH dem Praefix (Wiederanlauf-Klausel im letzten offenen Prompt) sind cache-neutral (Fix-Zug 01.09.: 3 Vorgaenger
+gecacht, Bump-Fahrer frisch mit neuem Key).
+
+**KON134-10 (FOLD-REST wf_fe1cf67c-94e -- STAND 01.09. 13:5xZ, LAEUFT; Traeger Board #159):** Reduce 16/16 (7 aus Lauf
+3 + 9 in Wellen), Refuter-Welle 1 (Batches 1-4) + Welle 2 (5-8) je bis Runde 3 komplett refutiert/gefixt; 0 ERNST-Kipp
+ohne Traeger; Status-Kipps am Objekt (Lead-Volllesung Results 1-50, WIEDERANLAUF-LOG-0109.md): S04/B-04 libcpuid vs
+<cpuid.h>-Eigenweg (Owner 21.07. N-08/N-09/N-10 vs 27.07. HW-Plan-GO + 01.08. O-32 F3 'nicht von externen Loesungen
+abhaengig machen') = Owner-Vorlage A/B; S04/B-03 Self-Leak-Token = VAULT-PROD L347, seit 27.07. R17/P1e im
+#327-Register (Vollzug, keine Frage); S04/B-12 Infra-Rueckschrieb 26.07. belegt (B38 N-13/N-22/N-29 + Cluster
+3bf858c/924e62f/47160f2/49b05b5) -> WANDERT_NACH_A; S04/B-19 prt-art-Demo-Slot -> WANDERT (Regel-3-Lesart, TEIL-REST
+M-4/#27); S06/B-09 Limitierungen Weg-B (Owner 22.08. 19:48 5aab516) -> WANDERT; #211-Spiegel seit #188-4c-iii 24e37e1f
+(02.07.) physisch eliminiert -> Zeile Nr. 11 raus (de+en) + Generator csv_to_latex.cpp:1044-1055 = #121-Vollzug;
+S06/B-17 F2 Messpunkt (Owner 08./12./14.08. + 19./20.08.) und F5 Einbringung (07.-21.08.) -> WANDERT.
+LEAD-NACHFIX-POSTEN: der Praefix-Cache-Re-Run von b08:r3 fand teils andere Funde als der nicht konsumierte Erstlauf
+(refute-08.md.riss5-r3-vollstand-0109-nicht-konsumiert): #211-Objekt-Fakt (Pfad (a) steht fest) + RF-C 17.08.
+Docks-Glied sind im konsumierten Lauf ohne Traeger -> KORREKTUR-Absatz 'Lead-Nachtrag' in reduce2/reduce-08.md nach
+dem Fold-Terminal, Eingang fuer die A2.3a-Owner-Vorlage. Rest des Laufs: Wellen 3-4 (Batches 9-16) -> Zusatz ->
+Assembleur (157-Gate) -> Final-Wache -> NEUER-LEDGER-konsolidiert-owner-antworten.md -> Lead-Volllesung ->
+Trace-Workflow der Rueckfragen-Aufgabe (Owner 01.09.: 'erst, wenn fold rest wirklich fertig ist, sodass du ihn
+vollstaendig lesen und abgleichen kannst'; Script rueckfragen-trace-0109-wf_50f25326-cd6.js als NEUER Run mit
+Datei-Eingaengen) -> Owner-Vorlage je Rest-Frage mit A2.3a-NEIN-Probe.
 ## KON133 -- RF-TRANCHE 26.08. (~19:0xZ) + PAUSE 5 + VO3-1 GEBAUT + E-10 S1/S2 + BL-1 GEHEILT (Lead 27.08.+28.08.)
 
 **KON133-01 (Owner-RF-Tranche 26.08. ~19:0xZ, verbatim, 5a19728e-Transkript nach Z.93400):** "RF-9: Volles GO.
