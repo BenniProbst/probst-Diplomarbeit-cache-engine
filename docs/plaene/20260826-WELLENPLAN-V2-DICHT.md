@@ -814,6 +814,10 @@ S-086 TRIGGER-PARAMETER (Vortafel/KON129-06, woertlich-kern): ##49 = VOLL-BAU-4 
       -> Stufe-2 KONSTANT 4 Batch-Jobs je Lane (kGnBatchSlice=4096, timeout 7d, Lane-Routing avx512->amd,
       avx2->intel, sonst amd); DER TRIGGER BAUT, MISST NICHT (Mess-Jobs manual/inert). ##47-Form (KON131-01):
       wie ##49 mit COMDARE_GN_TOTAL=64, KEIN COMDARE_MEASURE_PROFILE, KEIN COMDARE_OPT_O3.
+      NACHTRAG 01.09. (E-1-DESIGN-FIX, GELANDET ce 53150058 + super-ci-Commit): 'Mess-Jobs manual/inert' ist
+      MECHANIK-UEBERHOLT -- Mess-Batches + measure:marke-wache + ergebnis:holen laufen jetzt per rules-Skip
+      (COMDARE_MEASURE_PROFILE smoke|full = Mess-Entscheid; ohne Marke when:never, 0 when:manual, 0
+      allow_failure). Der SATZ 'Der Trigger baut, misst nicht' bleibt wahr: ##47/##49 ohne Marke messen nie.
 S-087 TRIGGER-ZAHLEN-STAND (Owner OS-1 26.08. woertlich: "Ja, die ausdrueckliche definition von O2 UND O3
       ist von mir gewollt. Der default waere auch nur O2. Wir bleiben dennoch bei O2 und O3 zum Testen."):
       n_bau = organ_produkt 131072 (17 Achsen freigabe=2 x persistence_target=1) x system_perms 4 ({O2,O3}

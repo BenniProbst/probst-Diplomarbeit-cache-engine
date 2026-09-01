@@ -437,6 +437,10 @@ ce a558e87c KEIN allow_failure; der 16.08.-Marker dazu war ein Stale-Befund -- L
 AUSNAHME: super ergebnis:holen = seit 13.08. DEKLARIERTE when:manual-Ausnahme (NE-20: "darf ungespielt
 bleiben", nicht "Fehler egal"; Objektprobe 26.08.: genau 1 allow_failure-Flag in super .gitlab-ci.yml);
 beim Scharfschalten des Sammel-Aufrufs NEU triagieren; Owner-Deckung der Ausnahme = offen (W-03).
+NACHTRAG 01.09. (E-1-DESIGN-FIX F7, VOLLZOGEN): die when:manual-Ausnahme ist ENTFERNT -- ergebnis:holen
+traegt die Vier-Regel-Form (_bot_-never -> Marken-Skip smoke|full -> Kaskaden-Gates BUILD_GOLDEN_N/
+DYNAMIC_PLANER_CI -> never); super = 0 when:manual / 0 allow_failure (Objektprobe 01.09., ci/lint valid);
+W-03 damit GEGENSTANDSLOS (Heilung statt Deckungs-Frage). ce-Seite gelandet 53150058 (CI 16305/16308).
 LESEHINWEIS: Nummern sind KEIN Autoritaetsbeleg (mind. 3 unabhaengige "D2"; Gegenstand vor Nummer, V12).
 
 ## D-11 BERICHTERSTATTUNG (woertlich)
@@ -503,6 +507,7 @@ NACHTRAG 01.09. (#157(d)): BEIDE Scopes dokumentiert -- docs/-Rechtetraeger = 'd
        = NACH Kampagne (W-C) FIX; Zeile bleibt als datierte Historie.
 NACHTRAG 01.09.: #158 bestaetigt+praezisiert (Owner 28.08. 'Ich bleibe bei letzterem').
   W-03 ergebnis:holen-Ausnahme: Owner-Deckung nicht belegt (bis dahin: deklarierte Ausnahme fuehren).
+       [GESCHLOSSEN 01.09. durch E-1-DESIGN-FIX F7: Ausnahme entfernt, 0 manual/0 allow_failure -- s. NE-20-Absatz.]
   W-04 Lager-Integritaetsfrage je Maschine (s. D-7.2) -- explore-pflichtig.
   W-05..W-12 (aufgeloeste Wortwahl-/Retter-/Verify-Posten): Volltext K3-goal-drift.md Abschnitt 4
        (Beweisort 20260826-konsolidierung-dichte-fassungen); darunter W-06 S-19-Rettung, W-08 Board-
