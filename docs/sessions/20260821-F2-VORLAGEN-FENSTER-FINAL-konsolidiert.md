@@ -37,6 +37,12 @@ liegt (NP-01/02/03/07/17/18 + KON45-01(5)-Budget-Neurechnung)."
 „OV-1 (B=3-B-Spline neu vs. Hermite ratifizieren; axis_spline.hpp fuehrt Hermite) + OV-6
 (BE-Definition; Fallregel: nicht bis F2 konsolidiert -> Break-Even faellt aus dem W1-Scope)
 + D4f-Statusraum (bauen solange 0 Konsumenten ODER W2 deklarieren): EIN Entscheid erbeten."
+[F3-17-NACHZUG 02.09. (Lead, W-7.3 27.5.2 F3-17; additiv): D-04 ist OWNER-BEANTWORTET 21.08. 20:40:56Z
+(Transkript L80809, KON120-02 Ledger Z.2970-2975): "Volles GO fuer ALLE diese Felder als mathematisches
+Definitions-Bereich Command pattern" -- Hermite bleibt EINE erlaubte Familie, nicht die einzige (Break-Even-
+Buendel ueberholt KONSOLIDAT-A K443/K699); Sortier-Filter 1 = geringste Fehler-Enthropie [sic], 2 = Fehlerrate;
+"Hinweis: Durchsuche den Kontext nach 'Komponente 1 bis 4'" + 2x "(web recherche)" (Web-Recherche bis 02.09.
+NICHT belegt = R1 V-017, Board #129-Vorspann); D4f-Statusraum -> ##57 W4 (RN-57, D-04-Form aus #129-Design).]
 
 ### D-05 · G-1-Restfragen 9/12 + S-18-DREIPHASIG-mess (G13) [ENTSCHEID]
 „G-1-Restfragen (9 von 12 offen) — darunter Task#16-Luecke2: mess_form_ist_dreiphasig-
