@@ -183,3 +183,22 @@ Rohdaten enthalten bekannte Token-Fundstellen (wf_78955b71 Runner-Tokens prod2 1
 Nenner + Secret-Scan-Ergebnis: siehe NACHTRAG am Dateiende (nach Abschluss des Hintergrundlaufs).
 
 Selbstcheck: ASCII, <= 120 Spalten, Zahlen aus Journalen/Scripts/Task-Outputs, keine Secrets, keine Koeder.
+
+## 7. NACHTRAG NAS-SICHERUNG (04.09. 20:33-20:58Z, Lead)
+
+Erster Pass 20:33-20:41Z (rsync -a --ignore-existing; NFS verweigert chgrp = rc 23 nur Attribut, Daten vollstaendig):
+runs/ 28 Ordner 1520/1520 Dateien, task-outputs/ 927, subagenten-lead/ 4, scripts/ 11, beweisorte/ 4488/4488;
+gesamt 6956 Dateien, 786 MB. Nachpass (-rlt, ohne owner/group, additiv) + Vollkopie aller wf_*-Runs nach
+runs-nachpass/ laeuft beim Schreiben noch; Zaehler im INDEX.md auf dem NAS. INDEX.md + REGISTER.md (Kopie dieses
+Dokuments) liegen im Ordner, chmod go-rwx.
+SECRET-SCAN (7 Muster, nur Klassen/Zaehler): 55 Treffer-Dateien -> P7 runners_token 286/287/288 in 6 API-Dumps der
+Beweisorte (27.08. lande-reif ce-push r4-projekt-*.json; 01.09. e1-ci-zombie-fix design-fix/api-project-*.json + lenses/
+proben-r3/fable-r3-proj-288.json) = ECHT -> REDIGIERT (Wert -> REDACTED-sha256[:8]) lokal UND NAS, chmod 600, Vermerk
+REDAKTION-0409.md je Beweisort; P1 glpat: COMDARE_THESIS_WRITEBACK_TOKEN (PAT id=98, 53 Zeichen, in CI masked+protected,
+aber im Variablen-Dump im Klartext) in 2 Lens-Dumps seit 01.09. mit Rechten 664 = ECHT -> REDIGIERT lokal UND NAS; 2
+Transkript-Treffer = Koeder-Kontext; P2 glrt prod2 Runner 17+56 in 1 Transkript = ECHT (bekannt, #152) -> NAS-Kopie
+redigiert, lokales Transkript unveraendert; P6 codex-OAuth-Codes in 25 NAS-Transkripten L-13-maskiert (lokale
+Transkripte unveraendert); P4 AKIA 13 Dateien / 2 distinkte Werte ohne EXAMPLE-Form = gitleaks-Koeder-Klasse (nicht am
+Objekt verifiziert); P5 1 Textnennung 'BEGIN PRIVATE KEY' ohne END-Block = kein Schluessel. Gegenprobe nach Redaktion:
+P7 0, P1-vars 0, P2 0, P6-unmaskiert 0. NEUE ROTATIONS-POSTEN an #152: PAT id=98 (Wert lag 3 Tage mit 664 auf prod1) +
+runners_token 286/288 (zusaetzlich zu 287/289). Haupt-Session-Transkript ist NICHT auf dem NAS (nicht beauftragt).
