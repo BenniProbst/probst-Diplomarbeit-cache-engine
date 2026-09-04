@@ -113,7 +113,8 @@ Riss-Tote vor einem Resume (23./24.08. Session-/Spend-Risse 1-5, Fold-Resumes), 
 | wf_61f202de | 26.08. 18:54 | bl1-deploy-token-heilung-2608        | 1/1/0/0      | terminal, #150                 |
 | wf_4cd99fd6 | 26.08. 18:57 | vo3-1-global-o2-bauposten            | 12/5/0/7     | terminal, #145                 |
 
-Bilanz 2 Wochen (21.08.-04.09.): 59 Runs = 31 (21.-26.08.) + 28 (27.08.-04.09.); offen sind unveraendert nur #179 (Resume)
+Bilanz 2 Wochen (21.08.-04.09.): 59 Runs = 31 (21.-26.08.) + 28 (27.08.-04.09.); offen sind unveraendert nur #179
+(Resume)
 und #182 (nie gestartet); v4 laeuft. Die Riss-Toten (o) summieren sich auf 341 Agenten-Starts ohne Ausgang ueber zwei
 Wochen -- das ist der Preis der Parallelitaet unter Spend-/Session-Limits und der Grund fuer die Regel "max 2 Agenten".
 
@@ -127,12 +128,14 @@ Gegenstand (Alias-Spalte) und klassifiziert K1/K2/K3 -- nur K3 geht als Entschei
    beantwortet / 9 offen) + F2-VORLAGEN-FENSTER (35 Bloecke, nie zugestellt -> spaeter V-115) + 12 Dossiers.
 2. 21.-23.08. Owner-Tranchen 1+2 (#118) + wf_bc7303ab explore-buendel-tranche2 (#119, 8 Explores: A4/C1/C2/C4/D-01/
    D-04/D-08/D-10) + A56/A58/A60-Runden -> F-01..F-19 + G-1 -> Lead-Zusage EIN-NACHRICHT-Minimalantwort (S12/B-18).
-3. 23.08. wf_bce0efd4 rueckfragen-vollbild-12w (168 Agenten) -> Herkunfts-Fenster B24/B29 (20260823-rueckfragen-vollbild)
+3. 23.08. wf_bce0efd4 rueckfragen-vollbild-12w (168 Agenten) -> Herkunfts-Fenster B24/B29
+   (20260823-rueckfragen-vollbild)
    -> 24.08. Rueckfragen-Synthese 2 -> NEUER-LEDGER-konsolidiert-owner-antworten mit den Sektionen S01..S12 = 157
    Rueckfragen-IDs (Eingang des FOLD). Dazu wf_23486ee9 opus-6k-nachhol-sweep -> NACHHOL-KARTE N-01..N-48 (#136) und
    wf_c745729a -> R-Tafel V3 + Fristen (#136).
 4. 25./26.08. Owner-Kerne A1-A6/B1-B10 + wf_082a9e40 owner-explores 12w/15w -> A5-Synthese; wf_dfd17e9b absicherung-
-   owner-tranche -> ABSICHERUNGS-TAFEL (16 SFB / 9 frische Fragen / 1 DELTA / 3 echt offen) + RF-1..RF-9 -> Owner-Antworten
+   owner-tranche -> ABSICHERUNGS-TAFEL (16 SFB / 9 frische Fragen / 1 DELTA / 3 echt offen) + RF-1..RF-9 ->
+   Owner-Antworten
    26.08. 13:00Z + ~19:0xZ (#144); 27.08. F1-F5 (KON133-20) = die NICHT-ERNEUT-FRAGEN-Basis jeder spaeteren Vorlage.
 5. 29.08. wf_c37fb077 rueckfragen-synthese-2stufig (Owner: "pausiere") -> Reduce-Rueckkehrer r18-r30; 30.08.-01.09.
    wf_fe1cf67c FOLD ueber S01..S12 -> 97 WANDERT_NACH_A / 60 BLEIBT_REST (#159); 02.09. wf_1c5577e4 Volllesung r18-r30
@@ -142,7 +145,8 @@ Gegenstand (Alias-Spalte) und klassifiziert K1/K2/K3 -- nur K3 geht als Entschei
    wf_217f0221 Raster (#170) -> Nenner 277, U-01..U-28, N-01..N-09, V-110..V-148, Raster-Zulieferung (V-115 35 Bloecke
    + 3 NEU, V-111, U-19b, F-039); 02.-04.09. wf_1a36d148 Explore-10K (#174) -> G-01..G-16 A2.3a-Eingaenge.
 7. 02.09. Owner: "ernstes Problem" (sieben ueberlappende Nummernkreise) -> Fold-Auflage -> A2.3a v2/v3 (16 Map-Dateien:
-   10 Fragen-Batches, OG-1..OG-58, 7 Bringschulden + Loesch-Tafel L1..L10, Explore/Rettungen 32 Zeilen, Sperren S-1..S-9)
+   10 Fragen-Batches, OG-1..OG-58, 7 Bringschulden + Loesch-Tafel L1..L10, Explore/Rettungen 32 Zeilen, Sperren
+   S-1..S-9)
    -> 04.09. v4 (Map-Rest + Welle 2: R1 voll, Board owner-gated, Entwuerfe/DICHT/WIDERSPRICHT, Nachleser) -> FOLD
    Gegenstands-Tafel G-nnn -> Versand + CHAT-FASSUNG + Antwort-Schablone -> 3 Lenses -> Fix. Ergebnis = die Liste der
    K3-Entscheide, die NUR der Owner treffen kann; bisher aus der Map-Lesung: A-2, A-5, A-6, S04/B-10(+#162), S05/B-11/
