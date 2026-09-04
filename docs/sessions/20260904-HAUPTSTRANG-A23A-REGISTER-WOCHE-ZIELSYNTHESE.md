@@ -16,37 +16,37 @@ Quelle: ~/.claude/projects/-home-comdare/5a19728e-.../subagents/workflows/wf_*/j
 aus workflows/scripts/ ALLER Projekt-Verzeichnisse (Runs wurden aus wechselnden cwd gestartet), Task-Outputs unter
 /tmp/claude-1001/.../tasks/. s/r/f = started/result/failed-Zeilen; o = Agenten OHNE Ausgang (Riss, Stop, Kill).
 
-| Run          | letzte Akt.  | Script / Gegenstand                       | s/r/f/o     | Stand 04.09.                        |
-|--------------|--------------|-------------------------------------------|-------------|-------------------------------------|
-| wf_78955b71  | 27.08. 12:06 | d1-va-prod2-nas-2608 (D1 prod2)           | 3/1/1/1     | terminal, #151 completed            |
-| wf_607d23d9  | 27.08. 12:08 | lead-vollzug-kon-prtartff-2608            | 5/2/2/1     | terminal, #107 completed            |
-| wf_363cae62  | 27.08. 18:01 | d1-prod1-gnout-2708                       | 1/1/0/0     | terminal, #151 completed            |
-| wf_2fa9c753  | 27.08. 18:05 | thesis-sync-2708                          | 2/1/0/1     | terminal, #156 completed            |
-| wf_9def1e89  | 27.08. 18:17 | thesis-kommentar-nachtrag-2708            | 1/1/0/0     | terminal, Ledger KON133-14          |
-| wf_e4c580a2  | 27.08. 18:18 | dichte-fassungen (#146)                   | 27/13/6/8   | terminal, #146 completed            |
-| wf_8cf07321  | 28.08. 18:51 | stempel-teil2-bau-2608                    | 7/2/4/1     | ABGELOEST -> #147 gelandet 01.09.   |
-| wf_bc166beb  | 28.08. 19:18 | e10-38a2-86-designplan-und-bauzug         | 27/13/2/12  | ABGELOEST -> #133 gelandet 30.08.   |
-| wf_027ac946  | 29.08. 02:16 | lande-reif-2708                           | 17/8/7/2    | ABGELOEST -> #153 komplett          |
-| wf_d27fc8f0  | 29.08. 12:31 | lande-rest-mainff-47                      | 8/3/4/1     | ABGELOEST -> #153 komplett          |
-| wf_c37fb077  | 29.08. 17:36 | rueckfragen-synthese-2stufig              | 228/88/95/45| ABGELOEST (Owner 'pausiere'), s.u.  |
-| wf_401a0ff3  | 30.08. 10:02 | Verify+Fix ##47-Kalibrier (2 Lens, 2 Fix) | 5/4/1/0     | terminal, #153 Lande-Pruefung       |
-| wf_bf22ab45  | 30.08. 20:40 | E-10 Folgephasen (Review, Landung, codex) | 8/5/3/0     | ABGELOEST -> Lead-Kette #147        |
-| wf_50f25326  | 01.09. 08:47 | rueckfragen-trace-0109                    | 4/0/0/4     | LEER (Owner-Interrupt) -> 1fcc434d  |
-| wf_38c58b96  | 01.09. 12:42 | e1-ci-zombie-fix-explore-design           | 5/4/1/0     | terminal, #160                      |
-| wf_e1751971  | 01.09. 13:27 | verify stempel-2 + super-bump             | 7/5/1/1     | terminal, #147                      |
-| wf_4fc4b8d9  | 01.09. 13:28 | e4-thesis-secret-audit-rewrite            | 7/6/1/0     | terminal, #161                      |
-| wf_d102ab04  | 01.09. 18:51 | e1-bau rules-skip-fix S-1..S-13           | 14/14/0/0   | terminal, #160                      |
-| wf_fe1cf67c  | 01.09. 19:39 | FOLD 157 Rueckfragen-IDs -> 97 W / 60 R   | 120/109/7/4 | terminal, #159                      |
-| wf_6a56ad4d  | 01.09. 21:29 | e1-abschluss + ce-Landung 53150058        | 4/4/0/0     | terminal, #160                      |
-| wf_1fcc434d  | 02.09. 00:15 | 30-kontexte-trace + nachfold              | 82/70/3/9   | terminal, #168                      |
-| wf_bfe3433a  | 02.09. 07:02 | raster-w2-v109                            | 14/7/7/0    | terminal, #170                      |
-| wf_217f0221  | 02.09. 07:48 | raster-nacharbeit-5-schritte              | 10/5/3/2    | terminal TRAEGT, #170               |
-| wf_1c5577e4  | 02.09. 08:12 | volllesung-r18-r30-map-reduce             | 37/19/15/3  | terminal, #171                      |
-| wf_d69f800c  | 02.09. 17:08 | thesis-license-zug-179 (C)                | 2/1/1/0     | OFFEN -> Resume, Warteschlange 2    |
-| wf_1a36d148  | 04.09. 19:31 | explore-10-kontexte-offen-gerissen (A)    | 20/13/4/3   | terminal, voll gelesen, #174 compl. |
-| wf_f97550fa  | 04.09. 19:42 | a23a-vorlage v2/v3 (B)                    | 79/20/51/8  | ABGELOEST -> v4 (Datei-Eingaenge)   |
-| wf_a7fff12a  | 04.09. lebt  | a23a-owner-vorlage-v4-max2                | 2/1/0/-     | LAEUFT (2 Agenten, seit 20:1xZ)     |
-| (kein Run)   | 04.09. 18:23 | explore-3-kontexte-vergessene-arbeit #182 | 0           | OFFEN -> Umbau 2er-Paare, Platz 3   |
+| Run         | letzte Akt.  | Script / Gegenstand                  | s/r/f/o      | Stand 04.09.                   |
+|-------------|--------------|--------------------------------------|--------------|--------------------------------|
+| wf_78955b71 | 27.08. 12:06 | d1-va-prod2-nas-2608 (D1 prod2)      | 3/1/1/1      | terminal, #151 completed       |
+| wf_607d23d9 | 27.08. 12:08 | lead-vollzug-kon-prtartff-2608       | 5/2/2/1      | terminal, #107 completed       |
+| wf_363cae62 | 27.08. 18:01 | d1-prod1-gnout-2708                  | 1/1/0/0      | terminal, #151 completed       |
+| wf_2fa9c753 | 27.08. 18:05 | thesis-sync-2708                     | 2/1/0/1      | terminal, #156 completed       |
+| wf_9def1e89 | 27.08. 18:17 | thesis-kommentar-nachtrag-2708       | 1/1/0/0      | terminal, Ledger KON133-14     |
+| wf_e4c580a2 | 27.08. 18:18 | dichte-fassungen (#146)              | 27/13/6/8    | terminal, #146 completed       |
+| wf_8cf07321 | 28.08. 18:51 | stempel-teil2-bau-2608               | 7/2/4/1      | ABGELOEST -> #147 (01.09.)     |
+| wf_bc166beb | 28.08. 19:18 | e10-38a2-86-designplan-und-bauzug    | 27/13/2/12   | ABGELOEST -> #133 (30.08.)     |
+| wf_027ac946 | 29.08. 02:16 | lande-reif-2708                      | 17/8/7/2     | ABGELOEST -> #153 komplett     |
+| wf_d27fc8f0 | 29.08. 12:31 | lande-rest-mainff-47                 | 8/3/4/1      | ABGELOEST -> #153 komplett     |
+| wf_c37fb077 | 29.08. 17:36 | rueckfragen-synthese-2stufig         | 228/88/95/45 | ABGELOEST (Owner 'pausiere')   |
+| wf_401a0ff3 | 30.08. 10:02 | verify+fix ##47-kalibrier (2L/2F)    | 5/4/1/0      | terminal, #153 Pruefung        |
+| wf_bf22ab45 | 30.08. 20:40 | e10-folgephasen (review/landung)     | 8/5/3/0      | ABGELOEST -> Lead #147         |
+| wf_50f25326 | 01.09. 08:47 | rueckfragen-trace-0109               | 4/0/0/4      | LEER -> in wf_1fcc434d         |
+| wf_38c58b96 | 01.09. 12:42 | e1-ci-zombie-fix-explore-design      | 5/4/1/0      | terminal, #160                 |
+| wf_e1751971 | 01.09. 13:27 | verify stempel-2 + super-bump        | 7/5/1/1      | terminal, #147                 |
+| wf_4fc4b8d9 | 01.09. 13:28 | e4-thesis-secret-audit-rewrite       | 7/6/1/0      | terminal, #161                 |
+| wf_d102ab04 | 01.09. 18:51 | e1-bau rules-skip-fix S-1..S-13      | 14/14/0/0    | terminal, #160                 |
+| wf_fe1cf67c | 01.09. 19:39 | fold 157 IDs -> 97 W / 60 R          | 120/109/7/4  | terminal, #159                 |
+| wf_6a56ad4d | 01.09. 21:29 | e1-abschluss + ce-Landung 53150058   | 4/4/0/0      | terminal, #160                 |
+| wf_1fcc434d | 02.09. 00:15 | 30-kontexte-trace + nachfold         | 82/70/3/9    | terminal, #168                 |
+| wf_bfe3433a | 02.09. 07:02 | raster-w2-v109                       | 14/7/7/0     | terminal, #170                 |
+| wf_217f0221 | 02.09. 07:48 | raster-nacharbeit-5-schritte         | 10/5/3/2     | terminal TRAEGT, #170          |
+| wf_1c5577e4 | 02.09. 08:12 | volllesung-r18-r30-map-reduce        | 37/19/15/3   | terminal, #171                 |
+| wf_d69f800c | 02.09. 17:08 | thesis-license-zug-179 (C)           | 2/1/1/0      | OFFEN -> Resume, Platz 2       |
+| wf_1a36d148 | 04.09. 19:31 | explore-10-kontexte (A)              | 20/13/4/3    | terminal, gelesen, #174        |
+| wf_f97550fa | 04.09. 19:42 | a23a-vorlage v2/v3 (B)               | 79/20/51/8   | ABGELOEST -> v4 (Datei-Eing.)  |
+| wf_a7fff12a | 04.09. lebt  | a23a-owner-vorlage-v4-max2           | 2/1/0/-      | LAEUFT (2 Agenten, 20:1xZ)     |
+| (kein Run)  | 04.09. 18:23 | explore-3-kontexte #182 (Script)     | 0            | OFFEN -> Umbau, Platz 3        |
 
 Zu wf_c37fb077 (die groesste Zahl "ohne Ausgang", 45): Owner-Wort "pausiere die rueckfragen synthese" (L89812);
 die 88 Results (Reduce r18-r30 u.a.) sprengten den Lead-Kontext und wurden am 02.09. per Map-Reduce (wf_1c5577e4,
