@@ -275,3 +275,37 @@ Owner 04.09. ~18:1xZ nach /login (verbatim): "Bitte resume ALLE Agenten und Work
 offenen Arbeit fort." + "Bitte untersuche mit ultracode die Aquivalente des Session Logs ueber die letzten 3 Kontexte
 auf vergessene Arbeit." -> Vollzug sequentiell (Regel 16:59Z steht): A Resume -> Explore-3K (neuer Workflow, Owner-
 Order) -> B Resume -> C Resume. Board #174/#175/#179 tragen den Stand.
+
+## 12. NACHTRAG 04.09. 19:3xZ -- Workflow A TERMINAL, Owner-Order NEUSTART (Kill aller claude-Sessions)
+
+Owner 04.09. 18:29Z (verbatim): "Bitte schreibe 'Dies ist die korrekte Session zum weitermachen' hier in den Chat
+und nimm keine neue Arbeit mehr auf, dann kille alle claude sessions auf dieser Maschine, nachdem der aktuelle
+Workflow durchgelaufen ist. Unser Ziel ist ein Neustart von claude code in der aktuellen Client Version."
+Satz im Chat gesetzt (Transkript L107312ff.); Session-ID zum Weitermachen = 5a19728e-f6e1-4736-a246-e3fda9ac35a1.
+
+WORKFLOW A (wf_1a36d148, Task wd20qy0f8) TERMINAL 19:29Z: 13/13 Agenten, 0 Fehler, 2,74M Tokens. Ergebnis
+UNGELESEN (X-19 nachholen = ERSTE Handlung des Nachfolgers, Haeppchen-Regel): Task-Output /tmp/claude-1001/
+-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/tasks/wd20qy0f8.output (33779 B; /tmp stirbt ggf. mit dem
+Neustart -> Journal ist die Wahrheit: subagents/workflows/wf_1a36d148-ffb/journal.jsonl 37 Z., 13 Results) +
+Beweisort ~/backups-workflow/20260902-explore-10-kontexte/: reduce/OFFENE-UND-GERISSENE-ARBEIT-K072-K081.md
+765 Z. (Riss-Register A, GERISSEN-OFFEN B 10, OFFEN-OHNE-TRAEGER C 8, D 38, E 89, F Lead-Sofort 8, G A2.3a-
+Eingaenge 16, H Workflow-Bilanz 17 wf_-IDs, I Nenner) + refute/REFUTE.md 183 Z. (TRAEGT_MIT_FIXES, 23 Funde,
+173/173 Posten geprueft) + fix/FIX-K072-K081.md 258 Z. (15 Quittungen). Riss 11 = 04.09. 18:29Z Owner-Interrupt
+traf den Reduce-Agenten a866501d -> Neustart a41b19cb (Tafel-Torso 43861 B ueberschrieben, Endfassung gilt).
+Aus dem Result-Kopf (nur Notification gelesen): C-7 super 3 lokale Commits ungepusht (786437a5, 56611a41,
+2b7ef7c4) + dieser Nachtrag = ERSTER ZUG nach dem Neustart (EIN Push, V3-Gates); C-8 Cluster-Repo: fremder
+Commit db8db8b 'K174: F4 FGT-V1-DNS-Fix' (03.09., andere Session) + porcelain ' M _infra/ci-templates'
+(Gitlink uncommitted) = Kenntnisnahme, nicht anfassen; OT V-028/V-073/V-074 ohne Board-Traeger.
+
+WARTESCHLANGE (unveraendert, sequentiell, Regel 16:59Z): (1) Rueckkehrer A voll lesen + verbuchen (Lesequittung
+Abschn. 27, Board #174 completed erst danach) -> (2) #182 Explore-3K STARTEN: Workflow({scriptPath:
+'/home/comdare/backups-workflow/20260904-explore-3-kontexte-vergessen/explore-3-kontexte-vergessene-arbeit.js'})
+(Script 04.09. 18:23Z, K079-K083 extrahiert, NIE gestartet, kein Run) -> (3) B Resume A2.3a v3 byte-unveraendert
+(vorher 14 map/-Dateien voll lesen) -> (4) C Resume #179. Board-Hygiene V-072 Tranche 1 (#177) + #178 Tranchen 6/7
+verifiziert; #178 Repo-Seite (ARBEITSWEISE X-21..X-23, RITUAL-KARTE Spend-Risiko/Wecker) NICHT begonnen.
+
+KILL-PROTOKOLL 04.09. (Owner-GO gegenstands-genau 'alle claude sessions auf dieser Maschine'): Bestand 18:3xZ =
+interaktiv 3318723 (claude --resume) + Kind 3318911 (2.1.258, Session 235a6646), 3319644 (2.1.260, Session
+58b1efec), bg-spare 3433514 (2.1.251), Daemon 3319288 + Spare-Huellen 3319315/3319900 + pty-hosts, DIESE Session
+3433003 (2.1.251) zuletzt per abgesetztem Killer (setsid, 20 s Verzug). Kein pkill -f (eigene Shell). Nach dem
+Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, Abschnitt 12 zuerst lesen.
