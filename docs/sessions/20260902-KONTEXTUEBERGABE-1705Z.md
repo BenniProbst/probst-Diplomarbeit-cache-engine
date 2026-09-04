@@ -349,8 +349,10 @@ Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, 
   20260904-kontexte-c3-c1-volllesung/LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md (308 Z., Kopie NAS k084).
 - Owner ~21:47Z: "Bitte pausiere alle workflows und lege eine abbruchsichere Pause ein" -> PAUSE 10: TaskStop v4
   wf_a7fff12a-828 (7 started / 6 result / 0 failed; Fold-Torso 20325 B nach pause10-pre-resume-0904-2148z/, fold/ leer)
-  + Monitor bgna7cpqm; kein anderer Workflow lief. Protokoll ~/backups-workflow/20260904-PAUSE-2148Z/PAUSE-PROTOKOLL-10.md
+  + Monitor bgna7cpqm; kein anderer Workflow lief. Protokoll
+    ~/backups-workflow/20260904-PAUSE-2148Z/PAUSE-PROTOKOLL-10.md
   (Objektstand, Wiederanlauf R-0..R-6, Owner-Posten, Sicherheitsregeln; Kopie NAS k084). Hintergrund-Redaktion der
   210 Secret-Treffer im NAS-Nachpass (idempotent) lief beim Schreiben noch.
 - WIEDERANLAUF: R-1 v4 Resume byte-unveraendert (6 Cache-Treffer, Fold neu, max 2 Agenten) -> Chat-Fassung ->
-  R-2 #179 -> R-3 #182 -> R-4 super-Push (jetzt 15 ungepushte docs-Commits) -> R-5 #152 Rotationen -> R-6 NAS-Gegenprobe.
+  R-2 #179 -> R-3 #182 -> R-4 super-Push (jetzt 15 ungepushte docs-Commits) -> R-5 #152 Rotationen -> R-6
+    NAS-Gegenprobe.
