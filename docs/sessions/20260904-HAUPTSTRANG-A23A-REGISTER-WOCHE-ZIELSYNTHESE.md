@@ -69,6 +69,86 @@ spaetere Runs/Lead-Kette abgeloest und verbucht. Kein Rueckkehrer ist ungelesen.
 noch mehr" trifft fuer die abgeloesten Bau-/Lande-Zuege 28.-30.08. zu (5 Runs mit 21 Riss-Toten), aber deren
 Gegenstaende sind gelandet; offen im Sinne von "noch zu tun" sind nur #179 und #182.
 
+
+## 1b. ZWEI-WOCHEN-UEBERBLICK: WORKFLOWS 21.-26.08. (Owner-Erweiterung 04.09. ~20:5xZ)
+
+Owner-Wortlaut: "Bitte erweitere das Register auf einen Ueberblick ueber 2 Wochen unter beruecksichtigung meiner letzten
+Anfrage. So finden wir den Anschluss wieder zum Hauptstrang und Beantwortung von Fragen. Das war ja eigentlich der Sinn
+des rueckfragen-workflow und fold Rest und jetzt a23a, damit wir die offenen Fragen finden, die noch fehlen, die ich
+beantworten muss und die du nicht aufloesen kannst. Sonst weiter wie gehabt". Quelle wie Abschn. 1 (Journale, Scripts
+aller Projekt-Verzeichnisse, Board-Referenzen per grep der Run-ID in den Task-JSONs). 31 Runs, alle terminal; "o" =
+Riss-Tote vor einem Resume (23./24.08. Session-/Spend-Risse 1-5, Fold-Resumes), keine ungelesenen Rueckkehrer (#141).
+
+| Run         | letzte Akt.  | Script / Gegenstand                  | s/r/f/o      | Stand 04.09.                   |
+|-------------|--------------|--------------------------------------|--------------|--------------------------------|
+| wf_2c6cd0b8 | 21.08. 07:06 | vollaudit-sammelstrecke-k1-heute     | 54/40/0/14   | terminal, #110 (+#128)         |
+| wf_2cbc2ee0 | 21.08. 09:25 | w2-sofortstaffel-1                   | 55/10/0/45   | terminal, #108 (9/9 landereif) |
+| wf_b954e62e | 21.08. 12:09 | w1-luecken-baustrang                 | 10/9/0/1     | terminal, #111                 |
+| wf_95033571 | 21.08. 18:03 | w1l-landung                          | 2/1/0/1      | terminal, #113                 |
+| wf_29b3b9e5 | 21.08. 18:20 | w2-sofortstaffel-2                   | 50/10/0/40   | terminal, #109                 |
+| wf_cc1edd79 | 21.08. 18:37 | ultracode-explore-owner-fragen       | 16/16/0/0    | terminal, #115 (Tafel-22)      |
+| wf_c267c180 | 22.08. 12:01 | explore-buendel-letzte-phase         | 1/1/0/0      | terminal (Riss-Nachlauf)       |
+| wf_6d754bf7 | 22.08. 12:05 | w2-audit-letzte-phase                | 1/1/0/0      | terminal (Riss-Nachlauf)       |
+| wf_214ff767 | 22.08. 12:58 | sweep-6-kontexte                     | 9/9/0/0      | terminal, 20260822-6k-sweep    |
+| wf_94813666 | 22.08. 16:44 | anschluss-leser-nach-sweep           | 10/9/0/1     | terminal, 20260822-anschluss   |
+| wf_fdb84b2f | 22.08. 17:50 | h23-design-d08-91-86                 | 1/1/0/0      | terminal, #91                  |
+| wf_aaef0e71 | 22.08. 18:16 | e10-38a2-provenienz-5wochen          | 1/1/0/0      | terminal, #120                 |
+| wf_b6ce88a4 | 23.08. 09:03 | stempel-recency-tieflesung           | 4/4/0/0      | terminal, #133                 |
+| wf_bc7303ab | 23.08. 20:14 | explore-buendel-tranche2             | 15/13/0/2    | terminal, #119 (8 Explores)    |
+| wf_23486ee9 | 23.08. 20:48 | opus-6k-nachhol-sweep                | 20/10/0/10   | terminal, #136 (N-01..N-48)    |
+| wf_f3f75b60 | 23.08. 20:50 | resume-abschluss-audit-und-explore   | 37/30/0/7    | terminal (Resume #116/#119)    |
+| wf_c745729a | 23.08. 20:55 | wellenplan-update-offene-punkte      | 9/6/0/3      | terminal, #136 (R-Tafel V3)    |
+| wf_bce0efd4 | 23.08. 21:13 | rueckfragen-vollbild-12w             | 168/117/0/51 | terminal, Vollbild B24/B29     |
+| wf_98cabd77 | 24.08. 11:57 | w2-audit-fixverify-s1-s2             | 168/126/0/42 | terminal, #116/#118/#134       |
+| wf_08c04723 | 24.08. 13:09 | w2-abschluss-design-regressionsfrei  | 12/7/0/5     | terminal, #139                 |
+| wf_b546634b | 24.08. 20:20 | lande-zug-sequentiell                | 110/33/0/77  | terminal, #131 (26/27 + #19)   |
+| wf_082a9e40 | 25.08. 14:52 | owner-explores-20260825-12w-15w      | 22/17/0/5    | terminal, #144 (A5-Synthese)   |
+| wf_ccef7bcc | 25.08. 14:54 | rest-landung-design-und-vollzug      | 15/13/0/2    | terminal, #131-Rest            |
+| wf_3152eee0 | 25.08. 14:55 | explore-buildsystem-speicherorte-t1  | 2/2/0/0      | terminal, T1 -> #151           |
+| wf_7f00b85f | 25.08. 20:10 | explore-x3-scheduling-unterachse-12w | 3/2/0/1      | terminal, #140                 |
+| wf_9720bb21 | 25.08. 20:14 | explore-achsen-schichtenmodell-12w   | 7/4/0/3      | terminal, #140                 |
+| wf_53d967b8 | 26.08. 05:37 | explore-x2-csv-factory-aus-xlsx-12w  | 5/2/0/3      | terminal, #18 (X2 gedeckt)     |
+| wf_dfd17e9b | 26.08. 18:40 | absicherung-owner-tranche            | 25/17/0/8    | terminal, #142/#144 (A-Tafel)  |
+| wf_8c890d9a | 26.08. 18:42 | lead-super-nachlauf-kon129           | 11/4/0/7     | terminal, #141/#144/#150       |
+| wf_61f202de | 26.08. 18:54 | bl1-deploy-token-heilung-2608        | 1/1/0/0      | terminal, #150                 |
+| wf_4cd99fd6 | 26.08. 18:57 | vo3-1-global-o2-bauposten            | 12/5/0/7     | terminal, #145                 |
+
+Bilanz 2 Wochen (21.08.-04.09.): 59 Runs = 31 (21.-26.08.) + 28 (27.08.-04.09.); offen sind unveraendert nur #179 (Resume)
+und #182 (nie gestartet); v4 laeuft. Die Riss-Toten (o) summieren sich auf 341 Agenten-Starts ohne Ausgang ueber zwei
+Wochen -- das ist der Preis der Parallelitaet unter Spend-/Session-Limits und der Grund fuer die Regel "max 2 Agenten".
+
+## 1c. DIE FRAGEN-KETTE: WELCHER LAUF WELCHEN NUMMERNKREIS DER OFFENEN OWNER-FRAGEN ERZEUGTE (Anschluss an A2.3a)
+
+Sinn der zwei Wochen (Owner 04.09.): die offenen Fragen finden, die der Owner beantworten muss und der Lead nicht
+aufloesen kann. Jeder Kreis unten ist ein Eingang der A2.3a-Gegenstands-Tafel; A2.3a faltet sie auf EINE Zeile je
+Gegenstand (Alias-Spalte) und klassifiziert K1/K2/K3 -- nur K3 geht als Entscheid an den Owner.
+
+1. 21.08. wf_cc1edd79 ultracode-explore-owner-fragen (#115) -> antwort-tafel-22-punkte (22 Owner-Punkte: 13 selbst
+   beantwortet / 9 offen) + F2-VORLAGEN-FENSTER (35 Bloecke, nie zugestellt -> spaeter V-115) + 12 Dossiers.
+2. 21.-23.08. Owner-Tranchen 1+2 (#118) + wf_bc7303ab explore-buendel-tranche2 (#119, 8 Explores: A4/C1/C2/C4/D-01/
+   D-04/D-08/D-10) + A56/A58/A60-Runden -> F-01..F-19 + G-1 -> Lead-Zusage EIN-NACHRICHT-Minimalantwort (S12/B-18).
+3. 23.08. wf_bce0efd4 rueckfragen-vollbild-12w (168 Agenten) -> Herkunfts-Fenster B24/B29 (20260823-rueckfragen-vollbild)
+   -> 24.08. Rueckfragen-Synthese 2 -> NEUER-LEDGER-konsolidiert-owner-antworten mit den Sektionen S01..S12 = 157
+   Rueckfragen-IDs (Eingang des FOLD). Dazu wf_23486ee9 opus-6k-nachhol-sweep -> NACHHOL-KARTE N-01..N-48 (#136) und
+   wf_c745729a -> R-Tafel V3 + Fristen (#136).
+4. 25./26.08. Owner-Kerne A1-A6/B1-B10 + wf_082a9e40 owner-explores 12w/15w -> A5-Synthese; wf_dfd17e9b absicherung-
+   owner-tranche -> ABSICHERUNGS-TAFEL (16 SFB / 9 frische Fragen / 1 DELTA / 3 echt offen) + RF-1..RF-9 -> Owner-Antworten
+   26.08. 13:00Z + ~19:0xZ (#144); 27.08. F1-F5 (KON133-20) = die NICHT-ERNEUT-FRAGEN-Basis jeder spaeteren Vorlage.
+5. 29.08. wf_c37fb077 rueckfragen-synthese-2stufig (Owner: "pausiere") -> Reduce-Rueckkehrer r18-r30; 30.08.-01.09.
+   wf_fe1cf67c FOLD ueber S01..S12 -> 97 WANDERT_NACH_A / 60 BLEIBT_REST (#159); 02.09. wf_1c5577e4 Volllesung r18-r30
+   per Map-Reduce -> RT-01..RT-62 Rettungen, 159 Owner-Worte ohne Ledger (9 NIRGENDS), P-01..P-20 (#171).
+6. 01./02.09. wf_1fcc434d 30-Kontexte-Trace + Nachfold (#168) -> O-1..O-29 Owner-Entscheide, R1 V-001..V-148 vergessene
+   Posten, R3 F-001..F-040 Owner-Fakten, V-090 (a)-(v), EINGANG-A2.3a (61 Fragen = 60 REST + E-4-Rest); wf_bfe3433a +
+   wf_217f0221 Raster (#170) -> Nenner 277, U-01..U-28, N-01..N-09, V-110..V-148, Raster-Zulieferung (V-115 35 Bloecke
+   + 3 NEU, V-111, U-19b, F-039); 02.-04.09. wf_1a36d148 Explore-10K (#174) -> G-01..G-16 A2.3a-Eingaenge.
+7. 02.09. Owner: "ernstes Problem" (sieben ueberlappende Nummernkreise) -> Fold-Auflage -> A2.3a v2/v3 (16 Map-Dateien:
+   10 Fragen-Batches, OG-1..OG-58, 7 Bringschulden + Loesch-Tafel L1..L10, Explore/Rettungen 32 Zeilen, Sperren S-1..S-9)
+   -> 04.09. v4 (Map-Rest + Welle 2: R1 voll, Board owner-gated, Entwuerfe/DICHT/WIDERSPRICHT, Nachleser) -> FOLD
+   Gegenstands-Tafel G-nnn -> Versand + CHAT-FASSUNG + Antwort-Schablone -> 3 Lenses -> Fix. Ergebnis = die Liste der
+   K3-Entscheide, die NUR der Owner treffen kann; bisher aus der Map-Lesung: A-2, A-5, A-6, S04/B-10(+#162), S05/B-11/
+   B-12, S06/B-26, S07/B-28, S07/B-36(a), S08/B-03, S10/B-12, S11/B-06, S12/B-06(a)(c), S12/B-09(b), S12/B-14, S12/B-15,
+   V-090 (e)(f)(p), L1, L7 -- die endgueltige Menge liefert der v4-Fold.
+
 ## 2. HAUPTSTRANG: DIE OWNER-AUFTRAEGE ZU A2.3a (chronologisch, Vollzugsstand 04.09.)
 
 A2.3a = "Owner-Vorlage mit Fold-Auflage": EIN Versand-Dokument, in dem jeder offene Gegenstand GENAU EINMAL steht
