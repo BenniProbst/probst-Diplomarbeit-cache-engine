@@ -339,3 +339,18 @@ Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, 
 - Ungepushte super-docs-Commits nach diesem Nachtrag: 5 (786437a5, 56611a41, 2b7ef7c4, 0c329c42, +1); Push im
   naechsten Lead-Zug mit V3-Gates (Wachen 13/26, gitleaks Koeder/Echt, R4/R6, Dual-Push, CI 288 dev + main-FF) --
   spaetestens mit der #179-Landung, die sie laut B-LANDE-REZEPT R-09 ohnehin mitnimmt (dort '2' -> '5' korrigieren).
+
+## NACHTRAG 14 (04.09. 21:50Z) -- PAUSE 10 (Owner-Order 21:4xZ), v4 GESTOPPT, VOLLLESUNG 3 KONTEXTE ABGESCHLOSSEN
+- Owner 21:16:50Z: "Eben lief ein compact, bitte pruefe ueber die letzten 3 Kontexte was du noch nicht vollstaendig
+  gelesen und verbucht hast, weil dort einiges fehlt, lies den gesamten Kontext" -> Lead-Volllesung C-3/C-2/C-1/C0
+  (66 Stuecke, 131 Owner-Texte, 65 Notifications, 3 v4-Rueckkehrer) -> 0 ungelesene Rueckkehrer, 0 unbeantwortete
+  Owner-Worte, 10 Luecken geschlossen (Board-Rettungen #180/#148/#96/#84/#127/#176/#177, Memory Kipp-Formel, NACHFOLD-
+  WACHE-Quittungen, Modell-Fallback 20:02Z = KON137-03 (t), Extraktor-Falsch-Null B-0). Quittung: ~/backups-workflow/
+  20260904-kontexte-c3-c1-volllesung/LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md (308 Z., Kopie NAS k084).
+- Owner ~21:47Z: "Bitte pausiere alle workflows und lege eine abbruchsichere Pause ein" -> PAUSE 10: TaskStop v4
+  wf_a7fff12a-828 (7 started / 6 result / 0 failed; Fold-Torso 20325 B nach pause10-pre-resume-0904-2148z/, fold/ leer)
+  + Monitor bgna7cpqm; kein anderer Workflow lief. Protokoll ~/backups-workflow/20260904-PAUSE-2148Z/PAUSE-PROTOKOLL-10.md
+  (Objektstand, Wiederanlauf R-0..R-6, Owner-Posten, Sicherheitsregeln; Kopie NAS k084). Hintergrund-Redaktion der
+  210 Secret-Treffer im NAS-Nachpass (idempotent) lief beim Schreiben noch.
+- WIEDERANLAUF: R-1 v4 Resume byte-unveraendert (6 Cache-Treffer, Fold neu, max 2 Agenten) -> Chat-Fassung ->
+  R-2 #179 -> R-3 #182 -> R-4 super-Push (jetzt 15 ungepushte docs-Commits) -> R-5 #152 Rotationen -> R-6 NAS-Gegenprobe.
