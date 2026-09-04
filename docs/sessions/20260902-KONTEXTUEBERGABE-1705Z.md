@@ -310,7 +310,7 @@ interaktiv 3318723 (claude --resume) + Kind 3318911 (2.1.258, Session 235a6646),
 3433003 (2.1.251) zuletzt per abgesetztem Killer (setsid, 20 s Verzug). Kein pkill -f (eigene Shell). Nach dem
 Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, Abschnitt 12 zuerst lesen.
 
-## NACHTRAG 13 (04.09. ~21:1xZ) -- RISS 12, OWNER-STOP, ERNTE, MAX-2-AGENTEN-REGEL, WIEDERANLAUF v4
+## NACHTRAG 13 (04.09. ~20:1xZ) -- RISS 12, OWNER-STOP, ERNTE, MAX-2-AGENTEN-REGEL, WIEDERANLAUF v4
 - 19:37Z Owner "Der restart ist durch, bitte fahre fort wie gehabt und finde und resume alle abgebrochenen Workflows"
   -> Resume 3 von wf_f97550fa (A2.3a) mit 13 parallelen Fable-Agenten -> RISS 12 19:42Z: 8 Tote binnen 4 min am
   Fable-5-Kontingent ('resets Sep 8, 7pm UTC'); 0 neue Results.
@@ -323,18 +323,18 @@ Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, 
   schrieben ausschliesslich Dateien); riss8-Torsi fragen-batch-3.md (VOLLSTAENDIG 6/6 + Wachen) und v-090-
   ergaenzungen Abschn. A (a)-(v) als Datei-Eingaenge nach map/ uebernommen; o-1..o-29 viermal ohne Datei (nur der
   Hilfsextrakt tmp-o/board-extract.txt); riss7-Torsi durch 17:0xZ-Vollfassungen ueberholt.
-- UNTERSUCHUNG ABGESCHLOSSEN ~21:0xZ: alle 16 Map-Dateien (B), B-LANDE-REZEPT 358 Z. (C) und REFUTE/FIX (A) VOLL
+- UNTERSUCHUNG ABGESCHLOSSEN ~20:1xZ: alle 16 Map-Dateien (B), B-LANDE-REZEPT 358 Z. (C) und REFUTE/FIX (A) VOLL
   gelesen und quittiert (Lesequittung Abschn. 27-Nachtrag, 28 Haeppchen B1-B5, 29, 30); Board #174 completed;
   Rettungen an #176/#177/#180 als Metadata verbucht; K3-Owner-Zeilen bisher 20 (Liste in #175-Metadata).
-- ~20:5xZ Owner (nach /compact + "Bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der offenen Arbeit
+- ~20:0xZ Owner (nach /compact + "Bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der offenen Arbeit
   fort."): "Das Fable Kontingent ist wieder frisch, alles ist wieder frisch, aber dennoch bitte maximal 2 Agenten
   gleichzeitig laufen, dann stirbt nicht so viel am spend limit" -> Regel verschaerft auf ALLE Modelle (Memory+Index).
-- WIEDERANLAUF ~21:0xZ: #175 als NEUER Lauf v4 wf_a7fff12a-828 (Task wfgekht1r; K27: 15 fertige Map-Dateien =
+- WIEDERANLAUF ~20:1xZ: #175 als NEUER Lauf v4 wf_a7fff12a-828 (Task wfgekht1r; K27: 15 fertige Map-Dateien =
   Datei-Eingang, nur o-1..o-29 + V-090 Abschn. B-D laufen; Welle 2 in 2er-Paaren; Fold 1; Reduce 1; Lenses 2+1; Fix
   1 + Re-Verify 1). Script gesichert: 20260902-a23a-vorlage/a23a-vorlage-v4-max2.js. WARTESCHLANGE danach (ein
   Workflow zur Zeit): #179 (C, Resume wf_d69f800c-888 byte-unveraendert -- Fan-out nie > 2; Vorbedingung S01
   vorher neu messen) -> #182 (Script auf 2er-Paare umbauen, dann Start).
-- Lebendprobe 20:3xZ: eigene Workflows 0; FREMDE Session 2edcea22 'e1-e4-ebenen-konsolidierung' (Fork von 46375cdc,
+- Lebendprobe 19:5xZ: eigene Workflows 0; FREMDE Session 2edcea22 'e1-e4-ebenen-konsolidierung' (Fork von 46375cdc,
   claude-fable-5, bypass) lebt = K20 tabu, nur Kenntnisnahme. df / 89 %, 28G frei.
 - Ungepushte super-docs-Commits nach diesem Nachtrag: 5 (786437a5, 56611a41, 2b7ef7c4, 0c329c42, +1); Push im
   naechsten Lead-Zug mit V3-Gates (Wachen 13/26, gitleaks Koeder/Echt, R4/R6, Dual-Push, CI 288 dev + main-FF) --
