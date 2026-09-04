@@ -115,7 +115,7 @@ Riss-Tote vor einem Resume (23./24.08. Session-/Spend-Risse 1-5, Fold-Resumes), 
 
 Bilanz 2 Wochen (21.08.-04.09.): 59 Runs = 31 (21.-26.08.) + 28 (27.08.-04.09.); offen sind unveraendert nur #179
 (Resume) und #182 (nie gestartet); v4 laeuft. Die Riss-Toten (o) summieren sich auf 341 Agenten-Starts ohne Ausgang
-ueber zwei Wochen -- der Preis der Parallelitaet unter Spend-/Session-Limits und der Grund fuer die Regel "max 2 Agenten".
+ueber zwei Wochen -- der Preis der Parallelitaet unter Spend-/Session-Limits und der Grund der Regel "max 2 Agenten".
 
 ## 1c. DIE FRAGEN-KETTE: WELCHER LAUF WELCHEN NUMMERNKREIS DER OFFENEN OWNER-FRAGEN ERZEUGTE (Anschluss an A2.3a)
 
