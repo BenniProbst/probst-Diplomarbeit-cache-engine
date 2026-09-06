@@ -324,3 +324,23 @@ das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen
     20260906-push-fenster/STAND-2.md.
 - OFFEN: Reduce-Rueckkehrer voll lesen + Torso-Diff -> Lenses/Fix/Re-Verify -> Chat-Fassung 1:1 + Lead-Nachtrag 2 ->
   Owner-Antworten -> #176 docs-Zug; #179 -> #182 -> #152; Infra-Rueckmeldung md5-8 (Suchmuster umstellen).
+
+## 15. NACHTRAG (15:23Z) -- REDUCE GELESEN, OWNER-ORDERS 15:08Z/15:10Z, #185 EXPLORE-5K, K088-REKONSTRUKTION
+- v4 Reduce a930740f Result 15:07Z (Versand 3179 Z., Chat-Fassung 381 Z., Schablone 101 Z.; zaehlwerk 162 G, 522/522,
+  10 STAND-06.09.-Vermerke, NEIN-Probe 22 K3 x 9 Quellen = 0) vom Lead VOLL gelesen + Torso-Gegenprobe (Quittung
+  0109 Abschn. 31.8, Prueffunde (a)-(f) = Lead-Nachtrag 3 fuer die Post-Fassung). Lenses addf7d0e + a4e5a64e laufen
+  (Monitor b2wxr6co0), danach Lens 3, Fix, Re-Verify -> Chat-Fassung 1:1 posten + Lead-Nachtraege 2/3.
+- Compact 15:11:35Z (L110675) fiel in die Reduce-Erstlesung. Owner 15:08:44Z (L110666): "lies mit ultracode die
+  letzten 5 aequivalente des session logs und pruefe auf vergessene und gerissene Arbeit, verwende Sonet max very
+  thougough explore Agenten dafuer. Sonst weiter wie gehabt" -> Board #185: K084-K088 (L107773-110674) per
+  kontext-extraktor.py geschnitten (Token-Probe 48 Treffer = Prosa, 0 Secrets), Script explore-5-kontexte-
+  vergessene-gerissene-arbeit.js (je Kontext 2 Sonnet-max-Explore-Agenten als Paar sequentiell, Fable-Reduce mit
+  Riss-Register + Kontextende-Nachholen, 2 Refute-Lenses, Fix); START nach v4-Terminal (MAX-2, ein Workflow zur
+  Zeit). Sequenz danach: #179 -> #182 (K079-K083, neu schneiden) -> #152/#162.
+- Owner 15:10:10Z (L110667): "in den letzten 2 Kontexten immer zum compact nicht alles einlesen und verbuchen, bitte
+  hole das nach" -> K088 per Extraktor rekonstruiert (ctx4/c0, 0600) + VOLL gelesen; Quittung LESEQUITTUNG-KONTEXTE
+  Abschn. 7: 6/6 Owner-Saetze mit Handlung, Riss 13 + Compact 15:11Z geheilt, Nachholungen (Quittung 31.8, Board #175
+  reduce_0609_gelesen, Memory-Nachtrag 3) vollzogen; offen mit Traeger: Push Nachtraege 14+15 (naechstes Fenster),
+  Chat-Posting (v4-gated), #179 hinter #185. K087 = Abschn. 6 (10:5xZ).
+- Lehre (Kandidat X-Register): nach JEDEM Rueckkehrer-Read sofort die Quittungszeile schreiben, bevor der naechste
+  Read folgt -- der Compact traf zwischen Read und Quittung; Haeppchen-Regel 02.09. gilt auch fuer die Quittung.
