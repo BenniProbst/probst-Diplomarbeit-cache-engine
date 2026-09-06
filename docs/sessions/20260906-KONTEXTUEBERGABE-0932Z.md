@@ -320,6 +320,7 @@ das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen
   GELTEND-Vermerke Abbruchkanon/L-05, Commit 67c34b0; super RITUAL-KARTE Spend-Risiko + Wecker, a4f279cb);
   Lesequittung-0109 31.6 (Tafel voll) + 31.7 (Riss 13); LESEQUITTUNG-KONTEXTE Abschn. 6 (C-2 + C-1 rekonstruiert).
 - PUSH-FENSTER 2 + 3 (Pipelines sequentiell): cf2cd52f dev 16387 + main 16388 SUCCESS; a4f279cb dev 16391 + main
-  16392 SUCCESS (4/4 Refs); Umbrella 67c34b0 CI 16393 SUCCESS 41 + 22 manual. Beweisort 20260906-push-fenster/STAND-2.md.
+  16392 SUCCESS (4/4 Refs); Umbrella 67c34b0 CI 16393 SUCCESS 41 + 22 manual. Beweisort
+    20260906-push-fenster/STAND-2.md.
 - OFFEN: Reduce-Rueckkehrer voll lesen + Torso-Diff -> Lenses/Fix/Re-Verify -> Chat-Fassung 1:1 + Lead-Nachtrag 2 ->
   Owner-Antworten -> #176 docs-Zug; #179 -> #182 -> #152; Infra-Rueckmeldung md5-8 (Suchmuster umstellen).
