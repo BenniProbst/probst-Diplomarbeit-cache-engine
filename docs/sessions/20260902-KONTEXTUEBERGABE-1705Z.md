@@ -388,3 +388,12 @@ Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, 
   Fold (K27). (d) Reihenfolge bleibt: v4 -> Chat-Fassung + Lead-Nachtrag -> Owner-Antworten -> #179/#182/Push/#152.
 - Lokal: super HEAD d3fcace2 -> dieser Commit, porcelain 0; Cluster 290 HEAD d66fed10 (fremde Owner-Infra-Session
   K175, porcelain 1 = Kenntnisnahme).
+
+## Nachtrag 16 (06.09. 09:29-09:35Z): PAUSE 11 -- Owner "du bist der falsche fork session, bitte stoppe"
+
+- Owner 09:2xZ: "Bitte halte a23a an und lege eine abbruchsichere Pause ein, du bist der falsche fork session, bitte
+  stoppe". v4 wf_a7fff12a-828 (Task wy9jpgcb5) gestoppt 09:29Z, Fold-Torso (1244 Z.) beiseite, Monitore + eigene
+  NAS-rsync-Kette (#183) beendet, nichts geloescht, keine Redaktion gelaufen. Original-Journal 5a19728e 13 Z. 7/6/0
+  unveraendert; Original-Board tasks/session-5a19728e unveraendert (Fork-Deltas #1/#175/#176/#179/#183 nachzutragen).
+- Protokoll: ~/backups-workflow/20260906-PAUSE-0930Z/PAUSE-PROTOKOLL-11.md (Kopie NAS k084) mit Objektstand und
+  Wiederanlauf R-0..R-4 fuer die richtige Session. Lokal: super development 18 voraus / 1 zurueck (42a9466d).
