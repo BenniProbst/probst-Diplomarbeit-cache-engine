@@ -17,15 +17,15 @@ feedback_nach_jedem_compact_sofort_neugruenden_und_memory_lesen, Formel L104808)
 
 ## 1. OBJEKTSTAND 06.09. 09:41Z (Lead-Messung, git fetch + ls, keine Aenderung an Remotes)
 
-| Repo | lokal | Remotes | Bemerkung |
-|---|---|---|---|
-| super 288 | development 4543b8a4 | origin/development 42a9466d (Owner 02.09. 17:41Z) | 18 voraus / 1 zurueck; porcelain 0 |
-| super 288 | -- | github dev/main + origin main = 35ed801f | Push-Fenster BLOCKIERT (Abschn. 2.3) |
-| ce 286 | dev==main==53150058 | beide Remotes | unveraendert |
-| prt-art 287 | b539d6ee | beide Remotes | unveraendert |
-| thesis 289 | dev==main==cbefa617 | GitLab + GitHub (PUBLIC seit 01.09., OHNE LICENSE) | #179 blockiert (Abschn. 2.3) |
-| Cluster 290 | HEAD d66fed10 (K175, 06.09. 08:18Z) | fremde Owner-Infra-Session | porcelain 1 = Kenntnisnahme, tabu |
-| Umbrella | 6ae5771 | origin | unveraendert |
+Spalten: Repo | lokal | Remotes | Bemerkung
+- super 288 | development 4543b8a4 | origin/development 42a9466d (Owner 02.09. 17:41Z) | 18 voraus / 1 zurueck;
+  porcelain 0
+- super 288 | -- | github dev/main + origin main = 35ed801f | Push-Fenster BLOCKIERT (Abschn. 2.3)
+- ce 286 | dev==main==53150058 | beide Remotes | unveraendert
+- prt-art 287 | b539d6ee | beide Remotes | unveraendert
+- thesis 289 | dev==main==cbefa617 | GitLab + GitHub (PUBLIC seit 01.09., OHNE LICENSE) | #179 blockiert (Abschn. 2.3)
+- Cluster 290 | HEAD d66fed10 (K175, 06.09. 08:18Z) | fremde Owner-Infra-Session | porcelain 1 = Kenntnisnahme, tabu
+- Umbrella | 6ae5771 | origin | unveraendert
 
 Platte prod1: / 20 G frei (92 %). RAM 13 G frei. NAS 10.0.20.242 /mnt/backup2-nfs 6,3 T frei.
 
@@ -79,16 +79,23 @@ Gegenstand genau einmal steht) ist erst nach Fold -> Reduce -> 3 Lenses -> Fix +
 beurteilbar. Der Fold laeuft seit 09:43Z; ein "Ziel erreicht" gibt es erst nach Lens 1-3.
 
 Anforderungen (Owner-Worte) und Erfuellungsstand:
-| Nr | Anforderung (Quelle) | Stand v4 |
-|---|---|---|
-| Q1 | Vollbestand = UNION Fold-Rest + Rueckfragen-Audit ueber 7 Nummernkreise, "wirklich alle" (02.09. 08:0x/08:1xZ) | 21 Fold-Eingaenge decken alle Kreise: 61 Fragen, 29 O, 22 V-090 + Raster/35 F2 + 8 RK, 58 OG, 7 Bringschulden + L1-L10, R1 148/148, Board 68/68, Entwuerfe/DICHT/WIDERSPRICHT 107 Z., Explore-10K + Delta 17, 9 Sperren; Fold-Prompt verlangt Nenner je Kreis literal |
-| Q2 | Gegenstaende statt Nummernkreise, eine Zeile je Gegenstand, Alias-Spalte (Fold-Auflage 02.09. 08:00Z) | Fold-Stufe seit v2 unveraendert; laeuft (Agent a89017ce, Tafel inkrementell in fold/) |
-| Q3 | Nicht erneut fragen, was beantwortet ist (Lens 1) | jede Map-Datei traegt NEIN-Probe + dreiwertige Klasse; Lens 1 prueft gegen KON136/137-Entwuerfe + Board |
-| Q4 | Fable 5 max ueberall | 26/26 Map-Results (20 v3 + 6 v4) + Fold = claude-fable-5-1 (Transkript-grep, 06.09. nachgemessen 8/8 v4-Transkripte) |
-| Q5 | Rueckkehrer vollstaendig lesen und verbuchen (04.09. 19:36Z) | alle 21 Map-Dateien vom Lead voll gelesen + quittiert (LESEQUITTUNG-0109 Abschn. 28 + 31.1-31.5) |
-| Q6 | max 2 Agenten gleichzeitig (04.09. 19:44/20:04Z) | v4 = 2/2/1/1/2+1/1; heute 1 Agent (Fold) |
-| Q7 | keine Torsi als Eingang | fragen-batch-3 inhaltlich vollstaendig (6/6 + Wachen), V-090 A byte-gleich aus vollstaendigem Abschn. A; Torsi pause10/pause11 beiseite, NICHT im Fold |
-| Q8 | Form: Versand + CHAT-FASSUNG + Schablone, 3 Lenses, Fix + Re-Verify (v2-Design, Owner-JA) | in v4 unveraendert |
+Spalten: Nr | Anforderung (Quelle) | Stand v4
+- Q1 | Vollbestand = UNION Fold-Rest + Rueckfragen-Audit ueber 7 Nummernkreise, "wirklich alle" (02.09. 08:0x/08:1xZ)
+  | 21 Fold-Eingaenge decken alle Kreise: 61 Fragen, 29 O, 22 V-090 + Raster/35 F2 + 8 RK, 58 OG, 7 Bringschulden +
+  L1-L10, R1 148/148, Board 68/68, Entwuerfe/DICHT/WIDERSPRICHT 107 Z., Explore-10K + Delta 17, 9 Sperren; Fold-Prompt
+  verlangt Nenner je Kreis literal
+- Q2 | Gegenstaende statt Nummernkreise, eine Zeile je Gegenstand, Alias-Spalte (Fold-Auflage 02.09. 08:00Z) |
+  Fold-Stufe seit v2 unveraendert; laeuft (Agent a89017ce, Tafel inkrementell in fold/)
+- Q3 | Nicht erneut fragen, was beantwortet ist (Lens 1) | jede Map-Datei traegt NEIN-Probe + dreiwertige Klasse; Lens
+  1 prueft gegen KON136/137-Entwuerfe + Board
+- Q4 | Fable 5 max ueberall | 26/26 Map-Results (20 v3 + 6 v4) + Fold = claude-fable-5-1 (Transkript-grep, 06.09.
+  nachgemessen 8/8 v4-Transkripte)
+- Q5 | Rueckkehrer vollstaendig lesen und verbuchen (04.09. 19:36Z) | alle 21 Map-Dateien vom Lead voll gelesen +
+  quittiert (LESEQUITTUNG-0109 Abschn. 28 + 31.1-31.5)
+- Q6 | max 2 Agenten gleichzeitig (04.09. 19:44/20:04Z) | v4 = 2/2/1/1/2+1/1; heute 1 Agent (Fold)
+- Q7 | keine Torsi als Eingang | fragen-batch-3 inhaltlich vollstaendig (6/6 + Wachen), V-090 A byte-gleich aus
+  vollstaendigem Abschn. A; Torsi pause10/pause11 beiseite, NICHT im Fold
+- Q8 | Form: Versand + CHAT-FASSUNG + Schablone, 3 Lenses, Fix + Re-Verify (v2-Design, Owner-JA) | in v4 unveraendert
 
 Warum die Maps "nur noch ergaenzend" liefen und das keine Kuerzung ist: v3 (wf_f97550fa) starb dreimal am Fable-
 Kontingent (Riss 7/8/9) und wurde am 04.09. 19:43Z auf Owner-Order gestoppt; 15 Map-Dateien waren fertig und voll
@@ -107,12 +114,17 @@ Kandidaten + 8 NEU aus O-1..O-29 = Erwartung an den Fold; Abweichung = Lens-2-Fu
 
 ### 4.1 Script-Fassungen (alle in ~/backups-workflow/20260902-a23a-vorlage/, Diff-Umfang v1->v2 135, v2->v3 115,
   v3->v4 525)
-| Fassung | Zeit | Ausloeser (Owner-Wort) | agent() | Neu gegen Vorgaenger |
-|---|---|---|---|---|
-| v1 map-reduce.js 316 Z. | 02.09. 07:32Z | Rohliste nach Nummernkreisen | 11 | Erstfassung, Reduce direkt aus Map-JSON, 2 Lenses |
-| v2 map-fold-reduce-v2.js 409 Z. | 08:02Z | "ernstes Problem ... fold rest und rueckfragen audit zusammenschalten" + "Ja, fahre ... mit der Fold-Auflage" | 14 | FOLD-Stufe (Gegenstands-Tafel, Alias-Spalte), Lens 3 Dopplung/Alias, Explore-10K/r18-r30-Leser |
-| v3 map-fold-reduce-v3.js 498 Z. | 08:32Z | "wirklich alle" (Luecken b/c/e/g) + Riss 7 | 18 | Welle 2: R1 V-001..V-148 voll, Board owner-gated, Entwuerfe/DICHT/WIDERSPRICHT, Nachleser; Welle 1 byte-identisch |
-| v4 v4-max2.js 412 Z. = Registry a23a-owner-vorlage-v4-max2-wf_a7fff12a-828.js | 04.09. 20:15Z | "maximal 2 Agenten" + K27 | 11 | 15 Map-Dateien als Datei-Eingang, MapRest 2 + Welle 2 als 2+2, Fold liest 21 Dateien, Lenses 2+1, Fix + Re-Verify |
+Spalten: Fassung | Zeit | Ausloeser (Owner-Wort) | agent() | Neu gegen Vorgaenger
+- v1 map-reduce.js 316 Z. | 02.09. 07:32Z | Rohliste nach Nummernkreisen | 11 | Erstfassung, Reduce direkt aus
+  Map-JSON, 2 Lenses
+- v2 map-fold-reduce-v2.js 409 Z. | 08:02Z | "ernstes Problem ... fold rest und rueckfragen audit zusammenschalten" +
+  "Ja, fahre ... mit der Fold-Auflage" | 14 | FOLD-Stufe (Gegenstands-Tafel, Alias-Spalte), Lens 3 Dopplung/Alias,
+  Explore-10K/r18-r30-Leser
+- v3 map-fold-reduce-v3.js 498 Z. | 08:32Z | "wirklich alle" (Luecken b/c/e/g) + Riss 7 | 18 | Welle 2: R1
+  V-001..V-148 voll, Board owner-gated, Entwuerfe/DICHT/WIDERSPRICHT, Nachleser; Welle 1 byte-identisch
+- v4 v4-max2.js 412 Z. = Registry a23a-owner-vorlage-v4-max2-wf_a7fff12a-828.js | 04.09. 20:15Z | "maximal 2 Agenten"
+  + K27 | 11 | 15 Map-Dateien als Datei-Eingang, MapRest 2 + Welle 2 als 2+2, Fold liest 21 Dateien, Lenses 2+1, Fix +
+  Re-Verify
 
 ### 4.2 Laeufe (Journal = Wahrheit)
 wf_f97550fa-4b8 (v2 08:03Z -> Riss 7; v3 08:32Z -> Riss 8 08:52Z Resume -> Riss 9 16:58Z -> Owner-Stop 04.09. 19:43Z):
