@@ -248,3 +248,36 @@ trifft die eigene Shell (Fork-Bash starb 09:20Z daran).
 - Uebergabe-Staende ("dev==main==X") nie ohne Neumessung fortschreiben (Nachtrag 14 vs. 42a9466d).
 - Fremde NAS-Ordner koennen root-owned sein: Sibling anlegen, Umzug = root-Kommando, nie chmod/chown versuchen.
 
+
+## 12. NACHTRAG 06.09. 10:31Z -- OWNER-ANTWORTEN 10:0xZ UND VOLLZUG (NAS, E-4 B, C atlas, Log-Redaktion, Push)
+Owner (verbatim, 2 Nachrichten ~09:5x/10:0xZ): "E-4: Option A, weiterhin ist fuer Cluster git gemerged und du sync um
+  die
+Schluessel fuer root zu finden und fuer NAS, C: Benoetige eine Erklaerung zum Verstaendnis, NAS: Es wird lokal NUR die
+backup workflows unter den Sessions ins NAS verschoben, sonst nichts, NAS-Ordner: mv . Bitte stelle Rueckfagen und
+Entscheidungen hier, meiner Auffassung nach hast du keine der Auftraege verstanden" -> Lead-Rueckfragen im Chat ->
+"NAS: Du hast es jetzt verstanden, die Session Rohdaten und Beweisorte bleiben, wir verwenden sie als Referenzen in
+neuen workflows. Alles andere ist korrekt. E-4: Sofern du per hash ueber alle Dateien nachweisen kannst, dass kein
+Fortschritt verloren geht waehlen wir dann doch B. Aber ich habe auf dem Laptop einiges auf gitlab und github gepusht,
+was nun mit dieser Maschine synchronisiert werden muss haendisch, das ist komplexer als es aussieht. Bitte ziehe den
+stand nach Option B ohne leaks haendisch nach aber remote scheint derzeit zu fuehren, zumindest fuer thesis, pruefe
+das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen des Fehlers."
+- Cluster: FF-Merge d66fed10 -> b711a2e4 (Owner-Commit K171-Handover); Schluessel = Vault $NAS-SSH-Kanal backup2
+  (Benutzer sshd = uid 0); Zugriff geprueft. K30 (Self-Leak): der 11-stellige Wert erschien einmal maskierungs-
+  bedingt in einer Tool-Ausgabe -> Session-Log 5a19728e byte-gleich redigiert (2 Vorkommen -> REDACTED-30, 0 Rest,
+  JSON gueltig), Vermerk keys/LEAKED-SECRETS-ROTATION-LOG.md (Cluster adfac425, lokal), Rotation empfohlen (offen).
+- NAS (#183): Verify rsync -rc 6/6 Quellen (nur 2 lebende v4-Dateien), Redaktion Lauf 2 (Script-Fix wgkey) 872
+  Dateien, Gegenprobe 0 unmaskiert; Manifeste Owner-Konvention in workflow-backups/.MANIFESTE (M-src/M-nas/M-diff
+  20260906; 81 von 4946 Repo-Backup-Dateien auf dem NAS redigiert); mv als root 10:2xZ: workflow-backups/
+  probst-diplomarbeit-cache-engine/docs/sessions/backups (4946) + workflow-backups/_rohdaten-prod1-lead-5a19728e/
+  (Session-Rohdaten + Beweisorte, root:root). super Quell-Entfernung e1355407 (4047 getrackt + 899 ignoriert lokal
+  weg, Zeiger README-VERSCHOBEN-NAS-20260906.md). Lokal bleiben: Run-Dirs, ~/backups-workflow (Owner).
+- E-4 B: Hash-Nachweis 20260906-e4-b-hashnachweis/E4-B-HASHNACHWEIS-0609.md (29a1700d tree-identisch 993d28f,
+  236/236 Blobs, Ancestor von cbefa617, 0 Verlust); Remotes 10:22Z: thesis/overleaf dev==main==cbefa617, kein
+  Laptop-Push sichtbar, super origin/development 42a9466d = einziger Owner-Push. Merge 41ec93b2 + Fix 74282893
+  (Gitlinks cbefa617, C=atlas ASCII 05c_uml_klassenatlas_20260902_artefakt-export.htm/_files, Zip weg, .idea
+  bleibt). Overleaf-Standalone-Klon main -> cbefa617 (Alt-Ref alt-vor-rewrite-main-20260803 lokal). Laptop-Rezept:
+  OWNER-REZEPT-LAPTOP-UND-RESTRISIKEN-E4.md Nachtrag 06.09.
+- Push-Fenster 10:29Z: Wachen 13/26 0 rot ([C2] Vorbestand), clang-format 0/0, gitleaks Koeder 1 / Echt 0 (22
+  Commits), R4 0/0/0/0, R6 0, Diff-Hygiene GRUEN; origin+github development 74282893; CI 288/16377 (Poller);
+  danach main-FF + Nachmessung. Beweisort 20260906-push-fenster/.
+- v4 Fold laeuft weiter (Tafel > 180 KB, Journal 14 Z.); #182 umgebaut, Start nach v4; #179 nach main-FF.
