@@ -11,6 +11,8 @@ KON133 ist durch den Lead-Entwurf (RF-Tranche/PAUSE 5, Abschnitt KON133-07 DICHT
 17:3xZ KON133-01..10 ENTWURF, nicht im Ledger) reserviert -> der Ledger-Anker dieser Fassung ist
 "KON13x-KONSOLIDIERUNG" = naechste freie Nummer bei Einspielung durch den Lead
 (vergebene Nummer -> naechste freie); Owner-Order und Gegenstand bleiben unveraendert (Gegenstand vor Nummer).
+NACHTRAG 06.09.2026 16:38Z (additiv AM ORT): Owner-Fund 'alte LaTeX-Anhang-/Verarbeitungs-Pipeline im super'
+-> S-078a (Teilsektion Repo-Rollen) + RN-28-Zeile; Prio niedrig, zukuenftige Aufgabe, Traeger #74.
 STAND-KOPF: Original 08.08.2026 (docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md,
 5406 Z., juengster Datei-Commit c778ed7b [26.08. 18:59Z, RN-05-F-02/R7-ERLEDIGT-Vermerk; GEPUSHT 27.08.
 12:0xZ = origin/development, CI 16249, KON133-08-Entwurf; Datei-Commit davor da0bef4c 24.08.];
@@ -740,6 +742,22 @@ S-077 EMISSIONS-DOKTRIN B-17 (par.19.2, KON16-03/KON18-01): KEINE YAML -- das ze
 S-078 REPO-ROLLEN + DOKTRIN-NACHTRAEGE (par.18.8, KON71-73): ce = Framework, super = Einstieg (XSD-Hoheit
       -> ce = #74); No-Bloat + Planer-Bloat-AUSNAHME; Mess-Interfaces = eigene Mess-Haupt-Achse iw/ima/imi;
       AND-Freigabe der Kategorien; OS-Realm-Lager-Pooling; Mess-Permutation DYNAMISCH > 32, NUR S-19.
+S-078a NACHTRAG 06.09.2026 16:38Z (Owner-Fund, additiv AM ORT; Prio NIEDRIG = zukuenftige Aufgabe): Owner
+      verbatim: 'ich [habe] in Diplomarbeit super noch die alte Pipeline der Erstellung an Latex-Anhang und
+      Verarbeitung gefunden, obwohl ausdruecklich vermerkt war, dass die cache engine das Framework und
+      Bibliothek fuer die gesamte Verarbeitung stellt und die Diplomarbeit nur per XML ihre Belange bei der
+      cache engine anfragt. Das hat keine hohe Prioritaet, muss aber im dichten Wellenplan als zukuenftige
+      Aufgabe verbucht werden.' OBJEKT (super @0eb7fb03): Code/04_csv_to_latex, Code/05_diagram_generator,
+      Code/06_latex_to_pdf (build_thesis.sh/.bat), Code/08_appendix_generator + CI-Jobs .gitlab-ci.yml
+      anhang:forward (Z.2612), thesis:pdf (Z.1719), analyse:thesis-data (Z.1491), test:anhang-forward-probe
+      (Z.896), test:anhang-snapshot-einbuchen-probe (Z.936). AUFGABE: die GESAMTE Verarbeitungskette
+      (CSV -> LaTeX -> Diagramme -> Anhang -> PDF/Writeback) wird Framework-/Bibliotheksleistung der ce;
+      super behaelt nur den XML-Einstieg (Anfrage der Belange per XML, S-13/#18 Export-Element + #48
+      <publish>-Sektion) und den Anwender-Aufruf. Traeger #74 (Zuschnitt erweitert: nicht nur die 15
+      CE-Kandidaten der W-G-Karte), Bauweg RN-28; Einordnung nach T-Entscheid (#158): NACH Trigger ##49 +
+      Funktionsnachweis, in der W7-Naehe mit #88 Monolith-Split (Zeile 'restliche Wellen-Einarbeitung').
+      Bis dahin bleibt die alte super-Pipeline lauffaehig (F1-Kanal E-18/289-Writeback, B2-Last-Mile S-082);
+      Abloesung = eigener Lande-Zug mit CI-Beweis beider Wege (alt rot->neu gruen), nie stiller Abbau.
 S-079 LAGER-DOKTRIN: ZWEI NEUE WURZELEBENEN Gattung -> Genus -> Binary | Messung (B-08); Lager-Typ 3+4
       (#88-Mechanik RN-63); Release = REKONSTRUKTIONS-Anfrage an die compare-Bibliothek (W9); Owner T3
       25.08.: "Trigger IST der Lager-Baum-Vollausbau" (kein Vorbau, R-04/RN-34 gegenstandslos als Vorbau);
@@ -1209,6 +1227,8 @@ NACHTRAG 01.09.: VOLLZOGEN -- E-10 als eigener Zug gelandet (5e03c2cc, K17 4/4 '
            Skripte/Z-9; O7-smoke_19_1; D-3-Shell-Bissproben-Migration; 279 TUs ohne
            -Wall = H-21c). Traeger #71/#74/#69/#28.
            STATUS 26.08./27.08.: OFFEN.
+           NACHTRAG 06.09. 16:38Z: #74-Zuschnitt erweitert auf die GESAMTE LaTeX-/Anhang-/PDF-
+           Verarbeitungskette des super (Owner-Fund, Prio niedrig, nach Trigger) -> S-078a.
     RN-29  #103 TSan-VOLLAUSBAU [lokal, build-tsan-NEUBAU; M-2-Fence-Naht] + P6:
            #40-NE-TRIAGE (38 NE-Posten/20 Auftraege sichten; NE-01-Zahlenkorrektur
            bindend; T-UPD-2-Kollision T-13/T-14 W7-vs-vor-W3 AUFLOESEN -- Entscheid
