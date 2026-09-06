@@ -344,3 +344,31 @@ das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen
   Chat-Posting (v4-gated), #179 hinter #185. K087 = Abschn. 6 (10:5xZ).
 - Lehre (Kandidat X-Register): nach JEDEM Rueckkehrer-Read sofort die Quittungszeile schreiben, bevor der naechste
   Read folgt -- der Compact traf zwischen Read und Quittung; Haeppchen-Regel 02.09. gilt auch fuer die Quittung.
+
+## 16. DAUER-POSTEN-TAFEL (fester Abschnitt jeder Uebergabe; R1 V-073 / 10K-Tafel C-2 / #177 (17); Stand 15:35Z)
+Schablone V-073 (Posten, die aus den lebenden Uebergaben gefallen waren) + heutige Dauerposten; je Zeile Traeger +
+Fenster; keine Zeile faellt ohne Objekt-Beleg (NIE KUERZEN):
+- #154 (b)-(f) D1-Nachlauf beide Hosts inkl. prod2-Reboot-Persistenz-Probe: Fenster VOR ##49 (kurzes O-2-Fenster,
+  Tafel G-008 Mitfahrer); (d) .gitiso-Raeumung nur mit Loesch-GO L7 (G-006).
+- #155 prt-art ASCII-Doktrin + Diff-Hygiene-Wache: 0 Bewegung seit 27.08.; eigener Zug nach #153, Klasse 2 Lenses.
+- #121 Thesis-Grosszug: GO liegt (RF-8b), Start nach Code-Fertigstellung; 3/90 Owner-Restkommentare = Feinschluss.
+- #142 gitleaks-private-key-Regeln in super + prt-art (Mehrzeilen-TOML wie ce) + thesis (#179/#121); #143 Lizenz-
+  Lande-Zug ce -> prt-art -> super + NOTICE-Pfad + D3b/CI-Gate.
+- #148 Vendor-Einzug ext/ NACH Trigger (RF-7), fingerprint-neutral.
+- #7 S-19 Kampagnen-XML-Lauf / #18 S-13 Export + per-Binary-xlsx / #57 Lager-Vollausbau (6 Luecken NACH Trigger, T3).
+- W-Register (Nachfold-Wache W-1..W-5): W-2 geschlossen, W-1/W-3/W-4/W-5 = 4 Quittungszeilen in NACHFOLD-WACHE.md
+  (Lead-Formsache #167/#176).
+- Rotationen: #152 Runner-/Projekt-Token + #162 root-PAT id 62 im ruhigen Fenster (= kurzes O-2-Fenster); #166
+  Turnus-Fix vor 01.10.; K30 NAS-SSH: Infra rotiert (Handout 05aeafc8), danach Suchmuster md5-Tag umstellen.
+- Register: #96 Wiederaufnahme (nie ausbuchen), #135 GELOEST!=KONFORM Workaround-Register, #165 SOLL-Inventar
+  (SOLL=PFLICHT), #167 Lead-Nachlese Fold-Runden, #173 E-10-Lead-Posten, #180 Traeger-Anlagen R4-1.8, #181 CR-10
+  Vollaudit-Backup je Welle, #28 Test-Konsolidierung (Dauerposten bis W4).
+- Doku-Zuege: #176 docs-Zug (KON136-04..08 + KON137 + Ledger-Etikett-Korrekturen aus Lens 1 M03/M05) NACH den
+  A2.3a-Owner-Antworten; #177 Board-Hygiene V-072 (Tranche 3 vollzogen 06.09.: #82/#85/#147/#37; Rest Ledger-#56 =
+  #176; Traeger-Luecken (1)-(9) im #180-Zug); Uebergabe-Nachtraege je Fenster mit V3-Gates pushen.
+- Owner-Handgriffe (Bringschulden des Owners, keine Frage): A-5c Laptop-FF auf super 74282893 (OWNER-REZEPT Nachtrag
+  06.09.), codex login (G-019), node6 'Entfernte Anmeldung' (G-022), 3/90 Overleaf-Restkommentare (G06).
+- Lesepflichten (X-19/X-21): jeder Rueckkehrer VOLL + Quittung UNMITTELBAR nach dem Read (K32); Lesequittung-0109
+  Abschn. 31.x, LESEQUITTUNG-KONTEXTE Abschn. 1-7.
+- Sequenz laufender Zuege: v4 (Lens 3 -> Fix -> Re-Verify -> Chat-Posting) -> #185 Explore-5K -> #179 Thesis-LICENSE
+  (SOFORT-Posten seit 02.09., public ohne LICENSE seit 01.09.) -> #182 Explore K079-K083 -> #152/#162.
