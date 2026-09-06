@@ -525,3 +525,38 @@ NAECHSTE GLIEDER: Versand-Rest + Chat + Schablone lesen (39.10-39.12) -> Capston
 Owner-Antworten -> Nachtraege in die 4 DICHT + KON137/138 einspielen (#176, Fenster 7 Push) -> #186 Resume
 (S2/S3/Reduce) -> #179 -> #182 -> #162 -> #152 Teil 2 -> #149.
 
+
+## 22. NACHTRAG (21:00Z) -- DRITTER COMPACT, STRATEGIE FUER DAS GIGANTISCHE THEMA, FENSTER 7, TRANCHE 1
+
+**Owner (verbatim, ~20:54Z):** "Der compact lief schon wieder, als Hinweis, Der Kontext ist wieder leer, du musst wohl
+einige Dinge neu einlesen, um sie korrekt verarbeiten zu koennen. Das Thema ist gigantisch, es braucht daher eine
+strategische Verarbeitung"
+
+**Befund:** Drei Compacts in einer Runde (19:57Z, ~20:3xZ, ~20:53Z). Ursache = Volumen im Lead-Kontext: Kipp-Ritual
+4/4 DICHT (4221 Z.) + Volllesungen (Versand 3332 Z., Session-Log-Extrakt 842 Z., S1-Tafel 824 Z., 5K-Rueckkehrer).
+
+**Strategie (gilt ab jetzt, bis Owner-Widerruf):**
+1. Der Lead haelt INDIZES, nicht Dokumente: DICHT-INDEX.md (Ueberschriften + Zeilennummern der DICHT-Fassungen) unter
+   ~/backups-workflow/20260906-capstone-4-zentraldokumente/; Paragraph-Nachschlag per sed -n Zeilenbereich statt
+   Vollkipp. Volles Kipp-Ritual nur auf ausdrueckliches Owner-Wort ('voll kippen').
+2. Volumenarbeit laeuft delegiert: Capstone #187 (Map-Reduce, 65+9 Chunks, strikt 1 Agent zur Zeit) verarbeitet die
+   4 Zentraldokumente gegen Rueckfragen-Workflows + A2.3a; der Lead liest nur Rueckkehrer (Haeppchen <=400 Z.) und
+   quittiert SOFORT (K32), damit ein Compact nichts mehr verliert.
+3. Neugruendung nach Compact = Uebergabe letzte 2 Nachtraege + DICHT-INDEX + Lesequittung-Kopfzeilen (grep '^### ')
+   + Board (<= 400 Z. gesamt), nicht 4221 Z.
+4. Chat-Fassung in Tranchen (3er-Tranchen-Doktrin 23.08.): Tranche 1 = Kopf + Teil B (16 Entscheide) + Teil D
+   (Schablone), gepostet in dieser Runde; Tranche 2 = Teil A + Teil C (Kenntnisnahmen, 42 KB) im naechsten Zug;
+   Vollbestands-Luecken aus dem Capstone = Nachtrag.
+
+**Vollzuege seit Nachtrag 21:** Quittungen 32.6/32.7/32.8 (K086-scan, K087-leser, K087-scan; 5K-Karte: V-K087-01
+Chat-Fassung chronisch aufgeschoben -> Tranche 1 jetzt; V-K087-02 #179 Journal seit 02.09. unveraendert -> naechster
+MAX-2-Slot nach 5K-Terminal, VOR #186-Resume). Fenster 7: Commit 02b90cbd (Nachtrag 21), Gates gruen, dev-Push beide
+Remotes (a71f572b..02b90cbd), Pipeline 16405 laeuft, main-FF folgt in der Kette (Endmarke FENSTER7-ENDE).
+K-Fehler korrigiert: #175-Metadatum 'gepostet' war VOR dem Vollzug geschrieben -> zurueckgesetzt.
+
+**Bewandtnis-Frage (Fork-Agent 20:53Z, 0 Tool-Uses):** #186 wurde NICHT wegen A2.3a gestoppt, sondern fuer den
+MAX-2-Slot des Capstone; A2.3a traegt die Bewandtnis nur indirekt (G-051/G-052/G-047, G-044/G-045/G-056); die
+Bewandtnis-Scans S2/S3 von #186 fehlen noch -> Resume nach Capstone-/5K-Terminal.
+
+**Laufend:** Capstone wf_7d1c1cf1-4b4 (Agent a37dd5d5, Chunk NL-01 seit 20:44Z), 5K wf_9e4d189d-2a8 (K088 a48bfb0a
+seit 20:56Z), Fenster-7-Kette (Hintergrund b7p0k1wvp).
