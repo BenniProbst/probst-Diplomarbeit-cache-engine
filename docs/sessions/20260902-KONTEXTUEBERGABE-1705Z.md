@@ -356,3 +356,35 @@ Neustart: claude in aktueller Client-Version starten, Session 5a19728e resumen, 
 - WIEDERANLAUF: R-1 v4 Resume byte-unveraendert (6 Cache-Treffer, Fold neu, max 2 Agenten) -> Chat-Fassung ->
   R-2 #179 -> R-3 #182 -> R-4 super-Push (jetzt 15 ungepushte docs-Commits) -> R-5 #152 Rotationen -> R-6
     NAS-Gegenprobe.
+
+## Nachtrag 15 (06.09. 09:04-09:15Z): Wiederanlauf nach Pause 10 in der Fork-Session 72a14bfa
+
+- Owner 08:58Z: "Bitte resume alle Agenten und Workflows und fahre mit offener Arbeit wie gehabt fort."
+- Client 2.1.263 resumte mit --fork-session -> neue Session-ID 72a14bfa; Board und Workflow-Registry der alten
+  Session 5a19728e waren in der Fork unsichtbar (TaskList "No tasks found"). Migration additiv (cp -pn, Originale
+  bleiben): Run-Record + Run-Dir + Script nach projects/.../72a14bfa-*/, Board-Tasks 2..182 nach
+  tasks/session-e17f24f5 (Task-Listen-ID der Fork, per TaskCreate-Probe; #1 = Migrations-Task). Memory:
+  reference_fork_session_resume_board_und_workflow_registry_unsichtbar_migrationsrezept.md.
+- R-0 (08:58-09:02Z): v4-Journal 13 Z. 7/6/0 unveraendert, Pseudo-Result 0, kein alter v4-Agent, Script md5 gleich,
+  df / 20G frei (92 %). R-1 09:04:09Z: v4 wf_a7fff12a-828 byte-unveraendert resumt -> Task wy9jpgcb5, 6 Map-Results
+  aus dem Cache, Fold live (Agent a49d80c5c7133cbc5, Modell-Wache 18/18 claude-fable-5-1), Monitor b75254o75.
+  PAUSE-PROTOKOLL-10 Abschn. 7 + Berichtigung; NAS-Kopie PAUSE-PROTOKOLL-10.20260906-0909Z-nachtrag7.md.
+- BEFUND S01-VORFLUG (git fetch + ls-remote 09:09Z): super origin/development = 42a9466d = Owner-Commit
+  "versioning submodles and classes overview" (Autor 02.09. 17:38Z, Push 17:41Z, NUR GitLab 288; github dev/main
+  und origin main = 35ed801f). Nachtrag 14 (04.09.) trug den 1705Z-Stand "dev==main==35ed801f" ohne Neumessung
+  fort -- Lead-Fehler, hiermit korrigiert. Inhalt des Commits: .idea/ (3 Dateien), UML-Klassenatlas-HTML-Export
+  (21640 Zeilen + 2,3 MB zip), Gitlinks thesis/diplomarbeit cbefa617 -> 29a1700d und
+  Code/external/20260931-overleaf-diplomarbeit cbefa617 -> 03cce78d. 29a1700d = VOR-REWRITE-Linie des Owner-Laptops
+  ("Kapitel 6 (Fazit, FF2-Erweiterbarkeit)", 348 voraus / 412 zurueck gegen cbefa617, auf keinem Remote-Ref, lokal
+  nur loses Objekt); 03cce78d nirgends vorhanden. Thesis-Remotes 289 + GitHub: dev==main==cbefa617 unveraendert.
+  Pipeline 16329 (development, 02.09. 17:41Z) ROT: verify:submodules, docs:anker-wache, docs:plan-zahlen-wache,
+  test:abnahme06-zusicherung, test:host-klassen-bericht (5 failed / 20 success / 11 skipped, allow_failure false).
+- FOLGEN: (a) R-4 super-Push (jetzt 17 lokale docs-Commits) braucht vorher den Merge von origin/development (nie
+  rebase); der Merge traegt die roten Gitlinks, die Pipeline bliebe rot -> Push-Fenster BLOCKIERT bis Owner-Entscheid
+  E-4 (Laptop-Linie vs. Rewrite-Linie cbefa617) plus Owner-Push der Thesis-/Overleaf-Commits oder Gitlink-Korrektur.
+  (b) #179 (Thesis-LICENSE) bumpt beide Gitlinks cbefa617 -> Tip und kollidiert mit dem Owner-Commit -> #179 erst
+  nach dem E-4-Entscheid. (c) Owner-Frage als LEAD-NACHTRAG zur A2.3a-Chat-Fassung (Datei
+  backups-workflow/20260902-a23a-vorlage/lead-nachtrag-0609-owner-commit-42a9466d.md), NICHT in den laufenden
+  Fold (K27). (d) Reihenfolge bleibt: v4 -> Chat-Fassung + Lead-Nachtrag -> Owner-Antworten -> #179/#182/Push/#152.
+- Lokal: super HEAD d3fcace2 -> dieser Commit, porcelain 0; Cluster 290 HEAD d66fed10 (fremde Owner-Infra-Session
+  K175, porcelain 1 = Kenntnisnahme).
