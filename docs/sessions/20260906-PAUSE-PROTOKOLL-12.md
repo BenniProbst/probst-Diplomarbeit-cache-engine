@@ -65,3 +65,13 @@ Endmarke FENSTER6-ENDE, Log ~/backups-workflow/20260906-push-fenster/fenster6.lo
   /home/comdare/backups-workflow/20260906-pause12.
 Memory: project_pause12_20260906_1645z_owner_pause_zwei_workflows_killed.md + Index. Board: #175/#185 metadata
 pause12. Bei Session-Abriss waehrend der Kette: fenster6.log lesen (Endmarke), Nachmessung ls-remote 4x.
+
+## 5. WIEDERANLAUF (Owner 19:44:15Z verbatim: "Bitte resume alle Agenten und Workflows und weiter wie gehabt, die
+## credits sind jetzt wieder frisch.")
+
+Vorflug X-15 19:44Z: keine fremden Workflow-Prozesse, Journale seit Stop unveraendert (28 Z. / 9 Z., Records killed),
+md5 beider Scripts OK (MD5SUMS-scripts-pre-resume.txt), Pseudo-Result-Kandidaten 0/0. Resumes 2026-09-06T19:45:40Z:
+v4 wf_a7fff12a-828 -> Task w2ucmec8y (Re-Verify neu, Fix im Cache); Explore-5K wf_9e4d189d-2a8 -> Task wd0i122xn
+(K086-A neu, K084/K085 im Cache); je 1 Agent = MAX-2. Monitore neu (Journal-Poller je Workflow), Modell-Wache nach
+90 s. Push-Fenster 6 (super docs a71f572b: Wellenplan S-078a + Pause-Protokoll + Uebergabe) laeuft als detached Kette
+seit 19:44:15Z (fenster6.log, Waiter); Fix-Commit f6bd8fec (Zeilenlaengen) = Fenster 7. Pause-Dauer 16:46-19:44Z.

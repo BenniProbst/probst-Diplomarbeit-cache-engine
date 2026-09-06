@@ -460,3 +460,6 @@ C-01-Vorlage -> ##49 Trigger POST -> Funktionsnachweis (Bau + Kampagne) -> W7/#8
 Monitore + beide Workflows gestoppt (v4 Torso Re-Verify adc60c08; 5K Torso K086-A a5099262), Sicherung
 ~/backups-workflow/20260906-pause12/, Protokoll docs/sessions/20260906-PAUSE-PROTOKOLL-12.md (Wiederanlauf-Rezept),
 Push-Fenster 6 fuer die docs-Commits als detached Kette.
+**Nachtrag-19-Zusatz (19:45Z) -- RESUME:** Owner 19:44:15Z "Bitte resume alle Agenten und Workflows und weiter
+wie gehabt, die credits sind jetzt wieder frisch." -> Vorflug X-15 gruen, v4 (Task w2ucmec8y) + 5K (Task wd0i122xn)
+resumed 19:44Z je 1 Agent; Fenster 6 (a71f572b) laeuft; Pause-Protokoll-12 Abschn. 5.
