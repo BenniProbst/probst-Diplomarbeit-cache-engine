@@ -1,8 +1,0 @@
-== J-0b: PRUEFLINGE + Generator + Compiler + BuildType ==
-CMAKE_BUILD_TYPE:STRING=Release
-CMAKE_CXX_COMPILER:UNINITIALIZED=g++
-COMDARE_CE_PRUEFLINGE:STRING=/home/comdare/wt-ce-lande/tests/pruefling_fixture
-CMAKE_GENERATOR:INTERNAL=Ninja
-== Pruefling-Fixture-Pfad existiert? ==
-tests/pruefling_fixture
-OK

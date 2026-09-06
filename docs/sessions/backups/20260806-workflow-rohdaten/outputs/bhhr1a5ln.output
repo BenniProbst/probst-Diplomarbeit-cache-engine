@@ -1,5 +1,0 @@
-rc1=0
-workload_driver    =   0.00 sec*proc (1 test)
-xml_export         =   0.00 sec*proc (1 test)
-
-Total Test time (real) =  64.43 sec

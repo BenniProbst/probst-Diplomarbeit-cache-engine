@@ -1,2 +1,0 @@
-  Frozen-Preimage Laenge : 560 Bytes
-  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374

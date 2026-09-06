@@ -1,9 +1,0 @@
-==== C-5 FINGERPRINT-NEUTRALITAET gegen den VOR-STAND c371a9c6 ====
-2026-08-06T05:09:06+00:00
--- Diff der Working-Tree-Aenderung dieser Scheibe auf Digest-Literale (leer = unbewegt) --
-    (Ende -- leer = KEIN Digest bewegt)
--- geaenderte Dateien dieser Scheibe --
-     .../cache_engine/abi/anatomy_fingerprint.hpp       | 101 +++++++++-
-     .../cache_engine/abi/toolchain_stamp_glied.hpp     | 215 ++++++++++++++++++++-
-     tests/unit/test_m_w12_stamp_bausteine.cpp          | 151 +++++++++++++++
-     3 files changed, 463 insertions(+), 4 deletions(-)

@@ -1,7 +1,0 @@
-=== FIXSTRECKE2-ABNAHME ZELLE 4: CC=/usr/bin/clang CXX=/usr/bin/clang++ TYPE=Release DIR=/home/comdare/wt-ce-bump15/build/clang-release START=2026-08-19T17:17:31+00:00
-TIP_AM_START 8cd32a0d958b1dfd6d3d4acca10618ea94da9032 fix(a25-f2): G6/F6 -- ASCII-Nachzug der Terminierungs-Notiz (Mittelpunkt-Zeichen raus)
-DF_GATE avail=17G limit=5G
-CACHE_SOLL_IST BT=Release/Release CXX=/usr/bin/clang++/clang++
-CACHE_CXX_FREMD
-DONE_CELL4_RC_CTEST=90
-ENDE fixstrecke2_c4 2026-08-19T17:17:31+00:00

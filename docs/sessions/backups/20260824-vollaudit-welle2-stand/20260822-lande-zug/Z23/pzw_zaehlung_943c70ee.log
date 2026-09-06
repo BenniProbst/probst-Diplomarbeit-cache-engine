@@ -1,7 +1,0 @@
-Z23-PZW-ZAEHLUNG am ce-Baum 943c70ee52796da8dede7ace1bf3a370a0994d16 (Formeln der Wache selbst):
-  SCHEMA-STELLEN = 44   (Rohzeilen 63, Kommentar abgezogen)
-  SCHEMA-DATEIEN = 24
-  SCHEMA-LITERAL = 2
-  CI-AUFRUFE     = 2
-  CI-ALTMUSTER   = 0
-  Nenner: 564 Test-.cpp am Baum, 2968 Zeilen .gitlab-ci.yml

@@ -1,7 +1,0 @@
-[0/2] Re-checking globbed directories...
-[1/680] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
-[overlay_source_hash_gen] 712 Dateien, 3422173 Bytes, sha512=6d8e10b8cf9fd4a9... (unveraendert)
-[2/6] Scanning /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_profile_roundtrip.cpp for CXX dependencies
-[3/6] Generating CXX dyndep file tests/unit/CMakeFiles/test_profile_roundtrip.dir/CXX.dd
-[4/6] Building CXX object tests/unit/CMakeFiles/test_profile_roundtrip.dir/thesis_tiere/test_profile_roundtrip.cpp.o
-[5/6] Linking CXX executable tests/unit/test_profile_roundtrip

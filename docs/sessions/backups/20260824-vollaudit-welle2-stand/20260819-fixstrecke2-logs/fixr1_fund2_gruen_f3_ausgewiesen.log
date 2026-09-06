@@ -1,5 +1,0 @@
-== FIXR1 FUND2 GRUEN-GEGENPROBE 2026-08-19T18:17:19+00:00 ==
-$ grep -n 'F3-AUSWEIS\|VERBLEIB F3' (End-Quittung)
-23:F3-AUSWEIS (Heilung Verify-R1-Fund 2). Definition woertlich (Timeline 19.08.):
-26:VERBLEIB F3 = ENTLASTET mit Messung, beide Haelften:
-EXIT=0

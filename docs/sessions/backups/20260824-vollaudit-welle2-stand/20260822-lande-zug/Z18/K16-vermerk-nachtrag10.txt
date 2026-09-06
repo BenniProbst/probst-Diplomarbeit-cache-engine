@@ -1,6 +1,0 @@
-K16-VERMERK Z18 (2026-08-24T12:55:45Z): Waehrend der Beweis-Sicherung (12:54:40Z) hat die
-Lead-Session den docs-Commit 2e6f7a0b 'Nachtrag 10 (owner-pausiert, Resume-Rezept) [ci skip]'
-AUF den Z18-Merge c27af110 gesetzt (Parent-Kette e80286b0 -> c27af110 -> 2e6f7a0b, reflog
-linear, kein Rebase). Die 2 VF-Dateien sind seit c27af110 unberuehrt (git log leer).
-Erste Fassungen von merge-commit-*.patch und commit-message.txt waren dadurch vom falschen
-HEAD gezogen; beide hier mit explizitem Ref c27af110 NEU gesichert. Kein Schaden.

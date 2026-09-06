@@ -1,6 +1,0 @@
-[0/2] Re-checking globbed directories...
-[1/24] Generating CXX dyndep file tools/overlay_source_hash_gen/CMakeFiles/comdare_overlay_source_hash_gen.dir/CXX.dd
-[2/22] comdare E-E: Overlay-Quell-Hash (Glied [7] des Tier-Fingerprints)
-[overlay_source_hash_gen] 712 Dateien, 3420405 Bytes, sha512=9c3a0bb29a31a523... (unveraendert)
-[3/22] Generating CXX dyndep file apps/is_original_validator/CMakeFiles/is_original_validator.dir/CXX.dd
-[4/7] Generating CXX dyndep file tools/axis_version_lock/CMakeFiles/comdare_axis_version_lock.dir/CXX.dd

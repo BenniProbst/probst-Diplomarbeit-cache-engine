@@ -1,4 +1,0 @@
-/tmp/g1_koeder_naht.cpp:7:75: error: static assertion failed: KOEDER: Ycsb (measurement_meta_meta) als SYSTEM deklariert -- muss rot sein
-    7 | static_assert(cet::axis_category(cem::YcsbLoadFrameworkAxis::axis_kind()) == cet::AxisCategory::system,
-      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-EXIT=1

@@ -1,7 +1,0 @@
-== FIXR1 FUND1 GRUEN-GEGENPROBE 2026-08-19T18:17:19+00:00 ==
-$ grep -n '#38a2 -> W2-Bump-Buendel mit Freeze-Nachbuchung, deklariert 19.08.' (End-Quittung)
-10:#38a2 -> W2-Bump-Buendel mit Freeze-Nachbuchung, deklariert 19.08.
-EXIT=0
--- NACHPROBE nach 120er-Umbruch-Edit 2026-08-19T18:18:31+00:00:
-10:#38a2 -> W2-Bump-Buendel mit Freeze-Nachbuchung, deklariert 19.08.
-EXIT=0

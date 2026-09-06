@@ -1,3 +1,0 @@
-Auto-merging .gitlab-ci.yml
-CONFLICT (content): Merge conflict in .gitlab-ci.yml
-Automatic merge failed; fix conflicts and then commit the result.

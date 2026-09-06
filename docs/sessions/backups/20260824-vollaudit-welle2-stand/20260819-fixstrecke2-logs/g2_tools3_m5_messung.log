@@ -1,9 +1,0 @@
-=== G2(d) MESSUNG 19.08.2026, wt-ce-bump15 @ d232ee0f ===
---- tools-3 clang-format --dry-run (lokal Ubuntu clang-format version 22.1.8) ---
-== tools/axis_registry_gen/main.cpp: 1 Meldungen
-== tools/gen_golden_fullpilot/main.cpp: 1 Meldungen
-== tools/p27_bundle_finder/include/comdare/p27/bundle_finder.hpp: 27 Meldungen
---- CI-Pruefmengen-Beleg: 3 Dateien unformatiert im Baum seit 965b121a, ce-CI 15974 SUCCESS (lint:format gruen) => ausserhalb der Pruefmenge ---
---- M-5: apps/experiment_planner/main.cpp ---
-515:                  << "  Emissions-Kanaelen -- zwei Laeufe sind byte-gleich.\n"
---- Traeger angelegt: Task #100 (tools-3), Task #101 (W2-1) ---

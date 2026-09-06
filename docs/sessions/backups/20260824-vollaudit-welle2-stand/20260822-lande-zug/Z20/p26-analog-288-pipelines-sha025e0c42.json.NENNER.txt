@@ -1,1 +1,0 @@
-P-26-ANALOG-288 NENNER (16070): /jobs = [] UND /bridges = [] -> UNION = 0 Jobs; status=skipped, source=push, created 2026-08-21T17:40:52Z. ci.skip-Pipelinefreiheit des kampvor-super-Push BEWIESEN (Analogie ce 16071).

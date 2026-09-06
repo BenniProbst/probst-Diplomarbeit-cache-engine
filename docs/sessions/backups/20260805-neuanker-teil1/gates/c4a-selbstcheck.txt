@@ -1,2 +1,0 @@
-== C-4a Selbstcheck: nur Kommentar-Zeilen? ==
-  (Ende -- leer = ausschliesslich Kommentar-Zeilen)

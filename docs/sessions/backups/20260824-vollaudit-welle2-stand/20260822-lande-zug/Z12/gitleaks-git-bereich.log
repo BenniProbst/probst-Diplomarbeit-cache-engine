@@ -1,6 +1,0 @@
-rev-list --count --no-merges 3841d717..943c70ee = 3
-[90m8:01AM[0m [32mINF[0m [1mUnknown SCM platform. Use --platform to include links in findings.[0m [36mhost=[0mgitlab.comdare.local
-[90m8:01AM[0m [32mINF[0m [1m3 commits scanned.[0m
-[90m8:01AM[0m [32mINF[0m [1mscanned ~14505 bytes (14.51 KB) in 83.6ms[0m
-[90m8:01AM[0m [32mINF[0m [1mno leaks found[0m
-GITLEAKS_RC=0

@@ -1,5 +1,0 @@
-=== RAEUMUNG r4-Vorbereitung (Lead-Order 13:43, Schritt 1) ===
-df VORHER: /dev/nvme0n1p2  251G  231G  7.5G  97% /
-wt-ce-lande/build: tracked=0 csv_ausserhalb=0
-GELOESCHT: build-cifix2-rel build-clang-cifix2 build-kombibau build-axislock wt-ce-lande/build (alle Doppel-Bedingung tracked=0/csv=0)
-df NACHHER: /dev/nvme0n1p2  251G  223G   16G  94% /

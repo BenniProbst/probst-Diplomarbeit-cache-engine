@@ -1,9 +1,0 @@
-BUILD-EXIT: 0
-      |                                                ^~~~~~~~~~~~~~~~~~~~~~~
-[1788/1795] Linking CXX executable tests/unit/test_experiment_plan_director
-[1789/1795] Building CXX object tests/unit/CMakeFiles/test_t2a_f4_facade_plan_durchreichung.dir/test_t2a_f4_facade_plan_durchreichung.cpp.o
-[1790/1795] Linking CXX executable tests/unit/test_t2a_f4_facade_plan_durchreichung
-[1791/1795] Building CXX object tests/unit/CMakeFiles/test_lazy_adhoc_source_gen.dir/test_lazy_adhoc_source_gen.cpp.o
-[1792/1795] Linking CXX executable tests/unit/test_lazy_adhoc_source_gen
-[1793/1795] Building CXX object tests/unit/CMakeFiles/test_limits_entkopplung_vorstufe.dir/test_limits_entkopplung_vorstufe.cpp.o
-[1794/1795] Linking CXX executable tests/unit/test_limits_entkopplung_vorstufe

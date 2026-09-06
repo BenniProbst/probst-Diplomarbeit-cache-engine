@@ -1,3 +1,0 @@
-Glieder-Zahl           : 6
-Frozen-Preimage Laenge : 299 Bytes
-Frozen-Digest (RT-Weg) : 0fe275bddc7af1af9474cea655ff28280b93cfb3acc299c00d76d3489822993bf043b4cee58b97d7ed2e42b0fc5bb0e3e300d15b1c50c31dd1aba7a23cc9fe36

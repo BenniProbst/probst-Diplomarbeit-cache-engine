@@ -1,9 +1,0 @@
-                 from /home/comdare/wt-ce-bump15/libs/cache_engine/hybrid/hybrid_binary_proxy.hpp:38,
-                 from /home/comdare/wt-ce-bump15/tests/unit/test_hy_a2_stempel_kette.cpp:27:
-/home/comdare/wt-ce-bump15/libs/cache_engine/hybrid/hybrid_dock_contract.hpp:179:49: error: static assertion failed: HY-A1-STATUS: ein gelisteter Status hat keinen Namen (oder zwei teilen sich einen). NAHT-1-Lehre (pruef_dock.hpp:59-63): ein stummer Zustand ist schlimmer als gar keiner -- er sieht im Bericht aus wie ein bekannter Fehler.
-  179 | static_assert(detail::alle_hybrid_status_benannt(),
-      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
-gmake[3]: *** [tests/unit/CMakeFiles/test_hy_a2_stempel_kette.dir/build.make:79: tests/unit/CMakeFiles/test_hy_a2_stempel_kette.dir/test_hy_a2_stempel_kette.cpp.o] Error 1
-gmake[2]: *** [CMakeFiles/Makefile2:17011: tests/unit/CMakeFiles/test_hy_a2_stempel_kette.dir/all] Error 2
-gmake[1]: *** [CMakeFiles/Makefile2:17018: tests/unit/CMakeFiles/test_hy_a2_stempel_kette.dir/rule] Error 2
-gmake: *** [Makefile:4262: test_hy_a2_stempel_kette] Error 2

@@ -1,9 +1,0 @@
-Top-Level-Schluessel: 59
-Jobs (nicht-versteckt, nicht-reserviert): 47
-  build:clang: rules=[{'when': 'on_success'}] extends=['.build-clang-latest'] needs=['verify:submodules']
-  test:unit: rules=[{'when': 'on_success'}] extends=['.test', '.ccache-pull'] needs=['verify:submodules']
-  test:unit:debug: rules=[{'when': 'on_success'}] extends=['.test'] needs=[{'job': 'test:unit', 'artifacts': False}]
-  test:unit:clang: rules=[{'when': 'on_success'}] extends=['.test'] needs=[{'job': 'build:clang', 'artifacts': False}]
-  test:unit:clang:debug: rules=[{'when': 'on_success'}] extends=['.test'] needs=[{'job': 'test:unit:clang', 'artifacts': False}]
-  verify:submodules: rules=[{'when': 'on_success'}] extends=None needs=['lint:secrets']
-lint:secrets rules=[{'when': 'on_success'}]

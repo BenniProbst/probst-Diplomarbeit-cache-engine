@@ -1,9 +1,0 @@
-workload_driver           =   0.00 sec*proc (1 test)
-writeback_method          =   0.00 sec*proc (1 test)
-writer_kern               =   0.00 sec*proc (1 test)
-xlsx                      =   0.23 sec*proc (7 tests)
-xml_export                =   0.00 sec*proc (1 test)
-zulassung                 =   0.03 sec*proc (3 tests)
-
-Total Test time (real) =  31.94 sec
-100% tests passed, 0 tests failed out of 505

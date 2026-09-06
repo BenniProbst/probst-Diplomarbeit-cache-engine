@@ -1,9 +1,0 @@
-== GATES 6/6 START 2026-08-24T11:48:59Z HEAD=943c70ee ==
-GATES_RC=0
- PRE-PUSH-LANDE-GATES: sechs Gates, fail-fast, Nenner je Gate
-PRE-PUSH-LANDE-GATES: GRUEN -- alle sechs Gates ueber diesem Baum.
-== GITLEAKS-ZUSATZ (Owner: Push-Bereich mit -m + Nenner) ==
-gitleaks-binary: /home/comdare/.local/bin/gitleaks (8.30.1)
-KOEDER-LAENGE=26 (SOLL 26 = 6 Praefix + 20 Rumpf)
-KOEDER_RC=0 (SOLL 1 = beisst)
-ABBRUCH: Selbstbiss fehlgeschlagen, Echt-Scan wertlos

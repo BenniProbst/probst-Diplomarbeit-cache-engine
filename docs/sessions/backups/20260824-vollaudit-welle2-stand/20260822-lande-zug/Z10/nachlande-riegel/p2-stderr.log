@@ -1,1 +1,0 @@
-[dump-ci] PMC-BEFUND lage=amd vendor=AuthenticAMD events=3/4 biss=[cache_misses_l1=1;cache_misses_l3_ll=0;dtlb_misses=1;branch_misses=1] quelle=perf_event_open+cpuid+koeder beweist-nicht=runner-host

@@ -1,8 +1,0 @@
-P1 GRUEN: go=1 kriterien=10/10 literale=23/23 befunde=0
-P2 ENTFERNUNG: 23/23 Einzelentfernungen ergeben NO-GO
-P3 LEER: go=0 nenner_0_23_in_ausgabe=1
-P4 ECHO: go=0 (muss 0 sein)
-P5 FLAG=2: go=0 (muss 0 sein)
-P6 DELTA-0: go=0 ungueltig_befund=1
-AUDIT-PROBE-ERGEBNIS: ALLE OK (fehler=0)
-RUN-RC=0

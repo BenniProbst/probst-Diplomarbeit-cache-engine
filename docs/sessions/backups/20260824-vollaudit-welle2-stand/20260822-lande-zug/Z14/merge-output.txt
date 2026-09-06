@@ -1,7 +1,0 @@
-Merge made by the 'ort' strategy.
- .gitlab-ci.yml                                | 63 ++++++++++++++++++++++++---
- prt_art/registry_gen/CMakeLists.txt           |  3 ++
- prt_art/registry_gen/registry_roundtrip.cmake | 15 +++++++
- tests/unit/support/lizenz_audit.hpp           |  9 +++-
- 4 files changed, 83 insertions(+), 7 deletions(-)
-RC_MERGE=0

@@ -1,7 +1,0 @@
-=== FIXSTRECKE2-ABNAHME ZELLE 2: CC=/usr/bin/gcc CXX=/usr/bin/g++ TYPE=Release DIR=/home/comdare/wt-ce-bump15/build/gcc-release START=2026-08-19T17:17:30+00:00
-TIP_AM_START 8cd32a0d958b1dfd6d3d4acca10618ea94da9032 fix(a25-f2): G6/F6 -- ASCII-Nachzug der Terminierungs-Notiz (Mittelpunkt-Zeichen raus)
-DF_GATE avail=17G limit=5G
-CACHE_SOLL_IST BT=Release/Release CXX=/usr/bin/g++/g++
-CACHE_CXX_FREMD
-DONE_CELL2_RC_CTEST=90
-ENDE fixstrecke2_c2 2026-08-19T17:17:30+00:00

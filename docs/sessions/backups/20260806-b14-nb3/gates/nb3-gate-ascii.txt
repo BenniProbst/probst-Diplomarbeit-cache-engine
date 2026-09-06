@@ -1,3 +1,0 @@
-=== GATE ASCII (sauber) -- nur hinzugefuegte Diff-Zeilen ===
-hinzugefuegte Zeilen gesamt : 525
-davon mit Nicht-ASCII-Byte  : 0

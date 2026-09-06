@@ -1,1 +1,0 @@
-Rettung vor Worktree-Abbau 05.08.2026: all19_pilot.csv (untracked, einzigartig, 04.08. ~05:11, wt-a8s1/build/thesis_tiere/) — 19-Achsen-Pilot-Messdaten; gesichert nach Messdaten-nie-loeschen-Doktrin vor Entfernung des beweisbar gelandeten Worktrees wt-a8s1 (haertung-64-69-70, ancestor von dev).

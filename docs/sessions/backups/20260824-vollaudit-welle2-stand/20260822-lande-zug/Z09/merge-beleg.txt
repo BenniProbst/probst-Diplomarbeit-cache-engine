@@ -1,8 +1,0 @@
-MERGE_COMMIT=b4c593f5fa65201a6b3876dc3703649be5f7e478
-PARENTS=cf524bd1801c51c496c8d885669aef6f538ff77f 1e1bc19952fbdb9f12dc299ec84aa2e0596cb54f
-SUBJECT=merge(lande 10/10): bau/kampvor @ 1e1bc199 in lande/w2-s1s2 (Kampagnen-Vorstaffel, ce-Haelfte)
-b4c593f5fa65201a6b3876dc3703649be5f7e478 merge(lande 10/10): bau/kampvor @ 1e1bc199 in lande/w2-s1s2 (Kampagnen-Vorstaffel, ce-Haelfte)
-
- .../planner/experiment_plan_director.hpp           | 70 ++++++++++++++++
- .../thesis_tiere/test_experiment_plan_director.cpp | 97 +++++++++++++++++++++-
- 2 files changed, 166 insertions(+), 1 deletion(-)

@@ -1,7 +1,0 @@
-GOLDEN-DIFF-PROBE e285d316..HEAD (HEAD=8cd32a0d958b1dfd6d3d4acca10618ea94da9032) 2026-08-19T17:21:07+00:00
---- git diff --stat e285d316..HEAD -- 5 TABU-Pfade:
-STAT_RC=0 (leere Ausgabe = unberuehrt)
---- git diff --name-only e285d316..HEAD | grep -i golden:
-docs/plaene/20260819-F6-TERMINIERUNG-golden-ereignis-ein-zug-vor-f2.md
-GREP_RC=0
---- Gesamtzahl beruehrter Pfade e285d316..HEAD: 56

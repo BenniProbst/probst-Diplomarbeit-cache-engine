@@ -1,4 +1,0 @@
-[90m6:20PM[0m [32mINF[0m [1mUnknown SCM platform. Use --platform to include links in findings.[0m [36mhost=[0mgitlab.comdare.local
-[90m6:20PM[0m [32mINF[0m [1m5 commits scanned.[0m
-[90m6:20PM[0m [32mINF[0m [1mscanned ~33697 bytes (33.70 KB) in 149ms[0m
-[90m6:20PM[0m [32mINF[0m [1mno leaks found[0m
