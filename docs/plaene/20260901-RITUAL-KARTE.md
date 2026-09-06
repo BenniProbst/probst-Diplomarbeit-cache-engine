@@ -18,6 +18,10 @@ ZUSAETZLICH IMMER: Zeilenzahl-Probe vor ARBEITSWEISE-Lesen (zweistellig = Zeiger
 /goal-Alt-Trio (816+5406+1021 Z.) NIE mehr voll kippen (Paragraf-Nachschlag in den Beleg-Archiven erlaubt);
 nach jeder Owner-Antwortrunde Rueckwaerts-Konsolidierung; Owner-Nachfrage nach den 4 DICHTs = Voll-Lesung
 aller vier sofort nachholen und mit Zeilen-Nennern quittieren (Praezedenz 01.09.).
+SPEND-RISIKO-REGISTER (Owner 23.08. 14:07 L86284; Board #178 (2); Nachtrag 06.09.): jede Uebergabe/Pause traegt
+je laufendem Workflow eine Zeile mit Agentenzahl, Phase, Cache-Stand (Results/Started) und Resume-Rezept sowie
+eine WECKER-Zeile mit dem Reset-Zeitpunkt der Limit-Meldung (Session-Limit = Uhrzeit, Fable-5-Limit = Datum);
+Resume nie vor dem Reset, Torsi beiseite (nie Eingang), MAX 2 Agenten (Owner 04.09.); Risse 1-13 im Memory.
 PFLEGE: Aenderungen an den DICHT-Fassungen additiv AM ORT mit Datum + Stand-Kopf-Bump je Konsolidierung
 (zuletzt 01.09., Commit b14e444f); hinten-Anfuegen verboten; Originale = Beleg-Archiv (Kopf-Zeiger 27.08.).
 VORBEHALT (W-1): ARBEITSWEISE-DICHT ist LESE-/RITUAL-Fassung; geltend fuer Teil A/V bleibt die Vollfassung
