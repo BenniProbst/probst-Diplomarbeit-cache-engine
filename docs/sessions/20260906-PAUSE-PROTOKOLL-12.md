@@ -28,14 +28,16 @@ Run mit
 Datei-Eingaengen); (3) Pseudo-Result-grep im Journal (0 Kandidaten am 06.09. 16:46Z); (4) Torsi bleiben beiseite
 (Transkripte im Pause-Ordner sind Rohdaten, NIE Eingang); (5) Modell-Wache je Spawn; (6) Kipp-Ritual falls Compact.
 - v4 (#175): Workflow({scriptPath:
-  '/home/comdare/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/workflows/scripts/a23a-owner-vorlage-v4-max2-wf_a7fff12a-828.js',
+  '/home/comdare/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/workflows/scripts/a23a-owner-vo
+  rlage-v4-max2-wf_a7fff12a-828.js',
   resumeFromRunId: 'wf_a7fff12a-828'}) -> Cache bis inkl. Fix (12 Results), Re-Verify laeuft NEU (1 Agent).
   DANACH Lead: (a) Re-Verify voll lesen + quittieren; (b) lead-nachfix-info-muss-0609.md (10 MUSS aus 16 INFO,
   Owner-Regel 06.09.) additiv anwenden + Lead-Gegenprobe; (c) Chat-Fassung (GEFIXT, 361 Z.) 1:1 posten +
   Lead-Nachtraege 2+3 (lead-nachtrag-0609-owner-commit-42a9466d.md); (d) Owner-Antworten -> #175 completed,
   KON137-10ff, #176 docs-Zug.
 - 5K (#185): Workflow({scriptPath:
-  '/home/comdare/backups-workflow/20260906-explore-5-kontexte-vergessen/explore-5-kontexte-vergessene-gerissene-arbeit.js',
+  '/home/comdare/backups-workflow/20260906-explore-5-kontexte-vergessen/explore-5-kontexte-vergessene-gerissene-arbe
+  it.js',
   resumeFromRunId: 'wf_9e4d189d-2a8'}) -> Cache K084 A/B + K085 A/B, K086-A laeuft NEU, dann K086-B .. K088, Reduce,
   Refute A/B, Fix (je 1 Agent). Lead-Nachfix-Eingang: lead-nachfix-5k.md (Script-Regression S-1 UEB-Pfad
   PAUSE-PROTOKOLL-10 = 20260830; K084-1..6, K085-1..6).
