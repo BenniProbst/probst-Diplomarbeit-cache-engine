@@ -463,3 +463,65 @@ Push-Fenster 6 fuer die docs-Commits als detached Kette.
 **Nachtrag-19-Zusatz (19:45Z) -- RESUME:** Owner 19:44:15Z "Bitte resume alle Agenten und Workflows und weiter
 wie gehabt, die credits sind jetzt wieder frisch." -> Vorflug X-15 gruen, v4 (Task w2ucmec8y) + 5K (Task wd0i122xn)
 resumed 19:44Z je 1 Agent; Fenster 6 (a71f572b) laeuft; Pause-Protokoll-12 Abschn. 5.
+
+## 20. NACHTRAG (19:52Z) -- OWNER-RUEGE 19:51:49Z: RUECKFRAGEN-KETTE ALS ZIELHIERARCHIE VERGESSEN -> EXPLORE
+
+**Owner (verbatim):** "Hinweis: du hast alle Ziele der Kette vom rueckfragen workflow von vor ueber 3 wochen und dessen
+Gruende, ueber die Ledger Aktualisierung als Hauptziel unter den a23a Korrekturen an Fragen leider vollstaendig
+vergesen, bitte suche den Strang nochmal zusammen und verschaffe dir einen Ueberblick ueber die Kontexte und die
+eigentlichen Bewandnisse der grossen Audits bis heute. Das ist alles definiert, bitte Explore dazu"
+**Lead-Befund:** Arbeitsfehler K35 (Strang-Verlust): die A2.3a-Korrekturen wurden als Selbstzweck gefuehrt, die
+Kette Rueckfragen-Workflow (Wurzel ~14.-20.08.) -> Fold/Rest-Fold -> NEUER-LEDGER -> A2.3a-Vorlage -> Owner-Antworten
+-> LEDGER-AKTUALISIERUNG (Hauptziel, dichtes Ledger #176) -> Trigger-Pfad nicht als Zielhierarchie mitgefuehrt; die
+Audits (W1-Vollaudit 21.08., W2-Audit/Fix-Verify, Konsolidierung 26./27.08., 30-Kontexte-Trace 01./02.09.,
+Explore-10K/5K) ohne ihre Bewandtnis referenziert. Vorgehen: (1) Gedaechtnis (Memory rueckfragen_vollbestand,
+30-Kontexte-Trace R2-HERKUNFT/GESAMTBILD/EINGANG-KON136/HERKUNFT-VERBATIMS, Fold-Kontexte, Ledger KON136), (2)
+ultracode-
+Explore ueber 12 Wochen (Sonnet-Scans je Quellklasse, sequentiell 1 Agent = MAX-2, Fable-Reduce STRANG-UEBERBLICK)
+sobald
+ein Agenten-Slot frei ist, (3) Korrektur der Zielhierarchie in Board-Subjects/Uebergabe/Memory-Index-Kopf.
+
+
+## 21. NACHTRAG (2026-09-06T20:49:17Z) -- ZWEI COMPACTS (19:57Z, 20:28Z), KIPP-RITUAL 2x, v4 TERMINAL + LEAD-NACHFIX,
+STRANG-EXPLORE #186 (S1), CAPSTONE #187 GESTARTET
+
+KETTE (K35, in jedem Bericht): Wurzel 20./21.08. (L79109/L79132: Rueckfragen als eigene Kategorie, 12W-Explore, T-9
+Drift-Designs) -> Rueckfragen-Workflow/Fold NEUER-LEDGER (97W/60R, F-001..F-040) -> Trace 30K/Raster/Volllesung/Explores
+10K/5K -> A2.3a-Vorlage v4 (MITTEL; LETZTES GLIED der Kette laut Owner 20:27Z) -> Owner-Antworten -> HAUPTZIEL
+LEDGER-AKTUALISIERUNG (#176 KON137/KON138) -> Trigger-Pfad #158 -> Abgabe 15.09. Beide Owner-Positionen zur Reihenfolge
+werden zitiert, nicht entschieden: 01.09. 'Fragen -> Antworten -> dichtes Ledger' vs 06.09. 19:51Z 'Ledger
+Aktualisierung als Hauptziel unter den a23a Korrekturen'.
+
+Owner-Orders dieses Fensters (verbatim, Umlaute transliteriert): 19:5xZ 'Der compact hat gerade den Kontext gezogen,
+bitte lies die Dokumente von eben alle nochmal vollstaendig ein' (VOLLZOGEN, Lesequittung 35/37); 20:20:26Z 'Na so
+komplett gekippt hast du die 4 dichten Dokumente noch nicht, bitte hole das nach, der compact hat Verwirrung gestiftet,
+sonst wird die Aufloesung der Rueckfragenkette nicht sauber' (VOLLZOGEN 20:25-20:36Z: 4/4 DICHT 4221/4221 per Read in 14
+Haeppchen, Lesequittung 38.1-38.6); 20:27:00Z (Endfassung nach 20:26:17Z/20:26:27Z) 'Bitte lies den workflow a23a
+Ergebnis vollstaendig und verbuche. Er ist das letzte Glied in der Kette, starte dann eine sorgfaeltig geplante
+Ultracode workflow mit einem map reduce (sodass es den Kontext nicht reisst weil die Happen gigantisch sind), der alle 4
+Zentraldokuemte gegen die rueckfragen workflows und a23a als capstone verarbeitet. Der compact hat gerade schon wieder
+den Kontext gezogen, bitte delegiere die Aufgabe, sie ist zu gross fuer die direkte Verarbeitung' (LAUFEND: Capstone
+#187 gestartet 20:4xZ); 20:27:47Z 'Bitte lies den Session log des letzten Kontextes gruendlich und gezielt, damit es in
+dieser Runde klappt' (VOLLZOGEN: Extrakt Z.112300-112742, 842/842, Lesequittung 40.1-40.4).
+
+Vollzuege: (1) v4 wf_a7fff12a-828 TERMINAL 20:02Z (13/13); Re-Verify r2 TRAEGT_MIT_FIXES 7 MUSS + 3 INFO; LEAD-NACHFIX
+20:25:00Z (reverify2/LEAD-NACHFIX-R2-0609.md: R2-M01..M07 + R2-I01/I02 + N-01..N-11, davon N-05/N-08 ENTLASTET; Backups
+*.pre-lead-nachfix-0609.bak; md5 nachher Tafel ef781844 / Versand 31eb10f5 / Chat ddf4ffe9 / FIX-QUITTUNG 816d6bc4;
+Zaehlwerk 534/534, Runde-3-Proben P1-P8 im Zielzustand, Wachen 0 >120 / 0 non-ASCII). (2) Versand-Endfassung 3332 Z.
+wird linear nachgelesen (Vor-Fix-Fassung 3179/3179 war 15:07-15:14Z gelesen; Stand 21:0xZ Z.1-3200, Rest + Chat +
+Schablone folgen; Lesequittung 39.x). (3) Strang-Explore #186 (wf_8fe446c5-b84) 20:12Z gestartet;
+S1-OWNER-KETTE-TAFEL.md 824 Z. voll gelesen (41.1/41.2: Luecken L-A..L-I gegen EINGANG-LEAD, Z-1 dreistufig
+L88750/L102011/L111216, Z-4 = KON136-01 vollzogen); nach S1-Result fuer den MAX-2-Slot gestoppt (TaskStop 20:44Z),
+Resume byte-unveraendert spaeter. (4) CAPSTONE #187 (wf_7d1c1cf1-4b4, Task wvjku2ee4, Start 20:4xZ, erster Agent
+Sonnet): EINGANG-CAPSTONE.md + CHUNK-TAFEL.txt (MAP-A 65 Chunks: NEUER-LEDGER-Nachfold 33, R1 3, R2 1, R3 2, GB/EK/EA 3,
+Volllesung-Reduce 2, KON137-Entwurf 1, 10K 3, 5K-Maps 7, S1 2, Versand 6, Chat 1, Schablone 1; MAP-B 9 Anker-Chunks der
+4 Ziele) -> Reduce-1 je Zieldokument (Fable, Buckets <= 120 Deltas + Merge) -> Reduce-2 KON137/KON138-ENTWURF +
+RUECKFRAGEN-VOLLBESTAND-ABGLEICH + STRANG-ABSCHLUSS -> 2 Refute-Lenses -> Fix/Re-Verify (alle Funde MUSS); strikt 1
+Agent zur Zeit; Landung = Lead (Nachtraege per Script in super 3 + Umbrella 1, docs-Zug #176). (5) 5K #185 laeuft weiter
+(K087-B/K088 -> Reduce/Refute/Fix; Nachzug in den Capstone als Folge-Run).
+
+NAECHSTE GLIEDER: Versand-Rest + Chat + Schablone lesen (39.10-39.12) -> Capstone-Rueckkehrer je VOLL lesen
+(Lesequittung 41ff.) -> Vollbestands-Abgleich: Luecken = Nachtrag zur Chat-Fassung -> Chat-Fassung 1:1 posten (#175) ->
+Owner-Antworten -> Nachtraege in die 4 DICHT + KON137/138 einspielen (#176, Fenster 7 Push) -> #186 Resume
+(S2/S3/Reduce) -> #179 -> #182 -> #162 -> #152 Teil 2 -> #149.
+
