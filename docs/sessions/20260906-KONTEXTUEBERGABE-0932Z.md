@@ -281,3 +281,28 @@ das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen
   Commits), R4 0/0/0/0, R6 0, Diff-Hygiene GRUEN; origin+github development 74282893; CI 288/16377 (Poller);
   danach main-FF + Nachmessung. Beweisort 20260906-push-fenster/.
 - v4 Fold laeuft weiter (Tafel > 180 KB, Journal 14 Z.); #182 umgebaut, Start nach v4; #179 nach main-FF.
+
+## 13. NACHTRAG (10:54Z) -- MAIN-FF, INFRA-HANDOUT, FOLD-ERGEBNIS, KONTEXT-REKONSTRUKTION 10:46Z
+- Push-Fenster ABGESCHLOSSEN 10:41Z: main-FF SHA-explizit 74282893 origin+github (Ancestor JA/JA, Diff-Hygiene FF
+  GRUEN, R4 0), main-Pipeline 288/16379 SUCCESS 36/36; Nachtrag-12-Push d1f8851c dev 16380 SUCCESS; Nachmessung 4/4;
+  Beweisort backups-workflow/20260906-push-fenster/STAND.md. super origin+github: development d1f8851c, main 74282893.
+- Owner 10:32:45Z "Infra soll das NAS-SSH Passwort rotieren, bitte schicke ihm ein handout ueber git" -> Cluster
+  docs/sessions/2026-09-06-HANDOUT-INFRA-nas-ssh-passwort-rotation-backup2-selfleak-k30-diplomarbeit-lead.md, Commit
+  05aeafc8, gitlab/development gepusht (wertfrei: nur md5-8 63151943, Laenge, Rolle, Kanal, 3 Nutzungen; Bitte um
+  neuen md5-8 fuer die Umstellung des blinden Suchmusters). Cluster _infra/buildtools (M, Infra-Session) unberuehrt.
+- v4 wf_a7fff12a-828: Fold-Result 10:44Z (Agent a89017ce, 92737 B): fold/GEGENSTANDS-TAFEL.md 2851 Z. = 162
+  Gegenstaende (K1 54 / K2 36 / K3 22 / KN 35 / LEAD 15; dringlich 20; 522/522 Quell-IDs je genau eine Alias-Spalte);
+  Lead-Volllesung in 8 Haeppchen (LESEQUITTUNG-0109 Abschn. 31.6, Prueffunde (a)-(f): Tafel traegt fuer G-005/G-025/
+  G-049/G-050 den Stand VOR den Owner-Antworten 10:0xZ -> Fix-Schritt + Lead-Nachtrag zur Chat-Fassung). Reduce
+  a1836ce2 laeuft seit 10:44Z (Versand + CHAT-FASSUNG + Schablone), danach Lenses 2+1, Fix, Re-Verify.
+- Owner 10:46:01Z "analysiere das ende des letzten Kontextes und den gesamten vorletzten Kontext gruendlich [...]
+  Der compact lief gerade schon" (Kompaktierung 10:47:45Z, L110058) -> Rekonstruktion aus dem Session-Log: C-2 =
+  L108769-109224 (04.09. 21:31Z - 06.09. 09:38Z) + C-1 = L109225-110057 (06.09. 09:38-10:47Z) VOLL gelesen
+  (LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md Abschn. 6): 7 Owner-Saetze je mit Handlung + Bericht, 0 unverbuchte
+  Rueckkehrer; Rest (a) Owner 10:21Z "auf dem Laptop einiges gepusht" -> Vollprobe aller Remote-Refs (super 55,
+  thesis 10, ce 92, prt-art 11, overleaf-ext 7, Cluster 2) gegen HEAD: KEIN Laptop-Push unsynchronisiert (nur 3x
+  rescue/thesis-gitlink-paritaet-20260810 06.08. + ce worktree-wf_e22d25ef X-11 = bekannte Refs).
+- OFFEN (Reihenfolge, ein Workflow zur Zeit): Reduce -> Lenses -> Fix -> Re-Verify -> Chat-Fassung 1:1 + Lead-
+  Nachtrag -> #179 Resume wf_d69f800c-888 (S01-Vorflug: porcelain 0, ls-remote 4x, thesis 4x cbefa617, WT fehlt =
+  ok) -> #182 (Script auf 2er-Paare umgebaut) -> #152/#162 Rotationen; #176 docs-Zug NACH Owner-Antworten; Infra-
+  Rueckmeldung md5-8 -> Suchmuster umstellen; Owner-Laptop-Nachzug (OWNER-REZEPT Nachtrag 06.09.) = Owner-Handgriff.
