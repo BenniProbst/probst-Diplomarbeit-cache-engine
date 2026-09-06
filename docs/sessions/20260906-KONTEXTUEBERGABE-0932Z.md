@@ -306,3 +306,20 @@ das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den session log wegen
   Nachtrag -> #179 Resume wf_d69f800c-888 (S01-Vorflug: porcelain 0, ls-remote 4x, thesis 4x cbefa617, WT fehlt =
   ok) -> #182 (Script auf 2er-Paare umgebaut) -> #152/#162 Rotationen; #176 docs-Zug NACH Owner-Antworten; Infra-
   Rueckmeldung md5-8 -> Suchmuster umstellen; Owner-Laptop-Nachzug (OWNER-REZEPT Nachtrag 06.09.) = Owner-Handgriff.
+
+## 14. NACHTRAG (15:07Z) -- RISS 13 + RESUME, VERBUCHUNGEN NACHGEHOLT, FENSTER 2/3 GRUEN
+- RISS 13 06.09. 11:10:21Z: Reduce-Agent a1836ce2 (v4) am Session-Limit ("resets 1:50pm UTC") beim Return gestorben;
+  Journal 17 Z. = 9/7/1, Run failed ("Reduce fehlt"). Torso (VERSAND 3139 Z. inkl. Selbstcheck 522/522, CHAT-FASSUNG
+  174 Z., SCHABLONE 57 Z.) nach 20260902-a23a-vorlage/riss13-pre-resume-20260906-1444Z/ (nie Eingang, nur Gegenprobe).
+- Owner 14:4xZ "Bitte resume alle Agenten und Workflows [...] Hole die Verbuchungen nach. Die Pause ist vorbei" ->
+  Resume 14:45Z byte-unveraendert (Task wp8ytqkgt; 7 Results im Cache, Reduce a930740f neu, danach Lenses 2+1, Fix,
+  Re-Verify; Monitor mit Record-Zeitstempel-Wache). #179/#182 folgen sequentiell (ein Workflow zur Zeit).
+- VERBUCHUNGEN NACHGEHOLT (Owner 11:0xZ/14:4xZ): Lead-Nachtrag 2 (lead-nachtrag-0609 = E-4 erledigt + Tafel-Drift
+  G-005/G-025/G-049/G-050); Memory-Nachtrag 2 + Index; Board-Hygiene V-072 Tranche 2 (#54 #121 #84 #49 #71 #149 #3
+  #40 #136 #146, 0 Status-Kipps) + NEU #184 Fleet-CI-Template (Tafel G-108); #178 Repo-Seite (Umbrella DICHT X-21 +
+  GELTEND-Vermerke Abbruchkanon/L-05, Commit 67c34b0; super RITUAL-KARTE Spend-Risiko + Wecker, a4f279cb);
+  Lesequittung-0109 31.6 (Tafel voll) + 31.7 (Riss 13); LESEQUITTUNG-KONTEXTE Abschn. 6 (C-2 + C-1 rekonstruiert).
+- PUSH-FENSTER 2 + 3 (Pipelines sequentiell): cf2cd52f dev 16387 + main 16388 SUCCESS; a4f279cb dev 16391 + main
+  16392 SUCCESS (4/4 Refs); Umbrella 67c34b0 CI 16393 SUCCESS 41 + 22 manual. Beweisort 20260906-push-fenster/STAND-2.md.
+- OFFEN: Reduce-Rueckkehrer voll lesen + Torso-Diff -> Lenses/Fix/Re-Verify -> Chat-Fassung 1:1 + Lead-Nachtrag 2 ->
+  Owner-Antworten -> #176 docs-Zug; #179 -> #182 -> #152; Infra-Rueckmeldung md5-8 (Suchmuster umstellen).
