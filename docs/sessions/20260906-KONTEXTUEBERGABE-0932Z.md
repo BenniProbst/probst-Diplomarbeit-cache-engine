@@ -372,3 +372,91 @@ Fenster; keine Zeile faellt ohne Objekt-Beleg (NIE KUERZEN):
   Abschn. 31.x, LESEQUITTUNG-KONTEXTE Abschn. 1-7.
 - Sequenz laufender Zuege: v4 (Lens 3 -> Fix -> Re-Verify -> Chat-Posting) -> #185 Explore-5K -> #179 Thesis-LICENSE
   (SOFORT-Posten seit 02.09., public ohne LICENSE seit 01.09.) -> #182 Explore K079-K083 -> #152/#162.
+
+## 17. NACHTRAG (16:16Z) -- FENSTER 5 GRUEN (K33-ENDMARKE), 5B LAEUFT, K084 BEIDE EXPLORER GELESEN, MUSS-REGEL
+
+**Owner-Regel 15:5xZ (verbatim):** "Gut, bitte merke dir, dass wir ALLE Regressionen jeder Klasse als 'Muss' verbuchen,
+wir wollen hohe Qualitaet" -> Memory feedback_alle_regressionen_jeder_klasse_sind_muss_hohe_qualitaet + SOLL=PFLICHT
+verschaerft; Umbrella ARBEITSWEISE-DICHT X-20 GELTEND-Vermerk 06.09. (c199846, Fenster 5b); #182-Script auf MUSS
+umgestellt (Refute-Prompts + Fix-Filter ohne INFO-Ausschluss); laufende Runs (K27): Lead-Nachfix der INFO-Regressionen
+vor Posten/Landung; Bericht als "n MUSS (davon m frueher SOLL/INFO)".
+
+**Fenster 5 (super 0eb7fb03, Nachtrag 16 Dauer-Posten-Tafel):** Gates gruen, dev-CI 288/16396 SUCCESS 28/28
+15:53:59Z, main-FF, main-CI 16397 SUCCESS 15:58:28Z, 4/4 Refs == 0eb7fb03. LEAD-FEHLER K33: fenster5-chain.sh war
+Kopie des 4er-Scripts mit Endmarke 'FENSTER4-ENDE' -> 5b-Waiter und Rotationskette #152 hingen 16 min; 16:14:53Z
+Marke nachgetragen, Script korrigiert, Memory K33 (Endmarke als EINE Variable + Waiter-Muster-Gegenprobe).
+**Fenster 5b (Umbrella c199846, X-20-Vermerk):** gitleaks Koeder rc=1 / Echt rc=0, DICHT-Wachen 0/0, R4 0, Push
+origin 67c34b0..c199846, Pipeline comdare/projekte 16398 laeuft (Waiter b7r6sg2gk meldet FENSTER5B-ENDE).
+**#152 Teil 1 (PAT id 98 auf 289, write_repository):** Vorflug read-only erledigt (Token active, Ablauf 2026-10-15,
+CI-Var 288 masked+protected len 53, Vault-Datei Ein-Wert, Cluster porcelain nur _infra/buildtools); blinde
+Rotation rot98.py (Werte nur im Skript-Speicher, 0600 + shred, Ausgabe len/md5-8/HTTP) startet automatisch nach
+FENSTER5B-ENDE im R4-Leerlauf (run-rot98.sh, Waiter bax8nexen); danach Cluster-Commit Vault+Rotations-Log,
+Push gitlab development. Teil 2 (runners_token 286/287/288/289 + prod2 17/56 + 390er) = eigenes Fenster mit Vorflug.
+
+**#185 Explore-5K (wf_9e4d189d-2a8, 1 Agent zur Zeit):** K084 Leser (267 Z.) + Scanner (654 Z.) VOLL gelesen,
+Quittungen 32.1/32.2 (Lesequittung-0109). Scanner-Nenner: 94 Fundstellen / 19 IDs / 45 Riss-Marker, Owner-Marker
+16 = 12 distinkt + 4 DUP deckungsgleich. Lead-Prueffunde fuer den Reduce-Nachtrag: Wrap-Formregression der Tafel
+(MUSS), Summary-Echo L107773 vs K084-eigene Zusagen trennen, #179-Rezept 'Explorer A nachholen' gilt fort,
+wf_1a36d148 Differenz 3 = Zaehlnachweis; Script-Regression UEB-Pfad PAUSE-PROTOKOLL-10 (= 20260830) bleibt
+Lead-Nachfix (K27). K085 Explore-A a64d375e laeuft seit 16:09:51Z.
+**v4 (wf_a7fff12a-828):** Fix-Agent a25b3532 laeuft seit 15:47:53Z (Journal 26 Z.); Lenses 11 MUSS / 25 SOLL /
+16 INFO gelesen (Quittung 31.9-31.11); INFO-Funde werden nach MUSS-Regel vorab geprueft (Lead-Datei im Beweisort),
+Nachfix nach Fix-Rueckkehrer, dann Chat-Fassung 1:1 posten + Lead-Nachtraege 2+3.
+**Sequenz danach:** #179 Thesis-LICENSE Resume (S01-Vorflug) -> #182 (K079-K083 neu schneiden) -> #162 root-PAT ->
+#152 Teil 2 -> naechstes Push-Fenster (Nachtrag 17 + STAND-2 + Lesequittungen sind lokal/Beweisort).
+**Nachtrag-17-Zusatz (16:20Z):** Kontextgrenze K089/K090 = L111409 (Compact 16:13:09Z); K089-Rest
+(L111111-L111408) voll gelesen + quittiert (LESEQUITTUNG-KONTEXTE Abschn. 9, 0 Reste ohne Traeger). Fuer #182 liegen
+K079-K090 neu geschnitten in 20260904-explore-3-kontexte-vergessen/kontexte-0609/ (Token-Probe 0; alter K083-Schnitt
+war unvollstaendig 40471 -> 81861 B).
+**Nachtrag-17-Zusatz 2 (16:21Z):** Fenster 5b GRUEN: Umbrella c199846 gepusht, CI comdare/projekte 16398
+success 41 + 22 manual (16:20:21Z), origin development == c199846. Rotationskette #152 Teil 1 startet automatisch.
+**Nachtrag-17-Zusatz 3 (16:23Z) -- #152 TEIL 1 VOLLZOGEN:** Thesis-Writeback-Token rotiert 16:20:47-54Z
+(id 98 -> id 100, write_repository, Ablauf 2026-10-15; Vault r20260906 0600; CI-Var 288 PUT 200 masked+protected,
+md5-8 gleich); Beweise: Alt-Token API 401 + git 'HTTP Basic' (revoked), Neu-Token git ls-remote rc=0 HEAD cbefa617
+(API-GET 403 = Scope write_repository deckt REST nicht; Script-Erwartung 200 war falsch = MUSS-Vermerk fuer Teil 2);
+Cluster d446b2db gepusht (== gitlab/development). Beweisort 20260906-rotation-152/STAND.md. Offen: CI-Wirkungsbeweis
+beim naechsten Writeback-Job; Teil 2 eigenes Fenster. Nebenbefund: GitLab 289 visibility=private (API), GitHub public
+-> #179-Dringlichkeit gilt fuer GitHub.
+
+## 18. NACHTRAG (16:40Z) -- OWNER-FUND 16:38Z ALTE LATEX-ANHANG-PIPELINE IM SUPER (WELLENPLAN S-078a)
+
+**Owner 16:38:27Z (verbatim):** "Bitte verbuche ausserdem, dass ich in Diplomarbeit super noch die alte Pipeline der
+Erstellung an Latex-Anhang und Verarbeitung gefunden habe, obwohl ausdruecklich vermerkt war, dass die cache engine
+das Framework und Bibliothek fuer die gesamte Verarbeitung stellt und die Diplomarbeit nur per XML ihre Belange bei
+der cache engine anfragt. Das hat keine hohe Prioritaet, muss aber im dichten Wellenplan als zukuenftige Aufgabe
+verbucht werden. Wie verbuchst du derzeit, sind dir die 4 zentralen Planungsdokumente als Referenz des letzten
+'goal' Textes noch ein Begriff? Welche Ziele ergeben sich insbesondere, wenn a23a workflow zurueckkehrt?"
+**Vollzug:** Objekt im super @0eb7fb03: Code/04_csv_to_latex, 05_diagram_generator, 06_latex_to_pdf,
+08_appendix_generator; CI anhang:forward Z.2612, thesis:pdf Z.1719, analyse:thesis-data Z.1491, test:anhang-forward-
+probe Z.896, test:anhang-snapshot-einbuchen-probe Z.936. WELLENPLAN-V2-DICHT: S-078a + RN-28-Nachtrag + Kopf-Nachtrag
+(additiv AM ORT, Commit 943fb10d lokal); Board #74 owner_fund_0609; KON137-03 Nachtrag (u) im Entwurf; Traeger #74
+(Zuschnitt erweitert), Bauweg RN-28, Einordnung nach Trigger + Funktionsnachweis (T-Entscheid #158, W7-Naehe #88).
+Regelquelle GOAL-DICHT Z.66 (Repo-Rollen KON71-73). Antworten auf die zwei Fragen: Chat 16:4xZ + Abschn. 19.
+
+## 19. NACHTRAG (16:48Z) -- OWNER-FRAGEN 16:38Z BEANTWORTET + PAUSE 12 (16:45Z)
+
+**Frage "Wie verbuchst du derzeit?":** sieben Ebenen je Owner-Wort/Ereignis: (1) Board-Traeger (Metadata/Subject,
+Gegenstand vor Nummer, Kipps nur mit Beleg), (2) Kontextuebergabe docs/sessions/*-KONTEXTUEBERGABE-*.md (Nachtraege
++ Dauer-Posten-Tafel), (3) KON-Entwurf (KON137-ENTWURF-*.md) -> Ledger-Einspielung NUR per scripts/ledger_nachtrag.sh
+im docs-Zug #176, (4) die vier Referenz-DICHT-Fassungen additiv AM ORT + Stand-Kopf-Bump (GOAL/WELLENPLAN/DESIGNPLAN
+im super, ARBEITSWEISE im Umbrella; Originale = Beleg-Archiv), (5) Memory (Regeln, K-Register, Kontext-Nachtraege),
+(6) Lesequittungen je Rueckkehrer SOFORT (Beweisort backups-workflow), (7) Push-Fenster mit Gates -> CI gruen ->
+main-FF; Owner-Fragen laufen ueber die A2.3a-Gegenstandstafel (7 Nummernkreise). Beispiel heute: Owner-Fund 16:38Z
+-> S-078a/RN-28/Kopf im Wellenplan-DICHT (943fb10d), Board #74, KON137-03 (u), dieser Nachtrag.
+**Frage "4 zentrale Planungsdokumente noch ein Begriff?":** Ja: GOAL-V8-DICHT (536 Z.), WELLENPLAN-V2-DICHT (2503 Z.),
+DESIGNPLAN-TDD-DICHT (437 Z.), ARBEITSWEISE-GESAMT-DOKTRIN-DICHT (746 Z., Umbrella); Geltung = Vollfassungen bis
+v4.5-GO (W-1). EHRLICH: nach dem Compact 16:13Z hatte ich das Kipp-Ritual nicht sofort vollzogen (K34); auf die
+Frage hin nachgeholt: GOAL/DESIGNPLAN/ARBEITSWEISE VOLL + Wellenplan Z.1-1260; Rest Z.1261-2503 offen (Pause).
+**Frage "Ziele bei Rueckkehr des a23a-Workflows":** (1) Re-Verify lesen, 10 MUSS-Nachfixe (Owner-Regel 06.09.)
+anwenden, Chat-Fassung 1:1 posten + Lead-Nachtraege 2/3; (2) Owner-Antworten verbuchen (#175 completed, KON137-10ff)
+-> docs-Zug #176 = dichtes Ledger (Owner-Reihenfolge 01.09.: Fragen -> Antworten -> Ledger); (3) damit fallen die
+owner-gated Posten: v4.5-DICHT-Geltung (G-031), RK-1..8 (G-034), #184 Fleet-CI, W-01 Rechtstraeger, Mid-Line
+09cc7286, #162 root-PAT, W-1 6-GB-Arena, S-19 O1-O4; (4) HEAVY/T2-Sperrfenster wird scharf ("sofort nach fertiger
+Landung + beantworteten Owner-Fragen"): ##47-Re-Run-3 intel (E-2/C-02) -> #114-Re-Run auf eingefrorener Linie ->
+C-01-Vorlage -> ##49 Trigger POST -> Funktionsnachweis (Bau + Kampagne) -> W7/#88-Split -> Rest-Wellen
+(T-Entscheid #158); parallel W4-Text/Auswertung, T-3-Reset ~12.09., echte Messung 12.-14.09., Abgabe 15.09.;
+(5) vorher/daneben: #179 LICENSE (GitHub public ohne LICENSE), #182, #152 Teil 2, E2-Redaktion #149 -> super public.
+**PAUSE 12 (Owner 16:45:05Z "Bitte pausiere alle workflows und Agenten und lege eine abbruchsichere Pause ein"):**
+Monitore + beide Workflows gestoppt (v4 Torso Re-Verify adc60c08; 5K Torso K086-A a5099262), Sicherung
+~/backups-workflow/20260906-pause12/, Protokoll docs/sessions/20260906-PAUSE-PROTOKOLL-12.md (Wiederanlauf-Rezept),
+Push-Fenster 6 fuer die docs-Commits als detached Kette.
