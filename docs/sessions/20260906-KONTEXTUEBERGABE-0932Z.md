@@ -561,9 +561,9 @@ Bewandtnis-Scans S2/S3 von #186 fehlen noch -> Resume nach Capstone-/5K-Terminal
 **Laufend:** Capstone wf_7d1c1cf1-4b4 (Agent a37dd5d5, Chunk NL-01 seit 20:44Z), 5K wf_9e4d189d-2a8 (K088 a48bfb0a
 seit 20:56Z), Fenster-7-Kette (Hintergrund b7p0k1wvp).
 
-## 23. NACHTRAG (07.09. 06:55Z) -- RISS 13 (RATE-LIMIT), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
+## 23. NACHTRAG (07.09. 06:55Z) -- RISS 14 (RATE-LIMIT; Riss 13 = Session-Limit 06.09. 11:10Z), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
 
-**Riss 13:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
+**Riss 14:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
 gekillt ('[Request interrupted by user]'): Capstone wf_7d1c1cf1-4b4 nach 4/65 MAP-A (NL-01..NL-04, 0 Pseudo; NL-03
 traegt 1 WIDERSPRICHT + 7 FEHLT), 5K wf_9e4d189d-2a8 nach 10 Results (K088 A+B fertig, Reduce offen). Owner /login
 07.09. ~06:3xZ + Order (verbatim): "Bitte resume alle workflows und agenten und fahre wie gehabt mit offener Arbeit
@@ -605,3 +605,6 @@ A/B + K088-leser Teil 1 (32.1-32.9); Queue: K088-leser Teil 2, K088-scan, 5K-Red
 **Lead-Befunde aus der Volllesung (fuer Reduce/Refute vorgemerkt):** NL-03-D06 vs NL-04 (RN-88/O-13 Status-
 Konflikt), NL-04-D05(c) super .gitlab-ci.yml Z.1940/2193 globale Sperre ceb-measurement-exclusive = lebende
 Nicht-Konformitaet (Owner 21.07. par.61), Dedup NL-04-D07/NL-05-D04 + NL-01-D01/NL-03-D05, G-009 offen (Tranche 2).
+**Korrektur (07:28Z):** Der Rate-Limit-Riss 06.09. 21:51Z heisst RISS 14; RISS 13 war das Session-Limit
+06.09. 11:10-14:43Z (K088-Leser R1, riss13-pre-resume-20260906-1444Z). Board-Metadaten #185/#187 'riss13_resume'
+meinen Riss 14.
