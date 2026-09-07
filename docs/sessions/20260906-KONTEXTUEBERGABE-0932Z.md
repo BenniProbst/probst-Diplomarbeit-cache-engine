@@ -725,3 +725,22 @@ Resumes + Starts: s. PAUSE-PROTOKOLL-13 Abschn. 7 (6 Workflows, 2 Teammates). Ve
 zuerst) ->
 Fenster 8. NAECHSTES GLIED: Rueckkehrer je VOLL lesen; O-2-Fenster (G-008 sofort); #191 HEAVY_J 8; danach Bau-Slots nach
 DESIGN-TRANCHE2-ANTWORTEN.md.
+
+## 31. NACHTRAG (07.09. 12:57Z) -- O-2-FENSTER, FENSTER 8, HANDOUT-RUNDE 2, LEDGER-DICHT-ZUG #197, K41
+
+KETTE (K35): Wurzel 20./21.08. -> Rueckfragen-Workflow -> A2.3a (MITTEL) -> Owner-Antworten T1 17/17 + T2 79/79 ->
+HAUPTZIEL LEDGER-AKTUALISIERUNG = #176 (Zug laeuft, KON136-04..08/KON137/KON138) + #197 DICHTES LEDGER (NEU, Owner-Frage
+12:39:17Z L114596 "die Ledger Ueberarbeitung auf dense [...] auf dem Schirm?" -> Lead-Luecke: Traeger fehlte; Workflow
+wf_86e234d4-c80 12:48Z: Kartierung + Spez -> Map >= 15 Chunks NEUER-LEDGER + KON120..136 + A2.3a -> Reduce-1 G1..G4 ->
+Reduce-2 LEDGER-DICHT.md -> 2 Lenses -> Fix + Lande-Rezept) -> Trigger #158 -> Abgabe 15.09.
+FENSTER 8 GRUEN 12:37-12:46Z: 13 docs-Commits, dev-CI 16449 + main-CI 16450 SUCCESS, super 4/4 Refs == 71f7c818.
+O-2-FENSTER (Owner G-008 'sofort'): reset_registration_token 286/287/288/289 je HTTP 201 12:32:45Z (Runner 14/14 unver-
+aendert); root-PAT id 62 -> 101 per self/rotate 12:53Z (Fallback B, H3; neu 200/alt 401; md5-8 481e64bf; Keeper =
+Owner);
+Vault 5 Dateien + ROTATION-LOG wertfrei = Cluster bed4c707; Push aller 5 Cluster-Commits (Handouts H1-H9 + runner-mode
+v4
+88e31f63) 12:56Z. K41: Credential-Store trug das root-PAT, git loeschte die Zeile bei 401 -> blind neu gesetzt; Regel
+Konsumenten-Inventur vor Rotation (Memory). Handout-Runde 2 gelesen (LQ 54): H7 PW-Rotation 7 Hosts, H8 redshield-Keys,
+H9 prod-MinIO (LEBT seit talos-prod1-Neustart, widerspricht K144) -> #198. G-096 measure_out_d03 nach NAS (66/66 md5,
+71f7c818). 5K TERMINAL 14/14 gelesen (#185 completed, LQ 43.7). Board neu #193-#198. Laufend: #176-Zug, #194 Design-
+Explore, #197, Capstone, Strang, 3K; Teammates lizenz-bauer (CC-BY-Umbau), heavyj8-bauer (K17), handout-bauer (Runde 3).
