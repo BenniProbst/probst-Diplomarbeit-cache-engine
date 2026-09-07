@@ -668,3 +668,29 @@ Lead: GO fuer sofortige Einspielung der 19 antwort-unabhaengigen Bloecke), K-3 =
 Tranche 1 (G-006 L1/L7/(6) nach Pruefung, G-074 Posten (4), G-073 G06, G-019), Lizenz-/Vertragsfragen 1-7 + 12 des
 #179-Bauers. G-008 (HEAVY-Fenster) haengt jetzt an G-007-Vollzug (HEAVY_J 8 + Swap 16 GB). Naechstes Glied: Owner-
 Antworten Tranche 2 -> KON138 komplett -> docs-Zug #176 (Reihenfolge S3 Abschn. 4; Capstone-Gegenlesung).
+
+## 29. NACHTRAG (07.09. 08:10Z) -- PAUSE 13 (OWNER 07:44:37Z): VIER WORKFLOWS NACH DEM LETZTEN RESULT GESTOPPT
+
+Owner 07:44:37Z (L113944, zugestellt 07:47:56Z) verbatim: "Bitte nimm keine neue Arbeit mehr auf und lassse alle
+Agenten auslaufen, lege eine abbruchsichere Pause ein, sodass ich die Fragen in ruhe beantworten kann." Vollzug:
+docs/sessions/20260907-PAUSE-PROTOKOLL-13.md (Stop-Tafel, Rueckkehrer-Bilanz, offene Owner-Fragen, Objektstand,
+Resume-Rezept). Stops: 3K 07:57:13Z (K079-Paar fertig), Capstone 07:58:10Z (NL-01..NL-08 fertig), Strang 08:02:59Z
+(Reduce fertig), 5K 08:06:10Z (Refute A/B fertig); gekillte Folge-Agenten 42 s bis 7 min alt, 0 Torsi, 0 Pseudo.
+Alle Rueckkehrer der Schnittstellen + Teammate-Results VOLL gelesen (Lesequittung 42.7/42.8/43.5/43.6/49/50/51/52/
+53). Sicherung ~/backups-workflow/20260907-pause13/ (Journale post-stop, Script-MD5s). Monitor b0jwa9exg gestoppt.
+BERICHTIGUNG zu Nachtrag 25 (5K-Refute-A F-01, MUSS): die vier Owner-Worte 04.09. 20:14:43Z/20:15:22Z/20:26:57Z
+(+ "Paradigma geheilt?") standen NICHT "in keiner Uebergabe/Quittung/Memory" -- sie stehen verbatim in
+~/backups-workflow/20260904-.../LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md Z.28-29/197-201/208-209 und in
+20260904-HAUPTSTRANG-A23A-REGISTER Z.9; richtig bleibt: nicht im KON137-Entwurf und nicht im Ledger (KON137-11).
+Nachtrag 25 war Zweitablage, kein Erstfund. Lehre: 'nicht gefunden' erst nach grep ueber ALLE Traeger.
+ZEITANKER (V14): Rueckkehrer-Ruege = L113511 07:20:58Z (Nachtrag 24 nannte 07:23:59Z = eigene Wiedergabe); K35 =
+L112228 19:50:45Z; Pause-Nummern: 04.09.-Pause = PAUSE 10b (Kollision mit 20260830-PAUSE-PROTOKOLL-10.md).
+NEUE FUNDE AUS DEN RUECKKEHRERN (Traeger gesetzt): 3K K079 VK-1 Journal-Forensik 5 Alt-Runs (#167), VK-2 super
+.gitlab-ci.yml Z.331-335 retry-deprecated = MUSS (#176), VK-4 3er-Tranchen-Regel 01.09. verletzt (K39), VK-5 sechs
+K079-Verbatims (KON137-04); Capstone NL-08 D08-D10 WIDERSPRICHT: #114-Re-Run-2 GO war AUF dd0f56d3 (01.09.
+10:22:43Z, super-Bump-2 8b9ca7c9), WELLENPLAN Z.228-229 / GOAL Z.370+518-519 / DESIGNPLAN Z.371-372 schreiben ihn
+bd55942a zu (Reduce-1 beim Resume); 5K-Refute-A F-06 = K38 (keys/-Log vom Agenten gegrept); Lizenz-Bauer: Vertrag
+traegt ein Geburtsdatum (Owner bestaetigen, public-Fassung ohne) + super LICENSE Abschn. 6/9 nicht kanonisch (#143
+MUSS); Infra-Handouts 7/7 gelesen, Cluster b5f64892 lokal, Push nach der Pause.
+OFFEN BEIM OWNER: Tranche 2 (37 + 9 + 33) + Anhang K-1/K-3/G-006/G-074/G-073/G-019/Lizenz 1-8 + Geburtsdatum.
+NAECHSTES GLIED (nach Owner-Wort): Resume nach Rezept -> Antworten verbuchen (KON138) -> #176 Teil A -> Fenster 8.
