@@ -284,3 +284,8 @@ Transkripte unveraendert); P4 AKIA 13 Dateien / 2 distinkte Werte ohne EXAMPLE-F
 Objekt verifiziert); P5 1 Textnennung 'BEGIN PRIVATE KEY' ohne END-Block = kein Schluessel. Gegenprobe nach Redaktion:
 P7 0, P1-vars 0, P2 0, P6-unmaskiert 0. NEUE ROTATIONS-POSTEN an #152: PAT id=98 (Wert lag 3 Tage mit 664 auf prod1) +
 runners_token 286/288 (zusaetzlich zu 287/289). Haupt-Session-Transkript ist NICHT auf dem NAS (nicht beauftragt).
+
+## NACHTRAG 8 (07.09., aus 5K-Reduce V5-016): runs-nachpass ABGESCHLOSSEN 04.09. 21:20:50Z (b3w7gl3p7): 9036/9040
+Dateien, 427 wf_-Ordner, ~2.0 GB; GESAMT k084-Woche 15994 Dateien 2.8 GB; Secret-Scan 210 Treffer klassifiziert
+(Runde 2 21:50:48Z: 95 Dateien redigiert, Gegenprobe 0 unmaskiert; AKIA WERT-2 = fremde S3-Key-ID); INDEX.md
+Nachtraege 2+3 auf dem NAS (sessions-rohdaten/k084-woche-20260827-20260904/).

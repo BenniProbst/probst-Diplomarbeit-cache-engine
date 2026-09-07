@@ -610,3 +610,21 @@ Nicht-Konformitaet (Owner 21.07. par.61), Dedup NL-04-D07/NL-05-D04 + NL-01-D01/
 meinen Riss 14.
 **Korrektur 2 (07:30Z, aus 5K-Reduce B):** Riss 14 = PAUSE 12 (PAUSE-PROTOKOLL-12 Z.5); der Rate-Limit-Riss
 06.09. 21:51Z ist RISS 15 (unvergeben gewesen). Nachtrag 23/24 entsprechend korrigiert.
+
+## 25. NACHTRAG (07.09. 07:32Z) -- VIER OWNER-WORTE OHNE DOKU-STAND (5K-Reduce V5-010/OT-3), LEAD-SOFORT-
+## VOLLZUEGE AUS DEM 5K-REDUCE
+
+**Owner-Verbatims 04.09. (bisher in keiner Uebergabe/Quittung/Memory; Vollzug damals im Chat L107985/L108022):**
+- L107922 20:14:43Z: "Also vor einem Kontext wurde das folgende Unterbrochen, hast du das jetzt alles unter dem neuen
+  Paradigma geheilt? [Terminal-Zitat: Board #179 SOFORT ... LICENSE Apache-2.0 + Copyright ...]" -> Antwort L107985
+  (Heilungsstand der Risse 11/12: nichts verloren, Fundorte genannt).
+- L107923 20:15:22Z: "Viele Ergebnisse davon waren auch schon fertig abgelegt, wo sind die hin?" -> L107985 'Nichts
+  davon ist weg' + Fundorte (ernte-0409/, Beweisorte).
+- L108016 20:26:46Z: "[Request interrupted by user]" (versehentlich) -> 0 Verlust.
+- L108018 20:26:57Z: "Bitte weiter, ich wollte nicht unterbrechen" -> Fortsetzung L108022.
+**Lead-Sofort aus dem 5K-Reduce (07.09.):** #183-Beweisort ~/backups-workflow/20260906-nas-verschiebung (32 Dateien
+aus Job-tmp nas-r3 + INDEX); MEMORY.md PAUSE-10-Indexzeile; #176-Metadaten KON137 (v) Riss-Register + KON137-11
+Verbatim-Block (vorlagefertig); #165 V-028 allow_failure-Klasse; #182 Ernte-Script-Posten; #181 NAS-Nachpass-Nenner;
+Register Nachtrag 8; Riss-Nummern: 13 = Session-Limit 06.09. 11:10Z, 14 = Pause 12, 15 = Rate-Limit 21:51Z.
+**K37 (Form-Regression MUSS, 5K-Reduce V5-035):** Lead-Antwort 07.09. 06:51:48Z in Englisch -> Sprach-Wache vor jedem
+Owner-Bericht (immer Deutsch).
