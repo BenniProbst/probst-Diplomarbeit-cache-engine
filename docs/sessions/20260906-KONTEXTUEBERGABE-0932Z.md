@@ -649,3 +649,13 @@ Modell-Wort (Fable-only vs A1-Matrix), Lizenz-/Vertragsfragen 1-7 + 12 (Namensfo
 Verguetung, UG-Vertreter/HRB, Signaturform Textform statt QES, kuenftige Fassungen, Ablage signiertes PDF).
 **Nebenbefund MUSS:** super-LICENSE weicht vom kanonischen Apache-2.0-Text ab (4(d), Abschn. 9) -> #143, naechster
 super-Zug byte-gleich setzen.
+
+## 27. NACHTRAG (07.09. 07:38Z) -- STRANG-S3 GELESEN: LEDGER-RUECKSTAND SEIT KON136-03
+
+S3 (695/695, Lesequittung 46.1-46.3): Ledger-Kopf kennt nur den Stand 01.09. ~19:5xZ; 20 Entwurfsbloecke (KON136-
+04..08, KON137-01..09 + (n)-(u), KON138) 0/20 im Ledger, 19/20 antwort-unabhaengig; 13 Owner-Worte 02.-06.09. ohne
+Ledger-Zeile (neu fuer den Entwurf: Kill-Kaskade + K29 04.09. -> (v); MUSS-Regel 06.09. -> eigene Zeile); 17
+Kleinposten V-059-Familie + 6 grosse Ergebnismengen ohne Einspielung. Einspiel-Reihenfolge 8 Schritte (S3 Abschn. 4)
+mit Mechanik-Vorbehalt ledger_nachtrag.sh (Einfuegepunkt Z.19). V14: Owner-Ruege = 19:50:45Z (L112228); Reihenfolge-
+Wort A = 02.09. 06:34:06Z (L103848), nicht 01.09. Owner-Frage K-1 (fuer Tranche 2): 'NUR KON138 wartet auf A2.3a;
+19 Bloecke + 17 Kleinposten sofort einspielen -- GO, oder #176 als Ganzes warten?' (Lead-Empfehlung: GO).
