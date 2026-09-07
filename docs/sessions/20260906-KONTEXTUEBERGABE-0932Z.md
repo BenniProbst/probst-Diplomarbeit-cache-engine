@@ -560,3 +560,33 @@ Bewandtnis-Scans S2/S3 von #186 fehlen noch -> Resume nach Capstone-/5K-Terminal
 
 **Laufend:** Capstone wf_7d1c1cf1-4b4 (Agent a37dd5d5, Chunk NL-01 seit 20:44Z), 5K wf_9e4d189d-2a8 (K088 a48bfb0a
 seit 20:56Z), Fenster-7-Kette (Hintergrund b7p0k1wvp).
+
+## 23. NACHTRAG (07.09. 06:55Z) -- RISS 13 (RATE-LIMIT), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
+
+**Riss 13:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
+gekillt ('[Request interrupted by user]'): Capstone wf_7d1c1cf1-4b4 nach 4/65 MAP-A (NL-01..NL-04, 0 Pseudo; NL-03
+traegt 1 WIDERSPRICHT + 7 FEHLT), 5K wf_9e4d189d-2a8 nach 10 Results (K088 A+B fertig, Reduce offen). Owner /login
+07.09. ~06:3xZ + Order (verbatim): "Bitte resume alle workflows und agenten und fahre wie gehabt mit offener Arbeit
+fort. Die Kostenlimitierung ist aufgehoben und wir fahren stattdessen die dichte claude code Arbeitsweise."
+-> 07.09. ~06:5xZ: #187, #185, #186 byte-unveraendert resumt (md5 de769b03/10ddc51c/d1beea6c, pgrep leer, Journale
+9 h stale); MAX-2 als aufgehoben verbucht (Memory-Nachtrag); #179 zurueckgehalten bis G-030-Zuschnitt.
+
+**Owner-Antworten Tranche 1 (06.09. 21:49:11Z, L113305):** 16/16 Entscheide beantwortet, wortgetreu gesichert
+(antworten/OWNER-ANTWORTEN-TRANCHE1-0609.utf8.txt, md5 33a4e2de) und verbucht (A2.3a-ANTWORTEN-TRANCHE1-VERBUCHUNG-
+0709.md, Tabelle G -> Antwort -> Folge). Groesste Folgen: Thesis-Rewrite 2 (alle Claude-Trailer inkl. Mid-Line
+09cc7286) + Infra-Handout force-pull + 3-Maschinen-Sync (G-005); Neustart-Handout nach Node-Start (G-006);
+Loeschungen nur nach Pruefung + Backup-Nachweis; Service-Identitaet nach Infra-Schema comdare-admin-management (G-020);
+Statusseite + Mail (G-039); Talos-Handout (G-071); Bau-Freigabe CEB-Vertrag + Alt-Posten VOR Trigger (G-074);
+Peak-Slot A dann B VOR Trigger (G-077); Rechteuebertragung Person -> UG als Vertrags-PDF + Lizenzklausel + Pruefpaket
+(G-030); v4.5 GO (G-031); Rename-GO (G-072); Achsen-GOs (G-078/G-079).
+
+**Owner-Rueckfrage G-005 beantwortet:** Thesis-Remotes 07.09. 06:41Z frisch geholt: origin+github dev+main 4/4 ==
+cbefa617, cbefa617 in allen Tips enthalten, 0 neue Commits, 1 Claude-Rest (Mid-Line 09cc7286); Kommentar/Sync = #121
++ #67.
+
+**Owner-Order 06.09. ~21:5xZ (verbatim):** "Bitte stelle mir noch die jetzt noch nicht beantworteten Fragen und
+Entscheidungen mit Erklaerungen. Es kommt mir so vor, als waere alles unter Teil D eine Schablone aber nur halb
+fertig." -> Befund: zutreffend (Teil D = Schablone; Erklaerungen lagen in nicht gepostetem Teil A/C) -> Tranche 2 =
+erklaerte Liste aller Teil-D-Zeilen ausser den 16 (delegiert an Fable-Subagent 'tranche2-extraktor', Ziel
+antworten/TRANCHE2-CHAT-OFFENE-ENTSCHEIDE.md); G-007 neu gestellt (VMs bleiben an: A HEAVY_J 8 memory-gated + C
+earlyoom fail-loud empfohlen).
