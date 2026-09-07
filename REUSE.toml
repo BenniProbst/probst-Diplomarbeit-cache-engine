@@ -188,7 +188,17 @@ path = ["Code/external/comdare-cache-engine/**", "Code/external/comdare-prt-art/
 SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), owner of the registered trademark Comdare"
 SPDX-License-Identifier = "LicenseRef-Comdare-Research-1.0"
 
+# Thesis-Repositorium seit 07.09.2026 unter CC BY 4.0 (Owner-Entscheid Lizenz-Punkt 8, #179);
+# LICENSES/CC-BY-4.0.txt ist byte-gleich zu thesis/diplomarbeit/LICENSES/CC-BY-4.0.txt.
 [[annotations]]
 path = ["thesis/diplomarbeit/**", "Code/external/20260931-overleaf-diplomarbeit/**"]
 SPDX-FileCopyrightText = "2026 Benjamin-Elias Probst"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Nutzungsrechte-Vertrag Urheber -> BEP Venture UG (oeffentliche Fassung ohne personenbezogene Daten):
+# Rechtstext beider Parteien, kein Software-Artefakt; Wiedergabe nur mit Nennung, keine Lizenz.
+[[annotations]]
+path = "docs/recht/**"
+precedence = "closest"
+SPDX-FileCopyrightText = ["2026 Benjamin-Elias Probst", "2026 BEP Venture UG (haftungsbeschraenkt)"]
 SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"

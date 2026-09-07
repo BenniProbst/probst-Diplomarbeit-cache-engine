@@ -90,14 +90,18 @@ und haben verschiedene Rollen:
 Die Begruendung und das Owner-Zitat dazu stehen im Kommentarblock von
 .gitmodules. Beide Zeiger werden von Hand gemeinsam gesetzt.
 
-Das Diplomarbeits-Repositorium fuehrt KEINE eigene Lizenzdatei; das
-Urheberrecht an der Arbeit liegt bei Benjamin-Elias Probst. Beide
-Einbindungen sind hier deshalb als KEINE-LIZENZDATEI gefuehrt.
+Das Diplomarbeits-Repositorium steht seit dem 07.09.2026 unter der
+Creative Commons Attribution 4.0 International (CC BY 4.0); das
+Urheberrecht an der Arbeit liegt bei Benjamin-Elias Probst (Owner-
+Entscheid Lizenz-/Vertragszug #179, Punkt 8; bis dahin KEINE-LIZENZDATEI).
+Beide Einbindungen zeigen auf denselben Stand und tragen dieselbe
+Lizenzdatei LICENSE; der Nutzungsrechte-Vertrag Urheber -> BEP Venture UG
+liegt als oeffentliche Fassung unter docs/recht/.
 
 WACHE: SUBMODUL Code/external/comdare-cache-engine LIZENZ "Comdare Research License, Version 1.0" DATEI LICENSE
 WACHE: SUBMODUL Code/external/comdare-prt-art LIZENZ "Comdare Research License, Version 1.0" DATEI LICENSE
-WACHE: SUBMODUL thesis/diplomarbeit KEINE-LIZENZDATEI
-WACHE: SUBMODUL Code/external/20260931-overleaf-diplomarbeit KEINE-LIZENZDATEI
+WACHE: SUBMODUL thesis/diplomarbeit LIZENZ "Attribution 4.0 International" DATEI LICENSE
+WACHE: SUBMODUL Code/external/20260931-overleaf-diplomarbeit LIZENZ "Attribution 4.0 International" DATEI LICENSE
 
 Zum cache-engine-Eintrag: er nennt den Stand, den der Gitlink HEUTE
 zeigt. Steht dort spaeter eine andere Lizenz, wird diese Zeile hart
