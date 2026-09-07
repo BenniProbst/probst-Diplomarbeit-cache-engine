@@ -331,8 +331,16 @@ lint:secrets:
   retry:
     max: 1
     when:
-      - stuck_or_timeout_failure
+      # GitLab 19.1: stuck_or_timeout_failure ist deprecated (ci/lint-Warnung 01.09./07.09.);
+      # die vier Nachfolger decken exakt dieselbe Klasse. runner_system_failure bleibt, seine
+      # 19.1-Abspaltungen runner_external_dependency_failure/runner_interrupted werden mitgefuehrt.
+      - stuck_pending_with_matching_runners
+      - stuck_pending_no_matching_runners
+      - no_updates_running
+      - no_updates_canceling
       - runner_system_failure
+      - runner_external_dependency_failure
+      - runner_interrupted
   rules:
     - when: on_success
   variables:
