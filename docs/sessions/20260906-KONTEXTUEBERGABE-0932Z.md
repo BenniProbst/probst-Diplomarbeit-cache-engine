@@ -561,9 +561,9 @@ Bewandtnis-Scans S2/S3 von #186 fehlen noch -> Resume nach Capstone-/5K-Terminal
 **Laufend:** Capstone wf_7d1c1cf1-4b4 (Agent a37dd5d5, Chunk NL-01 seit 20:44Z), 5K wf_9e4d189d-2a8 (K088 a48bfb0a
 seit 20:56Z), Fenster-7-Kette (Hintergrund b7p0k1wvp).
 
-## 23. NACHTRAG (07.09. 06:55Z) -- RISS 14 (RATE-LIMIT; Riss 13 = Session-Limit 06.09. 11:10Z), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
+## 23. NACHTRAG (07.09. 06:55Z) -- RISS 15 (RATE-LIMIT; Riss 13 = Session-Limit 06.09. 11:10Z, Riss 14 = Pause 12), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
 
-**Riss 14:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
+**Riss 15:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
 gekillt ('[Request interrupted by user]'): Capstone wf_7d1c1cf1-4b4 nach 4/65 MAP-A (NL-01..NL-04, 0 Pseudo; NL-03
 traegt 1 WIDERSPRICHT + 7 FEHLT), 5K wf_9e4d189d-2a8 nach 10 Results (K088 A+B fertig, Reduce offen). Owner /login
 07.09. ~06:3xZ + Order (verbatim): "Bitte resume alle workflows und agenten und fahre wie gehabt mit offener Arbeit
@@ -608,3 +608,5 @@ Nicht-Konformitaet (Owner 21.07. par.61), Dedup NL-04-D07/NL-05-D04 + NL-01-D01/
 **Korrektur (07:28Z):** Der Rate-Limit-Riss 06.09. 21:51Z heisst RISS 14; RISS 13 war das Session-Limit
 06.09. 11:10-14:43Z (K088-Leser R1, riss13-pre-resume-20260906-1444Z). Board-Metadaten #185/#187 'riss13_resume'
 meinen Riss 14.
+**Korrektur 2 (07:30Z, aus 5K-Reduce B):** Riss 14 = PAUSE 12 (PAUSE-PROTOKOLL-12 Z.5); der Rate-Limit-Riss
+06.09. 21:51Z ist RISS 15 (unvergeben gewesen). Nachtrag 23/24 entsprechend korrigiert.
