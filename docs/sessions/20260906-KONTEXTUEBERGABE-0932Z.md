@@ -747,7 +747,8 @@ Explore, #197, Capstone, Strang, 3K; Teammates lizenz-bauer (CC-BY-Umbau), heavy
 
 ## 32. NACHTRAG (07.09. 15:1xZ) -- FENSTER 9: HAUPTZIEL LEDGER-EINSPIELUNG #176 VOLLZOGEN, LIZENZ-MERGE, RISS 17, K45
 
-KETTE (K35): Wurzel 20./21.08. -> Rueckfragen-Workflow/Fold NEUER-LEDGER 97 W / 60 R -> A2.3a (MITTEL) -> Owner-Antworten
+KETTE (K35): Wurzel 20./21.08. -> Rueckfragen-Workflow/Fold NEUER-LEDGER 97 W / 60 R -> A2.3a (MITTEL) ->
+Owner-Antworten
 T1 16/16 + G-007 + T2 79/79 (07.09. 12:12:56Z L114346; T3 = #195) -> HAUPTZIEL LEDGER-AKTUALISIERUNG: #176 EINGESPIELT
 (dieser Nachtrag) + #197 LEDGER-DICHT (laeuft) -> Trigger-Pfad #158 -> Abgabe 15.09.
 RISS 17 (Session-Limit ~14:2xZ, 'resets 7pm UTC'): 5 Workflows tot -> Torsi beiseite (MD5SUMS, RISS17-ZEIT.txt in
@@ -763,10 +764,12 @@ kuerzen, ganze Zeilen auslagern). Antwort im Chat 14:5xZ.
 + Lens 2 (14 MUSS) -> Fix 28/28 + SOLL 8/8 -> EINSPIELUNG-176.md; Lead-Volllesung 2102/2102 (LQ 55.73) + Lead-Nachtraege
 additiv: KON137-04 K082-Absatz (L105645 07:50:03Z Haeppchen-Regel, L105973 /login, L105974 08:15:20Z 'Bitte halte kurz
 inne', L105977 Interrupt + L106008, L106542 08:46:11Z 'credits sind wieder frisch' + L106552) und KON138-01 G-006 Lesart
-'morgen' = 07.09. (VERB1 nannte 08.09.). Trockenlauf frische Kopie rc=0 -> ECHTLAUF 15:0xZ per scripts/ledger_nachtrag.sh:
+'morgen' = 07.09. (VERB1 nannte 08.09.). Trockenlauf frische Kopie rc=0 -> ECHTLAUF 15:0xZ per
+scripts/ledger_nachtrag.sh:
 Ledger 35288 -> 37407 Z. (2119 Z., md5 a8c8bc58; Titel KON138 Z.19 / KON137 Z.1191 / KON136-NACHTRAG Z.2004 / KON136
 Z.2138), Sicherung LEDGER.pre-176-<T>.md im Beweisort 20260907-ledger-zug-176/. Commit e5667823.
-LIZENZ-MERGE b004ff84 (--no-ff bau/super-lizenz-nachzug-0709 b4f979a7): NOTICE + REUSE.toml Thesis CC BY 4.0, docs/recht/
+LIZENZ-MERGE b004ff84 (--no-ff bau/super-lizenz-nachzug-0709 b4f979a7): NOTICE + REUSE.toml Thesis CC BY 4.0,
+docs/recht/
 Vertrag oeffentliche Fassung (.md 239 Z. + PDF 8 Seiten, Lead-Probe pypdf: 0 Anschrift/Geburtsdatum/HRB-Zahl, 6
 Platzhalter), Gitlinks beide Zeiger cbefa617 -> 0b582b3590ed; reuse lint compliant 3194/3194; Submodule lokal auf
 0b582b35 gesetzt (LICENSE 'Attribution 4.0 International'). #179 damit im super nachgezogen; Rest #179 = Signatur-
