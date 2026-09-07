@@ -629,3 +629,23 @@ Verbatim-Block (vorlagefertig); #165 V-028 allow_failure-Klasse; #182 Ernte-Scri
 Register Nachtrag 8; Riss-Nummern: 13 = Session-Limit 06.09. 11:10Z, 14 = Pause 12, 15 = Rate-Limit 21:51Z.
 **K37 (Form-Regression MUSS, 5K-Reduce V5-035):** Lead-Antwort 07.09. 06:51:48Z in Englisch -> Sprach-Wache vor jedem
 Owner-Bericht (immer Deutsch).
+
+## 26. NACHTRAG (07.09. 07:37Z) -- RUECKKEHRER-RUNDE 2: 5K-REDUCE, STRANG-S2, #182 GESTARTET, LIZENZ-
+## ZWISCHENSTAND, HANDOUTS
+
+**Gelesen + quittiert (Lesequittung):** 5K-Reduce 844/844 (43.1-43.4: 36 V5 + 17 Risse; Lead-Sofort OT-1..OT-8 alle
+vollzogen ausser Fenster 8), Strang-S2 1022/1022 (44.1-44.6: A1..A24, 14 verwaiste Ergebnismengen, L-S2-01..09; alles
+laeuft auf #176 zu = Hauptziel-Rueckstand), Capstone NL-06 327/327 (42.6), #182-Script 285/285 (44.2), Lizenz-Bauer
+OFFENE-FRAGEN 82/82 (45.1). Riss-Nummern endgueltig: 13 = Session-Limit 06.09. 11:10Z, 14 = Pause 12, 15 = Rate-
+Limit 21:51Z.
+**Gestartet:** #182 Explore-3K K079-K083 (wf_00731c1a-1a1, 07:33Z, Opus-Leser + Sonnet-Scanner je Kontext); Monitor
+b0jwa9exg ueber 4 Workflows. Laufend: Capstone (NL-07), 5K Refute A/B, Strang S3 (55 KB, waechst), Tranche-2-
+Extraktor (Schreibphase), Lizenz-Bauer (Dateien liegen, Result offen), Infra-Handout-Bauer (7 Handouts inkl. H6
+prod2-swap-earlyoom liegen im Cluster-Repo, Result offen).
+**Board:** #176 Einspielmenge (8 Posten), #177 Divergenzen #159/#140/#142, #136 aeltester Rueckstand (48 N-Posten
+seit 22.08.), #182 in_progress, #183 Beweisort, #165 V-028, #181 NAS-Nenner, #191 in_progress (G-007-Antwort).
+**Owner-Fragen-Vorrat fuer Tranche 2:** K-1 Reihenfolge A/B (Ledger-Zug jetzt oder nach Tranche 2; Lead: B), K-3
+Modell-Wort (Fable-only vs A1-Matrix), Lizenz-/Vertragsfragen 1-7 + 12 (Namensform, ausschliesslich/einfach,
+Verguetung, UG-Vertreter/HRB, Signaturform Textform statt QES, kuenftige Fassungen, Ablage signiertes PDF).
+**Nebenbefund MUSS:** super-LICENSE weicht vom kanonischen Apache-2.0-Text ab (4(d), Abschn. 9) -> #143, naechster
+super-Zug byte-gleich setzen.
