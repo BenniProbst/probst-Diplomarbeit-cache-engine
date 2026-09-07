@@ -694,3 +694,34 @@ traegt ein Geburtsdatum (Owner bestaetigen, public-Fassung ohne) + super LICENSE
 MUSS); Infra-Handouts 7/7 gelesen, Cluster b5f64892 lokal, Push nach der Pause.
 OFFEN BEIM OWNER: Tranche 2 (37 + 9 + 33) + Anhang K-1/K-3/G-006/G-074/G-073/G-019/Lizenz 1-8 + Geburtsdatum.
 NAECHSTES GLIED (nach Owner-Wort): Resume nach Rezept -> Antworten verbuchen (KON138) -> #176 Teil A -> Fenster 8.
+
+## 30. NACHTRAG (07.09. 12:29Z) -- TRANCHE 2 BEANTWORTET, PAUSE 13 BEENDET, SECHS WORKFLOWS + ZWEI TEAMMATES
+
+Owner 12:12:56Z (L114346; verbatim antworten/OWNER-ANTWORTEN-TRANCHE2-0709.utf8.txt md5 4b8de858): I. 37/37 beantwortet,
+II.
+G-051 + "alle Fehler muessen als Regression verbucht und geprueft und nachgeholt werden", III. "Alle zur Kenntnis
+genommen und
+ALLE volles GO", Anhang K-1 "GO, sofort einspielen wie von dir empfohlen" (Lesart A), K-3 widerrufen = G-032 (max 6
+Workflows,
+max 2 Fable-5-max je Workflow, Rest frei), G-006 L1 NEIN ("Fremde tmp Artefakte duerfen NIE geloescht werden") / L7 ja /
+(6)
+spaeter, G-074 beide, G-073 G06 = Rest-Kommentare Lead-Nacharbeit (#121), G-019 Codex 5.6 astra auf Ultra, G-007 GO;
+Lizenz-/
+Vertragszug: "Apache wurde ueberholt und gilt nur noch fuer super direkt, Thesis laeuft unter Copyright [...] Punkt 8:
+Bitte
+wechsel auf CC-BY. Alle 4 Projekte der Diplomarbeit haben eigene Sicherheitsstufen und Lizenzen, bitte lies nach was wir
+definiert hatten." (E1 26.08. UEBERHOLT; Vertreter = Benjamin-Elias Probst; Kerndaten NAS backup1
+Cloud/Dokumente/Firmensachen/
+BEP_Venture_UG; kuenftige Fassungen inkl.; PDF in datierten NAS-Ordner). Owner-Korrektur G-088 ("Die Frage ist irrsinnig
+[...]")
+= K40 (Memory). Alle Fristen 15.09. (G-093), NIE STREICHEN.
+VOLLZUG 12:13-12:4xZ: Verbatim gesichert; Memory (Regime G-032, Fable-only widerrufen, Codex 5.6 astra, Lizenz-Wende,
+K40,
+Pause 13 Historie); Board #175/#179/#140/#191/#163/#121/#184/#84/#149/#132 + NEU #193 (PRT-ART-Einbindung, G-001), #194
+(Design-Explore), #195 (Tranche 3), #196 (G-096/G-109); Capstone-Eingang um KON137-10..13/KON138-Reservierung ergaenzt.
+Resumes + Starts: s. PAUSE-PROTOKOLL-13 Abschn. 7 (6 Workflows, 2 Teammates). Verbuchungstafel Tranche 2 = Stufe 1 des
+#176-Zugs
+(wf_663f7e45-015), KON138 = die EINE Rueckfragen-Tafel; Lead spielt nach Fix per ledger_nachtrag.sh ein (Trockenlauf
+zuerst) ->
+Fenster 8. NAECHSTES GLIED: Rueckkehrer je VOLL lesen; O-2-Fenster (G-008 sofort); #191 HEAVY_J 8; danach Bau-Slots nach
+DESIGN-TRANCHE2-ANTWORTEN.md.

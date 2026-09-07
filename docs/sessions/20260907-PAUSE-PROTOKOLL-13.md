@@ -93,3 +93,26 @@ Bei Session-Abriss waehrend der Pause: nichts laeuft (0 Workflows, 0 Monitore, T
 geschrieben; dieses Protokoll + Memory project_pause13 + Board-Metadaten pause13_* tragen den Stand; Resume-Rezept
 Abschn. 5; Rohdaten/Beweisorte lokal (Owner 06.09. 10:21Z). Pause-Beginn 07:47Z (Order-Zustellung), Stop-Serie
 07:57-08:06Z, Protokoll geschrieben 2026-09-07T08:09:27Z.
+
+## 7. WIEDERANLAUF (Owner 07.09. 12:12:56Z L114346: Tranche-2-Antworten + "Bitte verbuche zuerst vollstaendig und resume
+alle
+## Agenten und Workflows und fahre mit der offenen Arbeit fort.")
+
+Vorflug X-15 12:16Z: Journale seit den Stops unveraendert (6/18/10/29 Z.), md5 4/4 OK (MD5SUMS-scripts-pre-resume.txt),
+Pseudo
+0/4, keine fremden Workflow-Prozesse. Owner-Antwort verbatim gesichert
+(antworten/OWNER-ANTWORTEN-TRANCHE2-0709.utf8.txt, md5
+4b8de858, 56 Z.). Regime ab 12:13Z (G-032/K-3): max 6 Workflows parallel, max 2 Fable-5-max je Workflow, Rest frei;
+Fable-only
+12.08. widerrufen. Resumes 12:2xZ: 5K wf_9e4d189d-2a8 -> Task wx4d8zgs8 (Fix neu), Strang wf_8fe446c5-b84 -> wneobsfz3
+(Refute
+neu), Capstone wf_7d1c1cf1-4b4 -> wgu7qkofc (NL-09 neu), 3K wf_00731c1a-1a1 -> w0v0cd5f0 (K080 neu). NEU 12:3xZ:
+#176-Ledger-Zug
+wf_663f7e45-015 (Task w977fz0wz; Verbuchung T2 -> Assembler A/B -> 2 Lenses -> Fix; Beweisort 20260907-ledger-zug-176/)
+und
+#194 Design-Explore wf_c275ff67-425 (Task w1be9bndb; 6 Sonnet-Scans -> Reduce -> Refute -> Fix; 20260907-design-explore-
+tranche2/) = 6 Workflows. Teammates: thesis-lizenz-bauer (#179 Neubau CC-BY + Vertrag + NAS-Kerndaten),
+infra-handout-bauer
+(#189 Runde 2: H7 G-004, H8 G-026, H9 G-101). Pause-Dauer 07:47-12:13Z. Naechste Lead-Glieder: Monitor,
+Uebergabe-Nachtrag 30,
+O-2-Fenster (G-008 sofort: #152 Teil 2 / WF-1 / #162), #191 HEAVY_J 8, Rueckkehrer je VOLL lesen.
