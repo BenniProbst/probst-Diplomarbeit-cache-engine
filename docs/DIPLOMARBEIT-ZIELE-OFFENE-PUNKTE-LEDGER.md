@@ -16,6 +16,2125 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## KON138 -- 06./07.09.2026: OWNER-ANTWORTEN A2.3a = DIE EINE RUECKFRAGEN-TAFEL (KON137-09; Tranche 1 L113305 21:49:11Z
+## + G-007 L113578 07:25:24Z + Tranche 2 L114346 12:12:56Z; Einspielung 07.09., #176)
+
+**KON138-00 (KOPF DER EINEN TAFEL; Regel KON137-09; Owner-Eroeffnung L114346 Z.1 verbatim: "Zu den offenen Fragen:";
+Owner-Schluss L114346 Z.56 verbatim: "Bitte verbuche zuerst vollstaendig und resume alle Agenten und Workflows und fahre
+mit der offenen Arbeit fort."):** [ASCII-Transliteration: Owner-Zitate ae/oe/ue/ss, sonst wortgetreu (V13: Kuerzung nur
+mit [...], nie umgestellt); Owner-Schreibvarianten belassen, z.B. 'uebera', 'emfohlen', 'Qorum', 'Dannn', 'gesehehen',
+'Kampange', 'setzten', 'Gesesellschafter', 'durchzuzuziehen', 'Parallitaet'. Doppelte Anfuehrungszeichen =
+Owner-Verbatim aus OWNER1/G007/OWNER2 bzw. der genannten Transkript-Zeile; einfache Anfuehrungszeichen =
+Kurzzitate/Etiketten aus Tafel, TR2 oder Verbuchung.] REGEL (KON137-09): der Rueckfragen-Vollbestand steht NUR als EINE
+Tafel mit EINEM Nummernkreis G-nnn = A2.3a-Gegenstands-Tafel (backups-workflow/
+20260902-a23a-vorlage/fold/GEGENSTANDS-TAFEL.md, 3017 Z., md5 ef781844, 163 G-Nummern G-001..G-163, Fix-Stand 06.09.
+16:30:22Z = Wachen-Lauf Tafel Z.3002, Lead-Nachfix 20:25:00Z = Datei-mtime, md5 ef781844 deckt den 20:25Z-Stand);
+Alias-Spalte ueber alle Nummernkreise der Tafel Abschn. 2 (FRAGEN 61 = A-1..A-6 + 55 Sektion-2-B-Posten; O-ENTSCHEIDE
+O-1..O-29; V-090-KREIS 69 = (a)-(v) + Raster V-111/V-115/U-19b/F-039 + F2-Bloecke V-01..V-20/Z-01..Z-03/ D-01..D-12 +
+RK-1..RK-8; OG-1..OG-58; BRINGSCHULDEN lb (1)-(7) + Loesch-Tafel L1..L10; R1 V-001..V-148 (34 owner-relevant); BOARD 89
+Zeilen; ENTWUERFE/DICHT/WIDERSPRICHT 107; EXPLORE Z-01..Z-32 + Z-N01..Z-N17; SPERREN S-1..S-9; KIPP 12 = 534
+Kreis-Zaehlungen / 532 distinkte Quell-IDs). OG-n, V-115-Bloecke, RT-n und O-n erscheinen NUR als Alias, nie als eigene
+Zeile. Nummern #274 (Code-Review G5), #276 (Sektion-4-Posten 06.07.), #327 (G-021-Alias) und #278 (Test, NACHTRAG-A)
+sind KEINE Board-Tasks (Board = #1..#219, Stand 14:46:49Z). ZAEHLWERK (literal): 163 G-Nummern = 162 Zeilen dieser Tafel
++ 1 Faltungszeiger (G-152 = GEFALTET -> G-153, Fix L3-S4 06.09., Tafel Z.2599 + Z.2834 'zaehlt nicht als Gegenstand';
+keine Zeile, nur dieser Kopf). Zeilen: Tranche 1 = 17 (16 beantwortet 06.09. 21:49:11Z L113305 + G-019 Handgriff-Zeile
+ohne T1-Antwort, beantwortet in Tranche 2 Anhang) + Tranche 2 = 79 (Abschn. I 37 + II 9 + III 33, 07.09. 12:12:56Z
+L114346) + Teil A/C = 66 (TR2 Abschn. V Z.339 nennt 67 Nummern inkl. G-152: 26 Einzelne + G-121..G-159 = 39 +
+G-161/G-162) -> 17 + 37 + 9 + 33 + 66 = 162 Zeilen; 17 + 79 + 67 = 163. NENNER-VERMERK: die Formel '17 + 79 + 68 - 1
+(G-152) = 163' (STRANG-UEBERBLICK 5.3; Auftrag #176) zaehlt die TR2-Liste als 68 = Zaehlartefakt; literal sind es 67
+(Bereichs-Expansion G-121..G-159 = 39; Board #195 07.09.: '67 Nummern = 66 Gegenstaende ohne Faltungszeiger G-152'); die
+Summe 163 ist in beiden Lesarten gleich. SPALTEN je Zeile (Zeilen-Schluessel = 'G-nnn |' am Zeilenanfang, Folgezeilen
+eingerueckt; Verweise in Anhang/ Korrekturen/Alias-Spalte sind keine Zeilen): G-nnn | Alias (Gegenstand-Kurzform +
+Quell-IDs, Tafel-Zeilenanker bei Teil A/C) | Klasse | Tranche/Datum/L-Anker + Quelldatei:Zeile | ANTWORT (verbatim-nah,
+Kuerzung nur [...]) | FOLGE/ TRAEGER (Board-#) | VOLLZUG (Stand 07.09. 13:07Z; Nachmessung Fix 07.09. 14:29Z gegen 218
+JSON: 87/87 Status-Angaben dieser Tafel unveraendert; Nachmessung Fix-Quittung 07.09. 14:46:49Z gegen 219 JSON: 113/113
+Status-Nennungen '#n + Status' dieser Tafel = Board, 0 Abweichungen; NEU seit 14:29Z: #219 pending (14:41:05Z, '#219
+EXPLORE-6K VERGESSENE/UNVERBUCHTE ARBEIT + HALB GELESENE AGENTEN K089-K095') (kein G-Traeger dieser Tafel); Board-Status
+literal aus tasks/session-5a19728e/<n>.json). KLASSEN (Tafel): K1 = bereits beantwortet, K2 = explore-aufloesbar, K3 =
+Owner-Entscheid, KN = Kenntnisnahme, LEAD = Lead-Bringschuld. TRANCHEN-ANKER: T1 = Owner 2026-09-06T21:49:11.272Z
+L113305 (Rohfassung antworten/OWNER-ANTWORTEN-TRANCHE1-0609.utf8.txt, 1 Z., 3437 B, md5 33a4e2de); G-007-NACHTRAG =
+2026-09-07T07:25:24.788Z L113578 (Transkript-Typ queue-operation; OWNER-ANTWORT-G007-0709.utf8.txt, 1 Z., 97 B, md5
+b1090e36); T2 = 2026-09-07T12:12:56.524Z L114346 (antworten/OWNER-ANTWORTEN-TRANCHE2-0709.utf8.txt, 56 Z., 9837 B, md5
+4b8de858); Fragen T2 = Lead-Chat L113950 2026-09-07T07:49:47.260Z (96450 Zeichen) =
+antworten/TRANCHE2-CHAT-OFFENE-ENTSCHEIDE.md (340 Z., md5 47010804); Verbuchungen =
+antworten/A2.3a-ANTWORTEN-TRANCHE1-VERBUCHUNG-0709.md (92 Z., md5 625f7ad0 = Erstlesung / 19fa39bc = Stand 07.09.
+13:17:52Z, Lead 2026-09-07T06:55:38Z) + antworten/A2.3a-ANTWORTEN-TRANCHE2-VERBUCHUNG-0709.md (1028 Z., md5 7ee0dfad,
+Verbucher 07.09. ~13:00Z, Wachen 0/0). ZUSATZ-ORDER Owner 2026-09-07T06:39:11.774Z L113344 (verbatim): "Bitte resume
+alle workflows und agenten und fahre wie gehabt mit offener Arbeit fort. Die Kostenlimitierung ist aufgehoben und wir
+fahren stattdessen die dichte claude code Arbeitsweise." -> Capstone #187, 5K #185, Strang #186 byte-unveraendert resumt
+(K27), Tranche 2 delegiert; Tranche 2 verlangt: Owner 2026-09-06T21:51:24.482Z L113329. LESART-VORBEHALTE sind mit
+(LESART) markiert, Owner-Widerspruch genuegt; RUECKFRAGE-KANDIDATEN (VERB2 Abschn. OFFENE OWNER-RUECKFRAGEN Nr. 1-7; nur
+bei Bedarf in Tranche 3 #195, sonst faehrt der Lead die verbuchte Lesart): Nr. 1 G-089 'ok' + 'kein 5. token' im selben
+Satz (verbucht: kein 5. Token, FK-7-Etiketten); Nr. 2 G-104 (B) verbund_union kollidiert am Objekt (verbucht: (B) nach
+Kampagne mit Alias-Registry R-2 + Kollisions-Aufloesung); Nr. 3 G-074 Posten (4) Gegenstand ungenannt (verbucht:
+Lead-Explore Z36292/Z42737); Nr. 4 Lizenz Punkt 5 Textform vs QES (verbucht: Textform par. 126b BGB); Nr. 5 G-105
+XML-Satz = publish-Feld (verbucht als #48/#57-Anforderung); Nr. 6 G-096 'commit lokal' bei untracked Verzeichnis
+(verbucht: Zeiger-README + .gitignore-Commit, Messdaten nur verschoben); Nr. 7 G-014 Fenster O0/O1 + Flag-Passthrough
+(verbucht: naechstes golden-Fenster nach Trigger). OWNER-ENTSCHEIDE GEGEN DIE LEAD-EMPFEHLUNG (15, im Ledger als
+Owner-Wahl markiert, G-115-Muster, nie als 'wie empfohlen'): G-001 (2 statt 1), G-004 (a statt b), G-014 (Fork
+zusaetzlich ins golden-Fenster), G-089 (kein 5. Token), G-091 (C statt A), G-092 (A+B+C statt A), G-101 (bauen statt
+OK), G-104 (B nach Kampagne), G-105 (B statt A), G-109 (C statt A), G-082 (vor Abgabe), G-087 (E-7 in-HY-C), G-032
+(widerrufen), G-088 (keine Option, Explore), G-090 (A+B+C).
+
+**KON138-01 (TRANCHE 1 = 17 ZEILEN; Owner 2026-09-06T21:49:11.272Z L113305 = OWNER1 Z.1 verbatim, 16 Antworten in Owner-
+Reihenfolge + G-019 Handgriff-Zeile; Verbuchung VERB1 Z.7-76 (G-002..G-079) + 'OFFEN nach Tranche 1' Z.77-78 + Zusatz-
+Order Z.79-83 + G-007-Nachtrag Z.85-92; Muster STRANG-UEBERBLICK 5.3; Tranche-1-Reste G-006 L1/L7/(6), G-074 Posten (4),
+G-073 G06, G-019, G-007 wurden im Tranche-2-Anhang beantwortet -> KON138-05 A3-A7, die Zeile hier bleibt die EINE Zeile
+je Nummer):**
+G-002 | libcpuid-Vendoring bestaetigen/widerrufen; A-2, S04/B-04, O-11, #169, bog #169(a) | K3 | T1 L113305 21:49:11Z,
+      OWNER1 Z.1 | "Ja, aber xlsx und cpuid sind zwei Welten. Bei xlsx moechte ich mich nicht abhaengig machen, das
+      aendert sich ja nicht so schnell, aber die CPUs kann nur der Hersteller in seiner Entwicklungsgeschwindigkeit
+      pflegen, wir schaffen das nicht und hier sind externe Bibliotheken fuer alle zu unterstuetzenden OS hilfreich.
+      Daher Option (A) wie empfohlen." | (A) wie empfohlen; #169 umwidmen: x86 bleibt <cpuid.h>, Nicht-x86 (Linux/
+      macOS/RISC-V/Pi5) per externer Bibliothek (libcpuid/cpu_features) nach Vendoring-Doktrin; xlsx bleibt eigen |
+      OFFEN (Bau; #169 pending)
+G-005 | E-4-Rest Thesis: Mid-Line 09cc7286, Alt-Linie-Cleanup A-5b, Laptop-Rezept A-5c, Nachtrag G-NEU-0609-1; A-5, O-9,
+      V-088, V-090(i), Z-07, OG-27, #121/#67 | K3 | T1 L113305, OWNER1 Z.1 | "Moment, aber alle commits von gitlab und
+      github hast du dir gezogen und die Aufgabe der Kommentarverarbeitung und sync der Diplomarbeit mit dem code ist
+      noch verbucht? Ich waehle alles genau wie empfohlen, Ich habe aber schon vom Laptop gepusht und du muesstest dem
+      Infra Agenten ein handout dalassen, dass er doch das Projekt mal force pullen muss, ich denke ein erneuter
+      cleanup und history rewrite ist eh erforderlich, da koennen wir auch gleich alle "Coauthored by Claude" mit raus
+      nehmen. Wir brauchen weiterhin einen full sync der remotes uebera alle 3 Maschinen, was eine Komplexe Aufgabe
+      aufgrund der Leaks ist." | alles wie empfohlen (A-5 gesehen, A-5b NEIN, A-5c JA); (1) Rueckfrage beantwortet
+      07.09. 06:4xZ: 4/4 Refs == cbefa617, 1 Mid-Line-Rest 09cc7286, #121/#67 tragen Kommentar/Sync; (2) NEU: Thesis-
+      Rewrite 2 (alle Claude-Trailer inkl. Mid-Line) = gegenstandsgenaue Owner-Ausnahme + Infra-Handout force-pull +
+      3-Maschinen-Sync-Plan (Leak-Klassen beachten) = #188, #189; Faltung 0.17 (G-NEU-0609-1) steht hier EINMAL |
+      TEILWEISE (#188 pending, #189 in_progress)
+G-006 | Root-Neustart prod1 (GO/Fenster) + Loesch-GO-Buendel V-049 L1..L10 + Ref-Posten (6)(7)(8); A-6, S12/B-04, O-24,
+      V-049, V-090(l), S04/B-09, OG-11, OG-25, lb (7) | K3 | T1 L113305, OWNER1 Z.1 + Anhang T2 Z.48 (KON138-05 A3) |
+      "Empfehlung (2), weil infra Agent gerade dabei ist neue nodes in cluster prod einzubinden um K8s Qorum halten zu
+      koennen, was unter handout an infra agent morgen den Neustart ermoeglichen wird, nachdem die node laeuft.
+      Bezueglich Loeschung: Alle wie emfohlen aber erst nach erneuter Pruefung, dass nichts verloren gehen kann, alles
+      gelandet ist und der history rewrite ein sicheres backup nachweisen kann, bevor er laeuft (alle nicht gelandeten
+      worktrees inklusive)." | Neustart (2) vor Trigger im Fenster nach Node-Start (LESART: 'morgen' = 07.09. [KORREKTUR
+      Lead 07.09. 15:0xZ: VERB1 Z.23 nannte 08.09.; T1-Zeitpunkt 06.09. 21:49:11Z L113305 -> 'morgen' = 07.09.;
+      massgeblich bleibt 'nach Node-Start']) = Infra-Handout #189; Loeschungen erst nach Pruefung + Backup-Nachweis VOR
+      Rewrite 2 (#188), nicht-gelandete Worktrees eingeschlossen; L1 NEIN / L7 JA / (6) spaeter = Anhang A3 (Faltung
+      0.18 = L1..L10 steht hier EINMAL); Loesch-Mengen frisch messen (G-055) | TEILWEISE (#189 in_progress, #188
+      pending)
+G-007 | E-2 prod2-Speicherbremse (VMs, HEAVY_J intel, earlyoom); O-1, E-2, KON135-10 E-2, #160-S11, Z-01, #191 | K3 |
+      T1 L113305 + NACHTRAG 2026-09-07T07:25:24.788Z L113578 (G007 Z.1) + Quittung T2 Z.52 (KON138-05 A7) | T1: "Die VMs
+      muessen leider auf prod2 an bleiben, bitte stelle die Frage nochmal mit den daraus resultierenden neuen
+      Empfehlungen." -> Frage neu gestellt 07.09. (A HEAVY_J 8 memory-gated / B 16 GB Swap / C earlyoom fail-loud / D
+      seriell; Empfehlung A+C) -> Nachtrag: "(A) Dannn bitte nur 8 jobs. (B) Bitte 16GB swap. (C) Ja behalten. (D) Wie
+      empfohlen sonst" | (A) kOwnerHeavyJIntel 24 -> 8 im ce-Code mit Pin-Test + K17, runner-mode HEAVY_J intel = 8
+      (#191); (B) 16 GB Swap prod2 = Infra-Handout #189 H6 (root-Handgriff); (C) earlyoom bleibt, fail-loud konfiguriert
+      (#189 H6 + Runner-Log-Marker); (D) keine serielle intel-Lane; Reihenfolge A+C sofort, B im Wartungsfenster prod2,
+      dann ##47-Re-Run-3 -> S-19 intel kalibrieren (#7) -> ##48-Tafel -> ##49 (G-008); VMs bleiben an | TEILWEISE (#191
+      in_progress, #189 in_progress)
+G-020 | root-PAT id 62 rotieren + Session-Identitaet root vs Service-User; O-8, E-5, #162, S04/B-10, Z-29, KON135-07 |
+      K3 | T1 L113305, OWNER1 Z.1 | "Bitte (A), aber anders als du denkst - wir hatten in infra festgelegt, dass
+      comdare-admin der Samba AD notfall user ist und root der lokale Notfall user auf allen Maschinen und NAS mit
+      unterschiedlichen Passwoertern je Maschine, und comdare-admin-management ist der Samba AD standard admin user,
+      der ja auch auf dem NAS eingebunden werden kann, um taegliche Aufgaben zu erledigen, also lautet die Antwort (A)
+      unter fallback (B) wie sonst auch auf infra Agent gehandhabt mit comdare-admin-management user als Samba AD
+      Hauptuser. Das ist ein Fall fuer infra Agent handout." | (A) nach Infra-Schema: comdare-admin = Samba-AD-Notfall-
+      User, root = lokaler Notfall-User je Maschine (eigene Passwoerter), comdare-admin-management = Samba-AD-Standard-
+      Admin = Service-Hauptuser, Fallback (B); root-PAT id 62 rotieren im ruhigen Fenster (#162); Infra-Handout #189 |
+      TEILWEISE (#189 in_progress, #162 pending)
+G-022 | Infra-Wartungsfenster: (a) Termin = O-2-Fenster, (c) id18 austragen; S12/B-06 (a)(c), OG-16/28/30/31,
+      V-17, V-18, V-033, V-101, #84, bog #84(a), F-01 | K3 | T1 L113305, OWNER1 Z.1 | "Bitte genau wie empfohlen und
+      infra Agent per handout informieren." | (c) id18 austragen; Fenster = kurzes O-2-Fenster (G-008); #84 + Infra-
+      Handout #189 | OFFEN (#84 pending, #189 in_progress)
+G-039 | Fernmeldungs-Kanal fuer den abwesenden Owner (Artifact-Statusseite + Mail); V-090(p), Z-24, RETT-T3-L97545
+      (29.08. 12:21:51Z), F-023, K071-V-09, #190 | K3 | T1 L113305, OWNER1 Z.1 | "Volles GO wie empfohlen, ich lese Mail
+      am liebsten mit dem link zur Uebersichtsseite des Fortschrittes." | B+C: Artifact-Statusseite LAGE + Mail
+      (Kurzstand + Link; nur Riss/Pause/Owner-Frage, max 1/h); Regel ins X-Register v4.5 (G-031); #190 | OFFEN (#190
+      pending)
+G-071 | Talos-Upgrade v1.12.4 -> v1.13.x (NICHT v1.14) fuer die Talos-Lane #87; S10/B-12, OG-43, bog #87(a), bog #85(b),
+      F-01 (Talos), D-5, K-b | K3 | T1 L113305, OWNER1 Z.1 | "Volles GO unter infra Agent als Option (A), bitte die
+      Aufgabe uebergeben." | Infra-Handout #189: Talos v1.12.4 -> v1.13.x, Fenster vor ##49; #87 | TEILWEISE (#189
+      in_progress, #87 pending)
+G-074 | Vier Formsachen der A58-Runde + S-19 O1-O4: Bau-Freigabe CEB-Rechen-Vertrag #53 + sechs Alt-Posten + B3-Reste,
+      Posten (4) Z36292/Z42737; S12/B-15, F-11, F-12(b), F-14, F-15, O1, V-090(c), V-10, V-06, V-13, D-11, P1, P5, OG-7,
+      OG-12, OG-13 | K3 | T1 L113305, OWNER1 Z.1 + Anhang T2 Z.49 (KON138-05 A4) | "Bitte ALLE fehlenden Bauten
+      nachholen, ich gebe sie hiermit frei nach den bereits liegenden Entwuerfen nach Option (b)." | Bau-Freigabe: CEB-
+      Rechen-Vertrag (#53) VOR Trigger + sechs Alt-Posten + B3-Reste nach den liegenden Entwuerfen; Posten (4): "Beide
+      bleiben Gegenstand." -> Lead-Explore an Z36292/Z42737 (#214 angelegt 07.09. 13:16:16Z 'Explore G-074 Posten (4)',
+      #194, #167), Anhang A4 | OFFEN (Bau; #53 in_progress, #214 pending)
+G-077 | Snapshot-Peak-Quelle bytes_in_use_peak: A Wire-Slot Klasse B VOR ##49 (ABI-Major) + B Zeitreihe; S11/B-06,
+      OG-54, bog #180(b), RN-34 | K3 | T1 L113305, OWNER1 Z.1 | "Bitte gruendlichste Version mit Option (A), dann
+      auch (B) Reste nachtraeglich nachziehen, aber vor Trigger." | Bau A: Chokepoint + Wire-Slot bytes_in_use_peak
+      (ABI-Major, Flotten-Identitaet), DANN B Zeitreihe -- beides VOR ##49; R1 heilen; #180(b) | OFFEN (Bau; #180
+      pending)
+G-030 | Rechts-Trio: (a) Vertrag Rechteuebertragung Person -> BEP Venture UG, (b) anwaltliche Pruefung ext/ GPL-3;
+      S07/B-36 (a)+(b), S08/B-03, S08/B-04, #143/#179 | K3 | T1 L113305, OWNER1 Z.1 | "Alles korrekt erkannt, bitte gib
+      der BEP Venture UG die vollen Nutzungsrechte an der Diplomarbeit meiner Person direkt mit, aber ohne die
+      Diplomarbeit super an die BEP Venture UG zu uebertragen. Tatsaechlich hat noch keine schriftliche
+      Rechteuebertragung stattgefunden, bitte lass dies direkt in die Lizenz mit einfliessen und pushe den Vertrag als
+      PDF in Diplomarbeit super, sodass ich ihn digital unterschreiben und pushen kann. Ansonsten genau wie von dir
+      Empfohlen (a), daher eher Hauptpunkt (B). Wir brauchen ein Pruefpaket und meinen Handgriff." | (a)=B: Vertrag
+      Rechteuebertragung Person -> BEP Venture UG als PDF in super (digital signierbar), Klausel in die Lizenz, OHNE
+      Uebertragung des super an die UG; (b)=A (LESART: 'Pruefpaket' = Pruefpaket fuer anwaltliche Pruefung); Zuschnitt
+      durch Lizenz-Punkte 1-8 praezisiert (KON138-06); #179, #143 | OFFEN (#179 in_progress, zurueckgehalten bis
+      Zuschnitt eingearbeitet; #143 pending)
+G-031 | v4.5-GO: ARBEITSWEISE-DICHT geltend + 4 UEBERHOLT-Marker + X-Register-Zeilen; O-25, V-090(a), Z-31, RETT-P19,
+      K070-V-03, R-01, R-02, E-20, V-091, bog #177(a), W-1 (ARBEITSWEISE), #146-Rest | K3 | T1 L113305, OWNER1 Z.1 |
+      "Volles GO fuer (A) wie empfohlen." (bestaetigt durch L113344 07.09. 06:39:11Z "dichte claude code Arbeitsweise")
+      | DICHT geltend + Marker AM ORT; docs-Zug #176 + Memory #178; G-032/G-033/G-034 (RK-1..8) mit; X-Register-Zeilen
+      Fernmeldung (G-039), Sachlage-je-Frage (G-058), Regime 07.09. (G-032) | TEILWEISE (#178 completed 06.09. 15:06Z;
+      #176 in_progress = dieser Zug)
+G-072 | C2-Rename: axis_version_stamp.hpp -> realm_axis_version_stamp.hpp + 3 Fulljoin-Testnamen -> Union; S12/B-09,
+      O-18, N-19, OG-17, bog #167(c), V-12, #119 R-A, F-04 (A60), R-2 | K3 | T1 L113305, OWNER1 Z.1 | "Volles GO nach
+      Option (A)." | Rename + Include-Nachzug + 3 Testnamen Union in EINEM ce-Zug; #192 | OFFEN (#192 pending)
+G-073 | F-16 Thesis-Trias (1) Default-Workload-Vollpermutation + (2) Planer-CLI-XML-Wizard NACH Trigger, (3) Deep-
+      Research-Evaluation im #121-Zug + G06 Overleaf-Restkommentare; S12/B-14, O-29, G06, F-16, W-1 (WIDERSPRICHT),
+      V-016, bog #121(a)/#130(a), bog #77(a), G-8 (W-9.2), S12/C-22 | K3 | T1 L113305, OWNER1 Z.1 + Anhang T2 Z.50
+      (KON138-05 A5) | "Volles GO wie empfohlen." | (3) im #121-Zug; (1)/(2) nach Trigger; G06 geliefert (Anhang A5:
+      Rest-Kommentare = Lead-Nacharbeit aus dem Thesis-Repo); #121, #130 | TEILWEISE (#121 pending, #130 pending)
+G-078 | Value-Filter-Achse (A5 05.08.): Verortung A neue Organ-Hauptachse; S06/B-26, bog #53(b)/#86(b)/#88(b), T19-Slot-
+      Kollision, S05/B-05 | K3 | T1 L113305, OWNER1 Z.1 | "(A) exakt wie von dir Empfohlen war die richtige Annahme." |
+      neue Organ-Hauptachse Value-Filter, naechster Slot; golden-Zug XSD/Lock; #88 | OFFEN (#88 pending)
+G-079 | G-4 Welle D Workload-Clusterung (Linkage, Cluster-Noise-Schwelle, Skalierung, 'nicht erhobene'):
+      Deep-Research-Defaults hart + XML; S07/B-28, S06/B-02 (gemergt), G-4 (Welle D), N-44 | K3 | T1 L113305, OWNER1 Z.1
+      | "(A) genau wie empfohlen." | Deep-Research-Defaults hart + XML; 12W-Explore vor Bau; TRAEGER (Fix 07.09.): #88 =
+      Bau-Traeger, belegt im Board-Metadatum #88 g078_g079_0609 (06.09.: 'Owner G-079 (A) genau wie empfohlen ->
+      Welle-D-Clusterung: Deep-Research-Defaults (QueryBot5000/OtterTune) hart im Planer + XML-ueberschreibbar,
+      12W-Explore SOTA'); kein Task-Subject unter #1..#219 nennt G-079 (#194-Subject nicht), eigener NEU-Traeger 'Welle
+      D Workload-Clusterung (G-079)' = Lead-Option, keine Luecke | OFFEN (Explore; #88 pending)
+G-019 | codex login = Owner-HANDGRIFF (zugesagt 25.08., vollzogen 26.08. 13:03:36Z, seit ~30.08. verloren); O-7, E-3,
+      Z-04, EXPL-G-02, sperren P-19, bog #167(a)/#173(c), KON135-10 E-3 | KN | T1: keine Antwort (Handgriff-Zeile) -> T2
+      Anhang Z.51 (KON138-05 A6) | "Reconnect zu Codex abgeschlossen, verwende stets Codex 5.6 astra auf Ultra.
+      Erledigt." | Codex-Modell-Pin 'Codex 5.6 astra auf Ultra' in Memory (CODEX-KLEIN-Rezept) + neue Workflow-Lens-
+      Aufrufe (K27); Lead-Probe 'codex login status'; #178-Nachzug | ERLEDIGT (Owner-Handgriff; Transkript L114343
+      '/mcp' + L114344 stdout 'Reconnected to codex.', beide 2026-09-07T12:00:51.817Z; Probe + Memory-Pin = Lead-Rest)
+
+**KON138-02 (TRANCHE 2 ABSCHN. I = 37 ECHTE ENTSCHEIDE; Owner 2026-09-07T12:12:56.524Z L114346 = OWNER2 Z.3-39 verbatim;
+Fragen + Optionen + Empfehlung je G in TR2 Abschn. I Z.5-227 (Lead-Chat L113950 07:49:47Z); Verbuchung VERB2 Z.29-609;
+Reihenfolge = Owner-Antwort = TR2-Reihenfolge; Traeger #193-#198 vom Lead nach Eingang der Antworten angelegt):**
+G-008 | C-02 HEAVY-Fenster beide Hosts (##47-Re-Run-3 -> #114-Re-Run-3 -> ##49); O-2, C-02, KON135-10 C-02, RN-33, W-H.2
+      H15, GOAL G-48, bog #154(c), bog #69(a), V-123 | K1 | T2 L114346 12:12:56Z, OWNER2 Z.3 | "Es gilt, dass es sofort
+      nach dem Eingang der Antworten gilt und die CI Pipeline sowie die Diplomarbeit Arbeit fuer den Compile der
+      Programme beinhaltet. Daher gesehen und volles GO dafuer." | (gesehen): Fenster-Beginn SOFORT ab 07.09.
+      12:12:56Z, kein eigenes Datum; (LESART) das Fenster umfasst die CI-Pipeline UND die Compile-Arbeit der
+      Diplomarbeit auf beiden Hosts, keine Fremdlast; KURZ-Fenster: G-007-Vollzug zuerst (#191, #189 H6), dann
+      ##47-Re-Run-3 + #114-Re-Run-3 mit #152/#162-Rotationen, Infra-Token-Fenster G-022 (#84), Mitfahrer #154 (prod2
+      Reboot-Probe) + #69 (750-vs-1310); LANG-Fenster: ##49-POST erst nach C-01-Literalmeldung (G-011) + X3 (G-009);
+      Traeger #191, #152, #162, #84, #154, #69, #140, #160-S11/#173 L-6, Lead-Kette #158 | OFFEN (KURZ sofort, #191
+      in_progress; LANG vor Trigger)
+G-011 | C-01 Vollbau-Gate-Tafel = Lead-MELDUNG der vier Owner-Kriterien (10.08.) + T3 + Trigger-GO A2; O-5, C-01, RN-32,
+      GOAL G-09, KON122-09, GD-06, W-11, C-1 (W-9.1), OV-4, DP-06 | KN | T2 L114346, OWNER2 Z.4 | "gesehen, wie
+      empfohlen volles go." | KEIN Zusatzkriterium; Lead meldet je Kriterium literal ((1) Lager per T3 + NAS 239.7 GB,
+      (2) Stempel inkl. X3 gelandet, (3) PZW 5/5 + Floor, (4) amd gruen + intel gruen nach Re-Run-3 + #114-Re-Run-3 GO
+      + R-8 Rerun-Rate) -> ##49-POST im O-2-Fenster ohne Rueckfrage; #140 (Kriterium 2), #191 + #160-S11 (Kriterium
+      4), #154(a), #158, #176 | OFFEN (vor Trigger = Schlusspunkt des KURZ-Fensters)
+G-009 | X3-Schlichter: scheduling = Kanal-A-Unterachse (target_isa), Preimage-Glied [11], Format-Bump 6->7, per-Binary-
+      Glied [5] im Identitaets-Buendel; O-3, V-013, V-096, V-034, bog #140(a)/(b), bog #173(a), Z-30, KON133-16, GD-08,
+      L-1 | KN | T2 L114346, OWNER2 Z.5 | "gesehen, volles GO wie empfohlen, vor Trigger bauen." | (A) VOR Trigger
+      bestaetigt (F-X3-1 26.08. + KON132-02); kein RT-Kanal, keine Drehung; Bau S0-S12 (4-5 Bau-Tage sequentiell) im
+      Identitaets-Buendel mit E-11 (G-013), Glied [5] per Binary (L-1 3d-DELTA), golden ohne <scheduling> -> k=1,
+      n_bau 524288 unveraendert; NEU aus G-091: Affinity-Aware Core-Pinning-Unterachse im selben X3-Bau (HybridAware =
+      Pflicht); #140 (S0-S12), #173(a), #120 (E-11-Kopplung), #194 | OFFEN (vor Trigger, kritischer Pfad; #140 pending)
+G-003 | Bruecken (trigger:ce/prt-art/thesis) auf branch:main + gruen->main-CI-Automatik #163; A-3, S06/B-21(ii),
+      O-13, S01/B-14, #163, bog #163(a)/(b), E-34, EXPL-G-06, EXPL-D-26, Z-N01, R55 | K2 | T2 L114346, OWNER2 Z.6 |
+      "Bitte (B) wie empfohlen." | (B): Bruecken bleiben auf main, #163 wird gebaut (Owner-Order S07/A-54 08.08. bleibt
+      in Kraft); Design sofort, Bau VOR ##49 (super .gitlab-ci.yml:1381/1399/1417 unveraendert, main-FF nach gruenem
+      dev-Push = Automatik am Pipeline-Ende), bis dahin main-FF manuelle Pflicht (B1 25.08.); Doku-Halbsatz S01/B-14 in
+      #176; #163, #176 | OFFEN (#163 pending; nicht ##49-blockierend)
+G-012 | Frist-Kollision: Verzug seit K-4 (7 Tage 15 h Stand 04.09.), T-3-Reset ~12.09. + Abgabe 15.09.; O-6, OG-46,
+      W12-10, V-027, bog #18(a), W-10, K-4 | KN | T2 L114346, OWNER2 Z.7 | "Die Termine bleiben wie gesetzt, wir haben
+      heute reichlich Kontingent erhalten und arbeiten nach Claude Code Arbeitsweise mit bis zu 6 Workflows parallel,
+      das wird klappen. Wir holen die Woche heute auf. Nie kuerzen gilt fort." | beide Termine bleiben Owner-Termine;
+      NIE-KUERZEN gilt fort; Regime = G-032 (max 6 Workflows, max 2 Fable-5-max je Workflow); Kampagnen-Neuterminierung
+      aus #158 unter dem 6-Workflow-Regime; alle Kalender-Fristen 15.09. (G-093); Regime-Zeile Memory/Doktrin (#178-
+      Nachzug, #176); #18 (W4-Fenster S-13 B0-B10 hart vor T-3) | OFFEN (sofort Regime; vor Abgabe 15.09.)
+G-001 | prt-art-Waisen tests/deprecated/prt_art_legacy_waisen/ (B2-GO 15.08.) + Allowlist-Frist frist:2026-09-15; A-1,
+      S08/B-10, O-10, #65, bog #65(a)/(b), EXPL-G-07, Z-N02, EXPL-C-3, Z-N12, V-074, fold b11 (#159) | K2 | T2 L114346,
+      OWNER2 Z.8 | "Solange alles auf git versioniert ist, bitte loeschen nach (2) wie empfohlen, volles GO, lege die
+      Aufgabe des Updates der Einbindung von PRT-ART als Pruefling durch die CE als Aufgabe an." | (2) LOESCHEN unter
+      der Bedingung 'auf git versioniert' (erfuellt: Archiv-Commit b39d62a2, gelandet 8fe66469, Historie auf
+      origin+github) = Owner-Wahl GEGEN Lead-Empfehlung (1); Frist-Zeile entfaellt mit; LOESCH-GO-ZEILE = diese Zeile
+      (Owner-Verbatim; Blob-SHAs der 4 Dateien im Archiv-Commit VOR dem rm im ce-Zug nachweisen), K17-Kombibau + TABU-
+      Wache (test-Map-Nachzug); NEU-Posten 'Einbindung von PRT-ART als Pruefling durch die CE aktualisieren' (Ladeweg-
+      Kandidat bau/prtart-ladeweg-w0a 7c0c9975 = #65 mitfuehren, 10W-Planungs-Explore nach BESTANDS-PFLICHT); #193
+      (vom Lead angelegt 07.09.), #65, #28 | OFFEN (#193 pending; Loeschung im naechsten ce-Zug, Bau in der #158-Reihe)
+G-004 | PW-Rotation der 6 Cluster-Maschinen (pve1, pve2, node3, node4, opn-1/opn-2, node8); A-4, S06/B-25, #152, bog
+      #152(a)/(b) | K2 | T2 L114346, OWNER2 Z.9 | "Bitte (a) sofort an infra als Handout uebergeben und ihn verbuchen
+      und durchfuehren lassen." | (a) INFRA = Owner-Wahl GEGEN Lead-Empfehlung (b); Handout SOFORT (F-027-Muster:
+      blinde Vault-Gegenprobe je Maschine, NUR tatsaechlich verlorene lokale Konten, Beleg blind im cred vault +
+      LEAKED-SECRETS-ROTATION-LOG) ins Cluster-Repo; #152 bleibt Session-Gegenstand (Runner-Token 287/289/390er/prod2
+      17/56), Fenster-Kopplung fuer die Maschinen-PWs entfaellt (Infra terminiert selbst); #189 Abschnitt NEU 'PW-
+      Rotation Cluster-Maschinen', #152 | OFFEN (#189 in_progress; Infra-Fenster, nicht trigger-blockierend)
+G-015 | RAM-OOB-/Arena-voll-Stopp = 'failed' OHNE T-15b-5er-Retry, Bestand persistiert (DESIGN-90 4.2); S08/B-23 | K2 |
+      T2 L114346, OWNER2 Z.10 | "Das bleibt ein harter Abbruch, der dein eingreifen erfordert, gesehen failed ohne
+      retry. Volles GO." | (gesehen): failed ohne Retry, Bestand persistiert; (LESART) 'der dein eingreifen erfordert'
+      = Lead-Eingriffspflicht (Fernmeldung/Markierung + Ursachenpruefung, kein stiller Weiterlauf; Fortsetzung mit dem
+      naechsten Experiment bleibt Design-90-Bestand); Bau-Auflage S13-05/06/07 + E11/CEB-Stopp-Pfad: 'failed'-Token +
+      Grund im Log + OOB-Marker im Bestandslog UND Fernmeldung (#190, Klasse Riss/Owner-Frage); mess_arena.hpp
+      'WEITERMESSEN' heilen; Eingriffs-Pflicht in die Kampagnen-Betriebsregel (ARBEITSWEISE-X); #18, #120, #190, #194 |
+      OFFEN (vor Trigger)
+G-040 | NFS-Mount bleibt soft (timeo=100,retrans=2; F5 27.08.); V-090(q), Z-32, RETT-N29, Z-N05, EXPL-G-10, K071-V-13,
+      N-29, #151-Rest, T1 4.5 | K1 | T2 L114346, OWNER2 Z.11 | "gesehen, soft bleibt. GO." | soft bleibt (fail-loud);
+      Re-Vorlage 'hard' nur bei Aussetzer OHNE Speicherdruck; Beobachtungs-Auflage im ##47-Re-Run-3 (artefakt_io-
+      Zeilen zaehlen, earlyoom-Fenster ausschliessen); keine Bau-Wirkung; #160-S11/#173 L-6, #151-Rest | OFFEN
+      (Beobachtung KURZ-Fenster)
+G-014 | F5-golden-Detail: search_algo-Pin first-2 {k_ary,interpolation}, Kontrast-Fork INC-G7 (#96), O0..O3 als Kunden-
+      Wahl; S06/B-20 | K2 | T2 L114346, OWNER2 Z.12 | "ok, bleibt so, grundsaetzlich werden dem Kunden alle O0,O1,O2,O3
+      fuer die XML Konfiguration als compile Ziel angeboten, Default ist O2 und O3 kann dennoch ueberschreibend gewaehlt
+      werden, sowie alle anderen compile flag Anpassungen, die an die Compiler aus der XML durchgereicht/angepasst
+      werden. Kontrast-Fork ins golden Fenster bitte. Volles GO fuer Fork INC-G7." | Pin bleibt UND GO fuer Fork INC-G7
+      liegt JETZT (naechstes golden-Fenster nach Trigger, golden-Folge-Zug G-013/W-14, deklarierter Bruch) = Owner-Wahl
+      GEGEN Lead-Empfehlung 'ok' (zusaetzlich zur Option: Fork ins golden-Fenster); (LESART) opt_level-Achse traegt fuer
+      den Kunden alle vier Werte O0..O3 als XML-Wahl, Default O2, Compile-Flag-Durchreichung XML -> Compiler = Feature
+      der XML-Sprache; R1-Trigger bleibt {O2,O3} x {no_extension,avx2} (OS-1 26.08.), Voll-Bau-4 unveraendert; Explore
+      (BESTANDS-PFLICHT): XSD/opt_level O0/O1 vorhanden? Flag-Passthrough gebaut? -> Luecke = Bau-Posten im selben
+      golden-Fenster (Lock-/XSD-Bump kontrolliert), Thesis-Absatz 'O0..O3 als Kunden-Wahl' (#121); KANDIDAT Nr. 7
+      (Fenster nicht owner-gesetzt); #96 (Fork-Vorbehalt ausbuchen), #120/#24, #194, #121, #207 (angelegt 07.09.
+      13:14:46Z 'Compiler-Unterachsen + O0/O1 als Kunden-Wahl + Flag-Passthrough'), #208 (13:14:55Z 'INC-G7 Max-
+      Kontrast-Fork BAUEN im naechsten golden-Fenster') | OFFEN (#207/#208 pending; Explore sofort; Bau nach Kampagne)
+G-089 | FK-7 Zell-Token: Zelle 'failed' + Grund im Log, FUENFTES Nicht-Zahl-Token fuer 'Ort unbekannt', FK-8-Etiketten;
+      S07/B-31, FK-7, FK-8, Fuenftes-Token, KON-13, kDockErrorClassCount | K1 | T2 L114346, OWNER2 Z.13 | "Dies ist
+      eigentlich die Sachlage der Eintragung der Fehlermeldungen in die xlsx Warnungen von unbekannten oder falschen
+      oder nicht machbaren Messeintraegen. Ich sage dennoch "ok" und volles GO fuer FK-7 Etiketten und kein 5. token.
+      Volles GO wie von dir beschrieben und empfohlen." | Kern-Quittung (ok): Zelle traegt 'failed' (nie null), Grund im
+      Log, FK-8 bleibt; Owner-Wahl GEGEN Lead-Empfehlung (Owner-Wort ueber die Option hinaus) = (FK-7:Etiketten) UND
+      (kein-5.-Token): eigene FK-7-Etiketten je Dock-Fehlerklasse, KEIN fuenftes Nicht-Zahl-Token; (LESART) 'Ort
+      unbekannt' u.ae. = Eintrag im xlsx-Warnungs-/INFO-Blatt mit Fehlermeldung; 05.07.-Entscheid 'perm_runner-Pinning
+      verworfen' bleibt NICHT widerrufen; Buendel-Auflage 'FK-7 MIT Fuenftes-Token' (G-057) damit gedreht;
+      E-11-Fehlerklassen-Design (W-14, G-013) umschreiben, kDockErrorClassCount bleibt 4; Owner-Reframing = KON138-08;
+      KANDIDAT Nr. 1; #120, #18, #194, #217 (angelegt 07.09. 13:54:47Z 'xlsx-Warnungen-Sektion (INFO-Blatt) + Warnungs-
+      Etiketten-Registry') | OFFEN (#217 pending; Design-Nachzug sofort; Vollzug golden-Zug nach Trigger)
+G-095 | T6-Allokations-Summe: die 14 transienten Streu-/Umbau-Puffer zaehlen MIT (EINMAL an der Store-Einsammel-Naht +
+      Teil-Spalte); S05/B-14, Posten 76, S05/B-17 E2 (Nachbar) | K2 | T2 L114346, OWNER2 Z.14 | "Zur Kenntnis genommen,
+      mitzaehlen wie beschrieben. Genau wie empfohlen." | (Kenntnisnahme): mitzaehlen genau EINMAL an der Einsammel-Naht
+      + eigene Teil-Spalte 'transient_puffer_bytes' im S-13-Schema; Design-Schritt B5 des Mess-Schnitt-Fensters VOR
+      Messbeginn mit E2 (T6-Peak/Slot-Vergabe); Fingerprint-Wirkung der Teil-Spalte vor dem Bau pruefen; #18, #24, #194,
+      #205 (angelegt 07.09. 13:14:22Z 'T6-Einsammel-Naht + Doppelzaehlungs-Regel + E2 = EIN Lead-Design-Schritt B5'),
+      #216 (T6-Teil-Spalte im Freeze 189->191) | OFFEN (#205 pending; vor Trigger)
+G-090 | Bruecke Katalog-Ziel-Id -> WIDE-Spalte: CT-Tabelle 45 Ids (KEIN_MESSKANAL fail-loud) / XML je Zielgroesse /
+      Katalog-Anker als Metadatum + R10 Crossover; S06/B-06, V-090(e), R10, R9 (-> G-074 F-11) | K2 | T2 L114346, OWNER2
+      Z.15 | "Tatsaechlich gilt A ueber das Optimum von Default sortierten Parametern fuer break even, solange die XML
+      nicht bestimmte Parameter definiert und damit mit Option B ueberschreibt. Dabei muessen diese Parameter in xlsx
+      aehnlich Option C eingetragen werden, sofern sie per Option A (alle Werte ohne filter) oder eingeschraenkt durch
+      Definition von Option B nicht ueberblendet werden. Es gelten also A und B, sowie C nur fuer die Verbuchung der
+      Messergebnisse in xlsx. Volles GO dafuer." | A UND B UND C(eingeschraenkt) = Owner-Wahl GEGEN Lead-Empfehlung A
+      (Owner-Praezisierung ueber A hinaus): A = CT-Tabelle als Default (Optimum ueber Default-sortierte Parameter fuer
+      Break-Even), B = XML ueberschreibt je definiertem Parameter, C = Katalog-Anker NUR fuer die xlsx-Verbuchung (INFO-
+      Blatt/Header-Kommentar, kein WIDE-CSV-Schema-Bruch); R10 ohne Owner-Wort -> 'egal' bis #129; Bau #18 S-13 Ziel-
+      Filter + XML-Override-Pfad (Whitelist S06/A-15), Pareto-Fuellung nur ueber Ids mit Kanal, Break-Even-Design #129
+      nutzt A+B; #18, #129, #194 | OFFEN (vor Trigger)
+G-091 | p053-Betreuer-Tabelle vs 4-Werte-Modell: HybridAware + Affinity-Core-Pinning + Hardware prod2; S06/B-12, T-3
+      (Hybrid-Lane), pe_policy | K2 | T2 L114346, OWNER2 Z.16 | "Meine Worte vom 06.08. beziehen sich auf eine weitere
+      ISA System-Unter-Achse, welche in der Lage ist auf Linux Affinity Aware Architekturen, Threads zur Laufzeit auf
+      bestimmte cores zu pinnen und dort durchzumessen. Daraus ergibt sich (C) als HybridAware Architektur, was auch die
+      Basis fuer CacheLine Awareness voraussetzt, weil wir diese sonst nicht gezielt an bestimmten hybriden cores
+      durchmessen koennen, sie ist Pflicht. Bitte bedenke weiterhin, dass immer noch die i9 12900K Alder Lake Ersatz CPU
+      verbaut ist. Ansonsten volles GO dafuer." | (C) HybridAware als 6. Modus in p053 = Owner-Wahl GEGEN Lead-
+      Empfehlung A; Core-Pinning als ISA-System-Unter-Achse (Linux sched_setaffinity, Threads zur Laufzeit auf Cores
+      pinnen + dort messen) IM X3-Bau S0-S12 (#140), HeteroCoreDispatch {None,HybridAware} bleibt, PCoresOnly/
+      ECoresOnly-Dopplung bereinigen, None -> Unpinned; CacheLine-Awareness-Messung setzt HybridAware voraus = Pflicht-
+      Feature (NIE KUERZEN; Design-Vorgabe #53/#140); p053: 6. Modus + Fussnote (#121); HARDWARE-KORREKTUR AM LEAD:
+      prod2 = i9-12900K Alder Lake Ersatz-CPU (Tafel/TR2 nannten i9-14900KS 8P+16E = falsch) ->
+      Tafel/Ledger/S-19-Kalibrierung (#7)/Thesis nachziehen (KON138-08); #140, #53, #121, #7, #176, #194, #215 (angelegt
+      07.09. 13:54:31Z 'RT-Pinning-Verdrahtung run_profile + prod2-P/E-Topologie'), #212 (13:15:57Z 'XSD-Drift
+      Hybrid/Organ-Meta-Meta', Umfeld G-088/G-091) | OFFEN (#215/#212 pending; X3-Anteil vor Trigger; Hardware-Korrektur
+      sofort; p053 im #121-Zug)
+G-080 | XML-Rueckfrage-Kandidaten K1-K4 + Posten 81 D1-Wrapper-Fassaden: Richtung (b) + P2 (K308 05.08.); S05/B-11,
+      S05/B-12, Posten 81, K1-K4, RN-76 V20, F30-Guard | KN | T2 L114346, OWNER2 Z.17 | "gesehen, Richtung (b) mit P2.
+      Insgesamt bleiben dann aber die danach templated Fassaden aus dem ersten Punkt nach der Aenderung das finale
+      Design." | (gesehen) = (b) + P2 (nach ##49 + Funktionsnachweis + Split); (LESART) die aus K1 (type=Template-Id in
+      der XML-Syntax) entstehenden templated Fassaden/direkten Template-Koepfe = Endzustands-Design, kein weiterer
+      Rueckbau, (a)-Rueckfall nur bei gescheitertem Konsistenz-Nachweis; Lead-Bringschuld VOR Bau: Konsistenz-
+      Gegenueberstellung (b) vs (a) je Organ-Achse + Lock-/golden-Wirkung + D-1-Wachen -> Alternative-Rueckfrage in
+      K308-Form (Syntax-Vorschlag type= je Achse, EIN Regenerations-Lauf); K3/K4 im selben XML-Zug (ORGAN_LOCATION
+      bleibt, F30-Guard = EIN Waechter, 18 default-OFF Organe enabled="false" sichtbar); #88, #135 (Fassade =
+      deklarierter Workaround bis Umbau), #194, #206 (angelegt 07.09. 13:14:34Z 'XML type=-Syntax / D1-Wrapper-Fassaden
+      Richtung (b)+P2') | OFFEN (#206 pending; nach Kampagne P2, vor Abgabe; Nachweis-Explore sofort)
+G-024 | envoy-gateway CrashLoop (Gateway-API-CRDs fehlen); bog #132(a), #132, W-B5 | KN | T2 L114346, OWNER2 Z.18 |
+      "gesehen, beheben bitte, infra Handout." | (gesehen) beheben, Akteur Infra: Gateway-API-CRDs installieren +
+      Sidekiq-HPA-Values im Infra-Fenster (G-022); Board #132 von 'Entscheid Owner/Infra' auf 'Defekt, Infra-Handout'
+      drehen (#177); #132, #189 (Abschnitt envoy), #177 | OFFEN (#132 pending, #189 in_progress; Infra-Fenster)
+G-026 | F.6 WG-Rotations-Vollzugsbeleg (b3a7ee8 01.09., 8/8 Paare) + redshield-Interface-Keys mit-rotieren; O-21,
+      F.6, V-087, V-090(h), U-19b, B-3 (v090), V-083, Z-03, Z-N04, #149, #142 | K1 | T2 L114346, OWNER2 Z.19 | "Bitte
+      die redshield eigenen interface keys mit rotieren als eigener Durchgang, aber das macht alles der infra Agent,
+      also Handout an ihn. Volles GO." | (ja) redshield-Interface-Keys mit-rotieren als eigener Durchgang = Infra-
+      Handout 'redshield-Interface-Keys Rotation (par. 7 Gegenseite)' + Purge-Kern-Nachtrag (0891fcf43cbf, Blob
+      71670a3d); E2-NARROW #149 -> GitHub super public -> GitLab LAN-public bleibt Lead-Sequenz nach #179; gitleaks-
+      private-key-Regeln 4/4 Repos (#142); stale Marker GOAL D-12/WELLENPLAN W-9/Ledger KON136 in #176; #189, #149,
+      #142, #176 | OFFEN (#189 in_progress; #149/#142 pending; E2-Kette = naechster serieller Lead-Slot nach #179)
+G-032 | Fable-max-Order 12.08. + 'maximal 2 Agenten gleichzeitig' 04.09. -> NEUES REGIME 07.09.; O-26, W-3
+      (ARBEITSWEISE), K29 (= Anhang K-3) | KN | T2 L114346, OWNER2 Z.20 + Z.47 | "gesehen, derzeit sind die
+      Beschraenkungen wieder aufgehoben und wir laufen maximal 6 Workflows parallel nach der Claude code Arbeitsweise
+      und maximal 2 Fable 5 max Agenten je workflow parallel, sonst keine Beschraenkungen fuer die Verwendung der
+      Parallitaet der anderen Agenten, grundsaetzlich keine Beschraenkung des Umfangs sofern sinnvoll. Volles GO." +
+      K-3 Z.47: "Ich habe sie widerrufen, wie oben beschrieben." | (widerrufen) = Owner-Wahl GEGEN Lead-Empfehlung
+      'gesehen': max 6 Workflows parallel, max 2 Fable-5-max-Agenten JE Workflow parallel, andere Modelle ohne
+      Parallelitaets-Beschraenkung, Umfang unbeschraenkt 'sofern sinnvoll'; MAX-2-Gesamtregel (04.09., K29) + Fable-
+      only-Order (12.08.) widerrufen; Memory-Regime-Zeile 'max 6 WF / max 2 Fable je WF', ARBEITSWEISE-X-Register-Zeile
+      (v4.5, G-031), Workflow-Skripte: Fable-max-Cap 2 je NEUEM Script (laufende byte-unveraendert, K27), Board-Vermerk
+      #185/#186/#187 'MAX-2 aufgehoben'; #178-Nachzug, #176, #177 (Regime-Detail KON138-08) | TEILWEISE (Memory: beide
+      Feedback-Memories seit 07.09. 'AUFGEHOBEN (Nachtrag)' markiert; Doktrin-Zeile/Skript-Cap/Board-Vermerke offen)
+G-028 | Rechtstraeger-Scope super = BEP Venture UG (REUSE path='**' + docs/), Thesis = Copyright Probst; O-22, W-01,
+      GD-02, W12-12, R-08, bog #143(c), Lizenzpunkt 3, G-3 (e10k), W-M7 | KN | T2 L114346, OWNER2 Z.21 | "Das gesamte
+      super repo gehoerte schon immer der BEP Venture UG unter der dafuer benannten lizenz, also bleibt. Nur die
+      Diplomarbeit gehoert Benjamin-Elias Probst unter Copyright. Gesehen, super=BEP Venture UG unter der mehrfach
+      Lizenz mit Freigabe fuer die Forschung, Thesis gehoert Benjamin-Elias Probst unter Copyright." | (gesehen): super
+      = BEP Venture UG 'unter der mehrfach Lizenz mit Freigabe fuer die Forschung' (Apache-2.0 super + Research-Lizenz
+      ce/prt-art, alle forschungsfrei; KON138-06), Thesis = Copyright Benjamin-Elias Probst + CC-BY (Lizenz-Punkt 8,
+      NICHT mehr Apache-2.0); REUSE.toml super unveraendert; Thesis-Submodul-Zeile in super REUSE.toml von 'Apache-2.0 +
+      (C) Probst' auf 'CC-BY-4.0 + (C) Benjamin-Elias Probst' nachziehen (#179/#143 Lande-Zug); GOAL D-13 NACHTRAG
+      'Scope-DETAIL OWNER-GATED' -> entschieden-Marker (#176); #179, #143, #176 | OFFEN (mit #179-Landung; #179
+      in_progress)
+G-082 | V13-V17 (RN-74: Migration A1/A5/A7, G5/#274 measurement-all-Zergliederung, Tools-Lagerhaltung #32, #276 3-ISA-
+      Teilmatrix, Vortrag D-15) Kategorie C 'nach Abgabe'; C-6 (W-9.1), RN-74, V13-V17, S-130 | KN | T2 L114346, OWNER2
+      Z.22 | "Wir ziehen alles VOR die Abgabe und reihen die Arbeit ein. Volles GO, wir haben gerade die Ressourcen um
+      das durchzuzuziehen." | (vor Abgabe) = Owner-Wahl GEGEN Lead-Empfehlung 'gesehen': V13-V17 komplett VOR die Abgabe
+      in die #158-Rest-Wellen eingereiht; Kategorie C 'nach Abgabe' existiert nicht mehr (C-2 17.08. + NIE-KUERZEN
+      28.08. + 07.09.); V14 = #88-Split-Zug (W-C), V16 = #184/#276-Posten ('sobald das ledger abgearbeitet ist', G-111),
+      V17 Vortrag D-15 NEU; RN-74-Zeile 'nach Abgabe' als datierte Historie (#176); #199 (angelegt 07.09. 13:13:31Z
+      'V13-V17 Rest-Wellen-Einplanung VOR Abgabe 15.09.'), #200 (V16), #176, #96 | OFFEN (#199 pending, #200 pending;
+      nach Kampagne, vor Abgabe 15.09.)
+G-081 | OV-14 Paper-Kopplung (je Paper die XML ermitteln; Owner-Auftrag 08.08. + GO Frage 6): Kalender; O-20, C-3
+      (W-9.1), W12-02, S-128, #172 | K1 | T2 L114346, OWNER2 Z.23 | "gesehen, bitte (A) VOR Abgabe im Rest-Wellen-Block
+      wie empfohlen, volles GO." | (A) VOR Abgabe im Rest-Wellen-Block: #172 nach #148 (Vendor-Einzug); Ruecksprache im
+      Design-Detail VOR dem Bau (Owner-GO-Vorbehalt 08.08. 'Ruecksprache mit mir im Detail') = eigene Owner-Vorlage;
+      Thesis-Absatz 'Reproduktion je Paper' im #121-Zug; W-9.1-Zeile 'OV-14 nach Abgabe' = datierte Historie + Ledger-
+      Korrektur (Lead-Prosa faelschlich als Owner-verbatim etikettiert, Fix L1-M05) in #176; #172, #148, #121, #176 |
+      OFFEN (nach Kampagne, vor Abgabe 15.09.)
+G-034 | Regel-Kandidaten RK-1..RK-8 in Kraft mit v4.5 (F5 27.08. 'Volles go fuer alle Punkte, wie empfohlen.'); O-28,
+      V-090(f), RK-1..RK-8, Z-28, RETT-T3-REGELKAND, R-05, R-07, K069-VK-04, W-2/W-12 (ARBEITSWEISE), W-M6 | K1 | T2
+      L114346, OWNER2 Z.24 | "gesehehen, GO." | (gesehen): RK-1..RK-8 in Kraft (GO wiederholt), Overlay-Kasten bleibt
+      Abgrenzungs-Satz + Verweis; Einbau in ARBEITSWEISE v4.5 (G-031) = docs-Zug #176 + Doktrin-Nachzug #178; keine
+      Bau-Wirkung; #176, #178-Nachzug | OFFEN (sofort mit v4.5-Einbau)
+G-087 | Hybrid-Restentscheide: E-7 HY-V Paketschnitt, E-12 Verdraengung in HY-B2, Hybrid-Komponenten nach 17.08.;
+      S07/B-14, OG-53, OG-55, R4-Tafel E-7/E-12 (Hybrid) | K2 | T2 L114346, OWNER2 Z.25 | "ok, E-7 in-HY-C direkt.
+      Weiterhin sind es mittlerweile mehr als 3 Komponenten, aber die benannten 3 Komponenten sind die tatsaechlich
+      bestehenden Basis-Komponenten des Hybrid Paketes - um es nicht zweimal anfassen zu muessen, musst du herausfinden
+      welche Komponenten nach dem Datum der Festlegung noch ergaenzt wurden." | (E-7 in-HY-C) = Owner-Wahl GEGEN Lead-
+      Empfehlung 'ok': HY-V (Heuristik-Strategie im SearchAlgorithm) wird DIREKT in HY-C gebaut, E-12 bleibt in HY-B2
+      (Komponente 3); Owner-Auftrag: 12W-EXPLORE (Pflicht vor Bau) aller Hybrid-Komponenten, die NACH der Festlegung
+      17.08. (KON109-01 'genau diesen 3 Komponenten') hinzukamen -- Kandidaten aus #130: Hybrid-Live-Ranking (4.),
+      Hybrid-State-Sync-Memento-Sidecar, Messfehler-Interpolation (5. compare-Komponente) -> Tafel 'Hybrid-Komponenten
+      nach 17.08.', damit HY-C EINMAL angefasst wird; Bauplan HY-C um HY-V erweitern (--check-size-Wirkung, sequentiell
+      landen); #123 (HY-B-Export), #130, #194, #211 (angelegt 07.09. 13:15:42Z 'HY-C-Zug EINMAL anfassen'; Explore der
+      Komponenten nach 17.08. laut #211 erledigt = Design-Explore S2) | OFFEN (#211 pending; HY-Pakete nach Kampagne,
+      Reihenfolge A,B,C)
+G-088 | Traegerachse der Mess-Permutations-Unterachse: (a) collector/measurement_tooling / (b) hybrid-Meta-Meta / (c)
+      neue Mess-Ebenen-Hauptachse; S07/B-02, S06/B-24 (abgeraeumt) | K2 | T2 L114346, OWNER2 Z.26 | "Die Frage ist
+      irrsinnig und beruecksichtigt nicht die Eigenschaften des Planers und der Achsen-Kategorie-Schichten des
+      B+-Experiment Baumes, welcher die Permutation im Planer als Director durchfuehrt und dann an (a) uebergibt. [...]
+      Es braucht damit weder eine Haupt- noch Unterachse, sondern einfach einen Explore, welcher den Experiment Baum als
+      Planer Director wieder rekonstruiert, um dessen Direktiven der XML-Planung an nachfolgende Stufen zu delegieren,
+      danach volles GO, weil dieser schon definiert ist." (Volltext KON138-08) | KEINE der Optionen als neue Achse: der
+      PLANER als DIRECTOR im B+-Experiment-Baum (Achsen-Kategorie-Schichten) fuehrt die Permutation durch und uebergibt
+      an (a) collector/measurement_tooling; (b) hybrid-Meta-Meta hat damit nichts zu tun (Meta-Meta-Achsen werden nur
+      von vorangehenden Directors Planer-CEB-->(Hybrid-Tier-Binary->)Tier-Binary per XML angeordnet, sofern
+      FREIGEGEBEN); (c) entfaellt; GO erst NACH dem 12W-Explore (Experiment-Baum als Planer-Director rekonstruieren:
+      B+-Baum, Achsen-Kategorie-Schichten, Direktiven der XML-Planung -> Delegation CEB -> Hybrid-Tier-Binary -> Tier-
+      Binary, Freigabe-Mechanik per XML; Rohtranskripte zuerst) = Bauvorgabe #53 (Registry-Verortung = Uebergabe-Punkt
+      (a)); S07/B-02 + S06/B-24 als 'Owner-Korrektur' gebucht = LEAD-FEHLER K40 (KON138-08); keine Owner-Vorlage je
+      Achse mehr fuer diesen Punkt; #194 (erster Posten), #212 (angelegt 07.09. 13:15:57Z 'XSD-Drift Hybrid/Organ-Meta-
+      Meta', Fund Design-Explore S1), #53, #176, K40-Register | OFFEN (Explore sofort, #194 in_progress, #212 pending;
+      Bau #53 nach Trigger)
+G-092 | OS-Support-/Debug-Messung: Kennzeichnung am Tupel / zusaetzliche Beleg-Spalte / eigenes Debug-Realm; S06/B-15,
+      bog #169(b), Fallback 5/2/1 | K2 | T2 L114346, OWNER2 Z.27 | "Derzeit manifestiert sich alles primaer als xlsx
+      statt CSV, aber ich waehle A, B UND C. Dabei kann Tupel per XML gewaehlt werden und die zusaetzliche Spalte ist
+      Default. Schema Bruch freigegeben. Trigger ist ja noch nicht gelaufen, daher valide." | A UND B UND C = Owner-Wahl
+      GEGEN Lead-Empfehlung A: Tupel-Kennzeichnung per XML waehlbar (A), zusaetzliche Beleg-Spalte 'debug_beleg' =
+      DEFAULT (B; Schema-Bruch VOR dem Trigger freigegeben: "Trigger ist ja noch nicht gelaufen, daher valide"), eigenes
+      Debug-Realm im Lager (C; #57 Realm-Erweiterung, GOAL D-7.6 'Debug-Zahlen NIE ins Messwertlager' = getrenntes
+      Realm); Schema-Bruch im Identitaets-/golden-Buendel (G-013/W-14 mit X3 + E-11), XML-Schalter
+      run_methodology/platform, Render-Regel Anhang 'Debug-Messung, keine golden-Zahl' (#18), XSD/Lock-Bump
+      kontrolliert, S-19 rechnet Nenner; Fallback-ERROR-Bau #169 unveraendert; #18, #57, #169, #120, #194, #216
+      (angelegt 07.09. 13:54:39Z 'run_methodology WIDE-Spalte + manifest-Schalter + Debug-Realm') | OFFEN (#216 pending;
+      vor Trigger, Schema-Bruch im Identitaets-Buendel mit X3)
+G-093 | Kalender-Posten C-4/C-6/T-3/C-8 (Katalog 06.08.): ChainRef H3-tragend, kein Abbruchkriterium H2, Hybrid-Lane =
+      intel-Lane prod2, C-8 durch #158 aufgeloest; S06/B-16, C-4/C-5/C-6/C-8 (Kalender), R-2 (Kalender) | K2 | T2
+      L114346, OWNER2 Z.28 | "Wir setzten alle Fristen auf den 15.09. , derzeit gute Ressourcen Lage und daher
+      schaffbar. Ansonsten: NIE STREICHEN gilt weiterhin, wir versuchen mit (A) hinzukommen, sonst fallback auf (B)." |
+      (A) mit Fallback (B); alle Fristen = 15.09. (C-6 = 15.09., C-8 = 15.09.); (C) Streichen ausgeschlossen;
+      H3-Auswertung aus axis_14-Observable im T-8-Auswerte-Zug vor Reset ~12.09.; Annahme-/Ablehnkriterium H2 im
+      #121-Zug; P/E-Auspraegung #140 (jetzt mit Core-Pinning-Unterachse G-091); Traeger-Anlage 'ChainRef-H3-Auswertung'
+      = #213 (angelegt 07.09. 13:16:06Z); Kalender-Marker 'spaeteste Frist 15.09.' je Posten im Ledger (#176); #213,
+      #180, #121, #140, #176 | OFFEN (#213 pending; vor Abgabe 15.09.; T-8-Zug vor T-3-Reset ~12.09.)
+G-094 | xlsx: Werte-Tabellen + Links in die w/ma/mi-Layer; Chart-Objekte je Sheet / im INFO-Blatt; LaTeX-Factory;
+      S06/B-05 | K2 | T2 L114346, OWNER2 Z.29 | "Ja korrekt Werte_Tabellen+Links welche in die geplanten tieferen Ebenen
+      der Messung w/ma/mi Layer verweisen, wie auch beschrieben (bitte explore dazu das ist geplant). Chart Objekte im
+      sheet sind nicht erwuenscht, sofern nicht explizit in der XML gefordert, aber Feature ist pflicht. Die Charts in
+      Latex bei XML Deklaration aus den Messwerten wie geplant sind viel wichtiger. Chart Objekte im Info Blatt sind ein
+      weiteres Feature, welches in der XML deklariert werden kann." | (A) als Default; (B) Sheet-Charts + (C) INFO-
+      Blatt-Charts = XML-deklarierbare PFLICHT-Features (Default AUS; NIE KUERZEN); LaTeX-Charts aus XML-Deklaration
+      'viel wichtiger' = Prioritaet (#18 dritte Factory + #98 F-07b); Owner-Auftrag 'bitte explore dazu das ist
+      geplant': Link-Semantik der Werte-Tabellen in die w/ma/mi-Layer (welches Sheet/Realm verlinkt wohin; write_url)
+      aus dem 12W-Korpus -> Bauvorgabe #18/#55; XML-Schalter <xlsx charts='sheet|info|none'> (Default none), lxw_chart-
+      Nutzung, schema-neutral; #18, #55-Folge, #98, #194, #201 (angelegt 07.09. 13:13:53Z 'xlsx-Chart-Features per XML
+      (Sheet/INFO, Default AUS)'; Explore-Auftrag laut #201 erledigt = Design-Explore S4) | OFFEN (#201 pending; Bau
+      #18/#98 W4 vor Abgabe, Chart-Features nach Kampagne)
+G-096 | super Code/measure_out_d03/ (Mess-Erstbeleg 26.07., 66 Dateien, 3,7 MB, untracked; Archiv-Kopie getrackt);
+      S05/B-25, V-3 cppcheck-Scope, #165(B) | K2 | T2 L114346, OWNER2 Z.30 | "Bitte verschiebe es in den workflow
+      backup Ordner auf dem NAS und dann loesche es durch einen commit lokal (->verschieben). Daher (a) raeumen und
+      verschieben ins NAS." | (a) raeumen = VERSCHIEBEN ins NAS (sessions-rohdaten/workflow-backups/.../measure_out_d03-
+      20260726, #183-Muster: rsync additiv + Manifest + sha256 je Datei, 66/66 Verify), lokale Entfernung erst nach
+      Verify; (LESART) das Verzeichnis ist untracked (.gitignore:116 seit 07.08.), der Commit traegt nur die Spur
+      (Zeiger-README 'README-VERSCHOBEN-NAS' + .gitignore-Zeile) -- Messdaten werden NICHT geloescht, sondern
+      verschoben (MESSDATEN NIE LOESCHEN gewahrt), tracked Archiv-Kopie erstbeleg-d03-20260726 bleibt; LOESCH-GO-ZEILE =
+      diese Zeile; cppcheck-Rot der super-Wachen entfaellt am Objekt, #165 (B) Scope-Heilung bleibt PFLICHT; KANDIDAT
+      Nr. 6 (keine Rueckfrage noetig); #196 (vom Lead angelegt 07.09.), #183, #165 | OFFEN (#196 pending; NAS-Kopie
+      sofort, Commit im naechsten super-docs-Zug)
+G-097 | Trace-Endpoint-HTTP-500 (P11, C-21) = STALE seit Helm-Upgrade 15.08. (16/16 Trace-Vollkopien ohne 500);
+      S05/B-26, P11 (Trace), C-21 | K2 | T2 L114346, OWNER2 Z.31 | "Genau wie empfohlen." | (A) Kurz-Retest N>=20 GET
+      jobs/<id>/trace (http_code-Histogramm literal, Token blind) im Infra-Handout mit #154, danach C-21/P11 im Secret-/
+      Chronik-Register geschlossen (#176); #154 (Handout-Mitfahrer), #176 | OFFEN (KURZ-Fenster / Infra-Handout)
+G-098 | E-23 f2 (Sperr-Etiketten/Tombstone-Koepfe GitLab 293-298) + f3 (Analysis-Remote anlegen + Name); S05/B-09, f2/f3
+      (E-23 GitLab 293-298; nicht edw E-23) | K2 | T2 L114346, OWNER2 Z.32 | "Volles GO wie empfohlen im Split-Zug W-C."
+      | (Kenntnisnahme): f2/f3 im Split-Zug W-C nach der 28.08.-Reihenfolge; GO + Name werden am Anlage-Schritt in EINER
+      Zeile eingeholt (A-Regel 07.07.: nie leer anlegen; B-Regel: Name am Anlage-Schritt); E-23 bleibt PFLICHT;
+      D8-Design fuehrt f2 als Referenz-Ziel-Kopf, f3-Inhalt = Analysis-Extraktion super Code/06,08 (Split D9); Namens-
+      Kandidaten (comdare-<da>-analysis / comdare-analysis / comdare-<familie>-product) in der Anlage-Zeile; #88
+      (W7/Split-Zug W-C), #204 (angelegt 07.09. 13:14:12Z 'E-23 f2/f3 Vollzug im Split-Zug W-C'), Anlage-Tafel G-105 =
+      #210 | OFFEN (#204 pending; nach Kampagne, Split-Zug W-C)
+G-101 | MinIO: prod-MinIO-Neuerzeugung (Infra), Bucket-Policy, CI-Vars masked + protected=false; S08/B-13, S01/B-13
+      (Verweis CARP) | K2 | T2 L114346, OWNER2 Z.33 | "Prod-minio doch bauen, testen, aber wir bleiben fuer die
+      Verwendung bei der aktuellen Loesung. Volles GO dafuer. Das ist aber ein infra Agent Thema, also bitte handover."
+      | (prod-MinIO doch bauen) + testen = Owner-Wahl GEGEN Lead-Empfehlung 'OK'; Verwendung bleibt die aktuelle
+      Loesung (ccache minio.comdare.de + Buildsystem-NAS, Owner 11.08. 'letztes Wort'); Akteur = Infra per Handover
+      (prod-MinIO V91 bauen + testen, Cluster-Ledger #72 CARP/Longhorn, KEIN Konsumenten-Umbau im Projekt, Session baut
+      nichts); (c) protected=false ohne Owner-Wort -> bleibt (masked, Rotation #152/#54 deckt); #198 (vom Lead
+      angelegt 07.09.), #189 H9, Cluster-Ledger #72 | OFFEN (#198 pending, #189 in_progress; Infra-Fenster)
+G-104 | T-3-Meldung axis_cross_product statt verbund_union (Bausteinname) + C-1 Journal-Agent-Labels; S10/B-23, OG-9,
+      OG-47, V-08, P20, U-3, U-5, C-5 (W-9.1), C-1 (Journal-Labels), OFFEN-ZEILE 1, FR-08, N-36 | K2 | T2 L114346,
+      OWNER2 Z.34 | "Bitte (A) vor Abschluss der Kampange und dann (B) nach Abschluss der Kampange." | (A)
+      axis_cross_product bis Kampagnen-Ende, danach (B) Umbenennung auf verbund_union NACH Abschluss der Kampagne =
+      Owner-Wahl GEGEN Lead-Empfehlung A; C-1 ohne Owner-Wort -> bleibt 'angenommen' (B5 21.08. + KON120-02); KANDIDAT
+      Nr. 2: verbund_union ist am Objekt aktiv anders belegt (KON91-Kollision, 0 Konsumenten von axis_cross_product)
+      -> Ein-Zeilen-Umbenennung nur mit Alias-Registry R-2 vorab + Kollisions-Aufloesung (bestehendes verbund_union
+      analysieren/umbenennen, Bezeichnungs-Schema G-102), K17-Kombibau, fingerprint-neutral pruefen; #88 (Split-Zug),
+      #194, #176 | OFFEN (nach Kampagne; kein Trigger-Blocker)
+G-105 | Repo-Anlage-Regel: Pauschal-/Blanko-GOs decken NIE Remote-ANLAGEN; A5-Welle / Anlage-Tafel / ~50 nicht-
+      abhaengige; S01/B-03, #46 (Fleet-Sweep; Tafel-Alias falsch, #46 = Transkript-Rewrite A2+A4 completed, s. #218) |
+      K2 | T2 L114346, OWNER2 Z.35 | "B, das wird bei Experiment Start in der XML eingestellt, ob auf ein git gepusht
+      werden soll oder nicht und wenn ja wo." | (B) Anlage-Tafel (Repo, Layer, Abhaengigkeits-Beleg, Vertraulichkeits-
+      Spalte) als Owner-Vorlage VOR dem ersten GitHub-Push der A5-Welle (W-C nach Kampagne) = Owner-Wahl GEGEN Lead-
+      Empfehlung A; (LESART) der XML-Satz = Design-Anforderung an die XML-<publish>- Sektion (#48/#57 (6)): Feld 'git
+      push ja|nein + Ziel-Remote' je Experiment-Start, NICHT die Remote-ANLAGE selbst (bleibt Owner-GO je Repo nach
+      Tafel); KANDIDAT Nr. 5; Explore Bestand (publish-Hebel AF_BRANCH/anhang:forward, 289-Push-Dualitaet) vor Bau; #218
+      (angelegt 07.09. 14:20:11Z 'FLEET-SWEEP GitLab-only-Repos (~50) = G-105 nicht-abhaengiger Rest'; ersetzt den
+      falschen Tafel-Alias '#46 (Fleet-Sweep)' -- #46 = Transkript-Rewrite A2+A4, completed; Lead-Arbeitsfehler K43 lt.
+      #218), #48 + #57 (publish-Sektion), #18 (Design mit S-13), #194, #210 (angelegt 07.09. 13:15:20Z 'Anlage-Tafel VOR
+      dem ersten GitHub-Push') | OFFEN (#210/#218 pending; Tafel vor dem ersten Push nach Kampagne; XML-Feld im
+      S-13-/#57-Design vor Abgabe)
+G-107 | comdare-workloads (321): WorkloadOpKind (driver-Welt, YCSB-Op-Set) = Zellen-API vs OperationKind = API-Kern +
+      Steuerpfade der Anlage; S01/B-04 | K2 | T2 L114346, OWNER2 Z.36 | "Die Anlage kann entweder als Planer per Shell
+      direkt oder per API CLI mit headless server gesteuert werden, welche den Planer als Zelle auf K8s oder bare metal
+      auf einem Server bedient. Also die Entscheidung ist A, aber mit Erweiterung im Zug wie du es empfohlen hast.
+      Volles GO." | (A) WorkloadOpKind = Zellen-API, OperationKind per Adapter intern, mit 'Erweiterung im Zug'
+      (W7/#88-Split-Zug); (LESART) zwei Steuerpfade der Anlage = Planer-CLI per Shell direkt UND API-CLI mit headless
+      Server, der den Planer als Zelle auf K8s oder bare metal bedient = Erweiterungs-Anforderung an den Split-Zug,
+      BESTANDS-PFLICHT: headless-Server-/API-CLI-Pfad im 12W-Korpus pruefen; Zelle 321 im W7/#88-Split, Explore + Design
+      'API-CLI + headless Server', Thesis-Absatz (#121); #88, #194, #121, #209 (angelegt 07.09. 13:15:08Z 'Planer als
+      Zelle auf K8s oder bare metal: API-CLI mit headless Server') | OFFEN (#209 pending; Explore sofort; Bau nach
+      Kampagne)
+G-108 | foundation-all-Alt-CI + Fleet-Template v7.0.x (14/17 Umbrella-Repos, 7x allow_failure, 18 Exoten ohne Runner):
+      Neuschnitt nach #51-Muster; S01/B-09, #38 (08.07.-Welt), (bog #40(a) -> G-162), #184 | K2 | T2 L114346, OWNER2
+      Z.37 | "ok (a) volles GO. Wir konzentrieren uns zuerst auf prod1 und prod2 und erweitern erst danach auf die
+      Exoten und die anderen Pflicht ISA und images." | (a) Neuschnitt jetzt: Vorlage v7.0.5 nach #51-Muster ('rules:
+      when: never' je Pool ohne Runner, x86-Native hart, 0 allow_failure), Mass-Redeploy ueber Cluster-ci-templates, #38
+      schliessen; Owner-Reihenfolge: prod1/prod2 zuerst, danach Exoten + uebrige Pflicht-ISA + Images = Reaktivierungs-
+      Notat je Pool (riscv/macos/windows/arm64) im #276-Posten (G-111; VOR Abgabe per G-082); #184, #38 (schliessen),
+      #276-Posten = #200, #162-Umbrella (G-162) | OFFEN (#184 pending, #200 pending; Start jetzt, nicht trigger-
+      blockierend)
+G-109 | dedup-lab (Reporter, access 20) = verwaiste Dienst-Identitaet des seit 02.08. abgebauten Dedup-Experiments;
+      S01/B-10, dedup-lab | K2 | T2 L114346, OWNER2 Z.38 | "(C) loeschen, wir haben mittlerweile ganz andere Ressourcen
+      und andere Infrastruktur, das Projekt ist veraltet." | (C) LOESCHEN = ausdrueckliches Owner-GO (irreversibel-
+      Klasse), Owner-Wahl GEGEN Lead-Empfehlung A (blockieren); LOESCH-GO-ZEILE = diese Zeile; im ruhigen Admin-API-
+      Fenster mit #152: (1) Nullbefund-Probe (existiert das Konto?), (2) Bundle/Export der Mitgliedschaften +
+      Aktivitaeten als Archiv-Nachweis (blind, Vault-Vermerk), (3) vererbte Mitgliedschaften entfernen, (4) Konto
+      loeschen, (5) Beleg vorher/nachher blind + LEAKED-SECRETS-ROTATION-LOG-Vermerk; #196 (vom Lead angelegt 07.09.),
+      #152 (Fenster) | OFFEN (#196 pending; KURZ-/Admin-API-Fenster mit #152)
+G-111 | #276 'Offene User-Fragen' P1..P15 (Sektion 4, 06.07.) + #276-Zeitpunkt 'sobald das ledger abgearbeitet ist';
+      S01/B-15, #276, P1..P15 (Sektion 4) | K2 | T2 L114346, OWNER2 Z.39 | "Alles ok, volles GO." | (ok): alle 15 Posten
+      + #276-Zeitpunkt-Lesart bestaetigt (P10 Default KEIN Sharing; P3 #276 nach Lead-Feststellung 'Ledger
+      abgearbeitet', VOR Abgabe; arm64 mandatory, kein Burn-in); Doku-Nachtrag #176; #276-Zeitpunkt in die Rest-Wellen
+      (G-082 V16 3-ISA-Teilmatrix VOR Abgabe); Pool-Liste prod1/prod2 -> Exoten (G-108) im #276-Posten; #176, #184, #200
+      (angelegt 07.09. 13:13:40Z '#276 3-ISA-Teilmatrix VOR Abgabe', mit V16 aus G-082) | OFFEN (#200 pending; nach
+      Kampagne, vor Abgabe 15.09.)
+
+**KON138-03 (TRANCHE 2 ABSCHN. II = 9 LEAD-BRINGSCHULDEN; Owner-Satz zu G-051 OWNER2 Z.41 verbatim + Owner-Sammelsatz
+OWNER2 Z.42 verbatim: "Der Rest von II. BRINGSCHULDEN ist gelesen und alle Fehler muessen als Regression verbucht und
+geprueft und nachgeholt werden, um Ungenauigkeiten zu vermeiden."; Regel: jede Bringschuld G-052..G-059 = REGRESSION
+MUSS (Owner 06.09. L111216: alle Regressionen jeder Klasse = MUSS; Owner 01.09. L102011: SOLL = PFLICHT) = je Zeile
+pruefen (Ist am Objekt) + nachholen (Rest) + im Regressions-Register #135/#136 verbuchen; Fragen TR2 Abschn. II
+Z.229-253; Verbuchung VERB2 Z.610-661):**
+G-051 | DIESE Vorlage = Antwort auf die Owner-Fragen 02.09. 07:42Z/08:07Z: EINE Tafel mit EINEM Nummernkreis ersetzt die
+      Chat-Rohliste 07:54Z; dichtes Ledger folgt NACH den Antworten; bog #175(a), bog #176(a), E-11, E-21, E-22, E-23,
+      E-33, Z-12, Z-N07, EXPL-G-14, sperren S-9, KON136-08, KON137-09 | LEAD (dringlich JA) | T2 L114346, OWNER2 Z.41 |
+      "Alles klar, die Konsolidierung des Ledgers in die Dichte Fassung steht ja weiterhin aus, wie geplant." |
+      Kenntnisnahme + Owner-Erinnerung (M5 24.08. L88921, 02.09. L103848, 07.09.): #176 (KON136-04..08 + KON137-01..13 +
+      KON138 = diese Tafel) -> danach #197 LEDGER-DICHT (NEUER-LEDGER 157 Fragen 97W/60R + KON120..KON138 + A2.3a-
+      Antworten); Reihenfolge = K-1 GO (KON138-05 A1); #176, #197 | LAEUFT (#176 in_progress = dieser Zug; #197
+      in_progress)
+G-052 | S12/B-18 EIN-NACHRICHT-Minimalantwort (22.08. L83933 13:21:50Z / L84993 16:34:57Z / L85093 16:47:49Z, Lead) +
+      Zuordnung der 12 A60-F-Eingaenge + A58-Reste je Zeile; S12/B-18, lb (5), V-090(n), sperren S-6, bog #136(a), Z-23,
+      RETT-RT62g, K061-K-02, K062-V-4, A60, F-09 (A60) | LEAD | T2 L114346, OWNER2 Z.42 (Sammelsatz) | Sammelsatz Z.42
+      (Blockkopf) | REGRESSION MUSS: pruefen (Zuordnung der 12 A60-F-Eingaenge + A58-Reste je Zeile am Objekt
+      Ledger/Board nachvollziehbar? Gate werg46arx #136(6) umgehaengt?) + nachholen (fehlende Buchungen in KON138); #136
+      (Gate), #176 | OFFEN (sofort im #176-Zug)
+G-053 | V-090-Ergaenzungsliste (a)-(w) 22/22 + V-115 35/35 + V-111 + U-19b + F-039 + RK-1..8 eingearbeitet; V-090,
+      V-090(w), (V-115 -> G-061), sperren S-2 | LEAD | T2 OWNER2 Z.42 (Sammelsatz) | Sammelsatz Z.42 | REGRESSION MUSS:
+      pruefen (jede Ergaenzung hat einen Buchungssatz in KON136/KON137/KON138) + nachholen (fehlende Saetze); #176,
+      #167 | OFFEN (sofort)
+G-054 | OG-1..OG-58 (W2-ABFOLGE-DESIGN 20.08.; Herkunft Audit A2 wf_4370bd53-7a9 20.08. 16:37-16:51Z, S2-Tafel Z.83): 38
+      entschieden / 12 in Tafel-Zeilen / 8 KN, Materialisierung im Ledger; V-051, sperren S-5 | LEAD | T2 OWNER2 Z.42
+      (Sammelsatz) | Sammelsatz Z.42 | REGRESSION MUSS: pruefen (KON137-09-Block traegt die Serie, sonst geht sie mit
+      der Session verloren) + nachholen (KON137-09 vollstaendig; OG-n nur als Alias dieser Tafel); #176 | OFFEN (sofort)
+G-055 | Explore-10K-Endfassung (Reduce/Refute/Fix) + r18-r30-Reduce: Nenner-Historie 45/35/60/283, 15/15 Fix-Anker, 17
+      Delta-Zeilen; sperren S-8, Z-18, RETT-RT38, Z-N15, EXPL-F-7, Z-N17, EXPL-REFUTE-FIX, E-26, R62 | LEAD | T2 OWNER2
+      Z.42 (Sammelsatz) | Sammelsatz Z.42 | REGRESSION MUSS: pruefen (Fix-Anker 15/15 in der Tafel; Loesch-Mengen am
+      Versandtag frisch gemessen? G-006: L1 NEIN, L7 JA) + nachholen (Nachmessung /tmp, /var/log, .gitiso vor dem L7-
+      Vollzug); #167, #189 (L7-Handout), #176 | OFFEN (vor Neustart-Fenster)
+G-056 | Versand-Sperren S-1/S-3: V-109-Vollzaehligkeits-Pass 30/30 Maps (Nenner 277, 39 Nachtraege) + Nachfold-Wache
+      W-1..W-5; sperren S-1, sperren S-3, E-39, Wache-Reste W-1..W-5, V-109 | LEAD | T2 OWNER2 Z.42 (Sammelsatz) |
+      Sammelsatz Z.42 | REGRESSION MUSS: pruefen + nachholen (die vier Quittungszeilen W-1/W-3/W-4/W-5 in NACHFOLD-
+      WACHE.md fehlen = Lead-Formsache im #167/#176-Zug); #167, #176 | OFFEN (sofort)
+G-057 | Buendelungs-Auflagen K077-K-04 im Fold (S01/B-14 MIT S06/B-21(ii) = G-003; E-13 MIT R4-R-Tafel = G-070; FK-7 MIT
+      Fuenftes-Token = G-089; S06/B-25 MIT #152 = G-004); V-090(t), Z-08, EXPL-K077-Z3, K077-K-04, B-7 (e10k) | LEAD |
+      T2 OWNER2 Z.42 (Sammelsatz) | Sammelsatz Z.42 | REGRESSION MUSS: pruefen (Owner-Antworten je Buendel EINMAL
+      gebucht) + nachholen (G-089: der Owner hat das Buendel gedreht -- kein 5. Token, FK-7-Etiketten -> Buendel-
+      Buchung anpassen); #176 | OFFEN (sofort)
+G-058 | Vorlage-Form-Regel 'Sachlage je Frage' (Verfalls-Mechanik K063-V-06; Lead-Messung 23.08. L86772 18:48:51Z:
+      Antwortquote 100 % mit Sachlage / 0 % auf Listen-Vorlagen); V-090(u), K063-V-06, L86772 | LEAD | T2 OWNER2 Z.42
+      (Sammelsatz) | Sammelsatz Z.42 | REGRESSION MUSS: pruefen (X-Regel steht in v4.5, G-031 GO) + nachholen
+      (X-Register-Zeile im Doktrin-Nachzug); #176, #178-Nachzug | OFFEN (sofort mit v4.5-Einbau)
+G-059 | NICHT-ERNEUT-FRAGEN-Gegenprobe (0 der K3-Fragen auf der ABSICHERUNGS-Liste Z.359-362; 20 Beruehrungen =
+      Kenntnisnahmen/Quittungen); V-090(v), K067-V-10, sperren S-7, v090 D | LEAD | T2 OWNER2 Z.42 (Sammelsatz) |
+      Sammelsatz Z.42 | REGRESSION MUSS: pruefen (nach Tranche 2 erneut messen: taucht ein beantworteter Gegenstand in
+      Tranche 3 wieder auf? Owner-Ruege-Klasse 25.08. 'bitte pruefe nicht staendig, was laengst entschieden') +
+      nachholen (Gegenprobe VOR dem Tranche-3-Versand); #195 (Tranche 3), #176 | OFFEN (vor Tranche-3-Versand)
+Ohne eigene Nummer, vom Sammelsatz Z.42 erfasst (VERB2 Z.657-9): 0.17 = Nachtrag G-NEU-0609-1 in G-005 gefaltet; 0.18 =
+Loesch-/GO-Buendel-Tafel L1..L10 = G-006 Teil 2 -> REGRESSION MUSS: beide Faltungen stehen in KON138 je EINMAL (Zeile
+G-005; Zeile G-006 + Anhang A3); die G-019-Zeile (Handgriff codex) = Zeile in KON138-01 + Anhang A6 (erledigt).
+
+**KON138-04 (TRANCHE 2 ABSCHN. III = 33 KENNTNISNAHMEN; Owner-Sammelsatz OWNER2 Z.44 verbatim: "III. REINE
+KENNTNISNAHMEN: Alle zur Kenntnis genommen und ALLE volles GO."; je Zeile ANTWORT 'KN GO' = Kenntnisnahme + Vollzugs-
+Freigabe des in TR2 Abschn. III Z.253-285 beschriebenen Lead-Wegs; Verbuchung VERB2 Z.662-733; Reihenfolge = TR2):**
+G-016 | Achse-06/CRC-Anker-Drift + 5 dauerrote super-Tests ohne da_unit-Label (CI gruen durch Nicht-Auswahl); V-090(j),
+      V-012, V-11, P12, OG-14, OG-15, bog #127(a), OFFEN-ZEILE 2, RN-46, KON119-06 | KN (dringlich JA) | T2 L114346,
+      OWNER2 Z.44 | KN GO (Sammelsatz) | Lead-Zug #127 NEU ANKERN + da_unit-Labels als eigener kontrollierter Zug VOR
+      der W3-Kampagne, naechster ce-Slot vor ##49; #127 | OFFEN (vor Trigger; #127 pending)
+G-013 | B5-golden-GO (21.08.) deckt den Folge-golden-Zug; E-11 Fehlerklassen-Familie im SELBEN golden-Bruch mit X3;
+      O-15, V-020, V-090(k), W-14, W12-14, G-3 (W-9.2), S-135, W12-05, W-M3 | KN | T2 OWNER2 Z.44 | KN GO | E-11 im
+      Identitaets-Buendel mit X3 (G-009) vor ##49, jetzt inkl. G-089-Drehung + G-092-Schema-Bruch; NULL-Bump-Wache
+      scharf ab ##49; #120 | OFFEN (vor Trigger; #120 pending)
+G-017 | allow_failure-Ausnahmen: NE-20 super geheilt (E-1 F7); ce is_original:relock + build:arm64-smoke im E-1-Muster
+      aufloesen; V-028, EXPL-C-1, Z-N10, R-09, GD-04, W-03, bog #180(f), OG-32, NE-20, K-7 | KN | T2 OWNER2 Z.44 | KN GO
+      | rules-Skip when:never; arm64-smoke scharf, sobald ein arm64-Runner registriert ist (node7-Freeze H18 = G-110);
+      #164(h), #165, #180 | OFFEN (naechster ce-CI-Zug)
+G-025 | Cluster-Repo traegt fremde Infra-Arbeit K174/K175 (Commits bis 04.09. 21:06Z + uncommitteter Gitlink _infra/ci-
+      templates); V-135, E-36, Z-N14, EXPL-C-8, G-5 (nl) | KN | T2 OWNER2 Z.44 | KN GO | diese Session fasst dort nichts
+      an (K20), eigene Handouts erlaubt (06.09. adfac425, 05aeafc8), _infra/* tabu; Traeger keiner | ERLEDIGT (Regel)
+G-033 | W-4/W-5 Regeltext v4.5: History-Rewrite/Force-Push verboten (21.08.), Ausnahme nur per gegenstands-genauem
+      Owner-GO je Fall (14.08./15.08./01.09.), Infra-Handgriffe nur per Owner-Satz; O-27, R-06, W-4/W-5 (ARBEITSWEISE),
+      KON137-07(g) | KN | T2 OWNER2 Z.44 | KN GO | Regeltext in v4.5 (an G-031 gehaengt), keine neue Befugnis; #176 |
+      OFFEN (sofort)
+G-037 | W-7-Gate (W2-Abschluss) + GELOEST!=KONFORM: W135-Verdikte 0/7 (#135 + 3 Nachtrags-Kandidaten + V-040 + V-3),
+      GG3-1..4 (#139-Rest), RN-A-F-Reste (#128); F-039, B-4 (v090), V-039, V-041, W12-04, DP-03, DP-08, bog #135(a),
+      E-06, R09, U-20, L88750 (23.08. 21:39:14Z), F-004, T-13 | KN | T2 OWNER2 Z.44 | KN GO | W2-Pflicht = Lead-Vollzug
+      jetzt (B1 28.08. 'Bitte jetzt nachziehen'); 'objektiv nach W2' darf nur der Owner einstufen; #135, #139-Rest, #128
+      | OFFEN (vor Trigger/W4; #135 pending, #128 pending)
+G-041 | Owner-Meldung 23.08. 'Systemfehler und memory leak in die Eingabe' + Interrupt != Order (F-034); V-090(r),
+      K064-VK-02, E-07, F-034, R10 (edw), L87337 (23.08. 20:29:09Z, Queue), L95863 (28.08. 18:12:13Z) | KN | T2 OWNER2
+      Z.44 | KN GO | Verbuchungs-Haelfte geheilt (K064 A-03); technische Haelfte = Werkzeug-Defekt-Klasse 'TUI-Eingabe'
+      im Fallen-Register (Memory), kein Objekt-Defekt in ce/super; Traeger Memory (Fallen-Register) | ERLEDIGT (Regel;
+      Register-Zeile im #178-Muster)
+G-043 | Nachfold-WIDERSPRICHT-Dreier = Lead-Entscheid nach juengstem Owner-Wort (Fall 1 Thesis 3/90 -> G-073, Fall 3
+      Kipp-Ritual -> G-042, Fall 2 O-8 Aufgaben-Vollbild 23.08. 97 s spaeter L85664 23.08. 08:41:57Z beantwortet); W-2
+      (WIDERSPRICHT), bog #167(d), Z-21, RETT-RT61, B-9 (e10k), S12/A-30, F-033(i) | KN | T2 OWNER2 Z.44 | KN GO |
+      Fall-2-Verbuchung korrigiert (nur die Verbuchung fiel hinters Fenster); #176 | OFFEN (sofort, #176)
+G-063 | 22er-Nachtrag 21.08.: X-12 Hybrid-Map-Laufzeitbefuellung #105c, V-02 Slots 5->6 (#15), V-03 KON60-04 stale
+      (S-6a gelandet), Z-01 Fingerprint-Satz 17.08.; V-090(d), lb (4), KN-3/5/6/7, OG-4, OG-5, OG-18, V-02, V-03, F2
+      Z-01, S10/B-05, P14, P18, P19, P21 | KN | T2 OWNER2 Z.44 | KN GO | Code-Labels 'OFFENE OWNER-FRAGE'
+      (iterator.hpp:2975, steuerdock.hpp:30) auf 'entschieden 17.08.' drehen; #105, #176 | OFFEN (docs-Zug + ce-Zug;
+      #105 pending)
+G-064 | G21 F2-Freeze-Testat: nie als eigener Satz erteilt, 'durch Sachlage gedeckt' (B1 21.08. + 18/35 Fenster-
+      Antworten + Freeze-Check R5 15/18); V-090(b), K053-V8, G21 | KN | T2 OWNER2 Z.44 | KN GO | Ledger-Marker; #176 |
+      OFFEN (Marker, #176)
+G-067 | Split-Feinordnung: W7/#88-Monolith-Split BAU im Worktree PARALLEL zur Kampagne (~38 h amd / ~86 h intel),
+      LANDUNG nach Funktionsnachweis (Reihenfolge 28.08.); V-090(o), Z-20, RETT-RT60, bog #88(a), K070-V-14, N-12, N-13
+      | KN | T2 OWNER2 Z.44 | KN GO | Split-Bau startet mit dem Kampagnen-Start; #88 | OFFEN (#88 pending)
+G-070 | RISC-V (VisionFive 2) + Pi 5 + macOS x86/ARM = eigene Debug-only-Plattform-Schiene IN scope; Formal-Beweis VOR
+      Abgabe; Cross-Compile bleibt gestrichen; E-13 Hybrid EXPLIZIT in der Zeile; O-12, S12/B-11, E-12, F-07 (A58), R4,
+      OG-38, OG-56, R4-Tafel E-13 (Hybrid), R-34, W10-00 | KN | T2 OWNER2 Z.44 | KN GO | W10-00 native OS-Schiene =
+      Bauposten in der #158-Reihe (0x in YAML, os_realm 0 Code-Treffer = Plan, nie gebaut); Kipp-ID S12/B-11 (G-163);
+      #180 (W10-00 Bauposten), #158-Reihe | OFFEN (nach Kampagne, vor Abgabe)
+G-075 | A58-F-17 B-11.2-Einordnung: per-Binary-xlsx-Haelfte gehoert zu #18/S-13 (S13-03, 24.08.), NICHT zum golden-
+      Zug (Lead-Entscheid 17); S12/B-16, F-17 (A58), B-11.2, Lead-Entscheid 17 | K2 | T2 OWNER2 Z.44 | KN GO | Lead-
+      Entscheid 17 bestaetigt; #18 | ERLEDIGT (Einordnung; Bau S13-03 24.08.)
+G-076 | Halbsatz 21.08. 'Die Frage ist welcher': per C4-Explore (#119) durchsucht, kein eindeutiger Treffer, unter jeder
+      Lesart A/B/C erledigt; S12/B-10, F-06 (A58), C4-Halbsatz | K2 | T2 OWNER2 Z.44 | KN GO | ausgetragen (nicht der
+      thesis-Ledger-Posten C4 Aufgabenblatt RF-8a); #176 (Austrag) | ERLEDIGT (Austrag im docs-Zug)
+G-083 | RN-75 #38a3 IO-Vollausbau + L3-Container-Vier + Warmup-Paar VOR der Abgabe (W7-Anteil nach #158; Etikette 'nach
+      Abgabe' war Lead-Text KON47-03); O-16, G-2 (W-9.2), W12-03, S-134, bog #38(b), KON47-03, KON47-04 | KN | T2 OWNER2
+      Z.44 | KN GO | Warmup-Paar = Bau-Posten, keine Trigger-Relevanz; #38a3, #86, #53-Umfeld | OFFEN (nach Kampagne,
+      vor Abgabe)
+G-099 | H8/S-5-Registry-Geschlossenheit: eigener Beweis-Traeger 'S-5 CT-Geschlossenheits-Wache' (static_assert der
+      gebundenen Baustein-Tokens gegen die S-5-Registry, analog KON60-07); S09/B-11, H8, S-5-Registry | K2 | T2 OWNER2
+      Z.44 | KN GO | Board-Anlage + Bau im S-5-Registry-Zug vor B5 'nach S-5' (#24); SOLL = PFLICHT; #202 (angelegt
+      07.09. 13:13:58Z 'S-5 CT-Geschlossenheits-Wache anlegen + bauen'), #24 | OFFEN (#202 pending; vor B5)
+G-100 | Skript-Ausnahmen N1-N3 (Plan 10.08.) NICHT genommen: alle 9 Dateien portiert/ersetzt/deprecated (C++/CMake/
+      Google-Test); S08/B-07, N1-N3 (Skript), S07/B-24 (Verweis) | K2 | T2 OWNER2 Z.44 | KN GO | GNU-Bauweg im
+      Wurzelordner bleibt einzige Ausnahme; #88 (W7-Split-Zug) | OFFEN (nach Kampagne)
+G-102 | Bezeichnungssystem C++-Klassen (Owner 11.08.): Schema-Dokument (A <bintyp>_binary_stamp / B1 axis_<rolle> / B2
+      <ding>_verfahren_version; EN, 'planner', comdare::<modul>, Klasse = Datei, Alias-Registry vor jedem Rename);
+      S08/B-15, Bezeichnungssystem, R-2-Pilot (antwort-tafel P10), KON2-20 | K2 | T2 OWNER2 Z.44 | KN GO | Schema gilt
+      ab sofort fuer neue Namen; Bestands-Renames im W7/#88-Split mit eigenem GO (G-104 (B) = erster Fall); #88, #176
+      (Schema-Dokument) | OFFEN (Schema sofort; Renames nach Kampagne)
+G-103 | 'ComdareDB' (Habich 08.05.) = comdare-db = Expose-Systembasis 'redcomponent/comdare DB' = Nachfolge-Produkt der
+      fremden UltiHash-DB (Konzept OHNE Code), KEINE vierte Entitaet; S10/B-15, OG-36, S10/B-14, R-25, UltiHash | K2 |
+      T2 OWNER2 Z.44 | KN GO | Release-Konzept als Thesis-Text; #86/#121 | OFFEN (#121-Zug)
+G-112 | Alt-Eingriffe 06.07.: Phantom-Job-Vorfall sofort geheilt (Jobs 213696/213697), Runner-Downgrade prod1
+      19.1.1->18.9.0 zurueckgebaut (Runner 16 v19.1.1, GitLab v19.1.4), Runner-17-Pause aufgehoben; S01/B-16, Ledger-
+      Posten '[AKTUELL-infra-runner-version] prod1 Runner 18.9.0 auf hold [...] Grund-Entscheid offen' (Tafel-Anker
+      L24788 = Ledger-Zeile zum S01-Stand, heute Ledger Z.25689; kein Transkript-Anker), Phantom-Job (#23) | K2 | T2
+      OWNER2 Z.44 | KN GO | Phantom-Job-Lehre bleibt Regel, Ledger-Posten Z.25689 'Grund-Entscheid offen'
+      gegenstandslos; #176 | ERLEDIGT (Marker im docs-Zug)
+G-113 | SOSD-Akte: die 553-MB-Datei ist das zstd-Archiv der falschen Upstream-Datei (books_200M_uint32), kein
+      'headerloses' Format; S01/B-17, sosd | K2 | T2 OWNER2 Z.44 | KN GO | Akte korrigieren (source = books_800M_uint64
+      .zst + Upstream-md5 + Rezept zstd -d -> downsample d[::4], size 1600000008 B), Fetch fahren, sha256 in die Akte;
+      sosd bleibt Bestands-Extra; #45-Loader-Umfeld, #203 (angelegt 07.09. 13:14:03Z 'SOSD-Akte-Fix + Fetch') | OFFEN
+      (#203 pending; vor Kampagne, Datensatz-Bereitstellung)
+G-114 | H5 13-Framework-Registry: Registry = nur verdrahtete Frameworks (heute 1/1 ycsb), kein Phantom-Angebot; die 13
+      Literatur-Frameworks als LP01-LP14 (Lastsequenz-Unterachse #53) + Datensatz-Lader (#45) = Bau-SOLL; S02/B-02,
+      H5, 13-Framework-Registry | K2 | T2 OWNER2 Z.44 | KN GO | NIE KUERZEN; Doc-21-Buchung als Lead-Setzung markieren;
+      #53 (Lastsequenz), #45, #176 | OFFEN (#53-Design)
+G-116 | Code-Review-Quelle 12.07. = Gesamtreview 20260712-20-48-003294 (272 Repos) + transfer-001 (ce) + transfer-005
+      (measurement-all); S02/B-26, G5/#274 (Quelle), transfer-001 | K2 | T2 OWNER2 Z.44 | KN GO | G5/#274 im docs-Zug
+      auf diese drei Dokumente rueckverankern; Zeitrahmen G5 = #158-Reihenfolge (V14, VOR Abgabe per G-082); #176 |
+      OFFEN (docs-Zug)
+G-117 | perl-Umschreiber 18.07. (F-05b): offengelegte Doppel-Abweichung vom 8er-Agenten-Modell (Race-Korrektur + perl
+      statt Agenten, 117 + 69 Substitutionen, 0 stale Refs) mit sauberem Ergebnis; S03/B-25, F-05b | K2 | T2 OWNER2
+      Z.44 | KN GO | #135-Workaround-Register ('Abweichung offengelegt, Ergebnis konform, Quittung fehlte'); 8er-Regel
+      = Programmier-Regel (K280 02.08.); #135 | OFFEN (sofort; #135 pending)
+G-118 | DoD-7 (V5.2, 16.07.) = Lead-Vorschlag, als Owner-Entscheid gebucht, nie woertlich bestaetigt; durch GOAL v8
+      (fuenf Pruefungen, D-15) UEBERHOLT, Substanz (EINE XML fuer ALLE, jedes Feature XML-unterstuetzt, Serie im Schema)
+      = Owner-Doktrin E4/F6/1-XML; S03/B-28, DoD-7 | K2 | T2 OWNER2 Z.44 | KN GO | UEBERHOLT-Marker am Ledger-Posten
+      V5.2-DoD-7; #176 | OFFEN (docs-Zug)
+G-119 | Vault-Sichtungs-Vorfall 17.07.: entwerteter Alt-Wert im Kontext, kein gueltiges Secret, vom Owner 4,5/9 Minuten
+      spaeter selbst geschlossen (Handover-Order + Hauptstrang-Freigabe); S03/B-30, S03/C-08, P3 (B24 Strukturvorschlag)
+      | K2 | T2 OWNER2 Z.44 | KN GO | Posten im Secret-Vorfall-Register S03/C-08 schliessen; P3-Strukturvorschlag =
+      Infra-Kandidat im #152-Fenster; #176, #152 | OFFEN (docs-Zug)
+G-120 | GA-09-Waisen-Klasse (ce-Test-TUs ohne Target, u.a. br4_emit/br4_load); V-010, GA-09, br4_emit/br4_load | KN | T2
+      OWNER2 Z.44 | KN GO | als Tests im #96-Schnitt verdrahten (Default 'Wir ueberspringen aber nie etwas' 21.08.),
+      nichts wird entfernt, Loeschung braeuchte GO; #96 | OFFEN (SOFORT-Klasse, naechster ce-Zug; #96 pending)
+G-160 | Nenner-Vorbehalt: Rohtranskripte decken 31.05.-05.07. NICHT (~5 Wochen); '12-Wochen'-Aussagen stuetzen sich dort
+      nur auf history.jsonl, Repos, Ledger, Session-Docs (Praezedenz S08/B-22 11.08.); V-093, Transkript-Luecke | KN |
+      T2 OWNER2 Z.44 | KN GO | Vorbehalt bleibt, kein anderer Transkript-Ort genannt; #176 (Vorbehalt im Ledger-Kopf) |
+      ERLEDIGT (Vorbehalt = diese Zeile)
+G-021 | Alt-Token-Komplex: PAT-Leak 19.07. (Infra-Agent) + 3 Token-Leichen 23.07.; S03/B-02, S04/B-11, B9, F-027, #327 |
+      K1 | T2 OWNER2 Z.44 | KN GO | Zuordnung per Vollvault-Gegenprobe (F-027-Muster 01.09., eigener Agent, nicht unter
+      Null-Annahme), 403er nach Zuordnung im #152-Fenster widerrufen, 401er = Store-Bereinigung; #152 | OFFEN (KURZ-
+      Fenster; #152 in_progress)
+G-046 | Prozess-Orders 04.09.: Neustart vollzogen (Kill-Protokoll L107312), 'resume ALLE', Stop + Ergebnis-Untersuchung,
+      MAX-2-Regel (K29), Reihenfolge B (diese Vorlage) -> C (#179) -> #182 Explore-3K; bog #182(a), E-27, E-28, E-29,
+      Z-N08, Z-N09, EXPL-G-15, EXPL-G-16, L107312 | K1 | T2 OWNER2 Z.44 | KN GO | Reihenfolge lief wie gesetzt; MAX-2
+      seit 07.09. durch das G-032-Regime ersetzt; #176 (KON137-03 Nachtrag (v)), #182 | ERLEDIGT (Orders vollzogen;
+      Vermerk #176)
+G-106 | Pi-5-Sync-Order 18.07. ('Bitte sync diesen Fehler auf Pi 5 und node1') + Dual-Remote-Regel: node1 vollzogen,
+      Pi-5-Haelfte (node7, key-only) offen; S03/B-20, Owner-Wort 18.07. 23:05:56 (Tafel-Anker 'L56936' = fb-4-Zeile,
+      NICHT Transkript 5a19728e: dort ist L56936 eine Assistenten-Zeile 15.08. 09:21:45Z; Original-Zeile 18.07. in
+      5a19728e nicht gehoben, grep 'ausser bei Cluster git' (+ Eszett-Schreibung) = nur Wiedergaben ab L107721 04.09. =
+      KANDIDAT Lead), bog #180(c), F-029, B29 F-11 | K1 | T2 OWNER2 Z.44 | KN GO | Infra-Traeger 'O-27 Pi-5-Sync'
+      anlegen (#180, naechstes ruhiges Infra-Fenster); Anlage-GOs je Repo ueber die G-105-Tafel; #180, #189
+      (Handout-Abschnitt Pi-5-Sync); NEU-Traeger 'O-27 Pi-5-Sync' unter #1..#218 NICHT angelegt (Stand 14:29Z, erneut
+      14:46:49Z) | OFFEN (Infra-Fenster)
+G-115 | H3 Regime-Schluessel: Schluessel der Workload-Groessen-Map = Cache-Regime-Werte (maschinenrelativ; Owner 10.07.
+      B13), absolute N abgeleitet; S02/B-03, H3, Regime-Schluessel | K1 | T2 OWNER2 Z.44 | KN GO | nur das Etikett 'wie
+      empfohlen' wird im docs-Zug als Owner-Wahl gegen die Session-Empfehlung markiert; #176 | OFFEN (docs-Zug)
+G-163 | KIPP-RATIFIKATION 8/8: die acht durch A2.5-FIX nach WANDERT_NACH_A gekippten Rest-Fragen (S04/B-03, S03/B-10,
+      S04/B-12, S04/B-19, S06/B-09, S06/B-17, S08/B-19, S10/B-19) + 4 Kipp-IDs bei G-150/G-084/G-130/G-070; KIPP-
+      RATIFIKATION 8/8 (Fix L2-M1) | K1 | T2 OWNER2 Z.44 | KN GO | ratifiziert durch Owner-GO (Ratifikation genuegt,
+      keine Frage); S04/B-03 Self-Leak-Token B40 27.07. -> Rotations-Vormerkliste/#152-Fenster (A4 14.08. + F-027
+      01.09.); #176 (diese Zeile = Ratifikationszeile), #152 | ERLEDIGT (Ratifikation; #152-Vormerk offen)
+
+**KON138-05 (ANHANG = 7 POSTEN DES LEAD-ANHANGS ZUR TRANCHE 2; Fragen im Lead-Chat L113950 2026-09-07T07:49:47.260Z;
+Owner OWNER2 Z.46-52 verbatim; die G-Nummern G-006/G-074/G-073/G-019/G-007 behalten ihre EINE Zeile in KON138-01, hier
+steht nur die Tranche-2-Antwort; K-1/K-3 = Lead-Kuerzel ohne G-Nummer; Verbuchung VERB2 Z.734-836):**
+A1 K-1 REIHENFOLGE LEDGER-ZUG #176 (Wort A Owner 2026-09-02T06:34:06.673Z L103848 "nachdem du mir offene Rueckfragen und
+   Entscheidungen hier vorgelegt hast" gegen Wort B Owner 2026-09-06T19:50:45.085Z L112228 "Ledger Aktualisierung als
+   Hauptziel"; Frage: 19 antwort-unabhaengige Bloecke + 17 Kleinposten SOFORT einspielen, nur KON138 wartet (GO) oder
+   #176 als Ganzes warten). Owner Z.46: "GO, sofort einspielen wie von dir empfohlen." -> (GO) = Lesart A: Wort A ist
+   durch die Vorlage erfuellt, #176 faehrt SOFORT in der S3-Reihenfolge (KON136-04..08 -> KON137-01/02 -> 03 mit
+   Nachtrag (v) -> 04..09 -> KON137-10 Reihenfolge-Order + Dauerregel MUSS -> V-059-Familie -> KON138 zuletzt), diese
+   Tafel = KON138-Eingang; Trockenlauf des Einfuegeskripts auf Kopie + Gegenlesung gegen den Capstone-Entwurf; danach
+   #197 LEDGER-DICHT. TRAEGER #176, #197. VOLLZUG: LAEUFT (#176 in_progress, #197 in_progress).
+A2 K-3 FABLE-MAX-ORDER 12.08. 'bis ich das widerrufe' + MAX-2 04.09. (= G-032 Modell-Wort; Lead-Anhang: MAX-2 als
+   aufgehoben verbucht, Fable-only nur Widerruf-Kandidat). Owner Z.47: "Ich habe sie widerrufen, wie oben beschrieben."
+   -> widerrufen; Regime = G-032-Wortlaut Z.20 (max 6 Workflows parallel, max 2 Fable-5-max je Workflow, andere Agenten
+   ohne Parallelitaets-Beschraenkung, Umfang frei 'sofern sinnvoll'; Zeile G-032 in KON138-02, Regime-Detail
+   KON138-08); Lead-Vorbehalt 'Fable-only nur Kandidat' entfaellt. TRAEGER #178-Nachzug, #176, #177. VOLLZUG:
+   TEILWEISE (Memory-Markierung 07.09.; Doktrin-Zeile + Skript-Cap offen).
+A3 G-006 LOESCH-GO-BUENDEL V-049 (Tranche-1-Rest; Lead-Anhang: L1 fremde /tmp-Artefakte 10.08. ~434 M, vermutlich Owner-
+   Arbeitsprodukte = NEIN bis gesichtet | L7 302 .gitiso-Verzeichnisse prod1 = JA im Neustart-Fenster nach Verifikation
+   je Verzeichnis | (6) lokale Thesis-Alt-Refs + stale Store-Branches + alt-vor-rewrite-Ref = SPAETER nach Rewrite 2 mit
+   Bundle-Nachweis; Schablone L1 ja|nein ; L7 ja|nein ; (6) GO|NEIN|spaeter). Owner Z.48: "Fremde tmp Artefakte
+   duerfen NIE geloescht werden L1 -> nein. Ich habe keine Zeit sie zu sichten, also bleiben sie. L7 freigegeben. (6)
+   wie empfohlen spaeter, aber dann GO." -> L1 NEIN als DAUERREGEL (woertlich 'Fremde tmp Artefakte duerfen NIE
+   geloescht werden'; keine Sichtungs-Bedingung mehr, sie bleiben; L1-Pfade aus jeder Loesch-Tafel streichen; Regel ins
+   Memory Fallen-/Loesch-Register + ARBEITSWEISE-X); L7 JA = Infra-/Root-Handgriff im Neustart-Fenster prod1 nach Node-
+   Start (#189 Abschnitt Neustart): je .gitiso-Verzeichnis verifizieren (kein laufender Job, Alter, Inhalt), Protokoll
+   je Zeile, Nachmessung /home/gitlab-runner/builds; (6) SPAETER = nach Thesis-Rewrite 2 (#188) Bundle + SHA256 je Ref
+   (main-alt 95db7793, b-thesis-o4-nachzug, backup/pre-rescrub, w2-E02-Ledger, alt-vor-rewrite-main-20260803 993d28f,
+   stale Store-Branches #156) -> Loeschung mit Protokoll, dann GO ohne erneute Frage; KON-Beleg 'GO (6) 07.09.' = dieser
+   Absatz; Loesch-Mengen vor Vollzug frisch messen (G-055); Tranche-1-Rest damit geschlossen (L2-L6/L8-L10 ok
+   aus Tranche 1; (8) X-11/X-1 JA aus Tranche 1 'Alle wie emfohlen' nach Pruefung). TRAEGER #189 (Neustart + L7), #188
+   (Rewrite 2 -> (6)), #178-Nachzug (Dauerregel), #176, #154(d) (L7-Objekt). VOLLZUG: L1 sofort (Regel) / L7 Neustart-
+   Fenster (vor Trigger-Vorlauf) / (6) nach Rewrite 2 -> OFFEN (#189 in_progress, #188 pending).
+A4 G-074 POSTEN (4) (Tranche-1-Rest; die beiden unbenannten 'Dann weiter'-GOs Z36292/Z42737; Schablone Z36292
+   <Gegenstand|streichen> ; Z42737 <Gegenstand|streichen>; Lead-Empfehlung in TR2/Tafel: streichen, falls nicht
+   praesent, dann Lead-Nachforschung am Anker). Owner Z.49: "Beide bleiben Gegenstand." -> NICHT streichen; der Owner
+   nennt den Gegenstand NICHT selbst -> Lead-Explore am Transkript-Anker (Kontext beider 'Dann weiter'-Stellen:
+   Vorlage/Frage unmittelbar davor, Antwort-Objekt), Gegenstand benennen, Traeger zuordnen oder als Regression 'GO ohne
+   Gegenstand' fuehren; Ergebnis als Nachtrag zur Zeile G-074 mit beiden Ankern; KANDIDAT Nr. 3 nur, falls der Explore
+   keinen eindeutigen Gegenstand hebt. TRAEGER #214 (angelegt 07.09. 13:16:16Z 'Explore G-074 Posten (4)'), #194, #176,
+   #167 (Lead-Nachlese). VOLLZUG: OFFEN (#214 pending; Explore sofort; Buchung im #176-Zug).
+A5 G-073 G06 (Tranche-1-Rest; F-16 Thesis-Trias + Owner-Bringschuld G06 = die 3 von 90 Overleaf-Restkommentare;
+   Schablone G06 geliefert | keine weiteren). Owner Z.50: "Ich habe keine weiteren gemacht und diese restlichen
+   Kommentare sind wichtig und muessen noch eingepflegt werden. Daher habe ich G06 geliefert, aber du musst
+   nacharbeiten, wie auf git derzeit einsehbar in Thesis." -> G06 GELIEFERT (keine weiteren Kommentare kommen); die
+   vorhandenen Rest-Kommentare 'sind wichtig und muessen noch eingepflegt werden' = Lead-Nacharbeit; Quelle = Thesis-
+   Repo auf git (Stand cbefa617 bzw. juengster Owner-Push): git log/diff beider Remotes, Owner-Commits nach 246eff9 ->
+   alle offenen Owner-Kommentare (KOMMENTAR-EXTRAKT.md 61 Ereignisse / 44 Anmerkungen + Rest) in den #121-Feinschluss
+   (META-REGEL cf17d1d/08cb848: Kommentar -> Code fuehrt); #121-Gate 'wartet auf 3/90' ausbuchen (#177); #130-Text um
+   Nr. 1-3 mit Fenster (nach Trigger per T-Entscheid) nachtragen; (3) Deep-Research-Evaluation im #121-Zug (Tranche-1-
+   Entscheid). TRAEGER #121 (Grosszug + Feinschluss), #130, #177, #188 (Rewrite 2 = Vorbedingung Thesis-Push). VOLLZUG:
+   OFFEN (Kommentar-Nachlese sofort startbar; #121 pending; vor Abgabe 15.09.).
+A6 G-019 CODEX LOGIN (Tranche-1-Rest; auth.json fehlt seit ~30.08.; Schablone erledigt | Callback-URL im Chat). Owner
+   Z.51: "Reconnect zu Codex abgeschlossen, verwende stets Codex 5.6 astra auf Ultra. Erledigt." -> erledigt (Owner-
+   Handgriff vollzogen; Transkript L114343 '/mcp' + L114344 stdout 'Reconnected to codex.', beide
+   2026-09-07T12:00:51.817Z); Owner-Praezisierung 'verwende stets Codex 5.6 astra auf Ultra' = Modell-/Tier-Vorgabe fuer
+   die Codex-Lens (A1 CODE-REVIEW: Opus-max Erhebung + Fable-max Bewertung + Codex-Lens); Lead-Probe 'codex login
+   status' (Verbucher-Probe 07.09. ~12:3xZ: /home/comdare/.codex/auth.json existiert NICHT, der Reconnect lief ueber den
+   MCP-Kanal -> per Status-Kommando pruefen, nie Dateiinhalt ausgeben); Codex-Pin in Memory (CODEX-KLEIN-Rezept) + neue
+   Workflow-Lens-Aufrufe (nur NEUE Scripte, K27); Ersatz-Lens-Deklaration entfaellt. TRAEGER #178-Nachzug, Code-Review-
+   Zuege (#140 X3, #164, #169), #176. VOLLZUG: ERLEDIGT (Handgriff) / OFFEN (Probe + Memory-Pin, sofort).
+A7 G-007 QUITTUNG (Tranche-1-Rest; Nachtrag L113578 07:25:24Z verbucht, G-008 haengt am Vollzug: erst HEAVY_J 8 im Code
+   + Swap auf prod2, dann Re-Run-3). Owner Z.52: "Korrekt, Freigabe, volles GO." -> Quittung + Freigabe: (A) HEAVY_J
+   intel 8 (kOwnerHeavyJIntel 24 -> 8 mit Pin-Test + K17, runner-mode HEAVY_J intel = 8), (B) 16 GB Swap prod2 (Infra-
+   Handout H6, root-Handgriff), (C) earlyoom bleibt als fail-loud-Waechter (H6 + Runner-Log-Marker), (D) keine
+   serielle intel-Lane; Reihenfolge A+C sofort, B im Neustart-/Wartungsfenster prod2, Kopplung G-008 bestaetigt; dann
+   ##47-Re-Run-3 -> S-19 intel kalibrieren -> ##48-Tafel -> ##49 (G-008/G-011). TRAEGER #191, #189 (H6), #160-S11/#173
+   L-6, #7 (S-19). VOLLZUG: TEILWEISE (#191 in_progress, #189 in_progress; B im Wartungsfenster).
+
+**KON138-06 (LIZENZ- UND VERTRAGSZUG #179 = PUNKTE 1-8; Fragen aus backups-workflow/20260907-thesis-license-rechte/
+OFFENE-FRAGEN-OWNER.md (82 Z., 14 Punkte, md5 4b3a08c6; im Lead-Chat L113950 standen nur 1-8; vom Bau-Agenten #179 am
+07.09. auf 78 Z. aktualisiert); Owner OWNER2 Z.54 verbatim in EINEM Absatz; KERN: E1 26.08. 'Thesis = Apache-2.0 + (C)
+Probst' ist UEBERHOLT; Verbuchung VERB2 Z.837-917):** Owner Z.54 (verbatim, vollstaendig): "Lizenz- und Vertragszug
+#179: Apache wurde ueberholt und gilt nur noch fuer super direkt, Thesis laeuft unter Copyright und super und ce und
+prt-art sind grundsaetzlich ALLE fuer die Forschung frei, auch wenn super sowieso Apache 2.0 bleibt. Punkte 1 bis 3 alle
+korrekt wie empfohlen. Der Hauptvertreter der BEP Venture UG fuer Punkt 4 ist Benjamin-Elias Probst, du kannst unter
+backup1 unter "backup1.comdare.de\Cloud\Dokumente\Firmensachen\BEP_Venture_UG" im Ordner Steuer die Kerndaten der BEP
+Venture UG auslesen und im Hauptordner findest du auch die PDF fuer die Gruendung und Handelsregister Daten, die Herr
+Benjamin-Elias Probst als alleiniger Gesesellschafter und Geschaeftsfuehrer fuehrt. Da die Diplomarbeit an der TU
+Dresden geschrieben wird, muss sie in diesem Rahmen als Copyright laufen, aber der Rest ist an die Firma uebertragbar.
+Punkt 5: Lege nach dem Datumsschema gerne einen neuen Ordner in der BEP Venture UG an und lege mir dort die PDF vor, ich
+unterschreibe dann digital, daher sonst genau wie du es empfohlen hast. Punkt 6: Einschliesslich kuenftiger Fassungen.
+Punkt 7: Bitte in einen neuen nach Schema datierten Ordner in die BEP Venture UG. Punkt 8: Bitte wechsel auf CC-BY. Alle
+4 Projekte der Diplomarbeit haben eigene Sicherheitsstufen und Lizenzen, bitte lies nach was wir definiert hatten."
+KERN-ENTSCHEID: Thesis = Copyright Benjamin-Elias Probst + CC-BY (Punkt 8), NICHT mehr Apache-2.0 (E1 26.08. UEBERHOLT);
+super bleibt Apache-2.0 (BEP Venture UG); ce/prt-art = LicenseRef-Comdare-Research-1.0 (Lead-Kuerzel CRL) mit
+Forschungsfreigabe; alle vier Projekte forschungsfrei; TU-Rahmen: Thesis als Copyright, 'der Rest ist an die Firma
+uebertragbar' (= G-030 Vertrag Person -> BEP Venture UG). PUNKT 1 NAMENSFORM (Copyright-Vermerk "Benjamin-Elias Probst"
+wie gebaut): Owner 'Punkte 1 bis 3 alle korrekt wie empfohlen' -> voller Name, 4 Repos konsistent, keine Aenderung
+(NOTICE/REUSE/Vertrag); TRAEGER #179; sofort. PUNKT 2 NUTZUNGSRECHT (ausschliesslich mit Rueckbehalten:
+Urheberpersoenlichkeitsrecht, TU-Pruefungsrecht, eigenes einfaches Nutzungsrecht, Lizenz-Belastung des Thesis-Repos |
+einfach mit Unterlizenzierung): -> ausschliesslich mit Rueckbehalten; Vertrag par. 2 Rueckbehalt 'Apache-2.0-Belastung
+des Thesis-Repos' auf 'CC-BY-4.0-Belastung' harmonisieren (Folge aus Punkt 8, Lead-Konsistenz, kein neues Owner-Wort);
+TU-Rahmen-Satz als Praeambel-Zeile; TRAEGER #179; sofort (vor Signatur). PUNKT 3 VERGUETUNG (A unentgeltlich als
+Gesellschafterbeitrag / B Einmalbetrag / C Erloesbeteiligung): -> A unentgeltlich + Pruefvermerke P-5/P-6 (UrhG par.
+32/32a + Steuer); keine Aenderung; TRAEGER #179; sofort. PUNKT 4 VERTRETER + REGISTERDATEN (wer unterschreibt fuer die
+UG, Sitz, Amtsgericht, HRB, par. 181 BGB): -> Vertreter = Benjamin-Elias Probst (alleiniger Gesellschafter +
+Geschaeftsfuehrer); Registerdaten aus NAS backup1 Cloud/Dokumente/Firmensachen/BEP_Venture_UG (Ordner Steuer =
+Kerndaten; Hauptordner = Gruendungs-PDF + Handelsregister) blind auslesen -- nur Amtsgericht/HRB/Sitz in den Vertrag,
+keine Steuer-/Personendaten in Repos; par.-181-BGB-Befreiung in der Satzung pruefen (P-1); STAND Bau-Agent #179 (OFFENE-
+FRAGEN-OWNER.md 07.09.): NAS-Cloud-Share technisch NICHT zugaenglich (smbclient fehlt, Gast-Login abgelehnt, NFS-Mount
+braucht root, Samba-Credential nur im Voll-Vault) -> Wege: Owner traegt ein / Infra-Agent mit NAS-Schreibrecht (blind) /
+SMB-Credential als 0600-Datei = Infra-Handout; TRAEGER #179, #189 (Handout 'NAS-Firmenordner-Zugriff blind'); sofort
+(vor Signatur), nicht trigger-relevant. PUNKT 5 SIGNATURFORM (gebaut Schriftform + QES par. 126a BGB; Lead-Empfehlung im
+Chat abweichend: Textform par. 126b BGB, damit eine einfache PDF-Signatur genuegt): Owner 'Punkt 5: Lege nach dem
+Datumsschema gerne einen neuen Ordner in der BEP Venture UG an und lege mir dort die PDF vor, ich unterschreibe dann
+digital, daher sonst genau wie du es empfohlen hast.' -> digitale Unterschrift des Owners auf der im datierten NAS-
+Ordner (BEP_Venture_UG/<Datumsschema>-...) vorgelegten PDF; (LESART) 'genau wie du es empfohlen hast' = Adressat Lead
+(Chat-Autor) -> Textform par. 126b BGB; der Bau-Agent #179 buchte 'Schriftform/QES wie empfohlen' = abweichende Lesart
+-> Lead harmonisiert auf Textform; KANDIDAT Nr. 4 nur bei Lead-Zweifel; Vertrag par. 7 Abs. 1 auf Textform,
+Signaturfassung in den neuen datierten NAS-Ordner (NAS-Zugriff Infra/ Owner, s. Punkt 4), Ort/Datum Platzhalter bis
+Unterzeichnung; TRAEGER #179, #189; sofort. PUNKT 6 VERTRAGSGEGENSTAND (nur Staende in Anlage 1 oder auch kuenftige
+Fassungen): Owner 'Punkt 6: Einschliesslich kuenftiger Fassungen.' -> Formel par. 1 Abs. 1 bleibt ('sowie in allen
+kuenftigen Fassungen, soweit vom Urheber geschaffen'); TRAEGER #179; sofort. PUNKT 7 ABLAGE DES SIGNIERTEN PDFS
+(Default: unsignierte Fassung ohne Anschriften public super docs/recht/, signierte Fassung mit Anschriften NICHT
+public): Owner 'Punkt 7: Bitte in einen neuen nach Schema datierten Ordner in die BEP Venture UG.' -> signierte Fassung
+in einen NEUEN nach Schema datierten Ordner unter BEP_Venture_UG (NAS backup1), nicht public; Default fuer die
+oeffentliche Fassung (ohne Anschriften/Geburtsdatum, super docs/recht/, E2-public-faehig) unwidersprochen; Geburtsdatum
+(aus diplomarbeit.tex Z.94) NUR in der Signaturfassung; NAS-Ordner-Anlage + Ablage = Infra-/Owner-Handgriff (NAS-Stopp);
+TRAEGER #179, #189, #149 (public-Sequenz); sofort (Ablage), public mit E2-Schritt. PUNKT 8 APACHE-2.0 FUER TEXTWERK
+(zulaessig aber unueblich, CC-BY ueblicher; per E1 26.08. Apache-2.0): Owner 'Punkt 8: Bitte wechsel auf CC-BY.' ->
+Thesis-Repo -> CC-BY, E1 26.08. UEBERHOLT, Copyright-Vermerk Benjamin-Elias Probst bleibt; (LESART) Version 4.0 (Owner
+nennt 'CC-BY' ohne Versionsnummer; 4.0 = aktuelle Fassung, Schwester-Repos tragen LICENSES/CC-BY-4.0.txt); Vollzug:
+LICENSE/NOTICE/REUSE.toml/LICENSES/CC-BY-4.0.txt im Thesis-Repo + Absatz 'Lizenzen und Copyright' in diplomarbeit.tex
+(DE Z.241/EN Z.267: 'Copyright Benjamin-Elias Probst, lizenziert unter CC BY 4.0'; vom Bau-Agenten bereits umgesetzt,
+Stand OFFENE-FRAGEN-OWNER.md 07.09.), thesis .gitleaks.toml bleibt, super REUSE.toml Thesis-Submodul-Zeile nachziehen
+(G-028), TRAILER-FREI, Gitlink-Bump beider Zeiger atomar, Push thesis dev/main + super; TRAEGER #179, #143, #121 (Text);
+sofort. OWNER-NACHSATZ (verbatim): "Alle 4 Projekte der Diplomarbeit haben eigene Sicherheitsstufen und Lizenzen, bitte
+lies nach was wir definiert hatten." -> Explore-PFLICHT VOR dem #179-Push: die definierten Sicherheitsstufen + Lizenzen
+je Projekt (super / ce / prt-art / thesis) aus Ledger, DICHT-Referenzen und Lizenz-Sessions 25.-27.08. (Lizenzpunkte
+1-5, F4-Revision 27.08., X1 25.08., A5 25.08.) heben und gegen den #179-Bau halten. REST-OFFEN aus OFFENE-FRAGEN-
+OWNER.md (nicht im Chat vorgelegt, keine Owner-Antwort, Stand 07.09.): Registerdaten (NAS-Stopp), Geburtsdatum-
+Verifikation, Ort/Datum, NAS-Ordner-Anlage, par. 181 BGB/35 GmbHG, CC-BY-4.0 SPDX-Form, Thesis-Text-Absatz-Weite (#121),
+super-LICENSE-Abweichung par. 4(d)/9 (Lead-Posten naechster super-Zug), P30-Hazard-Pointers ce-Audit-Zeile =
+Lead-/Infra-Vollzug mit Defaults, Owner-Wort nur bei Widerspruch, Nachtrag in Tranche 3 (#195) als Kenntnisnahme.
+VOLLZUG: #179 in_progress (zurueckgehalten, bis G-030-Zuschnitt + Punkte 1-8 eingearbeitet sind), #143 pending, #189
+in_progress (NAS-Handout).
+
+**KON138-07 (TEIL A/C = 66 ZEILEN 'VORGELEGT-OFFEN (Tranche 3, #195)'; IDs aus TR2 Abschn. V Z.339 (67 Nummern inkl.
+Faltungszeiger G-152, s. Kopf): in der A2.3a-Vollfassung (Versand 04./06.09., 3332 Z.) und in der Gegenstands-Tafel
+enthalten, NICHT in der Chat-Pflichtmenge der Tranche 2 (TR2 Z.3: 79 = 71 Teil-D-Nummern + 8 Bringschulden), daher
+bis 07.09. 12:12:56Z ohne Owner-Antwort; Antwort-Default 'KN gesehen' erst nach Tranche-3-Posting + Nicht-Widerspruch
+(Owner-Formel 'Widerspruch genuegt', Versand-Kopf; STRANG 5.3); Alias/Klasse/Gegenstand aus der Tafel (Anker = Tafel-
+Zeile); ANTWORT-Spalte = '--' (keine); Reihenfolge = TR2 Abschn. V; Board #195 pending):**
+G-010 | Owner F1 27.08.: Lager-Batch max 4096 fest + T-12c Arena 6 GB fest; O-4, W-6, B-05, RT-12, Z-16, Z-25, R-04,
+      R-11, DP-02, T26-7, bog #180(a); Tafel Z.365 | K1 | T3 (#195); keine Antwort in T1/T2 | -- | Quittung; #180(a),
+      #195 | VORGELEGT-OFFEN
+G-018 | Vendor-O3 / OS-1: global O2, O3 nur auf XML-Wunsch; R1-Trigger {O2,O3} x {no_extension,avx2}; VO3-1(b) gelandet;
+      bog #136(b), DP-10, X4, OS-1, R1, VO3-1, W-B3; Tafel Z.498 | K1 | T3 (#195) | -- | Quittung (mit G-014 O0..O3
+      als Kunden-Wahl per XML); #136(b), #195 | VORGELEGT-OFFEN
+G-023 | Rotations-Turnus 290 aktiv (V4-GO 16.08.), aber defekt (GNU date -d fehlt); Lead-Fix vor 01.10., kein manueller
+      Scharf-Lauf; (S12/B-06 Teil b -> G-022), #166, bog #166(a)/#136(5), E-35, N-43; Tafel Z.619 | KN | T3 (#195) | --
+      | Lead-Fix; #166 (pending), #195 | VORGELEGT-OFFEN
+G-027 | Thesis-Repo 289 seit 01.09. 13:30Z public OHNE Lizenzdatei: E1 Apache-2.0 + (C) Probst + REUSE + N-57 +
+      .gitleaks.toml landet der Lead (#179); RETT-RT56, Z-19, V-081, V-082, #179, bog #179(a), bog #143(a), RETT-P05,
+      B-8 (e10k); Tafel Z.684 | KN (dringlich JA) | T3 (#195) | -- (Inhalt durch KON138-06 Punkt 8 UEBERHOLT: CC-BY +
+      Copyright statt Apache-2.0) | #179 (in_progress), #143, #195 | VORGELEGT-OFFEN (Objekt: #179 laeuft)
+G-029 | N-58: ce-Konfigurations-XML bleiben unter der Research-Lizenz (Revision F4 27.08.), super-XML Apache-2.0;
+      Alternativen-Erklaerung (CC0/CC-BY/Apache/CRL) beigelegt; O-23, V-090(g), Z-26, RETT-T3-L95671-F4, V-086, bog
+      #143(b), K069-VK-05, N-58, G-10 (e10k); Tafel Z.713 | K1 | T3 (#195) | -- | Quittung; #143(b), #195 |
+      VORGELEGT-OFFEN
+G-035 | OS-2-Gate: Erklaerung (27.08. L95780) + W-9-Reichweite Allokatoren am Objekt aufgeloest; Einzug #148 + Bootstrap
+      #130 NACH Trigger (RF-7); lb (1), Z-17, RETT-RT35, DP-04, R-12, W-9 (GOAL D-13), bog #130(b), bog #148(a), OS-2,
+      G-2; Tafel Z.854 | LEAD | T3 (#195) | -- | Kenntnisnahme; #148, #130, #195 | VORGELEGT-OFFEN
+G-036 | Dauerregel SOLL=PFLICHT (Owner 01.09. L102011) -> SOLL-Inventar #165 = Lead-Pflichtpaket; Ledger-Verbatim folgt
+      #176; bog #165(a), E-05, R08, F-005, V-108; Tafel Z.879 | K1 | T3 (#195) | -- | Quittung; #165 (pending), #176
+      (KON136-07 (g)/(h)), #195 | VORGELEGT-OFFEN
+G-038 | Dauerregel NIE ausbuchen / NIE KUERZEN (18.08., C-2 17.08., 28.08.): Feinplatzierung vertagter Features = Lead
+      (#96/#180), W7 = kein Endlager; bog #96(a), DP-09, KON133-21, K678, K720; Tafel Z.906 | K1 | T3 (#195) | -- |
+      Quittung; #96, #180, #195 | VORGELEGT-OFFEN
+G-042 | Kipp-Ritual-Formel: 4 DICHT-Referenzen + Memories 3 Tage + letzte Uebergabe(n) (Owner L104808 02.09. 07:06:36Z,
+      Queue); Vollfassungs-Tabu 22.08. gilt fort; Memory-Kurzformel nachgezogen (#178); W-3 (WIDERSPRICHT), Z-09,
+      EXPL-K078-O4, E-25, S12/A-21, F-006, R58, R59, L104808; Tafel Z.957 | K1 | T3 (#195) | -- | Quittung; #178
+      (completed 06.09. 15:06Z), #195 | VORGELEGT-OFFEN
+G-044 | Unverbuchte Owner-Worte 20.08.-01.09. (21 [B]-Verbatims, K051/K060/K062 + 9 'nirgends'-Worte) -> KON137-04-Block
+      im docs-Zug #176; V-059, E-14, E-15, E-16, R19..R33; Tafel Z.988 | KN | T3 (#195) | -- | Kenntnisnahme; #176
+      (KON137-04, Assembler A), #195 | VORGELEGT-OFFEN (Objekt: #176 laeuft)
+G-045 | Riss-Register 20.08.-04.09. (12 Risse) + Prozess-Orders 29.08.-02.09. = alle vollzogen, K27-sauber; Owner-Zensus
+      '55 Agenten' = 92/75/17; E-04, E-13, E-03, E-17, E-24, E-30, E-31, E-32, Z-05, Z-06, Z-13; Tafel Z.1008 | KN | T3
+      (#195) | -- | Kenntnisnahme; #176 (KON137-03), #195 | VORGELEGT-OFFEN
+G-047 | Grossorder 01.09. Q1-Q5 beantwortet (GESAMTBILD #168); Konsolidierung KON136-01 vollzogen; 'warum gibt es kein
+      Konsolidat-B?' beantwortet (B-Slot = FRAGEN-B.md); E-01, E-02, E-10, Z-27, RETT-T3-L102088, R05, R06, R15, F-037,
+      KON134-05; Tafel Z.1050 | LEAD | T3 (#195) | -- | Kenntnisnahme; #168 (completed), #195 | VORGELEGT-OFFEN
+G-048 | ext-Stores-Praemisse 'ungelandete sehr teure Module' widerlegt (3181 getrackte ce-Dateien, 25 ext/-Commits
+      Ancestor); Worktree-Grossraeumung 01.09. nachgeprueft + owner-quittiert (38/38 Refs 0 ungelandete Commits);
+      E-08, E-09, Z-11, EXPL-K079-P07, R11..R14, KON137-01, KON137-02, F-036, L103549; Tafel Z.1065 | LEAD | T3 (#195)
+      | -- | Kenntnisnahme; #176 (KON137-01/02), #195 | VORGELEGT-OFFEN
+G-049 | 14 lokale super-docs-Commits ungepusht (Uebergaben, Register, Nachtraege): Push als EIN Fenster mit V3-Gates im
+      naechsten Lead-Zug, spaetestens mit der #179-Landung; E-38, Z-N13, EXPL-C-7, G-4 (nl); Tafel Z.1081 | KN | T3
+      (#195) | -- | Kenntnisnahme; Push-Fenster #176/#179, #195 | VORGELEGT-OFFEN
+G-050 | NAS-Sicherung der Workflow-Rohdaten (Owner 04.09. ~20:3xZ) + CR-10 W2-Vollaudit-Backup (Dauerregel 21.08. je
+      Welle) = Lead-Zug #181/#183; bog #181(a), E-37, R68, #181, #183; Tafel Z.1092 | K1 | T3 (#195) | -- | Quittung;
+      #183 (completed 06.09. 10:35Z), #181 (pending), #195 | VORGELEGT-OFFEN
+G-060 | Nachgereichte Antworten auf die Owner-Fragen 20.08. 07:24Z 'was fliegt raus?' / 'Ist der schon gelandet?' +
+      Quittung des Reihenfolge-Fehlers (F-038 'erst pruefen, dann machen'); V-111, lb (3), B-1 (v090), F-038, K048-V-3,
+      L73360 07:24:34Z, L73361 07:24:40Z, L73362 07:24:52Z (20.08., Queue); Tafel Z.1224 | LEAD | T3 (#195) | -- |
+      Kenntnisnahme; #176, #195 | VORGELEGT-OFFEN
+G-061 | F2-Fenster 20./21.08. -- nie zugestellt: alle 35 Bloecke (20 V + 3 Z + 12 D) namentlich mit Status (18
+      beantwortet / 5 gegenstandslos / 10 teil / 2 offen -> je Kenntnisnahme mit Optionen); V-115, B-2 (v090), V-119;
+      Tafel Z.1240 | LEAD | T3 (#195) | -- | Kenntnisnahme; #195 (V-115 F2-Fenster ausdruecklich im #195-Text), #176 |
+      VORGELEGT-OFFEN
+G-062 | D-10 'wie konnten wir das vergessen?' (21.08.): OV-16/OV-17 waren seit 09.08. GEBAUT, vergessen war nur die
+      Ledger-BUCHUNG (par.25.2); D-10, lb (2), B-17 (Bruchstellen), S12/C-24, OV-16, OV-17, L80820 (21.08. 20:54:20Z);
+      Tafel Z.1259 | LEAD | T3 (#195) | -- | Kenntnisnahme; #176, #195 | VORGELEGT-OFFEN
+G-065 | RF-1..RF-9 (26.08. ~19:0xZ) + Entschieden-Kurzliste 25./26.08. + Testseiten-Tranche + Aufgabenblatt RF-8a +
+      RF-8b Thesis-GO: verbucht und getragen, keine wird erneut gestellt; lb (6), W-9.3, W-9.4, G-5 (W-9.2), GD-01,
+      GD-07, DP-01, DP-11, bog #121(b), RF-1..RF-9; Tafel Z.1308 | K1 | T3 (#195) | -- | Quittung; #144 (completed),
+      #195 | VORGELEGT-OFFEN
+G-066 | T Split-Landung: Reihenfolge ##49 -> Funktionsnachweis -> W7/#88-Monolith-Split -> Rest-Wellen (RF-1 26.08. +
+      Owner 28.08. 'Ich bleibe bei letzterem'; #158); C-4 (W-9.1), G-7 (W-9.2), W12-01, GD-03, R-03, S-131, W-02 (GOAL
+      D-13), #158, T, KON133-22; Tafel Z.1327 | K1 | T3 (#195) | -- | Quittung; #158 (completed), #195 |
+      VORGELEGT-OFFEN
+G-068 | Stale Board-/DICHT-Marker + Doku-Nachzuege (#40/#49/#71/#84/#149/#3-Texte, KON133-20 /goal-Datum, W-9.2 P1/
+      RN-05, F.6-Zeilen, 22-vs-26-Achsen-SOLL-Doku, KON137 frei, Limitierungszeile Nr. 211 (Tafel-Alias, kein Board),
+      Dauer-Posten-Tafel je Uebergabe); bog #177(b), Z-N11, EXPL-C-2, V-073, Z-10, W12-11, W12-15, W12-16, DP-05, DP-07;
+      Tafel Z.1347 | KN | T3 (#195) | -- | Kenntnisnahme; #176, #177, #195 | VORGELEGT-OFFEN
+G-069 | S-12 CI-Geruest / Dual-Compiler: kein Owner-Entscheid offen (WF1-F6/F7 waren Bau-Forks); .test-clang in ci-
+      templates 269 = Ent-Duplizierung mit #3; F-G clang-debug entlastet; bog #3(a), F2 Z-03, OG-33, D-7 (OG), F-G;
+      Tafel Z.1366 | KN | T3 (#195) | -- | Kenntnisnahme; #3 (pending), #195 | VORGELEGT-OFFEN
+G-084 | R5 ma-hy 4. Mess-Ebene = Owner-Wort (09.08. + D-01 21.08.), am Objekt ABI-fest; Wert-3-Vergabe + Kanalwerk-
+      Erweiterung = Lead (RN-68); HY-Ebene4a-Testbau = Lead; O-17, F-05, R5, V-090(m), D-01, OG-50, S12/B-07 (Kipp-ID
+      G-163), N-17, G-6 (W-9.2), RN-68, HY-Ebene4a, K054-A-30, E-8; Tafel Z.1739 | K1 | T3 (#195) | -- | Quittung; Bau-
+      Traeger RN-68/HY-Ebene4a KANDIDAT (#53-Umfeld), #195 | VORGELEGT-OFFEN
+G-085 | AxisKind-Enum-Ordnung: Owner 17.08. 'definitiv mit drehen' gebaut + gelandet (V-01R 94095eda, Ordnung
+      MESS,SYSTEM,ORGAN); Plan-Marker W-9.2 P1/RN-05 stale; O-14, OG-3, V-01, P17, G-1 (W-9.2), W12-09, S-132, RN-05 P1,
+      W-M2, KON5-04; Tafel Z.1758 | K1 | T3 (#195) | -- | Quittung; stale Marker #176, #195 | VORGELEGT-OFFEN
+G-086 | Lager-Identitaet Hybrid-.so: Owner K1 (08./09.08. eigene Gattung+Genus im Lagerbaum, .so wie alle Stufen) +
+      SHA-Map 12.08. + D-01 21.08.; Emitter haengt den Hybrid-Stempel seit 01.09. an (#147); Ablage-Pruefung = Lead
+      (RN-87/#57); O-19, RN-87, S09/B-14, K-1 (Lager); Tafel Z.1769 | K1 | T3 (#195) | -- | Quittung; #57 (Ablage-
+      Pruefung), #195 | VORGELEGT-OFFEN
+G-110 | K87b-/Montags-Infra-Paket H11/H15/H18: Owner 'B10: Gesehen.' 25.08.; H15 seit 11.07. vollzogen, H11 in die
+      K174-Cluster-Split-Kampagne ueberfuehrt (Owner 02.09. 'Variante 1'), H18 = Cluster-Ledger-Posten 210 (kein
+      Session-Board; node7-Freeze = arm64-Runner-Vorbedingung G-017); S01/B-12, B10 (25.08.), K87b, H11, H15, H18; Tafel
+      Z.2139 | K1 | T3 (#195) | -- | Quittung; Infra K174/K175 (Cluster-Ledger), #195 | VORGELEGT-OFFEN
+G-121 | C-3a/#38a2 Comp-Gate + organ_stamp_line: dreifach owner-JA (16./17./22.08.), im E-10-Zug 30.08. gelandet;
+      18.6(3)-Fallweg-Buchung revidiert; Bau #120-B1 Tripwire = Lead; OG-1, OG-2, V-04, P2, KN-1, bog #38(a), bog
+      #105(a)/#123/#124, #38a2, B1 (22.08.), P4 (W2); Tafel Z.2309 | K1 | T3 (#195) | -- | Quittung; #120 (B1
+      Tripwire), #195 | VORGELEGT-OFFEN
+G-122 | V-08R Planer-Fingerprint = 64-hex SHA-256 (Owner 17.08. 'Der Planer traegt ja nur eine Versionsnummer und die
+      wird fuer seinen SHA256 gehasht.'), gelandet #95 4cc3aa0f; OG-6, V-05, P6, P5 (W2), #95; Tafel Z.2325 | K1 | T3
+      (#195) | -- | Quittung; #95 (completed), #195 | VORGELEGT-OFFEN
+G-123 | NP-02 axis_category_of: Meta-Meta-Diskriminatoren = Haupt-Achsen bestaetigt (C1 22.08.), 'Pflicht zur
+      ERWEITERUNG der compile time' -> CT-Bedingungs-Gates B1-B8 = #138 NACH dem Trigger (T4 25.08.); OG-8, V-07, P8,
+      P7 (W2), bog #138(a), #138, NP-02, C1 (22.08.); Tafel Z.2332 | K1 | T3 (#195) | -- | Quittung; #138 (pending),
+      #195 | VORGELEGT-OFFEN
+G-124 | T-9 CSV-Checkpoint-Spalten + OV-2 checkpoint_measure = B4 System B ratifiziert (22.08. 'B4 Ja, Freigabe wie
+      empfohlen und beschrieben.'); Lese-Vertrag 8 Pflichtspalten gebaut, Produzenten-Seite #24/#120; OG-10, V-09, P9,
+      bog #24(b), C-7 (W-9.1), OV-2, B4 (22.08.), KON29-01; Tafel Z.2345 | K1 | T3 (#195) | -- | Quittung; #24, #120,
+      #195 | VORGELEGT-OFFEN
+G-125 | V8 GitHub-PAT-Rotation: VOM OWNER ERLEDIGT (21.08. 'github PAT wurde jetzt manuell rotiert'; 26.08. Block D 'V8
+      ist schon vollzogen'); prod1-Vollzug 22.08.; V9 rescue-Ref vollzogen; OG-26, V-15, P15, KN-4, L-B, V8, V9; Tafel
+      Z.2355 | K1 | T3 (#195) | -- | Quittung (erledigt); #195 | VORGELEGT-OFFEN
+G-126 | v32-Stufe-String-Vokabular gegenstandslos: V32-Fork entschieden 16.07. (Rueckbau-Bauposten, E10 gilt weiter;
+      NICHT-ERNEUT-Liste); V-19, P11 (antwort-tafel), V32-Fork, E10; Tafel Z.2365 | K1 | T3 (#195) | -- | Quittung;
+      #195 | VORGELEGT-OFFEN
+G-127 | OD-7/S-8 --debug-CLI-Haelfte: 'alter Weg fahrbar' fuer diesen Trigger (T3 25.08. 'ja/ja/ja'); OD-7-Pruefpunkt =
+      Lead-Vollzug (#22); Generalprobe formal per --debug (KON41-01); V-20, bog #22(a), #22, OD-7, OF-5, KON42-02; Tafel
+      Z.2372 | K1 | T3 (#195) | -- | Quittung; #22 (pending), #195 | VORGELEGT-OFFEN
+G-128 | D-04 Break-Even: 'Volles GO fuer ALLE diese Felder als mathematisches Definitions-Bereich Command pattern
+      [...] Das Break Even Buendel gilt weiterhin' (21.08. 20:40:56Z); OV-1 Spline-Fork ersetzt; F3-17-Nachzug erfuellt;
+      Web-Recherche-Rest = Lead (#129/V-017); D-04, bog #129(a), bog #85(a), sperren S-4, Z-15, OG-52, OV-1, F3-17, D-2
+      (Spline-Trias), V-017; Tafel Z.2381 | K1 | T3 (#195) | -- | Quittung; #129, #85, #195 | VORGELEGT-OFFEN
+G-129 | G-1 owner-abgenommen ('F-G1: Volles GO, perfektes Design fuer diese Achsendarstellung, alles angenommen.'
+      14.08.); Restfragen 9/12 wieder aufgenommen + Ruecklauf zur W2-Tabelle = Lead-Pflicht (D-05 21.08.); G-1-Tabelle =
+      Anlage; D-05, OG-24, G-1 (Anlage), F-G1, S-2/G-1, S-18-DREIPHASIG; Tafel Z.2393 | K1 | T3 (#195) | -- | Quittung;
+      #53 (in_progress), #195 | VORGELEGT-OFFEN
+G-130 | D-06 ce-Standalone-SCHEMA-Bein: Skip-Verbot ('Wir ueberspringen aber nie etwas' 21.08.) + D-1 17.08. 'volle
+      Wohlgeformtheit [...] gesamte Syntax und Semantik muss pruefbar sein'; benannter Halb-Skip = Uebergang bis #74
+      (Lead); D-06, S12/B-08 (Kipp-ID G-163), F-03 (A60), OG-39, KON3-03, par.19.6(a), #74 (Halb-Skip); Tafel Z.2403 |
+      K1 | T3 (#195) | -- | Quittung; #74 (pending), #195 | VORGELEGT-OFFEN
+G-131 | D-08 Stempel-Pflicht-Weite Lesart A / Stempel Teil 2 = B-7/RN-78-Emitter-Haelfte: RF-2 26.08. 'Volles GO',
+      gelandet 01.09. dd0f56d3 (#147); D-08, F-18 (A60), W12-08, (RF-2 -> G-065), #147, Weiche A; Tafel Z.2414 | K1 |
+      T3 (#195) | -- | Quittung; #147 (completed), #195 | VORGELEGT-OFFEN
+G-132 | D-09/G-5 run_methodology-Enum-Ordnung: 'V-12: Bitte wie empfohlen mit drehen.' (17.08.), gebaut ea7df79b;
+      R7/V-12 gegenstandslos (NICHT-ERNEUT-Liste); D-09, F-02 (A60), R7/V-12, ERLEDIGT c778ed7b; Tafel Z.2421 | K1 | T3
+      (#195) | -- | Quittung (gebaut); #195 | VORGELEGT-OFFEN
+G-133 | Steuerdock-Zahl: 'SECHS' UEBERHOLT durch Owner 26.08. 'Aber korrekt ist dynamisch je Planer' (F-17 Dock-Modell
+      Option C); CEB 4-vs-6 = EIN Dock statisch je CEB, N dynamisch je Planer ('Bitte explore ueber 12 Wochen, das ist
+      beantwortet.'); Rest Lead-Explore + Doku; D-12, P13, W12-07, W12-13, F-17 (Dock-Zahl), R-1/OV-10, W13/RN-89,
+      KON132-05; Tafel Z.2428 | K1 | T3 (#195) | -- | Quittung; Lead-Explore + Doku (#176), #195 | VORGELEGT-OFFEN
+G-134 | B-Block-GOs 21./22.08. (B1-B5 + D-02 type_phase_rank + D-03 B5-Zug/B3-CEB-Glied + D-07 Klammerformen dominant +
+      D-11(a) K2-P/E-Core-Platz): alle GOs stehen, Bau #120/#24 = Lead; bog #120(a), D-02, D-03, D-07, #120, B-Block;
+      Tafel Z.2438 | K1 | T3 (#195) | -- | Quittung; #120, #24, #195 | VORGELEGT-OFFEN
+G-135 | OV-S13-3 PMC-Flag-Felder im Mess-POD: 'Mit in den Bruch, das ist der Kern-messwert der ganzen Arbeit.' (17.08.);
+      Bau #18/S13-11; OG-20, OV-S13-3; Tafel Z.2449 | K1 | T3 (#195) | -- | Quittung; #18 (S13-11), #195 |
+      VORGELEGT-OFFEN
+G-136 | OV-S13-5 Blattzahl-Schnitt: 'Bitte merge wie empfohlen.' (17.08.); Sheet-Zahl je Dokument = 1 + |verfuegbare
+      Unter-Achsen|; Bau #18/S13-14..16; OG-21, OV-S13-5; Tafel Z.2456 | K1 | T3 (#195) | -- | Quittung; #18, #195 |
+      VORGELEGT-OFFEN
+G-137 | OV-S13-6 Lagerbaum-Wurzel-Ordnung: 'Es soll doch auf Ebene 3 unter Gattung und Genus.' (17.08.) = gebaute
+      Ordnung IST die gewollte, kein Umbau; OG-22, OV-S13-6, X-9; Tafel Z.2462 | K1 | T3 (#195) | -- | Quittung; #195 |
+      VORGELEGT-OFFEN
+G-138 | OV-S13-2 = R-38 ETA-Merge: '(a) und fuer (b) bitte erneut explore, das ist UMFASSEND ueber die letzten 10 Wochen
+      definiert und MUSS nachgelesen werden.' (17.08.); (a) last_update_utc ans Feldende, (b) ETA-Semantik explore-
+      entschieden (KON104-03); Bau #57; OG-23, OV-S13-2, R-38; Tafel Z.2468 | K1 | T3 (#195) | -- | Quittung; #57, #195
+      | VORGELEGT-OFFEN
+G-139 | GitLab-Push-Mirroring statt lokalem GitHub-PAT (F5 16.08. 'Das ist sauberer'): nach V8-Rotation einrichtbar;
+      Reihenfolge mit E2-Sequenz abstimmen; OG-29, Mirrors-Z-21, F5 (16.08. Mirroring); Tafel Z.2475 | K1 | T3 (#195) |
+      -- | Quittung; #84-Umfeld/Infra (#189 KANDIDAT), #195 | VORGELEGT-OFFEN
+G-140 | Auswahl-Subsystem = Neubau als 3-Komponenten-Stack (Owner 12.08. 'XML-Element erweitern, Implementierung NEU
+      nach geaenderter Architektur, Altes archivieren' + 17.08. 'Es ist ein System aus genau diesen 3 Komponenten');
+      OG-34, Auswahl-Subsystem, S08/B-02; Tafel Z.2483 | K1 | T3 (#195) | -- | Quittung; Bau-Traeger in der Tafel-
+      Kopfzeile nicht benannt (KANDIDAT #88/#130 Hybrid-Umfeld), #195 | VORGELEGT-OFFEN
+G-141 | D-15 09.08.-Entscheide: CEB-Aenderung = Vollrebuild (18.07.), CEB = eigener Typ-/Versionsstempel (20.07.),
+      std::variant nur CEB + Hybrid-Pruefdock-Proxy (26.07./02.08./07.08.); OG-35, D-15 (09.08.), CEB-38, S07/B-13
+      (entfaellt); Tafel Z.2493 | K1 | T3 (#195) | -- | Quittung; #195 | VORGELEGT-OFFEN
+G-142 | BAUSTEINE_BEWERTUNG.md = Betreuer-Format (Habich H2, Termin 7 08.05.), Bauposten R-26 (W4), Sign-Off-Feld
+      bleibt 'ausstehend' bis Habich (nie autonom); OG-37, bog #180(d), R-26, BAUSTEINE_BEWERTUNG; Tafel Z.2503 | KN |
+      T3 (#195) | -- | Kenntnisnahme; #180(d), #195 | VORGELEGT-OFFEN
+G-143 | AVX-512 = Abgabe-Pflicht wo messbar (prod1; 01.08. OE-D + 17.08. V-03R 'avx512 sollte nie ausgeschlossen
+      werden, es ist Pflicht fuer die Abgabe'); no_extension Bau-Skip ja / Mess-Skip nein (V-10b); R1-Trigger bleibt
+      {no_extension,avx2}; OG-40, bog #180(e2), r1 A-12 (AVX), V-03R, V-10b, S07/B-05, S07/B-06; Tafel Z.2511 | K1 | T3
+      (#195) | -- | Quittung; #180(e2), #195 | VORGELEGT-OFFEN
+G-144 | PMC-Gueltigkeit + Anhang-Umfang: '(a) und (b) und (c) alle ja. Aber Warnung bei (c) wenn PMC vorhanden, aber
+      nicht verwendet. [...] Stille nullen gibt es bei Messung nicht' (17.08.); PMC = Meta-Meta-Achse im CEB-
+      Fingerprint (10.08.); Anhang A 16/44 wird nachgearbeitet (#121); OG-41, W-r3-2, W-r3-4, D-7 (Anhang 17.08.);
+      Tafel Z.2524 | K1 | T3 (#195) | -- | Quittung; #121 (Anhang A), #195 | VORGELEGT-OFFEN
+G-145 | MAX/MIN-Richtungen: Leseauftrag 17.08. C-3 ('Es gibt dazu immer noch einen deep research workflow, bitte
+      selbst tief lesen.') erfuellt -- alle 6 Selektor-Metriken MIN korrekt, T-9-Katalog 45 Zielgroessen (17 MAX/28
+      MIN) seit 08.08.; OG-42, r4 C-5 (MAX/MIN), S10/B-07; Tafel Z.2535 | K1 | T3 (#195) | -- | Quittung; #195 |
+      VORGELEGT-OFFEN
+G-146 | PMC-Schwester-Design owner-entschieden (F-P1..F-P10 15./16.08.: eigenstaendige Meta-Meta-Achse, F-P7 Option A
+      c{p}/c{e}, F-P9 'volles GO' + C++23, ZWEI PMC-Systeme Intel/AMD, 'PMC default an, P/E getrennt'); Bau folgt #53;
+      OG-45, KON73-01, F-P1..F-P10, #59; Tafel Z.2545 | K1 | T3 (#195) | -- | Quittung; #53 (in_progress), #195 |
+      VORGELEGT-OFFEN
+G-147 | V7 Staffelung: 'Die Break even kurven werden nur ueber die Parameter der in w/ma/mi Messebenen gemessenen
+      Organ-Achsen Parameter gemessen. [...] Deine Lesart ist exakt korrekt. Bitte schreibe das so fest.' (16.08.) ->
+      #49-Staffelungs-Design ENTBLOCKT (VOR W4); Board-#49-Text stale; OG-48, bog #49(a), V7, F-08 (A58), C1-
+      Widerspruch (#49); Tafel Z.2555 | K1 | T3 (#195) | -- | Quittung; #49 (pending), #177 (Text), #195 |
+      VORGELEGT-OFFEN
+G-148 | Prozessregel 'Owner-Vorlage je Achse VOR Bau' (Praxis seit F-G1 14.08., T19 17.08., E-10 KN-1..4 26.08.) bleibt
+      lebend fuer Kollektor/Lastsequenz/PMC-Schwester = Lead-Bringschuld je Achse; OG-49, bog #53(a), #53; Tafel Z.2563
+      | KN | T3 (#195) | -- | Kenntnisnahme (G-088: fuer die Permutations-Unterachse keine Vorlage mehr); #53, #195 |
+      VORGELEGT-OFFEN
+G-149 | Flattern = Signal statt Hysterese: 'flattert der Schalter offiziell erstmal nicht [...] ABER: fuer die Hybrid-
+      Tier-Binary sind EXAKT DIESE flatternden Bereiche der besten Tier-Binary in einem Bereich zu erkennen [...]'
+      (Owner 08.08. 10:10:03Z L17245; das Tafel-'...' und der Schlusspunkt waren unmarkierte Kuerzungen, V13-Fix
+      07.09.); HY-B1/HY-C entblockt; OG-51, E-9=OV-12, S11/B-05 (entfaellt); Tafel Z.2571 | K1 | T3 (#195) | -- |
+      Quittung; #123 (HY-B), #195 | VORGELEGT-OFFEN
+G-150 | Auswerte-Phase Thread-Zahl = T (maximale Anzahl; RF-E 17.08.); Bau-Strecken-Formel floor((T-4)/4) x 4 owner-
+      bestaetigt 15.08. 09:34:26Z; Board #71 'concurrency-Owner-Vorlage' damit vollzogen (Text stale); OG-57, bog
+      #71(a), #71, RF-E, S09/B-06 (Kipp-ID G-163), S10/B-21; Tafel Z.2579 | K1 | T3 (#195) | -- | Quittung; #71
+      (pending, Text stale -> #177), #195 | VORGELEGT-OFFEN
+G-151 | Versionierungs-Interface E-A..E-F (07.08. 'SHA256', 'Wir brechen golden-CRC!', 'Konkatenation einer festen
+      statischen Ordnung') gebaut + gelandet 20.08. (#15-Bump-Buendel); Ausfuehrungsvariante VS-A..VS-F = keine mehr
+      zu waehlen; OG-58, VS-A..VS-F, E-A..E-F, S09/B-03 (abgeraeumt); Tafel Z.2590 | KN | T3 (#195) | -- |
+      Kenntnisnahme; #15 (completed), #195 | VORGELEGT-OFFEN
+G-153 | Lager-Vollausbau: 'Wir sollten die Luecken ALLE schliessen' (15.08.), Frage 2=(a) config.toml-nativ, T3 25.08.
+      'Trigger IST der Lager-Baum-Vollausbau' -> Bauliste (1)-(6)/(10) = Nachtrags-/Verifikationsposten NACH ##49;
+      bog #57(a), #57, T3 (25.08.), bog #48(a), #48 (XML-<publish>-Sektion, GO 14.08.; gefaltet aus G-152); Tafel
+      Z.2606 | K1 | T3 (#195) | -- | Quittung (publish-Feld 'git push ja|nein + Ziel' aus G-105 kommt hinzu); #57, #48,
+      #195 | VORGELEGT-OFFEN
+G-154 | F6 Repo-Rollen-Umbau (Owner 15.08. 'voellig widersinnig'): W-G-Karte liegt (15 CE-Kandidaten), Umbau = Lead-Zug
+      in der Rest-Wellen-Einarbeitung (#158), Schnitt mit #29; bog #74(a), #74, F6 (Repo-Rollen); Tafel Z.2619 | K1 |
+      T3 (#195) | -- | Quittung; #74 (pending), #195 | VORGELEGT-OFFEN
+G-155 | ORG-19-IO: 'Ja bitte die optionale neuzehnte Achse anlegen und einbinden.' (17.08. abends) -> Bau im
+      Identitaets-Buendel vor ##49 (T19-Katalog-Zeile + E-1/Thesis-Textzug); bog #86(a), #86, ORG-19, T19
+      (persistence_target); Tafel Z.2626 | K1 | T3 (#195) | -- | Quittung; #86 (pending), #195 | VORGELEGT-OFFEN
+G-156 | F-07b 2D+3D-Diagramm-Bau (SOTA-orientiert) = Owner-KERN 06.08. 05:44 PFLICHT; Bau W4 mit ##60 nach Voll-Bau-4
+      (#49-Staffelung); bog #98(a), #98, F-07b; Tafel Z.2634 | K1 | T3 (#195) | -- | Quittung (G-094: LaTeX-Charts
+      'viel wichtiger'); #98 (pending), #195 | VORGELEGT-OFFEN
+G-157 | Regression-Audit-Order 22.08. ('Starte ein ultracode Audit nach der Rueckkehr des Landezuges, ob die regression
+      session Belange alle erledigt sind') = aeltester unvollzogener Auftrag; Start nach A2.3a als RN-17-Strang
+      (#128/#135/#53); bog #128(a), #128, H-28, H-29; Tafel Z.2640 | K1 | T3 (#195) | -- | Quittung; #128 (pending),
+      #135, #53, #195 | VORGELEGT-OFFEN (Start jetzt: A2.3a-Antworten liegen)
+G-158 | T-9 Design-Umform-Schritt (W2-DRIFT-KORREKTUR-DESIGNS 899 Z.) wird im #128-Soll-Ist-Abgleich auf Deckung
+      geprueft -- 'neu ansetzen oder gedeckt erklaeren' = Explore, keine Owner-Wertung; bog #128(b)/#180(e), T-9
+      (Design-Umform), W-B6; Tafel Z.2649 | KN | T3 (#195; #195-Text nennt G-158 T-9 ausdruecklich) | -- |
+      Kenntnisnahme; #128, #180(e), #195 | VORGELEGT-OFFEN
+G-159 | VI.1(b) Lager-Integritaetsfrage je Maschine (GOAL D-13 W-04): 12W-Explore = Lead vor einer etwaigen Frage; heute
+      keine Frage; GD-05, R-10, W-04 (GOAL D-13), VI.1(b); Tafel Z.2657 | KN | T3 (#195) | -- | Kenntnisnahme; #195 |
+      VORGELEGT-OFFEN
+G-161 | 4 Kommentar-Absichts-Kollisionen im #121-Eingang nach der META-REGEL (cf17d1d/08cb848) + RF-8b aufgeloest:
+      SHA256/SHA512 kein Widerspruch; Abschaltungsstufen = Owner-Kommentar fuehrt (B4/#130); Limitierungen = Code
+      fuehrt; Lizenzblock = Revision 27.08. (jetzt: KON138-06); V-090(s), V-075, KON133-14 (Kollisionen); Tafel Z.2675 |
+      KN | T3 (#195) | -- | Kenntnisnahme; #121, #130, #195 | VORGELEGT-OFFEN
+G-162 | Umbrella-CI comdare/projekte (B6-Ausnahme 14.08. 'a/b/c') seit 27.08. gruen: CI 16261 SUCCESS 41 + 22 manual
+      (macOS/Windows-Deklaration #51); Board-#40-Text stale; bog #40(a), #40, #51, B6-Ausnahme (14.08.), CI 16261; Tafel
+      Z.2686 | K1 | T3 (#195) | -- | Quittung (G-108 #184 = Folge-Neuschnitt); #40 (pending, Text -> #177), #184, #195 |
+      VORGELEGT-OFFEN
+
+**KON138-08 (OWNER-KORREKTUREN AM LEAD + REGIME 07.09.; Owner-Sachlagen verbatim OWNER2 Z.26/Z.13/Z.16/Z.20/Z.15/Z.29 +
+Anhang Z.47; K40 = naechste freie Nummer im Lead-Fehlerregister (K38/K39 vergeben lt. Pause-Protokoll 13 Z.47, L114302
+2026-09-07T08:11:20Z; K40 fuer denselben Gegenstand bereits in Memory feedback_eigene_arbeitsfehler Z.637 + Uebergabe
+0932Z Z.717 = keine Kollision); Verbuchung VERB2 Z.918-954):** K40 / G-088 (Traegerachse Mess-Permutations-Unterachse):
+LEAD-FEHLER -- die Frage bot (b) hybrid-Meta-Meta als Traeger an und uebersah die Planer-Director-Rolle im
+B+-Experiment-Baum. Owner-Sachlage verbatim (Z.26): "Die Frage ist irrsinnig und beruecksichtigt nicht die Eigenschaften
+des Planers und der Achsen-Kategorie-Schichten des B+-Experiment Baumes, welcher die Permutation im Planer als Director
+durchfuehrt und dann an (a) uebergibt. Weiterhin hast du falsch angeboten, dass die hybrid-Meta-Meta Achsen hiermit
+etwas zu tun haetten (was sie nicht tun), weil Meta-Meta-Achsen nur von vorangehenden Directors
+Planer-CEB-->(Hybrid-Tier-Binary->)Tier-Binary durch eine XML Konfiguration angeordnet werden koennen, sofern
+FREIGEGEBEN. Es braucht damit weder eine Haupt- noch Unterachse, sondern einfach einen Explore, welcher den Experiment
+Baum als Planer Director wieder rekonstruiert, um dessen Direktiven der XML-Planung an nachfolgende Stufen zu
+delegieren, danach volles GO, weil dieser schon definiert ist." LEHRE K40: ALLES IST GEPLANT -- vor einer
+Traegerachsen-Frage den Planer-Director/Experiment-Baum aus dem 12W-Korpus rekonstruieren (Owner-Vorhalt 25.08. 'bitte
+pruefe nicht staendig, was laengst entschieden'); Explore statt Frage; S07/B-02 + S06/B-24 als Owner-Korrektur gebucht;
+Folge/Traeger = Zeile G-088 (#194 erster Posten, #53, K40-Register). G-089 (FK-7/Fuenftes-Token): OWNER-REFRAMING -- der
+Gegenstand ist "die Sachlage der Eintragung der Fehlermeldungen in die xlsx Warnungen von unbekannten oder falschen oder
+nicht machbaren Messeintraegen", nicht ein fuenftes Zell-Token; Owner-Wahl: FK-7-Etiketten + "kein 5. token"
+(Buendel-Auflage 'FK-7 MIT Fuenftes-Token' damit gedreht, G-057); Folge/Traeger = Zeile G-089 (#120, #18, #194). G-091
+(p053/HybridAware + Hardware): OWNER-KLARSTELLUNG verbatim (Z.16): "Meine Worte vom 06.08. beziehen sich auf eine
+weitere ISA System-Unter-Achse, welche in der Lage ist auf Linux Affinity Aware Architekturen, Threads zur Laufzeit auf
+bestimmte cores zu pinnen und dort durchzumessen." -> (C) HybridAware = Pflicht, Basis fuer CacheLine Awareness ("sie
+ist Pflicht"); HARDWARE-KORREKTUR verbatim: "Bitte bedenke weiterhin, dass immer noch die i9 12900K Alder Lake Ersatz
+CPU verbaut ist." -> Tafel und TR2 fuehrten prod2 = i9-14900KS 8P+16E = FALSCH; prod2 = i9-12900K Alder Lake Ersatz-CPU
+(8P+8E lt. VERB2-Lesart; am Objekt per lscpu/cpuid VOR der S-19-Kalibrierung nachmessen) -> Korrektur in Tafel, Ledger
+(diese Zeile), S-19-Kalibrierung (#7), Thesis (#121), Hybrid-Lane-Zahlen; Folge/Traeger = Zeile G-091 (#140, #53, #121,
+#7, #176). G-032 / K-3 (REGIME 07.09.): Owner Z.20 verbatim (Zeile G-032) + Anhang Z.47 "Ich habe sie widerrufen, wie
+oben beschrieben." -> REGIME 07.09. ersetzt die Fable-only-Order 12.08. ('bis ich das widerrufe') und die MAX-2-Regel
+04.09. (K29): (1) max 6 Workflows parallel; (2) max 2 Fable-5-max-Agenten je Workflow parallel; (3) andere
+Modelle/Agenten ohne Parallelitaets-Beschraenkung; (4) Umfang unbeschraenkt 'sofern sinnvoll'; Anschluss: G-012
+"arbeiten nach Claude Code Arbeitsweise mit bis zu 6 Workflows parallel" + L113344 06:39:11Z "dichte claude code
+Arbeitsweise" (Kostenlimitierung aufgehoben); (LESART) die Sequenz-Order 02.09. 16:59Z L106775/L106759 ('aber
+sequentiell' / 'gleicher Umfang', KON137-03) war kontingent-bedingt und ist durch das 6-Workflow-Regime UEBERHOLT --
+Owner-Widerspruch genuegt; Vollzug: Memory (MEMORY.md-Index: beide Feedback-Memories seit 07.09. 'AUFGEHOBEN
+(Nachtrag)'), ARBEITSWEISE-X-Zeile (#176/#178-Nachzug), Board-Vermerk #185/#186/#187 (#177), Workflow-Scripte: Cap 2
+Fable je Workflow nur fuer NEUE Scripte (K27: laufende byte-unveraendert). G-090 (A+B+C-Semantik): OWNER-PRAEZISIERUNG
+verbatim (Z.15): "Es gelten also A und B, sowie C nur fuer die Verbuchung der Messergebnisse in xlsx." -> nicht 'A oder
+B oder C'; Folge/Traeger = Zeile G-090 (#18, #129, #194). G-094 (xlsx-Charts): OWNER-AUFTRAG verbatim (Z.29): "bitte
+explore dazu das ist geplant" (Links der Werte-Tabellen in die w/ma/mi-Layer) + Chart-Features als XML-deklarierbare
+Pflicht-Features (Default aus), LaTeX-Charts "viel wichtiger"; Folge/Traeger = Zeile G-094 (#18, #98, #55-Folge, #194).
+NEBENBEFUND (Lead-Hygiene, kein Owner-Vorwurf): G-001 'nach (2) wie empfohlen' und G-104 '(B) nach Abschluss' = Owner
+hat ausdruecklich GEGEN die Lead-Empfehlung entschieden -> im Ledger als Owner-Wahl gegen Empfehlung markiert
+(G-115-Muster; Liste der 15 im Kopf), nie als 'wie empfohlen' gebucht. Owner-Praezisierungen ueber die Optionen hinaus
+(29 Stellen, woertlich in den Zeilen): G-008, G-012, G-001, G-015, G-014, G-089, G-090, G-091, G-080, G-032, G-028,
+G-087, G-088, G-092, G-093, G-094, G-096, G-101, G-105, G-107, G-108, G-109, G-006, G-073, G-019, Lizenz
+Vorspann/4/5/7/8. NEU-TRAEGER (Board-Anlage durch den Lead 07.09. 13:13:31-13:16:16Z = #199-#214 und 13:54:31-13:54:47Z
+= #215-#217 und 14:20:11Z = #218, alle pending; Nachmessung Fix 07.09. 14:29Z + Fix-Quittung 14:46:49Z, alle weiter
+pending): #199 'V13-V17 Rest-Wellen-Einplanung VOR Abgabe' (G-082), #200 '#276 3-ISA-Teilmatrix VOR Abgabe' (G-111/G-082
+V16/G-108), #201 'xlsx-Chart-Features per XML' (G-094), #202 'S-5 CT-Geschlossenheits-Wache' (G-099), #203
+'SOSD-Akte-Fix + Fetch' (G-113), #204 'E-23 f2/f3 im Split-Zug W-C' (G-098), #205 'T6-Einsammel-Naht + E2 =
+Design-Schritt B5' (G-095), #206 'XML type=-Syntax / D1-Fassaden (b)+P2' (G-080), #207 'Compiler-Unterachsen + O0/O1 +
+Flag-Passthrough' (G-014), #208 'INC-G7 Kontrast-Fork bauen' (G-014), #209 'Planer als Zelle: API-CLI + headless Server'
+(G-107), #210 'Anlage-Tafel VOR dem ersten GitHub-Push' (G-105), #211 'HY-C-Zug EINMAL anfassen' (G-087), #212
+'XSD-Drift Hybrid/Organ-Meta-Meta' (G-088/G-091-Umfeld), #213 'ChainRef-H3-Auswertung' (G-093), #214 'Explore G-074
+Posten (4)' (G-074 A4), #215 'RT-Pinning-Verdrahtung + prod2-P/E-Topologie' (G-091), #216 'run_methodology WIDE-Spalte +
+Debug-Realm' (G-092), #217 'xlsx-Warnungen-Sektion + Etiketten-Registry' (G-089), #218 'FLEET-SWEEP GitLab-only-Repos =
+G-105 nicht-abhaengiger Rest, statt #46' (G-105, 14:20:11Z); NOCH NICHT angelegt: 'O-27 Pi-5-Sync' (G-106, an #180);
+G-079 traegt #88 per Metadatum g078_g079_0609 (06.09.), eigener NEU-Traeger = Lead-Option; Infra-Handout-Abschnitte in
+#189: PW-Rotation Cluster-Maschinen (G-004), envoy (G-024), redshield-Keys (G-026), Talos (G-071), Service-Identitaet
+(G-020), Wartungs-fenster (G-022), Neustart + L7 (G-006), H6 Swap/earlyoom (G-007), H9 prod-MinIO (G-101/#198),
+NAS-Firmenordner-Zugriff (Lizenz 4/5/7), Pi-5-Sync (G-106), force-pull (G-005).
+
+## KON137 -- 01.-07.09.2026: WORKTREE-RAEUMUNG, EXT-KLAERUNG, RISS-REGISTER, OWNER-VERBATIMS, VOLLLESUNG, STRANG
+## (Einspielung 07.09., #176)
+
+*(Assembler A des #176-Zugs wf_663f7e45-015, 2026-09-07; Rohdaten + Nenner je Block im Beweisort
+~/backups-workflow/20260907-ledger-zug-176/NACHTRAG-A-KON137-KON136.md. [ASCII-Transliteration]: Owner-Zitate
+wortgetreu, Umlaute ae/oe/ue/ss transliteriert, Kuerzung nur mit [...], Owner-Schreibvarianten belassen (V13); Anker =
+L<Zeile Transkript 5a19728e> + Zeitstempel UTC aus dem JSON-Feld timestamp (V14) oder Datei:Zeile; Gegenstand vor
+Nummer (V12); doppelte Anfuehrungszeichen = Owner-Verbatim, einfache = Kurzzitat/Etikett (V13). Blocknummern
+KON137-01..13 (+ KON137-12a Verbatim-Ergaenzung) nach der Reservierung des Capstone-Eingangs; Fix-Stand 07.09. 14:29Z
++ Fix-Quittung 14:46:49Z nach Lens 1/Lens 2 (FIX-QUITTUNG.md).)*
+
+**KON137-01 (WORKTREE-GROSSRAEUMUNG 01.09.; Owner-Order + GO 01.09. 21:29:55Z L103175 verbatim: "Volles go fuer die
+Loeschung der bereits gelandeten worktrees nach erneuter rekursiver Pruefung ob diese sauber sind und gelandet";
+Owner-Rueckfrage 21:55:42Z L103530 = KON136-07(f); Quittung 22:04:52Z L103604 "Sehr gut, dann weiter wie gehabt"):**
+37 Worktrees geloescht (29 ce-Home + nested p6 + wt-super-dicht + wt-super-a5lizenz + wt-umbrella-dicht +
+wt-prt-a5reuse + wt-thesis-{owner0109,sync,lizenz}); je Baum FRISCH gemessen (fetch --prune, is-ancestor
+origin/development, porcelain/stash 0, csvx 0, nested Stores); df / 12G -> 38G frei. STEHEN: b10rerun (S-127-TABU +
+204 CSV), 114rerun/114rerun2 (#114-Vorbehalt), nested p2/p3 (D12 NICHT-ENTHALTEN), wf_e22d25ef 7f3901fb (anc=NEIN,
+X-11). NACH-GEGENPROBE auf Owner-Rueckfrage: rev-list --count origin/development..<branch> = 0 fuer ALLE 38 Refs (31
+ce + 2 super + 1 Umbrella + 1 prt + 2 thesis-Submodul + 1 Standalone + 2 nested-mains) -- kein ungelandeter Commit
+geloescht; Loeschung beruehrt nur Arbeitsbaeume, keine Refs/Objekte. Beweisort
+~/backups-workflow/20260901-worktree-audit/ (LOESCHTAFEL.md + LOESCHPROTOKOLL.txt). 2 deklarierte Rest-Luecken:
+k2-build-protokolle-Logs (Bau-Logs, keine Beweisorte) + ext-Store-refs der 3 geloeschten nicht einzeln enumeriert
+(durch KON137-02-Zeugenbeweis entkraeftet). NACHTRAG 07.09. (3K-Explore #182 K079 VK-3, Lesequittung 49.1):
+Rest-Luecke wt-ce-k2 build-protokolle entlastet, BU ~/backups-workflow/20260821-k2-vollbau-logs-nachzug/ (2 Logs
+21.08.: wt-ce-k2-build-protokolle/20260817-k2-ctest-sauber.log + 20260817-wiederanlauf-bau-ctest.log, gesichert 21.08.
+08:50; dazu jobs-tmp/ 17 Dateien; Nachmessung 07.09.). Zeitablauf am Transkript: Messtafel -> 21:26:22Z L103147 "Bitte
+halte inne" -> GO 21:29:55Z -> Vollpruefung frisch ab 21:36Z (fetch --prune in allen Hauptklonen) -> Loeschung ab
+21:41Z -> Rueckfrage 21:55:42Z -> Nachvollzug 21:58:17Z L103538 -> Quittung 22:04:52Z. Prozess-Vermerk K39 (VK-4,
+Lesequittung 49.1): 3er-Tranchen zugesagt (L103178 21:30:01Z), 15/15/3/4 gefahren (L103273ff.), undeklariert; am
+Objekt folgenlos (38/38 rev-list 0).
+
+**KON137-02 (EXT-KLAERUNG F-036 auf Owner-Rueckfrage 01.09. 22:00:38Z L103549 "[...] Die ext stores waren ungelandete
+sehr teure Module, bitte pruefe den alten vollstaendigen wellenplan und designplan dazu, sowie die sessions und
+Buchungen, wann diese gebaut wurden. Die ce ist ein ext store der git tracked Fortschritt trug" [Vollzitat
+KON136-07(d)]):** Die teuren ext-Module sind GETRACKTER ce-Inhalt (3181 Dateien: allocator 1552 / traversal 1460 / io
+145 / prefetch 10 / queuing 9), eingezogen 09.-31.05.2026 (Phase 6.2.C 13.05. "10 Allokator-Repos geklont" ->
+V40/V41-Wellen -> 26.05. ext/-Reorganisation + concurrentqueue-PILOT-Submodul -> 28.05. R7.6.b Mass-Migration aller
+Paper-Code-Folders) + Nachzuege 27.07./07.08./20.08./26.08.; alle 25 ext/-Commits Ancestor von ce dev+main. Einziges
+Submodul = Q01-concurrentqueue (Upstream-Pin d655418); die geloeschten nested ext-Stores waren reine Upstream-Klone (3
+baugleiche Zeugen: refs nur master+Tags, reflog 2 Eintraege clone+checkout, stash 0) -- keine eigene Arbeit. ce selbst
+(= der "ext store" mit git-getracktem Fortschritt, Code/external/ im super) war nie Loeschgegenstand; Gitlink 01.09.
+53150058 (PZW 5/5). Offen bleibt NUR #148 Bau-Einzug (OS-2, nach Trigger). Session-Belege 20260526-organ-metapher +
+20260527-paper-migration; Plan-Belege Designplan D-8/MT-L11, Wellenplan 27.1.D + D5-1/D5-3. Owner-Quittung 22:04:52Z
+L103604 "Sehr gut, dann weiter wie gehabt" (Entwurf 01.09. ~22:1xZ, Beweisort
+20260901-worktree-audit/KON137-ENTWURF-worktree-audit-ext-klaerung.md).
+
+**KON137-03 (RISS-REGISTER-NACHTRAG 20.08.-07.09.: (a)-(f) aus der 30-Kontexte-Volllesung, (g)-(m)
+Riss-/Pausen-Chronik RT-01..RT-07 der r18-r30-Volllesung, (n)-(u) Entwurfs-Nachtraege 02.-06.09., (v) NEU 04.-07.09.
+inkl. Risse 13/14/15/16; Klasse R11 W-H.4; Owner-Regeln verbatim unter (q) und (s)):** bisher unverbucht: (a)
+Fable-5-Limit 20.08. abends 20/20 Agenten (K051, Ledger 0 Treffer) * (b) Spend-Limit 21.08. 12:41 (K056/K062-Umfeld) *
+(c) Session-Limit 21.08. 19:05Z (L80756 19:05:15Z), Reset 23:20Z -- ALLE fuenf Owner-Antwort-Tranchen A1..D-11 trafen
+im Limit-Fenster ein und wurden erst 9,5 h spaeter (22.08. 06:13Z) bearbeitet (K057; Verlust-RISIKO-Klasse, kein
+Verlust: Wiederaufnahme auf Owner-Order L80831 21.08. 20:58:16Z) * (d) Pause 22.08. 07:11 * (e) Owner-Zensus 22.08.
+'55 Agenten' -> Aufloesung 92/75/17 (K059, aeltester Riss-Zensus) * (f) RISS 6 02.09. ~07:09Z Session-Limit ('resets
+7:30am UTC') waehrend zweier laufender Workflows: wf_1c5577e4 15/18 + wf_217f0221 3/4 Agenten tot; Owner 07:08:44Z
+L104885 (Queue) "Bitte halte kurz inne", /login 07:08:46Z L104891 (Queue; Kommando L104900 + 'Login successful'
+L104901 07:09:53Z) + Order 07:10:21Z L104903 verbatim: "Weiter wie gehabt, bitte stoppe alle workflows/agenten und
+resume sie, weil sie am spend limit gestorben sind."; Vollzug: Objektstand VOR Resume gemessen (Kopie/R3 ==
+.pre-raster-0209, 0 Aenderungen), TaskStop + Lebendprobe 20 s, Resume byte-unveraendert (K27) 07:12Z, Modell-Wache
+20/20 claude-fable-5-1 (Lesequittung Abschn. 22; Memory reference_pause_resume NACHTRAG 02.09. inkl. cp-n-Falle fuer
+Schreiber-Prompts).
+
+(g)-(m) RISS-/PAUSEN-CHRONIK RT-01..RT-07 (Quelle maps-r18-r30/REDUCE-VOLLLESUNG-r18-r30-R1-R4-WACHE.md Abschn. 2A
+Z.340-372; Lesequittung Z.1165-1168 'ALLE = KON137-03 (g)-(m) + V-062'; je GEGENPROBE Ledger 0 Treffer): (g) RT-01:
+Pause 10 30.08. 21:19Z (6db38958) + Wiederanlauf 01.09. 08:24Z (L99617) + Session-Limit ~10:53Z (Owner-Wort R1 V-146;
+Chronik-Zeile fehlte) * (h) RT-02: Credits-Riss 23.08. 21:07Z (a745560/wyln30o5c/wg4nfrsb1/werg46arx, 17+4 failures) *
+(i) RT-03: Pause 4 26.08. 13:43:33Z (L93235, 6/6 TaskStop, PAUSE-PROTOKOLL-4 98 Z.) -> Wiederanlauf 18:02Z gleiche
+Run-IDs, 0 Verlust * (j) RT-04: K066-Risse: Fable-Limit 25.08. 20:46-20:56Z (7 WF + 2 TM, REDUCE RT-04 nennt fuenf Anker
+fuer '4x completed' -- am Transkript nachgezaehlt 07.09.: Pseudo-Result-Klasse 3x = L92160 20:50:17Z / L92165 20:50:49Z
+/ L92169 20:56:10Z ('completed' + 'failed: You've reached your Fable 5 limit'), L92144 20:48:45Z + L92145 20:48:46Z =
+echte Results (X2-Explore, KON129-Nachlauf), Anker-Fenster 20:48:45-20:56:10Z), /login 26.08. 05:22Z, PAUSE 3 06:10Z,
+5h-Fenster bis 13:00Z * (k) RT-05: Pausen-Chronik 27.08.: Pause-Order L94248 12:07:46Z NICHT vollzogen, Resume L94313
+17:10Z, Ruege L94452 17:20:30Z 'keine korrekte Pause verbucht' (Praezedenzfall F-021 Teilregel 2); Resume-Orders L93825
+11:21:19Z / L94027 11:38:08Z * (l) RT-06: K27-Vorlaeufer-Belege: E-10-Script 26.08. 3x editiert (L92567 05:46:17Z /
+L92573 05:46:31Z / L92575 05:46:33Z, Stopp-Logik) + Resume L92586 05:46:40Z cache-neutral; 4 Live-Patches 27.08.
+(konsolidierung L93986 11:30:11Z, lead-vollzug L93974 11:29:14Z, lande-reif L94346 17:12:02Z, stempel-teil2 L94371
+17:13:59Z); Trace-Frage 'lande-reif-Patch -> spaetere Praefix-Brueche?' ohne Befund (Traeger Memory
+reference_workflow_cache_ist_praefix_basiert + R2 A-4/RV-6) * (m) RT-07: Platz-Deckel wieder aktiv: df / 02.09. 07:16Z
+29G frei (89 %) vs V-048-FIX-r1 52G (79 %) 01.09. ~22:1xZ; 23 G in 9 h neu belegt (Map-Reduce-Journale,
+backups-workflow); Verursacher-Probe V-048-REST (c)/V-072. Dazu die V-062-Zeilen ohne RT-Nummer (R1 Z.528-535):
+Spend-Riss 21.08. 12:41-15:35Z (S11/C-21) = (b) * Pause 8 28.08. 20:38Z (kein Protokoll) + Resume-Order 28.08. 20:44Z *
+Riss 5 30.08. ~17:0x-17:17Z (4 Agenten) * Doppel-Resume 30.08. 20:33Z (K27-Beleg) * Pause-Order 22.08. 07:11 (durch
+Resume 11:38 ueberholt) = (d) * Pause-Doku 23.08. 20:24Z (durch Aufhebung ueberholt; Ein-Zeilen-Vermerk). RISS 10
+(Registerzeile, rekonstruiert 07.09. im Fix-Rueckkehrer): 02.09. 17:08-17:18Z Auslauf-Tod aller drei Runs am
+Fable-5-Kontingent ('resets Sep 8, 7pm (UTC)') = (r) unten; Quellen: 3K-Explore #182
+reduce/VERGESSENE-ARBEIT-K079-K083.md Z.56 'Auslauf-Tod aller 3 Runs (Riss 10)' + map/K083-leser.md Z.24 '-- Riss 10.
+Danach steht die Session ~2 Tage still' + 5K kontexte/K086.md Z.43 'Risse 7/8/9/10 im KON137-Entwurf (n)-(r)' + Z.44
+'Riss 10' + Memory feedback_eigene_arbeitsfehler Z.563 'seit Riss 10 knapp'; docs/sessions grep 'Riss 10' = 0 (die
+Registerzeile fehlte bis hier).
+
+(n)-(q) NACHTRAG (Entwurf 02.09. 17:1xZ, Lead) -- RISS 7/8/9 + SEQUENZ-/AUSLAUF-REGEL: (n) RISS 7 02.09. 08:16Z
+Session-Limit waehrend A2.3a-v2-Map-Welle (wf_f97550fa) + Explore-10K (wf_1a36d148); Heilung 08:22Z per Resume
+wz229cmol/w0sysditu, Torsi in riss7-pre-resume-0822z/ (6 Dateien), 0 Verlust. (o) RISS 8 02.09. 08:33-08:42Z (Etikett
+'~08:5xZ' war voreilig, RT-13) Fable-5-Kontingent ('resets Sep 8'): A2.3a v3 + Explore-Reduce tot; Owner-Credits,
+Resumes; Torsi riss8-pre-resume-0852z/ (fragen-batch-3, v-090-ergaenzungen); Cache-Beleg v2->v3 12/17 (K27 Praefix).
+(p) RISS 9 02.09. 16:58Z Fable-5-Kontingent ('resets Sep 4, 6pm UTC') 6 min nach DREI parallelen Resumes (wjcyrqo87
+A2.3a / wg91yxfte Explore / wdmw2n4yr #179): #179 Explore-A tot (Explore-B im Cache, Wache 'kein uninformierter Bau'
+brach kontrolliert ab), A2.3a halb tot (10 lebende Agenten 17:08Z), Explore-Reduce lief weiter (Reduce-Datei 32600 B
+17:12Z). (q) OWNER-REGELN verbatim: 02.09. 16:59:22Z L106758 (Queue; queued_command-Attachment L106775 gleicher
+Zeitstempel) "aber sequentiell" + 16:59:28Z L106759 (Queue) "gleicher Umfang" -> nur EIN Workflow zur Zeit, Umfang
+voll; 17:04:44Z L106832: "thesis license zug ist am spend limit gestorben und von a23a laeuft nur noch die Haelfte,
+aber wir lassen die aktuelle Stufe durchlaufen und resumen erst, wenn die naechste Stufe dieser workflows beginnt, um
+keine tokens durch Neustart zu verschwenden, lass diese Stufe noch auslaufen. Bitte schreibe eine reiche und elaborate
+Kontextuebergabe, der Kontext endet jetzt" -> Resume-Punkt = Beginn der naechsten Stufe, Reihenfolge Explore-10K ->
+A2.3a v3 -> #179. Uebergabe: docs/sessions/20260902-KONTEXTUEBERGABE-1705Z.md. Klasse R11 W-H.4 (Riss-Register),
+Traeger #176 (Einspielung = dieser Block).
+
+(r) NACHTRAG (Entwurf 04.09. 18:3xZ, Lead) -- AUSLAUF 02.09. = RISS 10 (Registerzeile s. (g)-(m) Schluss) +
+OWNER-RESUME-ORDER 04.09.: Alle drei Runs wurden 02.09. 17:08-17:18Z terminal (Fable-5-Kontingent 'resets Sep 8, 7pm
+(UTC)'): A wf_1a36d148 FAILED (reduce tot, 10 Scans Cache), B wf_f97550fa 'completed' mit Null-Result (14 Map-Results
+Cache; fold/reduce/Lenses tot), C wf_d69f800c FAILED (Doktrin-Wache 'kein uninformierter Bau', explore:B Cache). 0
+Datenverlust; Torsi riss9-auslauf-pre-resume-0904-1815z/. Owner 04.09. 18:13:31Z L106992 (nach /login 18:09:23Z
+L106986, 'Login successful' L106987) verbatim: "Bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der
+offenen Arbeit fort." + mid-turn: "Bitte untersuche mit ultracode die Aquivalente des Session Logs ueber die letzten 3
+Kontexte auf vergessene Arbeit." (18:14:06Z L106995 laut Strang-Refute V-06; Owner-Schreibvariante 'Aquivalente'
+belassen). Vollzug: sequentiell (Regel 16:59Z steht) A Resume 18:16Z (Task wd20qy0f8) -> Explore-3K (#182, K079-K083,
+Opus-Tiefleser + Sonnet-Scanner + Fable-Reduce/Refute/Fix; erst 07.09. 07:33Z gestartet, wf_00731c1a) -> B Resume -> C
+Resume. Uebergabe 1705Z Abschn. 11 (Commit 2b7ef7c4).
+
+(s) NACHTRAG 04.09. ~20:1xZ -- KILL-KASKADE, RISS 11/12, RUEGE K29, MAX-2-REGEL: Owner 04.09. 18:29:13Z L107312
+verbatim (innere Anfuehrungszeichen im Original doppelt): "Bitte schreibe 'Dies ist die korrekte Session zum
+weitermachen' hier in den Chat und nimm keine neue Arbeit mehr auf, dann kille alle claude sessions auf dieser
+Maschine, nachdem der aktuelle Workflow durchgelaufen ist. Unser Ziel ist ein Neustart von claude code in der
+aktuellen Client Version." (Vollzug: Satz gesetzt, Workflow A terminal 19:29Z, Kills, Client-Neustart ~19:37Z; A-Tafel
+F-4, hiermit nachgetragen). Riss 11 (18:29Z Owner-Interrupt kompaktierte Reduce-Agent a866501d -> Neustart a41b19cb;
+Workflow A heil terminal, Refute 173/173, Fix 15/15) + Riss 12 (19:42Z: 8 Fable-Tote binnen 4 min beim 13-fach
+parallelen Resume 3 von wf_f97550fa; Owner-Stop 19:43:19Z L107619 (Queue) "Bitte stoppe alle workflows und untersuche
+die vorhandenen Ergebnisse") + Ruege K29 19:44:09Z L107671 (queued_command; Queue-Eintrag L107663) verbatim: "Du hast
+einfach bestehende Agenten Ergebnisse verworfen, es war schon fast alles fertig und es gab multiple Workflows, die
+anfang des Kontextes am spend limit gestorben waren, bitte laufe nur maximal 2 Fable Agenen insgesamt" + Owner-Regel
+20:04:29Z L107843 verbatim: "Das Fable Kontingent ist wieder frisch, alles ist wieder frisch, aber dennoch bitte
+maximal 2 Agenten gleichzeitig laufen, dann stirbt nicht so viel am spend limit" -> MAX 2 AGENTEN GESAMT (alle
+Modelle) bei frischem Kontingent -> Wiederanlauf sequentiell: #175 als NEUER Lauf v4 wf_a7fff12a (K27, 15 fertige
+Map-Dateien = Datei-Eingang; 19:58:36Z L107794 "Bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der
+offenen Arbeit fort.") -> #179 (Resume wf_d69f800c) -> #182 (Script auf 2er-Paare umbauen). Regel-Geltung: 04.09.
+20:04Z bis 07.09. 06:39:11Z L113344 (Widerruf: "[...] Die Kostenlimitierung ist aufgehoben und wir fahren stattdessen
+die dichte claude code Arbeitsweise."; Vollzitat KON137-11) + G-032 12:12:56Z L114346 (maximal 6 Workflows parallel,
+maximal 2 Fable-5-max-Agenten je Workflow; K-3 "Ich habe sie widerrufen, wie oben beschrieben.").
+
+(t) NACHTRAG 04.09. ~21:4xZ (Volllesung C-3..C0 auf Owner-Order 21:16:50Z L108369): Modell-Wache -- 04.09. 20:00:34Z
+Harness-Safeguard-Fallback ('cyber'-Klasse) schaltete die Lead-Session fuer EINEN read-only Zug (L107797-L107799,
+20:02Z: Lebendprobe/df/Journal) auf claude-opus-4-8; ab 20:03:03Z wieder claude-fable-5-1 (C-1 132 + C0 108 Messages
+Fable). Keine Schreibung in dem Zug; Doktrin 'ueberall Fable 5 max' fuer 1 Zug durch den Harness verletzt, nicht durch
+Lead-Wahl. Dazu Werkzeug-Befund B-0: eine Q1-only-Transkript-Extraktion ist Falsch-Null (6 Owner-Worte 04.09. nur
+ueber Q3/Q4 sichtbar) -- Extraktor-Regel (NEUN Quellen) gilt auch fuer Ad-hoc-Lesungen des Lead.
+
+(u) NACHTRAG (Entwurf 2026-09-06T16:40:51Z, Lead) -- OWNER-FUND 06.09. 16:37:13Z L111825 (Entwurfs-Etikett 16:38:27Z):
+ALTE LATEX-ANHANG-PIPELINE IM SUPER. Owner verbatim: "Bitte verbuche ausserdem, dass ich in Diplomarbeit super noch
+die alte Pipeline der Erstellung an Latex-Anhang und Verarbeitung gefunden habe, obwohl ausdruecklich vermerkt war,
+dass die cache engine das Framework und Bibliothek fuer die gesamte Verarbeitung stellt und die Diplomarbeit nur per
+XML ihre Belange bei der cache engine anfragt. Das hat keine hohe Prioritaet, muss aber im dichten Wellenplan als
+zukuenftige Aufgabe verbucht werden. Wie verbuchst du derzeit, sind dir die 4 zentralen Planungsdokumente als Referenz
+des letzten 'goal' Textes noch ein Begriff? Welche Ziele ergeben sich insbesondere, wenn a23a workflow zurueckkehrt?"
+(innere Anfuehrungszeichen im Original doppelt) Vollzug: WELLENPLAN-V2-DICHT S-078a (Teilsektion Repo-Rollen, additiv
+AM ORT) + RN-28-Zeile + Kopf-Nachtrag, super-Commit 943fb10d (Push Fenster 8 07.09. 12:37-12:46Z gruen,
+dev==main==71f7c818); Board #74 metadata owner_fund_0609 (Zuschnitt erweitert: GESAMTE Kette
+04_csv_to_latex/05_diagram_generator/06_latex_to_pdf/08_appendix_generator + CI-Jobs
+anhang:forward/thesis:pdf/analyse:thesis-data/test:anhang-*), Einordnung nach T-Entscheid #158 (nach Trigger +
+Funktionsnachweis, W7-Naehe mit #88). Regel-Bezug: GOAL-DICHT Z.66 Repo-Rollen (KON71-73) ce = Framework/Hauptstrang,
+super = Installations-Code + Anwender-XML + CI-Einstieg. Die Frage nach den 4 Planungsdokumenten loeste das
+Kipp-Ritual K090 aus (Lesequittung 33; K34).
+
+(v) NEU -- RISS-REGISTER 04.-07.09. (5K-Explore #185 Reduce Abschn. B R-01..R-17 + Fix A-F-05; Board #176 Metadaten
+kon137_riss_nachtrag_v_0709 + kon137_v_nachzug_10b_riss16; je am Objekt nachgemessen 07.09. 06:53-07:07Z): Interrupt
+04.09. 20:26:46Z L108016 (0 Verlust; 20:26:57Z L108018 "Bitte weiter, ich wollte nicht unterbrechen") | Compact
+21:12:40Z (Lesequittung 31.3 nach der Naht; Owner 21:16:50Z L108369 "Eben lief ein compact [...]") | Auto-Compact
+21:31:41Z (C-2 010-015 -> K086; Compact-Summary behauptete faelschlich '004-009 noch nicht geschrieben' = Lehre
+'Compact-Summary != Vollzugsstand', Memory K32) | Interrupt 21:46:56Z L109077 | PAUSE 10b 21:47:45Z L109079 "Bitte
+pausiere alle workflows und lege eine abbruchsichere Pause ein" (Fold-Torso a950253a; Nummer 10b, weil PAUSE 10 =
+Repo-Dokument 20260830-PAUSE-PROTOKOLL-10.md vom 30.08.; Beweisort-Kopfzeile 20260904-PAUSE-2148Z '10' = Historie) |
+FORK 06.09. 08:54:51Z Session 72a14bfa (Owner-Resume lief als --fork-session, Board/Registry unsichtbar) + PAUSE 11
+09:29Z (Fold-Torso a49d80c5 1244 Z.; Memory reference_fork_session cp -pn-Rezept) | stiller Compact ~09:35Z (Owner
+09:35:35Z L109216 "Der compact ist jetzt leider schon durch [...]") | Compact 10:47:45Z (GEGENSTANDS-TAFEL 251/2851 ->
+Lesequittung 31.6) | RISS 13 11:10:21Z (Sub-Agent) / 11:12:19Z (Lead L110336) Session-Limit 'resets 1:50pm (UTC)':
+in-flight Reduce a1836ce2 (Torso Versand 3139 Z. + Chat 174 Z. + Schablone 57 Z. OHNE Result), Push Nachtrag 13 (Gates
+gruen L110312, Push offen), Restliste #177/#178 nur erhoben, Monitor b2kp206zg regulaer beendet; Heilung Owner
+14:43:34Z L110346 "Bitte resume alle Agenten und Workflows und fahre mit offener Arbeit wie gehabt fort. Hole die
+Verbuchungen nach. Die Pause ist vorbei" -> Resume 14:45:39Z (Task wp8ytqkgt), Reduce a930740f Result 15:07Z, Push
+Fenster 2 (CI 16387/16388); Torso-Gegenprobe Lesequittung 31.8 = 0 Substanzverlust; RISS13-VERMERK in
+riss13-pre-resume-20260906-1444Z/ | Monitor-Falschalarm 14:46:21Z (bk07yc1fy, stale Run-Record status=failed; Poller
+v2 mit Record-mtime-Wache T0=14:45:00Z) | Compact 15:11:35Z (Owner-Orders 15:08:44Z L110666 + 15:10:10Z L110667
+unbeantwortet an der Naht, Queue-Replay L110700/L110701; Zeitkosten 13-29 min) | Compact 16:13:09Z (K089->K090;
+Kipp-Ritual erst auf Owner-Frage 16:37:13Z L111825 = K34) | RISS 14 = PAUSE 12 16:43:58Z L111977 (Queue;
+PAUSE-PROTOKOLL-12 Z.3 nennt 16:45:05Z = Repo-Etikett, V14 massgeblich 16:43:58Z) "Bitte pausiere alle workflows und
+Agenten und lege eine abbruchsichere Pause ein" bis 19:43:23Z L112103 (v4 + 5K killed, Torsi Re-Verify adc60c08 +
+K086-A a5099262; docs/sessions/20260906-PAUSE-PROTOKOLL-12.md; Resume 19:44Z, Torsi neu gelaufen: Re-Verify r2
+terminal 20:02Z, K086-A ab51d994 Result 20:05Z) | Interrupt 19:54:34Z L112287 + Compacts 19:57Z/20:28Z/20:55Z
+(Uebergabe-Nachtraege 21/22: Kipp-Ritual 2x, Strategie 'Indizes statt Vollkipp'; Owner 20:54:21Z L113135 "[...] Das
+Thema ist gigantisch, es braucht daher eine strategische Verarbeitung") | RISS 15 06.09. 21:51:21-49Z RATE-LIMIT
+(Lead-seitige Limit-Antworten model <synthetic> L113326 21:51:21Z / L113332 21:51:24Z / L113337 21:51:49Z + system
+L113327/L113333/L113338; L113322-L113325 = Metadaten-Zeilen ohne timestamp; Owner-Order L113329 21:51:24Z liegt
+INNERHALB des Fensters; Poller-Ende 21:51:49Z L113334; Agent-Endmarken '[Request interrupted by user]' 21:51:40Z;
+Capstone #187 4/65 MAP-A + 5K #185 10 Results killed; Torso 5K-Reduce af4bab348 A+B 14588 B; in-flight ausserdem:
+Owner-Antworten Tranche 1 sichern (L113311 21:51:17Z Bash lief), Thesis-Remote-Probe (L113313), Owner-Order 21:51:24Z
+L113329 Tranche 2, K088-A/B-Rueckkehrer (Results 21:15Z/21:27Z) ungelesen; Session still bis 07.09. 06:39:11Z L113344;
+Heilung 07.09.: Uebergabe-Nachtrag 23 + antworten/ + Thesis 4/4 cbefa617, tranche2-extraktor 06:54Z, Resumes 06:53Z
+byte-unveraendert (md5 10ddc51c/de769b03), K088-A/B VOLL gelesen 07:26-07:29Z (Lesequittung 32.9/32.10)) | PAUSE 13 =
+RISS 16 07.09. 07:44:37Z L113944 (zugestellt 07:47:56Z L113967; Owner-Pause, kein Limit-Tod): vier Workflows nach dem
+letzten Result gestoppt (3K #182 07:57:13Z, Capstone #187 07:58:10Z, Strang #186 08:02:59Z, 5K #185 08:06:10Z; Monitor
+b0jwa9exg), 0 Torsi, Protokoll docs/sessions/20260907-PAUSE-PROTOKOLL-13.md; Resume 12:1xZ nach Owner-Wort 12:12:56Z
+L114346 ("Bitte verbuche zuerst vollstaendig und resume alle Agenten und Workflows und fahre mit der offenen Arbeit
+fort."), Fenster 8 12:37:49-12:46:49Z gruen, #176-Zug wf_663f7e45-015 gestartet 12:24:43Z (Journal erste Datei).
+NUMMERN-KOLLISION (5K-Reduce Abschn. B, Fix A-F-05): Uebergabe-Nachtrag 23 + Board #185/#187 Metadatum 'riss13_resume'
+nannten den Rate-Limit-Riss 'Riss 13'; GELTEND: Riss 13 = 06.09. 11:10Z Session-Limit (RISS13-VERMERK, Lesequittung
+31.7, Nachtrag 14), Riss 14 = Pause 12 (PAUSE-PROTOKOLL-12 Z.5), Riss 15 = Rate-Limit 21:51Z (Board-Metadatum
+'riss15_korrektur' 07.09.), Riss 16 = Pause 13. Verlustbilanz: 0 Ergebnisverlust je Riss; 4 Torsi (Fold a950253a, Fold
+a49d80c5, Reduce a1836ce2, Reduce af4bab348) beiseite, nie Eingang (K27); Riss 11 + 12 (04.09. 18:29Z/19:42Z) = (s);
+Traeger R1 V-062 damit eingespielt.
+
+**KON137-04 (UNVERBUCHTE OWNER-WORTE 20.-23.08. + 29./30.08. + 01./02.09., Verbatim-Anker mit V14-Zeitstempeln; Nenner
+je Kontext aus den Maps der 30-Kontexte-Volllesung + 3K K079):** K051 (20.08. 16:44-17:55): 11 Owner-Worte, 8 ohne
+Traeger, darunter DREI Volllese-Verschaerfungen an EINEM Abend -- L75750 16:48:30Z 'wirklich vollstaendig', L76058
+17:15:54Z 'anlesen reicht nicht', L76368 17:47:33Z 'Kontrollblock [...] vollstaendig' (Original "Bitt lies
+Kontrollblock C-11/C-12/C-14/A-1 quittieren vollstaendig") -- und L75936 17:04:52Z Zeithorizonte-Dauerregel (= X-03);
+Ledger-Luecke 20.08. abends (a7e8e151 / CI 16053 / W2-Design-Ernte / 19 Lead-Entscheide / 2 Pausen = 0
+Ledger-Treffer). K060 (22.08. 13:08-13:30): 11 Owner-Texte, 9 NUR als queue-operation/enqueue (Q4), darunter L83591
+13:11:09Z Worktree-Raeum-Verschaerfung (verankert Memory
+feedback_worktree_loeschung_erst_alle_submodul_branches_pruefen.md + ARBEITSWEISE X-09, im Ledger nur als KON122-08
+Nr. 6-Fassung), L83629 13:13:58Z + L83959 13:23:42Z Volllese-Order ('sonst finden wir nicht zurueck'; X-19), L84181
+13:29:12Z / L84182 13:29:28Z Kipp-Ritual-Neuform (X-13; KON122-08 Nr. 1), L84184 13:30:12Z 'Wo stehen wir mit der
+Heilung und Rueckkehr auf den Hauptstrang?' (Schlussfrage, sachlich beantwortet im Session-Doc
+20260822-SESSION-beide-leser-vollliste). K062 (22.08. 17:31-23.08. 15:27): 22 echte Owner-Worte, 0 im Ledger (keine
+KON fuer 22./23.08.), 5 NUR-Q4, darunter Dauerregel L85671 23.08. 08:47:57Z (Queue) "[...] dass es keine Posten geben
+darf, die zurueckgestellt oder nicht bearbeitet werden [...]" + 10er-Batch-Form L86438 23.08. 15:27:11Z
+(Memory-Nachtrag 02.09.) + Nachrichten-Buendel-Lesart L86188 23.08. 13:50:58Z. K072 (29./30.08.): L98278 30.08.
+09:18:17Z 'Bitte plane zuerst eine Sinnvolle Einteilung und aenderung und Heilung der Workflows, weil es das letzte
+Mal schief ging' (Planungs-Pflicht VOR Resume, Quelle der Wellen-Architektur des fold-rest) + L98455 30.08. 10:15:23Z
+'Bitte pruefe den Plattenspeicher von prod1' (kein Loesch-GO, kein Neustart-Wort; NL Z.13694); die uebrigen 8
+K072-Texte (Resume-/Innehalten-/Uebergabe-Orders, Harness-Check-ins) = PROZESS-KLASSE, ausdruecklich ohne Buchung.
+VOLLZAEHLIGKEITS-VERMERK: L83628 (22.08. 13:13:25Z) ist KEIN Owner-Wort (enqueue-content = Assistenten-Rueckschrieb
+'background agents launched'), der K060-Datei-Nenner zaehlt ihn als Q4 mit (Rueckschrieb-Klasse;
+Extraktor-Ueberzaehlungs-Filter, Memory reference_transkript_extraktor).
+
+01./02.09. (K079 = L103045-L103930, 01.09. 21:22Z -> 02.09. 06:40Z; 3K-Explore #182 map/K079-leser.md VK-5,
+Lesequittung 49.1): 14 distinkte Owner-Texte (Q1=10/Q2=1/Q3=3/Q4=4, 4 DUP-Marker), sechs bisher ohne Verbuchung,
+hiermit verbatim: L103060 01.09. 21:22:46Z "Bitte lies die kontextuebergabe vollstaendig und fahre mit offener Arbeit
+fort" * L103147 21:26:22Z (Queue) "Bitte halte inne" (Worktree-Raeumung angehalten, KON137-01) * L103166 21:28:12Z
+"Bitte weiter wie gehabt" * L103247 21:40:08Z "Bitte weiter wie gehabt, ich wollte dich nicht unterbrechen, bitte
+stoppe den workflow und starte ihn neu. Wir hatten API probleme. Viel last bei Anthropic" (K079-Riss R-1 Interrupt +
+API-Last 21:30:05Z; Interrupt != Order, F-034) * L103604 22:04:52Z "Sehr gut, dann weiter wie gehabt" (Quittung
+Worktree-Nachvollzug + F-036-Buchung, KON137-01/-02) * L103690 23:01:49Z "Sehr gut, weiter wie gehabt" (Quittung nach
+Resume-3-Order L103663 23:00:53Z, KON136-07(e)). Die uebrigen acht K079-Owner-Texte sind verbucht (u.a. L103175
+21:29:55Z GO = KON137-01, L103530 21:55:42Z = KON136-07(f), L103549 22:00:38Z = KON136-07(d), L103663 = KON136-07(e),
+L103848 02.09. 06:34:06Z = KON137-10). K079-Risse R-0..R-4 (Eingangs-Compact, Interrupt+API-Last 21:30:05Z,
+Spend-Limit ~23:00Z, Session-Limit 02.09. 00:21:23Z mit Raster 7/7 failed ~6 h + 1,01M Tokens verloren bei 0
+Datenverlust, Kontextende ~06:40Z) = Datenverlust 0/5.
+
+02.09. (K082 = 02.09. 07:4xZ -> 17:0xZ; 3K-Explore #182 map/K082-leser.md O-01/O-05/O-06/O-07/O-11 + REFUTE-B B-01/B-04
+07.09. 14:49Z; Lead-Transkriptprobe sed -n 07.09. 14:5xZ; Board #176 Metadatum kon137_04_k082_anker_korrektur_0709):
+fuenf Owner-Zeilen bisher ohne Anker-Fuehrung, hiermit verbatim: L105645 07:50:03Z (Queue) "Bitte lies stets alle
+Workflow Rueckkehrer vollstaendig, wenn moeglich, pruefe ob das Ergebnis nicht zu gross ist, sonst verbuche in
+haeppchen" (Haeppchen-Regel, X-19-Instanz) * L105973 08:14:53Z (Queue) "/login" * L105974 08:15:20Z (Queue) "Bitte halte
+kurz inne" (Vorlauf Riss 7, KON137-03 (n)) * L105977 08:15:38Z "[Request interrupted by user]" + Owner-Erklaerung
+L106008 08:16:41Z "Bitte weiter wie gehabt, ich wollte dich nicht unterbrechen, frische credits mussten her, bitte lese
+den letzten workflow Rueckkehrer wie gehabt weiter" (Interrupt != Order, F-034) * L106542 08:46:11Z (Queue) "Bitte fahre
+fort wie gehabt, credits sind wieder frisch" + L106552 08:46:21Z (Queue) "Ich wollte dich nicht unterbrechne"
+(Tippfehler original; Heilung Riss 8, KON137-03 (o)). KORREKTUR-VERMERK (Lead 07.09. 14:5xZ, 3K REFUTE-B B-01): das
+Board-Metadatum kon137_04_k082_anker_0709 (14:43:37Z) fuehrte L106738 16:58:04Z als Owner-Zeile 'Bitte halte kurz inne'
+-- L106738 ist eine queue-operation op=remove (Dequeue von L106735), keine Owner-Aeusserung; korrigiert per Metadatum
+kon137_04_k082_anker_korrektur_0709. Die Sequenz-Regeln 16:59Z L106758/L106759 + 17:04:44Z L106832 stehen in KON137-03
+(q); Arbeitsfehler K45 (Owner-Anker nur nach eigener Quellprobe uebernehmen).
+
+**KON137-05 (ETIKETTEN- UND ZAHLEN-KORREKTUREN, V12; Entwurf 02.09. ~07:2xZ):** (a) KON120-03/#118: der
+'Etikettenfehler Z.80368' (Fragen-Praesentation) liegt in K23 = K056, nicht in K24 (K062-Volllesung). (b) Board #110
+Subject '449 Z.' VOLLLISTE: gemessen wc -l = 448 (02.09.; K052 V-6 / K059 V-04). (c) DICHT-Zeile 'KOMPLETT 322/322'
+(#134) = Zahlen-Verwechslung (322 = NACHHOL-KARTE-Zeilen), 5 Runs ungeklaert (wf_eede2f12 16/0, wf_9292edd5 6/0,
+wf_355205a7 6/0, wf_cd576b6e 4/0 BAU-Strang, wf_294faf09 4/0) -> #167 Journal-Forensik (R1 V-080; 3K K079 VK-1
+ergaenzt 5 Alt-Journale wf_e9b2cd97 89 Z. 51/38/0, wf_eede2f12 16/0/0, wf_f56de681 5/4/0, wf_fd7950a4 1/0/0,
+wf_fe04933d 2/0/0 -> #167-Text 'Journal-Forensik 5 Runs + Gesamtinventar (Klasse #134)'). (d) wf_50f25326-cd6
+(Rueckfragen-Trace 01.09. 08:47Z) AUSGEBUCHT: 4 started / 0 results, alle 4 Transkripte enden 08:47:29Z '[Request
+interrupted by user]' ohne Werkzeugarbeit; Gegenstand = merged Folgeworkflow wf_1fcc434d (Terminal 02.09. ~00:2xZ,
+70/70 Results gelesen). (e) 'Workflows 1 bis 16' (K059 V-02) = 86f4fc1e Journal-Vollpruefung; die vertagte Volllesung
+wurde in NF-B7 geschlossen (40/40 Results; Fundort wf_2c6cd0b8). (f) Zeit-Etiketten der Lesequittungs-Tranchen A-G
+('07:1x..09:2xZ') = unverifiziert; massgeblich Transkript-Zeitstempel (Order 06:34:06Z L103848, Kompaktierungen
+06:40:11Z + 06:56:30Z, Systemuhr UTC). (g) NACHTRAG 07.09. (Strang-Explore #186 Abschn. 6 Nr. 11/12/22):
+45-vs-35-Nenner der 24.08.-Zusage ('Rest ca. 45 Posten als gefilterte Endliste', K065 (4), R2 L-11; Owner-Kontext
+L88921 24.08. 06:19:20Z) -> Nenner-Historie der Rueckfragen 45 -> 35 -> 60 -> 283 (RT-38; A2.3a-Versand-Kopf
+Z.293/299), Ledger 'ca. 45' bisher 0; OS-2-Gate-Erklaerung: Owner 27.08. 18:51:52Z L95671 'OS-2-Gate musst du mir
+erklaeren was das war' -> erklaert 19:02:44Z L95780 (HAUPTSTRANG-Register Abschn. 2), Ledger 'L95780' bisher 0;
+D-10/V-111: Owner D-10 21.08. 'ultracode ueber die letzten 10 Kontext-Session-logs [...] Kartieren und nachzuholen'
+realisiert durch 6K-Sweep + 30K-Trace (Form geaendert, nie als Antwort deklariert -- hiermit deklariert), V-111
+(nachgereichte Antworten L73360 20.08. 07:24:34Z / L73361 07:24:40Z, beide Queue) in der Raster-Zulieferung an A2.3a,
+Ledger 'V-111' bisher 0.
+
+(h)-(k) NACHTRAG (Fix-Quittung 07.09. 14:46:49Z, Lens 2 F-05; Quelle
+maps-r18-r30/REDUCE-VOLLLESUNG-r18-r30-R1-R4-WACHE.md Abschn. 2C Z.422-440 = RT-18..RT-21, dort je 'Traeger:
+KON137-Korrekturzeile per ledger_nachtrag.sh [...] SOFORT ja'; Board #176 Description; Ledger-Originalzeilen bleiben
+stehen, hier Zeiger-Korrekturen, je am Objekt nachgemessen 07.09.): (h) RT-18 KON122-L20(a) NACHBEWEIS-Korrektur: Ledger
+Z.2322-2329 fuehrt die gcc-dbg-Zelle weiter 'nur per Laufzeit-Indiz (84.94 s gegen r1 84.69/r3 84.23) + rc=0'; der
+NACHBEWEIS liegt seit 23.08.: frischer Voll-ctest build-dbg @ 3841d717 (Lauf 14:06:55Z), CTEST-RC=0, gestartet 544 /
+Test-Passed-Marker 540 + 4 WILL_FAIL-Negativproben, 'LastTestsFailed nach Lauf: FEHLT (0 Fails)' (Log
+20260821-w1l-landung/cifix2-vl3debug/k17-r4-gcc-dbg-NACHBEWEIS.log, mtime 23.08. 14:09:34Z; Board #131 Metadatum nennt
+den Log); Ledger 'NACHBEWEIS' bisher 0. (i) RT-19 KON123-05 #82-SIEBEN-Vermerk: Ledger Z.2180-2182 'Board #82 "6
+static_asserts" -> "7" [...] NUR Board offen' ist STALE -- Board #82 Metadatum traegt 'SIEBEN static_asserts --
+KON122-L4-Korrektur 6->7' + Ortsvermerk measurement/pmc_event_biss.hpp (Lead 23.08. 20:36:22Z L87532); Ledger Z.2471 +
+Z.2828 fuehren SIEBEN -> Ein-Zeilen-Vollzugsvermerk, V-072-Zeile '#82-Konflikt' = nur Ledger-Vermerk (KON137-08). (j)
+RT-20 KON133-20 Datumskorrektur: Ledger Z.852 '28.08. GESETZT (goal aktiv)' -- real 27.08. 19:04:02Z (L95786 'Goal set'
++ Stop-Hook L95787, beide 2026-08-27T19:04:02.632Z); die Nachfold korrigierte NUR die NL-Kopie ([Z210], F-033(a)) ->
+Datum 28.08. -> 27.08. 19:04:02Z. (k) RT-21 V13 'imt': Owner-Order L95825 28.08. 18:04:07Z verbatim "Bitte resume ALLE
+Agenten und Workflows und fahre imt der Arbeit wie gehabt fort." (Tippfehler original: imt); Ledger Z.865 zitiert still
+geglaettet 'fahre mit der Arbeit' (NL-Kopie heute Z.928/7283/7289/9669/10360 (Original-NL Z.876/7204/7210/9483; REDUCE
+nennt NL Z.10281; 'imt der Arbeit' in beiden = 0/0 Treffer)) -> V13-Vermerk + Falsch-Null-Liste 'imt' (Memory
+feedback_zehn_wochen_explore, 4. Klasse Owner-Schreibvariante).
+
+**KON137-06 (verify-47 GESAMTERGEBNIS + X-19-NEBENFUNDE, bisher nicht im Ledger; K072 V-02/V-07, R1 V-063/V-064):**
+verify-47 (wf_401a0ff3, terminal 30.08., 2 Runden) Urteil 'amd-Ernte TRAEGT / intel kontaminiert'; 8 Funde F-1..F-8:
+F-3 R-8 Drift-Gate-Rerun-Rate des MESSWEGS = ##49-GO-VORBEDINGUNG (Board #164 (f), W-10 R-8); F-6 intel-Grandchild
+cmake -DCOMDARE_PMC_VENDOR=amd (Emissions-Host prod1) = #164(a)/V-030; F-8 s19_kampagne-Schlusszeile 'urteil=ok' AUCH
+im GERISSEN-Fall = Mengen-Bilanz, kein Gesamtgruen-Anker (Konsumenten-Regel STAND.md; Klarstellung = #165
+SOLL=PFLICHT; Traeger-Verlust durch #160-Text-Ueberschreibung 01.09. = Board-Text-Ueberschreibungs-Klasse
+V-031/V-032); Pflicht-Etiketten 0.521 s/DLL 'Fenster-0:64 @16W ccache', Obergrenze 302,9 h, /125-Nenner,
+prod1-df-Zeitetiketten (NIE die unetikettierte Altzahl zitieren). X-19-Nebenfunde (Zusage L98133 29.08. 17:23:57Z
+'gehen in KON134-09', nie eingespielt): (a) Owner-B-Serie 25.08. im Snapshot L282-L291 annotiert, (b) K1271 'E18-Ort
+nie owner-bestaetigt' am Objekt WIDERLEGT (L28891/L28894) -- Substanz NUR im NEUEN LEDGER Z.1198 / Z.1212-1213 /
+Z.1218-1225 (S05/B-03 NEBENFUND; Original-Zeilen des 18345er-NL); hier als Zeiger gebucht.
+
+**KON137-07 (KLEINPOSTEN AUS K057/K060, je mit Traeger):** (a) K060 A-05: Owner-Order 'alle memories der letzten 6
+Kontexte' (L83959 22.08. 13:23:42Z) durch L84182 13:29:28Z (3-Tage-Fassung) 5,5 min spaeter ERSETZT; 15 Dateien
+gelesen, Nenner 'k von k' nie geschlossen, Ersetzung nie ausgewiesen (E-05 UE; hiermit ausgewiesen). (b) K060 S-2: der
+K29-Anschluss-Leser deckte nur 83684-84707; Zeilen 83522-83683 (7 der 11 Owner-Texte) lagen strukturell vor seinem
+Fenster -- gerettet nur durch Owner-Wiederholung + K27-Extrakt (V-092(c)). (c) K057 VK-1: Owner-Dauerregel 'Die
+sessions duerfen nie geraeumt werden' (L80595 21.08. 18:55:53Z, Antwort-Tranche A1) fehlt im ARBEITSWEISE-X-Register +
+GIT-UNIVERSELL-Zeile (nur Memory + KON120-01) -> docs-Zug V-091. (d) E-10 L-5: Organ-Budget-Hebung 778 > 768
+(Altbefund) = STAU-Zeile (E-6). (e) K057-Falsch-Null-Klasse 'Owner-Schreibvariante' (Fehler-Enthropie / kipppen / udn
+/ thourough) -> Memory feedback_zehn_wochen_explore 4. Klasse (02.09.). (f) K060 V-4: API-Host-Fehlgriff .de/.local
+22.08. (7 min Cluster-Umweg) ohne K-Nummer; Regel 'API-Host IMMER aus git remote -v' (KON135-07) ->
+ARBEITSWEISE-Kandidat (V-091). (g) "Force Push und rebase sind VERBOTEN, merke dir das." (L80798 21.08. 20:05:44Z,
+Antwort-Tranche C1) vs Rewrite-GOs 14.08./15.08./01.09. = gegenstands-genaue Ausnahme-Klasse (NF-B4), Verbot gilt im
+laufenden Betrieb fort.
+
+**KON137-08 (BOARD-HYGIENE 02.09. 07:1x-07:2xZ, V-072; Board-Bestand 173 Tasks):** #112 completed (KON122-07
+'Schliessung = Lead'); NEU #172 Ledger-#44 PV-4 Rest-Traeger (5 Rest-Punkte je Traeger); NEU #173 E-10-Lead-Posten
+L-1..L-10 dreiwertig (OFFEN: L-1 3d-DELTA-Provider, L-2 K-19-Nenner 48 Kommentare, L-3 R-10-Wortlaut, L-4 -> #86, L-5
+-> KON137-07(d), L-8-PMC -> #164(a); LEBEND: L-6 #114-Re-Run-3 vor ##49; ENTLASTET: L-7 PZW, L-8-CI 16263, L-9
+Stempel-2-Ordnung, L-10 wt-ce-e10 geraeumt); #133 completed (E-10/Stempel-2/Bump gelandet; Subject 'FOLGEPHASEN
+LAUFEN' = Historie 30.08.); #145 completed (vo3-1 01dc3122 Ancestor, merge-base 02.09.); #22 + #65 in_progress ->
+pending (kein aktiver Traeger; RN-13 / RN-15 + E-04); #128 REAKTIVIERT (Gate seit 24.08. erfuellt; Fenster SOFORT nach
+A2.3a als RN-17-Strang inkl. W135 0/7); Metadaten-Nachtraege #3 (RN-22 ce-clang-Stage-Luecken-Fix), #96
+(axis_centric_namespaces N1 + 9 Kommentar-Stellen + V-110..V-148-Eingang), #85 (RN-27-Rest + 14 B-Kleinposten + X-3b),
+#69 (RN-28, prod2-TeX-Probe fahrbar), #110 (448), #154 (Platz 29G frei 89 %, 3 wt-ce-* Rest =
+114rerun/114rerun2/b10rerun TABU; fremde /tmp 11 Eintraege -> A2.3a Loesch-GO-Buendel [Owner G-006 07.09.: fremde
+tmp-Artefakte bleiben, L1 nein]; /var/log 1,2 G Infra), #165 (verify-47 F-8 + F-6 aufgenommen). NEU #170
+Raster-Nacharbeit, #171 Kipp-Ritual + Map-Reduce-Volllesung. [STAND 07.09.: #168/#171/#174 completed, #172 seit 02.09.
+0 Vollzug (3K K081 VK-3, Fenster an #176/#197), #173 L-2/L-5 ohne Fenster (VK-4).]
+
+**KON137-09 (RUECKFRAGEN-VOLLBESTAND NUR DURCH ZUSAMMENSCHALTUNG; Owner-Order 02.09. 07:55:54Z L105730 verbatim: "Wir
+haben mit diesen Fragen ein ernstes Problem, bitte liste die letzten 10 workflows auf und den Fakt, dass wir den fold
+rest und das rueckfragen audit zusammenschalten mussten, um wirklich alle offenen Rueckfragen zu erfassen"; Entwurf
+02.09. ~08:0xZ):** Register + Fakt: super
+docs/sessions/20260902-WORKFLOW-REGISTER-LETZTE-10-UND-ZUSAMMENSCHALTUNG-RUECKFRAGEN.md (Abschn. 1 = 12 Workflows seit
+30.08. mit Zweck/Zeit/Agenten/Rissen; Abschn. 2 = Fakt (1)-(7)). Kern: Fold (wf_fe1cf67c) = nur S01-S12-Sektionen ->
+157 IDs 97 W/60 R; Rueckfragen-Audit (wf_50f25326 leer -> wf_1fcc434d MERGE) = 30 Kontexte -> R1 109->148 Posten, R3
+37->40 Fakten, O-1..O-29, V-090, V-115 35+3; erst Nachfold + Raster (wf_bfe3433a, Nenner 187->277) + Nacharbeit
+(wf_217f0221 TRAEGT) ergeben den Vollbestand = UNION aus 7 Nummernkreisen mit Ueberlappungen [Stand Register 02.09.
+07:55Z; KORREKTUR 07.09.: Endstand ELF Kreise -- Lead L105918 02.09. 08:12:57Z 'vier Quellen fehlten als
+Frage-Quellen' / 'elf Nummernkreise'; Tafel Abschn. 2 Z.40-54 = FRAGEN, O, V-090, OG, BRINGSCHULDEN, R1, BOARD,
+ENTWUERFE, EXPLORE, SPERREN, KIPP (534/532), s. KON138-00]. Ledger-Pflicht: EINE Rueckfragen-Tafel mit EINEM
+Nummernkreis + Alias-Spalte; OG-Serie materialisieren (S11/B-06). Traeger: A2.3a-Workflow (Strang-Dopplungs-Probe) +
+naechster docs-Zug. [STAND 07.09.: A2.3a v4 (wf_a7fff12a, GEGENSTANDS-TAFEL 2851 Z., Versand 3332 Z.) versandt 06.09.;
+EINE Rueckfragen-Tafel = KON138 dieses Zugs (Assembler B, 163 G-Nummern; Strang-Reduce Abschn. 5.3 Schema + 17
+Zeilen); die Zusage 23.08. 'RUECKFRAGEN-TAFEL-V3-REICH + VERBUCHUNGS-ABGLEICH-8K' (Owner L85609 23.08. 08:36:17Z M3
+Vollbild; k30-Uebergabe Z.12/18/21/35) wurde NIE erzeugt (find = 0, DOKU-ZUSAGEN Z-035) und ist durch NEUER-LEDGER
+(Fold) + A2.3a ersetzt (RV-2 geheilt; Strang Abschn. 6 Nr. 10).]
+
+**KON137-10 (REIHENFOLGE-ORDER 'Rueckfragen -> Antworten -> dichtes Ledger' vs 'Ledger-Aktualisierung als Hauptziel';
+ENTSCHIEDEN durch Owner K-1 07.09. 12:12:56Z L114346 verbatim "K-1: GO, sofort einspielen wie von dir empfohlen." =
+Lesart A):** Owner-Worte verbatim: (1) 02.09. 06:34:06Z L103848: "Bitte resume alle Agenten und workflows, dann weiter
+wie gehabt. Bitte lies den letzten Merge Workflow vollstaendig und stelle sicher, dass das neue dichte Ledger
+geschrieben wurde, nachdem du mir offene Rueckfragen und Entscheidungen hier vorgelegt hast, die du selbst nicht per
+Explore aufloesen kannst." (2) 02.09. 07:42:09Z L105514: "Hast du jetzt das dichte Ledger unter meinen Rueckfragen
+schon erstellt? Bitte stelle mir alle offenen und nicht durch explore aufloesbaren Fragen hier. Es gibt ueber die
+letzten Kontexte einige gerissene Straenge. Bitte erstelle eine Kontextuebergabe, der Kontext endet jetzt" (3) 06.09.
+19:50:45Z L112228 (K35, 'Hauptziel'): "Hinweis: du hast alle Ziele der Kette vom rueckfragen workflow von vor ueber 3
+wochen und dessen Gruende, ueber die Ledger Aktualisierung als Hauptziel unter den a23a Korrekturen an Fragen leider
+vollstaendig vergesen, bitte suche den Strang nochmal zusammen und verschaffe dir einen Ueberblick ueber die Kontexte
+und die eigentlichen Bewandnisse der grossen Audits bis heute. Das ist alles definiert, bitte Explore dazu" (4) 06.09.
+20:27:00Z L112733 (Queue; Erstfassung 20:26:17Z L112731 ohne den Map-Reduce-Einschub): "Bitte lies den workflow a23a
+Ergebnis vollstaendig und verbuche. Er ist das letzte Glied in der Kette, starte dann eine sorgfaeltig geplante
+Ultracode workflow mit einem map reduce (sodass es den Kontext nicht reisst weil die Happen gigantisch sind), der alle
+4 Zentraldokuemte gegen die rueckfragen workflows und a23a als capstone verarbeitet. Der compact hat gerade schon
+wieder den Kontext gezogen, bitte delegiere die Aufgabe, sie ist zu gross fuer die direkte Verarbeitung". LESARTEN
+(Strang-Explore #186 S3 Abschn. 4; Owner-Frage K-1 in Tranche 2, Lead-Chat L113950 07.09. 07:49:47Z, Posting-Beginn
+~07:40Z): A = antwort-unabhaengige Bloecke (KON136-04..08, KON137-01..13 inkl. 17 Kleinposten) SOFORT einspielen,
+KON138 (EINE Rueckfragen-Tafel) mit den Antworten im selben Zug; B = #176 als Ganzes bis nach Tranche 2 warten.
+ENTSCHEID: K-1 GO 12:12:56Z = Lesart A -> Zug wf_663f7e45-015 (Task w977fz0wz, gestartet 12:24:43Z = erste
+Journal-Datei wf_663f7e45-015; Stufe 1 Tranche-2-Verbuchungstafel -> Assembler A [dieser Text] + Assembler B [KON138]
+-> Lens 1 Verbatim/Anker + Lens 2 Struktur/Mechanik-Trockenlauf gegen Ledger-KOPIE -> Fix -> EINSPIELUNG-176.md;
+Einspielung NUR per scripts/ledger_nachtrag.sh vor Z.19 als EINE Datei [KON138][KON137][KON136-NACHTRAG], Fenster 9).
+Vorlauf: Order (1) = aelteste unerfuellte Doc-Zusage (Uebergabe 0750Z Abschn. 5 Punkt 6 'dichtes Ledger'; Lesequittung
+55.5 SD-2; K079 A-21 '#176 seit 5+ Tagen'); 'dichtes Ledger' = Vollfassung-Nachtraege + DICHT-Pflege, nie Kuerzung
+(Board #176 Description).
+
+**KON137-11 (UNVERBUCHTE OWNER-WORTE 04.09. 19:58Z - 07.09. 07:44Z, Verbatim-Anker nach Muster KON137-04; 5K-Explore
+#185 Reduce Abschn. I OW-01..OW-23 + Refute-A F-01 + Stand-Eingang K089-K093; Board #176 Metadatum
+kon137_11_verbatim_0409_0709; Ledger-Treffer vor diesem Block je 0):** Nenner: 23 distinkte Owner-Worte K084-K088
+(Queue-Replays L109252=L109216, L109253=L109217, L110084=L110050, L110294=L110284 nicht doppelt gezaehlt) + 16
+Owner-Worte des Stand-Eingangs 06.09. 15:27Z - 07.09. 07:44Z (Zaehlregel: 20 Anker im Fenster minus Interrupt L112287,
+Erstfassung L112731 und die Tranchen-Verweise L113305/L113578 = 16); 0/23 ohne jede Doku (Refute-A F-01 korrigierte
+die Reduce-Bilanz '4 ohne Doku': Erstfund LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md Z.28-29/197-201/208-209 + Register
+20260904-HAUPTSTRANG Z.9), 23/23 ohne KON137-Verbatim, 23/23 ohne Ledger -- hiermit geschlossen. Vorlauf 04.09.
+18:29:13Z L107312 (Kill-Kaskade) + 19:44:09Z L107671 (K29) = KON137-03 (s).
+
+OW-01 L107794 04.09. 19:58:36Z "Bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der offenen Arbeit
+fort." -> v4 neu (K29-konform) L107912; Doku: Uebergabe 1705Z Z.329, Lesequittung 30, Memory K29. OW-02 L107843
+20:04:29Z "Das Fable Kontingent ist wieder frisch, alles ist wieder frisch, aber dennoch bitte maximal 2 Agenten
+gleichzeitig laufen, dann stirbt nicht so viel am spend limit" -> MAX-2 bis 07.09. 06:39Z (Widerruf L113344 + G-032);
+Doku: Memory feedback_maximal_zwei NACHTRAG, Uebergabe Nachtrag 13. OW-03 L107922 20:14:43Z (Queue) "Also vor einem
+Kontext wurde das folgende Unterbrochen, hast du das jetzt alles unter dem neuen Paradigma geheilt? [...]" (Rest =
+Terminal-Mitschnitt: #179 failed 'Explore unvollstaendig -- kein uninformierter Bau', Explore-10K TypeError
+'reduce.datei', A2.3a completed, 2x 'You've hit your Fable 5 limit * resets Sep 8, 7pm (UTC)', /login interrupted) ->
+Chat L107985 Heilungsstand der drei Risse; Doku: LESEQUITTUNG-KONTEXTE Z.28-29/197-201 (Refute-A F-01). OW-04 L107923
+20:15:22Z (Queue) "Viele Ergebnisse davon waren auch schon fertig abgelegt, wo sind die hin?" -> L107985 'Nichts davon
+ist weg' + Fundorte; Doku: LESEQUITTUNG-KONTEXTE Z.28-29/197-201/279. OW-05 L107996 20:23:53Z "Bitte suche ueber die
+letzte Woche nach nicht abgeschlossenen Agenten und Workflows, da waren noch mehr und finde zurueck zum Hauptstrang,
+indem du dich wieder auf die Vorbereitung der Rueckkehr von a23a konzentrierst, indem du die vorangegangenen Schritte
+und offenen Auftraege untersuchst, die ich dir dazu gab, sie sind noch aktuell. Was ist in deinen eigenen Worten ueber
+die letzten 15 Kontexte das gesetzte Ziel und Aufgaben, warum haben wir uns 2 Wochen lang mit speziellen Workflows
+gequaelt. Bitte speichere diese workflows als Backup mit Rohdaten in den dafuer vorgesehenen Sicherungsordner auf dem
+NAS" -> L108130/L108237, HAUPTSTRANG-Register 20260904 (Abschn. 0 verbatim), NAS-Sicherung; Doku: Uebergabe 0932Z
+Abschn. 2, LESEQUITTUNG-KONTEXTE 4. OW-06 L108016 20:26:46Z "[Request interrupted by user]" + OW-07 L108018 20:26:57Z
+"Bitte weiter, ich wollte nicht unterbrechen" -> Fortsetzung L108022, 0 Verlust (Interrupt != Order); Doku:
+LESEQUITTUNG-KONTEXTE Z.208-209, Register Z.9. OW-08 L108170 20:53:17Z (Queue) "Bitte erweitere das Register auf einen
+Ueberblick ueber 2 Wochen unter beruecksichtigung meiner letzten Anfrage. So finden wir sen Anschluss wieder zum
+Hauptstrang und Beantwortung von Fragen. Das war ja eigentlich der Sinn des rueckfragen-workflow und fold Rest und
+jetzt a23a, damit wir die offenen Fragen finden, die noch fehlen, die ich beantworten muss und die du nicht aufloesen
+kannst. Sonst weiter wie gehabt" -> Register 1b/1c (3b60e578..25554f88), Register Z.75-78 verbatim. OW-09 L108369
+21:16:50Z "Eben lief ein compact, bitte pruefe ueber die letzten 3 Kontexte was du noch nicht vollstaendig gelesen und
+verbucht hast, weil dort einiges fehlt, lies den gesamten Kontext" -> LESEQUITTUNG-KONTEXTE (66 Posten), Uebergabe
+1705Z Z.344-349, KON137-03 (t). OW-10 L109077 21:46:56Z "[Request interrupted by user]" -> Rest im Pause-Bericht
+L109174; Uebergabe 0932Z Abschn. 7 (b). OW-11 L109079 21:47:45Z "Bitte pausiere alle workflows und lege eine
+abbruchsichere Pause ein" -> PAUSE 10b (KON137-03 (v)); PAUSE-PROTOKOLL-10-Beweisort, Uebergabe 1705Z Nachtrag 14,
+Memory pause10 (Index seit 07.09. 'PAUSE 10b'). OW-12 L109185 06.09. 09:32:20Z "Bitte resume alle Agenten und
+workflows und fahre wie gehabt mit offener Arbeit fort. Bitte erstelle jetzt eine sehr elaborate und reiche
+Kontextuebergabe, der Kontext endet jetzt. Entspricht der a23a workflow zusammen mit den nun mehr nur ergaenzend
+gelaufenen Maps den Qualitaetsanforderungen an dessen Ziel? Bitte trace alle Aenderungen aus a23a zurueck. Kannst du
+weiterhin auch die anderen grossen Audit workflows der letzten 3 Wochen noch sehen? Bitte sichere und verschiebe alle
+workflow backups mitsamt der Rohdaten aus dem session Ordner und die workflows der letzten 3 Wochen samt Rohdaten auf
+das NAS in einen dafuer vorgesehenen backup Ordner, gibt es den schon im NAS?" -> K087 (Uebergabe 0932Z Kopf verbatim,
+#183; Sechsteiler beantwortet L109242-L109512). OW-13 L109216 09:35:35Z (Queue) "Der compact ist jetzt leider schon
+durch, bitte lies dich gruendlich in den letzten Kontext ein, indem du ihn ueber den session log rekonstruierst." +
+OW-14 L109217 09:35:56Z (Queue) "Dann weiter wie gehabt" -> LESEQUITTUNG-KONTEXTE 5. OW-15 L109525 10:00:45Z "E-4:
+Option A, weiterhin ist fuer Cluster git gemerged und du sync um die Schluessel fuer root zu finden und fuer NAS, C:
+Benoetige eine Erklaerung zum Verstaendnis, NAS: Es wird lokal NUR die backup workflows unter den Sessions ins NAS
+verschoben, sonst nichts, NAS-Ordner: mv . Bitte stelle Rueckfagen und Entscheidungen hier, meiner Auffassung nach
+hast du keine der Auftraege verstanden" -> Rueckfragen L109659; Uebergabe 0932Z Nachtrag 12 Z.253-257, Board #179
+e4_owner_antwort_0609. OW-16 L109694 10:21:19Z "NAS: Du hast es jetzt verstanden, die Session Rohdaten und Beweisorte
+bleiben, wir verwenden sie als Referenzen in neuen workflows. Alles andere ist korrekt. E-4: Sofern du per hash ueber
+alle Dateien nachweisen kannst, dass kein Fortschritt verloren geht waehlen wir dann doch B. Aber ich habe auf dem
+Laptop einiges auf gitlab und github gepusht, was nun mit dieser Maschine synchronisiert werden muss haendisch, das
+ist komplexer als es aussieht. Bitte ziehe den stand nach Option B ohne leaks haendisch nach aber remote scheint
+derzeit zu fuehren, zumindest fuer thesis, pruefe das. C: verdoppeln wollte ich nicht. Dann atlas. Redigiere den
+session log wegen des Fehlers." -> E-4 Option B (V5-023 ER: thesis 4/4 cbefa617), NAS-Regel (Session-Rohdaten +
+Beweisorte bleiben), Session-Log-Redaktion; Uebergabe Nachtrag 12 Z.258-263, Memory kontextende NACHTRAG, Board
+#179/#183. OW-17 L109879 10:32:45Z "Infra soll das NAS-SSH Passwort rotieren, bitte schicke ihm ein handout ueber git"
+-> Cluster-Handout 05aeafc8 (gitlab/development); Uebergabe Nachtrag 13, Memory K30. OW-18 L110050 10:46:01Z (Queue)
+"Bitte analysiere das ende des letzten Kontextes und den gesamten vorletzten Kontext gruendlich und lies dich tief
+ein, dann weiter wie gehabt. Der compact lief gerade schon" -> LESEQUITTUNG-KONTEXTE 6. OW-19 L110281 11:08:27Z "Du
+wolltest noch liegengebliebene Aufgaben und verbuchungen erledigen, hole das bitte nach so sieht das fuer mich aus
+[...]" (Rest = Terminal-Mitschnitt 10:32-10:46Z) -> Restliste + Riss 13 + Nachholung; Memory K31 (Kernsatz), Uebergabe
+Nachtrag 14, LESEQUITTUNG-KONTEXTE 7 (2). OW-20 L110284 11:09:14Z (Queue) "Und du wolltest vorhin irgendwas noch
+erledigen und vollstaendig lesen." -> Lesequittung 31.6/31.8. OW-21 L110346 14:43:34Z "Bitte resume alle Agenten und
+Workflows und fahre mit offener Arbeit wie gehabt fort. Hole die Verbuchungen nach. Die Pause ist vorbei" -> Resume
+14:45:39Z + Nachholungen (KON137-03 (v) Riss 13). OW-22 L110666 15:08:44Z (Queue) "Bitte lies mit ultracode die
+letzten 5 aequivalente des session logs und pruefe auf vergessene und gerissene Arbeit, verwende Sonet max very
+thougough explore Agenten dafuer. Sonst weiter wie gehabt" -> #185 Explore-5K wf_9e4d189d (Start 15:39Z; 14/14
+Rueckkehrer VOLL gelesen 07.09. 12:47Z). OW-23 L110667 15:10:10Z (Queue) "Du konntest in den letzten 2 Kontexten immer
+zum compact nicht alles einlesen und verbuchen, bitte hole das nach" -> LESEQUITTUNG-KONTEXTE 6/7 + 5K-Reduce Abschn.
+G (Kontextende-Nachholen); Memory K32.
+
+Stand-Eingang 06.09. 15:27Z - 07.09. 07:44Z (K089-K093; Verbatim bisher nur in Uebergabe-Nachtraegen 15-23,
+Lesequittung 8/9/35-41 und Memory K33-K35/MUSS-Regel/pause12/Widerruf; Ledger 0): L110929 15:27:25Z "Du hast doch
+einiges liegengelassen und vergessen? Bitte lies den gesamten Kontext" * L111040 15:38:27Z "Ich hatte dir in diesem
+Kontext einen workflow aufgetragen, laeuft der?" (-> #185 Start 15:39Z) * L111216 15:50:34Z (DAUERREGEL, MUSS-Klasse;
+Anschluss KON136-07(h); Memory feedback_alle_regressionen_jeder_klasse_sind_muss) "Gut, bitte merke dir, dass wir ALLE
+Regressionen jeder Klasse als 'Muss' verbuchen, wir wollen hohe Qualitaet" (innere Anfuehrungszeichen im Original
+doppelt) * L111825 16:37:13Z LaTeX-Anhang-Fund + Frage nach den 4 Planungsdokumenten = KON137-03 (u) (Vollzitat dort)
+* L111977 16:43:58Z (Queue) "Bitte pausiere alle workflows und Agenten und lege eine abbruchsichere Pause ein" = PAUSE
+12 (Riss 14) * L112103 19:43:23Z "Bitte resume alle Agenten und Workflows und weiter wie gehabt, die credits sind
+jetzt wieder frisch." * L112228 19:50:45Z (K35) = KON137-10 (3) / KON137-13 (Vollzitat dort) * L112284 19:53:50Z
+(Queue) "Der compact hat gerade den Kontext gezogen, bitte lies die Dokumente von eben alle nochmal vollstaendig ein"
+* L112287 19:54:34Z "[Request interrupted by user]" * L112668 20:20:26Z (Queue) "Na so komplett gekippt hast du die 4
+dichten Dokumente noch nicht, bitte hole das nach, der compact hat Verwirrung gestiftet, sonst wird die Aufloesung der
+Rueckfragenkette nicht sauber" (-> Kipp-Ritual Lesequittung 38) * L112731 20:26:17Z (Queue) "Bitte lies den workflow
+a23a Ergebnis vollstaendig und verbuche. Er ist das letzte Glied in der Kette, starte dann eine Ultracode workflow mit
+einem map reduce, der alle 4 Zentraldokuemte gegen die rueckfragen workflows und a23a als capstone verarbeitet. Der
+compact hat gerade schon wieder den Kontext gezogen, bitte delegiere die Aufgabe, sie ist zu gross fuer die direkte
+Verarbeitung" + L112733 20:27:00Z (Queue, erweiterte Fassung) = KON137-10 (4) (-> Capstone #187 wf_7d1c1cf1) * L112734
+20:27:47Z (Queue) "Bitte lies den Session log des letzten Kontextes gruendlich und gezielt, damit es in dieser Runde
+klappt" (-> Lesequittung 40) * L113135 20:54:21Z (Queue) "Der compact lief schon wieder, als Hinweis, Der Kontext ist
+wieder leer, du musst wohl einige Dinge neu einlesen, um sie korrekt verarbeiten zu koennen. Das Thema ist gigantisch,
+es braucht daher eine strategische Verarbeitung" * L113305 21:49:11Z = Owner-Antworten Tranche 1 (G-002 ... G-079) ->
+KON138 (nur Verweis) * L113329 21:51:24Z "Bitte stelle mir noch die jetzt noch nicht beantworteten Fragen und
+Entscheidungen mit Erklaerungen. Es kommt mir so vor, als waere alles unter Teil D eine Schablone aber nur halb
+fertig." (-> Tranche 2, 79 Posten gepostet 07.09. 07:49:47Z L113950, Posting-Beginn ~07:40Z; Riss 15 lief bereits:
+erste Limit-Antwort 21:51:21Z L113326, 3 s VOR der Order) * L113344 07.09. 06:39:11Z "Bitte resume alle workflows und
+agenten und fahre wie gehabt mit offener Arbeit fort. Die Kostenlimitierung ist aufgehoben und wir fahren stattdessen
+die dichte claude code Arbeitsweise." (Widerruf MAX-2; v4.5 ARBEITSWEISE-DICHT geltend, G-031) * L113511 07:20:58Z
+"Bitte lies alle Rueckkehrer stets vollstaendig und verbuche" (Rueckkehrer-Regel, 5. Wiederholung; Uebergabe-Nachtrag
+24 nannte 07:23:59Z = eigene Wiedergabe, V14-Korrektur Uebergabe 0932Z Z.686) * L113578 07:25:24Z (Queue) =
+G-007-Antwort -> KON138 (nur Verweis) * L113944 07:44:37Z (Queue; zugestellt 07:47:56Z L113967) "Bitte nimm keine neue
+Arbeit mehr auf und lassse alle Agenten auslaufen, lege eine abbruchsichere Pause ein, sodass ich die Fragen in ruhe
+beantworten kann." = PAUSE 13 (Riss 16) * L114346 12:12:56Z = Owner-Antworten Tranche 2 inkl. K-1/K-3 -> KON138 (nur
+Verweis; K-1-Satz in KON137-10).
+
+**KON137-12 (DOKU-HYGIENE-RESTPAKET: V-059-Familie 17 Kleinposten der R1-VERGESSENE-ARBEIT-TAFEL Z.471-985 [Fenster
+'mit V-059'] je ID + Kern + Traeger + Stand 07.09.; dazu VK-2 retry-deprecated, Berichtigung Nachtrag 25,
+PAUSE-10b-Nummernkollision, V-067/V-068/V-077; Zaehlung: 17 = V-060..V-067 (8) + V-070, V-074, V-078, V-093, V-099,
+V-100, V-102, V-104, V-108 (9); V-059 selbst = RN-27-RESTPAKET-Sammel-Traeger):** V-060 | F2-Freeze-Check-KON-Zeile
+(Quelle docs/sessions/20260821-F2-FREEZE-CHECK-PROTOKOLL.md Z.104-109; das R1-Etikett 'KON120-ENTWURF, Protokoll
+Z.104-109' meint dieses Protokoll, KON120-ENTWURF-SAMMLUNG.md hat 82 Z.) nie gebucht; 'F2-FREEZE-CHECK'/'15/18' 0
+Ledger-Treffer, Sache in GOAL/WELLENPLAN getragen = reine Buchungsluecke | Traeger #176 | [STAND 07.09. 13:38Z:
+gehoben, Entwurfstext woertlich in KON137-12a] (war: OFFEN, Entwurfstext nicht im Assembler-Eingang). V-061 |
+Ledger-Luecke 20.08. abends (K051: U-1-Zug a7e8e151 + CI 16053 + W2-Design-Ernte 431 Posten + 19 Lead-Entscheide + 2
+Pausen + Fable-Limit 20/20; zwischen KON119 und KON120 keine KON; 8/10 Owner-Worte traegerlos) | Traeger #176 |
+EINGESPIELT: KON137-03 (a) + KON137-04 K051. V-062 | Riss-/Pausen-Register-Luecken (7 Zeilen) | Traeger #176 |
+EINGESPIELT: KON137-03 (b)/(d)/(g)-(m). V-063 | verify-47-Gesamtergebnis (wf_401a0ff3, 2 Runden, 8 Funde) | #160
+Ausfuehrungs-Traeger | EINGESPIELT: KON137-06. V-064 | K072-Nebenfunde fuer KON134-09 (Owner-B-Serie-Annotation;
+K1271-Widerlegung E18-Ort L28891/L28894) | NEUER-LEDGER S05/B-03 | EINGESPIELT: KON137-06 als Zeiger. V-065 |
+UEBERHOLT-Marker am MEASURESTORAGE-Plan docs/plaene/20260809-MEASURESTORAGE-... (Ueberlauf-Absatz vs KON93/94 harter
+Abbruch; K054-V-1/A-08 21.08.) | Traeger docs-Zug (additiver Marker nach T-12c-Muster) | OFFEN (Objekt-Edit, nicht
+Ledger). V-066 | L-14a Dock-Zahl-Docs-Nachzug (s8/F-17 + FINAL-D-12) + steuerdock.hpp:30-stale + D-12-Korrektur-Marker
+in beiden F2-Dokumenten + 'F-17-Neuform (CEB = EIN Dock)' (27.1.I L-14) | Traeger Ledger Z.2684/2716 + N-42-Familie;
+Code-Kommentar im #165(A)-Zug | OFFEN (MT). V-067 | DOKU-HYGIENE-PAKET 7 additive Marker: F2-FREEZE-CHECK-PROTOKOLL
+(B3-DATUM offen; F2-5 'IM BAU' ueberholt; #38a2-18.6(3)-Fehlbuchung -> Korrektur-Kopf) * K20-Doc 'kein unentdecktes
+Loch W1' [KORRIGIERT] (21.08. widerlegt) * k26-/k30-Uebergaben stale Saetze ('Sonst NICHTS starten'; 'Substanz
+gedeckt') * 20260826-WIEDERANLAUF-113xZ Fehlbefund 's19 NICHT GELANDET' * 1610Z-/1415Z-Fehldeutungs-Zeilen (Welle-4;
+Explore-tot) Verweis-Marker * 20260827-verbatim-Doc Fussnote prod1-gn_out (seit 27.08. 18:0x vollzogen) *
+K23/K24-Etiketten-Fehler Ledger Z.80368-Anker (= KON137-05 (a)); RT-08..RT-17-Liste der r18-r30-Volllesung gehoert
+dazu (PP-10 Watcher, Session-Doc 01.09. 14 SOLL + SOLL=PFLICHT-Marker, K064-Docs, 15-GB-Marker, DESIGNPLAN-DICHT T-12c
+GELTEND-Marker, Zeit-Drift 12:55:42Z, 25./26.08. Session-Docs NACHLANDEN mit Redaktions-Gate gitleaks,
+PAUSE-0828/2148-Marker, PP-6-Kopf, 1415Z-Fehldeutungs-Marker) | Traeger #176 docs-Hygiene-Pass (nur additiv, Doku nie
+loeschen) | OFFEN 0/7 (Strang Abschn. 6 Nr. 20; S3 Abschn. 3.1). V-068 | T-Entscheid-/NIE-KUERZEN-Marker-Nachzug an
+drei WELLENPLAN-Zeilen (A1 Z.244-246 / RN-63-STATUS / RN-74-STATUS tragen den 28.08.-T-Entscheid-Marker NICHT; nur
+W-12/W-1, W-H.2, GOAL Z.373) + par.5-Randbedingung (Z.74-80) ohne GELTEND-Marker (K-4-Lesart); Zusagen L96058 28.08.
+18:34:40Z / L96085 18:38:50Z (Lead) 'laeuft ueber #157', KON136-01-Nachtraege enthalten sie NICHT | Traeger
+#157-Posten (i) 4 additive Marker AM ORT (mit
+V-069 D.10-Anker-Drift: PlanSizeBuilder-Anker steht in der Vollfassung 20260808-WELLENPLAN-ENDFASSUNG-v2 Z.2120, Code
+heute experiment_plan_director.hpp:558; Anker vor Edit neu messen F3-07) | OFFEN. V-070 | GG2-1-Ledger-Vermerk (53 ->
+52) + ph89-Reste (Bericht-Nenner 6->7, s13-Bedarfsliste TEIL 6, K-3-REST SOTA-Metadaten, T-9-Codex-Pass 27.1.B
+LABEL-CAVE F3-19) + S1-Lande-Tips-Reste (L-05 test_rcu Parallel-Last, L-07 s19-Hinweiszeile, L-13/L-13a
+s8kopf/main.cpp-Anker, L-14 Dock-Zahl 27.1.I) | Traeger WELLENPLAN 27.1.B/C/I + #96 | OFFEN (MT). V-074 |
+prt-art-Altbranch-GitHub-Push (bau/prtart-ladeweg-w0a -> 7c0c9975, K074-K-08 01.09.) ohne Doku-Spur | hiermit Halbsatz
+im Ledger; Entscheid Weiterleben des Altbranchs (#155-Umfeld) | OFFEN (Entscheid). V-078 | K059-Kleinposten-Buendel:
+'journal-pruefung-Teilergebnis'/'Workflows 1 bis 16' Fundort (ERLEDIGT durch KON137-05 (e): 86f4fc1e + NF-B7) * pinduo
+lande-auflagen.md-Inventur * X-2/X-5-Ausweis-Zeile im Lande-Protokoll * Monitor-Widerspruch bcqxqdilc/bc9dtvlef
+(Transkript 'tot' vs beide-leser 'nie verifiziert') * cidual-Vorzieh-Abweichungs-Ausweis | Traeger Lead-Kleinzug | 1/5
+EINGESPIELT, 4 Ein-Zeilen-Vermerke OFFEN. V-093 | Transkript-Luecke 31.05.-05.07.: jede '12-Wochen'-Aussage deckt real
+~7 Wochen (K063-V-03/A-13 23.08. 'echte Luecke, kein Nullbefund') | hiermit Nenner-Vorbehalt im Ledger; A2.3a-Kopf +
+Ersatzquelle ~/.claude/history.jsonl (S08/B-22-Praezedenz) | TEIL. V-099 | Halluzinations-Ruege 21.08. 06:30 ohne
+Ledger-Verbatim (nur Fold KONSOLIDAT-A K743 / NEUER-LEDGER Z.831; Owner-Ruegen = Doktrin-Quellen, Ledger =
+Owner-sichtbares Register) | Traeger KON137-Owner-Verbatim-Block | [STAND 07.09. 13:38Z: gehoben, Verbatim L76898
+21.08. 06:30:56Z in KON137-12a] (war: OFFEN, Verbatim nicht im Assembler-Eingang; NEUER-LEDGER Original-Zeile Z.831 =
+Kopie heute Z.883). V-100 | Dauerregel 'Vollaudit-BU je Welle' (Owner 21.08., K052-V-11/O-4) ohne eigene
+Ledger-Buchung; erste Ledger-Spur = W2-Vollzug KON123-02 (Z.2152), Regel steht in Memory
+feedback_nach_jeder_welle_vollaudit_backup + ARBEITSWEISE-DICHT:665 (X-04) | hiermit Regel-Buchung im Ledger; V-071
+(CR-10 W2-Wellen-Ende-BU: cifix2-vl3debug/, V91-A1-Mutationsprotokoll, AB-09/fixstrecke2, CI-Belege 16095/16097/16101)
+bleibt Vollzugs-Posten | TEIL (Verbatim-Wortlaut nicht im Eingang). V-102 | 'EIN gebuendelter docs-/Memory-Zug' der
+~14 Kleinposten (beide-leser 20260822 Teil 5 Nr. 8: B-02/B-05/B-06/B-08/B-10/B-12/B-13/B-16/B-19/B-20 + H-35
+(2)-(5)(7)-(11)); WELLENPLAN RN-27 Z.1172 fuehrt 'H-14 + H-35 + P8' | Traeger RN-27 (H-35-Haelfte) + V-059-Zug
+(B-Posten) | OFFEN. V-104 | W-S Z-10 OW-04-Vollzitat (L92952/L92992) V13-Heilung: in der Uebergabe WIEDERANLAUF-113xZ
+nur HALB zitiert ohne [...]-Marke, fehlender Nebensatz 'dieser verweist auf Dokumente, die zu kippen sind und laut
+memory auch bekannt sind'; KON136-01 (iv) nennt Z-10 nicht | Traeger WELLENPLAN-DICHT W-S Z-10 (Prio NIEDRIG) | [STAND
+07.09. 13:38Z: gehoben, Vollzitat L92952/L92992 26.08. 13:13:54Z in KON137-12a] (war: OFFEN, Vollzitat per sed durch
+den Lead). V-108 | Owner-Verbatim 'Alle Soll Fehler sind IMMER auch PFLICHT zu beheben' (L102011 01.09. 15:47:33Z)
+fehlte im Ledger (nur Etikett Z.35/Z.60) | EINGESPIELT: KON136-07(a). V-059-SAMMEL-POSTEN (Raster Abschn. 3 Vorspann,
+21 [B]-Posten der GRUPPE D4 an V-059 gekoppelt): V-112 (L73020 Kipp-Ruege 'zu komplex' 20.08.) * V-113 (L73243 20.08.
+07:09:15Z aeltester Vergessene-Arbeit-Beleg) * V-114 (L72946 'rekonstruiere mit ultracode' 20.08. 06:54) * V-117
+(L77162 21.08. 07:49 Vollaudit/Baustrang Welle-1-Luecken) * V-118 (L77414 + L78127 21.08. vormittags inkl.
+Vormittags-Riss) * V-122 (Herkunft des Rueckfragen-Strangs, L80103 u.a.) * V-125 (L83024(b) 'massive CI Regression') *
+V-126 (L83205(4) 'nie raeumen [...] nicht der worktree selbst') * V-129 (10 Owner-Worte 22.08. 13:30-17:31,
+O-03..O-23) * V-131 (L92034 'Weil github privat ist') * V-136 (L94077 'Lande alles, was reif ist') * V-137 (L95324
+'verbuche [...] alles Fehlende' 27.08. 18:20Z) * V-139 (L96224 'ist ein verify drueber gelaufen') * V-140
+(L96917/L96940 frisch einlesen + Uebergabe-Order) * V-142 (L98278/L98455 = KON137-04 K072) * V-143 (L99433
+Uebergabe-Update-Order 30.08. 21:14Z) *
+V-144 (Kipp-Einlese-Ritual 01.09. 08:27-08:30Z) * V-145 (L100047 Halbsatz + E-1-Zombie-Ursache) * V-146
+(L99617/L99687/L100431/L100432 Owner-Orders 01.09.; L99617 = KON137-03 (g); Dubletten-Befund 07.09.: (c)/(d)
+L100431/L100432 = dieselben zwei Owner-Nachrichten wie V-147 L100470/L100471, je einmal als queue-operation und einmal
+als attachment aufgezeichnet, s. KON137-12a) * V-147 (L100470/L100471 01.09. 10:44Z) *
+V-148 (L100934 'Fold ist noch gar nicht fertig' 12:55:42Z = KON136-04). Form je Posten: Owner-Verbatim + Datum/Uhrzeit
++ L-Anker + R3-Fakt-Verweis (Original-Wortlaute bleiben stehen, K27/F-032). Stand: durch KON137-04 gedeckt V-142,
+V-148, V-146 (teil), K051-Umfeld V-112..V-114 (Anker, nicht Verbatim); die uebrigen Verbatims (Nenner 21) waren NICHT
+im Assembler-Eingang [STAND 07.09. 13:38Z: ALLE 21 + V-060/V-099/V-104 gehoben (24/24, 34 Anker mit Vollzeitstempel) =
+KON137-12a; Etiketten-Korrekturen V-131 25.08. 20:43:12Z, V-140 29.08., V-142 30.08. dort ausgewiesen].
+B-17/D-10-Quittung: 'Antwort WAR gegeben 22.08. L82180(4)+L85348' (Lead 22.08. 07:11:10Z / 17:36:51Z) --
+FIX-r1-PRUEFAUFLAGE: L82180(4) woertlich 'OV-16/OV-17 sind seit 09.08. GEBAUT (Test #278; AF_RESULT_NAMEN beide
+Formen) und waren nur nie verbucht -- jetzt verbucht, Wellenplan-par.24-Entwurf liegt wortfertig.' (Etikett 'D-10'
+kommt in L82180 NICHT vor); B-17-Wortlaut (beide-leser-Doc 20260822 Z.253-255) sachlich deckungsgleich,
+Etikett/Adressierung unbewiesen -> ZUERST Gegenstands-Pruefung (war L82180(4) DIE D-10-Antwort? par.24-Nachtrag
+vollzogen?), DANN Quittungs-Zeile | OFFEN.
+
+VK-2 CI-LINT-WARNUNG (3K K079, Lesequittung 49.1; MUSS nach Owner-Regel L111216): super .gitlab-ci.yml Z.331-335
+'retry: max: 1 when: stuck_or_timeout_failure/runner_system_failure' = ci/lint-Warnung 'retry deprecated', am 01.09.
+21:49:22Z/21:49:45Z (L103397/L103401) als 'Vorbestand (retry-deprecated, nicht mein Diff)' abgelegt (Lead-Text
+L103401) -> Posten im naechsten super-Push-Fenster (Fenster 9; Fenster 8 07.09. 12:37-12:46Z trug nur 13
+docs-Commits), Lint-Warnung auf 0; Board #176 Metadatum nachtraege_0709_pause13 (a). BERICHTIGUNG UEBERGABE-NACHTRAG
+25 (07.09. 07:32Z, 6d37b688; 5K-Refute-A F-01): die Praemisse 'die vier Owner-Worte 04.09.
+(L107922/L107923/L108016/L108018) bisher in keiner Uebergabe/Quittung/Memory' war falsch -- Erstfund
+LESEQUITTUNG-KONTEXTE-C-3-C-1-0409.md Z.28-29/197-201/208-209 + Register 20260904-HAUPTSTRANG Z.9; Nachtrag 25 war
+Zweitablage; NICHT trugen sie nur KON137-Entwurf und Ledger (jetzt KON137-11). Lehre: 'nicht gefunden' erst nach grep
+ueber ALLE genannten Traeger inkl. Quittungs-Abschnitte (Uebergabe 0932Z Z.685 traegt die Berichtigung bereits).
+PAUSE-10b-NUMMERNKOLLISION: die Owner-Pause 04.09. 21:47:45Z (L109079) heisst PAUSE 10b (Kollision mit dem
+Repo-Dokument 20260830-PAUSE-PROTOKOLL-10.md vom 30.08.; Beweisort 20260904-PAUSE-2148Z/ Kopfzeile '10' = Historie,
+Vermerk statt Umschrift; PAUSE-PROTOKOLL-13 Z.6-7 + MEMORY.md Z.11 fuehren 10b; 5K-Fix A-F-05). V-077 THESIS-LEDGER:
+thesis docs/ledger-sections C4:73 traegt weiter 'beim Owner', obwohl der Owner RF-8a am 26.08. fuer erledigt erklaerte
+(K068-V-07/A-08; KON133-18 'textlicher Nachzug im Thesis-Grosszug #121'; Objekt 01.09. Z.73 unveraendert) -> kleiner
+Thesis-docs-Posten VOR #121 (eine Zeile drehen, TRAILER-FREI) | OFFEN, Traeger #121.
+
+**KON137-12a (VERBATIM-ERGAENZUNG zu KON137-12: die 24 dort als 'nicht im Assembler-Eingang' gefuehrten
+Owner-Verbatims V-060/V-099/V-104 + V-112..V-148 (21 [B]-Posten der GRUPPE D4), 34 Anker; Quelle
+NACHTRAG-A-VERBATIM-ERGAENZUNG.md Z.23-183 (verbatim-heber-176, 07.09. 13:38:41Z, md5 a2b7ffd1), hier woertlich
+uebernommen; Zeitstempel = JSON-Feld timestamp der Transkriptzeile 5a19728e, Owner-Schreibvarianten und Tippfehler
+belassen, typografische Anfuehrungszeichen -> ", Kuerzung nur [...]; Abweichungs-Ausweis Etiketten
+V-131/V-140/V-142/V-060 + Dubletten-Befund V-146/V-147 = Ergaenzung Z.207-213; Einbau als Block 12a INNERHALB von
+KON137 nach Lens 2 F-07):**
+
+[TEIL 1 -- EINZELPOSTEN V-060 / V-099 / V-104]
+
+V-060 | 21.08.2026 (Dokument-Datum; KEIN Transkript-Zeitstempel, die Quelle ist ein Session-Doc) |
+docs/sessions/20260821-F2-FREEZE-CHECK-PROTOKOLL.md Z.104-109 (super-Repo; die Etikettierung "KON120-ENTWURF,
+Protokoll Z.104-109" in KON137-12/R1 Z.516 meint DIESES Dokument, nicht die Datei KON120-ENTWURF-SAMMLUNG.md, die nur
+82 Zeilen hat) | Entwurfstext WOERTLICH: "Ledger-Nachtrag (KON120-ENTWURF, Lead schreibt nach Staffel-Synthese):
+"F2-FREEZE-CHECK VOLLZOGEN 21.08. (Protokoll docs/sessions/20260821-F2-FREEZE-CHECK-PROTOKOLL.md): 15/18 (P) GELANDET
++ 3 Fall-Deklarationen (B1-18.6(4)->#24, B5-Freigabe erbeten, #38a2-18.6(3) T-A) . 23.1 8/8 getragen (5 im W1L-Bau) .
+23.2 0 Falsch-Rot . Fenster R6 vorgelegt (20+3 Bloecke + 12 Deltas [VF-A1-Nachzug 22.08.]; SOFORT: C-3a, root-Platte,
+Infra-Termin, O4)."" [Paragraphenzeichen im Original vor 23.1/23.2 als ASCII entfernt] | R1 Z.516 (Kette K053-V2/A-06
+-> K055-VK-4); Pruefbeleg RT-52: Ledger "F2-FREEZE-CHECK" = 3 Fremdtreffer (Z.2423/3223/10258, keiner = diese Zeile),
+"15/18" 0 sachlich; nur die Delta-Zahl 12 ist gebucht (Z.2423-2425).
+
+V-099 | 21.08.2026 06:30:56Z | L76898 (Transkript-Anker NEU gehoben; der Owner-Satz steht in dieser Zeile hinter einer
+Klienten-Limit-Meldung) | "Ich denke da ist ueberhaupt nichts gebaut und fertig, das ist eine Halluzination, ist ja
+schon wieder abgebrochen, ja der erste Agent hat fertig gebaut, aber der Rest der Kette ist nicht fertig und muss vor
+weiterbau erst geprueft werden." | NEUER-LEDGER-NACHFOLD-0109.md: Original-Zeile Z.831 laut Marker, KOPIE HEUTE Z.883
+(Datei jetzt 20816 Zeilen), Eintrag S11/A-10 OBJEKTPRUEFUNG VOR WEITERBAU [A51 21.08. 06:30, Halluzinations-Ruege
+N-02] -- dort mit Kuerzung "[...]"; der VOLLE Mittelteil "ist ja schon wieder abgebrochen, ja der erste Agent hat
+fertig gebaut, aber" fehlt im Ledger und wird hier erstmals wortgetreu nachgereicht. Weitere Fundstellen der Kopie:
+Z.428 (Fold 11) und Z.863 (S10/A-63). Pruefbeleg RT-52: Ledger "Halluzin" = 1 Fremdtreffer (Z.26760 Codex-Ausfall).
+
+V-104 | 26.08.2026 13:13:54Z | L92952 (queue-operation) UND L92992 (attachment, identischer Zeitstempel und Wortlaut =
+Doppel-Aufzeichnung derselben Owner-Nachricht) | "Bitte suche gezielt in den letzten 10 Kontext-Aequivalenten nach dem
+letzten gesetzten "/goal" Text, dieser verweist auf Dokumente, die zu kippen sind und laut memory auch bekannt sind" |
+R1 Z.499 (W-S Z-10 OW-04-Vollzitat, V13-Heilung): der in der Uebergabe 20260826-WIEDERANLAUF-113xZ fehlende Nebensatz
+"dieser verweist auf Dokumente, die zu kippen sind und laut memory auch bekannt sind" ist hiermit belegt; Traeger
+WELLENPLAN-DICHT W-S Z-10.
+
+
+[TEIL 2 -- DIE 21 [B]-POSTEN DER GRUPPE D4 (V-059-SAMMEL-POSTEN)]
+
+V-112 | 20.08.2026 07:02:55Z | L73020 | "Hast du bitte alle 4 "/goal" Referenzdokumente gekippt? Das Projekt ist zu
+komplex um das zu ueberspringen" | R1 Z.1029-1033 (K048-V-6); R1 0, R3 F-006; Vorschlag laut R1: Verbatim in
+KON137-Block + Kopie 1c-2 an F-006 (Herkunft D7).
+
+V-113 | 20.08.2026 07:09:15Z | L73243 | "Seit Beginn der Session, was hast du jetzt noch fuer liegengebliebene
+Aufgaben vergessen? Bitte hole sie direkt aus dem Wissen des Kontextes nach. Dann melde dich erst zu k16 workflow
+Ergebnis wieder, nachdem du diesen auch vollstaendig eingelesen hast." | R1 Z.1035-1039 (K048-V-7, aeltester Beleg der
+Vergessene-Arbeit-Order-Klasse); R1 0, R3 F-008; Traeger HERKUNFT-OWNER-VERBATIMS.md Glied 0.
+
+V-114 | 20.08.2026 06:54:48Z | L72946 | "Bitte rekonstruiere mit ultracode die Arbeit und eine Kontextuebergabe aus
+dem Session log des letzten Kontextes, dann weiter." | R1 Z.1041-1046 (K048-V-8, Methoden-Ursprung des
+Fenster-Leser-Fanouts); R1 0, R3 F-008; Traeger V-091 + V-059; zugleich Wurzel-Anker der Rueckfragen-Kette (Board
+#186).
+
+V-117 | 21.08.2026 07:49:17Z | L77162 | "Bitte lies das vollaudit vollstaendig und organisiere einen weiteren
+Baustrang mit ultracode fuer die welle 1 luecken" | R1 Z.1068-1073 (K052-V-12); R1 0, R3 F-033(f); Vorschlag laut R1:
+Verbatim-Nachtrag an NEUER-LEDGER Z.833 + KON137-Block.
+
+V-118 (zwei Anker) | (a) 21.08.2026 08:56:20Z | L77414 | "Bitte lies "W1-Luecken aus dem Vollaudit: Voll-Lesung der 3
+grossen Konsolidate, Kern-Explore am Objekt, sequentieller Bau der echten Luecken" vollstaendig und vollziehe nach dem
+compact eben das Einlese Ritual, lies die letzten 3 Kontextuebergaben und gruende dich neu." * (b) 21.08.2026
+11:39:00Z | L78127 | "Bitte fahre mit der offenen Arbeit direkt fort wie gehabt, die Pause ist vorbei. Bitte resume
+alle Workflows und Agenten. Die credits sind wieder frisch" | R1 Z.1075-1081 (K053-V7); R1 0, R3: O-1 = F-006, O-2 =
+U-06; KON137-Block "Owner-Worte 21.08. vormittags" inkl. Vormittags-Riss ca. 10:30-11:39Z.
+
+V-122 | 21.08.2026 18:28:15Z | L80103 | "Wir hatten im letzten Kontext gesagt, dass du bitte jede Welle (1,Staffel 1
+und dann Staffel 2) erst auditierst und behebst nach Claude code Arbeitsweise und dann bitte landest. Das Audit fuer
+Welle 1 ist fertig und sie ist bereit zum Landen, bitte lande sie also und dann weiter mit einem ultracode audit von
+Welle 2 angefuehrt durch ein Sonnet 5 max Planungs-Ergebung zu jeder der gefahrenen Aufgaben, um die Vollstaendigkeit
+auch gegen Wellenplan, designplan und Goal v8 zu verifizieren und in fix-verify Schleifen solange zu korrigieren, bis
+alles sitzt. Wiederhole das parallel mit Staffel 2." | R1 Z.1105-1112 (K056-VK-07, Herkunft des Rueckfragen-Strangs);
+ohne R1-Zeile (V-109-Fehlposten), Ledger 0 fuer "Knappheit"/"Drift-Korrektur"/wf_cc1edd79; Owner-Schreibvariante
+"Planungs-Ergebung" (statt Erhebung) belassen.
+
+V-125 | 22.08.2026 12:40:09Z | L83024, Teil (b) | Volltext der Zeile: "Was fuer eine variant? std::variant ist
+zumindest in den Tier-Binaries verboten. Weiterhin haben wir wieder die massive CI Regression, dass die CI extrem
+geschrumpft ist und nicht mehr alles testetm, wie etwa vor 2 Wochen noch. Es fehlen auch noch andere Landungen anderer
+Worktrees und deren sub-git Projekte im Verbund." | R1 Z.1141-1145 (K059-V-06); R1 0, R3 F-010; Teil (c) derselben
+Zeile traegt V-127 (Landungen anderer Worktrees, R3 F-009); Owner-Schreibvariante "testetm" belassen.
+
+V-126 | 22.08.2026 12:52:43Z | L83205, Teil (4) | Volltext der Zeile: "Bitte bearbeite paralle alle liegengebliebenen
+Aufgaben und abgebrochenen Straenge aus den letzten 6 Kontexten, sobald du den sweep-6-kontexte nach dessen Rueckkehr
+vollstaendig gelesen hast. Wir hatten in einem Workflow schon mal alle Workflows 1 bis 16 konsolidiert, bitte finde
+das workflow ergebnis und lies es vollstaendig. Zusammen mit dem aktuellen sweep und der regression session erhalten
+wir einen Gesamtueberblick. Weiterhin nie raeumen, alle Ergebnisse der sub repositories sind git tracked und muessen
+gemerged und gelandet werden, nicht der worktree selbst" | R1 Z.1147-1151 (K059-V-07, aeltester Beleg S12/A-22); R1 0,
+R3 F-009; Owner-Schreibvariante "paralle" belassen.
+
+V-129 (zehn Owner-Worte 22.08. 13:30-17:31Z; L-Anker aus map/K061.md Z.22-135, in R1 Z.1158-1166 nur klassenweise) |
+O-03 | 13:30:12Z | L84217 | "Wo stehen wir mit der Heilung und Rueckkehr auf den Hauptstrang?" * O-06 | 13:36:06Z |
+L84389 (Dublette L84395, 13:36:15Z) | "Du hast ueber die letzten 2 Kontexte dutzende Workflows gestartet und diese
+nicht verbucht. Wir kennen die Ergebnisse nicht mehr, bitte finde sieund lies sie ein, bitte kehre zu den Befunden und
+der Heilungsaufgabe und danach zum Hauptstrang. Ich verstehe nicht warum, aber der Kontext laeuft staendig voll und
+der compact resettet jedes Mal alles, wir sollten also besser konzentriert die Heilung verfolgen, weil wir sonst
+abgebrochene Straenge verlieren und die Landung nie fertig wird." (Owner-Schreibvariante "sieund" belassen; alles nach
+"nie fertig wird." in derselben Transkriptzeile ist Klienten-Auswurf, kein Owner-Text) * O-12 | 14:12:57Z | L84798 |
+"Weiterhin meldet p12-b10 dass er wartet, warum wartet er und worauf?" * O-13 | 16:30:26Z | L84895 | "Bitte resume
+alle Agenten und Workflows und fahre fort wie gehabt, die credits sind wieder frisch." * O-14 | 16:35:40Z | L84996 |
+"Der resume ist unvollstaendig:" (danach zitiert der Owner zwei Workflow-Abschlussmeldungen und die
+Fable-5-Limit-Zeile des Klienten) * O-15 | 16:44:27Z | L85018 | "Bitte pruefe ob die merges funktionieren, weil in der
+CI seit einigen Tagen wichtige Anforderungen fehlen, etwa das kompilieren mit clang und gcc parallel. Lasse die
+Workflows dennoch erstmal durchlaufen" * O-19 | 17:10:46Z | L85104 | "Bitte erstelle eine reiche Kontextuebergabe, der
+kontext endet jetzt" * O-21 | 17:24:11Z | L85139 | "Bitte schreibe eine reiche vollstaendige Liste beider Opus-max
+Leser fuer gebrochene Straenge, liegengebliebene oder noch nicht erledigte Aufgaben als Session. Du hast ja beide
+Workflows im Kontext" * O-22 | 17:31:02Z | L85160 | "Bitte vollziehe das Einlese Ritual und lies die letzte
+Kontextuebergabe und die letzte Session ueber gebrochene Straenge vollstaendig und beginne mit der Heilung. Starte ein
+ultracode Audit nach der Rueckkehr des Landezuges, ob die regression session Belange alle erledigt sind und finde die
+Stelle ueber die letzten 20 Kontexte wo schon einmal mehrere hunder nicht erledigte Aufgaben festgestellt wurden in
+einem bereits gelaufenen Workflow, finde diesen. Dann weiter mit dem Hauptstrang" (Owner-Schreibvariante "hunder"
+belassen) * O-23 | 17:12:22Z | L85120 (Quellklasse Q5b, /btw local-command; die Transkriptzeile traegt nur den
+gekuerzten Agenten-Titel) | Volltext laut map/K061.md Z.135-139 aus
+docs/sessions/20260822-SESSION-UEBERGABE-k29-ende-lande-zug-laeuft.md Abschnitt 3: "Und du bist dir ganz sicher, dass
+der merge wirklich einen full join faehrt und nicht immer nur eine der beiden Seiten als aktuell deklariert und
+einfach uebernimmt?" | R1 Z.1158-1166 (K061-K-06); R1 nur klassenweise V-053; KON122-08 deckt nur die
+Memory-/Prozess-Haelfte.
+
+V-131 | 25.08.2026 20:43:12Z (R1-Etikett "25./26.08." -- Transkript sagt 25.08. abends) | L92034 | "Weil github privat
+ist machen wir erstmal weiter" | R1 Z.1168-1172 (K066-V12, Freigabe-Praemisse der Public-Kette); R1 0, R3 F-026.
+
+V-136 | 27.08.2026 11:45:12Z | L94077 | "Bitte lies Board #133 vollstaendig. Lande alles, was reif ist jetzt mithilfe
+von ultracode Agenten." | R1 Z.1197-1202 (K068-V-08, OW-05 Effort-Praezedenz); R1 0, R3 F-031.
+
+V-137 | 27.08.2026 18:20:38Z | L95324 | "Bitte weiter wie gehabt, lies alle Rueckkehrer vollstaendig und fahre mit der
+Verbuchung fort - verbuche nach der Verarbeitung alles Fehlende" | R1 Z.1204-1210 (K069-VK-10, O-10); R1 0, V-091(7)
+nennt nur K068-V-03; Traeger [Z213]-Praezisierung in Kopie 1c.
+
+V-139 | 28.08.2026 19:05:28Z | L96224 | "hast du den letzten workflow vollstaendig gelese und ist ein verify drueber
+gelaufen, weil der build so of unterbrochen wurde?" | R1 Z.1219-1224 (K070-V-10); R1 0, R3 F-024;
+Owner-Schreibvarianten "gelese" und "so of" belassen.
+
+V-140 (zwei Anker; R1-Etikett "28.08." -- die Transkript-Zeitstempel sagen 29.08. frueh) | (a) 29.08.2026 06:04:58Z |
+L96917 | "Bitte lies den gesamten Kontext einmal und lies dich frisch ein" * (b) 29.08.2026 06:06:00Z | L96940 |
+"Bitte schreibe eine reiche und elaborate Kontextuebergabe, der Kontext endet jetzt" | R1 Z.1226-1230 (K070-V-13); R1
+0, R3 F-006/F-007.
+
+V-142 (zwei Anker; R1-Etikett "29.-30.08." -- beide Zeitstempel liegen am 30.08.) | (a) O-10 | 30.08.2026 09:18:17Z |
+L98278 | "Die Pause ist vorbei, bitte resume ALLE Agenten und Workflows und fahre wie gehabt mit der offenen Arbeit
+fort. Bitte plane zuerst eine Sinnvolle Einteilung und aenderung und Heilung der Workflows, weil es das letzte Mal
+schief ging" * (b) O-12 | 30.08.2026 10:15:23Z | L98455 | "Bitte pruefe den Plattenspeicher von prod1" | R1
+Z.1240-1245 (K072-V-11); R1 0, R3 F-013 + F-033(k); durch KON137-04 (K072) bereits als Anker gedeckt, der Wortlaut lag
+nicht vor.
+
+V-143 | 30.08.2026 21:14:39Z | L99433 | "Bitte update die letzte KOntextuebergabe, der compact kommt gleich und ist
+nah, aber wir haben in der Zeit viel geschafft" | R1 Z.1247-1252 (K073-V-4); R1 0, V-062 nennt nur K073-V-3/V-5; R3
+F-007; Owner-Schreibvariante "KOntextuebergabe" belassen.
+
+V-144 | 01.09.2026 08:26:48Z | L99687 | "Bitte vollzieh zuerst das Kipp-Einlese-Ritual" | R1 Z.1245-1250 des
+D4-Schlussteils (K074-K-02); R1 0, R3 F-006 traegt nur die Order; der Vollzug 01.09. 08:27-08:30Z ist in keinem
+lebenden Dokument gebucht.
+
+V-145 | 01.09.2026 09:37:14Z | L100047 | "Bitte sync alle branches aller 4 Diplomarbeit Projekte, ich habe gestern
+manuell mit dem admin laptop gemerged. Es koennte daran liegen, sonst weiter wie besprochen" | R1 (K074-K-06); R1 0,
+R3 F-029 vermerkt nur "(zweiter Halbsatz fehlt auch im Ledger)" -- der Halbsatz "Es koennte daran liegen, sonst weiter
+wie besprochen" ist hiermit wortgetreu gehoben; die Owner-Hypothese wurde widerlegt (Ursache = E-1-Zombie-Kaskade).
+
+V-146 (vier Anker) | (a) 01.09.2026 08:24:50Z | L99617 | "Bitte resume alle Agenten und workflows und fahre mit
+offener Arbeit fort." * (b) 01.09.2026 08:26:48Z | L99687 | "Bitte vollzieh zuerst das Kipp-Einlese-Ritual" (identisch
+mit V-144) * (c) 01.09.2026 10:44:24Z | L100431 | "Bitte lies den letzten Rueckkehrer Volltext vollstaendig ein" * (d)
+01.09.2026 10:44:36Z | L100432 | "Dann weiter und dann das Einlese-Ritual" | R1 (K074-K-07); L99617 auch in R3 = 0;
+L99617 ist zugleich KON137-03 (g). BEFUND: (c)/(d) sind zeitstempel- und wortgleich mit den V-147-Ankern
+L100470/L100471 -- es handelt sich um dieselben zwei Owner-Nachrichten, je einmal als queue-operation
+(L100431/L100432) und einmal als attachment (L100470/L100471) aufgezeichnet, KEINE vier verschiedenen Worte.
+
+V-147 (zwei Anker) | (a) O-1 | 01.09.2026 10:44:24Z | L100470 | "Bitte lies den letzten Rueckkehrer Volltext
+vollstaendig ein" * (b) O-2 | 01.09.2026 10:44:36Z | L100471 | "Dann weiter und dann das Einlese-Ritual" | R1
+(K075-K-5); Ledger 0, Session-Doc springt 09:36 -> 12:1xZ; R3 F-001/F-006 tragen die Worte. Siehe Dubletten-Befund
+unter V-146.
+
+V-148 | 01.09.2026 12:55:42Z | L100934 | "Fold ist noch gar nicht fertig" | R1 (K075-K-6, O-5); R1 0, R3 F-030; fehlt
+im Ledger, nur Session-Doc Z.17; durch KON136-04 bereits als Anker gedeckt, der Wortlaut lag nicht im
+Assembler-Eingang.
+
+**KON137-13 (STRANG UND ZIELHIERARCHIE DER RUECKFRAGEN-KETTE; Owner 06.09.2026 19:50:45Z L112228 verbatim: "Hinweis:
+du hast alle Ziele der Kette vom rueckfragen workflow von vor ueber 3 wochen und dessen Gruende, ueber die Ledger
+Aktualisierung als Hauptziel unter den a23a Korrekturen an Fragen leider vollstaendig vergesen, bitte suche den Strang
+nochmal zusammen und verschaffe dir einen Ueberblick ueber die Kontexte und die eigentlichen Bewandnisse der grossen
+Audits bis heute. Das ist alles definiert, bitte Explore dazu"; Arbeitsfehler K35):** KETTE: Wurzel 20./21.08. (L72861
+Compact ohne Uebergabe, L73243 vergessene Arbeit, L79109 "Welche Rueckfragen [...] die du nicht allein durch explore
+loesen kannst?", L79132 Ursprungsauftrag M1) -> Rueckfragen-Workflow (Vollbild wf_bce0efd4 -> Synthese-2 wf_c37fb077
+-> Fold-Rest wf_fe1cf67c: NEUER-LEDGER 157 = 97 WANDERT / 60 REST, #159; Trace 30K + Nachfold wf_1fcc434d #168, Raster
+#170, Volllesung #171, Explores 10K #174 / 5K #185 / 3K #182 = sieben Nummernkreise (Register 02.09. 07:55Z; Endstand
+ELF, Lead L105918 02.09. 08:12:57Z 'vier Quellen fehlten als Frage-Quellen', s. KON137-09), Vollbestand nur als Union,
+KON137-09) -> A2.3a-Vorlage (MITTEL, T-3; 163 G-Nummern; Owner 20:27Z L112733 "Er ist das letzte Glied in der Kette")
+-> Owner-Antworten (Tranche 1 L113305 06.09. 21:49Z 16/16 + G-007 07.09.; Tranche 2 L113329 21:51:24Z; Tranche 3 =
+Teil A/C) -> HAUPTZIEL LEDGER-AKTUALISIERUNG (ZWEI Zuege: dieser docs-Zug #176 = KON136-04..08, KON137-01..13, KON138
+= EINE Rueckfragen-Tafel; + #197 LEDGER-DICHT, Owner G-051 L114346 12:12:56Z + L114596 12:39:17Z, wf_86e234d4 seit
+12:48Z) -> Trigger-Pfad #158 (KON133-22) -> T-8 Soll-Ist W2 (#128/#135), T-9 Drift-Korrektur-Designs (M1;
+G-158/#180/#128; Datei 898 Z. seit 21.08.), Abgabe 15.09. DREI GEGENSTAENDE (Owner 29.08. 05:53Z L96837 "Ja fold war
+durch, aber doch nicht das landen und rueckfrage audit"): Fold (#159) / Landung (#131/#153, KON123/124/134-02) /
+Rueckfragen-Audit (#168 -> #175) sind getrennte Ziele mit eigenen Traegern; die Audits A1-A24 (Beweisort
+20260906-strang-rueckfragen-kette/S2) dienen je einem Teilziel T-1..T-9 und tragen ihre Restmengen (Nachfold 20468 Z.,
+Raster, RT-01..62, R4 268, VOLLLISTE 318, N-01..48) in diesen Zug bzw. #180/#128/#136. REIHENFOLGE (beide
+Owner-Worte): 02.09. 06:34Z L103848 "dichte Ledger [...] nachdem du mir offene Rueckfragen [...] vorgelegt hast" vs
+06.09. "Ledger Aktualisierung als Hauptziel" -> Lesart A (antwort-unabhaengige Bloecke sofort, KON138 nach den
+Antworten) = Owner-Frage K-1, Antwort 07.09. 12:12:56Z L114346: "K-1: GO, sofort einspielen wie von dir empfohlen."
+(Lesart A; Zug wf_663f7e45 seit 12:24Z). REGEL (K35): jeder Bericht, jede Board-Zeile einer Teilstufe nennt
+Wurzel-Order, Hauptziel und naechstes Glied. [V14-Zeitanker zu diesem Block (Transkript-Zeitstempel, Assembler A + Fix
+07.09.): L72861 20.08. 06:49:10Z (queued_command 'Bitte vollziehe das Einlese Ritual, der compact ist schon durch
+[...]'), L73243 20.08. 07:09:15Z, L79109 21.08. 16:58:09Z, L79132 21.08. 17:06:09Z, L96837 29.08. 05:53:00Z, L103848
+02.09. 06:34:06Z, L112733 06.09. 20:27:00Z, L113305 06.09. 21:49:11Z, L113329 06.09. 21:51:24Z, L114346 07.09.
+12:12:56Z, L114596 07.09. 12:39:17Z (user; wf_86e234d4-c80 Journal erste Datei 12:51:07Z); Nachfold-Kopie heute 20816
+Z. (Zahlenkette KON136-06); Quelle wortgleich KORREKTUR-VORSCHLAEGE.md Abschn. 7d Z.181-204 (Fix-r2 07.09. 13:54Z) =
+STRANG-UEBERBLICK.md Z.904-927; Zusaetze des Fix-Agenten in runden Klammern: L113329-Zeitstempel,
+Nummernkreis-Korrektur 7 -> 11.]
+
+## KON136 -- NACHTRAG 04..08 (Fortsetzung KON136-01..03 vom 01.09.; Einspielung 07.09.)
+
+*(Quelle: ~/backups-workflow/20260901-30-kontexte-vergessene-arbeit/EINGANG-KON136.md Z.11-100 (Schreiber GESAMTBILD
+Fable 5 max, 02.09.2026 ~00:2xZ, wf_1fcc434d; Raster-/Verify-Nachtraege 02.09. Lead); hier vollstaendig und
+unverkuerzt uebernommen, Zeitanker nach V14 praezisiert, [STAND 07.09.]-Vermerke = Assembler A. Zahlen geprueft
+07.09.: Nachfold-Kopie wc -l = 20816 Z. (Kette 20468 -> 20498 -> 20793 -> 20816, s. KON136-06), Raster-Nenner 277.)*
+
+**KON136-04 (01.09., Lead): FOLD-REST TERMINAL -- 157er-GATE GESCHLOSSEN.** wf_fe1cf67c "fold-rest-3008" TERMINAL
+01.09. 19:39Z (Journal 94/94, 40/40 Results; Gesamt 108 Agenten, 0 Fehler, 21,06M Tokens). Ergebnis:
+NEUER-LEDGER-konsolidiert-owner-antworten.md 18345 Z. (Assemblage 18:03Z + final-fix r1 +534 [519 mittendrin + 15
+Ende] + r2 +11 + Lead-Nachfix +22; Beweisort 20260824-rueckfragen-synthese2/). 157-Gate: 97 WANDERT_NACH_A / 60
+BLEIBT_REST / 0 WIDERSPRUCH / 0 NICHT_GEPRUEFT. GEGENLESE-GATE 3 Runden (F-1..F-5 + R2-1 BEHOBEN; Runde 3
+NULL_NEUE_FUNDE). Lead-Nachfix 19:44Z: riss5-b08-R3-Vollstand additiv nachgetragen (+22 Z., 4 VERMERK-Bloecke);
+Folgeposten #167(k). Owner-Sequenz-Gates eingehalten (L99955 01.09. 08:44:42Z "Bitte starte den zusaetzlichen workflow
+erst, wenn fold rest wirklich fertig ist [...]"; L100934 12:55:42Z "Fold ist noch gar nicht fertig"; L102189 18:30:05Z
+"Bitte warte auf die Fertigstellung des fold rest [...]").
+
+**KON136-05 (01.09.-02.09., Lead): 30-KONTEXTE-TRACE wf_1fcc434d TERMINAL -- BEFUND.** Owner-Grossorder 01.09.
+18:21:10Z (L102088) + Zusaetze 18:30:05Z/18:30:23Z (L102189/L102190 "Also danach wie gehabt") + M12 19:19:30Z
+(L102688). Lauf: 30 Opus-Kontextleser K048-K077 + 4 Sonnet-Scans -> 4 Fable-max-Reduces (R1 vergessene Arbeit / R2
+Herkunft+Weg / R3 Owner-Fakten / R4 Wellen-Rest-Plan) -> je 2 adversarische Refute/Fix-Runden (48 Funde, alle BEHOBEN,
+0 VERTAGT) -> Nachfold -> Gesamtbild. Resume-Historie: Erstlauf w4njtyz0s (API-Last) -> Resume 2 w9mpauktw
+(Spend-Limit) -> Resume 3 wiz02js0s (Owner 23:00:53Z L103663, byte-unveraendert, K27). KERN-BEFUNDE: (1) R1-Tafel =
+109 vergessene Arbeits-Posten (69 OFFEN-OHNE-TRAEGER / 39 MIT-TRAEGER / 1 ERLEDIGT; aus 283+11 Kandidaten;
+Stichproben-Dedup-Verlust 13 Prozent -> V-109-Vollzaehligkeits-Pass PFLICHT vor A2.3a-Konsum). (2) R2 =
+Herkunfts-/Rewrite-Tafel (Wurzel 20.08.; RV-1 Transkript-Blindheit ab R2-Rewrite; RV-2 Vorlage-Verengung =
+T-3-Kern-Rueckstand; Luecken L-1..L-16). (3) R3 = JA, Fold-Erweiterung noetig: 37 Owner-Fakten F-001..F-037 (Nenner
+187 Posten: 71 im Korpus / 101 nicht / 15 teil). (4) R4 = Wellen-Rest-Plan: 268 Rest-Gegenstaende der 4
+DICHT-Referenzen in Stufen 0-6 + Q1-Q6 nach #158-Reihenfolge; Frist-Kollision Stufen 1-3 vs W4-Fenster 07.09. als O-6
+ausgewiesen. Beweisort: ~/backups-workflow/20260901-30-kontexte-vergessene-arbeit/ (GESAMTBILD-30-KONTEXTE.md =
+Owner-Antwort Q1-Q5; EINGANG-A2.3a-OWNER-VORLAGE.md; EINGANG-KON136.md).
+
+[NACHTRAG RASTER 02.09.] Nenner 277 statt 187 (Raster 30/30; Deckung 121/117/13/28 [Nenner-Lesart Fix 07.09.: 28 = 25
+UNGEDECKT-Zeilen + 3 Kandidaten der K065-Sammelzeile; 277 = 121+117+13+25+1, RASTER Z.58-62];
+nachfold/RASTER-W2-V109-ERGEBNIS.md) -- zu KON136-05 Satz (3) [EINGANG Z.31] 'R3 [...] Nenner 187 Posten: 71 / 101 /
+15': JA/NEIN/TEIL nach Map-Bilanz 125/136/15; 187 = R3-Zaehlartefakt vor dem Raster (aus keiner Quelle
+reproduzierbar); 37 Fakten bleiben bis zu den Nachtraegen F-038..F-040 + 36 Instanzen (Raster Abschn. 2);
+Statuswirkung auf die 157: 0 Kipps. Zu Satz (1) [EINGANG Z.27-28] 'V-109-Vollzaehligkeits-Pass PFLICHT': gefahren
+02.09. (283 Kandidaten, 39 ohne R1-Zeile -> V-110..V-148; R1-Nachtrag = Raster Abschn. 4 (3), offen [STAND 07.09.:
+vollzogen als GRUPPE D4 der R1-Tafel]). Kipp-Tafel: Raster 30/30 vollzogen.
+
+**KON136-06 (01.09.-02.09., Lead): NACHFOLD VOLLZOGEN -- 0 KIPPS, WACHE TRAEGT_MIT_FIXES.** Nachfold-Kopie
+nachfold/NEUER-LEDGER-NACHFOLD-0109.md = Original 18345 Z. + 2123 NUR-Einfuege-Zeilen = 20468 (Original
+md5-unveraendert; 12 Einfuegeorte; 49 NACHFOLD-Bloecke aus 8 Batch-Dateien; 26/26 Verbatim-Stichproben wortgetreu).
+STATUSWIRKUNG: 0 Kipps der 157 (97 W / 60 R bestaetigt); 1 Begruendungs-Praezisierung an S10/B-03 (F-025
+Force-Push-Praezedenz E-4, gegenstands-genau; a/b-Wahl Mid-Line 09cc7286 bleibt beim Owner). NACHFOLD-WACHE (02.09.
+~00:0xZ, Datei-mtime 23:58Z): TRAEGT_MIT_FIXES -- W-1 Kopf-/1c-/A-Zeilen-Materialisierung der Batch-Auflagen
+(Lead-Assembleur-Nachlauf), W-2 Vollzaehligkeits-Raster 26/30 Maps offen (187er-Nenner bis dahin stichproben-gedeckt
+4/30), W-3 B8-Zuschnitts-Quittung, W-4 164->157-Vermerk, W-5 Kipp-Tafel um den NF-B3-WIDERSPRICHT-Randfall
+(S12/A-21-Formel) ergaenzen. Traeger: Lead vor A2.3a-Versand. [ZAHLEN-PRUEFUNG 07.09. (RT-62b, Assembler A): Kopie
+heute wc -l = 20816 Z.; Kette 20468 (02.09. ~00:0xZ, NACHFOLD-WACHE Z.27 '18345 + 2123 = 20468 = wc -l Kopie') ->
+20498 (Lead-Nachlauf W-1/W-3/W-4/W-5 additiv, Lesequittung Z.472) -> 20793 (Raster-Nachtraege 02.09., Lesequittung
+Z.1152/1253 'Kopie 20468->20498->20793, Map-Zeilen = Original 18345') -> 20816 (Lesequittung 55.6 Kartierung 07.09.:
+KOPF 132 / 1a 800 / 1b 8673 / 1c 68 / 1c-2 8774 / Anhang A 2297 / PROTOKOLL 72; 157 IDs = 97 + 60 exakt); Differenz
+20793 -> 20816 (+23) am Objekt belegt 07.09.: .pre-leadfix-0209 = 20793 Z. (mtime 02.09. 08:40:01Z) -> Datei 20816 Z.
+(08:43:05Z), diff = 20793a20794,20816 = 23 reine Einfuegezeilen, 0 Loeschungen = Block '[LEAD-NACHFIX 02.09. ~08:5xZ,
+additiv am Dateiende (Kopf byte-unveraendert; Platzierungs-Deklaration W-1(b)/(c)); Quelle REDUCE-VOLLLESUNG-r18-r30
+TEIL 2]' ab RT-30/F-035 Nachlese-Fenster, Kopie Z.20794-20816; .pre-raster-0209 = 20498 Z. (07:07Z) bestaetigt das
+mittlere Glied. Beim Zitieren gelten die Original-Zeilen des 18345er-NL (N-07).]
+
+[NACHTRAG RASTER 02.09.] Nenner 277 statt 187 (Raster 30/30; Deckung 121/117/13/28;
+nachfold/RASTER-W2-V109-ERGEBNIS.md) -- zu KON136-06 'W-2 [...] Raster 26/30 Maps offen (187er-Nenner [...] 4/30)'
+[EINGANG Z.50-51]: W-2 GESCHLOSSEN (30/30 Maps je Posten-ID; 28 UNGEDECKT U-01..U-28 + 9 Instanz-Luecken N-01..N-09 +
+11 Hinweise H-1..H-11 -> Nachtraege VOR A2.3a); W-1/W-3/W-4/W-5 unveraendert (Lead-Nachlauf 02.09. in der Kopie;
+Quittung = Lead; Orte in nachfold/NACHFOLD-WACHE.md NACHTRAG 02.09.). Kipp-Tafel: Raster 30/30 vollzogen.
+
+**KON136-07 (Owner-Verbatim-Nachtraege; Quelle 30-Kontexte-Lesung + Stand-Eingang 06.09., je Transkript-Anker mit
+V14-Zeitstempel).**
+
+    (a) SOLL=PFLICHT-Dauerregel VERBATIM (bisher nur Etikett im Ledger Z.35/Z.60; V-108): Owner 01.09. 15:47:33Z
+    (L102011): "Alle Soll Fehler sind IMMER auch PFLICHT zu beheben".
+
+    (b) GELOEST!=KONFORM VERBATIM (F-004): Owner 23.08. 20:41:20Z (L87648): "Bitte bedenke, dass 'geloest' nicht
+    automatisch konform heisst, daher muessen workarounds konform nach Plan gegengeprueft und als Struktur-Regression
+    behandelt werden." (innere Anfuehrungszeichen im Original doppelt).
+
+    (c) INTERRUPT != ORDER (F-034; Datums-Korrektur V-091(19)): Owner 28.08. 18:12:13Z (L95863): "Ich wollte dich
+    nicht unterbrechen, das war ein IO Bug auf meiner Tastatur"; aelteste Instanz 06.08. (Snapshot); weitere Instanzen
+    01.09. 21:40:08Z L103247 (KON137-04 K079) + 04.09. 20:26:57Z L108018 (KON137-11 OW-07).
+
+    (d) EXT-STORES-PRUEFAUFTRAG (F-036): Owner 01.09. 22:00:38Z (L103549): "Sehr gut, bitte verbuche das so. Die ext
+    stores waren ungelandete sehr teure Module, bitte pruefe den alten vollstaendigen wellenplan und designplan dazu,
+    sowie die sessions und Buchungen, wann diese gebaut wurden. Die ce ist ein ext store der git tracked Fortschritt
+    trug" -- Traeger: Nachfold NF-B7 + KON137-02 (eingespielt).
+
+    (e) RESUME-3-ORDER (F-021/F-022): Owner 01.09. 23:00:53Z (L103663): "Bitte pausiere den workflow und starte ihn
+    nochmal, ein paar agenten sind am spend limit gestorben, aber jetzt wieder frische credits"; Quittung 23:01:49Z
+    L103690 "Sehr gut, weiter wie gehabt" (KON137-04 K079).
+
+    (f) WORKTREE-NACHVOLLZUGS-AUFTRAG (F-035): Owner 01.09. 21:55:42Z (L103530): "Und du hast vorher gemessen, dass
+    wirklich all diese Baeume und worktrees bereits gelandet waren, die du geloescht hattest? [...] Bitte vollziehe
+    nach, ob du einen fehler gemacht haben koenntest." -- Vollzug + Quittung 22:04:52Z (L103604 "Sehr gut, dann weiter
+    wie gehabt"); Beweisort 20260901-worktree-audit/ (KON137-01).
+
+    (g) KONSOLIDAT-B-FRAGE (F-037): Owner 29.08. 06:39:19Z (L97001): "[...] Es gibt zum Schluss noch ein Konsolidat-A
+    und Konsolidat-C, warum gibt es kein Konsolidat-B ?" -- Antwort: der B-Slot ist FRAGEN-B.md (157 Rest-Fragen) im
+    Korpus-Eingang; in der Nachfold-Kopie auszuweisen (Wache W-1); Ledger KON134-05 Z.344-350 traegt die Antwort
+    (Strang Abschn. 6 Nr. 13).
+
+    (h) NEU -- ALLE REGRESSIONEN JEDER KLASSE = MUSS (Dauerregel; Anschluss an (a) SOLL=PFLICHT; Memory
+    feedback_alle_regressionen_jeder_klasse_sind_muss_hohe_qualitaet; KON137-11): Owner 06.09. 15:50:34Z (L111216):
+    "Gut, bitte merke dir, dass wir ALLE Regressionen jeder Klasse als 'Muss' verbuchen, wir wollen hohe Qualitaet"
+    (innere Anfuehrungszeichen im Original doppelt). Wirkung: kein SOLL/INFO fuer Defekte; VK-2 retry-deprecated
+    (KON137-12) und jede Lint-/CI-Warnung = MUSS-Posten.
+
+**KON136-08 (Traeger/naechste Schritte nach Gesamtbild-Terminal; "wie gehabt" = L102190 01.09. 18:30:23Z).** (1)
+A2.3a-OWNER-VORLAGE = naechster Lead-Schritt (EINGANG liegt; Versand-Sperren: V-109-Pass ueber alle 30 Maps,
+V-090(a)-(v), Wache-W-1/W-2-Nachlauf, F3-17, NICHT-ERNEUT-FRAGEN-Gegenprobe); DRINGLICH S08/B-10 (Frist 15.09., Wache
+ROT ab 16.09.), S04/B-04, S06/B-21(ii), S06/B-25, E-4-Rest Mid-Line, S12/B-04-Neustart-GO; S12/B-11 ist durch den
+Fold-Endstand WANDERT (nur Kenntnisnahme). [STAND 07.09.: A2.3a v4 versandt 06.09. (wf_a7fff12a), Owner-Antworten
+Tranche 1 06.09. 21:49:11Z L113305 + Tranche 2 07.09. 12:12:56Z L114346 = KON138; Tranche 3 = #195.]
+
+[NACHTRAG RASTER 02.09.] Nenner 277 statt 187 (Raster 30/30; Deckung 121/117/13/28;
+nachfold/RASTER-W2-V109-ERGEBNIS.md) -- zu (1) 'V-109-Pass ueber alle 30 Maps' + 'Wache-W-1/W-2-Nachlauf' [EINGANG
+Z.70-71 = Z.83-84 der Datei]: W-2-Raster VOLLZOGEN (30/30); V-109-Pass gefahren: 283 Kandidaten, 39 ohne R1-Zeile ->
+V-110..V-148 (R1-Tafel-Nachtrag = Raster Abschn. 4 (3), offen [STAND 07.09.: vollzogen als GRUPPE D4]; V-115
+F2-Fenster 0/35 -> V-090 = Versand-Sperre); W-1-Nachlauf unveraendert (Lead-Quittung). KEINE FREIGABE laut Raster
+Abschn. 4 bis Schritte (1)-(5) vollzogen. Kipp-Tafel: Raster 30/30 vollzogen.
+
+(2) KON137+ danach: KON137-01/02-ENTWURF (Raeumung 37 Baeume + ext-Klaerung) einspielen + Riss-/Pausen-Chronik (V-062)
++ K051-Abend (V-061) + verify-47 (V-063) + Buchungs-Kleinposten V-060/064/065/099/100. [STAND 07.09.: =
+KON137-01..03/-04/-06/-12 dieses Zugs; V-060/V-065/V-099 offen mit Traeger, s. KON137-12.] (3) Board-Nachzug: #168 auf
+terminal drehen; V-072-Board-Hygiene-Zug (SOFORT fahrbar); #133-Kopf. [STAND 07.09.: #168 completed (02.09.),
+V-072-Zug = KON137-08 (02.09. 07:1x-07:2xZ), #133 completed.] (4) Trigger-Kette nach R4-Stufenplan: 0e #114-Re-Run ->
+Stufe 1 -> 2a-2d -> ##49 (GO-Checkliste R4). [STAND 07.09.: #114-Re-Run-3 vor ##49 lebend (KON137-08 L-6);
+Trigger-Pfad #158 (KON133-22) = naechstes Glied nach diesem Zug (KON137-13).]
+
+[NACHTRAG VERIFY 02.09. ~07:49Z, Lead nach Volllesung wlvap6kg6 264/264 Z.] Raster Abschn. 4 Schritte (1)-(5)
+VOLLZOGEN (wf_217f0221 Verify URTEIL=TRAEGT: 28/28 U-Anker, 9/9 N-Anker, V-110..V-148 39/39, 0 Kipps 97/60, Original
+md5 21f53ad9506d87ef189a7d6f23b016a5 unveraendert, Additivitaet 6/6 Dateien 0 geloescht). Versand-Sperre A2.3a jetzt
+NUR noch: V-090(w)/V-115-Uebernahme (3 NEU-Zeilen V-02/V-10/V-11 + 35er-Abschnitt) in die Vorlage; Datum "20./21.08.".
+[STAND 07.09.: Sperre durch den A2.3a-v4-Versand 06.09. aufgehoben; V-115 F2-Fenster 35 Bloecke bleiben explizite
+Zeile im #176-Nachzug (Board #176 Metadatum einspielmenge_0709_s2 (6)).]
+
 ## KON136 -- 01.09.: 14-TAGE-SOLL-IST-KONSOLIDIERUNG DER 4 DICHT-REFERENZEN (Owner-Order ~19:2xZ), Z-06-BLIP-
 ## VERBATIMS 25.08. NACHGESPIELT, E-1-BAU TERMINAL -> LANDE-RUN, FOLD FINAL-WACHE R3 (Lead 01.09.)
 
