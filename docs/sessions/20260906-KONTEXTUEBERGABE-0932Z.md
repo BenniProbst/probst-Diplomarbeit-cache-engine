@@ -561,7 +561,8 @@ Bewandtnis-Scans S2/S3 von #186 fehlen noch -> Resume nach Capstone-/5K-Terminal
 **Laufend:** Capstone wf_7d1c1cf1-4b4 (Agent a37dd5d5, Chunk NL-01 seit 20:44Z), 5K wf_9e4d189d-2a8 (K088 a48bfb0a
 seit 20:56Z), Fenster-7-Kette (Hintergrund b7p0k1wvp).
 
-## 23. NACHTRAG (07.09. 06:55Z) -- RISS 15 (RATE-LIMIT; Riss 13 = Session-Limit 06.09. 11:10Z, Riss 14 = Pause 12), OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
+## 23. NACHTRAG (07.09. 06:55Z) -- RISS 15 (RATE-LIMIT; Riss 13 = Session-Limit 06.09. 11:10Z, Riss 14 = Pause 12),
+  OWNER-ANTWORTEN TRANCHE 1, RESUME ALLER WORKFLOWS
 
 **Riss 15:** 06.09. ~21:5xZ rate_limit_error (Transkript L113322-113333), beide laufenden Workflows um 21:51:49Z
 gekillt ('[Request interrupted by user]'): Capstone wf_7d1c1cf1-4b4 nach 4/65 MAP-A (NL-01..NL-04, 0 Pseudo; NL-03
@@ -593,7 +594,7 @@ earlyoom fail-loud empfohlen).
 
 ## 24. NACHTRAG (07.09. 07:27Z) -- OWNER-REGEL 5x, G-007-ANTWORT, LESESTAND RUECKKEHRER
 
-**Owner 07:23:59Z (verbatim):** "Bitte lies alle Rückkehrer stets vollständig und verbuche" [Umlaute im Original]
+**Owner 07:23:59Z (verbatim):** "Bitte lies alle Rueckkehrer stets vollstaendig und verbuche" [Umlaute im Original]
 -> K36 (MAP-Chunks nur gezaehlt) verbucht; Regel praezisiert: Zwischenergebnisse laufender Workflows = Rueckkehrer;
 Monitor je Journal-Result (Task bvfrdfft9), Lesequittung Abschn. 42 (Capstone) + 32.9ff (5K).
 **Owner 07:25:24Z (verbatim):** "G-007: (A) Dannn bitte nur 8 jobs. (B) Bitte 16GB swap. (C) Ja behalten. (D) Wie
