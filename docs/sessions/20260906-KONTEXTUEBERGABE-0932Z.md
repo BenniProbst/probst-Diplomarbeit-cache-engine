@@ -590,3 +590,18 @@ fertig." -> Befund: zutreffend (Teil D = Schablone; Erklaerungen lagen in nicht 
 erklaerte Liste aller Teil-D-Zeilen ausser den 16 (delegiert an Fable-Subagent 'tranche2-extraktor', Ziel
 antworten/TRANCHE2-CHAT-OFFENE-ENTSCHEIDE.md); G-007 neu gestellt (VMs bleiben an: A HEAVY_J 8 memory-gated + C
 earlyoom fail-loud empfohlen).
+
+## 24. NACHTRAG (07.09. 07:27Z) -- OWNER-REGEL 5x, G-007-ANTWORT, LESESTAND RUECKKEHRER
+
+**Owner 07:23:59Z (verbatim):** "Bitte lies alle Rückkehrer stets vollständig und verbuche" [Umlaute im Original]
+-> K36 (MAP-Chunks nur gezaehlt) verbucht; Regel praezisiert: Zwischenergebnisse laufender Workflows = Rueckkehrer;
+Monitor je Journal-Result (Task bvfrdfft9), Lesequittung Abschn. 42 (Capstone) + 32.9ff (5K).
+**Owner 07:25:24Z (verbatim):** "G-007: (A) Dannn bitte nur 8 jobs. (B) Bitte 16GB swap. (C) Ja behalten. (D) Wie
+empfohlen sonst" -> #191 in_progress (kOwnerHeavyJIntel 8, runner-mode 8), #189 H6 (Swap 16 GB + earlyoom fail-loud).
+**Owner ~07:2xZ:** "Was war mit en anderen Fragen?" + "Hast du alles verbucht?" -> Tranche 2 (erklaerte Liste) noch
+beim Extraktor (seit ~07:05Z), Posting sofort nach Rueckkehr; Verbuchungsstand: 17/17 Owner-Antworten (Tafel +
+Board), KON138 = docs-Zug #176 nach Tranche 2; Rueckkehrer gelesen: Capstone NL-01..NL-05 (42.1-42.5), 5K K084-K087
+A/B + K088-leser Teil 1 (32.1-32.9); Queue: K088-leser Teil 2, K088-scan, 5K-Reduce, Strang S2, NL-06.
+**Lead-Befunde aus der Volllesung (fuer Reduce/Refute vorgemerkt):** NL-03-D06 vs NL-04 (RN-88/O-13 Status-
+Konflikt), NL-04-D05(c) super .gitlab-ci.yml Z.1940/2193 globale Sperre ceb-measurement-exclusive = lebende
+Nicht-Konformitaet (Owner 21.07. par.61), Dedup NL-04-D07/NL-05-D04 + NL-01-D01/NL-03-D05, G-009 offen (Tranche 2).
