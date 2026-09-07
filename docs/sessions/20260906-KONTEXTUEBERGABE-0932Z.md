@@ -659,3 +659,12 @@ Kleinposten V-059-Familie + 6 grosse Ergebnismengen ohne Einspielung. Einspiel-R
 mit Mechanik-Vorbehalt ledger_nachtrag.sh (Einfuegepunkt Z.19). V14: Owner-Ruege = 19:50:45Z (L112228); Reihenfolge-
 Wort A = 02.09. 06:34:06Z (L103848), nicht 01.09. Owner-Frage K-1 (fuer Tranche 2): 'NUR KON138 wartet auf A2.3a;
 19 Bloecke + 17 Kleinposten sofort einspielen -- GO, oder #176 als Ganzes warten?' (Lead-Empfehlung: GO).
+
+## 28. NACHTRAG (07.09. 07:40Z) -- TRANCHE 2 GELESEN UND GEPOSTET
+
+TRANCHE2-CHAT-OFFENE-ENTSCHEIDE.md 340/340 (Lesequittung 47): 37 offene Entscheide + 9 Bringschulden + 33 Kenntnis-
+nahmen = 79/79 Teil-D-Nummern erklaert; 1:1 in den Chat gepostet mit Lead-Anhang: K-1 Reihenfolge (S3-Vorlagezeile,
+Lead: GO fuer sofortige Einspielung der 19 antwort-unabhaengigen Bloecke), K-3 = G-032 (Kostenlimit 07.09.), Rest aus
+Tranche 1 (G-006 L1/L7/(6) nach Pruefung, G-074 Posten (4), G-073 G06, G-019), Lizenz-/Vertragsfragen 1-7 + 12 des
+#179-Bauers. G-008 (HEAVY-Fenster) haengt jetzt an G-007-Vollzug (HEAVY_J 8 + Swap 16 GB). Naechstes Glied: Owner-
+Antworten Tranche 2 -> KON138 komplett -> docs-Zug #176 (Reihenfolge S3 Abschn. 4; Capstone-Gegenlesung).
