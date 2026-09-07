@@ -744,3 +744,45 @@ Konsumenten-Inventur vor Rotation (Memory). Handout-Runde 2 gelesen (LQ 54): H7 
 H9 prod-MinIO (LEBT seit talos-prod1-Neustart, widerspricht K144) -> #198. G-096 measure_out_d03 nach NAS (66/66 md5,
 71f7c818). 5K TERMINAL 14/14 gelesen (#185 completed, LQ 43.7). Board neu #193-#198. Laufend: #176-Zug, #194 Design-
 Explore, #197, Capstone, Strang, 3K; Teammates lizenz-bauer (CC-BY-Umbau), heavyj8-bauer (K17), handout-bauer (Runde 3).
+
+## 32. NACHTRAG (07.09. 15:1xZ) -- FENSTER 9: HAUPTZIEL LEDGER-EINSPIELUNG #176 VOLLZOGEN, LIZENZ-MERGE, RISS 17, K45
+
+KETTE (K35): Wurzel 20./21.08. -> Rueckfragen-Workflow/Fold NEUER-LEDGER 97 W / 60 R -> A2.3a (MITTEL) -> Owner-Antworten
+T1 16/16 + G-007 + T2 79/79 (07.09. 12:12:56Z L114346; T3 = #195) -> HAUPTZIEL LEDGER-AKTUALISIERUNG: #176 EINGESPIELT
+(dieser Nachtrag) + #197 LEDGER-DICHT (laeuft) -> Trigger-Pfad #158 -> Abgabe 15.09.
+RISS 17 (Session-Limit ~14:2xZ, 'resets 7pm UTC'): 5 Workflows tot -> Torsi beiseite (MD5SUMS, RISS17-ZEIT.txt in
+20260907-riss17-pre-resume/), Owner 14:3xZ "Bitte rsume alle workflows und agenten, die credits sind wieder frisch" ->
+Resumes byte-unveraendert (K27), 6K per NEUEM Run wf_e10ce323 (Praefix-Regel, 12 Cache-Results als Datei-Eingang); K44
+(K094-leser faelschlich als Torso bewegt, zurueckgelegt). Praefix-Regel bestaetigt: LDICHT NL-12 failed -> NL-13/14/15
+Rerun; NL-13 Rerun a03c028d NICHT byte-gleich (423 statt 348 Z., Feld-je-Zeile + G-Alias), NL-14/15 byte-gleich.
+OWNER 14:44Z "Was willst du kuerzen und warum?" / "Ich moechte nichts kuerzen": Gegenstand = MEMORY.md-Index-Hooks
+(Korridor 24,4 KB = Lead-Setzung 04.09. L107147, kein Owner-Wort). Vollzug 14:47Z: 13 Hooks wortgetreu restauriert,
+10 Historie-Zeilen verbatim nach MEMORY-DETAIL.md HISTORIE-INDEX ausgelagert, Regel im NIE-KUERZEN-Memory (Index nie
+kuerzen, ganze Zeilen auslagern). Antwort im Chat 14:5xZ.
+#176-ZUG wf_663f7e45-015 TERMINAL 14:58:46Z (6/6): Verbuchung 1028 Z. -> Assembler A 1021 / B 1213 -> Lens 1 (14 MUSS)
++ Lens 2 (14 MUSS) -> Fix 28/28 + SOLL 8/8 -> EINSPIELUNG-176.md; Lead-Volllesung 2102/2102 (LQ 55.73) + Lead-Nachtraege
+additiv: KON137-04 K082-Absatz (L105645 07:50:03Z Haeppchen-Regel, L105973 /login, L105974 08:15:20Z 'Bitte halte kurz
+inne', L105977 Interrupt + L106008, L106542 08:46:11Z 'credits sind wieder frisch' + L106552) und KON138-01 G-006 Lesart
+'morgen' = 07.09. (VERB1 nannte 08.09.). Trockenlauf frische Kopie rc=0 -> ECHTLAUF 15:0xZ per scripts/ledger_nachtrag.sh:
+Ledger 35288 -> 37407 Z. (2119 Z., md5 a8c8bc58; Titel KON138 Z.19 / KON137 Z.1191 / KON136-NACHTRAG Z.2004 / KON136
+Z.2138), Sicherung LEDGER.pre-176-<T>.md im Beweisort 20260907-ledger-zug-176/. Commit e5667823.
+LIZENZ-MERGE b004ff84 (--no-ff bau/super-lizenz-nachzug-0709 b4f979a7): NOTICE + REUSE.toml Thesis CC BY 4.0, docs/recht/
+Vertrag oeffentliche Fassung (.md 239 Z. + PDF 8 Seiten, Lead-Probe pypdf: 0 Anschrift/Geburtsdatum/HRB-Zahl, 6
+Platzhalter), Gitlinks beide Zeiger cbefa617 -> 0b582b3590ed; reuse lint compliant 3194/3194; Submodule lokal auf
+0b582b35 gesetzt (LICENSE 'Attribution 4.0 International'). #179 damit im super nachgezogen; Rest #179 = Signatur-
+fassung (Owner-Handgriff NAS), Registerdaten (Infra H10), anwaltliche Pruefung (P-1..P-9).
+CI-RETRY-FIX 873d7857 (VK-2, MUSS): stuck_or_timeout_failure (deprecated 19.1) -> stuck_pending_with_matching_runners /
+stuck_pending_no_matching_runners / no_updates_running / no_updates_canceling + runner_external_dependency_failure /
+runner_interrupted; ci/lint POST valid, warnings []. PP-12 Z.3 V14-Korrektur (L111977 16:43:58Z) additiv.
+3K-EXPLORE #182: Reduce 757/757 (md5 b90f1e8e; LQ 55.55 nannte die Vorfassung 750/bc2dfdaa = nachquittiert LQ 55.74),
+REFUTE-B 180/180 (12 MUSS; B-01 Lead-Fehler K45: #176-Metadatum kon137_04_k082_anker_0709 trug L106738 = queue-remove
+als Owner-Zeile -> kon137_04_k082_anker_korrektur_0709), REFUTE-A 298/298 (33 MUSS; u.a. F-03 Cluster db8db8b =
+04.09. 19:28:56Z nicht 03.09.; F-10 Riss-Register 19 -> 17 distinkt; F-12 Riss-8-Heilung 16:52-16:54Z; F-16/F-17
+Nenner-Korrekturen LQ; F-33 MEMORY.md-Wache durch Owner-Regel 'nichts kuerzen' ersetzt); Fix a50c283b laeuft.
+RUECKKEHRER DIESES KONTEXTS gelesen/verbucht: 45/45 (LQ 55.49-55.74). Capstone MAP-A 17/65 (NL-16/NL-17 mit 11+13
+Deltas, alle ARBEITSWEISE-DICHT); LEDGER-DICHT Maps 19/21 (+NL-18 Result 15:0xZ ungelesen); #194 Design-Explore TERMINAL
+(9/9; 5 Scans + Reduce + Refute + FIX-QUITTUNG ungelesen); 6K-Nachlauf K093-scan 1992 Z. + K089-leser 577 Z. ungelesen.
+LAUFEND (G-032-Deckel 6): #182 Fix, #197 (NL-21 -> LED/A23A -> Reduce), #187 (ab MA-NL-18), 6K-Nachlauf (Reduce nach
+K089-leser), Strang #186 TERMINAL, #176/#194 TERMINAL. NAECHSTE GLIEDER: Fenster-9-Gates (Wachen 13/26, Lizenz-Wache,
+gitleaks Bereich, R4/R6) -> Dual-Push -> CI 288 dev -> main-FF -> 4/4 -> STAND-9.md; dann Rueckkehrer-Reste VOLL lesen;
+Tranche 3 (#195) mit Eingaengen H-1..H-3 + db8db8b-Korrektur; #191 heavyj8-Landung; #189 Handout-Runde 3.

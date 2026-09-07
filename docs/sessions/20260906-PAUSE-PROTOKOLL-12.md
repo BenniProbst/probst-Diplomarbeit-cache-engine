@@ -3,6 +3,8 @@
 Lead-Session 5a19728e (prod1, Fable 5 max). Owner 16:45:05Z (verbatim): "Bitte pausiere alle workflows und Agenten
 und lege eine abbruchsichere Pause ein". Vorgaenger: 20260830-PAUSE-PROTOKOLL-10.md (30.08.); PAUSE 11 = 06.09.
 09:30Z (falsche Fork-Session, Memory project_pause11_*). Dieses Dokument = Riss 14 (Owner-Pause, kein Limit-Tod).
+[V14-KORREKTUR 07.09.2026 (Lens 1 F-24 des #176-Zugs, Lead): die Owner-Pause-Zeile ist Transkript L111977
+2026-09-06T16:43:58Z (queue-operation); "16:45:05Z" oben = Zustell-/Repo-Etikett. Wortlaut unveraendert; Riss 14.]
 
 ## 1. STOP-PROTOKOLL (Zeiten aus date -u)
 
