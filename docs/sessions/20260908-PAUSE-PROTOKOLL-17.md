@@ -92,3 +92,46 @@ Handlungsliste H-01..H-16 (TEIL B) = Antwort auf die Owner-Frage Q4 (L120457), U
   Vollzug nach dem Wiederanlauf in der Tafel-Reihenfolge, angepasst: alle 4 Workflows stehen (Pause 17), daher zuerst
   Abschn. 4 Schritte 0-1, dann H-03/H-04/H-05 vor den Resumes.
 
+
+NACHTRAG 2 (2026-09-08T16:39:40Z) -- RESUME-ORDER 16:33:05Z + PRAEZISIERTE RISS-19-REKONSTRUKTION AM ROHTRANSKRIPT
+Owner-Order (verbatim, L121120 2026-09-08T16:33:05.091Z, user, nach /login ki_agent_15 16:22:14Z): "Bitte resume alle
+  Agenten und workflows und fahre mit offener Arbeit fort wie gehabt. Bitte sieh dir den letzten Kontext und den Riss
+  genau an, um den letzten Zustand von dort zu rekonstruieren, leider kam der compact dazwischen." Compact-Marker
+  weiterhin 102 (letzter L120828 10:00:45Z): kein neuer Compact, laufender Kontext = K103, der gemeinte Riss = Riss 19.
+RISS 19 EXAKT (L120763-L120827): 09:49:22Z Resume-Order -> 09:51:00Z K44-Messung (Ergebnis liegt) -> 09:51:06Z
+  Output-Parse #220 (Fehlparse reduce auf Top-Level, korrigiert 09:52:18Z) -> 09:52:03Z K29-Ernte (liegt) -> 09:52:18Z
+  RESULT-WF9009-0809.txt geschrieben 292 Z. (liegt) -> 09:54:44Z Sammelaufruf L120803 mit VOLLSTAENDIGEM Ergebnis
+  L120804 (Torso-Move + Manifest 09:54:44Z; Records: #197/#187 args None, #224 args dict, #220 args ids 103; Script-md5
+  6c5232f4/de769b03; KB-108-Probe #220: 16 mehrfach gestartete Keys mit Result, alle zweiten agentIds MIT Transkript =
+  Retry-Ketten der 16 Pause-15-Torsi, KEIN Doppellauf fertiger Jobs -- die Probe war reihenfolgeblind, Praezisierung
+  unten) -> 09:54:46Z Workflow-Resume #224 = Task wbeogri33 (L120807) -> 09:54:49Z Poller b3mlb3nnd (L120809) ->
+  09:57:53Z L120810 ASSISTANT "API Error: The response stopped arriving. The response above may be incomplete." = DER
+  RISS (Antwortabbruch der API des Vorgaenger-Accounts; zeitgleich starb Refute-A-Retry ae147e03 mit 0 Tool-Uses) ->
+  09:59:38Z Owner-Order Pause 17 (queue-operation L120820) -> 10:00:45Z Compact L120828. KORREKTUR zu Protokoll 16
+  Abschn. 3 / Protokoll 17 Abschn. 2(b): die Formulierung "Tool result missing due to internal error" stammt aus der
+  Compact-Zusammenfassung, NICHT aus dem Transkript; alle Tool-Ergebnisse des Sammelaufrufs sind zugestellt worden.
+  Letzter Zustand K102 vor dem Riss: Resume-Order 1/4 vollzogen (#224), #220/#197/#187 nicht resumed, KB-108-Wache nicht
+  gefahren, Protokoll 16 nicht geschrieben, #220-Rueckkehrer nur RESULT Z.1-120 gelesen -- alles in K103 nachgeholt
+  (Pause 17, Nachtrag 1) bzw. jetzt vollzogen.
+VOLLZUG 16:34-16:4xZ: Vorflug df 27 GB / 89 % (Gate 20 GB erfuellt; -10 GB seit 10:05Z durch Fremdverbrauch), 0
+  Altprozesse, Journale md5 8cad274c/3befa120/e053fb2c/067021e4 = POST 10:05Z unbewegt, 0 neue Dateien in den
+  Beweisorten seit 10:20Z, Run-Records byte-identisch zu den Beweisort-Scripts (8e409798 / 6c5232f4 / de769b03 /
+  76347848). #197-Fix-Agent a8871c43 (gekillt 09:30:31Z, 49 Tool-Uses): 0 Write/Edit, LEDGER-DICHT.md md5 10f81bc1 /
+  19966 Z. / mtime 08:45:24Z unveraendert = sauberer Resume. RESUMES (K27 byte-unveraendert, args identisch): #220
+  wf_9009b464-3e9 -> Task woxqyc0q2 (args ids=103 aus dem Record), #224 wf_c06a4433-750 -> w3sobh4g8 (args dir/kontexte
+  K087..K102/stamp), #197 wf_86e234d4-c80 -> wxkst2qzp, #187 wf_7d1c1cf1-4b4 -> wyozguehz; Poller -> blckfpnrv (Basis
+  eb18a85a). G-032: 4 Workflows, Fable je Workflow <= 2. KB-108-Wache (reihenfolgebewusst: result VOR zweitem started =
+  Doppellauf) folgt ~2 min nach Start.
+CLUSTER-RUECKKEHRER (git fetch 16:35Z, 8b913f6e..eb18a85a = 13 Commits, 32 Dateien, keys/ TABU nur Namen): f6048d64
+  Nachtrag 96 (v4.5 GESETZT), e4f5c830 keys FALLE-c, c20ae344 Nachtrag 97 (Owner R44: Q-31 beide Lead-Agenten leben =
+  P0/H2 GESPERRT -> keine PAUSE-OK-Pflicht des Diplom-Leads; Q-42 W6-Windows-DC-Pause wf_aec0c077), 769e63b7 Nachtrag 98
+  (Owner R45 16 Antworten, u. a. Q-52 "Diplom-Ausnahme", Q-55 durchziehen), 0d1d0866 P12 comdare-web-History-Redaktion,
+  8d5b1c0e Handout-Rueckkanal, 5e437ac5 Merge, f109af4b ABBRUCHSICHERE PAUSE Infra (Owner R46 08.09. ~10:18Z;
+  .gitattributes Vault -diff = KB-114), f315be9a Nachtrag 100 (Self-Leak Infra-Lead GitHub-PAT 4d59cf4b im lokalen
+  Transkript, Q-57 Owner-Handgriff neuer PAT), a96768ed Nachtrag 101 (Owner R47 "Q-57 Fehler: bitte redigier das, die
+  Pause gilt fort"; Q-58 Vault-Kopien im Scratchpad), eb18a85a P13 (comdare-web-Lead: GitLab-PAT 26 Zeichen im Klartext
+  in Rohdaten wf_6bffd5aa-863 vom 23.08. = comdare-web-Workflow, NICHT Diplom-Rohdaten; redigiert, Rotation durch Infra
+  pruefen). H-04-Lesung der docs in Haeppchen folgt (#189).
+KIPP-RITUAL K103 (K34) startet jetzt: 4 DICHT (4250 Z.) + Memories 06.-08.09. (32 Dateien) + Uebergabe
+  20260906-KONTEXTUEBERGABE-0932Z.md; Protokolle 15/16/17 liegen im Kontext.
+
