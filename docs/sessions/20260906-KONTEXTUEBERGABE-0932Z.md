@@ -814,3 +814,49 @@ wvq9dbmi4, Capstone wuvhfy918, 6K wyzr15m3n (byte-unveraendert, 0 Altprozesse, J
 NAECHSTE GLIEDER: Tranche 3a (#195: 67 nie gepostete G-Nummern als Kenntnisnahmen-Liste + S-1..S-4 + H-1..H-3;
 Entwurf per Opus-Agent aus Vollfassung Z.145-2935, Lead liest voll + postet) -> Fenster 10 (Pause-14-Protokoll +
 dieser Nachtrag) -> LDICHT-Fix-Nachlauf -> Bau-Fahrplan Stufe 0 (#191 -> ##47-Re-Run-3) / Stufe 1 WF-A1..WF-G.
+
+## NACHTRAG 34 (2026-09-08T19:33Z) -- Kontexte K106/K107 (Extraktor K107/K108): Uebergabe 1836Z, Limit-Riss, Explore-16,
+   Fenster 11 rot->gruen, Fenster 12
+
+Dieser Nachtrag verweist auf die eigenstaendige Uebergabe docs/sessions/20260908-KONTEXTUEBERGABE-1836Z.md (285 Z.,
+  Owner-Order 18:31:10Z L122894 "Bitte erstelle eine reiche und elaborate Kontextuebergabe, der Kontext endet jetzt";
+  Beweisort ~/backups-workflow/20260908-kontextuebergabe-1836z/). Kette (K35) unveraendert: Wurzel 20./21.08. -> Fold
+  NEUER-LEDGER -> A2.3a v4 -> Owner-Antworten T1/T2/T3a -> HAUPTZIEL #176 eingespielt -> #197 LEDGER-DICHT gelandet mit
+  Geltung (A) (Fenster 11) -> #220 terminal -> #227 / #225 P1 / Capstone v2 / #229 laufen -> Fenster 12 (#230) -> #221
+  docs-Zug -> Trigger-Pfad #158.
+
+ZAEHLUNG: die Lead-Kontextzaehlung liegt seit ~K103 um EINS unter der absoluten compact_boundary-Zaehlung des Extraktors
+  v2 (Lead K106 = Extraktor K107, L122917-L123464; Lead K107 = Extraktor K108 ab L123465, Compact-Marker L123464
+  18:50:42Z). Beide Zahlen werden genannt (Prozessnotiz fuer #221/KON141).
+
+OWNER-ORDERS 18:50-19:20Z (verbatim, Dateien 20260908-owner-orders/): 18:50:12Z L123457 "Bitte lies gezielt nach, welche
+  Aufgaben du die letzten 15 Kontexte vergessen hast, bitte lies die Rueckkehrer vollstaendig und verbuche nach wo
+  notwendig. Sind straenge gerissen? Ist Arbeit liegen geblieben? Sind dinge nachtraeglich zu verbuchen? Der compact hat
+  eben schon wieder den Kontext gezogen. Sonst weiter wie gehabt." -> Explore-16 #229 wf_438a9de3-948 (19:04Z,
+  K093-K108, Nachtrags-Tafel Teil H = Owner-Antwort). 18:59:20Z L123593 "Bitte halte kurz inne" (Pause 18, nur Messung).
+  19:01:50Z L123639 "Bitte stoppe alle workflows und resume sie erneut, dann weiter wie gehabt, credits sind wieder
+  frisch" + 19:02:03Z L123640 "Alle workflows sind am limit gestorben" + 19:02:14Z L123652 "Die Pause ist vorbei" ->
+  Limit-Riss 18:57-19:01Z (Session-Limit, resets 10:30pm UTC) aller drei Workflows; TaskStop + Journal-Stillstandsprobe
+  + K27-Probe (Scripts byte-unveraendert) -> Resume 19:04Z: Capstone v2 wf_bde8d286-e8e Task wmkoefn4r (Cache 41
+  Results), #227 wf_15652479-5d7 w8mo14mtq (23), #225 P1 wf_077c58fb-cbd wx6mx22ou (6). 19:20:04Z L123975 "Der compact
+  lief eben, du hast den Kontext verloren" -> Kipp-Ritual K108 komplett (LQ 55.154: 4 DICHT 4250/4250 + Ledger-Kopf 100
+  + RITUAL-KARTE 36 + Uebergabe 0932Z 816 + MEMORY.md + 32/32 Memories).
+
+FENSTER 11 (super 5454ac31 -> 865b83a2, 8 Commits): dev-CI 16533 ROT 27/28 -- Job 390392 lint:diff-hygiene auf Runner 17
+  prod2 63 min ohne Trace, failure_reason no_updates_running = INFRA-TRANSIENT (Nachbarjobs prod1 < 30 s, lokale Diff-
+  Hygiene GRUEN ueber denselben Bereich, prod2 zeitgleich fuer comdare-web gruen); Retry 19:22:10Z -> 390560 success
+  prod1 9 s -> 16533 success -> Kette 11b: main-FF 865b83a2 origin+github, main-CI 16541 success 36/36 (19:28:46Z), ls-
+  remote 4/4 == 865b83a2, FENSTER11-ENDE 2026-09-08T19:28:48Z (STAND-11.md 11.1-11.6, LQ 55.155/55.156). Lehre
+  K33-Klasse: Endmarken nur in Erfolgsform greppen ("FENSTER11-ENDE ABBRUCH" haette die Fenster-12-Wache passieren
+  lassen; Wache geschaerft).
+
+FENSTER 12 (#230, Owner L122823 "Ist die dichte Fassung denn schon wieder gegen den Drift des echten Ledgers
+  konsolidiert? Sonst hole das bitte nach."): KON140 per ledger_nachtrag.sh + Zeiger-Korrektur Z.25-27 + DICHT-Records
+  KON139-01..05/KON140-01..04 AM ORT mit K3-Bump bis KON140 (fenster12-dicht-apply.py, Wache K3 == Vollfassung) +
+  RITUAL-KARTE 3a/3b UEBERHOLT + Mitfahrer (Uebergabe 1836Z, dieser Nachtrag). Noch in keiner Fassung: KON138-09..13,
+  KON137-04-Nachtrag, KON-ENTWURF-VERBUCHUNG (#227), Konsolidierung 4 DICHT (#225), KON141 (Orders 18:31-19:20Z, Limit-
+  Riss, Zaehlungsversatz) -> #221, danach erneut Diff.
+
+LEAD-DELTAS-K106.md (D-K106-01..06, Eingang #225 Phase 2): X-13 Ritual-Form 22./26.08. veraltet (L104808/L122823); GOAL
+  D-1 Punkt 4 v4.4 -> v4.5 (G-031); WELLENPLAN S-065/H15 intel 24 -> HEAVY_J 8 (bd55942a, #191, G-007); Regime G-032 +
+  Limit-Riss-Rezept + Pause-Orders; Verbuchungs-Delegation (L122186/L122498); Zaehlungsversatz.
