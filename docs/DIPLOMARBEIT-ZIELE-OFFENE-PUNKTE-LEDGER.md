@@ -15,6 +15,13 @@
 > ledger-sections/architektur-ziele-offene-punkte-ledger.md` + thesis `thesis/diplomarbeit/docs/ledger-sections/
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
+> LEBENDE DICHTE FASSUNG: docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER-DICHT.md (Owner-Worte M5 24.08. L88921 + G-051
+> 07.09. L114346; Zug #197 wf_86e234d4-c80, Reduce-2 + Fix nach Lens 1/2 08.09.2026, 19343 Z., 1368 Records). Dieses
+> Dokument bleibt Single-Source und NACHTRAGSORT (ledger_nachtrag.sh, neueste KON oben); nichts geloescht. GELTUNG seit
+> 08.09.2026 18:02:39Z (Owner L122494 "LEDGER-DICHT: Volles GO fuer (A) wie empfohlen."): die DICHT-Fassung ist die
+> geltende LESE-/RITUAL-Fassung (Register geltender Owner-Entscheide + nur-noch-offene Fragen; RITUAL-KARTE Schritt 3a
+> = DICHT VOLL, 3b = dieser Kopf nur KON juenger als der DICHT-Stand-Kopf K3); Audit-Klausel unveraendert.
+> [Nummern-Vermerk: KON-Nummer der Landungszeile = naechste freie bei Einspielung (08.09.: KON139).]
 
 ## KON138 -- 06./07.09.2026: OWNER-ANTWORTEN A2.3a = DIE EINE RUECKFRAGEN-TAFEL (KON137-09; Tranche 1 L113305 21:49:11Z
 ## + G-007 L113578 07:25:24Z + Tranche 2 L114346 12:12:56Z; Einspielung 07.09., #176)
