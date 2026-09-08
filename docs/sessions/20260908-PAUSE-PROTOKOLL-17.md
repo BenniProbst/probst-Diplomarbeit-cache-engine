@@ -72,3 +72,23 @@ Q-31 Agenten-Stillstand: Zusage PAUSE OK >= 30 min Vorlauf bleibt.
 
 ## 7. NACHTRAEGE (chronologisch, ASCII, je Haeppchen sofort)
 
+
+NACHTRAG 1 (2026-09-08T10:18:16Z) -- LESUNGEN IN DER PAUSE + REGISTER-ERWEITERUNG (Quelle: LQ 55.125-55.130)
+Gelesen + quittiert: R-1 RESULT-WF9009 Z.121-292 (55.125), R-3 LENS-A 172/172 (55.126), R-4 LENS-B 264/264 (55.127), R-5
+  RUECKKEHRER-HANDLUNGSTAFEL 887/887 in 3 Haeppchen (55.128-55.130). Ergebnis #220: 0 NIE-GEFRAGT (F-1/F-2 durch L114346
+  Punkte 4+5 + L119041 gedeckt), Meldungen M-1/M-2, G-027-Korrektur, 19 Anker-Korrekturen LB-01..19 (Fix-Stufe beim
+  Resume). R-2 (Reduce 997 Z.): Lead liest die FIX-ENDFASSUNG nach dem Resume (Fix aendert die Datei;
+  Momentaufnahme-Doktrin D-11), nicht die Vor-Fix-Fassung -- als Abweichung von 'bei Eintreffen' hier benannt.
+Register-Erweiterung aus der Tafel (TEIL A): R-9 #197 map/A23A.md 1973 Z. (Result 07.09. 15:30Z; LQ Z.4685 'A23A
+  gekillt' = Fehlvermerk, K44-Klasse); R-10 #197 reduce/R1-G4.md 3375 Z. (zu R-7: A23A + R1-G3 + R1-G4 = 7889 Z. =
+  Volllesungs-Workflow H-03); R-11 #197 LEDGER-DICHT.md 19966 Z. Reduce-2 (Endfassung nach Fix, H-10); R-12
+  Aggregat-Quittungen wgu7qkofc.output 3574 Z. (#187) + w1be9bndb.output 278 Z. (#194) (H-05); R-13
+  Cluster-Poller-Rueckkehrer bjjj97jgq: Infra-Commits 8b913f6e..e4f5c830 (edcc8a7c Wellenplan par.27.1 +
+  H1-H10-Antworten, f6048d64 Nachtrag 96 v4.5 GESETZT, e4f5c830 keys/ TABU) UNGELESEN (H-04, #189); R-14 #187
+  MA-NL-31..33 (zu R-8). Board-Kipp mit Beleg: #186 -> completed (RK-005: 7/7 terminal 07.09. 13:39Z, 11/11 MUSS r2
+  BEHOBEN, LQ 55.32/55.34/55.47). Owner-Frage L115211 13:14:25Z ist am Objekt beantwortet (L119363 21:19:50Z, RK-056) ->
+  LB-09 insoweit ueberholt; KON138-Nachtrag = #221.
+Handlungsliste H-01..H-16 (TEIL B) = Antwort auf die Owner-Frage Q4 (L120457), UNREFUTIERT (Refute A/B gestoppt);
+  Vollzug nach dem Wiederanlauf in der Tafel-Reihenfolge, angepasst: alle 4 Workflows stehen (Pause 17), daher zuerst
+  Abschn. 4 Schritte 0-1, dann H-03/H-04/H-05 vor den Resumes.
+
