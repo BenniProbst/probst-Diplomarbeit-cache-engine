@@ -22,7 +22,52 @@
 > geltende LESE-/RITUAL-Fassung (Register geltender Owner-Entscheide + nur-noch-offene Fragen; RITUAL-KARTE Schritt 3a
 > = DICHT VOLL, 3b = dieser Kopf nur KON juenger als der DICHT-Stand-Kopf K3); Audit-Klausel unveraendert.
 > [Nummern-Vermerk: KON-Nummer der Landungszeile = naechste freie bei Einspielung (08.09.: KON139).]
+> [KORREKTUR 08.09.2026 18:26Z, Owner L122823: das Kipp-Ritual liest weiter DIESEN Kopf (Schritt 3); die DICHT-Fassung
+> ist BLAUPAUSE fuer Map-Reduce-Workflows, per Diff gegen diese Vollfassung konsolidiert (KON140); Z.22-23 '3a/3b'
+> UEBERHOLT.]
 
+## KON140 -- 08.09.2026 18:20-18:26Z: OWNER-WORTE ZUR DICHT-FASSUNG -- (A) BESTAETIGT, RITUAL-FORM VERWORFEN,
+  BLAUPAUSE-REGEL, DRIFT-KONSOLIDIERUNG
+
+**KON140-01 VORLAGE NACHTRAEGLICH + BESTAETIGUNG (A):** Owner 18:20:05Z L122761 (type user, typed) verbatim: "Moment,
+  ich habe (A) gewaehlt, ohne dass du mir die Optionen vorgelegt und erklaert hast, bitte bleibe erstmal bei meiner
+  Entscheidung, aber lege mir das nachtraeglich vor". Lead-Fehler K47 (Memory feedback_eigene_arbeitsfehler): die
+  L-05-Vorlage stand im Post 17:58Z als Einzeiler ohne Folgen/Kosten/Rueckweg; das GO 18:02:39Z L122494 kam als
+  suggestion_accepted-Kurztext. Vorlage nachgeliefert 18:2xZ (Optionen (A) DICHT = geltende Lese-/Ritual-Fassung / (B)
+  nur Lese-Einstieg / (C) Auflage; je Folgen, Kosten, Risiko, Rueckweg; Empfehlung (A) analog G-031; Hinweis: 19343 Z.
+  sind je Compact nicht voll lesbar, 1.9 MB). Owner 18:23:13Z L122798 (typed) verbatim: "Alle klar, (A) war korrekt".
+  Damit ist die Geltung (A) zweifach owner-gesetzt; die Landung (KON139) bleibt.
+
+**KON140-02 RITUAL-FORM VERWORFEN + BLAUPAUSE-REGEL (Owner 18:26:22Z L122823, typed) verbatim:** "Die Ritual Form kann
+  so nicht stattfinden fuer das ledger, aber nach Konsolidierung des weiter mit allen Antworten fortgelaufenen Ledgers,
+  welches nun die Dichte Fassung per Diff fixen sollte, kann das dichte Ledger workflows als Blaupause dienen, um ueber
+  einen map reduce effizienter zu bauen, bitte merke dir das. Ist die dichte Fassung denn schon wieder gegen den Drift
+  des echten Ledgers konsolidiert? Sonst hole das bitte nach. Wenn dann diese Workflows alle durch sind, koennen wir
+  weiter machen wie gehabt" (Umlaute im Original). FOLGEN: (a) das Kipp-Ritual liest weiter den Kopf DIESER Vollfassung
+  (Schritt 3, juengste KON VOLL); die in KON139-02 und in der RITUAL-KARTE (2ccbe503, Zeilen 3a/3b) genannte Ritual-Form
+  "DICHT VOLL" sowie die Lead-Verfeinerung "Kopf + TEIL B voll, TEIL A gezielt" (Chat 18:2xZ) sind UEBERHOLT
+  (RITUAL-KARTE: UEBERHOLT-Nachtrag in diesem Fenster; Kopf-Zeiger Z.22-23 dieser Vollfassung: Korrekturzeile Z.25); (b)
+  die DICHT-Fassung ist die BLAUPAUSE fuer Map-Reduce-Workflows (Verbuchung, Konsolidierung, Explores gegen den Ledger
+  nehmen sie als Eingang in Haeppchen statt der Vollfassung); (c) Geltung (A) bleibt: DICHT = geltende dichte Fassung,
+  Vollfassung = Single-Source + Nachtragsort, Audit-Klausel unveraendert; (d) Memory
+  feedback_dicht_ledger_ist_blaupause_fuer_workflows_nicht_ritual_lesung (08.09. 18:3xZ) + Ueberholt-Vermerk im
+  Ritual-Memory.
+
+**KON140-03 DRIFT-KONSOLIDIERUNG PER DIFF (Pflegeregel + Vollzug 08.09.):** Regel: nach jeder Antwortrunde / jedem
+  docs-Zug, der diese Vollfassung veraendert, wird der Diff seit dem DICHT-Stand-Kopf K3 ermittelt (git diff <K3-Commit>
+  HEAD -- Ledger; neue KON-Bloecke) und als Records additiv AM ORT (Thema) in die DICHT-Fassung eingetragen + K3-Bump
+  (klein = Lead, gross = eigener Map-Reduce-Zug); Wache vor jedem Workflow mit DICHT-Eingang: juengste KON im K3 ==
+  juengste KON dieser Vollfassung, sonst DRIFT. Messung 08.09. 18:27Z: DICHT-Stand e5667823 (KON120..KON138);
+  Vollfassung seither +KON139 (70 Z.) + Kopf-Zeiger (7 Z.) = git diff e5667823 HEAD 78/1; DICHT trug 0 KON139-Records ->
+  Vollzug in diesem Fenster: KON139-01..05 + KON140-01..03 als Records AM ORT (T07/T11/B.2), K2-Korrektur-Nachtrag
+  (Ritual-Satz UEBERHOLT), K3-Bump "verdichtet bis KON140", C.1-4 + WACHEN nachgemessen. NOCH IN KEINER FASSUNG
+  (Eingaenge des docs-Zugs #221, danach erneut Diff): KON138-09..13 (#220 Register/Lead-Nachfix K-01..K-24),
+  KON137-04-Nachtrag (14 Owner-Anker), KON-ENTWURF-VERBUCHUNG (#227), Konsolidierungs-Ergebnis 4 DICHT (#225).
+
+**KON140-04 REIHENFOLGE (Owner L122823 Schluss):** erst die laufenden Workflows durch (#227 Verbuchung wf_15652479-5d7,
+  #225 Konsolidierung 4 DICHT Phase 1 wf_077c58fb-cbd, Capstone v2 wf_bde8d286-e8e), dann "weiter wie gehabt" (Kette
+  K35: #221 docs-Zug -> Trigger-Pfad #158). Fenster 11 (LEDGER-DICHT-Landung, 8 Commits 75bd4e8b..865b83a2) lief zur
+  Zeit dieser Worte: dev-CI 288/16533 seit 18:12:03Z.
 ## KON139 -- 08.09.2026: LEDGER-DICHT GELANDET + GELTUNG (A) (#197; Owner-GO 18:02:39Z L122494; Fenster 11)
 
 **KON139-01 LIEFERUNG:** docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER-DICHT.md, 19343 Z., 1368 Records (TEIL A 1279 in
