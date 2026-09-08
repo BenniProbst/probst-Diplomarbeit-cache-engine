@@ -30,6 +30,12 @@ NACHTRAG 08.09.2026 (Landung, Fenster 11; K4 additiv AM ORT): Owner 08.09.2026 1
   byte-gleich [...] (Fenster 9)" = Historie: gelandet im Fenster 11 mit diesen datierten Nachtraegen (K2, K3, B.1-7,
   B.1-13, NACHMESSUNG), sonst byte-gleich zur Arbeitsdatei (md5 3f79e357 = Beleg-Archiv
   ~/backups-workflow/20260907-ledger-dicht/LEDGER-DICHT.md).
+  NACHTRAG K2 08.09.2026 (Owner 18:26:22Z L122823; K4 additiv AM ORT): der Ritual-Satz im Nachtrag oben ("RITUAL-KARTE
+  Schritt 3a: diese Datei VOLL; Schritt 3b: Vollfassungs-Kopf nur KON juenger als K3") ist UEBERHOLT -- "Die Ritual Form
+  kann so nicht stattfinden fuer das ledger" (verbatim L122823, Record KON140-02 in A.T07). Das Kipp-Ritual liest weiter
+  den Vollfassungs-Kopf (Schritt 3, juengste KON VOLL); DIESE Fassung ist Blaupause/Eingang fuer Map-Reduce-Workflows
+  (Verbuchung, Konsolidierung, Explores) und wird per Diff gegen die Vollfassung konsolidiert (Regel KON140-03). Geltung
+  (A) als Register-/Lesefassung bleibt (L122494, bestaetigt L122798 "Alle klar, (A) war korrekt").
 
 K3 -- STAND-KOPF (Nenner je 'wc -l' am Schreibtag 08.09.2026, 2026-09-08T08:45:23Z): (a) Vollfassung 37407 Z. @ e5667823
 (Datei-Commit 07.09. 15:06:51Z, #176 EINGESPIELT; Repo-HEAD super am Schreibtag 2ccab581); Kopf-Zeiger Z.1-17, KON138
@@ -53,6 +59,12 @@ NACHTRAG K3 08.09.2026 (Landung): Vollfassung am Landetag 37407 Z. @ e5667823 un
   Landung baa3766b; Kopf-Zeiger fuer diese Fassung als 7 zusaetzliche ">"-Zeilen nach Z.17 = Z.18-24, KON138 danach ab
   Z.26); Zielpfad docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER-DICHT.md = DIESE Datei; Geltung (A) seit 18:02:39Z
   L122494 (K2-Nachtrag); naechste Pflege = Records additiv AM ORT je neuer KON (K4), Stand-Kopf-Bump.
+  NACHTRAG K3 08.09.2026 (Drift-Konsolidierung K106, Fenster 12): Vollfassung 37484 Z. @ 865b83a2 (= e5667823 + 7
+  Zeiger-Zeilen Z.18-24 + KON139 70 Z. Z.26-95) und nach Fenster 12 zusaetzlich KON140 (nachtrag-140.md, 42 Z.) +
+  Zeiger-Korrektur (3 Z.); verdichtet hier bis KON140: Records KON139-01..05 + KON140-01..04 additiv AM ORT (A.T07 5,
+  A.T11 3, B.2 1), C.1-4 = 147 + 9 KON-Nummern; WACHE (Regel KON140-03): juengste KON dieses Stand-Kopfs == juengste KON
+  der Vollfassung (grep -m1 "^## KON" docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md), sonst DRIFT; Beleg
+  ~/backups-workflow/20260908-fenster12-drift/.
 
 
 K4 -- PFLEGE-REGEL (woertlich A.0-K4): "Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump
@@ -8457,6 +8469,68 @@ NACHTRAG-A+B 6 / R1-G3 42 / R1-G1 130 / R1-G2 25; Ordnung R-12: G4 > Nachtraege 
 R1-Reihenfolge; Rang 2..n und Gegenstands-Dubletten im Rang-1-Record gemergt (Felder RANG n / GEMERGT))
 ================================================================================================================
 
+R: KON140-01 | ALIAS: K47, L-05-Vorlage nachtraeglich, suggestion_accepted 18:02:39Z | GEGENSTAND: der Owner entschied
+  (A) fuer die LEDGER-DICHT-Geltung auf eine Einzeiler-Vorlage im Lead-Post 17:58Z; Vorlage als Block (Optionen A/B/C
+  mit Folgen, Kosten, Rueckweg, Empfehlung) nachtraeglich 18:2xZ geliefert | STATUS: GELTEND | ENTSCHEID: "Moment, ich
+  habe (A) gewaehlt, ohne dass du mir die Optionen vorgelegt und erklaert hast, bitte bleibe erstmal bei meiner
+  Entscheidung, aber lege mir das nachtraeglich vor" (08.09.2026 18:20:05Z L122761, typed, md5-8 7562a39c) * "Alle klar,
+  (A) war korrekt" (18:23:13Z L122798, typed, md5-8 f387eb65) = informierte Bestaetigung | VOLLZUG: Vorlage
+  nachgeliefert, Entscheid (A) unveraendert; K47 im Lead-Fehlerregister (owner-gated Vorlagen immer als Block; Kurz-GO
+  gilt, Erklaerung folgt sofort); Memory feedback_eigene_arbeitsfehler K47 | TRAEGER: #197 (in_progress), K47 |
+  UEBERHOLT-durch: - | QUELLE: LED 865b83a2 KON139-02 + Nachtrag KON140-01 (Fenster 12, nachtrag-140.md) | THEMA: A.T07
+  | R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026 (git diff e5667823..HEAD -- Ledger; kein Reduce-1-Record)
+
+R: KON140-02 | ALIAS: Ritual-Form verworfen, DICHT = Blaupause, Schritt 3a/3b UEBERHOLT, Memory
+  feedback_dicht_ledger_ist_blaupause_fuer_workflows_nicht_ritual_lesung | GEGENSTAND: die DICHT-Fassung des Ledgers ist
+  NICHT Lesestoff des Kipp-Rituals, sondern Blaupause/Eingang fuer Map-Reduce-Workflows; Kipp-Ritual Schritt 3 bleibt
+  der Vollfassungs-Kopf (juengste KON VOLL) | STATUS: GELTEND | ENTSCHEID: "Die Ritual Form kann so nicht stattfinden
+  fuer das ledger, aber nach Konsolidierung des weiter mit allen Antworten fortgelaufenen Ledgers, welches nun die
+  Dichte Fassung per Diff fixen sollte, kann das dichte Ledger workflows als Blaupause dienen, um ueber einen map reduce
+  effizienter zu bauen, bitte merke dir das. Ist die dichte Fassung denn schon wieder gegen den Drift des echten Ledgers
+  konsolidiert? Sonst hole das bitte nach. Wenn dann diese Workflows alle durch sind, koennen wir weiter machen wie
+  gehabt" (08.09.2026 18:26:22Z L122823, typed, md5-8 bbc5a8c8; Umlaute transliteriert, V13) | VOLLZUG: (a) Ritual
+  Schritt 3 = Vollfassungs-Kopf, (b) KON139-02-Ritualsatz + RITUAL-KARTE 3a/3b + Vollfassungs-Zeiger Z.22-23 +
+  K2-Nachtrag dieser Datei = UEBERHOLT (Fenster 12 Nachtraege AM ORT), (c) DICHT = Blaupause fuer
+  Verbuchung/Konsolidierung/Explores (#227, #225), (d) Geltung (A) als Register-/Lesefassung bleibt; Memory-Datei
+  angelegt 18:29Z, Nachtraege 18:17Z/18:23Z in feedback_nach_jedem_compact als UEBERHOLT markiert | TRAEGER: #197
+  (in_progress), #225 (in_progress), #227 (in_progress) | UEBERHOLT-durch: - (ueberholt selbst KON139-02 Ritual-Satz) |
+  QUELLE: LED Nachtrag KON140-02 (nachtrag-140.md; L122823) | THEMA: A.T07 | R1-HERKUNFT: Lead-Drift-Konsolidierung K106
+  08.09.2026
+
+R: KON140-03 | ALIAS: Drift-Konsolidierung per Diff, K3-Wache, Fenster 12 | GEGENSTAND: Pflege der DICHT-Fassung = nach
+  jedem docs-Zug/jeder Antwortrunde git diff <K3-Commit>..HEAD -- Ledger, neue KON-Bloecke als Records additiv AM ORT +
+  K3-Bump; Wache: juengste KON im K3 == juengste KON der Vollfassung, sonst DRIFT (vor jedem Workflow, der die DICHT als
+  Eingang nimmt) | STATUS: GELTEND | ENTSCHEID: "Ist die dichte Fassung denn schon wieder gegen den Drift des echten
+  Ledgers konsolidiert? Sonst hole das bitte nach." (L122823, s. KON140-02) | VOLLZUG: Messung 18:27Z: Vollfassung
+  e5667823 -> 865b83a2 = +78/-1 Zeilen (7 Zeiger + KON139 70 Z.), DICHT trug 0 KON139-Records; Fenster 12: KON140 in die
+  Vollfassung (ledger_nachtrag.sh), Zeiger-Korrektur, Records KON139-01..05 + KON140-01..04 hier AM ORT, K2-Korrektur,
+  K3-Bump "verdichtet bis KON140", C.1-4 +9, WACHEN-Nachmessung; noch in keiner Fassung: KON138-09..13,
+  KON137-04-Nachtrag, KON-ENTWURF-VERBUCHUNG (#227), #225-Ergebnis -> docs-Zug #221, danach erneut Diff | TRAEGER: #197
+  (in_progress), #221 (pending), Lead | UEBERHOLT-durch: - | QUELLE: LED Nachtrag KON140-03 (nachtrag-140.md) | THEMA:
+  A.T07 | R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026
+
+R: KON139-04 | ALIAS: Verbuchung delegiert, ultracode map reduce in Haeppchen, #227, #225 | GEGENSTAND: Volllesung +
+  Verbuchung aller Rueckkehrer und die Konsolidierung der 4 DICHT-Dokumente laufen als Map-Reduce-Workflows, nicht als
+  Lead-Direktlesung | STATUS: GELTEND | ENTSCHEID: "Du brauchst fuer die 4 dichten Haupt-Planungsdokumente, die
+  Verbuchung der letzten 3 Workflow Rueckkehrer und weitere Aufgaben bitte einen ultracode map reduce Worklflow in
+  haeppchen, das ist zu gross fuer einen Kontext, bitte delegiere die Verbuchung und Voll lesung aller Rueckkehrer."
+  (08.09.2026 17:34:45Z L122186, /login command-args, md5-8 3a19e4e2) * "Volles go fuer alle weiteren Schritte, aber die
+  Verbuchung braucht auch ultracode und ist fuer das direkte lesen zu gross. Bitte map reduce gegen die 4 Haupt dichten
+  Designdokumente und Konsolidierung dagegen" (18:03:39Z L122498, md5-8 4e571e78) | VOLLZUG: wf_15652479-5d7 (#227, 83
+  Chunks / 86699 Z., 17:49Z) + wf_077c58fb-cbd (#225 Phase 1, 18:1xZ); Capstone v2 wf_bde8d286-e8e resumed 17:41Z
+  (L122209/L122227) | TRAEGER: #227 (in_progress), #225 (in_progress), #187 (in_progress) | UEBERHOLT-durch: - | QUELLE:
+  LED 865b83a2 KON139-04 (Z.73-87) | THEMA: A.T07 | R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026
+
+R: KON139-02 | ALIAS: Geltung (A), Owner-GO L122494, Vorlage L-05 | GEGENSTAND: die DICHT-Fassung ist die geltende
+  Register-/Lesefassung des Ledgers (geltende Owner-Entscheide + nur-noch-offene Fragen); die Vollfassung bleibt
+  Single-Source + Nachtragsort | STATUS: GELTEND (Teil UEBERHOLT: der Ritual-Satz "Schritt 3a = DICHT VOLL, 3b = Kopf
+  nur KON juenger als K3" gilt seit L122823 NICHT mehr, s. KON140-02) | ENTSCHEID: "LEDGER-DICHT: Volles GO fuer (A) wie
+  empfohlen." (08.09.2026 18:02:39Z L122494, suggestion_accepted, md5-8 4d7e0acf) | VOLLZUG: Landung Fenster 11
+  (81a867f4 DICHT + 7 Zeiger-Zeilen; 2ccbe503 RITUAL-KARTE 3a/3b; 865b83a2 KON139), dev-CI 288/16533 seit 18:12:03Z;
+  Fenster 12: Zeiger-Korrekturzeile + RITUAL-KARTE-UEBERHOLT-Vermerk | TRAEGER: #197 (in_progress) | UEBERHOLT-durch:
+  KON140-02 (nur Ritual-Formel 3a/3b; Geltung (A) bleibt) | QUELLE: LED 865b83a2 KON139-02 (Z.44-54) | THEMA: A.T07 |
+  R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026
+
 R: G-032 | ALIAS: O-26, W-3 (ARBEITSWEISE), K29 (= Anhang K-3) | GEGENSTAND: Fable-max-Order 12.08. + 'maximal 2 Agenten
   gleichzeitig' 04.09. -> NEUES REGIME 07.09. | STATUS: GELTEND | ENTSCHEID: "gesehen, derzeit sind die Beschraenkungen
   wieder aufgehoben und wir laufen maximal 6 Workflows parallel nach der Claude code Arbeitsweise und maximal 2 Fable 5
@@ -13745,6 +13819,34 @@ NACHTRAG-A+B 4 / R1-G3 35 / R1-G1 39 / R1-G2 6; Ordnung R-12: G4 > Nachtraege KO
 R1-Reihenfolge; Rang 2..n und Gegenstands-Dubletten im Rang-1-Record gemergt (Felder RANG n / GEMERGT))
 ================================================================================================================
 
+R: KON139-01 | ALIAS: LEDGER-DICHT Lieferung, #197 wf_86e234d4-c80, 1368 Records, Fenster 11 | GEGENSTAND:
+  docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER-DICHT.md 19343 Z., 1368 Records (TEIL A 1279 in A.T01..A.T12 / TEIL B
+  89), Zaehlwerk C.1 157/157 Fragen (97 WANDERT / 60 REST), 655/655 A-Bestand, 163/163 G, 147 KON-Nummern
+  KON120..KON138, OG 58/58, F 41/41, V 148/148, U 28/28, N 9/9, Kreise 534/534; Zug 35 Agenten TERMINAL 17:25Z, Lens 1/2
+  TRAEGT_MIT_FIXES -> Fix 29 BEHOBEN / 9 KEIN FUND / 1 OFFEN (Gegenstands-Dubletten = Explore-Posten) | STATUS: GELANDET
+  (81a867f4, Beleg-Archiv md5 3f79e357 / gelandet md5 399895dc) | ENTSCHEID: Owner-GO (A) L122494 (s. KON139-02) |
+  VOLLZUG: Fenster 11 dev-Push 865b83a2 origin+github, CI 16533 (STAND-11.md nach FENSTER11-ENDE) | TRAEGER: #197
+  (in_progress) | UEBERHOLT-durch: - | QUELLE: LED 865b83a2 KON139-01 (Z.28-42); Beweisort
+  ~/backups-workflow/20260907-ledger-dicht/ | THEMA: A.T11 | R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026
+
+R: KON139-03 | ALIAS: #220 Tranche 3a Historien-Explore TERMINAL, wf_9009b464-3e9, M-1/M-2, G-027 | GEGENSTAND: 103/103
+  Punkte gegen 3 Monate Owner-Historie: 70+1 BEREITS_BEANTWORTET / 32 KEIN_ENTSCHEID_NOETIG / 1 WIDERSPRUCH (G-027
+  Post-Text Apache -> CC-BY, Objekt konform) / 0 NIE_GEFRAGT nach Fix 27 BEHOBEN; Ersatz-Meldungen M-1/M-2 vom Owner
+  abgehakt | STATUS: VOLLZOGEN | ENTSCHEID: "Bitte hake auch die Kenntnisnahmen M-1 und M-2 ab, ich hatte sie schon
+  gesehen, volles GO dafuer." (08.09.2026 17:12:48Z L121805) | VOLLZUG: #220 completed 17:53Z; 24 Lead-Korrekturen
+  K-01..K-24 -> KON138-09..13 im docs-Zug #221; Map-Dateien 103 (17988 Z.) + FINAL-Rest -> #227 | TRAEGER: #220
+  (completed), #221 (pending), #227 (in_progress) | UEBERHOLT-durch: - | QUELLE: LED 865b83a2 KON139-03 (Z.56-71);
+  Beweisort 20260907-tranche3/historien-explore/ | THEMA: A.T11 | R1-HERKUNFT: Lead-Drift-Konsolidierung K106 08.09.2026
+
+R: KON140-04 | ALIAS: Reihenfolge nach L122823, "weiter wie gehabt", Trigger-Pfad #158 | GEGENSTAND: erst die laufenden
+  Workflows durch (#227 Verbuchung, #225 Konsolidierung 4 DICHT, Capstone v2 #187), dann weiter wie gehabt (Kette K35 ->
+  #221 docs-Zug -> Trigger-Pfad #158) | STATUS: GELTEND | ENTSCHEID: "Wenn dann diese Workflows alle durch sind, koennen
+  wir weiter machen wie gehabt" (L122823, s. KON140-02) * "Der compact ist schon durch, bitte weiter wie gehabt"
+  (18:31:34Z L122909, enqueue, md5-8 2782b107) | VOLLZUG: Fenster 11 lief; Kipp-Ritual K106 vollzogen (LQ 55.152);
+  Uebergabe K106 geschrieben | TRAEGER: #227 (in_progress), #225 (in_progress), #187 (in_progress), #221 (pending) |
+  UEBERHOLT-durch: - | QUELLE: LED Nachtrag KON140-04 (nachtrag-140.md) | THEMA: A.T11 | R1-HERKUNFT:
+  Lead-Drift-Konsolidierung K106 08.09.2026
+
 R: G-043 | ALIAS: W-2 (WIDERSPRICHT), bog #167(d), Z-21, RETT-RT61, B-9 (e10k), S12/A-30, F-033(i) | GEGENSTAND:
   Nachfold-WIDERSPRICHT-Dreier = Lead-Entscheid nach juengstem Owner-Wort (Fall 1 Thesis 3/90 -> G-073, Fall 3
   Kipp-Ritual -> G-042, Fall 2 O-8 Aufgaben-Vollbild 23.08. 97 s spaeter L85664 23.08. 08:41:57Z beantwortet) | STATUS:
@@ -15256,6 +15358,12 @@ Nenner B.1: 13 Zeilen = 12 bedingte Kandidaten/Vorlagen + 1 Zeiger; unbedingte O
   Owner L122494 08.09.2026 18:02:39Z.
 
 ### B.2 REGRESSION MUSS + BRINGSCHULDEN + LEAD-/BAU-POSTEN (Owner L111216 06.09. + OWNER2 Z.42 07.09. = N-2; alle MUSS)
+B.2-K106 (NACHTRAG 08.09.2026, Drift-Konsolidierung K106, additiv AM ORT) | KON139-05 OFFEN/TRAEGER: (a) DICHT-Pflege
+nach #227 + #225 + je neuer KON (Records AM ORT + K3-Bump) = Lead, Regel KON140-03; (b) Explore-Posten
+Gegenstands-Dubletten ueber Schluesselgrenzen (Fix F-12(2)) = kleiner docs-Zug; (c) B.1: 11 bedingte Kandidaten, 0
+unbedingte Owner-Fragen; (d) KON137-04-Nachtrag (14 Owner-Anker, K45) + KON138-09..13 + KON-ENTWURF-VERBUCHUNG (#227) =
+#221; (e) CI-Nummern Fenster 11 + main-FF-Nachmessung = STAND-11.md | Traeger: #197 (in_progress), #221 (pending), #227
+(in_progress), #225 (in_progress), Lead | Quelle: LED 865b83a2 KON139-05 (Z.89-95) | Record (STATUS OFFEN)
 B.2-1 | S12/B-18 EIN-NACHRICHT-Minimalantwort (22.08. L83933 13:21:50Z / L84993 16:34:57Z / L85093 16:47:49Z, Lead) +
   Zuordnung der 12 A60-F-Eingaenge + A58-Reste je Zeile | Traeger: #136(a), #136(6), #136, #176, #222, #136 (pending),
   #176 (completed), #222 (in_progress), #135, #167, #189, #152, #178, #195, #197 | Quelle: OWNER2 Z.42; TAFEL Z.1131; T2
@@ -17544,6 +17652,8 @@ G-176/G-274 = Ledger-/Board-Nummern in Aliassen; keine Tafel-Nummern). Herkunft:
 + 33 III) / 66 Teil A/C Tranche 3 (Zaehl-Etikett 68 = 66 + G-152 + 1 Artefakt, R1-G4 B.2-14) + Anhang K-1/K-3 + Lizenz
 1-8 (#179-Punkt-n, KON138-05/06).
 C.1-4 KON-BLOECKE: grep -oE 'KON1[23][0-9]-[0-9]{2}' | sort -u = 147 Nummern (KON120-01..KON138-08); als
+  NACHTRAG 08.09.2026 K106 (Fenster 12): + 9 KON-Nummern (KON139-01..05, KON140-01..04) = 156 Nummern
+  KON120-01..KON140-04 (Regex-Artefakt KON130-13 unveraendert daneben).
 Record-Schluessel (inkl. Suffixe) = 240; Reduce-2-Records KON137-01..13 + KON137-12a + KON136-NACHTRAG-04..08 +
 KON138-08 (LED e5667823 Z.1129-1190, Z.1202-2137); KON138-00 = Record R1-G4; KON138-01/02/03/04/07 = GEDECKT durch die
 G-Records, die sie zitieren (C.2-NB); KON138-05 = GEDECKT durch G-051 (A1), G-032 (A2/K-3), G-006 (A3), G-074 (A4),
@@ -19341,3 +19451,6 @@ ENDE LEDGER-DICHT -- REDUCE-2 + FIX (Fable 5 max, READ-ONLY an allen Quellen), 0
 NACHMESSUNG (2026-09-08 nach dem Fix): awk -> 0, grep -cP -> 0, wc -l -> 19310 inkl. dieser Zeile.
 NACHMESSUNG 08.09.2026 (Landung Fenster 11, nach den GO-Nachtraegen K2/K3/B.1-7/B.1-13/Nenner-B.1): awk -> 0,
   grep -cP -> 0, wc -l -> 19343 inkl. dieser Zeile; Beleg-Archiv der Arbeitsdatei md5 3f79e357 (19310 Z.).
+NACHMESSUNG 08.09.2026 K106 (Fenster 12, Drift-Konsolidierung KON139/KON140): awk -> 0, grep -cP -> 0, wc -l -> 19455
+  inkl. dieser 2 Zeilen; grep -c "^R: " -> 1376 (1368 + 8: A.T07 5, A.T11 3) + B.2-K106 1 Zeile; WACHE-K3 (KON140-03):
+  juengste KON Stand-Kopf = KON140 ; juengste KON Vollfassung = KON140 -> OK
