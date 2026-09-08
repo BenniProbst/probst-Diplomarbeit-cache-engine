@@ -23,6 +23,76 @@
 > = DICHT VOLL, 3b = dieser Kopf nur KON juenger als der DICHT-Stand-Kopf K3); Audit-Klausel unveraendert.
 > [Nummern-Vermerk: KON-Nummer der Landungszeile = naechste freie bei Einspielung (08.09.: KON139).]
 
+## KON139 -- 08.09.2026: LEDGER-DICHT GELANDET + GELTUNG (A) (#197; Owner-GO 18:02:39Z L122494; Fenster 11)
+
+**KON139-01 LIEFERUNG:** docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER-DICHT.md, 19343 Z., 1368 Records (TEIL A 1279 in
+  12 Themen A.T01..A.T12 / TEIL B 89 = 34 Reduce-1 + 57 V-Records aus R1-VERGESSENE-ARBEIT-TAFEL), Zaehlwerk C.1:
+  157/157 Fragen (97 WANDERT / 60 REST), 655/655 A-Bestand, 163/163 G (G-152 GEDECKT durch G-153), 147 KON-Nummern
+  KON120..KON138, OG 58/58, F 41/41, V 148/148, U 28/28, N 9/9, Kreise 534/534. Quellen: NEUER-LEDGER-NACHFOLD-0109.md
+  20816 Z., diese Vollfassung @ e5667823 (KON120..KON138), A2.3a GEGENSTANDS-TAFEL 3017 Z., Owner-Antworten T1 06.09.
+  21:49:11Z L113305 / G-007 07.09. 07:25:24Z L113578 / T2 07.09. 12:12:56Z L114346 / Tranche 3a 07.09. 20:46:06Z
+  L119041. Zug #197 wf_86e234d4-c80 (35 Agenten, TERMINAL 08.09. 17:25Z): Kartierung (21 NL- + 3 LED-Chunks) + Spez 603
+  Z. -> Map 25 -> Reduce-1 R1-G1 8019 / R1-G2 3024 / R1-G3 2541 / R1-G4 3375 Z. -> Reduce-2 19966 Z. -> Lens 1
+  VERLUSTFREIHEIT TRAEGT_MIT_FIXES (7 MUSS / 1 SOLL / 7 INFO) + Lens 2 FORM-DOKTRIN TRAEGT_MIT_FIXES (13 / 5 / 5) -> Fix
+  19310 Z. (md5 3f79e357; dreiwertig BEHOBEN 29 / KEIN FUND 9 / OFFEN 1 = Gegenstands-Dubletten ueber Schluesselgrenzen,
+  Explore-Posten). Landung = Arbeitsdatei + 33 datierte Nachtrags-Zeilen AM ORT (K2 Geltung, K3 Stand, B.1-7 Owner-GO,
+  B.1-13 #220-Ergebnis, Nenner B.1, NACHMESSUNG; 0 Loeschungen; md5 399895dc). Beweisort
+  ~/backups-workflow/20260907-ledger-dicht/ (LEDGER-DICHT.md, LEDGER-DICHT.pre-fix-20260908.md md5 10f81bc1,
+  refute/LENS-1 277 Z. + LENS-2 248 Z., FIX-QUITTUNG.md 236 Z., LANDE-REZEPT-197.md 185 Z., fix/,
+  landung/landung-nachtraege.diff).
+
+**KON139-02 GELTUNG (A), Owner-Wort:** Vorlage L-05 (Lande-Rezept Abschn. 5) gestellt im Lead-Post 08.09. 17:58Z nach
+  #220-Terminal 17:07Z ("bitte stelle nur die noch nicht gefragten nach dem explore", L119041). Owner 08.09.2026
+  18:02:39Z L122494 (type user, suggestion_accepted) verbatim: "LEDGER-DICHT: Volles GO fuer (A) wie empfohlen." FOLGE:
+  die DICHT-Fassung ist die geltende LESE-/RITUAL-Fassung des Ledgers (Ritual Schritt 3a = DICHT VOLL, 3b = Kopf dieser
+  Vollfassung nur KON juenger als der DICHT-Stand-Kopf K3; RITUAL-KARTE Repo-Fassung
+  docs/plaene/20260901-RITUAL-KARTE.md additiv +8/-0, Commit 2ccbe503); diese Vollfassung bleibt Single-Source +
+  NACHTRAGSORT (scripts/ledger_nachtrag.sh, neueste KON oben), Audit-Klausel (Kopf Z.11-17) unveraendert; Kopf-Zeiger 7
+  ">"-Zeilen nach Z.17 (+7/-0, awk-Einfuegepunkt 19 -> 26, wc 37407 -> 37414; Commit 81a867f4). Historie: H-1 (a)
+  L119041 "Vollfassung bleibt Geltung, DICHT = Lese-Einstieg" galt bis 18:02:39Z. Pflege (K4/L-07): je neuer KON hier ->
+  Records additiv AM ORT in der DICHT-Fassung (Themen-Ort) + Stand-Kopf-Bump; nie hinten anfuegen; UEBERHOLT-Vermerk
+  statt Loeschung; die Vollfassung wird NIE gekuerzt.
+
+**KON139-03 #220 HISTORIEN-EXPLORE TRANCHE 3a TERMINAL (17:07Z, wf_9009b464-3e9, 107 Agenten):** 103/103 Punkte gegen 3
+  Monate Owner-Historie: Map 68 BEREITS_BEANTWORTET / 32 KEIN_ENTSCHEID_NOETIG / 1 WIDERSPRUCH (G-027: Post-Text
+  Apache-2.0 26.08. vs Owner 07.09. 12:12:56Z L114346 "Punkt 8: Bitte wechsel auf CC-BY" -> nur Post-Text-Korrektur,
+  Objekt seit 0b582b35 konform) / 2 NIE_GEFRAGT -> Refute A (8 Funde) + B (19 Funde) je TRAEGT_MIT_FIXES: F-1 (QES) und
+  F-2 (par. 181) WAREN gefragt (L113950 07.09. 07:49:47Z, L114346 Punkt 4 + 5, L113305 G-030, L119041) -> Fix 27 BEHOBEN
+  / 0 ENTLASTET / 0 VERTAGT, Endstand 70+1 / 32 / 1 / 0 NIE_GEFRAGT; Ersatz-Meldungen M-1 (P-8 Schriftform-Teilrisiko
+  fuer Punkt 6 "Einschliesslich kuenftiger Fassungen.") + M-2 (P-1 par.-181-Befreiung: Infra-Lesezugriff #189 +
+  Gesellschafterbeschluss-Anlage) = Owner 08.09.2026 17:12:48Z L121805 verbatim "Bitte hake auch die Kenntnisnahmen M-1
+  und M-2 ab, ich hatte sie schon gesehen, volles GO dafuer." -> ERLEDIGT. Register: 8 echte Spannungen (alle vom Owner
+  selbst oder nach Regel aufgeloest), 9 Scheinwidersprueche, 14 + 24 Lead-Korrekturen (K-01..K-24: Datums-Labels 22.08.
+  -> 21.08., Anker L84184 statt L84181, drei D-10 (17.08. NAS-Creds L63737 / 21.08. OV-16/17 L80820 / Wellenplan-D-10
+  G-140), G-056 = Regression-MUSS (Abschnitt II, L114346 Z.42) statt KN-GO, G-023 Frist 15.09. (G-093) statt 01.10.,
+  G-061 0 offen, NIE-KUERZEN 6 Setzungen inkl. L117167/L117168 + G-012) -> Einspielung als KON138-09..13-Nachtrag im
+  docs-Zug #221. Beweisort ~/backups-workflow/20260907-tranche3/historien-explore/ (reduce/HISTORIEN-ABGLEICH-T3A.md 997
+  Z., refute/LENS-A 172 + LENS-B 264, fix/HISTORIEN-ABGLEICH-T3A-FIX.md 1414 Z., fix/FIX-QUITTUNG.md 167 Z.). Board #220
+  completed 17:53Z.
+
+**KON139-04 VERBUCHUNG DELEGIERT (Owner 08.09. 17:34:45Z L122186):** "Du brauchst fuer die 4 dichten
+  Haupt-Planungsdokumente, die Verbuchung der letzten 3 Workflow Rueckkehrer und weitere Aufgaben bitte einen ultracode
+  map reduce Worklflow in haeppchen, das ist zu gross fuer einen Kontext, bitte delegiere die Verbuchung und Voll lesung
+  aller Rueckkehrer." + 18:0xZ "Volles go fuer alle weiteren Schritte, aber die Verbuchung braucht auch ultracode und
+  ist fuer das direkte lesen zu gross. Bitte map reduce gegen die 4 Haupt dichten Designdokumente und Konsolidierung
+  dagegen" -> Volllesungs-/Verbuchungs-Zug wf_15652479-5d7 (Board #227, 83 Chunks / 86699 Z.: #220 Maps + FINAL, #197
+  LEDGER-DICHT + Reduce-1 G3/G4 + A23A + 24 Maps + Doku + Fix-Scripts + H-05-Ausgaben, #224 Tafel/Refute/Maps,
+  Capstone-Restmaps; Reduce-1 je Gruppe, Reduce-2 VERBUCHUNGS-TAFEL + board-updates.json + KON-ENTWURF-VERBUCHUNG +
+  OWNER-EINGANG, Refute A/B, Fix) und Konsolidierungs-Zug 4 DICHT (Board #225: LEDGER-DICHT + Capstone v2
+  wf_bde8d286-e8e + Verbuchungs-Tafel + Kipp-Ritual-Deltas D-01..D-28 gegen
+  GOAL-/WELLENPLAN-/DESIGNPLAN-/ARBEITSWEISE-DICHT, Nachtraege AM ORT, 2 Verify + Fix, Lande-Rezept). Weitere
+  Owner-Worte 08.09.: 16:33:05Z L121120 Resume-Order; 16:44:48Z L121388 NAS-Nachzug (#226 VOLLZOGEN 17:52Z, 2240
+  Dateien, Verify 2240/2240) + Capstone 8er-Pool; 17:12:48Z L121805 M-1/M-2 GO; 17:36:47Z L122209 Capstone-Stop/Resume
+  (Limit-Tod, Resume 17:41Z byte-gleich, K27); 17:38:44Z L122227 "Bitte resume alle Agenten und workflows die gestorben
+  sind".
+
+**KON139-05 OFFEN / TRAEGER (Stand 08.09. 18:1xZ):** (a) DICHT-Pflege nach #227 (Verbuchungs-Tafel -> Records AM ORT) +
+  nach #225 (4-DICHT-Konsolidierung) + nach dieser KON139 (Record in TEIL A.T11 + Stand-Kopf-Bump) = Lead; (b)
+  Explore-Posten Gegenstands-Dubletten ueber Schluesselgrenzen (Fix F-12(2)) = eigener kleiner docs-Zug; (c) B.1 der
+  DICHT-Fassung: 11 bedingte Kandidaten/Vorlagen, 0 unbedingte Owner-Fragen; (d) KON137-04-Nachtrag (14 Owner-Anker,
+  K45) + KON138-09..13 (#220-Register) + KON-ENTWURF-VERBUCHUNG (#227) = docs-Zug #221; (e) CI-Nummern dieses Fensters
+  11 und die main-FF-Nachmessung stehen in ~/backups-workflow/20260907-push-fenster/STAND-11.md (diese Zeile ist eine
+  Momentaufnahme, V11).
 ## KON138 -- 06./07.09.2026: OWNER-ANTWORTEN A2.3a = DIE EINE RUECKFRAGEN-TAFEL (KON137-09; Tranche 1 L113305 21:49:11Z
 ## + G-007 L113578 07:25:24Z + Tranche 2 L114346 12:12:56Z; Einspielung 07.09., #176)
 
