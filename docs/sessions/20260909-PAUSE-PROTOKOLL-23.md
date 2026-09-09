@@ -1,4 +1,5 @@
-# PAUSE-PROTOKOLL 23 -- 09.09.2026 19:16Z (Owner L128429) + RISS 26 (Session-Limit 19:1xZ) + RESUME 9 (L128469 19:20Z)
+# PAUSE-PROTOKOLL 23 -- 09.09.2026 19:16Z (Owner-Order L128429) + RISS 26 (Session-Limit 19:1xZ)
+# + RESUME 9 (Owner-Order L128469 19:20Z)
 
 ## 1 OWNER-ORDERS (K45 geprobt; beide in ~/backups-workflow/20260908-owner-orders/ als 0600-Dateien)
 (a) L128429 user 2026-09-09T19:16:30.528Z (md5-8 6a0ef918, 90 Zeichen; Datei
@@ -49,3 +50,11 @@ Kette (K35) unveraendert: ... -> Pause 22 -> Resume 8 (18:41Z) -> RISS 26 + Paus
 
 ## 6 WACHEN
 awk length>120 -> 0; non-ASCII -> 0; Secret-Muster (Bracket-Grep) -> 0. Geschrieben 2026-09-09T19:24:57Z.
+
+
+## 7 FORM-KORREKTUR
+FORM-KORREKTUR 2026-09-09T19:26:24Z (Owner-Frage 'nie kuerzen, warum kuerzere Ueberschrift?'): die Titelzeile war im
+  ersten Schreibversuch 121 Zeichen und wurde 19:24Z auf 'Owner L128429' / 'L128469 19:20Z' gestrafft statt
+  umgebrochen (kein Sachverlust, aber formal falscher Weg); jetzt ungekuerzter Wortlaut in zwei '# '-Zeilen. Regel ab
+  hier: Wache >120 an Ueberschriften = UMBRUCH in eine Folgezeile, nie Wortwahl straffen (gleiche Form wie LQ
+  55.199a).
