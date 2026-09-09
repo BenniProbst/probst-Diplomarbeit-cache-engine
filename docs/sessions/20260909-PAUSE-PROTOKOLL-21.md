@@ -100,3 +100,12 @@ Phase 2 #225; Fenster 14; #221 docs-Zug (KON141/142, Riss-Register 20-25 + Torso
 Wachen dieser Datei (nach dem Schreiben gemessen, Werte im Anhang der LQ 55.199): awk length>120 -> 0; non-ASCII -> 0;
   Secret-Muster (Bracket-Grep) -> 0. Kopie im super: docs/sessions/20260909-PAUSE-PROTOKOLL-21.md (lokaler Commit,
   Push = Fenster 14 nach Pause-Ende). Geschrieben 2026-09-09T15:25:37Z.
+
+## 9 NACHTRAG 2026-09-09T15:32:20Z: OWNER L127896 15:30:14Z
+'Bitte verbuche noch fertig und lies den Rueckkehrer vollstaendig dann pause.' (user, md5-8 263711bb, 0600-Datei).
+Vollzogen (LQ 55.200): Diffs der 6 Fix-Objekte gegen pre-fix-r1 VOLL gelesen (1052 Diff-Zeilen), eigene Objektprobe
+  15:31:21Z (wc/md5 6/6 == FIX-QUITTUNG-r2, Wachen 0/0/0, Loeschzeilen = 10 dokumentierte in-place-Ersetzungen, Nenner
+  186 N-Bloecke / Q 27 / L 21, 4 DICHT unveraendert) -> FIX-QUITTUNG r2 ANGENOMMEN, MUSS offen 0, Phase-2-Warte-Gate
+  0.1 (a) ERFUELLT; Rueckkehrer #225 Phase 1 VOLLSTAENDIG gelesen. Abschn. 5 'NOCH NICHT gelesen' und Abschn. 6 (6)
+  damit erledigt; Lead-Nachfix-Posten (1)-(7) bleiben (kein Gate-Blocker). Board-Nachtraege weiter offen (Task-Tools
+  fehlen). PAUSE 21 bleibt in Kraft; Wiederanlauf unveraendert Abschn. 6 (1)-(5), dann (7)-(12).
