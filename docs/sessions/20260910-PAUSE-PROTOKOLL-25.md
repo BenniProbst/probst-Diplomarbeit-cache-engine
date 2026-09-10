@@ -89,3 +89,17 @@ Paket-Abgleich T-1b (nach dem 4. Terminal); Lizenz-Zug-Nachzug nach dessen Termi
   (T-5); Fenster 14 (Protokolle 20-25; T-6); ce-Welle allow_failure + kOwnerHeavyJIntel 8 (T-7, MUSS); #228
   NAS-Nachpass (T-8); Board-Nachtraege (BOARD-NACHTRAEGE-PENDING-0909.json, 8 Nachtraege; T-9); Memory-Zug (T-10);
   Owner-Post (T-11: N-36..N-40, G-164..G-168, O-01..O-04, Lizenz-Handgriffe Signaturfassung/NAS, Heilungs-Bilanz).
+
+## 8 PAUSE 25 BEENDET -- RESUME 12 (10.09.2026 13:27Z; Owner L130484 13:26:42Z nach /login L130481 13:26:11Z;
+## geschrieben 2026-09-10T13:27:47Z)
+Owner verbatim (K45, Datei OWNER-ORDER-20260910-1326Z-resume12-pause25-ende.txt 0600): 'Bitte resume alle Agenten und
+  workflows und fahre wie gehabt mit offener Arbeit fort.' Vollzug: PRE 13:27:17Z = alle 5 Journale STILL seit
+  Pause-25-PRE (719/285/852/713/3 Z., md5 62a7acdc/54b8a027/f86011b1/113708e8/b59882c2, failed unveraendert
+  241/78/214/262/0, pseudo 0, 0 Agenten < 1 h), Scripts md5 == Abschn. 3 (KEIN Patch), 1 claude-Prozess (kein
+  Doppel-Resume), keine Verify-/Fix-Worktrees des Lizenz-Runs vorhanden, Platte 33 GB frei -> Resume x5: die 4
+  Paket-Runs byte-unveraendert ohne args (#227 wtrp43nzi, Capstone wth3uksen, Fold w120fax43, #232 wewzsy8f0),
+  Lizenz-Nachverifikation mit resumeFromRunId wf_9b21e07e-a1d + denselben args (datum 2026-09-10, zeit 06:16Z) =
+  wlb4xgcx2 (Cache leer, beide Lenses starten neu). Pause 25 = 06:32Z-13:27Z (6 h 55 min). Beweisort
+  20260910-pause-25/ (MESSUNG-RESUME12-PRE.json, SCRIPT-MD5-RESUME12.txt, RESUME12-START.txt, Wache
+  MESSUNG-RESUME12-WACHE.txt). Weiter: Rueckkehrer je Terminal VOLL (nur verbuchen, Paket-Regel); Lizenz-Rueckkehrer
+  -> Lead-Nachzug (Owner L130287); nach dem 4. Paket-Terminal T-1b Paket-Abgleich.
