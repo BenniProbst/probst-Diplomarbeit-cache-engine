@@ -125,21 +125,30 @@ Owner-Entscheid vom 25.08.2026 (X1): super bleibt Apache-2.0 und wird
     LICENSES/LicenseRef-Comdare-Research-1.0.txt, die BYTE-GLEICHE
     Kopie der LICENSE des cache-engine-Submoduls. Wer dieses Repo
     liest, sieht die restriktive Lizenz damit OHNE Submodul-Checkout.
+  * LICENSES/CC-BY-4.0.txt ist seit dem 07.09.2026 (Owner-Entscheid
+    Lizenz-/Vertragszug #179, Punkt 8) die BYTE-GLEICHE Kopie der
+    SPDX-Fassung LICENSES/CC-BY-4.0.txt des Diplomarbeits-Submoduls
+    thesis/diplomarbeit (dessen Wurzel-LICENSE ist der Legalcode von
+    creativecommons.org).
   * REUSE.toml an der Wurzel ordnet jedem Pfad Rechteinhaber und
     SPDX-Bezeichner zu: Eigencode Apache-2.0, die beiden Comdare-
     Submodule LicenseRef-Comdare-Research-1.0, Fremdcode und
     Pruefungsunterlagen je nach ihrer eigenen Lage. REUSE.toml
     lizenziert nichts um: massgeblich bleibt je Komponente ihre
     eigene Lizenzdatei (LICENSE, Geltungsbereich, Punkt 3).
-  * Eine Kopie kann veralten. Deshalb bindet die Zeile unten die Kopie
+  * Eine Kopie kann veralten. Deshalb binden die Zeilen unten jede Kopie
     an ihre Quelle, und die Wache prueft Byte fuer Byte. Ist das
     Submodul nicht ausgecheckt, wird nur die Kopie verlangt und der
     Verzicht als SKIP protokolliert.
 
 WACHE: LIZENZTEXT LicenseRef-Comdare-Research-1.0.txt BYTEGLEICH Code/external/comdare-cache-engine/LICENSE
+WACHE: LIZENZTEXT CC-BY-4.0.txt BYTEGLEICH thesis/diplomarbeit/LICENSES/CC-BY-4.0.txt
 
 Wer den Gitlink der cache engine auf einen Stand mit anderer LICENSE
 setzt, bekommt hier einen roten Test -- und zieht die Kopie nach.
+Dasselbe gilt fuer den Thesis-Gitlink und die CC-BY-Kopie (gebunden
+seit 10.09.2026; bis dahin stand die Byte-Gleichheit nur als Kommentar
+in REUSE.toml, ungeprueft).
 Die prt-art-LICENSE ist derselbe Lizenztext mit anderem Repository-
 Namen in Zeile 11 und eigenem Abschnitt 8/9; sie liegt deshalb nicht
 als zweite Kopie hier, sondern im Submodul selbst.
@@ -202,5 +211,12 @@ PRUEFUNGSUNTERLAGEN
 
 Die Pruefungsunterlagen (Expose-Dokumente, Betreuer-Gutachten,
 Anmeldeformulare) bleiben Bestandteil dieses Repositoriums und werden
-mit veroeffentlicht. Sie sind Teil der Diplomarbeit von
-Benjamin-Elias Probst und tragen keine gesonderte Lizenz.
+mit veroeffentlicht. Sie gehoeren zum Pruefungsverfahren der
+Diplomarbeit von Benjamin-Elias Probst, sind aber KEINE Dateien des
+Diplomarbeits-Repositoriums und fallen deshalb NICHT unter dessen
+CC BY 4.0 (seit 07.09.2026). Sie tragen keine Lizenz: REUSE.toml ordnet
+sie LicenseRef-Diplomarbeit-Copyright-Only zu (Copyright Benjamin-Elias
+Probst; Betreuer-Gutachten und E-Mails: Copyright der jeweiligen
+Verfasser). Nachgezogen 10.09.2026; bis dahin stand hier nur "Teil der
+Diplomarbeit ... keine gesonderte Lizenz", was nach der CC-BY-Umstellung
+mehrdeutig war.

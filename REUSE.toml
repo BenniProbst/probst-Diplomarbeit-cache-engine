@@ -179,10 +179,26 @@ path = "Forschungsarbeiten/code/P30-Hazard-Pointers/haz_ptr/**"
 SPDX-FileCopyrightText = "2019 Jiahua Huang"
 SPDX-License-Identifier = "MIT"
 
+# -- 6b. COMDARE-EIGENE ANALYSE-NOTIZEN INNERHALB der Vendor-Klone (LETZTE ----
+#        Zuordnung gewinnt, Spec 3.3): die 13 STRUKTUR_NOTIZ.md unter
+#        Forschungsarbeiten/code/<P>/<klon>/ sind Comdare-Notizen UEBER den Klon,
+#        kein Vendor-Code. Ohne diese Zeile traefe sie der Vendor-Glob oben und
+#        `reuse spdx` wiese sie dem Vendor zu (gemessen 10.09.2026, P30: MIT/
+#        2019 Jiahua Huang) -- entgegen dem Kommentar zu Block 6 (Inventare
+#        daneben bleiben Eigencode). override, weil die Notizen die Copyright-
+#        Zeile des Vendors ZITIEREN (mit closest gewann das Zitat, gemessen 9/13).
+[[annotations]]
+path = "Forschungsarbeiten/code/*/*/STRUKTUR_NOTIZ.md"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), Marke Comdare"
+SPDX-License-Identifier = "Apache-2.0"
+
 # -- 7. SUBMODULE: fuer `reuse lint` keine Covered Files, fuer den Leser bindend
 #       (NOTICE, WACHE: SUBMODUL). Die Comdare-Submodule tragen die Comdare
-#       Research License 1.0 (Kopie in LICENSES/); die Diplomarbeit selbst ist
-#       Copyright Benjamin-Elias Probst ohne Lizenzdatei.
+#       Research License 1.0 (Kopie in LICENSES/); das Diplomarbeits-Repositorium
+#       traegt seit dem 07.09.2026 CC BY 4.0 (Kopie in LICENSES/, Zuordnung unten),
+#       Copyright Benjamin-Elias Probst. (Bis 07.09.2026: Copyright ohne
+#       Lizenzdatei, Owner-Entscheid E1 26.08.2026 -- durch Punkt 8 ueberholt.)
 [[annotations]]
 path = ["Code/external/comdare-cache-engine/**", "Code/external/comdare-prt-art/**"]
 SPDX-FileCopyrightText = "2026 BEP Venture UG (haftungsbeschraenkt), owner of the registered trademark Comdare"

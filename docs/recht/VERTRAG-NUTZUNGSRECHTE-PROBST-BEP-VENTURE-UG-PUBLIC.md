@@ -1,22 +1,25 @@
 <!-- ASCII-Transliteration der oeffentlichen Fassung (ae/oe/ue/ss, par. = Paragraf-Zeichen), Zeilen <= 120 Zeichen.
      Massgeblich ist die PDF-Datei VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC.pdf in diesem Ordner.
-     Signaturfassung (mit Geburtsdatum/Anschriften/Registerdaten) liegt NICHT in diesem Repositorium. -->
+     Signaturfassung (mit Geburtsdatum/Anschriften) liegt NICHT in diesem Repositorium; die Registerdaten der
+     Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in beiden Fassungen. -->
 
-# ENTWURF -- anwaltlich zu pruefen (OeFFENTLICHE FASSUNG ohne Geburtsdatum/Anschriften)
+# ENTWURF -- anwaltlich zu pruefen (OEFFENTLICHE FASSUNG ohne Geburtsdatum/Anschriften)
 
 **Vertrag ueber die Einraeumung von Nutzungsrechten an der Diplomarbeit
 "Aktive cache-bewusste Hardware-Adaption: Eine Cache-Engine fuer Trie-basierte Indexstrukturen"**
 
-Entwurfsstand: 07.09.2026 (Bau-Agent #179, Beweisort `~/backups-workflow/20260907-thesis-license-rechte/`;
-Lead-Nachzug 07.09.2026 par. 7 Abs. 1 und P-8 nach Owner-Antwort Punkt 5).
+Entwurfsstand: 10.09.2026 (Nachzug Registerdaten und par. 181 BGB nach der Verify-Stufe des Zugs #179; Vorfassungen
+07.09.2026: Bau-Agent #179 und Lead-Nachzug par. 7 Abs. 1 und P-8 nach Owner-Antwort Punkt 5). Beweise liegen in der
+Beweisablage des Leads ausserhalb des Repositoriums.
 Grundlage: Owner-Entscheidung G-030 (06.09.2026) und Lizenz-/Vertragszug #179 (07.09.2026, Punkte 1--8 beantwortet).
-Es gibt zwei aus dieser Quelle erzeugte PDF-Fassungen: eine **Signaturfassung** (mit Anschrift, Geburtsdatum,
-Registerdaten -- nur fuer den Firmenordner der BEP Venture UG) und eine **oeffentliche Fassung** ohne diese Daten (fuer
-das oeffentlich werdende Repositorium `probst-diplomarbeit-cache-engine`, `docs/recht/`).
+Es gibt zwei aus dieser Quelle erzeugte PDF-Fassungen: eine **Signaturfassung** (mit Anschrift und
+Geburtsdatum -- nur fuer den Firmenordner der BEP Venture UG) und eine **oeffentliche Fassung** ohne diese Daten (fuer
+das oeffentlich werdende Repositorium `probst-diplomarbeit-cache-engine`, `docs/recht/`). Die Registerdaten der
+Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in beiden Fassungen.
 
 Dieser Entwurf ist keine Rechtsberatung. Angaben in eckigen Klammern `[...]` sind Platzhalter, die nur der Urheber
-bzw. die Gesellschaft ausfuellen kann (siehe OFFENE-FRAGEN-OWNER.md). Die Pruefpunkte am Ende (P-1 bis P-9) sind
-Hinweise fuer die anwaltliche Pruefung und nicht Vertragsbestandteil.
+bzw. die Gesellschaft ausfuellen kann (siehe Pruefpunkte P-1 bis P-9 und die Beweisablage des Leads). Die
+Pruefpunkte am Ende (P-1 bis P-9) sind Hinweise fuer die anwaltliche Pruefung und nicht Vertragsbestandteil.
 
 ## Vertragsparteien
 
@@ -25,17 +28,18 @@ Hinweise fuer die anwaltliche Pruefung und nicht Vertragsbestandteil.
 
 und
 
-**BEP Venture UG (haftungsbeschraenkt)**, [Sitz und Anschrift] (nur Signaturfassung), eingetragen im Handelsregister
-des Amtsgerichts [Amtsgericht] unter HRB [HRB-Nummer], vertreten durch ihren alleinigen Geschaeftsfuehrer
+**BEP Venture UG (haftungsbeschraenkt)**, mit Sitz in Dresden (Anschrift nur in der Signaturfassung), eingetragen im
+Handelsregister des Amtsgerichts Dresden unter HRB 42678, vertreten durch ihren alleinigen Geschaeftsfuehrer
 **Benjamin-Elias Probst**,
 -- nachfolgend "Gesellschaft" --
 
 -- Urheber und Gesellschaft gemeinsam "Parteien" --
 
 Hinweis: Benjamin-Elias Probst ist zugleich Urheber (natuerliche Person) und alleiniger Gesellschafter und
-Geschaeftsfuehrer der Gesellschaft. Dieser Vertrag ist deshalb ein Insichgeschaeft; er bedarf der Befreiung von
-par. 181 BGB (Satzung oder Gesellschafterbeschluss) und, als Ein-Personen-Gesellschaft, der Niederschrift nach
-par. 35 Abs. 3 GmbHG (vgl. par. 7 Abs. 4 und Pruefpunkt P-1).
+Geschaeftsfuehrer der Gesellschaft. Dieser Vertrag ist deshalb ein Insichgeschaeft. Die Befreiung des
+Geschaeftsfuehrers von den Beschraenkungen des par. 181 BGB ist im Handelsregister eingetragen (Amtsgericht Dresden,
+HRB 42678; Gruendung nach Musterprotokoll). Als Ein-Personen-Gesellschaft ist der Vertrag unverzueglich in eine
+Niederschrift nach par. 35 Abs. 3 GmbHG aufzunehmen (vgl. par. 7 Abs. 4 und Pruefpunkt P-1).
 
 ## Praeambel
 
@@ -162,9 +166,10 @@ Folgen
    die dem wirtschaftlichen Zweck der unwirksamen Bestimmung am naechsten kommt. Entsprechendes gilt fuer Luecken.
 3. Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulaessig, der Sitz der
    Gesellschaft.
-4. Da der Urheber zugleich alleiniger Gesellschafter und Geschaeftsfuehrer der Gesellschaft ist, bedarf dieser Vertrag
-   der Befreiung von den Beschraenkungen des par. 181 BGB (Satzung oder Gesellschafterbeschluss); als
-   Ein-Personen-Gesellschaft ist er unverzueglich in eine Niederschrift nach par. 35 Abs. 3 GmbHG aufzunehmen [P-1].
+4. Der Urheber ist zugleich alleiniger Gesellschafter und Geschaeftsfuehrer der Gesellschaft; seine Befreiung von den
+   Beschraenkungen des par. 181 BGB ist im Handelsregister eingetragen (Amtsgericht Dresden, HRB 42678). Als
+   Ein-Personen-Gesellschaft ist dieser Vertrag unverzueglich in eine Niederschrift nach par. 35 Abs. 3 GmbHG
+   aufzunehmen [P-1].
 5. Massgeblich ist die deutsche Fassung dieses Vertrags.
 
 ## Unterschriften
@@ -194,8 +199,9 @@ GitHub |
 | 3 | `comdare-prt-art` ("prt-art") | Pruefling PRT-ART | `b539d6ee287699b35cd8e5b9b2d33183e0cefa7a` | Comdare Research
 License 1.0 (Change Date 2031-08-10); Copyright BEP Venture UG (haftungsbeschraenkt). GitLab Projekt 287; GitHub |
 | 4 | `20260931-overleaf-diplomarbeit` ("thesis") | Text der Diplomarbeit (LaTeX), erzeugte Anhaenge, Abgabe-PDF |
-`cbefa617aa54b17cec0933b3853d2b2bfdd7e22e` (Stand vor Lizenz-Einfuehrung); CC-BY-Einfuehrung mit den Commits `f63522a`
-und `510aa43` (Branch `bau/thesis-license-rechte-0709`, Landung durch den Lead) | Creative Commons Attribution 4.0
+`cbefa617aa54b17cec0933b3853d2b2bfdd7e22e` (Stand vor Lizenz-Einfuehrung); CC-BY-Einfuehrung durch die Commits
+`1c7fe4a`, `d215807`, `f63522a`, `510aa43` und den Merge `0b582b35` (07.09.2026, main = development; GitLab Projekt
+289 und GitHub) | Creative Commons Attribution 4.0
 International (CC BY 4.0), Copyright (c) 2026 Benjamin-Elias Probst (LICENSE, NOTICE, REUSE.toml). GitLab Projekt 289;
 GitHub |
 
@@ -219,8 +225,9 @@ die Cache-Engine zusaetzlich LICENSE_AUDIT_EXT.md.
 ## Pruefpunkte fuer die anwaltliche Pruefung (nicht Vertragsbestandteil)
 
 - **P-1 Insichgeschaeft (par. 181 BGB, par. 35 Abs. 3 GmbHG):** Benjamin-Elias Probst ist alleiniger Gesellschafter und
-  Geschaeftsfuehrer; Befreiung von par. 181 BGB in Satzung oder Gesellschafterbeschluss und Handelsregister-Eintrag
-  erforderlich; Vertrag unverzueglich in eine Niederschrift aufnehmen.
+  Geschaeftsfuehrer; seine Befreiung von par. 181 BGB ist laut Handelsregisterauszug eingetragen (Amtsgericht Dresden,
+  HRB 42678; Gruendung nach Musterprotokoll) -- anhand eines aktuellen Auszugs bestaetigen; Vertrag unverzueglich in
+  eine Niederschrift nach par. 35 Abs. 3 GmbHG aufnehmen.
 - **P-2 Nachtraegliche Genehmigung (par. 1 Abs. 3):** Lizenzen an ce/prt-art seit 02.08.2026 erteilt ohne schriftliche
   Rechteeinraeumung -> Genehmigungsklausel (par. 185 BGB analog) pruefen.
 - **P-3 Unbekannte Nutzungsarten (par. 31a UrhG):** Schriftform zwingend; Widerrufsrecht nicht abdingbar.
@@ -235,5 +242,6 @@ die Cache-Engine zusaetzlich LICENSE_AUDIT_EXT.md.
   (par. 40 UrhG) verlangt das Gesetz Schriftform; ohne qualifizierte elektronische Signatur (par. 126a BGB) waere nur
   dieser Teil unwirksam (par. 7 Abs. 2). Anwaltlich pruefen: einfache PDF-Signatur genuegen lassen oder QES fuer die
   Erstunterzeichnung.
-- **P-9 Personenbezogene Daten:** Signaturfassung (mit Anschrift/Geburtsdatum/Registerdaten) nur im Firmenordner;
-  oeffentliche Fassung ohne diese Daten fuer das oeffentlich werdende Repositorium (super, docs/recht/).
+- **P-9 Personenbezogene Daten:** Signaturfassung (mit Anschrift/Geburtsdatum) nur im Firmenordner; oeffentliche
+  Fassung ohne diese Daten fuer das oeffentlich werdende Repositorium (super, docs/recht/). Die Registerdaten der
+  Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in beiden Fassungen.
