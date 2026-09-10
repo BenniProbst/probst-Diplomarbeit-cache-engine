@@ -33,4 +33,10 @@ preferred-citation:
     country: DE
   year: 2026
   notes: "German title: Aktive cache-bewusste Hardware-Adaption: Eine Cache-Engine fuer Trie-basierte Indexstrukturen."
-notes: "The repository's own code is Apache-2.0. The embedded Comdare Cache Engine and PRT-ART are licensed under the Comdare Research License 1.0 (rights holder BEP Venture UG (haftungsbeschraenkt), trademark Comdare); their license text is in LICENSES/LicenseRef-Comdare-Research-1.0.txt. The thesis text is Copyright Benjamin-Elias Probst."
+# Licensing note (kept as a comment: the CFF 1.2.0 schema allows "notes" only inside references, not at
+# top level; until 2026-09-10 this text stood in a top-level "notes:" field, which failed validation):
+# The repository's own code is Apache-2.0. The embedded Comdare Cache Engine and PRT-ART are licensed
+# under the Comdare Research License 1.0 (rights holder BEP Venture UG (haftungsbeschraenkt), trademark
+# Comdare); their license text is in LICENSES/LicenseRef-Comdare-Research-1.0.txt. The thesis text is
+# copyright Benjamin-Elias Probst and is licensed under CC BY 4.0 (Creative Commons Attribution 4.0
+# International) since 2026-09-07; its license text is in LICENSES/CC-BY-4.0.txt.

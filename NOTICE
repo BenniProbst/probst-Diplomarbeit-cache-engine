@@ -215,8 +215,11 @@ mit veroeffentlicht. Sie gehoeren zum Pruefungsverfahren der
 Diplomarbeit von Benjamin-Elias Probst, sind aber KEINE Dateien des
 Diplomarbeits-Repositoriums und fallen deshalb NICHT unter dessen
 CC BY 4.0 (seit 07.09.2026). Sie tragen keine Lizenz: REUSE.toml ordnet
-sie LicenseRef-Diplomarbeit-Copyright-Only zu (Copyright Benjamin-Elias
-Probst; Betreuer-Gutachten und E-Mails: Copyright der jeweiligen
-Verfasser). Nachgezogen 10.09.2026; bis dahin stand hier nur "Teil der
-Diplomarbeit ... keine gesonderte Lizenz", was nach der CC-BY-Umstellung
-mehrdeutig war.
+sie LicenseRef-Diplomarbeit-Copyright-Only zu (Urheberrecht bei
+Benjamin-Elias Probst; Betreuer-Gutachten und E-Mails: Urheberrecht bei
+den jeweiligen Verfassern). Nachgezogen 10.09.2026; bis dahin stand hier
+nur "Teil der Diplomarbeit ... keine gesonderte Lizenz", was nach der
+CC-BY-Umstellung mehrdeutig war. Wortlaut seit 10.09.2026 "Urheberrecht
+bei" statt des englischen Worts: reuse erntet in Prosa jedes
+"Copyright"-plus-Name als Copyright-Vermerk DIESER Datei (REUSE.toml
+Block 1, precedence closest) -- Verify-Nachzug #179, Fund L1-r2-M02.
