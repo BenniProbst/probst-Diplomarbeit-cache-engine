@@ -213,8 +213,12 @@ SPDX-License-Identifier = "CC-BY-4.0"
 
 # Nutzungsrechte-Vertrag Urheber -> BEP Venture UG (oeffentliche Fassung ohne personenbezogene Daten):
 # Rechtstext beider Parteien, kein Software-Artefakt; Wiedergabe nur mit Nennung, keine Lizenz.
+# override (seit 10.09.2026, Verify-Nachzug #179 r2, Folgefund zu L1-r2-M02): der Vertragstext ZITIERT in
+# Anlage 1 die Copyright-Zeile des Thesis-Repositoriums; mit closest las reuse dieses Zitat als
+# Copyright-Vermerk der .md-Fassung (nur der Urheber), waehrend die .pdf-Fassung beide Parteien trug.
+# Regel wie Block 2 (Zitat). Bis 10.09.2026: precedence = "closest".
 [[annotations]]
 path = "docs/recht/**"
-precedence = "closest"
+precedence = "override"
 SPDX-FileCopyrightText = ["2026 Benjamin-Elias Probst", "2026 BEP Venture UG (haftungsbeschraenkt)"]
 SPDX-License-Identifier = "LicenseRef-Diplomarbeit-Copyright-Only"
