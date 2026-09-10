@@ -201,7 +201,8 @@ License 1.0 (Change Date 2031-08-10); Copyright BEP Venture UG (haftungsbeschrae
 | 4 | `20260931-overleaf-diplomarbeit` ("thesis") | Text der Diplomarbeit (LaTeX), erzeugte Anhaenge, Abgabe-PDF |
 `cbefa617aa54b17cec0933b3853d2b2bfdd7e22e` (Stand vor Lizenz-Einfuehrung); CC-BY-Einfuehrung durch die Commits
 `1c7fe4a`, `d215807`, `f63522a`, `510aa43` und den Merge `0b582b35` (07.09.2026, main = development; GitLab Projekt
-289 und GitHub) | Creative Commons Attribution 4.0
+289 und GitHub) sowie den Nachzug-Merge `113d8f2f` (10.09.2026, main = development;
+GitLab Projekt 289 und GitHub) | Creative Commons Attribution 4.0
 International (CC BY 4.0), Copyright (c) 2026 Benjamin-Elias Probst (LICENSE, NOTICE, REUSE.toml). GitLab Projekt 289;
 GitHub |
 
