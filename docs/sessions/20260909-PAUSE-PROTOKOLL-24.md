@@ -71,3 +71,21 @@ Phase 2 #225 (T-3); #221 docs-Zug KON141 (Riss-Register 15-27 mit Etiketten 19a/
   K3-Bump; Fenster 14 (Protokolle 20-24); ce-Welle allow_failure (MUSS); #228 NAS-Nachpass; #177 Board-Hygiene;
   Board-Nachtraege (BOARD-NACHTRAEGE-PENDING-0909.json, 4 Nachtraege) sobald Task-Tools; Memory-Zug; Owner-Post
   (N-36..N-40, G-164..G-168, O-01..O-04, Heilungs-Bilanz).
+
+## 8 PAUSE 24 BEENDET -- RESUME 11 (10.09.2026 05:14Z; Owner L129787 05:10:48Z nach /login L129784; geschrieben
+## 2026-09-10T05:16:55Z)
+Owner verbatim (K45, Datei OWNER-ORDER-20260910-resume11-nie-vorwegnehmen.txt 0600; Wiederholung L129802 05:11:04Z):
+  'Bitte resume alle Agenten und workflows und fahre wie gehabt mit offener Arbeit fort. Du hattest eben den fix
+  selbst versucht, anstatt dies wirklich dem dafuer vorgesehenen Agenten des Workflows zu ueberlassen, bitte resume
+  wirklich den workflow und korrigiere erst, wenn der workflow landet. Sonst machst du durch das vorwegnehmen von
+  workflow Arbeiten moeglicherweise Schaden.' -> Lead-Fehler K51 (Vorwegnahme: Fold-Patch-Plan, Vorurteile zu
+  Capstone-Refute-Funden, Phase-2-Regressions-Wache) im Register + Memory
+  feedback_workflow_arbeit_nie_vorwegnehmen_korrektur_erst_nach_landung; Korrekturen additiv in LQ 55.217,
+  HEILUNGS-BESTAND, LEAD-DELTAS D-K110-10.
+Vollzug: PRE 05:13Z = alle 4 Journale STILL seit Pause-24-PRE (714/280/845/708 Z., md5
+  c99dc263/1ffe5be3/81185582/669154d5, 0 frische Agenten), Scripts md5 == Abschn. 3
+  (178ea111/6a4f4a24/96696dc8/ba35afd9; KEIN Patch), 1 claude-Prozess (PID 2012008; kein Doppel-Resume), Platte 33 GB
+  frei -> Resume x4 byte-unveraendert ohne args 05:14Z: #227 wpd1dgotp, Capstone w6pbmevd8, Fold w3w0ybfnv, #232
+  wec1bg0g2 (Beweisort 20260909-pause-24/MESSUNG-RESUME11-PRE.json, SCRIPT-MD5-RESUME11.txt, RESUME11-START.txt).
+  Wache nach 2 min: s. MESSUNG-RESUME11-WACHE.txt. Pause 24 = 20:43Z-05:14Z (8 h 31 min). Weiter: Rueckkehrer je
+  Terminal VOLL, dann Heilungs-Plan T-1..T-11 -- ohne Vorwegnahme von Workflow-Arbeit.
