@@ -46,8 +46,16 @@ Lebender Projektstand: Kopf von `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md
 - Comdare Cache Engine und PRT-ART: Comdare Research License 1.0
   (`LICENSES/LicenseRef-Comdare-Research-1.0.txt`, byte-gleiche Kopie der
   Submodul-LICENSE; Rechteinhaber BEP Venture UG (haftungsbeschraenkt), Marke Comdare).
-- Thesis, Entwuerfe und Pruefungsunterlagen: Copyright Benjamin-Elias Probst
-  (`LICENSES/LicenseRef-Diplomarbeit-Copyright-Only.txt`).
+- Thesis-Repositorium (Submodule `thesis/diplomarbeit` und
+  `Code/external/20260931-overleaf-diplomarbeit`): CC BY 4.0, Urheberrecht bei
+  Benjamin-Elias Probst (`LICENSES/CC-BY-4.0.txt`, byte-gleiche Kopie der
+  Submodul-Fassung, bewacht per NOTICE-Zeile `WACHE: LIZENZTEXT`; Owner-Entscheid
+  07.09.2026, Lizenz-/Vertragszug #179, Punkt 8). Nutzungsrechte-Vertrag Urheber ->
+  BEP Venture UG (oeffentliche Fassung): `docs/recht/`.
+- Entwuerfe, Kompilat-Schnappschuesse vor dem 07.09.2026 und Pruefungsunterlagen:
+  Urheberrecht bei Benjamin-Elias Probst
+  (`LICENSES/LicenseRef-Diplomarbeit-Copyright-Only.txt`; bis 07.09.2026 galt das
+  auch fuer die Thesis selbst).
 - Vendorierter Forschungscode und Literatur: je eigene Lizenz oder keine
   (`NOTICE`, `REUSE.toml`, `LICENSES/`).
 

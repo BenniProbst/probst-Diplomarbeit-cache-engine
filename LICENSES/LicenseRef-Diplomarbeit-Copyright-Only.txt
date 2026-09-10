@@ -2,21 +2,32 @@ Diplomarbeit -- Copyright Only (no license granted)
 
 Copyright (c) 2026 Benjamin-Elias Probst. All rights reserved.
 
-The files marked with this identifier are part of the diploma thesis
-(Diplomarbeit) of Benjamin-Elias Probst at Technische Universitaet Dresden:
-the thesis text and its drafts, compiled thesis PDFs, and the examination
-documents (exposes, registration forms, supervisor correspondence). They are
-the personal examination work of a natural person. They are not software and
-they carry no software license.
+The files marked with this identifier belong to the diploma thesis
+(Diplomarbeit) of Benjamin-Elias Probst at Technische Universitaet Dresden
+but are NOT files of the thesis repository 20260931-overleaf-diplomarbeit:
+the thesis drafts (thesis/_archiv_entwurf1, the "Grosser Beleg"), thesis
+PDFs compiled before 2026-09-07 and kept as snapshots
+(measurement/thesis_compiles), the examination documents (exposes,
+registration forms, supervisor reports, supervisor correspondence) and the
+public text of the rights agreement under docs/recht (a legal text of both
+parties, see REUSE.toml). They are the personal examination work of a
+natural person, or documents of third parties about it. They are not
+software and they carry no software license.
 
 No license is granted by this file. Reading, assessment, reproduction and
 archival by the examiners and archives of Technische Universitaet Dresden are
 governed by that institution's examination regulations; quotation and
 scientific citation are governed by applicable copyright law. Any other use
-requires the prior written permission of Benjamin-Elias Probst.
+requires the prior written permission of Benjamin-Elias Probst (for
+supervisor reports and correspondence: of their respective authors).
 
 This identifier records the decision of the copyright holder of 2026-08-10
 ("Diplomarbeit ist nur copyright von Benjamin-Elias Probst"), confirmed on
-2026-08-25. Benjamin-Elias Probst (a natural person) and BEP Venture UG
+2026-08-25. Its scope was narrowed on 2026-09-07 (owner decision, license and
+contract train #179, point 8): the thesis repository itself -- LaTeX sources,
+generated appendices, build scripts, session records and the submitted PDF --
+is licensed under CC BY 4.0 since 2026-09-07 (LICENSES/CC-BY-4.0.txt;
+copyright Benjamin-Elias Probst). Files marked with this identifier stay
+copyright-only. Benjamin-Elias Probst (a natural person) and BEP Venture UG
 (haftungsbeschraenkt) (a company, rights holder of the Comdare Cache Engine)
 are two different legal persons; "BEP" on its own denotes neither of them.
