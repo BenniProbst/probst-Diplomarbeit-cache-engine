@@ -233,7 +233,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 5315005849fb145cb80dfde71f3f384b4b0b6a38
+PZW-CE-SHA         = eb69abc190b3cc80922d5e7ec6e388aaad443b49
 PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
@@ -254,6 +254,19 @@ PZW-CI-ALTMUSTER   = 0
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
 
+> NACHZUG 11.09.2026 abends (super-Gitlink-Bump Lizenz-Zug #179 Schritt 3, ce 53150058 -> `eb69abc1`
+> -- der Bump 14a29d5a fuhr OHNE diesen Nachzug (Lead-Fehler K56), dev-CI 16569 rot: Job
+> docs:plan-zahlen-wache 391244 rc=2 "Plan=53150058... Gitlink=eb69abc1..." = Drift-Biss der Wache,
+> wie gebaut; Heilung = dieser Nachzug im Folge-Commit; WIE GEMESSEN mit den Formeln der Wache
+> selbst): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN unveraendert **24**,
+> LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 -- die gelandete Kette 53150058..eb69abc1 (3 Commits:
+> af06a025 + 3c994b30 Doku-only NOTICE + LICENSE_AUDIT_EXT.md, Lande-Merge eb69abc1; git diff --stat
+> 2 Dateien, tests/*.cpp 0, lazy_csv_header 0) beruehrt KEINE `lazy_csv_header()`-Aufrufstelle.
+> Nenner **573** Test-.cpp UNVERAENDERT; .gitlab-ci.yml-Nenner 2984. Kontroll-Lauf am Alt-Baum
+> 53150058 (Bissprobe-Override) rc=0 5/5 (pzw-kontroll-altbaum-53150058.log); Drift-Biss rc=2 belegt
+> (pzw-drift-biss-eb69abc1.log); Lauf nach dem Nachzug rc=0 (pzw-nach-nachzug-eb69abc1.log).
+> Beleg-Logs: ~/backups-workflow/20260907-push-fenster/. Nur der CE-SHA der Ankertafel wandert.
+> Vorheriger Nachzug darunter.
 > NACHZUG 01.09.2026 abends (super-Gitlink-Bump E-1-Zombie-Fix, ce dd0f56d3 -> `53150058` -- der Bump
 > faehrt ATOMAR im selben Commit wie dieser Nachzug; WIE GEMESSEN mit den Formeln der Wache selbst ueber
 > COMDARE_PLAN-Kopie): SCHEMA-STELLEN unveraendert **45**, SCHEMA-DATEIEN unveraendert **24**,
