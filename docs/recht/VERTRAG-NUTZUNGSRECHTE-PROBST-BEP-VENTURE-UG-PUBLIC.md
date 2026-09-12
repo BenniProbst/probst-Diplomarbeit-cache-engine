@@ -19,7 +19,10 @@ Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in 
 
 Dieser Entwurf ist keine Rechtsberatung. Angaben in eckigen Klammern `[...]` sind Platzhalter, die nur der Urheber
 bzw. die Gesellschaft ausfuellen kann (siehe Pruefpunkte P-1 bis P-9 und die Beweisablage des Leads). Die
-Pruefpunkte am Ende (P-1 bis P-9) sind Hinweise fuer die anwaltliche Pruefung und nicht Vertragsbestandteil.
+Pruefpunkte (P-1 bis P-9) sind Hinweise fuer die anwaltliche Pruefung, nicht Vertragsbestandteil und liegen seit
+12.09.2026 (Owner-Order) als separate Datei
+VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC-PRUEFPUNKTE-ANWALTLICHE-PRUEFUNG.md (PDF gleichen Namens)
+in docs/recht/ vor; sie sind nicht Teil der Vertrags-PDF.
 
 ## Vertragsparteien
 
@@ -220,29 +223,3 @@ die Cache-Engine zusaetzlich LICENSE_AUDIT_EXT.md.
 3. `comdare-cache-engine`: Fremdcode unter `ext/` (22 Pakete laut LICENSE_AUDIT_EXT.md) sowie
    Infrastruktur-Bibliotheken (libxlsxwriter BSD-2, zlib, liburing MIT-Option).
 4. `comdare-prt-art`: keine gebuendelte Fremdsoftware; GoogleTest (BSD-3-Clause) nur als Bau-/Testwerkzeug.
-
----
-
-## Pruefpunkte fuer die anwaltliche Pruefung (nicht Vertragsbestandteil)
-
-- **P-1 Insichgeschaeft (par. 181 BGB, par. 35 Abs. 3 GmbHG):** Benjamin-Elias Probst ist alleiniger Gesellschafter und
-  Geschaeftsfuehrer; seine Befreiung von par. 181 BGB ist laut Handelsregisterauszug eingetragen (Amtsgericht Dresden,
-  HRB 42678; Gruendung nach Musterprotokoll) -- anhand eines aktuellen Auszugs bestaetigen; Vertrag unverzueglich in
-  eine Niederschrift nach par. 35 Abs. 3 GmbHG aufnehmen.
-- **P-2 Nachtraegliche Genehmigung (par. 1 Abs. 3):** Lizenzen an ce/prt-art seit 02.08.2026 erteilt ohne schriftliche
-  Rechteeinraeumung -> Genehmigungsklausel (par. 185 BGB analog) pruefen.
-- **P-3 Unbekannte Nutzungsarten (par. 31a UrhG):** Schriftform zwingend; Widerrufsrecht nicht abdingbar.
-- **P-4 Ausschliesslichkeit vs. CC-BY-Belastung (par. 2 Abs. 4):** Thesis-Repo steht bereits unter CC BY 4.0 fuer
-  jedermann; ausschliessliches Nutzungsrecht nur mit dieser Belastung.
-- **P-5 Angemessene Verguetung (par.par. 32, 32a UrhG):** Wirksamkeit des Verzichts bei unentgeltlicher Einraeumung
-  pruefen.
-- **P-6 Steuern:** verdeckte Einlage / Umsatzsteuer mit dem steuerlichen Berater klaeren.
-- **P-7 Rueckfallklausel (par. 6 Abs. 2):** Insolvenzfestigkeit und Wirkung auf erteilte Unterlizenzen pruefen.
-- **P-8 Form der Unterzeichnung (par. 7 Abs. 1):** Owner-Entscheid 07.09.2026 (Punkt 5): digitale Unterschrift,
-  Textform wie vom Lead empfohlen. Fuer unbekannte Nutzungsarten (par. 2 Abs. 3, par. 31a UrhG) und kuenftige Werke
-  (par. 40 UrhG) verlangt das Gesetz Schriftform; ohne qualifizierte elektronische Signatur (par. 126a BGB) waere nur
-  dieser Teil unwirksam (par. 7 Abs. 2). Anwaltlich pruefen: einfache PDF-Signatur genuegen lassen oder QES fuer die
-  Erstunterzeichnung.
-- **P-9 Personenbezogene Daten:** Signaturfassung (mit Anschrift/Geburtsdatum) nur im Firmenordner; oeffentliche
-  Fassung ohne diese Daten fuer das oeffentlich werdende Repositorium (super, docs/recht/). Die Registerdaten der
-  Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in beiden Fassungen.
