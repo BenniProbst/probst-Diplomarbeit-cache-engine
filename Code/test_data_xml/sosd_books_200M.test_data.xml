@@ -1,16 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Diplomarbeit Testdatensatz: SOSD books_200M_uint64
      Standard-Korpus fuer Layout-Theorie + Lernindexe (P05/P06/P11-P20).
-     V23.X1 (2026-05-14) -->
+     V23.X1 (2026-05-14); Quellen-Korrektur #203 (2026-09-16), s. Block HERKUNFT. -->
 <comdare_test_data id="sosd_books_200M" source="SOSD">
   <metadata>
     <name>SOSD books_200M_uint64</name>
     <license>CC-BY 4.0</license>
-    <size_bytes>1600000000</size_bytes>
-    <source_url>https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/JGVF9A/5YTV8K</source_url>
+    <size_bytes>1600000008</size_bytes>
+    <source_url>https://www.dropbox.com/s/y2u3nbanbnbmg7n/books_800M_uint64.zst?dl=1</source_url>
+    <upstream_md5>8708eb3e1757640ba18dcd3a0dbb53bc</upstream_md5>
+    <sha256>c71eb78eebb746f0e525e47d3d7e6b097f680c45cf17f1ead1d1f22a8950f939</sha256>
     <mirror_url>https://zenodo.org/records/15240501</mirror_url>
     <referenced_in_paper>P20 B-Trees Are Back, P05 START, P06 B2-Tree</referenced_in_paper>
   </metadata>
+
+  <!-- HERKUNFT (#203, 2026-09-16, am Objekt nachgemessen).
+       KORRIGIERT: source_url zeigte bis heute auf dataverse doi:10.7910/DVN/JGVF9A/5YTV8K.
+       Diese DOI traegt laut Upstream-Skript (github learnedsystems/SOSD, scripts/download.sh
+       Z.51) den Datensatz books_200M_uint32 (md5 9f3e578671e5c0348cdddc9c68946770,
+       32 Bit je Schluessel) und NICHT die uint64-Fassung. Der Loader sosd_uint64
+       (LE 8-Byte-Count + N*uint64 LE) kann sie nicht lesen. Ebenfalls korrigiert:
+       size_bytes stand auf 1600000000 und liess den 8-Byte-Count-Header aus.
+       BELEG, dass es books_200M_uint64 als Download NICHT gibt: der Zenodo-Spiegel
+       "Sorted Unsigned Integer Datasets" (15240501) fuehrt 14 Dateien, darunter
+       books_800M_uint64 (6400000008 B), books_200M_uint32 (800000008 B) und
+       wiki_ts_200M_uint64 (1600000008 B), aber KEIN books_200M_uint64.
+       REZEPT (Upstream download.sh Z.53 + Z.66 "python3 downsample.py"):
+         1. books_800M_uint64.zst laden (~4 GB; md5 des DEKOMPRIMIERTEN Stroms
+            8708eb3e1757640ba18dcd3a0dbb53bc, denn upstream prueft nach "zstd -d").
+         2. Strom lesen: Header count=800000000, dann 800000000 * uint64 LE.
+         3. Jede 4. Zahl nehmen (Index 0, 4, 8, ...; numpy-Schreibweise d[::4])
+            und mit neuem 8-Byte-LE-Header count=200000000 schreiben.
+         4. Ergebnis: exakt 1600000008 Byte, sha256 wie oben.
+       Gefahren am 16.09.2026 ueber das Ziel "make testdata" mit dem Datensatz-Argument
+       aus fetch_script unten;
+       das Skript prueft Groesse, Count, erste/letzte Zahl, Monotonie und sha256 selbst.
+       MESSWERTE der erzeugten Datei: erste Zahl 0, letzte Zahl 9223372036854784874,
+       0 Monotonie-Brueche ueber alle 200000000 Schluessel.
+       BESTANDS-EXTRA: das Archiv books_800M_uint64.zst (4094295332 B) bleibt neben der
+       Zieldatei liegen; beide sind gitignored (.gitignore:19 Code/tests/fixtures/external/).
+       sosd bleibt ein Bestands-Extra ausserhalb des 6er-Kanons. -->
 
   <key_value_signature>
     <key_types>std::uint64_t</key_types>
@@ -20,8 +49,20 @@
   <local_path>tests/fixtures/external/sosd/books_200M_uint64</local_path>
   <fetch_script>make testdata TESTDATA_ARGS="--dataset sosd_books_200M"</fetch_script>
 
-  <!-- #45 (2026-07-08): SOSD-Binaer-Loader existiert nun — sosd_uint64 (LE 8-Byte-Count + N*uint64 LE).
-       KEINE <dataset_akte>: Datei nicht lokal (honest-0); Akte folgt nach fetch. -->
+  <!-- #45 (2026-07-08): SOSD-Binaer-Loader existiert nun; sosd_uint64 (LE 8-Byte-Count
+       + N*uint64 LE). #203 (2026-09-16): der honest-0-Vermerk "Datei nicht lokal, Akte
+       folgt nach fetch" ist eingeloest. Die Werte unten stammen aus der offiziellen
+       Mechanik compute_dataset_akte (FNV-1a-64 ueber Datei-Bytes + Zaehlung der
+       Zeilenumbruch-Bytes), gefahren gegen die ECHTE Datei; kein Hand-Hash.
+       CAVE fuer test_25_kanon_dataset_akten (ce): dieser Test prueft sosd weiterhin
+       NICHT, weil die Datei gitignored ist und in der CI nicht vorliegt. Der Grund ist
+       also unveraendert die CI-Abwesenheit, nicht mehr das Fehlen der Akte. -->
+  <dataset_akte>
+    <checksum>0x3f2708a9f9310268</checksum>
+    <line_count>8686116</line_count>
+    <preprocessing>zstd -d books_800M_uint64.zst, dann jede 4. uint64 (d[::4]) mit Header 200000000</preprocessing>
+  </dataset_akte>
+
   <loader>
     <dataset_source>sosd_uint64</dataset_source>
     <dataset_id>tests/fixtures/external/sosd/books_200M_uint64</dataset_id>
