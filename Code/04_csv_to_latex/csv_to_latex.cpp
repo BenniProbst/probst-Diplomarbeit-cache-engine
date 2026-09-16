@@ -660,12 +660,14 @@ int write_exchange_longtables(std::filesystem::path const& out_dir, std::span<Ex
           << ">{\\raggedright\\arraybackslash}p{2.2cm} l r r r r "
           << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
         f << "\\caption{" << cap << "}\\label{tab:ld:exchange:" << axis << "}\\\\\n";
-        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+        // P-F (2026-09-16) -- chktex-RUECKFALL, s. Kopf-Kommentar der Schwester-Stelle unten:
+        // die longtable-Marken brauchen das abschliessende '%' (chktex Warning 1).
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
         f << "\\multicolumn{8}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued") << "}\\\\\n";
-        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endhead%\n";
         f << "\\midrule\n\\multicolumn{8}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-          << "}\\\\\n\\endfoot\n";
-        f << "\\bottomrule\n\\endlastfoot\n";
+          << "}\\\\\n\\endfoot%\n";
+        f << "\\bottomrule\n\\endlastfoot%\n";
 
         for (auto const& a : rows) {
             // n=0 (kein definiertes rel-Delta, z.B. scan-only-Zellen mit durchweg 0-Baseline) NICHT als
@@ -956,12 +958,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
     f << "\\begin{longtable}{@{}r >{\\raggedright\\arraybackslash}p{5.0cm} "
       << ">{\\raggedright\\arraybackslash}p{8.0cm}@{}}\n";
     f << "\\caption{" << cap << "}\\label{tab:le:limitierung}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{3}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{3}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     // Zeilen als (Vorbehalt, Status)-Paare. Reihenfolge bindend: Zeile 1 = Cache-Misses/PMC.
     // trailer: optionaler Kommentar HINTER dem LaTeX-Zeilenende. Er traegt die chktex-Inline-
@@ -1365,12 +1368,13 @@ int write_sweep_axis_longtable(std::filesystem::path const& out, std::span<WideF
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.6cm} r r r r r r r "
       << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
     f << "\\caption{" << cap << "}\\label{tab:m3v2:sweep:" << sweep_axis << "}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{9}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{9}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     for (auto& [v, fns] : by_value) {
         f << escape_latex(v);
@@ -1415,12 +1419,13 @@ int write_seg_coverage_appendix(std::filesystem::path const& out, std::span<Wide
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.5cm} r r r r@{}}\n";
     f << "\\caption{" << escape_latex(caption) << "}\\label{" << label << "}\\\\\n";
     std::string const colhead = being_h + " & " + cols_h + " \\\\";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{5}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{5}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     char buf[64];
     for (auto& [bid, samples] : cov) {

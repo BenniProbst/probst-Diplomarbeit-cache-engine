@@ -2054,3 +2054,278 @@ TEST(Stufe05Pipeline, LatencyTradeoffTrueZeroKeepsThePointAndForcesLinearAxes) {
     fs::remove(out, ec);
     fs::remove(p, ec);
 }
+
+// -----------------------------------------------------------------------------
+// F-4 / F-5 (2026-09-16), Posten #234 -- ENTARTUNGS-WACHEN gegen die pgfplots-Meldung
+// "Axis range for axis <a> is approximately empty" und gegen den 1515.18507pt-Overfull
+// der observer_detail-Kopfzeile. Alle vier Klassen stammen aus dem Owner-Log 13.09.:
+//   A  ld_sweep_<z>      : y-Achse entartet (P1b heilte 2026-08-06 NUR x)
+//   B  seg_attribution / latency_range : symbolische x-Achse mit EINER Kategorie
+//   C  latency_ecdf      : log-x mit EINER distinkten Stuetzstelle
+//   D  ld_sweep_op_insert: 0-ns-PHANTOM einer nie ausgefuehrten Operation
+//   F-5 observer_detail  : unbrechbare Konfigurations-Kopfzeile in einer l-Spalte
+// -----------------------------------------------------------------------------
+namespace {
+
+// EIN Messpunkt, EINE Reihe -- der d03-/ycsb_c-Fall des Owner-Logs. op_<art>_n ist gesetzt, damit
+// z_field_executed die PRIMAERQUELLE benutzt (insert nie ausgefuehrt, lookup 10000 Operationen).
+void write_f4_single_point_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;"
+      << "op_rmw_p50_ns;op_insert_n;op_lookup_n;op_erase_n;op_scan_n;op_rmw_n;working_set_n;"
+      << "workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;671.532;0;750;0;0;0;0;10000;0;0;0;4096;ycsb_c;1\n";
+}
+
+// Genau EINE Balken-Kategorie (nur k_ary) -- der Einer-Fall der symbolischen x-Achse.
+void write_f4_single_group_seg_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
+      << "total_ns;" << seg_header() << ";seg_run_total_ns;seg_coverage;workload;two_phase_valid\n";
+    f << seg_row("k_ary", 999999, 10, 1.0, true, false) << "\n";
+}
+
+// Genau EINE (algo/op)-Kombination fuer die Range-Balken und EINE distinkte ns_per_op fuer die ECDF.
+void write_f4_single_combo_p99_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_insert_p99_ns;op_lookup_p50_ns;op_lookup_p99_ns;"
+      << "op_erase_p50_ns;op_erase_p99_ns;op_scan_p50_ns;op_scan_p99_ns;op_rmw_p50_ns;op_rmw_p99_ns;"
+      << "workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;671.532;0;0;750;1170;0;0;0;0;0;0;ycsb_c;1\n";
+}
+
+} // namespace
+
+// (F-4/A) Ein einziger gemessener y-Wert -> NUR die y-Achse wird gesetzt, der Punkt bleibt EINER,
+// und die Legende weist n=1 aus (Form wie die ECDF-Legende). Owner-Log: [671.532:671.532].
+TEST(Stufe05Pipeline, SweepCurveSingleValueWidensOnlyTheYAxisAndMarksN1) {
+    auto p = comdare_user_tmp() / "f4a_single.csv";
+    write_f4_single_point_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_TRUE(rows[0].has_op_n);
+
+    auto            out = comdare_user_tmp() / "f4a_single.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "ymin=0, ymax=1343.0640")); // 2 * 671.532, nullpunktverankert
+    EXPECT_TRUE(file_contains(out, "(n=1)"));                  // sichtbarer Hinweis in der Legende
+    EXPECT_EQ(count_occurrences(out, "(4096,"), 1u);           // KEIN erfundener zweiter Stuetzpunkt
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/A, Gegenprobe) Mehrere distinkte y-Werte -> die y-Wache greift NICHT, die Emission bleibt
+// byte-gleich zum Bestand (kein ymin=, keine n=1-Marke).
+TEST(Stufe05Pipeline, SweepCurveSeveralValuesKeepTheAutomaticYAxis) {
+    auto p = comdare_user_tmp() / "f4a_multi.csv";
+    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4a_multi.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_FALSE(file_contains(out, "ymin="));
+    EXPECT_FALSE(file_contains(out, "(n=1)"));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/D) Die Operation wurde NIE ausgefuehrt (op_insert_n=0) -> KEINE 0-ns-Kurve, sondern der
+// ehrliche Vermerk. Die Datei MUSS entstehen: der Anhang-Fallback wuerde sonst die fehlende
+// working_set_n-Spalte als Grund nennen -- und die ist vorhanden.
+TEST(Stufe05Pipeline, SweepCurveNeverExecutedOperationYieldsHonestNoteNotAZeroCurve) {
+    auto p = comdare_user_tmp() / "f4d_phantom.csv";
+    write_f4_single_point_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4d_phantom.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "op_insert_p50_ns", "en"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out));
+    EXPECT_TRUE(file_contains(out, "HONEST-EMPTY"));
+    EXPECT_TRUE(file_contains(out, "never executed"));
+    EXPECT_FALSE(file_contains(out, "tikzpicture")); // keine Figur
+    EXPECT_FALSE(file_contains(out, "addplot"));     // und erst recht kein (4096,0.0000)
+    EXPECT_FALSE(file_contains(out, "0.0000)"));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/B) EINE Balken-Kategorie -> numerischer Index + xtick/xticklabels statt symbolic x coords,
+// mit explizitem Fenster. Owner-Log seg_attribution: [0.0:0.0].
+TEST(Stufe05Pipeline, SegmentAttributionSingleCategoryUsesNumericAxis) {
+    auto p = comdare_user_tmp() / "f4b_seg_single.csv";
+    write_f4_single_group_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4b_seg_single.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "en"), dg::status_ok);
+    // Auf die OPTION pruefen (mit "={"), nicht auf das Wort: der erklaerende Kommentar der Wache
+    // nennt "symbolic x coords" im Fliesstext und wuerde eine Wort-Probe faelschlich reissen lassen.
+    EXPECT_FALSE(file_contains(out, "symbolic x coords={"));
+    EXPECT_FALSE(file_contains(out, "enlarge x limits=0.25"));
+    EXPECT_TRUE(file_contains(out, "xmin=-0.5, xmax=0.5"));
+    EXPECT_TRUE(file_contains(out, "xtick={0}"));
+    EXPECT_TRUE(file_contains(out, "xticklabels={k\\_ary}"));
+    EXPECT_TRUE(file_contains(out, "coordinates {(0,"));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/B, Gegenprobe) Zwei Kategorien -> symbolische Achse unveraendert (Bestandsverhalten).
+TEST(Stufe05Pipeline, SegmentAttributionTwoCategoriesKeepTheSymbolicAxis) {
+    auto p = comdare_user_tmp() / "f4b_seg_multi.csv";
+    write_sample_wide_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4b_seg_multi.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "symbolic x coords={"));
+    EXPECT_TRUE(file_contains(out, "enlarge x limits=0.25"));
+    EXPECT_FALSE(file_contains(out, "xticklabels="));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/B) Dieselbe Entartung im Range-Balken: EINE (algo/op)-Kombination. Owner-Log latency_range: [0.0:0.0].
+TEST(Stufe05Pipeline, LatencyRangeSingleComboUsesNumericAxis) {
+    auto p = comdare_user_tmp() / "f4b_range_single.csv";
+    write_f4_single_combo_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4b_range_single.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_range_bar(out, rows, "en"), dg::status_ok);
+    EXPECT_FALSE(file_contains(out, "symbolic x coords={")); // s. Hinweis im Seg-Test oben
+    EXPECT_TRUE(file_contains(out, "xmin=-0.5, xmax=0.5"));
+    EXPECT_TRUE(file_contains(out, "xticklabels={k\\_ary/lookup}"));
+    EXPECT_TRUE(file_contains(out, "    (0,750.0000) +- (0,420.0000)"));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/B, Gegenprobe) Mehrere Kombinationen -> symbolische Achse unveraendert.
+TEST(Stufe05Pipeline, LatencyRangeSeveralCombosKeepTheSymbolicAxis) {
+    auto p = comdare_user_tmp() / "f4b_range_multi.csv";
+    write_sample_wide_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4b_range_multi.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_range_bar(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "symbolic x coords={"));
+    EXPECT_FALSE(file_contains(out, "xticklabels="));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/C) EINE distinkte Gesamt-Latenz -> Log-Oktave auf x. Owner-Log latency_ecdf: [6.50946:6.50946]
+// (= ln(671.532), die interne Log-Koordinate).
+TEST(Stufe05Pipeline, LatencyEcdfSingleSupportPointWidensTheLogXAxis) {
+    auto p = comdare_user_tmp() / "f4c_ecdf_single.csv";
+    write_f4_single_combo_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4c_ecdf_single.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_ecdf(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "xmin=335.7660, xmax=1343.0640")); // [v/2 : 2v]
+    EXPECT_EQ(count_occurrences(out, "671.5320"), 2u);                // weiterhin NUR die 2 Treppenpunkte
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-4/C, Gegenprobe) Mehrere distinkte Latenzen -> keine Achsen-Setzung (Bestandsverhalten).
+TEST(Stufe05Pipeline, LatencyEcdfSeveralSupportPointsKeepTheAutomaticXAxis) {
+    auto p = comdare_user_tmp() / "f4c_ecdf_multi.csv";
+    write_sample_wide_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "f4c_ecdf_multi.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_ecdf(out, rows, "en"), dg::status_ok);
+    EXPECT_FALSE(file_contains(out, "xmin="));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (F-5) Die Konfigurations-Kopfzeile steht in einer UMBRECHENDEN p-Spalte und das Achsen-Tupel traegt
+// nach jedem '/' eine Umbruch-Erlaubnis. Beides zusammen beseitigt den 1515.18507pt-Overfull
+// (Mutationsproben M1/M2/M3, TeX Live 2026); es geht KEIN Zeichen der binary_id verloren.
+TEST(Stufe05Pipeline, ObserverDetailHeaderRowBreaksInsteadOfOverflowing) {
+    auto p = comdare_user_tmp() / "f5_observer_break.csv";
+    write_observer_detail_wide_csv(p, /*all_na=*/false);
+    std::vector<c2l::WideFullRow> rows;
+    ASSERT_EQ(c2l::parse_wide_csv_full(p, rows), c2l::status_ok);
+
+    auto            out = comdare_user_tmp() / "f5_observer_break.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_axis_observer_detail_table(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "p{\\dimexpr\\linewidth-2\\tabcolsep\\relax}"));
+    EXPECT_FALSE(file_contains(out, "\\multicolumn{3}{@{}l}{\\textbf{")); // die alte l-Spalte ist weg
+    // binary_id "search_algo=k_ary/cache_traversal=direct" traegt genau EIN '/' -> genau EIN allowbreak.
+    EXPECT_EQ(count_occurrences(out, "\\allowbreak{}"), 1u);
+    EXPECT_TRUE(file_contains(out, "search\\_algo=k\\_ary/\\allowbreak{}cache\\_traversal=direct"));
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P-F) chktex-RUECKFALL: die vier longtable-Marken tragen das abschliessende '%' (Warning 1), und die
+// ECDF-CAPTION den Halbgeviertstrich (Warning 8). Der Owner hatte beides am 15.08. von Hand gesetzt
+// (26f88a0); der Emitter erzeugte die Vorform weiter und haette lint:latex auf 289 wieder rot gefaerbt.
+TEST(Stufe05Pipeline, EmittersKeepTheChktexCleanFormsOfCommit26f88a0) {
+    std::error_code ec;
+
+    auto p1 = comdare_user_tmp() / "pf_observer.csv";
+    write_observer_detail_wide_csv(p1, /*all_na=*/false);
+    std::vector<c2l::WideFullRow> frows;
+    ASSERT_EQ(c2l::parse_wide_csv_full(p1, frows), c2l::status_ok);
+    auto out1 = comdare_user_tmp() / "pf_observer.tex";
+    fs::remove(out1, ec);
+    ASSERT_EQ(dg::write_axis_observer_detail_table(out1, frows, "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out1, "\\endfirsthead%"));
+    EXPECT_TRUE(file_contains(out1, "\\endhead%"));
+    EXPECT_TRUE(file_contains(out1, "\\endfoot%"));
+    EXPECT_TRUE(file_contains(out1, "\\endlastfoot%"));
+
+    auto p2 = comdare_user_tmp() / "pf_ecdf.csv";
+    write_sample_wide_p99_csv(p2);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p2, rows), dg::status_ok);
+    auto out2 = comdare_user_tmp() / "pf_ecdf.tex";
+    fs::remove(out2, ec);
+    ASSERT_EQ(dg::write_latency_ecdf(out2, rows, "de"), dg::status_ok);
+    // CAPTION mit '--' (chktex W8 biss genau hier), TITLE unveraendert mit '-' (Bestand 26f88a0).
+    EXPECT_TRUE(file_contains(out2, "\\caption{ECDF der Gesamt-Latenz -- Verteilung ueber Konfigurationen}"));
+    EXPECT_TRUE(file_contains(out2, "title={ECDF der Gesamt-Latenz - Verteilung ueber Konfigurationen}"));
+
+    fs::remove(out1, ec);
+    fs::remove(out2, ec);
+    fs::remove(p1, ec);
+    fs::remove(p2, ec);
+}
