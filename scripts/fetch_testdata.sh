@@ -14,8 +14,14 @@
 # Memory-Direktive F-EXTRA-5: KEIN Python, nur sh/bat/cmake.
 
 # POSIX sh: kein "-o pipefail" (bash-spezifisch, dash bricht mit
-# "Illegal option -o pipefail" ab). Das Skript nutzt keine Pipes, deren
-# Zwischenglieder fehlschlagen koennten -- curl steht jeweils allein.
+# "Illegal option -o pipefail" ab). Alle curl-Aufrufe stehen jeweils allein.
+# AUSNAHME seit #203 (2026-09-16): der sosd_books_200M-Block fuehrt ZWEI
+# zstd-Pipes (md5-Probe und Downsample). Ohne pipefail bleibt ein Abbruch von
+# zstd im linken Glied unsichtbar, deshalb ist jede Pipe durch ein
+# nachgelagertes Gate gedeckt: bei der md5-Probe schlaegt der Vergleich gegen
+# die Upstream-Pruefsumme fehl, beim Downsample meldet der Filter "Eingabe
+# unvollstaendig" (rc 3). Beide Wege enden mit rc != 0; nur die Meldung nennt
+# dann die Wirkung statt der Ursache.
 set -eu
 
 SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
@@ -90,6 +96,10 @@ sosd_downsample_quelle() {
   cat <<'CQUELLE'
 /* SOSD-Downsample: LE-8-Byte-Count + N*uint64 LE  ->  jede 4. Zahl (d[::4]).
  * Eingabe: stdin (Rohstrom, z.B. aus "zstd -dc").  Ausgabe: argv[1].
+ * argv[2] = erwarteter Header-Count der EINGABE; weicht der gelesene Header
+ * davon ab, bricht der Filter ab, bevor er die Ausgabedatei anlegt (#203-Fixup
+ * S-4: der Count ist damit ein eigenes Gate, nicht nur mittelbar ueber Groesse
+ * und sha256 gedeckt).
  * Prueft beim Schreiben: Elementzahl, erste/letzte Zahl, Monotonie (SOSD-
  * Schluessel sind sortiert).  Exit 0 nur, wenn alle Pruefungen halten. */
 #include <stdio.h>
@@ -115,16 +125,30 @@ int main(int argc, char **argv) {
     unsigned char  hdr[8];
     unsigned char *inbuf;
     unsigned char *outbuf;
-    unsigned long long n_in, n_out, idx = 0ull, written = 0ull;
+    unsigned long long n_in, n_out, soll, idx = 0ull, written = 0ull;
     unsigned long long first = 0ull, last = 0ull, prev = 0ull, brueche = 0ull;
     int                have_prev = 0;
     size_t             ofill = 0, got, k;
+    char              *ende;
 
-    if (argc != 2) { fprintf(stderr, "usage: downsample <ausgabedatei>\n"); return 2; }
+    if (argc != 3) {
+        fprintf(stderr, "usage: downsample <ausgabedatei> <soll_count_eingabe>\n");
+        return 2;
+    }
+    soll = strtoull(argv[2], &ende, 10);
+    if (*ende != '\0' || soll == 0ull) {
+        fprintf(stderr, "FEHLER: ungueltiger Soll-Count \"%s\"\n", argv[2]);
+        return 2;
+    }
     if (fread(hdr, 1, 8, stdin) != 8) { fprintf(stderr, "FEHLER: Count-Header fehlt\n"); return 3; }
     n_in  = le64(hdr);
     n_out = (n_in + 3ull) / 4ull;
     if (n_in == 0ull) { fprintf(stderr, "FEHLER: Count-Header ist 0\n"); return 3; }
+    /* Gate VOR dem Anlegen der Ausgabedatei: sonst bliebe eine leere Datei zurueck. */
+    if (n_in != soll) {
+        fprintf(stderr, "FEHLER: Header-Count %llu != Soll %llu\n", n_in, soll);
+        return 3;
+    }
 
     out = fopen(argv[1], "wb");
     if (out == NULL) { fprintf(stderr, "FEHLER: Ausgabedatei nicht schreibbar\n"); return 4; }
@@ -197,6 +221,8 @@ fetch_sosd_books_200M() {
   local ist_md5=""
   local ist_sha=""
   local ist_size=""
+  local alt=""
+  local part=""
   mkdir -p "${out}"
 
   # Idempotenz: vorhandene Zieldatei mit korrekter Groesse UND sha256 -> nichts tun.
@@ -211,6 +237,18 @@ fetch_sosd_books_200M() {
     echo "[warn] ${dst} vorhanden, aber size/sha256 weichen ab -- wird neu erzeugt."
     echo "[warn] ist:  size=${ist_size} sha256=${ist_sha}"
     echo "[warn] soll: size=${SOSD_BOOKS_200M_SIZE} sha256=${SOSD_BOOKS_200M_SHA256}"
+    # #203-Fixup (M-1): Der Altbestand wird GESICHERT, nie ueberschrieben und nie
+    # geloescht. Der Vorgaenger dieses Skripts legte die FALSCHE Dataverse-Datei
+    # (books_200M_uint32) unter GENAU diesem Pfad ab; auf einem Klon mit Altbestand
+    # wuerde ein Neubau sie sonst stillschweigend verlieren. Das verbietet die
+    # Messdaten-/Bestandsregel: Messdaten werden verschoben, nie geloescht.
+    alt="${dst}.alt-$(date -u +%Y%m%dT%H%M%SZ)"
+    if [ -e "${alt}" ]; then
+      echo "FEHLER: Sicherungsname ${alt} existiert bereits -- Abbruch ohne Aenderung." >&2
+      return 5
+    fi
+    mv "${dst}" "${alt}"
+    echo "[warn] Altbestand gesichert nach ${alt} (wird NIE automatisch geloescht)."
   fi
 
   # Quelle: books_800M_uint64.zst (~4 GB). curl -C - setzt einen Abbruch fort.
@@ -233,28 +271,36 @@ fetch_sosd_books_200M() {
   # Downsample: jede 4. Zahl, Header 200000000, streamend.
   tmpdir="$(mktemp -d)" || return 4
   tool="$(sosd_downsample_bauen "${tmpdir}")" || { rm -rf "${tmpdir}"; return 4; }
-  echo "[downsample] ${zst} -> ${dst} (jede 4. Zahl, Header ${SOSD_BOOKS_200M_COUNT})"
-  if ! zstd -dc "${zst}" | "${tool}" "${dst}.part"; then
-    echo "FEHLER: Downsample fehlgeschlagen -- ${dst}.part bleibt zur Ansicht liegen." >&2
+  # #203-Fixup (S-1): der Neubau entsteht unter einem Zwischennamen. Der finale
+  # Name traegt erst, wenn BEIDE Gates halten -- sonst laege nach einem roten Gate
+  # eine ungepruefte Datei unter dem Pfad, den der Loader liest, und der Loader
+  # prueft selbst keinen sha256.
+  part="${dst}.part"
+  echo "[downsample] ${zst} -> ${part} (jede 4. Zahl, Header ${SOSD_BOOKS_200M_COUNT})"
+  if ! zstd -dc "${zst}" | "${tool}" "${part}" "${SOSD_BOOKS_800M_COUNT}"; then
+    echo "FEHLER: Downsample fehlgeschlagen -- ${part} bleibt zur Ansicht liegen." >&2
+    echo "FEHLER: ${dst} wurde NICHT angelegt oder veraendert." >&2
     rm -rf "${tmpdir}"
     return 5
   fi
   rm -rf "${tmpdir}"
-  mv "${dst}.part" "${dst}"
 
-  # Harte Gates an der fertigen Datei: Groesse, Count-Header, sha256.
-  ist_size="$(wc -c < "${dst}" | tr -d ' ')"
+  # Harte Gates AN DER ZWISCHENDATEI: Groesse, dann sha256.
+  ist_size="$(wc -c < "${part}" | tr -d ' ')"
   if [ "${ist_size}" != "${SOSD_BOOKS_200M_SIZE}" ]; then
     echo "FEHLER: Groesse ${ist_size} != ${SOSD_BOOKS_200M_SIZE} -- Abbruch." >&2
+    echo "FEHLER: ${part} bleibt liegen; ${dst} wurde NICHT angelegt." >&2
     return 5
   fi
   echo "[ok] size=${ist_size}"
-  ist_sha="$(sha256sum "${dst}" | cut -d' ' -f1)"
+  ist_sha="$(sha256sum "${part}" | cut -d' ' -f1)"
   echo "[ok] sha256=${ist_sha}"
   if [ "${ist_sha}" != "${SOSD_BOOKS_200M_SHA256}" ]; then
     echo "FEHLER: sha256 ${ist_sha} != ${SOSD_BOOKS_200M_SHA256} -- Abbruch." >&2
+    echo "FEHLER: ${part} bleibt liegen; ${dst} wurde NICHT angelegt." >&2
     return 5
   fi
+  mv "${part}" "${dst}"
   echo "[done] ${dst}"
   echo "[hinweis] ${zst} bleibt als Bestands-Extra liegen (nie automatisch geloescht)."
 }
