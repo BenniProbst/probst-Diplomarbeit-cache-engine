@@ -952,9 +952,12 @@ TEST(Stufe05Pipeline, Surface1x1IsHonestSizePlaceholder) {
     // EHRLICHKEIT: die Zelle IST gemessen -- der Vermerk darf die Datenlos-Behauptung NICHT tragen ...
     EXPECT_FALSE(file_contains(out_de, "nie ausgefuehrt"));
     EXPECT_FALSE(file_contains(out_de, "never executed"));
-    // ... sondern nennt die Groesse und das Minimum.
-    EXPECT_TRUE(file_contains(out_de, "1x1"));
-    EXPECT_TRUE(file_contains(out_de, "2x2"));
+    // ... sondern nennt die Groesse und das Minimum. S-1 (2026-09-16): in der MATHE-Form des
+    // Bestands (Hand-Fix 26f88a0) -- "1x1"/"2x2" sind chktex-W29 (am Objekt gemessen: Ziffer-x-Ziffer
+    // beisst, Wort-x-Wort nicht), und der Emitter drehte die Hand-Korrektur bei jedem Lauf zurueck.
+    EXPECT_TRUE(file_contains(out_de, "nur als $1{\\times}1$-Matrix vor (Suchalgorithmen $\\times$ Workloads)"));
+    EXPECT_TRUE(file_contains(out_de, "verlangt mindestens $2{\\times}2$."));
+    EXPECT_FALSE(file_contains(out_de, "1x1-Matrix")); // die chktex-rote Vorform darf NICHT zurueckkehren
     // F1-FIX (2026-08-13, Lens-Fund e-ii): 1x1 traegt GENAU EINEN Messwert -> Singular ist hier richtig.
     EXPECT_TRUE(file_contains(out_de, "Der Messwert selbst ist"));
     EXPECT_FALSE(file_contains(out_de, "Die Messwerte selbst sind"));
@@ -970,8 +973,9 @@ TEST(Stufe05Pipeline, Surface1x1IsHonestSizePlaceholder) {
     EXPECT_TRUE(file_contains(out_en, "\\begin{figure}"));
     EXPECT_FALSE(file_contains(out_en, "never executed"));
     EXPECT_FALSE(file_contains(out_en, "nie ausgefuehrt"));
-    EXPECT_TRUE(file_contains(out_en, "1x1"));
-    EXPECT_TRUE(file_contains(out_en, "2x2"));
+    EXPECT_TRUE(file_contains(out_en, "spans only a $1{\\times}1$ matrix (search algorithms $\\times$ workloads)"));
+    EXPECT_TRUE(file_contains(out_en, "requires at least $2{\\times}2$."));
+    EXPECT_FALSE(file_contains(out_en, "1x1 matrix"));
     // F1-FIX (Lens-Fund e-ii): Singular auch in der en-Fassung -- genau ein Messwert im 1x1-Korpus.
     EXPECT_TRUE(file_contains(out_en, "The measured value itself is"));
     EXPECT_FALSE(file_contains(out_en, "The measured values themselves are"));
@@ -999,7 +1003,8 @@ TEST(Stufe05Pipeline, Surface1xNAndNx1ArePlaceholders) {
     EXPECT_FALSE(file_contains(out_row, "addplot3"));
     EXPECT_TRUE(file_contains(out_row, "HONEST-EMPTY"));
     EXPECT_FALSE(file_contains(out_row, "never executed"));
-    EXPECT_TRUE(file_contains(out_row, "1x2"));
+    EXPECT_TRUE(file_contains(out_row, "spans only a $1{\\times}2$ matrix"));
+    EXPECT_FALSE(file_contains(out_row, "1x2 matrix"));
     // F1-FIX (2026-08-13, Lens-Fund e-ii): ZWEI gemessene Zellen -> der Vermerk muss den Plural tragen.
     // Der fruehere Pauschal-Singular ("The measured value itself is") behauptete EINEN Messwert, wo zwei
     // im Korpus stehen -- dieselbe Ehrlichkeitsklasse wie die nie-ausgefuehrt-Wache, nur im Numerus.
@@ -1019,7 +1024,8 @@ TEST(Stufe05Pipeline, Surface1xNAndNx1ArePlaceholders) {
     EXPECT_FALSE(file_contains(out_col, "addplot3"));
     EXPECT_TRUE(file_contains(out_col, "HONEST-EMPTY"));
     EXPECT_FALSE(file_contains(out_col, "nie ausgefuehrt"));
-    EXPECT_TRUE(file_contains(out_col, "2x1"));
+    EXPECT_TRUE(file_contains(out_col, "nur als $2{\\times}1$-Matrix vor"));
+    EXPECT_FALSE(file_contains(out_col, "2x1-Matrix"));
     // F1-FIX (Lens-Fund e-ii): auch die de-Fassung zaehlt -- zwei Messwerte, also Plural.
     EXPECT_TRUE(file_contains(out_col, "Die Messwerte selbst sind"));
     EXPECT_FALSE(file_contains(out_col, "Der Messwert selbst ist"));
@@ -1051,7 +1057,10 @@ TEST(Stufe05Pipeline, Ratio1x1IsHonestSizePlaceholder) {
     EXPECT_TRUE(file_contains(out, "\\begin{figure}"));
     EXPECT_FALSE(file_contains(out, "nie ausgefuehrt"));
     EXPECT_FALSE(file_contains(out, "never executed"));
-    EXPECT_TRUE(file_contains(out, "1x1"));
+    // S-1: auch der ratio-Pfad traegt die Mathe-Form des Bestands, nicht "1x1".
+    EXPECT_TRUE(file_contains(out, "nur als $1{\\times}1$-Matrix vor (Suchalgorithmen $\\times$ Workloads)"));
+    EXPECT_TRUE(file_contains(out, "verlangt mindestens $2{\\times}2$."));
+    EXPECT_FALSE(file_contains(out, "1x1-Matrix"));
 
     fs::remove(out, ec);
     fs::remove(p, ec);
@@ -2100,8 +2109,12 @@ void write_f4_single_combo_p99_csv(fs::path const& p) {
 } // namespace
 
 // (F-4/A) Ein einziger gemessener y-Wert -> NUR die y-Achse wird gesetzt, der Punkt bleibt EINER,
-// und die Legende weist n=1 aus (Form wie die ECDF-Legende). Owner-Log: [671.532:671.532].
-TEST(Stufe05Pipeline, SweepCurveSingleValueWidensOnlyTheYAxisAndMarksN1) {
+// und die Legende weist die Stichprobenzahl aus. Owner-Log: [671.532:671.532].
+// M-1 (2026-09-16, Lens r1): der Zusatz darf NICHT "(n=1)" heissen -- die x-Achse dieser Figur heisst
+// "Arbeitsmenge n (Schluessel)" / "working set n (keys)" und der einzige Punkt liegt bei n=4096; "(n=1)"
+// laese sich dort als Arbeitsmenge 1. Der Test haelt daher BEIDE Sprachformen fest UND die Abwesenheit
+// des alten Symbol-Zusatzes.
+TEST(Stufe05Pipeline, SweepCurveSingleValueWidensOnlyTheYAxisAndNamesTheSampleCount) {
     auto p = comdare_user_tmp() / "f4a_single.csv";
     write_f4_single_point_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
@@ -2114,14 +2127,24 @@ TEST(Stufe05Pipeline, SweepCurveSingleValueWidensOnlyTheYAxisAndMarksN1) {
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "ymin=0, ymax=1343.0640")); // 2 * 671.532, nullpunktverankert
-    EXPECT_TRUE(file_contains(out, "(n=1)"));                  // sichtbarer Hinweis in der Legende
+    EXPECT_TRUE(file_contains(out, "(1 sample)"));             // sichtbarer Hinweis in der Legende (en)
+    EXPECT_FALSE(file_contains(out, "(n=1)"));                 // M-1: nie das Symbol der x-Achse
     EXPECT_EQ(count_occurrences(out, "(4096,"), 1u);           // KEIN erfundener zweiter Stuetzpunkt
     fs::remove(out, ec);
+
+    // M-1: dieselbe Lage auf Deutsch -- der Zusatz ist sprachabhaengig, nicht durchgereichtes Englisch.
+    auto out_de = comdare_user_tmp() / "f4a_single_de.tex";
+    fs::remove(out_de, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out_de, rows, "ns_per_op", "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_de, "(1 Messpunkt)"));
+    EXPECT_FALSE(file_contains(out_de, "(n=1)"));
+    EXPECT_EQ(count_occurrences(out_de, "(4096,"), 1u);
+    fs::remove(out_de, ec);
     fs::remove(p, ec);
 }
 
 // (F-4/A, Gegenprobe) Mehrere distinkte y-Werte -> die y-Wache greift NICHT, die Emission bleibt
-// byte-gleich zum Bestand (kein ymin=, keine n=1-Marke).
+// byte-gleich zum Bestand (kein ymin=, kein Stichprobenzahl-Zusatz).
 TEST(Stufe05Pipeline, SweepCurveSeveralValuesKeepTheAutomaticYAxis) {
     auto p = comdare_user_tmp() / "f4a_multi.csv";
     write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
@@ -2133,6 +2156,7 @@ TEST(Stufe05Pipeline, SweepCurveSeveralValuesKeepTheAutomaticYAxis) {
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_FALSE(file_contains(out, "ymin="));
+    EXPECT_FALSE(file_contains(out, "(1 sample)"));
     EXPECT_FALSE(file_contains(out, "(n=1)"));
     fs::remove(out, ec);
     fs::remove(p, ec);
@@ -2328,4 +2352,74 @@ TEST(Stufe05Pipeline, EmittersKeepTheChktexCleanFormsOfCommit26f88a0) {
     fs::remove(out2, ec);
     fs::remove(p1, ec);
     fs::remove(p2, ec);
+}
+
+// (S-1, 2026-09-16) chktex-REINHEIT DER HONEST-EMPTY(GROESSE)-VERMERKE -- zweite Haelfte der
+// P-F-Klasse, Schwester von EmittersKeepTheChktexCleanFormsOfCommit26f88a0.
+// BEFUND (Lens r1): die Groessen-Vermerke schrieben "1x1"/"2x2"; chktex-W29 ("$\times$ may look
+// prettier here") beisst bei ZIFFER-x-ZIFFER (am Objekt gemessen; Wort-x-Wort wie
+// "(Suchalgorithmus x Workload)" in der Caption beisst NICHT). Der Thesis-Bestand traegt seit dem
+// Hand-Fix 26f88a0 die Mathe-Form -- ein Regeneratlauf haette sie zurueckgedreht und lint:latex auf
+// 289 rot gefaerbt (die Dateien sind in anhang/{de,en}/A_measurements.tex HART per \input gebunden).
+// Traeger der Heilung sind die ASCII-MARKEN (@MATH@/@BTIMES@/@TIMES@), die escape_latex unveraendert
+// passieren und erst DANACH zur Mathe-Form werden (dasselbe Muster wie with_breaks bei F-5).
+TEST(Stufe05Pipeline, HonestEmptySizeNotesKeepTheMathTimesFormsOfCommit26f88a0) {
+    std::error_code ec;
+
+    auto p = comdare_user_tmp() / "s1_size_note.csv";
+    write_wide_csv_smoke_1x1(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    // (a) Heatmap-Pfad de: Groesse, Achsenpaar und Minimum alle in Mathe-Form.
+    auto out_de = comdare_user_tmp() / "s1_size_note_de.tex";
+    fs::remove(out_de, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_de, rows, "ns_per_op", "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_de, "$1{\\times}1$-Matrix"));
+    EXPECT_TRUE(file_contains(out_de, "(Suchalgorithmen $\\times$ Workloads)"));
+    EXPECT_TRUE(file_contains(out_de, "mindestens $2{\\times}2$."));
+    // GEGENKOEDER: keine Marke darf in der Ausgabe stehenbleiben.
+    EXPECT_FALSE(file_contains(out_de, "@MATH@"));
+    EXPECT_FALSE(file_contains(out_de, "@BTIMES@"));
+    EXPECT_FALSE(file_contains(out_de, "@TIMES@"));
+    // Die CAPTION bleibt Bestand ("Suchalgorithmus x Workload") -- dort beisst chktex nicht.
+    EXPECT_TRUE(file_contains(out_de, "(Suchalgorithmus x Workload)"));
+
+    // (b) Heatmap-Pfad en.
+    auto out_en = comdare_user_tmp() / "s1_size_note_en.tex";
+    fs::remove(out_en, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_en, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_en, "$1{\\times}1$ matrix"));
+    EXPECT_TRUE(file_contains(out_en, "(search algorithms $\\times$ workloads)"));
+    EXPECT_TRUE(file_contains(out_en, "at least $2{\\times}2$."));
+    EXPECT_FALSE(file_contains(out_en, "@MATH@"));
+
+    // (c) ratio-Pfad: derselbe Gegenstand, eigener Wortlaut -- eigener Nachweis.
+    auto out_ratio = comdare_user_tmp() / "s1_size_note_ratio.tex";
+    fs::remove(out_ratio, ec);
+    ASSERT_EQ(dg::write_surface_ratio_vs_reference(out_ratio, rows, "ns_per_op", "k_ary", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_ratio, "$1{\\times}1$ matrix"));
+    EXPECT_TRUE(file_contains(out_ratio, "at least $2{\\times}2$."));
+    EXPECT_FALSE(file_contains(out_ratio, "@MATH@"));
+
+    // (d) der NEUTRALE Default-Vermerk (HeatmapData::degenerate_size_note leer) traegt dieselbe Form.
+    dg::HeatmapData d;
+    d.title          = "neutral";
+    d.x_label        = "workload";
+    d.y_label        = "search algorithm";
+    d.y_labels       = {"k_ary"};
+    d.x_labels       = {"ycsb_c"};
+    d.matrix         = {{1.0}};
+    d.executed       = {{true}};
+    auto out_neutral = comdare_user_tmp() / "s1_size_note_neutral.tex";
+    fs::remove(out_neutral, ec);
+    ASSERT_EQ(dg::write_heatmap(out_neutral, d), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_neutral, "1 row(s) $\\times$ 1 column(s)"));
+    EXPECT_FALSE(file_contains(out_neutral, "@TIMES@"));
+
+    fs::remove(out_de, ec);
+    fs::remove(out_en, ec);
+    fs::remove(out_ratio, ec);
+    fs::remove(out_neutral, ec);
+    fs::remove(p, ec);
 }

@@ -548,3 +548,55 @@ TEST(Stufe04Pipeline, ForestPlotReferenceVariantIsDistinguishableAndLabelIsUniqu
     fs::remove(out_ref, ec);
     fs::remove(out_plain, ec);
 }
+
+// (S-1, 2026-09-16) chktex-REINHEIT DER LIMITIERUNGS-TABELLE -- Gegenstueck zu
+// Stufe05Pipeline.EmittersKeepTheChktexCleanFormsOfCommit26f88a0.
+// BEFUND (Lens r1, chktex -q -n36 -n17 ueber das Regenerat): write_limitations_longtable emittierte
+// Formen, die der Hand-Fix 26f88a0 ("fix(lint): chktex-Reinheit Ganzbaum", 2026-08-15) im Thesis-Baum
+// laengst geheilt hatte -- jeder anhang:forward-Lauf haette sie zurueckgedreht und lint:latex rot
+// gefaerbt (chktex rc=2, von xargs als 123 propagiert):
+//   W11 "You should use \ldots"      : "catch(...)"  statt "catch(\ldots)"          (de + en)
+//   W18 "Use either `` or ''"        : ASCII-"  als schliessendes Anfuehrungszeichen (de)
+//   W12 "Interword spacing"          : "cf. rows" / "e.g. defensive"                (en)
+//   W29 "$\times$ may look prettier" : die RAW-Event-HEX-Literale 0x964 / 0x1443    (de + en)
+// Die ersten drei sind Textformen und werden im Emitter richtig geschrieben. Der vierte ist ein
+// chktex-FEHLALARM (0x964 ist ein Hex-Literal, kein Malzeichen; am Objekt gemessen: chktex-W29 beisst
+// bei ZIFFER-x-ZIFFER, nicht bei Wort-x-Wort). Dafuer traegt das Projekt seit jeher die Inline-Ausnahme
+// "% chktex 29" (31 Vorkommen im Thesis-Baum, davon 8 fuer W29, u.a.
+// kapitel/de/04_implementierung.tex:443 an genau derselben Hex-Literal-Klasse) -- der Emitter setzt sie
+// jetzt selbst ueber das trailer-Feld, statt sie dem naechsten Regeneratlauf zu opfern.
+TEST(Stufe04Pipeline, LimitationsTableKeepsTheChktexCleanFormsOfCommit26f88a0) {
+    std::error_code ec;
+
+    for (std::string const lang : {std::string{"de"}, std::string{"en"}}) {
+        auto out = comdare_user_tmp() / ("s1_limitierung_" + lang + ".tex");
+        fs::remove(out, ec);
+        ASSERT_EQ(c2l::write_limitations_longtable(out, lang), c2l::status_ok) << "lang=" << lang;
+        auto const c = read_all(out);
+
+        // W11: Auslassungspunkte als Makro, nie als drei Punkte.
+        EXPECT_NE(c.find("catch(\\ldots)"), std::string::npos) << "lang=" << lang;
+        EXPECT_EQ(c.find("catch(...)"), std::string::npos) << "lang=" << lang;
+
+        // W29: die Zeile mit den RAW-Hex-Literalen traegt die Inline-Ausnahme HINTER dem Zeilenende.
+        EXPECT_NE(c.find("0x964/0x1443"), std::string::npos) << "lang=" << lang;
+        EXPECT_NE(c.find("\\\\ % chktex 29"), std::string::npos) << "lang=" << lang;
+    }
+
+    // W18 (nur de): typografische Anfuehrungszeichen wie im Bestand, kein ASCII-".
+    auto       out_de = comdare_user_tmp() / "s1_limitierung_de.tex";
+    auto const cde    = read_all(out_de);
+    EXPECT_NE(cde.find("\u201Ehybrider Visitor\u201C"), std::string::npos);
+    EXPECT_EQ(cde.find("hybrider Visitor\""), std::string::npos);
+
+    // W12 (nur en): Zwischenwort-Abstand nach der Abkuerzung, sonst liest TeX einen Satzpunkt.
+    auto       out_en = comdare_user_tmp() / "s1_limitierung_en.tex";
+    auto const cen    = read_all(out_en);
+    EXPECT_NE(cen.find("(cf.\\ rows 2/4)"), std::string::npos);
+    EXPECT_NE(cen.find("(e.g.\\ defensive memento skip)"), std::string::npos);
+    EXPECT_EQ(cen.find("(cf. rows"), std::string::npos);
+    EXPECT_EQ(cen.find("(e.g. defensive"), std::string::npos);
+
+    fs::remove(out_de, ec);
+    fs::remove(out_en, ec);
+}

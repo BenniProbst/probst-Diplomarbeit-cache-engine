@@ -1009,7 +1009,11 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "Intel-PCM-Windows-Treiber steht f\\\"ur die Windows-Lane weiterhin aus (\\#26/P4). Auf Modellen "
              "ohne Katalog-Eintrag (heute traegt nur Zen 5 einen) bleibt die L2/Coherence-L\\\"ucke nur "
              "indirekt \\\"uber den Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op) "
-             "beobachtbar."});
+             "beobachtbar.",
+             // S-1 (2026-09-16): die RAW-Event-Kodierungen 0x964/0x1443 sind Hex-LITERALE; chktex liest
+             // das "x" zwischen Ziffern als Malzeichen (W29). Inline-Ausnahme wie im Bestand der Thesis
+             // (kapitel/{de,en}/04_implementierung.tex: \texttt{0x56F1B721C72DC10E} ... % chktex 29).
+             "% chktex 29 (Hex-Literale des RAW-Event-Katalogs -- kein Malzeichen)"});
         rows.push_back({"14 gepinnte Achsen = 0 Austauschbarkeits-Belege",
                         "Nur 4 der 18 Kompositions-Achsen variieren (search\\_algo, node\\_type, memory\\_layout, "
                         "prefetch). Gepinnt (je 1 Wert): cache\\_traversal, mapping, path\\_compression, allocator, "
@@ -1075,7 +1079,8 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
         rows.push_back(
             {"Kapsel-internes (verschlucktes) OOM in einer Mess-Op",
              "Nach aussen geworfenes OOM entwertet die Messung jetzt hart (two\\_phase\\_valid=false). Ein vom "
-             "Tier-Code INTERN per catch(...) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen nicht "
+             "Tier-Code INTERN per catch(\\ldots) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen "
+             "nicht "
              "beobachtbar → konservativ als Restvorbehalt dokumentiert, nicht erzwungen."});
         // G5-Audit (w289llo0o): de
         rows.push_back(
@@ -1086,7 +1091,8 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "betrifft den absoluten ns-Nullpunkt, nicht die relativen Achsen-Vergleiche (G5-Audit, MESS-MINOR-7)."});
         rows.push_back({"Entwurfs-Etiketten = Namenskonvention, kein Mess-Einfluss",
                         "Einzelne Pattern-Etiketten im Code/Doku sind Benennungs-/Entwurfsvorbehalte ohne "
-                        "Mess-Wirkung: „hybrider Visitor\" (real ein Memento, kein \\texttt{accept()}/Host-Besuch), "
+                        "Mess-Wirkung: \u201Ehybrider Visitor\u201C (real ein Memento, kein "
+                        "\\texttt{accept()}/Host-Besuch), "
                         "sowie Interpreter-/Template-/Decorator-Etiketten und \\texttt{reserve}-/\\texttt{if "
                         "constexpr}-Hygiene. Reine Naming-Konvention $\\to$ als Vorbehalt dokumentiert, kein Einfluss "
                         "auf Messwerte (G5-Audit, PATTERN-MINOR-1..7)."});
@@ -1112,7 +1118,10 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "without read access to the zone. The Intel PCM Windows driver is still pending for the "
              "Windows lane (\\#26/P4). On models without a catalog entry (today only Zen 5 carries one) the "
              "L2/coherence gap remains observable only indirectly via the wall-clock proxy "
-             "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+             "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op).",
+             // S-1 (2026-09-16): wie in der DE-Fassung -- 0x964/0x1443 sind Hex-Literale, chktex W29
+             // liest das "x" zwischen Ziffern als Malzeichen. Inline-Ausnahme nach Dokument-Konvention.
+             "% chktex 29 (hex literals of the RAW event catalog -- not a multiplication sign)"});
         rows.push_back(
             {"14 pinned axes = 0 exchangeability evidence",
              "Only 4 of the 18 composition axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). "
@@ -1160,12 +1169,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "the "
              "PINNED cache\\_traversal/mapping organs when auto-coupling (low bits); for records $>$ type width their "
              "observer entries collide. Does NOT affect the primary lookup (uint64); observer-only limitation of "
-             "pinned axes (cf. rows 2/4)."});
+             "pinned axes (cf.\\ rows 2/4)."});
         // Audit A1 / MINOR-MESS-02 residual (EN pendant).
         rows.push_back({"Capsule-internal (swallowed) OOM in a measured op",
                         "An OOM propagated outward now hard-invalidates the measurement (two\\_phase\\_valid=false). "
                         "An OOM caught "
-                        "INTERNALLY by tier code via catch(...) (e.g. defensive memento skip) is not observable from "
+                        "INTERNALLY by tier code via catch(\\ldots) (e.g.\\ defensive memento skip) is not observable "
+                        "from "
                         "outside $\\to$ "
                         "documented as a conservative residual caveat, not forced."});
         // G5-Audit (w289llo0o): en

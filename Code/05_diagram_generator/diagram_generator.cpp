@@ -92,6 +92,39 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
     if (cnst.resizebox_wrap) out << "}%\n";
 }
 
+// S-1 (2026-09-16) -- MATHE-FRAGMENTE IM VERMERK, EINGESETZT NACH escape_latex.
+// BEFUND (Lens r1, chktex -q -n36 -n17 ueber das Regenerat): der GROESSEN-Vermerk schrieb
+// "1x1-Matrix ... (Suchalgorithmen x Workloads) ... mindestens 2x2"; der Bestand der Thesis traegt
+// seit dem Hand-Fix 26f88a0 ("fix(lint): chktex-Reinheit Ganzbaum", 2026-08-15) dagegen
+// "$1{\times}1$-Matrix ... (Suchalgorithmen $\times$ Workloads) ... mindestens $2{\times}2$".
+// Ein Regeneratlauf drehte die Hand-Korrektur also zurueck und erzeugte je Sprache vier
+// chktex-W29 ("$\times$ may look prettier here") in zwei Dateien, die anhang/{de,en}/A_measurements.tex
+// HART per \input einbindet -- der naechste anhang:forward-Lauf haette lint:latex rot gefaerbt
+// (chktex rc=2, von xargs als 123 propagiert).
+// WARUM MARKEN: der Vermerk laeuft durch escape_latex, das '$', '{', '}' und '\' maskiert; ein direkt
+// eingesetztes $\times$ kaeme als \$\textbackslash{}times\$ heraus. Deshalb exakt das F-5-Muster
+// (with_breaks, s. write_axis_observer_detail_table): der Vermerk traegt reine ASCII-MARKEN, die
+// escape_latex unveraendert passieren (keine der zehn Sonderzeichen), und die Mathe-Form wird HIER --
+// nach dem Maskieren -- eingesetzt.
+// RUECKWIRKUNGSFREI: ein Vermerk OHNE Marken bleibt byte-identisch. Kein Bestands-Platzhalter des
+// 64er-Sets traegt ein '@' (nachgemessen 2026-09-16 ueber anhang/{de,en}/tabellen/).
+constexpr char kMarkDollar[] = "@MATH@";   // -> "$"
+constexpr char kMarkBTimes[] = "@BTIMES@"; // -> "{\times}"  (geklammert, zwischen zwei Zahlen)
+constexpr char kMarkTimes[]  = "@TIMES@";  // -> "\times"     (blank, allein zwischen zwei Woertern)
+
+[[nodiscard]] std::string replace_all(std::string s, std::string_view from, std::string_view to) {
+    if (from.empty()) return s;
+    for (std::size_t pos = s.find(from); pos != std::string::npos; pos = s.find(from, pos + to.size()))
+        s.replace(pos, from.size(), to);
+    return s;
+}
+
+[[nodiscard]] std::string with_math_marks(std::string s) {
+    s = replace_all(std::move(s), kMarkBTimes, "{\\times}");
+    s = replace_all(std::move(s), kMarkTimes, "\\times");
+    return replace_all(std::move(s), kMarkDollar, "$");
+}
+
 // E-2a/HONEST-EMPTY (2026-08-06) -- der EINE Ort, an dem ein datenloser Flaechen-Writer statt einer
 // entarteten pgfplots-Figur einen ehrlichen Vermerk schreibt. Bewusst OHNE pgfplots/tikz: der Vermerk
 // muss auch dann kompilieren, wenn die Farbskala mangels positiver Zelle gar nicht bestimmbar waere
@@ -118,7 +151,8 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
         f << head_comment;
     }
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
-    f << "\\emph{" << escape_latex(note) << "}\n";
+    // S-1: Marken NACH escape_latex aufloesen (F-5-Muster); markenlose Vermerke bleiben gleich.
+    f << "\\emph{" << with_math_marks(escape_latex(note)) << "}\n";
     if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
     return f.good() ? status_ok : status_io_error;
 }
@@ -153,8 +187,8 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
 // HeatmapData::degenerate_size_note leer laesst. Bewusst OHNE "never executed"/"nie ausgefuehrt":
 // die Matrix IST gemessen, nur als Flaeche nicht darstellbar.
 [[nodiscard]] std::string default_degenerate_size_note(std::size_t ny, std::size_t nx) {
-    return "(Measured, but not drawable as a surface: the corpus spans only " + std::to_string(ny) + " row(s) x " +
-           std::to_string(nx) +
+    return "(Measured, but not drawable as a surface: the corpus spans only " + std::to_string(ny) +
+           " row(s) @MATH@@TIMES@@MATH@ " + std::to_string(nx) +
            " column(s); pgfplots matrix plot requires at least 2 rows and 2 columns. The measured "
            "value(s) are present in the corpus; the surface is omitted honestly instead of failing "
            "the build.)";
@@ -1061,7 +1095,9 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
     // "nie ausgefuehrt" behaupten: der Messwert ist im Korpus VORHANDEN (F1-Beleg Job 376333, 1x1-Smoke,
     // ns_per_op=1199.047). Wortlaut nennt Metrik + Groesse + Vorhandensein.
     {
-        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // S-1: Marken statt "AxB" -- with_math_marks setzt daraus "$A{\\times}B$" (Bestandsform 26f88a0).
+        std::string const size_txt = "@MATH@" + std::to_string(data.y_labels.size()) + "@BTIMES@" +
+                                     std::to_string(data.x_labels.size()) + "@MATH@";
         // F1-FIX (2026-08-13, Lens-Fund e-ii): Numerus nach der ZAHL DER MESSWERTE, nicht pauschal
         // Singular -- eine gemessene 1x3-Matrix traegt drei Messwerte, "Der Messwert selbst ist" war
         // dort sachlich falsch. Gezaehlt wird mit exakt der Zellen-Logik des Writers (Masken-Wache +
@@ -1076,14 +1112,14 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
         data.degenerate_size_note =
             de ? ("(Gemessen, aber nicht als Flaeche darstellbar: " + metric +
                   " liegt im vorliegenden Korpus nur als " + size_txt +
-                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
-                  "2x2. " +
+                  "-Matrix vor (Suchalgorithmen @MATH@@TIMES@@MATH@ Workloads); die pgfplots-Flaechenform "
+                  "verlangt mindestens @MATH@2@BTIMES@2@MATH@. " +
                   (one ? "Der Messwert selbst ist" : "Die Messwerte selbst sind") +
                   " im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
                   "statt den Bau zu brechen.)")
                : ("(Measured, but not drawable as a surface: " + metric + " spans only a " + size_txt +
-                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
-                  "requires at least 2x2. " +
+                  " matrix (search algorithms @MATH@@TIMES@@MATH@ workloads) in the present corpus; the "
+                  "pgfplots surface form requires at least @MATH@2@BTIMES@2@MATH@. " +
                   (one ? "The measured value itself is" : "The measured values themselves are") +
                   " present in the corpus; the surface is "
                   "omitted honestly instead of failing the build.)");
@@ -1123,18 +1159,21 @@ int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span
     // (Referenz IM Korpus), ist aber unter dem 2x2-Minimum. KEINE "nie ausgefuehrt"-Behauptung; der
     // Wortlaut nennt Metrik, Referenz, Groesse und dass die Messwerte im Korpus VORHANDEN sind.
     {
-        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // S-1: dieselbe Marken-Form wie im Heatmap-Pfad (derselbe chktex-W29-Gegenstand).
+        std::string const size_txt = "@MATH@" + std::to_string(data.y_labels.size()) + "@BTIMES@" +
+                                     std::to_string(data.x_labels.size()) + "@MATH@";
         data.degenerate_size_note =
             de ? ("(Gemessen, aber nicht als Flaeche darstellbar: das Verhaeltnis " + metric + " zur Referenz " +
                   reference_algo + " liegt im vorliegenden Korpus nur als " + size_txt +
-                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
-                  "2x2. Die Messwerte selbst sind im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
-                  "statt den Bau zu brechen.)")
+                  "-Matrix vor (Suchalgorithmen @MATH@@TIMES@@MATH@ Workloads); die pgfplots-Flaechenform "
+                  "verlangt mindestens @MATH@2@BTIMES@2@MATH@. Die Messwerte selbst sind im Korpus vorhanden; "
+                  "die Flaeche wird ehrlich ausgelassen, statt den Bau zu brechen.)")
                : ("(Measured, but not drawable as a surface: the ratio of " + metric + " to reference " +
                   reference_algo + " spans only a " + size_txt +
-                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
-                  "requires at least 2x2. The measured values themselves are present in the corpus; the "
-                  "surface is omitted honestly instead of failing the build.)");
+                  " matrix (search algorithms @MATH@@TIMES@@MATH@ workloads) in the present corpus; the "
+                  "pgfplots surface form requires at least @MATH@2@BTIMES@2@MATH@. The measured values "
+                  "themselves are present in the corpus; the surface is omitted honestly instead of failing "
+                  "the build.)");
     }
     return write_heatmap(out, data, cnst);
 }
@@ -1692,7 +1731,7 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
           << ", xmax=" << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
     }
     if (degenerate_y) {
-        f << "    % F-4: nur EIN gemessener Wert dieser Metrik (n=1) -> y-Achse explizit gesetzt\n";
+        f << "    % F-4: nur EIN gemessener Stuetzpunkt dieser Metrik -> y-Achse explizit gesetzt\n";
         f << "    % (sonst ymin==ymax -> \"Axis range for axis y is approximately empty\"). Nur die ACHSE.\n";
         // y0 == 0 waere eine ECHT gemessene Null (der Nicht-Ausfuehrungs-Fall ist oben schon weg); auch
         // dann braucht die Achse ein nicht-entartetes Fenster, darum [0 : 1] statt [0 : 0].
@@ -1705,9 +1744,17 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
         f << "\\addplot+[mark=*] coordinates {\n";
         for (auto const& [wsn, med] : points) { f << "    (" << wsn << "," << fmt_double(med) << ")\n"; }
         f << "};\n";
-        // F-4: n-Hinweis NUR im entarteten Fall (genau EIN Stuetzpunkt). Der Leser sieht sonst einen
-        // einzelnen Punkt und haelt ihn fuer eine Kurve. Form wie in write_latency_ecdf ("(N=...)").
-        f << "\\addlegendentry{" << escape_latex(key) << (points.size() == 1 ? " (n=1)" : "") << "}\n";
+        // F-4: Hinweis NUR im entarteten Fall (genau EIN Stuetzpunkt). Der Leser sieht sonst einen
+        // einzelnen Punkt und haelt ihn fuer eine Kurve.
+        // M-1 (2026-09-16, Lens r1): der Hinweis darf das Symbol n NICHT benutzen. Diese Figur traegt
+        // "Arbeitsmenge n (Schluessel)" / "working set n (keys)" als x-Achse, und der einzige Punkt liegt
+        // bei n=4096 -- ein Legenden-Zusatz "(n=1)" liest sich dort als Arbeitsmenge 1 und behauptet damit
+        // eine Messung, die es nicht gibt. (Die Form stammte aus write_latency_ecdf "(N=...)"; dort gibt es
+        // keine n-Achse, weshalb sie DORT eindeutig bleibt und unveraendert steht.) Stattdessen benennt der
+        // Zusatz die Stichprobenzahl in Worten, sprachabhaengig.
+        std::string const single_point_hint = de ? " (1 Messpunkt)" : " (1 sample)";
+        f << "\\addlegendentry{" << escape_latex(key) << (points.size() == 1 ? single_point_hint : std::string{})
+          << "}\n";
     }
     f << "\\end{axis}\n\\end{tikzpicture}\n";
     close_resizebox(f, cnst);
