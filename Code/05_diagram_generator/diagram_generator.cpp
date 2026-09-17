@@ -92,6 +92,39 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
     if (cnst.resizebox_wrap) out << "}%\n";
 }
 
+// S-1 (2026-09-16) -- MATHE-FRAGMENTE IM VERMERK, EINGESETZT NACH escape_latex.
+// BEFUND (Lens r1, chktex -q -n36 -n17 ueber das Regenerat): der GROESSEN-Vermerk schrieb
+// "1x1-Matrix ... (Suchalgorithmen x Workloads) ... mindestens 2x2"; der Bestand der Thesis traegt
+// seit dem Hand-Fix 26f88a0 ("fix(lint): chktex-Reinheit Ganzbaum", 2026-08-15) dagegen
+// "$1{\times}1$-Matrix ... (Suchalgorithmen $\times$ Workloads) ... mindestens $2{\times}2$".
+// Ein Regeneratlauf drehte die Hand-Korrektur also zurueck und erzeugte je Sprache vier
+// chktex-W29 ("$\times$ may look prettier here") in zwei Dateien, die anhang/{de,en}/A_measurements.tex
+// HART per \input einbindet -- der naechste anhang:forward-Lauf haette lint:latex rot gefaerbt
+// (chktex rc=2, von xargs als 123 propagiert).
+// WARUM MARKEN: der Vermerk laeuft durch escape_latex, das '$', '{', '}' und '\' maskiert; ein direkt
+// eingesetztes $\times$ kaeme als \$\textbackslash{}times\$ heraus. Deshalb exakt das F-5-Muster
+// (with_breaks, s. write_axis_observer_detail_table): der Vermerk traegt reine ASCII-MARKEN, die
+// escape_latex unveraendert passieren (keine der zehn Sonderzeichen), und die Mathe-Form wird HIER --
+// nach dem Maskieren -- eingesetzt.
+// RUECKWIRKUNGSFREI: ein Vermerk OHNE Marken bleibt byte-identisch. Kein Bestands-Platzhalter des
+// 64er-Sets traegt ein '@' (nachgemessen 2026-09-16 ueber anhang/{de,en}/tabellen/).
+constexpr char kMarkDollar[] = "@MATH@";   // -> "$"
+constexpr char kMarkBTimes[] = "@BTIMES@"; // -> "{\times}"  (geklammert, zwischen zwei Zahlen)
+constexpr char kMarkTimes[]  = "@TIMES@";  // -> "\times"     (blank, allein zwischen zwei Woertern)
+
+[[nodiscard]] std::string replace_all(std::string s, std::string_view from, std::string_view to) {
+    if (from.empty()) return s;
+    for (std::size_t pos = s.find(from); pos != std::string::npos; pos = s.find(from, pos + to.size()))
+        s.replace(pos, from.size(), to);
+    return s;
+}
+
+[[nodiscard]] std::string with_math_marks(std::string s) {
+    s = replace_all(std::move(s), kMarkBTimes, "{\\times}");
+    s = replace_all(std::move(s), kMarkTimes, "\\times");
+    return replace_all(std::move(s), kMarkDollar, "$");
+}
+
 // E-2a/HONEST-EMPTY (2026-08-06) -- der EINE Ort, an dem ein datenloser Flaechen-Writer statt einer
 // entarteten pgfplots-Figur einen ehrlichen Vermerk schreibt. Bewusst OHNE pgfplots/tikz: der Vermerk
 // muss auch dann kompilieren, wenn die Farbskala mangels positiver Zelle gar nicht bestimmbar waere
@@ -118,7 +151,8 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
         f << head_comment;
     }
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
-    f << "\\emph{" << escape_latex(note) << "}\n";
+    // S-1: Marken NACH escape_latex aufloesen (F-5-Muster); markenlose Vermerke bleiben gleich.
+    f << "\\emph{" << with_math_marks(escape_latex(note)) << "}\n";
     if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
     return f.good() ? status_ok : status_io_error;
 }
@@ -153,8 +187,8 @@ void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
 // HeatmapData::degenerate_size_note leer laesst. Bewusst OHNE "never executed"/"nie ausgefuehrt":
 // die Matrix IST gemessen, nur als Flaeche nicht darstellbar.
 [[nodiscard]] std::string default_degenerate_size_note(std::size_t ny, std::size_t nx) {
-    return "(Measured, but not drawable as a surface: the corpus spans only " + std::to_string(ny) + " row(s) x " +
-           std::to_string(nx) +
+    return "(Measured, but not drawable as a surface: the corpus spans only " + std::to_string(ny) +
+           " row(s) @MATH@@TIMES@@MATH@ " + std::to_string(nx) +
            " column(s); pgfplots matrix plot requires at least 2 rows and 2 columns. The measured "
            "value(s) are present in the corpus; the surface is omitted honestly instead of failing "
            "the build.)";
@@ -1061,7 +1095,9 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
     // "nie ausgefuehrt" behaupten: der Messwert ist im Korpus VORHANDEN (F1-Beleg Job 376333, 1x1-Smoke,
     // ns_per_op=1199.047). Wortlaut nennt Metrik + Groesse + Vorhandensein.
     {
-        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // S-1: Marken statt "AxB" -- with_math_marks setzt daraus "$A{\\times}B$" (Bestandsform 26f88a0).
+        std::string const size_txt = "@MATH@" + std::to_string(data.y_labels.size()) + "@BTIMES@" +
+                                     std::to_string(data.x_labels.size()) + "@MATH@";
         // F1-FIX (2026-08-13, Lens-Fund e-ii): Numerus nach der ZAHL DER MESSWERTE, nicht pauschal
         // Singular -- eine gemessene 1x3-Matrix traegt drei Messwerte, "Der Messwert selbst ist" war
         // dort sachlich falsch. Gezaehlt wird mit exakt der Zellen-Logik des Writers (Masken-Wache +
@@ -1076,14 +1112,14 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
         data.degenerate_size_note =
             de ? ("(Gemessen, aber nicht als Flaeche darstellbar: " + metric +
                   " liegt im vorliegenden Korpus nur als " + size_txt +
-                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
-                  "2x2. " +
+                  "-Matrix vor (Suchalgorithmen @MATH@@TIMES@@MATH@ Workloads); die pgfplots-Flaechenform "
+                  "verlangt mindestens @MATH@2@BTIMES@2@MATH@. " +
                   (one ? "Der Messwert selbst ist" : "Die Messwerte selbst sind") +
                   " im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
                   "statt den Bau zu brechen.)")
                : ("(Measured, but not drawable as a surface: " + metric + " spans only a " + size_txt +
-                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
-                  "requires at least 2x2. " +
+                  " matrix (search algorithms @MATH@@TIMES@@MATH@ workloads) in the present corpus; the "
+                  "pgfplots surface form requires at least @MATH@2@BTIMES@2@MATH@. " +
                   (one ? "The measured value itself is" : "The measured values themselves are") +
                   " present in the corpus; the surface is "
                   "omitted honestly instead of failing the build.)");
@@ -1123,18 +1159,21 @@ int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span
     // (Referenz IM Korpus), ist aber unter dem 2x2-Minimum. KEINE "nie ausgefuehrt"-Behauptung; der
     // Wortlaut nennt Metrik, Referenz, Groesse und dass die Messwerte im Korpus VORHANDEN sind.
     {
-        std::string const size_txt = std::to_string(data.y_labels.size()) + "x" + std::to_string(data.x_labels.size());
+        // S-1: dieselbe Marken-Form wie im Heatmap-Pfad (derselbe chktex-W29-Gegenstand).
+        std::string const size_txt = "@MATH@" + std::to_string(data.y_labels.size()) + "@BTIMES@" +
+                                     std::to_string(data.x_labels.size()) + "@MATH@";
         data.degenerate_size_note =
             de ? ("(Gemessen, aber nicht als Flaeche darstellbar: das Verhaeltnis " + metric + " zur Referenz " +
                   reference_algo + " liegt im vorliegenden Korpus nur als " + size_txt +
-                  "-Matrix vor (Suchalgorithmen x Workloads); die pgfplots-Flaechenform verlangt mindestens "
-                  "2x2. Die Messwerte selbst sind im Korpus vorhanden; die Flaeche wird ehrlich ausgelassen, "
-                  "statt den Bau zu brechen.)")
+                  "-Matrix vor (Suchalgorithmen @MATH@@TIMES@@MATH@ Workloads); die pgfplots-Flaechenform "
+                  "verlangt mindestens @MATH@2@BTIMES@2@MATH@. Die Messwerte selbst sind im Korpus vorhanden; "
+                  "die Flaeche wird ehrlich ausgelassen, statt den Bau zu brechen.)")
                : ("(Measured, but not drawable as a surface: the ratio of " + metric + " to reference " +
                   reference_algo + " spans only a " + size_txt +
-                  " matrix (search algorithms x workloads) in the present corpus; the pgfplots surface form "
-                  "requires at least 2x2. The measured values themselves are present in the corpus; the "
-                  "surface is omitted honestly instead of failing the build.)");
+                  " matrix (search algorithms @MATH@@TIMES@@MATH@ workloads) in the present corpus; the "
+                  "pgfplots surface form requires at least @MATH@2@BTIMES@2@MATH@. The measured values "
+                  "themselves are present in the corpus; the surface is omitted honestly instead of failing "
+                  "the build.)");
     }
     return write_heatmap(out, data, cnst);
 }
@@ -1589,15 +1628,48 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
 
     // (Reihe → (working_set_n → Stichprobe des z-Feldes)); NUR two_phase_valid + working_set_n vorhanden.
     std::map<std::string, std::map<std::uint64_t, std::vector<double>>> series;
+    bool                                                                any_ws_row = false; // s. F-4/D
     for (auto const& r : rows) {
         if (!r.two_phase_valid) continue;
         if (!r.has_working_set_n) continue; // header-getrieben: fehlt die Spalte → kein Punkt (n/a)
         if (is_scan && (r.workload == "ycsb_e" || r.workload == "lp_range_scan")) continue;
+        any_ws_row = true;
+        // F-4/D (2026-09-16) -- PHANTOM-WACHE. Eine Zeile darf nur dann einen Stuetzpunkt stellen, wenn die
+        // Operation des z-Feldes in dieser Konfiguration UEBERHAUPT AUSGEFUEHRT wurde. Das Muster ist im
+        // Modul seit E-2a etabliert (z_field_executed, "nicht gelaufen" != "0 ns") und wird in
+        // aggregate_surface_matrix bereits benutzt -- HIER fehlte es. Folge am Objekt (Owner-Log 13.09.,
+        // anhang/de/tabellen/ld_sweep_op_insert_p50_ns.tex): der ycsb_c-Korpus fuehrt op_insert_n=0, die
+        // Kurve zeigte trotzdem (4096, 0.0000) und die y-Achse meldete "[0.0:0.0] approximately empty".
+        // Das war nicht bloss eine leere Achse, sondern eine ERFUNDENE 0-ns-Messung in der Diplomarbeit.
+        if (!z_field_executed(r, z_field)) continue;
         series[sweep_series_key(r)][r.working_set_n].push_back(pick_z_field(r, z_field));
     }
-    if (series.empty()) return status_empty_input; // keine working_set_n-Daten → ehrlich leer
-
     std::string const metric = z_field_human(z_field, lang);
+
+    if (series.empty()) {
+        // BESTANDSFALL (P1b-t1): gar keine Zeile mit working_set_n -> ehrlich leer, KEINE Datei. Der
+        // Anhang haengt an \InputIfFileExists und druckt dort seinen eigenen, zutreffenden Vermerk
+        // ("wartet auf eine Messreihe mit working_set_n-Spalte").
+        if (!any_ws_row) return status_empty_input;
+        // F-4/D: working_set_n IST da, aber die Operation des z-Feldes wurde in KEINER gueltigen
+        // Konfiguration ausgefuehrt. Hier waere "keine Datei" IRREFUEHREND -- der Anhang-Fallback nennt
+        // dann die fehlende Spalte als Grund, und die ist vorhanden. Deshalb der ehrliche Vermerk statt
+        // einer Figur: exakt das E-2a-HONEST-EMPTY-Muster der Flaechen-Writer.
+        std::cerr << "diagram-generator: HONEST-EMPTY -- z=" << z_field
+                  << " nie ausgefuehrt, Sweep-Kurve ausgelassen (lang=" << lang << ")\n";
+        std::string head;
+        head += "% AUTO-GENERATED durch diagram_generator (HONEST-EMPTY: Sweep-Metrik nie ausgefuehrt)\n";
+        head += "% Die Arbeitsmengen-Spalte working_set_n IST vorhanden, aber die Operation dieses\n";
+        head += "% z-Feldes wurde in KEINER gueltigen Konfiguration ausgefuehrt (op_<art>_n == 0). Eine\n";
+        head += "% Kurve daraus waere eine erfundene 0-ns-Messung -- daher ehrlicher Vermerk statt Figur.\n";
+        return write_honest_empty_placeholder(
+            out, (de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric,
+            (de ? "(Keine Messwerte: die Operation dieser Metrik wurde im vorliegenden Korpus nie "
+                  "ausgefuehrt. Die Kurve wird ehrlich ausgelassen, statt eine 0-ns-Messung zu zeigen.)"
+                : "(No measured values: the operation of this metric was never executed in the present "
+                  "corpus. The curve is honestly omitted instead of showing an invented zero.)"),
+            cnst, head);
+    }
 
     // P1b (2026-08-06) -- ENTARTUNGS-WACHE der x-Achse, aufgedeckt erst durch die Verdrahtung in die
     // Facade. Der d03-Korpus sweept working_set_n gar nicht: ALLE Zeilen tragen denselben Wert (4096),
@@ -1613,6 +1685,25 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
         for (auto const& [wsn, samples] : points) distinct_x.insert(wsn);
     bool const          degenerate_x = (distinct_x.size() == 1 && *distinct_x.begin() > 0);
     std::uint64_t const only_x       = degenerate_x ? *distinct_x.begin() : 0;
+
+    // F-4/A (2026-09-16) -- die SCHWESTER-WACHE zu P1b, diesmal fuer y. P1b heilte 2026-08-06 NUR die
+    // x-Achse; der Owner-Log vom 13.09. zeigt dieselbe Meldung auf y: "Axis range for axis y is
+    // approximately empty" in ld_sweep_ns_per_op ([671.532:671.532]) und ld_sweep_op_lookup_p50_ns
+    // ([750.0:750.0]). Ursache ist dieselbe wie bei x: bei EINEM Messpunkt ist ymin==ymax, und das von
+    // write_pgfplots_axis_options gesetzte enlargelimits=0.05 ist RELATIV (0.05 * 0 == 0), weitet also
+    // nichts. Gegenmassnahme wie bei P1b: NUR die ACHSE explizit setzen, KEIN Punkt erfunden. y ist hier
+    // linear (kein ymode=log), darum nullpunktverankert [0 : 2*y] statt der x-Oktave [v/2 : 2v].
+    // Die Mediane werden EINMAL hier berechnet und unten wiederverwendet (kein zweiter Durchlauf).
+    std::map<std::string, std::map<std::uint64_t, double>> medians;
+    std::set<double>                                       distinct_y;
+    for (auto const& [key, points] : series)
+        for (auto const& [wsn, samples] : points) {
+            double const med  = nearest_rank_median(samples);
+            medians[key][wsn] = med;
+            distinct_y.insert(med);
+        }
+    bool const   degenerate_y = (distinct_y.size() == 1);
+    double const only_y       = degenerate_y ? *distinct_y.begin() : 0.0;
 
     std::ofstream f{out};
     if (!f) return status_io_error;
@@ -1639,16 +1730,31 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
         f << "    xmin=" << fmt_double(static_cast<double>(only_x) / 2.0)
           << ", xmax=" << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
     }
+    if (degenerate_y) {
+        f << "    % F-4: nur EIN gemessener Stuetzpunkt dieser Metrik -> y-Achse explizit gesetzt\n";
+        f << "    % (sonst ymin==ymax -> \"Axis range for axis y is approximately empty\"). Nur die ACHSE.\n";
+        // y0 == 0 waere eine ECHT gemessene Null (der Nicht-Ausfuehrungs-Fall ist oben schon weg); auch
+        // dann braucht die Achse ein nicht-entartetes Fenster, darum [0 : 1] statt [0 : 0].
+        f << "    ymin=0, ymax=" << fmt_double(only_y > 0.0 ? only_y * 2.0 : 1.0) << ",\n";
+    }
     f << "    legend pos=north west,\n    legend style={font=\\tiny},\n";
     f << "    mark size=2pt,\n";
     f << "]\n";
-    for (auto const& [key, points] : series) {
+    for (auto const& [key, points] : medians) {
         f << "\\addplot+[mark=*] coordinates {\n";
-        for (auto const& [wsn, samples] : points) {
-            f << "    (" << wsn << "," << fmt_double(nearest_rank_median(samples)) << ")\n";
-        }
+        for (auto const& [wsn, med] : points) { f << "    (" << wsn << "," << fmt_double(med) << ")\n"; }
         f << "};\n";
-        f << "\\addlegendentry{" << escape_latex(key) << "}\n";
+        // F-4: Hinweis NUR im entarteten Fall (genau EIN Stuetzpunkt). Der Leser sieht sonst einen
+        // einzelnen Punkt und haelt ihn fuer eine Kurve.
+        // M-1 (2026-09-16, Lens r1): der Hinweis darf das Symbol n NICHT benutzen. Diese Figur traegt
+        // "Arbeitsmenge n (Schluessel)" / "working set n (keys)" als x-Achse, und der einzige Punkt liegt
+        // bei n=4096 -- ein Legenden-Zusatz "(n=1)" liest sich dort als Arbeitsmenge 1 und behauptet damit
+        // eine Messung, die es nicht gibt. (Die Form stammte aus write_latency_ecdf "(N=...)"; dort gibt es
+        // keine n-Achse, weshalb sie DORT eindeutig bleibt und unveraendert steht.) Stattdessen benennt der
+        // Zusatz die Stichprobenzahl in Worten, sprachabhaengig.
+        std::string const single_point_hint = de ? " (1 Messpunkt)" : " (1 sample)";
+        f << "\\addlegendentry{" << escape_latex(key) << (points.size() == 1 ? single_point_hint : std::string{})
+          << "}\n";
     }
     f << "\\end{axis}\n\\end{tikzpicture}\n";
     close_resizebox(f, cnst);
@@ -1802,14 +1908,30 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
     // Diese Figur war damit seit ihrer Landung nicht kompilierbar -- unbemerkt, weil sie am
     // \InputIfFileExists haengt und der d03-Korpus sie erst jetzt mit Daten fuellt.
     // Die relative Form leistet dasselbe (Rand fuer wenige breite Balken) und ist symbolisch gueltig.
-    f << "    enlarge x limits=0.25,\n"; // symbolische x-Achse: Rand fuer wenige breite Balken
-    f << "    symbolic x coords={";
-    for (std::size_t i = 0; i < agg.groups.size(); ++i) {
-        if (i > 0) f << ",";
-        f << escape_latex(agg.groups[i]);
+    // F-4/B (2026-09-16) -- ENTARTUNGS-WACHE der symbolischen x-Achse. pgfplots bildet symbolische
+    // Koordinaten intern auf die Indizes 0,1,2,... ab; bei GENAU EINER Kategorie ist xmin==xmax==0, und
+    // die relative Aufweitung enlarge x limits=0.25 bleibt wirkungslos (0.25 * 0 == 0) -> "Axis range
+    // for axis x is approximately empty" (Owner-Log 13.09., seg_attribution.tex, [0.0:0.0], Zeile 86).
+    // Die naheliegende abs-Form ist hier VERBOTEN -- sie bricht auf symbolischen Achsen FATAL ab (der
+    // P3a-BEIFANG-Block direkt darueber; 2026-09-16 an TeX Live 2026 erneut nachgemessen). Deshalb im
+    // EINER-Fall eine numerische Achse mit xtick/xticklabels und explizitem Fenster; ab zwei Kategorien
+    // bleibt die symbolische Form und die Emission BYTE-IDENTISCH zum Bestand.
+    bool const single_group = (agg.groups.size() == 1);
+    if (single_group) {
+        f << "    % F-4/B: EINE Kategorie -> numerischer Index statt symbolic x coords, Fenster explizit\n";
+        f << "    xmin=-0.5, xmax=0.5,\n";
+        f << "    xtick={0},\n";
+        f << "    xticklabels={" << escape_latex(agg.groups[0]) << "},\n";
+    } else {
+        f << "    enlarge x limits=0.25,\n"; // symbolische x-Achse: Rand fuer wenige breite Balken
+        f << "    symbolic x coords={";
+        for (std::size_t i = 0; i < agg.groups.size(); ++i) {
+            if (i > 0) f << ",";
+            f << escape_latex(agg.groups[i]);
+        }
+        f << "},\n";
+        f << "    xtick=data,\n";
     }
-    f << "},\n";
-    f << "    xtick=data,\n";
     f << "    x tick label style={font=\\small},\n";
     // Per-Segment-Legende (kSegmentCount Eintraege) AUSSERHALB rechts (tiny), damit sie den Plot nicht ueberdeckt.
     f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
@@ -1818,7 +1940,9 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
     for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
         f << "\\addplot[fill=segattr" << s << ",draw=black!45,very thin] coordinates {";
         for (std::size_t g = 0; g < agg.groups.size(); ++g) {
-            f << "(" << escape_latex(agg.groups[g]) << "," << fmt_double(agg.means[s][g]) << ")";
+            // F-4/B: im Einer-Fall traegt die x-Achse numerische Indizes (s. oben), sonst die Symbole.
+            f << "(" << (single_group ? std::to_string(g) : escape_latex(agg.groups[g])) << ","
+              << fmt_double(agg.means[s][g]) << ")";
             if (g + 1 < agg.groups.size()) f << " ";
         }
         f << "};\n";
@@ -1923,7 +2047,8 @@ int write_latency_range_bar(std::filesystem::path const& out, std::span<WideMeas
 
     // Datenqualitäts-Zählung: p99<p50 (Whisker würde nach unten zeigen). Wird NICHT gecrasht, sondern der
     // plus-Whisker auf 0 geklemmt (Punkt sichtbar, keine negative Fehlerbalken-Länge) und hier gezählt/geloggt.
-    std::size_t inversions = 0;
+    bool const  single_combo = (combos.size() == 1); // F-4/B, s. Achsen-Block unten
+    std::size_t inversions   = 0;
     for (std::size_t oi = 0; oi < agg.ops.size(); ++oi)
         for (std::size_t ai = 0; ai < agg.algos.size(); ++ai)
             if (agg.present[oi][ai] && agg.p99_median[oi][ai] < agg.p50_median[oi][ai]) ++inversions;
@@ -1948,13 +2073,24 @@ int write_latency_range_bar(std::filesystem::path const& out, std::span<WideMeas
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
     f << "    ymode=log,\n"; // Latenz spannt Dekaden -> log-y (alle Werte >0)
-    f << "    symbolic x coords={";
-    for (std::size_t i = 0; i < combos.size(); ++i) {
-        if (i > 0) f << ",";
-        f << escape_latex(combos[i]);
+    // F-4/B (2026-09-16) -- dieselbe Entartung wie in write_segment_attribution_stacked_bar: EINE
+    // symbolische Kategorie -> xmin==xmax==0 -> "Axis range for axis x is approximately empty"
+    // (Owner-Log 13.09., latency_range.tex, [0.0:0.0], Zeile 35). Hier gibt es nicht einmal eine
+    // relative Aufweitung. abs= ist auf symbolischen Achsen FATAL -> numerischer Index im Einer-Fall.
+    if (single_combo) {
+        f << "    % F-4/B: EINE Kombination -> numerischer Index statt symbolic x coords, Fenster explizit\n";
+        f << "    xmin=-0.5, xmax=0.5,\n";
+        f << "    xtick={0},\n";
+        f << "    xticklabels={" << escape_latex(combos[0]) << "},\n";
+    } else {
+        f << "    symbolic x coords={";
+        for (std::size_t i = 0; i < combos.size(); ++i) {
+            if (i > 0) f << ",";
+            f << escape_latex(combos[i]);
+        }
+        f << "},\n";
+        f << "    xtick=data,\n";
     }
-    f << "},\n";
-    f << "    xtick=data,\n";
     f << "    x tick label style={rotate=60,anchor=east,font=\\tiny},\n";
     f << "    legend pos=north west,\n    legend style={font=\\tiny,legend cell align=left},\n";
     f << "    mark size=2.4pt,\n";
@@ -1969,8 +2105,9 @@ int write_latency_range_bar(std::filesystem::path const& out, std::span<WideMeas
             double const p50  = agg.p50_median[oi][ai];
             double const p99  = agg.p99_median[oi][ai];
             double const plus = (p99 > p50) ? (p99 - p50) : 0.0; // Datenqualitaet: p99<p50 -> 0 (kein Neg-Whisker)
-            f << "    (" << escape_latex(agg.algos[ai] + "/" + agg.ops[oi]) << "," << fmt_double(p50) << ") +- (0,"
-              << fmt_double(plus) << ")\n";
+            // F-4/B: im Einer-Fall numerischer Index 0 (die Achse traegt dann xtick/xticklabels).
+            std::string const x_key = single_combo ? std::string{"0"} : escape_latex(agg.algos[ai] + "/" + agg.ops[oi]);
+            f << "    (" << x_key << "," << fmt_double(p50) << ") +- (0," << fmt_double(plus) << ")\n";
         }
         f << "};\n";
         f << "\\addlegendentry{" << escape_latex(agg.ops[oi]) << "}\n";
@@ -2024,16 +2161,39 @@ int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasureme
                                  : "overall latency per configuration ns_per_op (ns, log)";
     std::string const ylab =
         de ? "Anteil der Konfigurationen mit Latenz <= x" : "share of configurations with latency <= x";
+    // P-F (2026-09-16) -- chktex-RUECKFALL geschlossen. Der Owner hat die CAPTION am 15.08. von Hand auf
+    // den Halbgeviertstrich gesetzt (26f88a0); der Emitter schrieb weiter den einfachen Bindestrich und
+    // haette lint:latex auf 289 beim naechsten Writeback wieder rot gefaerbt (chktex Warning 8 "Wrong
+    // length of dash", selbst nachgemessen am VORHER-Regenerat: genau 1 Treffer, genau die Caption-Zeile
+    // -- die title-Zeile beisst NICHT). Deshalb NUR die Caption, damit der Bestand byte-gleich bleibt.
+    std::string const ecdf_caption = de ? "ECDF der Gesamt-Latenz -- Verteilung ueber Konfigurationen"
+                                        : "ECDF of overall latency -- distribution over configurations";
 
     f << "% AUTO-GENERATED durch diagram_generator (P3, Config-Streuungs-ECDF; lang=" << lang << ")\n";
     f << "% EHRLICH: Population = die KONFIGURATIONEN (Permutationen), jede = 1 ns_per_op-Punkt. Das ist die\n";
     f << "% Verteilung UEBER die Konfigurationen (Anteil der Configs mit Latenz <= x), NICHT eine Per-Operation-\n";
     f << "% Latenz-CDF (die rohen Einzel-Op-Latenzen traegt das WIDE-Schema nicht). 1 Treppe je search_algo.\n";
+    // F-4/C (2026-09-16) -- Entartung der LOG-x-Achse. Bei N=1 Konfiguration je Reihe tragen beide
+    // Treppenpunkte denselben x-Wert; die Achse meldete "[6.50946:6.50946] approximately empty"
+    // (Owner-Log 13.09., latency_ecdf.tex, Zeile 30 -- 6.50946 == ln(671.532), die interne
+    // Log-Koordinate). ymin/ymax sind gesetzt, xmin/xmax waren es nicht. aggregate_latency_ecdf
+    // filtert bereits ns_per_op > 0, die Oktave ist also immer wohldefiniert.
+    std::set<double> ecdf_distinct_x;
+    for (auto const& s : series)
+        for (double const v : s.sorted_ns_per_op) ecdf_distinct_x.insert(v);
+    bool const   ecdf_degenerate_x = (ecdf_distinct_x.size() == 1 && *ecdf_distinct_x.begin() > 0.0);
+    double const ecdf_only_x       = ecdf_degenerate_x ? *ecdf_distinct_x.begin() : 0.0;
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
     f << "    xmode=log,\n";
+    if (ecdf_degenerate_x) {
+        f << "    % F-4/C: nur EINE distinkte Gesamt-Latenz im Korpus (n=1) -> x-Achse explizit auf eine\n";
+        f << "    % Oktave geweitet (sonst xmin==xmax -> \"Axis range for axis x is approximately empty\").\n";
+        f << "    % Log-Achse, darum [v/2 : 2v] wie in der P1b-Wache -- NUR die ACHSE, kein Punkt erfunden.\n";
+        f << "    xmin=" << fmt_double(ecdf_only_x / 2.0) << ", xmax=" << fmt_double(ecdf_only_x * 2.0) << ",\n";
+    }
     f << "    ymin=0, ymax=1,\n";
     f << "    legend pos=south east,\n    legend style={font=\\tiny,legend cell align=left},\n";
     f << "]\n";
@@ -2051,7 +2211,7 @@ int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasureme
     }
     f << "\\end{axis}\n\\end{tikzpicture}\n";
     close_resizebox(f, cnst);
-    if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
+    if (!cnst.body_only) { f << "\\caption{" << escape_latex(ecdf_caption) << "}\n\\end{figure}\n"; }
     return f.good() ? status_ok : status_io_error;
 }
 
@@ -2064,6 +2224,19 @@ int write_axis_observer_detail_table(std::filesystem::path const&               
     // "echt gemessen" = Spalte vorhanden UND Wert weder leer noch "n/a" (Nicht-Mess-DLL schreibt ehrlich "n/a",
     // NICHT 0). Der Konsument erfindet NIE einen 0-Wert für einen fehlenden Zähler.
     auto const is_real = [](std::string const& v) { return !v.empty() && v != "n/a"; };
+
+    // F-5 (2026-09-16) -- Umbruchstellen in das Achsen-Tupel der Block-Kopfzeile. Wird NACH escape_latex
+    // angewandt, damit das eingefuegte \allowbreak nicht selbst escaped wird. Das '/' bleibt erhalten;
+    // es wird NUR eine Umbruch-ERLAUBNIS angehaengt -- rein typografisch, kein Zeichen geht verloren.
+    auto const with_breaks = [](std::string const& s) {
+        std::string out;
+        out.reserve(s.size() + 64);
+        for (char const c : s) {
+            out += c;
+            if (c == '/') out += "\\allowbreak{}";
+        }
+        return out;
+    };
 
     // ── HONEST-EMPTY (VOR dem ofstream, exakt das write_segment_attribution_stacked_bar-Muster): existiert KEINE
     //    Zeile mit mind. EINEM echt gemessenen stat_-Wert (alle "n/a"/leer ODER der stat_-Block fehlt ganz) →
@@ -2123,12 +2296,17 @@ int write_axis_observer_detail_table(std::filesystem::path const&               
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{4.6cm} "
          ">{\\raggedright\\arraybackslash}p{4.6cm} r@{}}\n";
     f << "\\caption{" << escape_latex(caption) << "}\\label{" << label << "}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL geschlossen. Der Owner hat die vier longtable-Marken am
+    // 15.08. von Hand um das abschliessende '%' ergaenzt (Commit 26f88a0, "chktex-Reinheit Ganzbaum");
+    // der Emitter erzeugte die Vorform weiter -- der naechste Writeback haette lint:latex auf 289
+    // wieder rot gefaerbt (chktex Warning 1 "Command terminated with space", 4 Treffer, selbst
+    // nachgemessen am VORHER-Regenerat). Das '%' frisst das Zeilenende-Leerzeichen.
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{3}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{3}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     // Je WIDE-Zeile (= je Tier-Binary/Messung) EIN Block: Kopfzeile binary_id[+workload] + je Achse/Feld die
     // echten Werte. Reihenfolge deterministisch: r.stat ist std::map (nach vollem Spaltennamen sortiert → nach
@@ -2144,7 +2322,18 @@ int write_axis_observer_detail_table(std::filesystem::path const&               
 
         std::string being = r.binary_id;
         if (!r.workload.empty()) being += "  [" + r.workload + "]";
-        f << "\\multicolumn{3}{@{}l}{\\textbf{" << escape_latex(being) << "}}\\\\\n";
+        // F-5 (2026-09-16) -- die Konfigurations-Kopfzeile ist der volle Achsen-binary_id (im Korpus
+        // 606 Zeichen). In einer l-Spalte ist sie EINE Zeile ohne jede Umbruchstelle; ihre natuerliche
+        // Breite sprengt die longtable und erzeugt in JEDEM der fuenf longtable-Chunks denselben
+        // "Overfull \hbox (1515.18507pt too wide) in alignment" (Owner-Log 13.09., 5 Ereignisse; die
+        // fuenf Chunks sind \endfirsthead/\endhead/\endfoot/\endlastfoot/Rumpf, alle mit derselben
+        // Endbreite). Gemessene Heilung (Mutationsproben M1/M2/M3 an TeX Live 2026): es braucht BEIDES
+        // -- (1) eine UMBRECHENDE p-Spalte statt l, mit \dimexpr-Abzug der beiden \tabcolsep (ohne
+        // den Abzug bleiben 3.0pt Rest), und (2) Umbruchstellen IM Tupel (with_breaks oben; weder '/'
+        // noch '\_' sind von sich aus Umbruchstellen). Keine Warnung wird unterdrueckt, \hfuzz bleibt
+        // unberuehrt, und es geht kein Zeichen der binary_id verloren.
+        f << "\\multicolumn{3}{@{}>{\\raggedright\\arraybackslash}p{\\dimexpr\\linewidth-2\\tabcolsep\\relax}}"
+          << "{\\textbf{" << with_breaks(escape_latex(being)) << "}}\\\\\n";
 
         std::string last_axis;
         for (auto const& [name, val] : r.stat) {

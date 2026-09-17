@@ -660,12 +660,14 @@ int write_exchange_longtables(std::filesystem::path const& out_dir, std::span<Ex
           << ">{\\raggedright\\arraybackslash}p{2.2cm} l r r r r "
           << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
         f << "\\caption{" << cap << "}\\label{tab:ld:exchange:" << axis << "}\\\\\n";
-        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+        // P-F (2026-09-16) -- chktex-RUECKFALL, s. Kopf-Kommentar der Schwester-Stelle unten:
+        // die longtable-Marken brauchen das abschliessende '%' (chktex Warning 1).
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
         f << "\\multicolumn{8}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued") << "}\\\\\n";
-        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endhead%\n";
         f << "\\midrule\n\\multicolumn{8}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-          << "}\\\\\n\\endfoot\n";
-        f << "\\bottomrule\n\\endlastfoot\n";
+          << "}\\\\\n\\endfoot%\n";
+        f << "\\bottomrule\n\\endlastfoot%\n";
 
         for (auto const& a : rows) {
             // n=0 (kein definiertes rel-Delta, z.B. scan-only-Zellen mit durchweg 0-Baseline) NICHT als
@@ -956,12 +958,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
     f << "\\begin{longtable}{@{}r >{\\raggedright\\arraybackslash}p{5.0cm} "
       << ">{\\raggedright\\arraybackslash}p{8.0cm}@{}}\n";
     f << "\\caption{" << cap << "}\\label{tab:le:limitierung}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{3}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{3}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     // Zeilen als (Vorbehalt, Status)-Paare. Reihenfolge bindend: Zeile 1 = Cache-Misses/PMC.
     // trailer: optionaler Kommentar HINTER dem LaTeX-Zeilenende. Er traegt die chktex-Inline-
@@ -1006,7 +1009,11 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "Intel-PCM-Windows-Treiber steht f\\\"ur die Windows-Lane weiterhin aus (\\#26/P4). Auf Modellen "
              "ohne Katalog-Eintrag (heute traegt nur Zen 5 einen) bleibt die L2/Coherence-L\\\"ucke nur "
              "indirekt \\\"uber den Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op) "
-             "beobachtbar."});
+             "beobachtbar.",
+             // S-1 (2026-09-16): die RAW-Event-Kodierungen 0x964/0x1443 sind Hex-LITERALE; chktex liest
+             // das "x" zwischen Ziffern als Malzeichen (W29). Inline-Ausnahme wie im Bestand der Thesis
+             // (kapitel/{de,en}/04_implementierung.tex: \texttt{0x56F1B721C72DC10E} ... % chktex 29).
+             "% chktex 29 (Hex-Literale des RAW-Event-Katalogs -- kein Malzeichen)"});
         rows.push_back({"14 gepinnte Achsen = 0 Austauschbarkeits-Belege",
                         "Nur 4 der 18 Kompositions-Achsen variieren (search\\_algo, node\\_type, memory\\_layout, "
                         "prefetch). Gepinnt (je 1 Wert): cache\\_traversal, mapping, path\\_compression, allocator, "
@@ -1072,7 +1079,8 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
         rows.push_back(
             {"Kapsel-internes (verschlucktes) OOM in einer Mess-Op",
              "Nach aussen geworfenes OOM entwertet die Messung jetzt hart (two\\_phase\\_valid=false). Ein vom "
-             "Tier-Code INTERN per catch(...) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen nicht "
+             "Tier-Code INTERN per catch(\\ldots) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen "
+             "nicht "
              "beobachtbar → konservativ als Restvorbehalt dokumentiert, nicht erzwungen."});
         // G5-Audit (w289llo0o): de
         rows.push_back(
@@ -1083,7 +1091,8 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "betrifft den absoluten ns-Nullpunkt, nicht die relativen Achsen-Vergleiche (G5-Audit, MESS-MINOR-7)."});
         rows.push_back({"Entwurfs-Etiketten = Namenskonvention, kein Mess-Einfluss",
                         "Einzelne Pattern-Etiketten im Code/Doku sind Benennungs-/Entwurfsvorbehalte ohne "
-                        "Mess-Wirkung: „hybrider Visitor\" (real ein Memento, kein \\texttt{accept()}/Host-Besuch), "
+                        "Mess-Wirkung: \u201Ehybrider Visitor\u201C (real ein Memento, kein "
+                        "\\texttt{accept()}/Host-Besuch), "
                         "sowie Interpreter-/Template-/Decorator-Etiketten und \\texttt{reserve}-/\\texttt{if "
                         "constexpr}-Hygiene. Reine Naming-Konvention $\\to$ als Vorbehalt dokumentiert, kein Einfluss "
                         "auf Messwerte (G5-Audit, PATTERN-MINOR-1..7)."});
@@ -1109,7 +1118,10 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "without read access to the zone. The Intel PCM Windows driver is still pending for the "
              "Windows lane (\\#26/P4). On models without a catalog entry (today only Zen 5 carries one) the "
              "L2/coherence gap remains observable only indirectly via the wall-clock proxy "
-             "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+             "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op).",
+             // S-1 (2026-09-16): wie in der DE-Fassung -- 0x964/0x1443 sind Hex-Literale, chktex W29
+             // liest das "x" zwischen Ziffern als Malzeichen. Inline-Ausnahme nach Dokument-Konvention.
+             "% chktex 29 (hex literals of the RAW event catalog -- not a multiplication sign)"});
         rows.push_back(
             {"14 pinned axes = 0 exchangeability evidence",
              "Only 4 of the 18 composition axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). "
@@ -1157,12 +1169,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "the "
              "PINNED cache\\_traversal/mapping organs when auto-coupling (low bits); for records $>$ type width their "
              "observer entries collide. Does NOT affect the primary lookup (uint64); observer-only limitation of "
-             "pinned axes (cf. rows 2/4)."});
+             "pinned axes (cf.\\ rows 2/4)."});
         // Audit A1 / MINOR-MESS-02 residual (EN pendant).
         rows.push_back({"Capsule-internal (swallowed) OOM in a measured op",
                         "An OOM propagated outward now hard-invalidates the measurement (two\\_phase\\_valid=false). "
                         "An OOM caught "
-                        "INTERNALLY by tier code via catch(...) (e.g. defensive memento skip) is not observable from "
+                        "INTERNALLY by tier code via catch(\\ldots) (e.g.\\ defensive memento skip) is not observable "
+                        "from "
                         "outside $\\to$ "
                         "documented as a conservative residual caveat, not forced."});
         // G5-Audit (w289llo0o): en
@@ -1365,12 +1378,13 @@ int write_sweep_axis_longtable(std::filesystem::path const& out, std::span<WideF
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.6cm} r r r r r r r "
       << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
     f << "\\caption{" << cap << "}\\label{tab:m3v2:sweep:" << sweep_axis << "}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{9}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{9}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     for (auto& [v, fns] : by_value) {
         f << escape_latex(v);
@@ -1415,12 +1429,13 @@ int write_seg_coverage_appendix(std::filesystem::path const& out, std::span<Wide
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.5cm} r r r r@{}}\n";
     f << "\\caption{" << escape_latex(caption) << "}\\label{" << label << "}\\\\\n";
     std::string const colhead = being_h + " & " + cols_h + " \\\\";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: longtable-Marken mit abschliessendem '%' (Warning 1).
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{5}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{5}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     char buf[64];
     for (auto& [bid, samples] : cov) {

@@ -204,12 +204,16 @@ int write_axis_inventory_table(std::filesystem::path const& out, std::span<AxisR
     f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{1.8cm} >{\\raggedright\\arraybackslash}p{3.0cm} "
       << ">{\\raggedright\\arraybackslash}p{2.6cm} r >{\\raggedright\\arraybackslash}p{5.0cm}@{}}\n";
     f << "\\caption{" << cap << "}\\label{tab:axis-inventory}\\\\\n";
-    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    // P-F (2026-09-16) -- chktex-RUECKFALL: die vier longtable-Marken brauchen das abschliessende
+    // '%' (chktex Warning 1 "Command terminated with space"). Der Owner hat das am 15.08. von Hand
+    // im Thesis-Baum ergaenzt (26f88a0); die Emitter erzeugten die Vorform weiter -- der naechste
+    // Writeback haette lint:latex auf 289 wieder rot gefaerbt. Am VORHER-Regenerat nachgemessen.
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead%\n";
     f << "\\multicolumn{5}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
       << "}\\\\\n\\toprule\n"
-      << colhead << "\n\\midrule\n\\endhead\n";
+      << colhead << "\n\\midrule\n\\endhead%\n";
     f << "\\midrule\n\\multicolumn{5}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
-      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+      << "}\\\\\n\\endfoot%\n\\bottomrule\n\\endlastfoot%\n";
 
     for (auto const& reg : registries) {
         for (auto const& a : reg.axes) {

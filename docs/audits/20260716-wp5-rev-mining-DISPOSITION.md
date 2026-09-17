@@ -55,7 +55,7 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 | REV-DATA-09 (P1, Legacy-Mikrobench-Achsen) | **offen — legacy-gated** | `tools/permutation_codegen/codegen.cmake:434-483` unverändert (Layout wechselt Algorithmus, Allokatorstress vor t0); Konsument ist ausschließlich der V38.C-Plugin-Mikrobench hinter `COMDARE_LEGACY_MESSREIHEN=1` (main.cpp:344ff). Wissenschaftliche Tabellen speisen sich aus dem E4-XML-Weg. Voll-Entfernung = P6, data-gated (golden-320-Subsumtion unbestätigt, §12 07-13). |
 | REV-DATA-10 (P1, ExperimentDriver-Erfolg) | **offen — legacy- + ABI-gated** | `libs/cache_engine/builder/experiment_driver/experiment_driver.cpp:497` `pr.succeeded = true;` bedingungslos; `module_abi_v1`-run_workload hat keinen Statusreturn (Fix bräuchte ABI-Kanal = ABI-gated). Pfad läuft nur bei `COMDARE_LEGACY_MESSREIHEN=1`. |
 | REV-DATA-11 (P1, Baseline≠Kandidat-Workload) | **offen — legacy-gated** | `libs/execution_engine/src/result_aggregator.cpp:21-33` compare_against_baseline prüft weiterhin nur succeeded, nicht workload_used (das Feld wird seit V20.2/V20.3 getragen und exportiert, aber nicht als Vergleichsgate genutzt). Konsument = Legacy-Pfad. |
-| REV-DATA-12 (P2, Median-Divergenz) | **offen** | Selector `best_binary_selector.cpp` lower_median (untere Mitte, `vals[(n-1)/2]`) vs. ~~`csv_to_latex.cpp:48-54`~~ **→ `:57-63`** + ~~`diagram_generator.cpp:414-420`~~ ~~`:653-659`~~ ~~`:662-668`~~ **→ `:710`** (beide am 09.08.2026 abends um je **9 Zeilen** gedriftet, ausgeloest vom D5-2-Merge; alte Stellen bleiben als Datum stehen, s. Nachtrag D5-3 unter dieser Tabelle; diagram_generator erneut **+48** durch den F1-Zweig der Welle-2-Landung, nachgezogen 14.08.2026, s. Nachtrag A2.5) nearest_rank_median (obere Mitte, `rank=0.5*(n-1)+0.5`) — Divergenz bei geradem n besteht; im DATA-07-Umbau bewusst NICHT mitgeändert (nicht mandatiert; jetzt aber im Code ehrlich als „REV-DATA-12 offen" annotiert statt der früheren falschen „identisch"-Behauptung). Fix = zentrale Medianfunktion (eigener kleiner Increment). |
+| REV-DATA-12 (P2, Median-Divergenz) | **offen** | Selector `best_binary_selector.cpp` lower_median (untere Mitte, `vals[(n-1)/2]`) vs. ~~`csv_to_latex.cpp:48-54`~~ **→ `:57-63`** + ~~`diagram_generator.cpp:414-420`~~ ~~`:653-659`~~ ~~`:662-668`~~ ~~`:710`~~ **→ `:744`** (beide am 09.08.2026 abends um je **9 Zeilen** gedriftet, ausgeloest vom D5-2-Merge; alte Stellen bleiben als Datum stehen, s. Nachtrag D5-3 unter dieser Tabelle; diagram_generator erneut **+48** durch den F1-Zweig der Welle-2-Landung, nachgezogen 14.08.2026, s. Nachtrag A2.5; diagram_generator erneut **+34** durch den #234-Fix-r1-Zweig `671abbcc`, nachgezogen 17.09.2026, s. Nachtrag 17.09.2026) nearest_rank_median (obere Mitte, `rank=0.5*(n-1)+0.5`) — Divergenz bei geradem n besteht; im DATA-07-Umbau bewusst NICHT mitgeändert (nicht mandatiert; jetzt aber im Code ehrlich als „REV-DATA-12 offen" annotiert statt der früheren falschen „identisch"-Behauptung). Fix = zentrale Medianfunktion (eigener kleiner Increment). |
 | REV-DATA-13 (P2, Welch-Zweitsample/Multiplizität) | **offen — legacy-gated** | `Code/02_messung_driver/main.cpp:458-515`: Welch-Sampling ist ein ZWEITER Lauf, rohe p<0,05 ohne Korrektur — unverändert; liegt vollständig im `COMDARE_LEGACY_MESSREIHEN=1`-Block (:344ff). |
 | REV-DATA-14 (P2, Writer-Teilverlust) | **offen — legacy-gated** | `measurement_writer.hpp:49-66` add() inkrementiert num_records_ ohne per-Write-Statusprüfung; `main.cpp:415` meldet „geschrieben" bei `writer.ok() \|\| count>0`. Liegt im Legacy-Block; der offizielle E4-Pfad schreibt über den ce-Iterator (stream-verifizierter CSV-Write + Stamp-Gate, GOAL-M1.4). |
 
@@ -125,9 +125,44 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 > der ce-Selector rechnet weiterhin lower_median; dessen Fundstelle (Punkt 4 oben: `:183-188`)
 > steht im ce-Lande-Stand `643102fb` auf `best_binary_selector.cpp:196` (Lambda, Aufrufer
 > `:219`/`:221`) -- die alte Stelle bleibt als Datum 09.08.2026 stehen.
+
+> **NACHTRAG 17.09.2026 -- #234-FIX-r1 IM GENERATOR: der diagram_generator-Anker ist ein viertes Mal gewandert.**
+> *(Alles oben bleibt woertlich stehen; dieser Absatz kommt DANEBEN, nicht darueber.)*
+>
+> | Verweis | Ist am 17.09.2026 | Differenz |
+> |---|---|---|
+> | ~~`diagram_generator.cpp:710`~~ | `nearest_rank_median` steht auf **744** | **+34** -- nachgezogen 17.09.2026 |
+> | `csv_to_latex.cpp:57` | `nearest_rank_median` steht auf **57** | **0** -- Anker haelt |
+>
+> Ursache am Objekt: Commit `671abbcc` ("#234 Fix r1", S-1 chktex-Reinheit des Regenerats) fuegt VOR der
+> verankerten using-Zeile in ZWEI Hunks genau 34 Zeilen ein -- nachgemessen an den Hunk-Koepfen des Commits:
+> `@@ -92,6 +92,39 @@` = +33 Zeilen (die Marken-Helfer `kMarkDollar`/`kMarkBTimes`/`kMarkTimes`, `replace_all`
+> und `with_math_marks`; heute Z.95-127) und `@@ -118,7 +151,8 @@` = +1 Zeile (der S-1-Kommentar ueber dem
+> `with_math_marks(escape_latex(note))`-Aufruf). Der dritte Hunk `@@ -153,8 +187,8 @@` ist netto 0 und zaehlt
+> nicht mit. Gegenprobe ueber drei Staende derselben Datei: `d738e80b` (development) 710, `ef68b630` (#234,
+> erster Generator-Commit) 710, `671abbcc` 744 -- der Drift entsteht also genau in `671abbcc`, nicht frueher.
+>
+> `ci/anker_wache.sh` meldete auf dem Bau-Branch `bau/latex-234-generatoren` literal "ROT
+> Code/05_diagram_generator/diagram_generator.cpp:710 traegt 'nearest_rank_median' NICHT -- es steht auf 744.
+> Differenz: 34 Zeilen", rc=1 (1 von 2 Ankern gedriftet); in der CI ist das Pipeline 288/16611, Job
+> docs:anker-wache 392132 (script_failure). Auf `development` (`d738e80b`) ist dieselbe Wache rc=0
+> "2 von 2 Ankern".
+>
+> ABGRENZUNG (nichts wird geloescht): die Tabellenzeile REV-DATA-12 oben fuehrt den diagram_generator-Verweis
+> unveraendert auf `:710` und bleibt als Datum vom 14.08.2026 stehen -- DIESER Nachtrag ist der heutige Stand.
+> Verankert ist weiterhin die using-Zeile `using comdare::da::stats::nearest_rank_median;`; die
+> Schwester-Zeile `csv_to_latex.cpp:57` stimmt unveraendert und wurde nicht angefasst.
+>
+> BERICHTIGUNG 17.09.2026 (Folge-Commit desselben Tages, #234 Fix NL-r1, Lens-Befund S-NL-3 Option (a)):
+> die ABGRENZUNG oben ist damit UEBERHOLT -- die Tabellenzeile REV-DATA-12 wurde in der Form der Praezedenz
+> `16f777be` nachgezogen: `~~:710~~ **-> :744**` plus Klammer-Zusatz "erneut +34 durch den #234-Fix-r1-Zweig
+> 671abbcc". Der Satz "bleibt als Datum vom 14.08.2026 stehen" gilt nur noch fuer die durchgestrichenen
+> Alt-Stellen `:414-420` / `:653-659` / `:662-668` / `:710`; geloescht wurde nichts. Ausnahme-Begruendung:
+> die Zeile traegt 866 Zeichen und Nicht-ASCII, `scripts/ci_diff_ascii_width_guard.sh` nimmt `.md` aber
+> ausdruecklich aus dem Scope (Kommentar-Block der Datei) -- die Wache bleibt davon unberuehrt.
 >
 > ANKER-SYMBOL  Code/04_csv_to_latex/csv_to_latex.cpp  nearest_rank_median  57
-> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  710
+> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  744
 
 ### REV-CI (super)
 
