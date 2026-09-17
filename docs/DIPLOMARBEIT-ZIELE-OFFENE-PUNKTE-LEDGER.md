@@ -26,6 +26,29 @@
 > ist BLAUPAUSE fuer Map-Reduce-Workflows, per Diff gegen diese Vollfassung konsolidiert (KON140); Z.22-23 '3a/3b'
 > UEBERHOLT.]
 
+## KON141 -- 17.09.2026: #203 SOSD-AKTE GELANDET + MAIN-FF CI-GRUEN (G-113 VOLLZOGEN, I-11 PRAEZISIERT)
+
+**KON141-01 G-113 VOLLZOGEN (Owner-GO 07.09. Abschnitt III; Bauer/Lens/Lead 16.-17.09.):** Akte
+  Code/test_data_xml/sosd_books_200M.test_data.xml zeigt jetzt auf books_800M_uint64.zst (source_url dropbox, lokal
+  4094295332 B) mit Downsample d[::4]; Zieldatei Code/tests/fixtures/external/sosd/books_200M_uint64 = 1600000008 B
+  (8-Byte-Count + 200M x uint64 LE), sha256 c71eb78eebb746f0e525e47d3d7e6b097f680c45cf17f1ead1d1f22a8950f939 in der
+  Akte; scripts/fetch_testdata.sh mit Idempotenz-Tor (Groesse + sha256 -> [skip]), Altbestand-Sicherung .alt-<UTC> und
+  Gates vor dem mv (Lens r1 M-1/S-1/S-2/S-4 -> Fixup bb12419c); Lens r2 URTEIL TRAEGT (0 MUSS / 1 SOLL materiell
+  gedeckt / 18 INFO). Landung: Branch bau/sosd-akte-203 aa2e7771 + bb12419c -> Merge --no-ff d738e80b in development
+  (16.09.), Dual-Push 19:26Z, CI 288/16607 dev SUCCESS 36/36; main-FF 17.09. 05:55Z (push origin + github
+  d738e80b...:refs/heads/main, Vorprobe ancestor JA / porcelain 0 / CI running 0), Nachmessung ls-remote 4/4 ==
+  d738e80b, CI 288/16612 main SUCCESS 36/36 Jobs (06:03:14Z, 0 Bridges). sosd bleibt Bestands-Extra (kein
+  Pflicht-Datensatz der Kampagne). Beweisorte 20260916-parallel-234-235-203/203/ + 20260917-resume-40/mainff-203/
+  (vorprobe, push-Logs, nachmessung-4-4, ci-16612-final/jobs). Board #203 completed 17.09.
+
+**KON141-02 I-11 / O-2 PRAEZISIERUNG zur G-113-Zeile ('553-MB-Datei'):** die alte source_url (dataverse DOI
+  10.7910/DVN/JGVF9A/5YTV8K) liefert laut Upstream-Skript learnedsystems/SOSD scripts/download.sh Z.51 den Datensatz
+  books_200M_uint32 (32 Bit je Schluessel); ein 1-Byte-Range-GET (Lens r1 O-2, kein Download) meldet Content-Range
+  0-0/580452341 = 553.6 MiB = das zstd-Archiv dieser uint32-Fassung; sie existierte nie lokal (Bauer B-1). size_bytes
+  stand auf 1600000000 und liess den 8-Byte-Count-Header aus -> korrigiert 1600000008. Loader sosd_uint64 (LE
+  8-Byte-Count + N x uint64 LE) unveraendert; mirror_url zenodo 15240501 gueltig. Landung 16.09. lief zunaechst nur
+  lokal (Merge), Push nach Owner-GO 19:24Z im Leerlauf (R4), main-FF nach Owner-Wort 'morgen' am 17.09.
+
 ## KON140 -- 08.09.2026 18:20-18:26Z: OWNER-WORTE ZUR DICHT-FASSUNG -- (A) BESTAETIGT, RITUAL-FORM VERWORFEN,
   BLAUPAUSE-REGEL, DRIFT-KONSOLIDIERUNG
 
