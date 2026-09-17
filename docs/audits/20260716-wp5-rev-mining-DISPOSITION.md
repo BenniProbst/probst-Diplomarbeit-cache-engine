@@ -125,9 +125,36 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 > der ce-Selector rechnet weiterhin lower_median; dessen Fundstelle (Punkt 4 oben: `:183-188`)
 > steht im ce-Lande-Stand `643102fb` auf `best_binary_selector.cpp:196` (Lambda, Aufrufer
 > `:219`/`:221`) -- die alte Stelle bleibt als Datum 09.08.2026 stehen.
+
+> **NACHTRAG 17.09.2026 -- #234-FIX-r1 IM GENERATOR: der diagram_generator-Anker ist ein viertes Mal gewandert.**
+> *(Alles oben bleibt woertlich stehen; dieser Absatz kommt DANEBEN, nicht darueber.)*
+>
+> | Verweis | Ist am 17.09.2026 | Differenz |
+> |---|---|---|
+> | ~~`diagram_generator.cpp:710`~~ | `nearest_rank_median` steht auf **744** | **+34** -- nachgezogen 17.09.2026 |
+> | `csv_to_latex.cpp:57` | `nearest_rank_median` steht auf **57** | **0** -- Anker haelt |
+>
+> Ursache am Objekt: Commit `671abbcc` ("#234 Fix r1", S-1 chktex-Reinheit des Regenerats) fuegt VOR der
+> verankerten using-Zeile in ZWEI Hunks genau 34 Zeilen ein -- nachgemessen an den Hunk-Koepfen des Commits:
+> `@@ -92,6 +92,39 @@` = +33 Zeilen (die Marken-Helfer `kMarkDollar`/`kMarkBTimes`/`kMarkTimes`, `replace_all`
+> und `with_math_marks`; heute Z.95-127) und `@@ -118,7 +151,8 @@` = +1 Zeile (der S-1-Kommentar ueber dem
+> `with_math_marks(escape_latex(note))`-Aufruf). Der dritte Hunk `@@ -153,8 +187,8 @@` ist netto 0 und zaehlt
+> nicht mit. Gegenprobe ueber drei Staende derselben Datei: `d738e80b` (development) 710, `ef68b630` (#234,
+> erster Generator-Commit) 710, `671abbcc` 744 -- der Drift entsteht also genau in `671abbcc`, nicht frueher.
+>
+> `ci/anker_wache.sh` meldete auf dem Bau-Branch `bau/latex-234-generatoren` literal "ROT
+> Code/05_diagram_generator/diagram_generator.cpp:710 traegt 'nearest_rank_median' NICHT -- es steht auf 744.
+> Differenz: 34 Zeilen", rc=1 (1 von 2 Ankern gedriftet); in der CI ist das Pipeline 288/16611, Job
+> docs:anker-wache 392132 (script_failure). Auf `development` (`d738e80b`) ist dieselbe Wache rc=0
+> "2 von 2 Ankern".
+>
+> ABGRENZUNG (nichts wird geloescht): die Tabellenzeile REV-DATA-12 oben fuehrt den diagram_generator-Verweis
+> unveraendert auf `:710` und bleibt als Datum vom 14.08.2026 stehen -- DIESER Nachtrag ist der heutige Stand.
+> Verankert ist weiterhin die using-Zeile `using comdare::da::stats::nearest_rank_median;`; die
+> Schwester-Zeile `csv_to_latex.cpp:57` stimmt unveraendert und wurde nicht angefasst.
 >
 > ANKER-SYMBOL  Code/04_csv_to_latex/csv_to_latex.cpp  nearest_rank_median  57
-> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  710
+> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  744
 
 ### REV-CI (super)
 
