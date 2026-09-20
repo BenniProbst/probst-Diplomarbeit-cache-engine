@@ -1,0 +1,133 @@
+variant,repetition,paired_median_percent,pairs,axis,metric,context
+node16,0,-9.523809523809524,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node16,1,-8.22072072072072,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node16,2,-7.8947368421052655,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node256,0,3.703703703703698,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node256,1,3.703703703703698,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node256,2,3.7749287749287763,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node4,0,0.0,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node4,1,0.0,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node4,2,0.0,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node48,0,-3.4482758620689613,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node48,1,-3.703703703703709,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+node48,2,-3.731551099972158,480,node_type,op_lookup_p50_ns,YCSB-C lookup p50
+memory_layout_aos_strict,0,0.0,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aos_strict,1,0.0,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aos_strict,2,0.0,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aosoa,0,8.778938705014717,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aosoa,1,8.49343308572431,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aosoa,2,11.373079489450832,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_cache_line_aligned,0,7.888193951064382,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_cache_line_aligned,1,8.281896446478543,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_cache_line_aligned,2,8.97579204754232,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_packed_bitmap,0,-3.019221276990475,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_packed_bitmap,1,-2.78933688139702,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_packed_bitmap,2,-1.3532510379172635,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_soa,0,10.02322625451687,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_soa,1,8.977985187255399,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_soa,2,13.058922778825,768,memory_layout,ns_per_op,YCSB A/C
+memory_layout_aos_strict,0,0.0,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aos_strict,1,0.0,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aos_strict,2,0.0,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aosoa,0,-0.6153196985332177,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aosoa,1,-1.2181780157163202,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aosoa,2,0.9934875785184372,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_cache_line_aligned,0,-1.3552679330408213,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_cache_line_aligned,1,0.17003353873714655,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_cache_line_aligned,2,-0.6337320028276416,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_packed_bitmap,0,-4.131849384991648,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_packed_bitmap,1,-3.6303026875143862,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_packed_bitmap,2,-1.7172050604595368,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_soa,0,-1.5682415940356131,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_soa,1,-1.5386919481403527,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_soa,2,-0.42733136253206294,384,memory_layout,ns_per_op,ycsb_c
+memory_layout_aos_strict,0,0.0,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aos_strict,1,0.0,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aos_strict,2,0.0,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aosoa,0,22.120017093981325,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aosoa,1,23.644157417585568,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aosoa,2,24.74841372922681,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_cache_line_aligned,0,20.681655537126197,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_cache_line_aligned,1,22.815334821675812,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_cache_line_aligned,2,24.073065980019337,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_packed_bitmap,0,-2.102876089924405,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_packed_bitmap,1,-1.6635486112429543,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_packed_bitmap,2,-1.1997499931443834,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_soa,0,24.835990202744696,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_soa,1,27.893219187025444,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_soa,2,28.407056106495844,384,memory_layout,ns_per_op,ycsb_a
+memory_layout_aos_strict,0,0.0,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_aos_strict,1,0.0,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_aos_strict,2,0.0,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_aosoa,0,6.027345814104934,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_aosoa,1,7.258035385389238,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_aosoa,2,7.3752347555559705,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_cache_line_aligned,0,6.0070980826421705,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_cache_line_aligned,1,7.20837912135509,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_cache_line_aligned,2,7.0256318494709475,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_packed_bitmap,0,-2.023323483505096,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_packed_bitmap,1,-2.268984181125849,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_packed_bitmap,2,-2.3518344530371382,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_soa,0,8.349067044728177,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_soa,1,8.023032658543539,384,memory_layout,ns_per_op,ycsb_f
+memory_layout_soa,2,8.764571048040326,384,memory_layout,ns_per_op,ycsb_f
+eytzinger,0,-56.83494481177173,480,search_algo,ns_per_op,ycsb_c
+eytzinger,1,-56.79601517549919,480,search_algo,ns_per_op,ycsb_c
+eytzinger,2,-56.69040929391049,480,search_algo,ns_per_op,ycsb_c
+interpolation,0,-66.19100560608592,480,search_algo,ns_per_op,ycsb_c
+interpolation,1,-65.77583432838767,480,search_algo,ns_per_op,ycsb_c
+interpolation,2,-65.99538464709673,480,search_algo,ns_per_op,ycsb_c
+k_ary,0,-75.14493171400133,480,search_algo,ns_per_op,ycsb_c
+k_ary,1,-75.58029940364821,480,search_algo,ns_per_op,ycsb_c
+k_ary,2,-75.20128882439704,480,search_algo,ns_per_op,ycsb_c
+linear_scan,0,0.0,480,search_algo,ns_per_op,ycsb_c
+linear_scan,1,0.0,480,search_algo,ns_per_op,ycsb_c
+linear_scan,2,0.0,480,search_algo,ns_per_op,ycsb_c
+eytzinger,0,260.43064133664853,480,search_algo,ns_per_op,ycsb_a
+eytzinger,1,261.3840078576401,480,search_algo,ns_per_op,ycsb_a
+eytzinger,2,261.38207993742844,480,search_algo,ns_per_op,ycsb_a
+interpolation,0,215.95860498868515,480,search_algo,ns_per_op,ycsb_a
+interpolation,1,202.29413150859938,480,search_algo,ns_per_op,ycsb_a
+interpolation,2,207.54681115869857,480,search_algo,ns_per_op,ycsb_a
+k_ary,0,94.49922336164035,480,search_algo,ns_per_op,ycsb_a
+k_ary,1,95.83975666593722,480,search_algo,ns_per_op,ycsb_a
+k_ary,2,96.27794690629958,480,search_algo,ns_per_op,ycsb_a
+linear_scan,0,0.0,480,search_algo,ns_per_op,ycsb_a
+linear_scan,1,0.0,480,search_algo,ns_per_op,ycsb_a
+linear_scan,2,0.0,480,search_algo,ns_per_op,ycsb_a
+eytzinger,0,-61.53216941787717,480,search_algo,ns_per_op,ycsb_f
+eytzinger,1,-61.65300010846507,480,search_algo,ns_per_op,ycsb_f
+eytzinger,2,-61.11346380578908,480,search_algo,ns_per_op,ycsb_f
+interpolation,0,-69.6624161328846,480,search_algo,ns_per_op,ycsb_f
+interpolation,1,-69.58080885081515,480,search_algo,ns_per_op,ycsb_f
+interpolation,2,-70.46060941150333,480,search_algo,ns_per_op,ycsb_f
+k_ary,0,-77.91321209229326,480,search_algo,ns_per_op,ycsb_f
+k_ary,1,-78.15116747118083,480,search_algo,ns_per_op,ycsb_f
+k_ary,2,-77.84289472558133,480,search_algo,ns_per_op,ycsb_f
+linear_scan,0,0.0,480,search_algo,ns_per_op,ycsb_f
+linear_scan,1,0.0,480,search_algo,ns_per_op,ycsb_f
+linear_scan,2,0.0,480,search_algo,ns_per_op,ycsb_f
+eytzinger,0,-58.38190950251611,480,search_algo,ns_per_op,coco_p04_neg100
+eytzinger,1,-57.40258542125522,480,search_algo,ns_per_op,coco_p04_neg100
+eytzinger,2,-58.32862783717946,480,search_algo,ns_per_op,coco_p04_neg100
+interpolation,0,-67.30778512830776,480,search_algo,ns_per_op,coco_p04_neg100
+interpolation,1,-67.15576894944229,480,search_algo,ns_per_op,coco_p04_neg100
+interpolation,2,-67.56299543395289,480,search_algo,ns_per_op,coco_p04_neg100
+k_ary,0,-76.709546062969,480,search_algo,ns_per_op,coco_p04_neg100
+k_ary,1,-76.25877918555665,480,search_algo,ns_per_op,coco_p04_neg100
+k_ary,2,-76.55956126704089,480,search_algo,ns_per_op,coco_p04_neg100
+linear_scan,0,0.0,480,search_algo,ns_per_op,coco_p04_neg100
+linear_scan,1,0.0,480,search_algo,ns_per_op,coco_p04_neg100
+linear_scan,2,0.0,480,search_algo,ns_per_op,coco_p04_neg100
+prefetch_distance_estimator,0,0.5094381109393975,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_distance_estimator,1,0.44166641863696565,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_distance_estimator,2,0.805642783250704,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_hardware,0,-0.2372726224563193,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_hardware,1,0.14709003476580662,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_hardware,2,-0.1780789252406545,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_none,0,0.0,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_none,1,0.0,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_none,2,0.0,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_path_oriented,0,0.7864776361751313,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_path_oriented,1,0.8318957989504105,9120,prefetch,ns_per_op,all eligible workloads
+prefetch_path_oriented,2,0.7593278486992983,9120,prefetch,ns_per_op,all eligible workloads
