@@ -24,6 +24,18 @@
 
 ## §2 Pro-Termin Office-Dokumente (.docx/.pptx)
 
+
+### Vorlauf Expose (2026-03-09 bis 2026-03-29) -- NACHTRAG 2026-09-20 (Owner-Order 289, Hauptebene aufgeraeumt)
+Verzeichnis `20260309 Vorlauf Expose/` (per git mv aus der Repo-Wurzel, Historie erhalten; Liste = §3):
+- `20260309 Expose_Diplomarbeit_suchnahe_Operatoren_Habich_v2.docx`
+- `20260312 Expose_Diplomarbeit_suchnahe_Operatoren_Habich_final.docx`
+- `20260321 Expose_Diplomarbeit_PRT_ART_CPU_only_Habich.docx`
+- `20260321 Expose_Diplomarbeit_PRT_ART_CPU_only_Habich_v2.docx`
+- `20260321 PRT_ART_Technische_Skizze_Habich.docx`
+- `20260323 Literatur_und_Arbeitsplanung_PRT_ART_Termin1_final.docx`
+- `20260328 PRT_ART_Technische_Skizze_Habich_termin1_geschaerft.docx`
+- `20260329 PRT_ART_Technische_Skizze_Habich_termin1_redirect_ergaenzt.docx`
+
 ### Termin 1 (2026-03-30)
 - `20260326 Expose_Diplomarbeit_PRT_ART_CPU_only_Habich_HOT_cacheline_final.docx`
 - `20260330 Literatur_und_Arbeitsplanung_PRT_ART_Termin1_START_CoCo_sort_compact.docx`
@@ -93,6 +105,12 @@ Diese Vorbereitungs-Doks bleiben aus historischen Gruenden im Top-Level
 (Diplomarbeit-Datenbanken Wurzel) und sind nicht in `docs/termine/`
 verschoben worden.
 
+NACHTRAG 2026-09-20 (Owner-Order 289 20.09.2026 21:18Z, Lead 5a19728e): der Absatz oben ist UEBERHOLT -- die acht
+Dateien liegen seit diesem Commit in `docs/termine/20260309 Vorlauf Expose/` (git mv, Dateinamen unveraendert,
+Historie per `git log --follow` erhalten). Die Verteidigungs-Praesentation (pptx + 3 docx + pilot_paired_effects.csv,
+Owner-Commits db2c771a/1cdefb89 vom 19./20.09.) liegt in `docs/presentation/` (Analyse dort:
+`20260920-ANALYSE-VORTRAG-DEFENSE-EN.md`). In der Repo-Wurzel verbleiben nur noch die Anmeldungs-/E-Mail-PDFs (§4).
+
 ---
 
 ## §4 Anmeldung
@@ -154,6 +172,7 @@ Master-Plan: `../MASTERPLAN_KONSOLIDIERUNG_TERMINE.md` (10 Phasen K-A bis K-J)
 
 Bewusst NICHT in docs/termine/ verschoben (gem. K-B.1 Audit):
 - Top-Level-Vor-Termin-Exposes (siehe §3) — historischer Kontext, bleibt in Wurzel
+  [NACHTRAG 2026-09-20: UEBERHOLT durch Owner-Order 289 -- jetzt `docs/termine/20260309 Vorlauf Expose/`, s. §3]
 - Anmeldung-PDFs (siehe §4) — Verwaltungs-Doku, bleibt in Wurzel
 - `STRUCTURAL_CORRECTION_*.md` und `FINDINGS_REV7_6_*.md` (Top-Level je Repo) — Master-Direktiven
 - `thesis/` Verzeichnis (Manuskript) — Eigene Domain
@@ -172,3 +191,4 @@ Memory-Direktive "niemals Doku loeschen" wird beachtet.
 | 2026-05-15 | Termine nach `docs/termine/` verschoben + INDEX refresh (K-B.1) | Master-Plan-Konsolidierung |
 | 2026-05-15 | Termin 8 ergaenzt | K-A Termin-8-Trio |
 | 2026-05-15 | Tag-Liste pro Termin ergaenzt (§7) | K-B.2 |
+| 2026-09-20 | Vorlauf-Exposes aus der Wurzel nach `20260309 Vorlauf Expose/` (git mv) + `docs/presentation/` angelegt (§2/§3/§8 Nachtraege) | Owner-Order 289 (Hauptebene aufraeumen) |
