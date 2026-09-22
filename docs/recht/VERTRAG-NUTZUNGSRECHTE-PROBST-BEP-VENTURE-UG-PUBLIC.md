@@ -1,5 +1,6 @@
 <!-- ASCII-Transliteration der oeffentlichen Fassung (ae/oe/ue/ss, par. = Paragraf-Zeichen), Zeilen <= 120 Zeichen.
-     Massgeblich ist die PDF-Datei VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC.pdf in diesem Ordner (Stand 22.09.2026).
+     Massgeblich ist die PDF-Datei VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC.pdf
+     in diesem Ordner (Stand 22.09.2026).
      Die Signaturfassung (mit Geburtsdatum, Wohnort und Geschaeftsanschrift) liegt NICHT in diesem Repositorium; die
      Registerdaten der Gesellschaft (Sitz, Registergericht, HRB-Nummer) sind oeffentlich und stehen in beiden
      Fassungen. -->

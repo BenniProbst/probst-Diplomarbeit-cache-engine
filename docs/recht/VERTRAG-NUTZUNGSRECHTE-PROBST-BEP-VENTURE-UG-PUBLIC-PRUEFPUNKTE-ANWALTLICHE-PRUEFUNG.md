@@ -1,6 +1,7 @@
 <!-- ASCII-Transliteration der Hinweise fuer die anwaltliche Pruefung (ae/oe/ue/ss, par. = Paragraf-Zeichen),
      Zeilen <= 120 Zeichen. Nicht massgeblich; massgeblich ist die PDF-Datei
-     VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC-PRUEFPUNKTE-ANWALTLICHE-PRUEFUNG.pdf in diesem Ordner (Stand 22.09.2026).
+     VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-PUBLIC-PRUEFPUNKTE-ANWALTLICHE-PRUEFUNG.pdf
+     in diesem Ordner (Stand 22.09.2026).
      Nicht Vertragsbestandteil, wird nicht unterzeichnet, enthaelt keine personenbezogenen Daten. -->
 
 # Hinweise fuer die anwaltliche Pruefung -- nicht Vertragsbestandteil
