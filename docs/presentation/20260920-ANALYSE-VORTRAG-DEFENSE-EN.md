@@ -13,10 +13,10 @@ der Thesis-Endlandung.
 
 | Datei (docs/presentation/) | Umfang | Rolle |
 |---|---|---|
-| 20260919 Cache_Engine_Defense_EN_Habich_Composition.pptx | 23 Folien = 15 Hauptroute + 8 Backup B1-B8 | Vortrag |
+| 20260919 Cache_Engine_Defense_EN-cache-awareness_Composition.pptx | 23 Folien = 15 Hauptroute + 8 Backup | Vortrag |
 | Cache_Engine_Speaker_Guide_EN_Composition.docx | 15 Folien: Zeitfenster, Sprechtext, Quellappendix | Redeskript |
 | Cache_Engine_Defense_Summary_EN.docx | 1 Seite: Forschungsfrage, Beitrag, Reproduzierbarkeit, Grenzen | Handout |
-| Cache_Engine_Defense_Review_and_QA_EN.docx | Evidenz-Review, 11 Pruefer-Fragen, Gates, Quellindex R1-R18 | Review |
+| Cache_Engine_Defense_Review_and_QA_EN.docx | Evidenz-Review, 12 Pruefer-Fragen, Gates, Quellindex R1-R18 | Review |
 | pilot_paired_effects.csv | 133 Zeilen: gepaarte Effekte des Pilots 18.06.2026 (3 Wiederholungen) | Folien 12-14 |
 
 Quellstand des Decks (Speaker-Guide-Appendix + Review Tabelle 1): Thesis development 56a8fe08 (Lesung ueber den GitHub-
@@ -51,8 +51,10 @@ Untergrenze und 60 s Reserve bis zur harten Obergrenze. Die drei Ergebnisfolien 
 und sind das Ueberzieh-Risiko (drei Sprechtexte mit je fuenf Absaetzen).
 Befund Z-2: Deck und Speaker Guide planen "approximately 6 minutes for questions"; Owner-Rahmen = 5 Minuten. Der
 Fragenteil ist keine Redezeit; die Zahl 6 ist im Deck/Guide nachzuziehen (Abgleichspunkt A-01).
-Befund Z-3: Zwoelf native Klick-Animationen auf den Folien 4-8; die PDF-Fassung zeigt Endzustaende. Die Probe der
-Klickfolge gehoert in die Rehearsal-Gates (Review Abschn. 6), nicht in diese Analyse.
+Befund Z-3: Acht native Klick-Animationen (clickEffect im Roh-XML: je zwei auf den Folien 5, 6, 8 und 9; Messung am
+Original-Deck 22.09.2026, md5 43f805b8; KORREKTUR V-8-02 der Tiefenanalyse 353, hier stand "Zwoelf ... Folien 4-8");
+die PDF-Fassung zeigt Endzustaende. Die Probe der Klickfolge gehoert in die Rehearsal-Gates (Review Abschn. 6), nicht
+in diese Analyse.
 Empfehlung (erst im Abgleichs-Zug): Sollzeit 19:20-19:40 mit benannter Kuerzungsreserve je Ergebnisfolie (z. B. der
 letzte Absatz von 12/13/14 als optional markiert), damit 19:00 nicht unterschritten und 20:00 nicht ueberschritten wird.
 
@@ -134,10 +136,13 @@ ausgeschlossen) wurden bei der Volllesung (K238, LQ 55.466wm) gegen die CSV gele
 Abgleichs-Zug wiederholt die Nachrechnung maschinell (A-14), weil die Panels 12-14 spaeter durch Kampagnendaten
 ersetzt werden und dieselbe Rechnung dann am neuen Datensatz laufen muss (Review Abschn. 3, Replacement Gate:
 CSV/XLSX + Commits + Profil + Hardware/ISA + Datensatz-Checksummen + Ausschlusskriterien + Validitaetsbeleg).
+NACHTRAG V-8-04 (22.09.2026): 480 gepaarte Kontexte gelten fuer die Achsen node_type und search_algo; Folie 14
+(memory_layout) nutzt 384 gepaarte Kontexte je Lauf/Workload/Variante; hier fehlte die 384. CSV-Messung 22.09. je
+Achse (Spalte pairs): node_type 480, search_algo 480, memory_layout 384 und 768, prefetch 9120 (132 Datenzeilen).
 
 ## 8 Q&A-Katalog (Review Abschn. 4/5) -- Deckung und Ergaenzungskandidaten
 
-Vorhanden (11 Fragen): Neuheit gegen OpenTuner/SPIRAL; Separation != Unabhaengigkeit; "active" bei statischer
+Vorhanden (12 Fragen): Neuheit gegen OpenTuner/SPIRAL; Separation != Unabhaengigkeit; "active" bei statischer
 Kompilation; PRT-ART-Rolle; 34 Profile != Originaltreue; ganze Indizes vs Komponenten; Cache-Kontrolle; Beweiskraft der
 Pilotplots; Mediane je Wiederholung; Noise-Winner-Vermeidung; Hybrid-Runtime (MaxDocks == 1); ABI-Stabilitaet.
 Ergaenzungskandidaten aus dem Thesis-Stand (nach Endlandung zu formulieren, nicht jetzt): (Q-a) Was ist die Organ-
@@ -172,3 +177,15 @@ K-6 Review-Vermerk B5: Betreuer deprioritisierte Overleaf/PDF-Automation gegenue
     der PDF-Writeback (Order 288) bleibt Werkzeug fuer den Abgabeweg, nicht Vortragsstoff.
 K-7 Review-Regel "Do not spend main-talk time on repository churn, credential incidents or agent workflow logs" wird
     fuer alle Vortragsvorlagen uebernommen.
+
+## 11 Nachtrag 22.09.2026 (Order 404 + Korrekturen V-8-02/03/04 der Tiefenanalyse 353)
+
+Owner-Order 404 (22.09.2026 13:53Z): der Deck-Dateiname traegt "-cache-awareness" statt des Betreuer-Segments; die
+"Composition"-Fassungen von Deck und Speaker Guide waren die korrekte Vorlage der Ueberarbeitung. Vollzug: git mv des
+Originals auf "20260919 Cache_Engine_Defense_EN-cache-awareness_Composition.pptx" (Inhalt unveraendert, md5 43f805b8);
+Abschn. 1 nachgezogen. Die ueberarbeiteten Abgabe-Kopien (Suffix -396, Zug Order 353/396 mit Diff-Protokoll) liegen
+ausserhalb des Repos im Abgabe-Paket; die Landung im Repo folgt nach Lens und Owner-Sicht (Order 353 (2)).
+Korrekturen dieser Analyse nach der Tiefenanalyse 353 (Beweisort 20260920-order-289-praesentation/): V-8-02 acht
+Klicks auf den Folien 5/6/8/9 statt zwoelf auf 4-8 (Abschn. 2, Z-3); V-8-03 zwoelf Pruefer-Fragen statt elf (Abschn. 1
+und 8; die Liste in Abschn. 8 zaehlte bereits zwoelf Eintraege); V-8-04 384 gepaarte Kontexte der Folie 14 ergaenzt
+(Abschn. 7). Stand der Zeilenanker: Momentaufnahme dieses Nachtrags.
