@@ -1107,21 +1107,21 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
              "L1, L3 (last-level) and dTLB misses for real via \\texttt{perf\\_event\\_open}(2) (kernel "
              "syscall, no vendor library, no PAPI required --- PAPI remains an optional secondary path). L2 "
              "and coherence invalidations have no portable generic counter; they are collected model-bound "
-             "via the RAW event catalog (\\texttt{pmc\\_raw\\_event\\_katalog.hpp}; Zen 5, family 26: "
+             "via the RAW event catalogue (\\texttt{pmc\\_raw\\_event\\_katalog.hpp}; Zen 5, family 26: "
              "\\texttt{l2\\_cache\\_req\\_stat.ic\\_dc\\_miss\\_in\\_l2} = \\texttt{PERF\\_TYPE\\_RAW} "
              "0x964 = demand IC+DC misses in L2 without L2 prefetch; "
              "\\texttt{ls\\_dmnd\\_fills\\_from\\_sys.remote\\_cache} = \\texttt{PERF\\_TYPE\\_RAW} 0x1443 "
              "= demand fills from the cache of another CCX, the core-PMU coherence observable --- a literal "
-             "invalidation counter does not exist in the amdzen5 set); models without a catalog entry "
+             "invalidation counter does not exist in the amdzen5 set); models without a catalogue entry "
              "honestly report n/a (per-field flag), never a guessed encoding. L3 can additionally fail to "
              "open on individual AMD platforms; energy runs best-effort via RAPL sysfs and stays empty "
              "without read access to the zone. The Intel PCM Windows driver is still pending for the "
-             "Windows lane (\\#26/P4). On models without a catalog entry (today only Zen 5 carries one) the "
+             "Windows lane (\\#26/P4). On models without a catalogue entry (today only Zen 5 carries one) the "
              "L2/coherence gap remains observable only indirectly via the wall-clock proxy "
              "(seg\\_memory\\_layout\\_ns/ns\\_per\\_op).",
              // S-1 (2026-09-16): wie in der DE-Fassung -- 0x964/0x1443 sind Hex-Literale, chktex W29
              // liest das "x" zwischen Ziffern als Malzeichen. Inline-Ausnahme nach Dokument-Konvention.
-             "% chktex 29 (hex literals of the RAW event catalog -- not a multiplication sign)"});
+             "% chktex 29 (hex literals of the RAW event catalogue -- not a multiplication sign)"});
         rows.push_back(
             {"14 pinned axes = 0 exchangeability evidence",
              "Only 4 of the 18 composition axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). "
@@ -1154,7 +1154,7 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
         // #226 (2026-06-28): #211 container_ mirror rebuild — present in cowfix-v1 (path B), unresolved as of M3.
         rows.push_back(
             {"container\\_ mirror (path B): O(n) flatten+rebuild as extra apparatus",
-             "Path-B creatures (SOTA trees/tries/hash) keep a sorted container\\_ mirror alongside the real search "
+             "Path-B living beings (SOTA trees/tries/hash) keep a sorted container\\_ mirror alongside the real search "
              "organ; its O(n) flatten+rebuild (on new inserts + successful erases; \\#211, unresolved as of M3) is "
              "EXTRA apparatus work the real tree does not incur $\\to$ the measured ns\\_per\\_op of path-B tiers is "
              "inflated by this mirror share. (For the path-A array family the same O(n) rebuild is the GENUINE "
