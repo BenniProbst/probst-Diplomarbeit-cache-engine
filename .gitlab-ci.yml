@@ -1738,7 +1738,20 @@ thesis:pdf:
     - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (P1c)"; exit 1; }'
     - cd thesis/diplomarbeit
     - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head'
-    - 'main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"; test -n "$main" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main"'
+    # REV (Order 389/390, 22.09.2026): vier Fassungen de/en x lang/kurz wie in der Thesis-CI (REV 4) und reproduzierbare
+    # PDF-Bytes (SOURCE_DATE_EPOCH = Submodul-Commit-Zeit) -- Eingang fuer thesis:pdf-export (docs/diplomarbeit/).
+    - |
+      export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct 2>/dev/null || echo 0) FORCE_SOURCE_DATE=1
+      echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+      main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"
+      test -n "$main" || { echo "FEHLER: kein documentclass in thesis/diplomarbeit/*.tex"; exit 1; }
+      for L in de en; do for U in lang kurz; do
+        echo "== Fassung $L-$U =="
+        latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=diplomarbeit-$L-$U \
+          -usepretex="\def\thesislang{$L}\def\thesisumfang{$U}" "$main" || exit 1
+        test -s diplomarbeit-$L-$U.pdf || { echo "FEHLER: diplomarbeit-$L-$U.pdf fehlt"; exit 1; }
+      done; done
+      ls -la diplomarbeit-*-*.pdf
   artifacts:
     paths:
       - thesis/diplomarbeit/*.pdf
@@ -2982,3 +2995,32 @@ ergebnis:holen:
       else
         echo "measure_out/ (noch) nicht vorhanden -> Skelett-Lauf, kein Sammeln (golden-neutral)."
       fi
+
+# ---------------------------------------------------------------------------------------------------------------------
+# thesis:pdf-export (Owner-Orders 389 + 390, 22.09.2026): die vier Thesis-Fassungen des super-eigenen Baus (thesis:pdf)
+# werden als Folge-Commit nach docs/diplomarbeit/ geschrieben (Order 390: docs/diplomarbeit statt docs/thesis, weil das
+# Thesis-Submodul unter thesis/ liegt). Nur auf development (Order 340 A-01 (c): eigener Branch, main folgt per FF);
+# Bot-Pushes loesen nie eine Pipeline aus ([skip ci] + -o ci.skip + Login-Wache). Uebersteuerung per Env-Vertrag
+# (Order 340 A-04 (a)): COMDARE_THESIS_PDF_EXPORT=false (inert), COMDARE_THESIS_PDF_DIR, COMDARE_THESIS_PDF_FASSUNGEN,
+# COMDARE_THESIS_PDF_SRC. Skript ci/thesis_pdf_export.sh (Biss-Test lokal gegen ein Bare-Repo, K270).
+thesis:pdf-export:
+  stage: persist
+  tags: [baremetal]
+  before_script: []                 # wie anhang:forward: kein manueller Cross-Projekt-Klon
+  cache:
+    paths: []                       # reines Kopieren + Commit, kein Compile
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "0"                  # voller Klon: Folge-Commit haengt an HEAD, Merge bei Ablehnung braucht die Basis
+    GIT_SUBMODULE_STRATEGY: none    # die PDFs kommen als Artefakt von thesis:pdf
+  needs:
+    - job: "thesis:pdf"
+      artifacts: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    - if: '$COMDARE_TEXLIVE_AVAILABLE != "true"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "development"'
+  script:
+    - 'sh ci/thesis_pdf_export.sh'
