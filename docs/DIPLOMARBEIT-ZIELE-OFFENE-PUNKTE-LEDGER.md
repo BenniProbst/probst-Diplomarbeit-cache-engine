@@ -26,6 +26,25 @@
 > ist BLAUPAUSE fuer Map-Reduce-Workflows, per Diff gegen diese Vollfassung konsolidiert (KON140); Z.22-23 '3a/3b'
 > UEBERHOLT.]
 
+## KON142 -- 22.09.2026: NUTZUNGSRECHTE-VERTRAG SIGNIERT (Order 388) + ENDSTAND r3/r3b IN docs/recht + NAS-ABLAGE
+
+**KON142-01 SIGNATUR (Owner 22.09. 09:44:02Z Z.232278 verbatim: "Ich habe die SIGNIERT Fassung des Vertrages dort
+  abgelegt."):** signierte Fassung im Vertragsordner auf backup1 ('20260911 cache-engine Signatur', NAS = Hauptbackup),
+  370862 B, md5 e16b0c6f, sha256 943742232c499a27 (voll im Signatur-Vermerk); Beweiskopie 0600 unter
+  ~/backups-workflow/20260922-order-362-vertrag-final/signatur/ (nie im Repo: Personendaten). Technische Probe ohne
+  Sicht: 1 zertifizierende Signatur (Adobe.PPKLite, DocMDP, Feld ES_CERTIFYING_SIGNATURE), 9 Seiten = 8 Seiten der
+  r3-Fassung + 1 angehaengte Audit-Seite; Text je Seite identisch mit der unsignierten r3-Fassung (md5 e2b46e7f) auf
+  7 von 8 Seiten, Seite 6 = ausgefuellter Unterschriftenblock. Signatur-Vermerk ohne Personendaten:
+  docs/recht/VERTRAG-NUTZUNGSRECHTE-PROBST-BEP-VENTURE-UG-SIGNATUR-VERMERK-20260922.md.
+**KON142-02 ENDSTAND r3/r3b (Orders 362/364):** docs/recht traegt die oeffentliche Fassung + Pruefpunkte-Beilage
+  (Commits 6c287836 + 75d54121; PUBLIC.pdf md5 b85da8cc, Pruefpunkte-PDF fa06cc95; Lens r3 TRAEGT 0 MUSS/0 SOLL/4
+  INFO; Beweisort 20260922-order-362-vertrag-final/). Repo-Dateinamen unveraendert (Namensfrage O-1 = Owner).
+**KON142-03 FOLGEPFLICHT (S-2 Fix B, 'Pflicht NACH Vertragsschluss'):** NOTICE/REUSE.toml in den 4 Repos (ce, prt-art,
+  super, thesis) + Anlage-1-SHAs nachziehen = eigener Zug nach der Abgabe-Kette (EN-Landung -> Kurzfassung -> Vortrag ->
+  Abgabe, Order 352); Traeger Board #179/#143.
+**KON142-04 NAS-ABLAGE + RECHTE (Orders 360/386):** Ablage 09:01Z additiv (7 Dateien), Ordnerrechte 09:2xZ auf
+  admin:share 777 wie die Nachbarordner nachgezogen (Ursache tar-'./'-Eintrag als root; Arbeitsfehler K107, Gegenmittel
+  69); Akte 20260922-order-360-vertrag-nas/VOLLZUG-NAS-ABLAGE-362-20260922.md.
 ## KON141 -- 17.09.2026: #203 SOSD-AKTE GELANDET + MAIN-FF CI-GRUEN (G-113 VOLLZOGEN, I-11 PRAEZISIERT)
 
 **KON141-01 G-113 VOLLZOGEN (Owner-GO 07.09. Abschnitt III; Bauer/Lens/Lead 16.-17.09.):** Akte
