@@ -233,7 +233,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = eb69abc190b3cc80922d5e7ec6e388aaad443b49
+PZW-CE-SHA         = ac5aa122e7650d4a641c68e3b4b24ae5d4d0a59c
 PZW-SCHEMA-STELLEN = 45
 PZW-SCHEMA-DATEIEN = 24
 PZW-SCHEMA-LITERAL = 2
@@ -253,6 +253,30 @@ PZW-CI-ALTMUSTER   = 0
 [PROSA-NACHTRAG 25.08.2026 (A2.5-FIX-R1, Di-25-docs-Anteil 'UEBERHOLT-MARKER-Prosa', L3-Restposten 2): der Klammer-Zusatz 'Lead-Merge b3dc3e93 lokal fertig/ungepusht' im UEBERHOLT-MARKER oben ist seit der o2-Standard-Landung UEBERHOLT -- b3dc3e93 (Merge bau/o2-standard, 23.08. 21:11Z) ist Vorfahr von ce development und beidseitig gepusht (Kette bis 943c70ee, CI 286 Pipeline 16150 @ 943c70ee SUCCESS; Floor-Anker LIVE 545/541/539, KON123-01). Der Marker-Kern (Ankertafel = PZW-Schema-Stellen, NICHT der Floor-Anker) gilt unveraendert. Additiv, nichts umgeschrieben; Beleg ~/backups-workflow/20260824-rest-landung/a25-fix-r1/ (Ancestry-Probe git merge-base --is-ancestor b3dc3e93 development = JA).]
 
 [LANDE-STAND-NACHTRAG 24.08.2026 spaet (Rest-Landung L2): Zweig bau/wellenplan-offene-punkte @ dec105ae per --no-ff harmonisiert in development gelandet -- obiger UEBERHOLT-MARKER (Zweig-Fassung) und der NACHZUG 24.08. darunter (development-Fassung) leben beide, EINE Fassung mit beiden Absichten; Zahlen-Nachzug der Ankertafel nach der ce-Landung = eigener Di-25-docs-Zug.]
+
+> NACHZUG 23.09.2026 nachts (super-Gitlink-Bump P-09 Teil 1: OV-2-Landung Order 206 / Board #248 PLUS Vortrags-Profil-
+> Landung Orders 400/403/432 / Board #284, ce eb69abc1 -> `ac5aa122` -- Zwischenstaende dieses einen ATOMAREN Commits:
+> Vorstufe c36997df (nur Gitlink 7d6a4909), amend 37eb0c30 (Gitlink 7d6a4909 + Nachzug, nie gepusht), amend auf ac5aa122
+> = dieser Commit, EINE super-Pipeline statt zwei; Drift-Biss der Wache am Vorstufen-Stand rc=2 "Plan=eb69abc1...
+> Gitlink=7d6a4909..." belegt (pzw-drift-biss-7d6a4909.log) und erneut am 7d6a4909-Plan gegen den Gitlink ac5aa122 rc=2
+> belegt (pzw-drift-biss-ac5aa122.log); Heilung = dieser Nachzug im ATOMAREN Commit (Gitlink + Designplan); WIE GEMESSEN
+> mit den Formeln der Wache selbst ueber eine COMDARE_PLAN-Kopie mit dem neuen SHA): SCHEMA-STELLEN unveraendert **45**,
+> SCHEMA-DATEIEN unveraendert **24**, LITERAL/AUFRUFE/ALTMUSTER unveraendert 2/2/0 -- die gelandete Kette
+> eb69abc1..ac5aa122 (56 Commits inkl. 3 Lande-Merges: 7d6a4909 OV-2, f01cd18b Profil-Vorstufe, ac5aa122 Profil in
+> development; git diff --stat 6 Dateien +6841/-292: libs/cache_engine/algorithm_profiles/
+> thesis_profiles/vortrag_pilot_320.profile.xml (+120, das Vortrags-Profil, Orders 400/432),
+> scripts/ci_test_registrierungs_allowlist.txt, scripts/ci_test_registrierungs_wache.sh,
+> tests/deprecated/prt_art_legacy_waisen/VERMERK.md, tests/unit/test_mt_l4_registrierungs_wache_isa.cpp,
+> tests/unit/test_pa1_tote_ausnahme.cpp; tests/*.cpp 2, lazy_csv_header 0) beruehrt KEINE `lazy_csv_header()`-
+> Aufrufstelle. Nenner **573** Test-.cpp UNVERAENDERT (eb69abc1 573 / ac5aa122 573); .gitlab-ci.yml-Nenner 2984.
+> Kontroll-Lauf am Alt-Baum eb69abc1 (Bissprobe-Override) rc=0 5/5 (pzw-kontroll-altbaum-eb69abc1.log); Kontroll-Lauf
+> ueber die Plan-Kopie mit neuem SHA rc=0 5/5 (pzw-kontroll-plankopie-ac5aa122.log); Lauf nach dem Nachzug rc=0
+> (pzw-nach-nachzug-ac5aa122.log). Kind-Pipelines ce 286/16778 (development 7d6a4909) SUCCESS 20:51:30Z + 286/16779
+> (main 7d6a4909) SUCCESS 21:44:03Z + 286/16780 (bau/vortrag-320 f01cd18b) SUCCESS 23:27:20Z + 286/16781 (development
+> ac5aa122) SUCCESS 2026-09-24T00:12:25Z, je 27 Jobs = 26 success + 1 manual is_original:relock, 0 Bruecken; ce
+> origin+github development==ac5aa122 (ls-remote), main 7d6a4909 (main-FF auf ac5aa122 = Stufe D nach dem Vortragslauf).
+> Beleg-Logs: ~/backups-workflow/20260923-p09-gitlink-ce/ + 20260923-p10-vortrag-ce/. Nur der CE-SHA der Ankertafel
+> wandert. Vorheriger Nachzug darunter.
 
 > NACHZUG 11.09.2026 abends (super-Gitlink-Bump Lizenz-Zug #179 Schritt 3, ce 53150058 -> `eb69abc1`
 > -- der Bump 14a29d5a fuhr OHNE diesen Nachzug (Lead-Fehler K56), dev-CI 16569 rot: Job
