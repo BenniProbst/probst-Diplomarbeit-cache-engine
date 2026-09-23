@@ -114,7 +114,7 @@
 #   P-30 COMDARE_THESIS_PDF_EXPORT=fasle: FEHLER 'unbekannt' rc=1; =false bleibt INERT rc=0 (C6-13)
 #   P-31 --ci + Testhaken: FEHLER 'im Modus --ci verweigert' rc=1; --ci --foo: FEHLER 'unbekanntes Argument' (C6-07)
 #
-# SELBSTBISS (--selbstbiss): 43 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 51 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -139,9 +139,16 @@
 # P-24 / P-23 / P-24 / P-23 / P-23 / P-23 / P-24 / P-24 / P-24 / P-24 / P-24 /
 # P-24 / P-24 / P-17 / P-24 / P-24 / P-24 / P-24 / P-24 / P-24 / P-17 / P-24 rot
 # machen -- sonst beweist die Probe nichts und endet mit rc=2. Fehlen die
-# YAML-Marker (Lead-Patch noch nicht gelandet), entfallen M7-M9/M13-M35/M41/M42
-# LAUT; P-23/P-24 sind dann rot. M30 + M35 entfallen LAUT, solange der
-# F09-Koppelpatch (Block F09-GATE-346) nicht gelandet ist.
+# YAML-Marker (Lead-Patch noch nicht gelandet), entfallen M7-M9/M13-M35/M41/M42/
+# M44-M51 LAUT; P-23/P-24 sind dann rot. M30 + M35 + M48-M50 entfallen LAUT, solange
+# der Koppelpatch (Block F09-GATE-346) nicht gelandet ist; M32 + M33 + M45 + M46
+# entfallen LAUT ohne den Block UMFANG-346 (Koppelpatch r8, L7-01).
+# r8 (Lens r7 L7-01/L7-02/L7-03, Codex r7 C7-01..C7-07): M44 /ID-Kardinalitaet nicht
+# geprueft (P-24 s7/s8), M45 kanonisches EN-Literal abgewandelt (P-24 s3b), M46 '6
+# Paare' auch im Zustand-Zweig (P-24 s3b), M47 shallow-case '*)' still (P-23 c2),
+# M48/M49/M50 F09 Praefix-Konsum / newcommand* / def-Leerraum (P-24 p4/p5/p6), M51
+# beide rev-parse-Substitutionen leer + Leer-Guard weg (P-23 Gitlink). biss(): ein
+# ohne Mutation roter Basisfall = [NICHT BEWERTBAR], nicht in MUT_N (L7-03).
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -896,6 +903,15 @@ fall_P23() { # L2-01 (r3): SOURCE_DATE_EPOCH = Quellstand; F-10 Gitlink == HEAD 
     fahre_block "$d/epoch.sh" "$d/out_elter"; rc=$?; MODUL="$MODUL_VOLL"; zeige "$d/out_elter"
     erw_rc "$rc" 1; erw_text "$d/out_elter" "Elternliste nicht lesbar"
     erw_kein_text "$d/out_elter" "SOURCE_DATE_EPOCH="
+    # (c2) C7-03 (r8): git-Wrapper liefert fuer --is-shallow-repository den Wert 'weird' -- am Wurzel-Stand X1 (kein
+    # Elter) muss der Block LAUT reissen (am r7-Block: 'weird' != true = wie false, rc=0 mit Epoch T1).
+    mkdir -p "$d/gitw" || { rot "Wegwerf-gitw nicht anlegbar"; return; }
+    printf '#!/bin/sh\ncase " $* " in *" --is-shallow-repository "*) echo weird; exit 0 ;; esac\nexec %s "$@"\n' \
+        "$(command -v git)" > "$d/gitw/git"; chmod 0755 "$d/gitw/git"
+    stand "$X1" || { rot "Stand X1 (c2)"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_c2" PATH="$d/gitw:$PATH"; rc=$?; zeige "$d/out_c2"
+    erw_rc "$rc" 1; erw_text "$d/out_c2" "unerwarteter Wert --is-shallow-repository"
+    erw_kein_text "$d/out_c2" "SOURCE_DATE_EPOCH="
 }
 fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
     d="$T/P24"; mkdir -p "$d"
@@ -940,10 +956,13 @@ done
 [ -z "${BAU_SPRACHE_GLEICH:-}" ] || cp diplomarbeit-de-lang.pdf diplomarbeit-en-lang.pdf
 # r7 (L6-01): Trailer-ID je jobname (wie pdfTeX) + Seitenzahl-Zeile des pdfTeX-Logs je Fassung
 for f in de-lang en-lang de-kurz en-kurz; do
-  printf '/ID [<%s> <%s>]\n' "$f" "$f" >> "diplomarbeit-$f.pdf"
+  case "${BAU_ID_N:-1}" in 0) ;;
+  2) printf '/ID [<%s> <%s>]\n/ID [<%s> <%s>]\n' "$f" "$f" "$f" "$f" >> "diplomarbeit-$f.pdf" ;;
+  *) printf '/ID [<%s> <%s>]\n' "$f" "$f" >> "diplomarbeit-$f.pdf" ;; esac   # r8 (C7-01): 0/1/2 ID-Zeilen
   case "$f" in de-lang) n=${BAU_S_DE_LANG:-100} ;; de-kurz) n=${BAU_S_DE_KURZ:-60} ;;
                 en-lang) n=${BAU_S_EN_LANG:-100} ;; *) n=${BAU_S_EN_KURZ:-60} ;; esac
-  printf 'Output written on diplomarbeit-%s.pdf (%s pages, 4711 bytes).\n' "$f" "$n" > "diplomarbeit-$f.log"
+  if [ "$n" -eq 1 ]; then pg=page; else pg=pages; fi   # r8 (C7-07): pdfTeX schreibt '1 page,'
+  printf 'Output written on diplomarbeit-%s.pdf (%s %s, 4711 bytes).\n' "$f" "$n" "$pg" > "diplomarbeit-$f.log"
 done
 BAU
     cat "$d/epoch.sh" "$d/bau.sh" "$d/drift.sh" > "$d/lauf.sh"
@@ -1119,22 +1138,60 @@ BAU
         nb_=$(cat "$MODUL"/diplomarbeit-*.pdf | grep -a -c ' neubau$')
         erw_gleich "$nb_" 4 "vier Fassungen neu gebaut trotz ausgecheckter 289-Kopien (rm -f + latexmk -g, C4-09)"
     fi
-    # (s) C4-08 b (r6): Block SCHALTER-346 -- vier verschiedene Fassungen rc=0; de-kurz byte-gleich zu de-lang = FEHLER
+    # (s) C4-08 b (r6) / r8 L7-01: Block SCHALTER-346 (Hauptpatch: Sprach-Schalter, /ID-Kardinalitaet, Seitenzahl) +
+    # Block UMFANG-346 (Koppelpatch r8: Umfang-Regeln de/en). Ohne UMFANG-346 entfallen die Umfang-Unterfaelle LAUT.
     zs=$(extrahiere_block "$CI_YML" SCHALTER-346 "$d/schalter.sh")
+    zu=$(extrahiere_block "$CI_YML" UMFANG-346 "$d/umfang.sh")
     if [ "$zs" -lt 3 ]; then rot "Block SCHALTER-346 fehlt in $CI_YML ($zs Zeilen) -- kein Schalter-Nachweis"; else
         cat "$d/epoch.sh" "$d/bau.sh" "$d/schalter.sh" > "$d/lauf_s.sh"
+        cat "$d/epoch.sh" "$d/bau.sh" "$d/schalter.sh" "$d/umfang.sh" > "$d/lauf_su.sh"
+        # (s0) L7-01 (r8): d32cc492-Fake -- de-kurz == de-lang und en-kurz == en-lang (ID-frei, Seiten gleich): der
+        # Hauptpatch-Block ALLEIN muss GRUEN bleiben (am r7-Block: FEHLER 'wirkungslos (de)' rc=1 = Gitlink-Kopplung).
+        stand "$Y1" || { rot "Stand Y1 (s0)"; return; }
+        fahre_block "$d/lauf_s.sh" "$d/out_s0" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_GLEICH=1 BAU_EN_GLEICH=1 \
+            BAU_S_DE_KURZ=100 BAU_S_EN_KURZ=100; rc=$?; zeige "$d/out_s0"
+        erw_rc "$rc" 0; erw_text "$d/out_s0" "Sprach-Schalter nachgewiesen (4 Paare"; erw_kein_text "$d/out_s0" "FEHLER"
+        erw_kein_text "$d/out_s0" "Umfang de nachgewiesen"
+        # (s6) Sprachpaar: en-lang = de-lang bis auf die /ID-Zeile -> FEHLER 'Sprach-Schalter wirkungslos' (m28, m31)
+        stand "$Y1" || { rot "Stand Y1 (s6)"; return; }
+        fahre_block "$d/lauf_s.sh" "$d/out_s6" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_SPRACHE_GLEICH=1; rc=$?
+        zeige "$d/out_s6"
+        erw_rc "$rc" 1; erw_text "$d/out_s6" "Sprach-Schalter wirkungslos: de_lang:en_lang"
+        erw_kein_text "$d/out_s6" "6 Paare"
+        # (s7)/(s8) C7-01 (r8): Fake-PDFs mit 0 bzw. 2 '/ID ['-Zeilen -> FEHLER '/ID-Zeilen n != 1' rc=1 (am r7-Block:
+        # ungefiltert bzw. mehrdeutig gehasht, rc=0)
+        stand "$Y1" || { rot "Stand Y1 (s7)"; return; }
+        fahre_block "$d/lauf_s.sh" "$d/out_s7" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_ID_N=0; rc=$?
+        zeige "$d/out_s7"
+        erw_rc "$rc" 1; erw_text "$d/out_s7" "FEHLER: /ID-Zeilen 0 != 1 in diplomarbeit-de-lang.pdf"
+        erw_kein_text "$d/out_s7" "Sprach-Schalter nachgewiesen"
+        stand "$Y1" || { rot "Stand Y1 (s8)"; return; }
+        fahre_block "$d/lauf_s.sh" "$d/out_s8" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_ID_N=2; rc=$?
+        zeige "$d/out_s8"
+        erw_rc "$rc" 1; erw_text "$d/out_s8" "FEHLER: /ID-Zeilen 2 != 1 in diplomarbeit-de-lang.pdf"
+        # (s9) C7-07 (r8): einseitige Fassung -- das pdfTeX-Log schreibt '(1 page,' (Singular): Seitenzahl 1 gelesen,
+        # rc=0 (am r7-Block: ERE 'pages' trifft nicht -> FEHLER '0-mal statt 1x')
+        stand "$Y1" || { rot "Stand Y1 (s9)"; return; }
+        fahre_block "$d/lauf_s.sh" "$d/out_s9" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_S_EN_KURZ=1; rc=$?
+        zeige "$d/out_s9"
+        erw_rc "$rc" 0; erw_kein_text "$d/out_s9" "FEHLER"
+        n9=$(grep -c -E 'diplomarbeit-en-kurz\.pdf .* Seiten 1$' "$d/out_s9")
+        erw_gleich "$n9" 1 "Seitenzahl 1 aus '(1 page,' gelesen (C7-07)"
+        if [ "$zu" -lt 3 ]; then
+            echo "      [ENTFAELLT] (s1)(s2)(s3a)(s3b)(s5)(s5b) Block UMFANG-346 fehlt (Koppelpatch r8 nicht gelandet)"
+        else
         stand "$Y1" || { rot "Stand Y1 (s1)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s1" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_s1"
+        fahre_block "$d/lauf_su.sh" "$d/out_s1" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_s1"
         erw_rc "$rc" 0; erw_text "$d/out_s1" "Umfang de nachgewiesen"; erw_text "$d/out_s1" "Umfang en nachgewiesen"
         erw_text "$d/out_s1" "6 Paare ID-frei verschieden"; erw_kein_text "$d/out_s1" "FEHLER"
         stand "$Y1" || { rot "Stand Y1 (s2)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s2" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_GLEICH=1; rc=$?
+        fahre_block "$d/lauf_su.sh" "$d/out_s2" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_GLEICH=1; rc=$?
         zeige "$d/out_s2"
         erw_rc "$rc" 1; erw_text "$d/out_s2" "Umfang-Schalter wirkungslos (de)"; erw_kein_text "$d/out_s2" "6 Paare"
         # (s3a) L6-01 (r7, MUSS): de-kurz = de-lang bis auf die jobname-abhaengige /ID-Zeile, Seiten gleich -> das
         # r6-Gate (rohe sha256) sagt 'paarweise verschieden' rc=0; r7 ID-frei: FEHLER 'wirkungslos (de)'.
         stand "$Y1" || { rot "Stand Y1 (s3a)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s3a" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_GLEICH=1 \
+        fahre_block "$d/lauf_su.sh" "$d/out_s3a" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_GLEICH=1 \
             BAU_S_DE_KURZ=100; rc=$?; zeige "$d/out_s3a"
         erw_rc "$rc" 1; erw_text "$d/out_s3a" "Umfang-Schalter wirkungslos (de): ID-freier Hash lang == kurz"
         erw_kein_text "$d/out_s3a" "paarweise verschieden"
@@ -1142,28 +1199,28 @@ BAU
         if cmp -s "$MODUL/diplomarbeit-de-lang.pdf" "$MODUL/diplomarbeit-de-kurz.pdf"; then
             rot "Nenner: de-lang und de-kurz sind roh byte-gleich (die /ID-Zeile fehlt)"
         else ok "Nenner: de-lang und de-kurz roh byte-verschieden (nur /ID), ID-frei gleich"; fi
-        # (s3b) EN-Paar gleich (EN-kurz = EN-lang, #270) -> LAUTE Zustand-Zeile, rc=0, de bleibt nachgewiesen
+        # (s3b) EN-Paar gleich (EN-kurz = EN-lang, #270) -> kanonisches Literal als EIGENE Zeile (byte-genau, C7-02a),
+        # Diagnose danach, '5 von 6 Paaren' statt '6 Paare' (L7-02 = C7-02b), rc=0, de bleibt nachgewiesen
         stand "$Y1" || { rot "Stand Y1 (s3b)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s3b" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_EN_GLEICH=1 \
+        fahre_block "$d/lauf_su.sh" "$d/out_s3b" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_EN_GLEICH=1 \
             BAU_S_EN_KURZ=100; rc=$?; zeige "$d/out_s3b"
-        erw_rc "$rc" 0; erw_text "$d/out_s3b" "ZUSTAND: Umfang en NICHT NACHGEWIESEN (EN-kurz ausstehend, Board #270"
-        erw_text "$d/out_s3b" "Umfang de nachgewiesen"; erw_kein_text "$d/out_s3b" "FEHLER"
+        erw_rc "$rc" 0; erw_text "$d/out_s3b" "Umfang de nachgewiesen"; erw_kein_text "$d/out_s3b" "FEHLER"
+        nl=$(grep -c -x -F 'UMFANG en NICHT NACHGEWIESEN (EN-kurz ausstehend, Board #270)' "$d/out_s3b")
+        erw_gleich "$nl" 1 "kanonisches Literal als eigene Zeile (byte-genau, C7-02a)"
+        erw_text "$d/out_s3b" "5 von 6 Paaren ID-frei verschieden, EN-Paar gleich (Zustand)"
+        erw_kein_text "$d/out_s3b" "6 Paare ID-frei verschieden"
         # (s5) de: Hash verschieden, aber Seiten kurz >= lang -> FEHLER; (s5b) en: Hash verschieden, Seiten gleich
         # -> FEHLER 'inkonsistent' (kein stilles Gruen ausserhalb der zwei erlaubten Kombinationen)
         stand "$Y1" || { rot "Stand Y1 (s5)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s5" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_S_DE_KURZ=100; rc=$?
+        fahre_block "$d/lauf_su.sh" "$d/out_s5" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_S_DE_KURZ=100; rc=$?
         zeige "$d/out_s5"
         erw_rc "$rc" 1; erw_text "$d/out_s5" "Umfang-Schalter wirkungslos (de): Seiten kurz 100 >= lang 100"
         stand "$Y1" || { rot "Stand Y1 (s5b)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s5b" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_S_EN_KURZ=100; rc=$?
+        fahre_block "$d/lauf_su.sh" "$d/out_s5b" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_S_EN_KURZ=100; rc=$?
         zeige "$d/out_s5b"
-        erw_rc "$rc" 1; erw_text "$d/out_s5b" "Umfang-Schalter en inkonsistent"; erw_kein_text "$d/out_s5b" "ZUSTAND"
-        # (s6) Sprachpaar: en-lang = de-lang bis auf die /ID-Zeile -> FEHLER 'Sprach-Schalter wirkungslos' (m28)
-        stand "$Y1" || { rot "Stand Y1 (s6)"; return; }
-        fahre_block "$d/lauf_s.sh" "$d/out_s6" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_SPRACHE_GLEICH=1; rc=$?
-        zeige "$d/out_s6"
-        erw_rc "$rc" 1; erw_text "$d/out_s6" "Sprach-Schalter wirkungslos: de_lang:en_lang"
-        erw_kein_text "$d/out_s6" "6 Paare"
+        erw_rc "$rc" 1; erw_text "$d/out_s5b" "Umfang-Schalter en inkonsistent"
+        erw_kein_text "$d/out_s5b" "UMFANG en NICHT"
+        fi
     fi
     # (c1) C6-01 (r7): 288-Bau traegt eine CreationDate != SOURCE_DATE_EPOCH, keine 289-Kopie (Stand X1) -> am
     # r6-Block '0 von 4 vorhanden' rc=0 (Epoch nie gegen den eigenen Bau geprueft); r7: FEHLER rc=1.
@@ -1215,6 +1272,21 @@ BAU
         stand "$F09D" || { rot "Stand F09d"; return; }
         fahre_block "$d/f09.sh" "$d/out_p3"; rc=$?; zeige "$d/out_p3"
         erw_rc "$rc" 1; erw_text "$d/out_p3" "ausserhalb von Kommentaren"
+        # (p4)/(p5)/(p6) C7-05 (r8): Praefix-Konsum '\thesislangAlt' (Control-Word-Grenze), '\newcommand*{...}' und
+        # '\def \thesislang' als reine Definitionen -> je FEHLER rc=1 (am r7-Gate gezaehlt = rc=0)
+        for pv in "p4:\\thesislangAlt \\thesisumfangAlt" \
+                  "p5:\\newcommand*{\\thesislang}{de} \\newcommand*{\\thesisumfang}{lang}" \
+                  "p6:\\def \\thesislang{de} \\def \\thesisumfang{lang}"; do
+            nm=${pv%%:*}; zeile=${pv#*:}
+            git -C "$MODUL" checkout -q -B "f09$nm" "$X1" || { rot "Zweig f09$nm nicht setzbar"; return; }
+            printf '%s\n' '\documentclass{article}' '\providecommand{\thesislang}{de}' \
+                '\providecommand{\thesisumfang}{lang}' "$zeile" > "$MODUL/diplomarbeit.tex"
+            git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600292 "F09$nm $nm" \
+                || { rot "Commit F09$nm"; return; }
+            stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand F09$nm"; return; }
+            fahre_block "$d/f09.sh" "$d/out_$nm"; rc=$?; zeige "$d/out_$nm"
+            erw_rc "$rc" 1; erw_text "$d/out_$nm" "ausserhalb von Kommentaren"
+        done
     fi
 }
 fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
@@ -1304,6 +1376,7 @@ fall_P31() { # C6-07 (r7): --ci verweigert den Testhaken bedingungslos; fremdes 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
+    eval "BASIS_$(printf '%s' "$1" | tr -d -)=\$FEHL" # r8 (L7-03): Basis-FEHL je Fall fuer biss()
     if [ "$FEHL" -eq 0 ]; then
         echo "  $1: GRUEN"; GRUEN_N=$((GRUEN_N+1))
     else
@@ -1383,17 +1456,23 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed '/(Quelle) liegt ausserhalb des Arbeitsbaums/d' "$SKRIPT" > "$MUT/m40.sh"
     # M43 (r7): jeder Fremdwert wieder INERT -> P-30 muss reissen (C6-13)
     sed 's/\*) fehler "COMDARE_THESIS_PDF_EXPORT=.*/*) echo "INERT: $SW"; exit 0 ;;/' "$SKRIPT" > "$MUT/m43.sh"
-    MUT_N=15; ENTF_N=0
+    MUT_N=15; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
     done
-    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung
+    basis_von() { eval "printf '%s' \"\${BASIS_$(printf '%s' "$1" | tr -d -):-0}\""; } # r8 (L7-03)
+    nicht_bewertbar() { # $1 = Mutante, $2 = Kennung, $3 = Basis-FEHL: roter Basisfall, Mutante nicht gezaehlt
+        echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1 nicht bewertbar"
+        MUT_N=$((MUT_N-1)); NB_N=$((NB_N+1))
+    }
+    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei r > Basis-FEHL
+        basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
         T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
         ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
         T="$T_ALT"
-        if [ "$r" -gt 0 ]; then
+        if [ "$r" -gt "$basis" ]; then
             echo "  [OK]  Mutante $1 macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
         else
             echo "  [ABBRUCH] Mutante $1 laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
@@ -1417,7 +1496,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
-        ENTF_N=28; echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42 (YAML): Block EPOCH-288 fehlt ($zm Zeilen)"
+        ENTF_N=36
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51 (YAML): Block EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -1426,8 +1506,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M9: Byte-Urteil entfernt -> P-24 (b) muss reissen (L1-04)
         sed '/test -n "\$s288" && test "\$s288" = "\$s289"/,/andere Bytes (L1-04\/L2-01)"; exit 1; }/d' \
             "$CI_YML" > "$MUT/m9.yml"
-        # M13 (r4): shallow-Pruefung entfernt (gekappte Historie faellt still auf %ct HEAD) -> P-23 (e) muss reissen
-        sed 's/if \[ "\$shallow" = true \]; then/if false; then/' "$CI_YML" > "$MUT/m13.yml"
+        # M13 (r4, r8 case-Form C7-03): shallow-Zweig 'true)' still (gekappte Historie faellt auf %ct HEAD) -> P-23 (e)
+        sed 's/^\( *\)true) echo "FEHLER: Submodul-Historie gekappt.*/\1true) : ;;/' "$CI_YML" > "$MUT/m13.yml"
         # M14 (r4): Fullbanner-Vergleich entfernt (Byte-Urteil trotz fremder Toolchain) -> P-24 (e) muss reissen
         sed 's/if \[ "\$b288" != "\$b289" \]; then/if false; then/' "$CI_YML" > "$MUT/m14.yml"
         # M15 (r5): Ein-Elter-Regel entfernt (Merge mit PDF-nur-Diff gilt als Writeback) -> P-23 (g) muss reissen
@@ -1465,8 +1545,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/^\( *\)ohne_kommentar=.*/\1ohne_kommentar=p/' "$CI_YML" > "$MUT/m30.yml"
         # M31 (r7): /ID-Zeile NICHT ausgeblendet (roher Hash wie r6) -> P-24 (s3a) muss reissen (L6-01)
         sed 's#grep -a -v .\^/ID \\\[. #cat #' "$CI_YML" > "$MUT/m31.yml"
-        # M32 (r7): ZUSTAND-Zeile fuer das EN-Paar entfernt -> P-24 (s3b) muss reissen (L6-01, Pflicht-Ausgabe)
-        sed 's/^\( *\)echo "ZUSTAND: Umfang en NICHT NACHGEWIESEN.*/\1:/' "$CI_YML" > "$MUT/m32.yml"
+        # M32 (r7, r8 C7-02a): kanonische Literal-Zeile des EN-Zustands entfernt -> P-24 (s3b) muss reissen (Koppel)
+        sed 's/^\( *\)echo "UMFANG en NICHT NACHGEWIESEN (EN-kurz ausstehend, Board #270)"$/\1:/' "$CI_YML" \
+            > "$MUT/m32.yml"
         # M33 (r7): Seitenzahl-Regel de entfernt -> P-24 (s5) muss reissen (L6-01)
         sed 's/test "\$n_de_kurz" -lt "\$n_de_lang" \\$/true \\/' "$CI_YML" > "$MUT/m33.yml"
         # M34 (r7): 288-Epoch-Selbstnachweis entfernt -> P-24 (c1) muss reissen (C6-01)
@@ -1479,22 +1560,48 @@ if [ "$SELBSTBISS" -eq 1 ]; then
             "$CI_YML" > "$MUT/m41.yml"
         # M42 (r7): main= ohne '|| main=' (leere Pipe reisst still unter -e -o pipefail) -> P-24 (q) muss reissen
         sed 's/| head -1) || main=; echo/| head -1); echo/' "$CI_YML" > "$MUT/m42.yml"
-        MUT_N=$((MUT_N+28)); M30=m30; M35=m35
+        # M44 (r8): /ID-Kardinalitaet nicht geprueft (0 oder 2 ID-Zeilen gehasht) -> P-24 (s7)/(s8) reissen (C7-01)
+        sed 's/^\( *\)test "\$n_id" -eq 1 || {.*/\1true/' "$CI_YML" > "$MUT/m44.yml"
+        # M45 (r8): kanonisches EN-Literal abgewandelt (Punkt angehaengt) -> P-24 (s3b) muss reissen (C7-02a; Koppel)
+        l45='UMFANG en NICHT NACHGEWIESEN (EN-kurz ausstehend, Board #270)'
+        sed "s/^\( *\)echo \"$l45\"\$/\1echo \"$l45.\"/" "$CI_YML" > "$MUT/m45.yml"
+        # M46 (r8): '6 Paare ID-frei verschieden' auch im Zustand-Zweig -> P-24 (s3b) muss reissen (L7-02; Koppel)
+        l46='UMFANG-346: 5 von 6 Paaren ID-frei verschieden, EN-Paar gleich (Zustand)'
+        sed "s/^\( *\)echo \"$l46\"\$/\1echo \"UMFANG-346: 6 Paare ID-frei verschieden\"/" "$CI_YML" > "$MUT/m46.yml"
+        # M47 (r8): shallow-case '*)' still (unerwarteter Wert wie false) -> P-23 (c2) muss reissen (C7-03)
+        sed 's/^\( *\)\*) echo "FEHLER: unerwarteter Wert --is-shallow-repository.*/\1*) : ;;/' \
+            "$CI_YML" > "$MUT/m47.yml"
+        # M48 (r8): Konsum ohne Control-Word-Grenze (\thesislangAlt zaehlt) -> P-24 (p4) muss reissen (C7-05; Koppel)
+        sed 's/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"
+        # M49 (r8): Definitionsfilter ohne '\*?' (\newcommand* zaehlt als Konsum) -> P-24 (p5) reissen (C7-05; Koppel)
+        sed 's/renewcommand)\\\*?/renewcommand)/' "$CI_YML" > "$MUT/m49.yml"
+        # M50 (r8): def/let-Filter ohne Leerraum (\def \thesislang zaehlt) -> P-24 (p6) muss reissen (C7-05; Koppel)
+        sed 's/(e?def|let)\[\[:space:\]\]\*/(e?def|let)/' "$CI_YML" > "$MUT/m50.yml"
+        # M51 (r8): beide rev-parse-Substitutionen leer + Leer-Guard entfernt (test "" = "") -> P-23 (Gitlink) reisst
+        sed -e 's/h_sub=$(git rev-parse HEAD)/h_sub=/' \
+            -e 's/h_git=$(git -C "$CI_PROJECT_DIR" rev-parse HEAD:thesis\/diplomarbeit)/h_git=/' \
+            -e '/test -n "$h_sub" && test -n "$h_git"/d' "$CI_YML" > "$MUT/m51.yml"
+        MUT_N=$((MUT_N+36)); M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-2)); ENTF_N=$((ENTF_N+2)); M30=; M35=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 (F09-GATE-346): Koppelpatch nicht in der YAML ($CI_YML)"
+            MUT_N=$((MUT_N-5)); ENTF_N=$((ENTF_N+5)); M30=; M35=; M48=; M49=; M50=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 (F09-GATE-346): Koppelpatch nicht in der YAML ($CI_YML)"
+        fi
+        if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
+            MUT_N=$((MUT_N-4)); ENTF_N=$((ENTF_N+4)); M32=; M33=; M45=; M46=
+            echo "  [ENTFAELLT] Mutanten m32 + m33 + m45 + m46 (UMFANG-346): Koppelpatch r8 nicht in der YAML ($CI_YML)"
         fi
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
-                 m31 m32 m33 m34 $M35 m41 m42; do
+                 m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
         done
-        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung
+        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss()
+            basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
             T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
             ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
             T="$T_ALT"
-            if [ "$r" -gt 0 ]; then
+            if [ "$r" -gt "$basis" ]; then
                 echo "  [OK]  Mutante $1 (YAML) macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
             else
                 echo "  [ABBRUCH] Mutante $1 (YAML) laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
@@ -1522,12 +1629,20 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && biss_yml m29 fall_P17 P-17
         [ "$BISS_RC" -eq 0 ] && [ -n "$M30" ] && biss_yml m30 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m31 fall_P24 P-24
-        [ "$BISS_RC" -eq 0 ] && biss_yml m32 fall_P24 P-24
-        [ "$BISS_RC" -eq 0 ] && biss_yml m33 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M32" ] && biss_yml m32 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M33" ] && biss_yml m33 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m34 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && [ -n "$M35" ] && biss_yml m35 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m41 fall_P17 P-17
         [ "$BISS_RC" -eq 0 ] && biss_yml m42 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m44 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M45" ] && biss_yml m45 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M46" ] && biss_yml m46 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m47 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M48" ] && biss_yml m48 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M49" ] && biss_yml m49 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M50" ] && biss_yml m50 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m51 fall_P23 P-23
     fi
 fi
 
@@ -1536,7 +1651,8 @@ echo "==========================================================================
 echo "BILANZ: $GRUEN_N von $N_FAELLE Faellen gruen, $ROT_N rot${ROT_LISTE:+ (}$ROT_LISTE${ROT_LISTE:+ )}"
 if [ "$SELBSTBISS" -eq 1 ]; then
     if [ "$BISS_RC" -eq 0 ]; then
-        echo "        Selbstbiss: $MUT_N von $MUT_N Mutanten rot${ENTF_N:+, }$ENTF_N entfallen (YAML ohne Marker)"
+        echo "        Selbstbiss: $MUT_N von $MUT_N Mutanten rot, $ENTF_N entfallen (YAML ohne Marker)," \
+             "$NB_N nicht bewertbar (Basisfall rot)"
     else
         echo "        Selbstbiss: NICHT bewiesen"
     fi
