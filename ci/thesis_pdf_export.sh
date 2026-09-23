@@ -20,6 +20,13 @@
 # Instanz (CI_SERVER_HOST + URL-Host == Konstante, CI_PROJECT_ID == 288, kein userinfo/Query/Fragment); C6-08
 # Quelle kanonisch unter dem Arbeitsbaum (Zwischen-Symlink); C6-05 F-06 auch bei bewegtem Export-Script; C6-04
 # nach dem Merge muss jede exportierte Fassung noch das eigene Artefakt sein, sonst UEBERHOLT (kein Mischstand).
+# REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
+# (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
+# rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
+# getrackten Aenderungen unter DIR, gestagt oder ungestagt); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
+# (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
+# nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
+# Variable; S7-08 pipelinefreier PDF-Header-Test, trap auch fuer INT TERM HUP.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -40,21 +47,28 @@ fehler() { echo "FEHLER: $*"; exit 1; }
 # C6-06 (r7): Instanz-Konstanten -- Host wie die origin-URL des Projekts, Projekt-ID 288 (kein Projektpfad-Literal).
 INSTANZ_HOST=gitlab.comdare.local
 INSTANZ_PROJEKT_ID=288
+# S7-04 (r8b): kanonischer Projektpfad des Projekts 288 (aus der origin-URL des super); NIE ausgeben (Log/Bericht
+# maskieren als <super-pfad>). CI_PROJECT_PATH muss ihm gleichen, sonst FEHLER ohne Wertausgabe.
+INSTANZ_PROJEKT_PFAD=comdare/research/probst-diplomarbeit-cache-engine
 # C6-07 (r7): Modus --ci = Produktionsaufruf aus der YAML (Literal im script:, nicht per Variable ueberschreibbar).
 MODUS=""
 for arg in "$@"; do
   case "$arg" in --ci) MODUS=ci ;; *) fehler "unbekanntes Argument '$arg' (erlaubt: --ci)" ;; esac
 done
 # C6-13 (r7): nur true|false; jeder andere Wert (Tippfehler) endet laut statt als gruener INERT-Job.
-SW="${COMDARE_THESIS_PDF_EXPORT:-true}"
+# S7-06 (r8b): expliziter Leerwert ist KEIN Default (fail-closed): nur ungesetzt = true.
+SW="${COMDARE_THESIS_PDF_EXPORT-true}"
 case "$SW" in
   true) ;;
   false) echo "INERT: COMDARE_THESIS_PDF_EXPORT=false, kein Export"; exit 0 ;;
   *) fehler "COMDARE_THESIS_PDF_EXPORT='$SW' unbekannt (erlaubt: true|false; C6-13)" ;;
 esac
-DIR="${COMDARE_THESIS_PDF_DIR:-docs/diplomarbeit}"
-SRC="${COMDARE_THESIS_PDF_SRC:-thesis/diplomarbeit}"
-FASSUNGEN="${COMDARE_THESIS_PDF_FASSUNGEN:-de-lang en-lang de-kurz en-kurz}"
+DIR="${COMDARE_THESIS_PDF_DIR-docs/diplomarbeit}"
+SRC="${COMDARE_THESIS_PDF_SRC-thesis/diplomarbeit}"
+FASSUNGEN="${COMDARE_THESIS_PDF_FASSUNGEN-de-lang en-lang de-kurz en-kurz}"
+[ -n "$DIR" ] || fehler "COMDARE_THESIS_PDF_DIR ist gesetzt, aber leer (S7-06: kein stiller Default)"
+[ -n "$SRC" ] || fehler "COMDARE_THESIS_PDF_SRC ist gesetzt, aber leer (S7-06: kein stiller Default)"
+[ -n "$FASSUNGEN" ] || fehler "COMDARE_THESIS_PDF_FASSUNGEN ist gesetzt, aber leer (S7-06: kein stiller Default)"
 BRANCH="${CI_COMMIT_BRANCH:?thesis_pdf_export: nur in Branch-Pipelines (CI_COMMIT_BRANCH fehlt)}"
 PIPE_SHA="${CI_COMMIT_SHA:?thesis_pdf_export: CI_COMMIT_SHA fehlt (Pipeline-Stand fuer die Stale-Pruefung)}"
 KURZ="${CI_COMMIT_SHORT_SHA:-NA}"
@@ -65,6 +79,8 @@ GITP="git -c credential.helper="
 # Arbeitsbaums und verschwinden mit dem Script.
 WERK=$(mktemp -d "${TMPDIR:-/tmp}/thesis_pdf_export.XXXXXX") || fehler "mktemp -d fuer Hilfsdateien"
 trap 'rm -rf "$WERK"' EXIT
+# S7-08 (r8b): Signale muenden in exit, damit der EXIT-Trap das Hilfsverzeichnis auch dann raeumt.
+trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # Explizite Statusauswertung (0 = gleich / Vorfahr, 1 = verschieden / kein Vorfahr, sonst Abbruch): set -e
 # unterscheidet 1 nicht von einem Werkzeugfehler.
@@ -90,10 +106,10 @@ if [ -n "${COMDARE_THESIS_PDF_REMOTE:-}" ]; then
     || fehler "COMDARE_THESIS_PDF_REMOTE ist ein Testhaken und wird in CI verweigert (CI/GITLAB_CI gesetzt)"
   case "$COMDARE_THESIS_PDF_REMOTE" in
     /*) ;;
-    *) fehler "Testhaken nur als absoluter lokaler Pfad, nicht '$COMDARE_THESIS_PDF_REMOTE'" ;;
+    *) fehler "COMDARE_THESIS_PDF_REMOTE: Testhaken nur als absoluter lokaler Pfad (Wert nicht ausgegeben)" ;;
   esac
   [ "$(git -C "$COMDARE_THESIS_PDF_REMOTE" rev-parse --is-bare-repository 2>/dev/null)" = "true" ] \
-    || fehler "COMDARE_THESIS_PDF_REMOTE '$COMDARE_THESIS_PDF_REMOTE' ist kein lokales Bare-Repo (Testhaken)"
+    || fehler "COMDARE_THESIS_PDF_REMOTE ist kein lokales Bare-Repo (Testhaken; Wert nicht ausgegeben)"
   echo "TESTHAKEN AKTIV: Push-Ziel ist ein lokales Bare-Repo, NICHT das Projekt-Remote"
   REMOTE="$COMDARE_THESIS_PDF_REMOTE"
 else
@@ -103,22 +119,38 @@ else
   # L2-08 (r3): CI_SERVER_URL ist durch Pipeline-/Projekt-Variablen ueberschreibbar (docs.gitlab.com/ci/variables);
   # der Askpass-Helfer liefert den Token an JEDES Ziel, also nur ueber TLS.
   case "$CI_SERVER_URL" in
-    *[@?#]*) fehler "CI_SERVER_URL '$CI_SERVER_URL' traegt userinfo, Query oder Fragment (C6-06)" ;;
+    # S7-05 (r8b): Verweigerungspfade nennen NIE den URL-Wert (ein userinfo-Token landete sonst im Job-Log).
+    *[@?#]*) fehler "CI_SERVER_URL traegt userinfo, Query oder Fragment (C6-06/S7-05)" ;;
     https://*) ;;
-    *) fehler "CI_SERVER_URL '$CI_SERVER_URL' ist nicht https:// (Token liefe im Klartext, L2-08)" ;;
+    *) fehler "CI_SERVER_URL ist nicht https:// (Token liefe im Klartext, L2-08/S7-05)" ;;
   esac
   # C6-06 (r7): Tiefenschutz -- der Askpass-Helfer liefert den Token an das Ziel; das Ziel muss die Instanz sein.
   : "${CI_SERVER_HOST:?thesis_pdf_export: CI_SERVER_HOST fehlt}"
   : "${CI_PROJECT_ID:?thesis_pdf_export: CI_PROJECT_ID fehlt}"
   [ "$CI_PROJECT_ID" = "$INSTANZ_PROJEKT_ID" ] \
-    || fehler "CI_PROJECT_ID '$CI_PROJECT_ID' ist nicht das Projekt $INSTANZ_PROJEKT_ID (C6-06)"
+    || fehler "CI_PROJECT_ID ist nicht das Projekt $INSTANZ_PROJEKT_ID (C6-06)"
   [ "$CI_SERVER_HOST" = "$INSTANZ_HOST" ] \
-    || fehler "CI_SERVER_HOST '$CI_SERVER_HOST' ist nicht die Instanz $INSTANZ_HOST (C6-06)"
+    || fehler "CI_SERVER_HOST ist nicht die Instanz $INSTANZ_HOST (C6-06)"
   url_host="${CI_SERVER_URL#https://}"; url_host="${url_host%%/*}"; url_host="${url_host%%:*}"
   [ "$url_host" = "$INSTANZ_HOST" ] \
-    || fehler "CI_SERVER_URL '$CI_SERVER_URL' zeigt nicht auf die Instanz $INSTANZ_HOST (C6-06)"
+    || fehler "CI_SERVER_URL zeigt nicht auf die Instanz $INSTANZ_HOST (C6-06/S7-05)"
   : "${CI_PROJECT_PATH:?thesis_pdf_export: CI_PROJECT_PATH fehlt}"
+  # S7-04 (r8b): die ID allein bindet das Ziel nicht -- der Pfad muss der kanonische Pfad des Projekts 288 sein.
+  [ "$CI_PROJECT_PATH" = "$INSTANZ_PROJEKT_PFAD" ] || fehler "CI_PROJECT_PATH != kanonischer Projektpfad (S7-04)"
   REMOTE="${CI_SERVER_URL%/}/${CI_PROJECT_PATH}.git"
+  # S7-04 (r8b): strikte Form der fertigen Push-URL https://<Instanz>[:Port]/<pfad>.git, Pfad nur [A-Za-z0-9._/-]
+  # (kein @ ? #), pipelinefrei; bei Abweichung FEHLER ohne Wertausgabe.
+  url_rest="${REMOTE#https://$INSTANZ_HOST}"
+  case "$url_rest" in
+    /*) url_pfad="${url_rest#/}" ;;
+    :*) url_port="${url_rest%%/*}"; url_port="${url_port#:}"
+        case "$url_port" in ''|*[!0-9]*) fehler "Push-URL: Port nicht numerisch (S7-04)" ;; esac
+        case "$url_rest" in */*) url_pfad="${url_rest#*/}" ;; *) fehler "Push-URL ohne Pfad (S7-04)" ;; esac ;;
+    *) fehler "Push-URL zeigt nicht auf https://$INSTANZ_HOST (S7-04)" ;;
+  esac
+  case "$url_pfad" in *.git) url_pfad="${url_pfad%.git}" ;; *) fehler "Push-URL endet nicht auf .git (S7-04)" ;; esac
+  case "$url_pfad" in ''|*[!A-Za-z0-9._/-]*) fehler "Push-URL: Pfad mit unzulaessigen Zeichen (S7-04)" ;; esac
+  [ "$url_pfad" = "$INSTANZ_PROJEKT_PFAD" ] || fehler "Push-URL: Pfad != kanonischer Projektpfad (S7-04)"
   cat > "$WERK/askpass.sh" <<'ASK'
 #!/bin/sh
 case "$1" in
@@ -193,7 +225,8 @@ for f in $FASSUNGEN; do
   src="$SRC/diplomarbeit-$f.pdf"; dst="$DIR/diplomarbeit-$f.pdf"
   [ ! -L "$src" ] || fehler "$src ist ein Symlink (Quelldatei verboten)"
   [ -s "$src" ] || fehler "Fassung $src fehlt oder ist leer (Artefakt des thesis:pdf-Jobs)"
-  head -c 5 "$src" | grep -q '^%PDF-' || fehler "$src ist kein PDF (Header)"
+  hdr=$(head -c 5 -- "$src") || fehler "head -c 5 $src (S7-08)"   # pipelinefrei (S7-08, r8b)
+  [ "$hdr" = "%PDF-" ] || fehler "$src ist kein PDF (Header)"
   [ ! -L "$dst" ] || fehler "$dst ist ein Symlink (Zieldatei verboten)"
   groesse=$(wc -c < "$src") || fehler "wc -c $src"
   cp -f "$src" "$dst" || fehler "cp $src $dst"
@@ -216,19 +249,25 @@ git ls-files -- "$DIR" > "$WERK/ls.txt" || fehler "git ls-files $DIR"
 gestagt=$(grep -cxF -f "$WERK/dst.txt" "$WERK/ls.txt" || true)
 [ "$gestagt" -eq "$n" ] || fehler "nur $gestagt von $n Zieldateien stehen im Index unter $DIR/"
 
-# I-02: nur Pfade unter $DIR/ duerfen im Index stehen; der Commit nimmt zusaetzlich nur den Pathspec $DIR.
+# I-02 / S7-03 (r8b): der Index darf GENAU die Fassungs-Liste tragen (nicht nur "unter $DIR/"); der Commit, der
+# lokale Byte-Vergleich und die Remote-Idempotenz arbeiten auf derselben exakten Pathspec-Liste (literal, set -f).
 git diff --cached --name-only > "$WERK/index.txt" || fehler "git diff --cached --name-only"
-fremd=$(awk -v d="$DIR/" 'index($0, d) != 1 { n++ } END { print n + 0 }' "$WERK/index.txt") \
-  || fehler "Index-Pruefung (awk)"
-[ "$fremd" -eq 0 ] || fehler "$fremd fremde Pfad(e) im Index (erlaubt ist nur $DIR/)"
+fremd=$(grep -c -v -x -F -f "$WERK/dst.txt" "$WERK/index.txt") && fr=0 || fr=$?
+case "$fr" in 0|1) ;; *) fehler "Index-Pruefung (grep rc=$fr)" ;; esac
+[ "$fremd" -eq 0 ] || fehler "$fremd fremde Pfad(e) im Index (erlaubt ist nur die Fassungs-Liste, S7-03)"
+ungestagt=$(git diff --name-only -- "$DIR") || fehler "git diff --name-only $DIR"
+[ -z "$ungestagt" ] || fehler "getrackte Aenderung(en) unter $DIR ausserhalb der Fassungs-Liste (ungestagt, S7-03)"
+set --
+while IFS= read -r p; do set -- "$@" "$p"; done < "$WERK/dst.txt"
+[ "$#" -eq "$n" ] || fehler "Fassungs-Liste $# != $n"
 
-if diff_gleich --cached -- "$DIR"; then
+if diff_gleich --cached -- "$@"; then
   echo "UNVERAENDERT: $n Fassungen byte-gleich zum Bestand in $DIR, kein Commit"; exit 0
 fi
 $GITP -c user.name="super-pdf-bot" -c user.email="super-pdf-bot@ci.comdare.local" commit -q --only \
   -m "docs(diplomarbeit): $n Thesis-Fassungen aus Pipeline $PIPE_ID" \
   -m "Quelle super $KURZ ($PIPE_SHA), Submodul thesis/diplomarbeit (Order 389/390, 22.09.2026) [skip ci]" \
-  -- "$DIR" || fehler "git commit"
+  -- "$@" || fehler "git commit"
 NEU=$(git rev-parse --short HEAD) || fehler "git rev-parse HEAD"
 NEU_VOLL=$(git rev-parse --verify HEAD) || fehler "git rev-parse --verify HEAD"
 echo "Commit $NEU auf $BRANCH (Basis Pipeline-Commit $KURZ)"
@@ -253,7 +292,7 @@ while [ "$versuch" -lt 5 ]; do
     echo "UEBERHOLT: Thesis-Gitlink oder CI-Rezept seit $KURZ bewegt ($FERN); kein Push alter PDFs"
     exit 0
   fi
-  if diff_gleich HEAD FETCH_HEAD -- "$DIR"; then  # F-07 Remote-Idempotenz
+  if diff_gleich HEAD FETCH_HEAD -- "$@"; then  # F-07 Remote-Idempotenz auf der exakten Fassungs-Liste (S7-03)
     echo "UNVERAENDERT (remote): $BRANCH ($FERN) traegt die $n Fassungen bereits byte-gleich, kein Merge/Push"
     exit 0
   fi
@@ -262,9 +301,16 @@ while [ "$versuch" -lt 5 ]; do
     || { git merge --abort 2>/dev/null || true; fehler "Merge mit $FERN kollidiert, naechste Pipeline holt nach"; }
   # C6-04 (r7): nach dem Merge muss jede exportierte Fassung noch das eigene Artefakt tragen; sonst hat ein fremder
   # Commit eine Fassung bewegt und der Push waere ein Mischstand -> UEBERHOLT (rc=0), naechste Pipeline exportiert.
+  # S7-01/S7-02 (r8b): voller Tree-Eintrag (Modus Typ Blob) statt Blob-ID; fehlender Pfad = UEBERHOLT (rc 0), nur
+  # Werkzeugfehler (ls-tree rc != 0) bleiben rot; fremder Symlink/Modus mit gleichem Blob = UEBERHOLT.
   while IFS= read -r dst; do
-    a=$(git rev-parse --verify "HEAD:$dst") || fehler "git rev-parse HEAD:$dst (nach Merge)"
-    b=$(git rev-parse --verify "$NEU_VOLL:$dst") || fehler "git rev-parse $NEU:$dst (eigener Export-Commit)"
+    a=$(git ls-tree HEAD -- "$dst") || fehler "git ls-tree HEAD -- $dst (nach Merge)"
+    b=$(git ls-tree "$NEU_VOLL" -- "$dst") || fehler "git ls-tree $NEU -- $dst (eigener Export-Commit)"
+    [ -n "$b" ] || fehler "Fassung $dst fehlt im eigenen Export-Commit $NEU"
+    if [ -z "$a" ]; then echo "UEBERHOLT: Fassung $dst am Remote geloescht ($FERN), kein Push (S7-02)"; exit 0; fi
+    ma="${a%% *}"; ta="${a#* }"; ta="${ta%% *}"
+    [ "$ma" = "100644" ] && [ "$ta" = "blob" ] \
+      || { echo "UEBERHOLT: Fassung $dst am Remote als $ta/$ma statt blob/100644 ($FERN), kein Push (S7-01)"; exit 0; }
     [ "$a" = "$b" ] || { echo "UEBERHOLT: Fassung $dst am Remote fremd bewegt ($FERN), kein Push (C6-04)"; exit 0; }
   done < "$WERK/dst.txt"
   echo "Merge mit $BRANCH-Tip $FERN [skip ci], erneuter Push"
