@@ -188,6 +188,7 @@ ci/mess_ausbeute_wache.sh	braucht measure_out/ eines realen Mess-Laufs
 ci/object_stat_abnahme.sh	braucht Lager-/MinIO-Zugang des Mess-Kontexts (Objekt-Roundtrip)
 ci/object_stat_wache.sh	braucht Lager-/MinIO-Zugang (Einzelobjekt-Pruefung im Mess-Kontext)
 ci/persist_sammler.sh	schreibender Vorgang (Writeback-Sammler nach measurement/), kein Gate
+ci/thesis_pdf_export.sh	schreibender Vorgang (PDF-Export-Writeback nach docs/diplomarbeit/), kein Gate
 ci/wide_aggregat.sh	Werkzeug mit Pflicht-Argumenten (Quell-Liste, Ziel-CSV) -- vom Mess-Job gerufen
 scripts/ci_host_klassen_gegenorakel.sh	konfiguriert den echten Baum (cmake): Bau-Schritt; Selbsttest laeuft oben
 EOF
