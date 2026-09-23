@@ -113,6 +113,16 @@
 #   P-29 Quelle ueber getrackten Zwischen-Symlink thesis/ext -> ../../aussen: FEHLER rc=1, kein Push (C6-08)
 #   P-30 COMDARE_THESIS_PDF_EXPORT=fasle: FEHLER 'unbekannt' rc=1; =false bleibt INERT rc=0 (C6-13)
 #   P-31 --ci + Testhaken: FEHLER 'im Modus --ci verweigert' rc=1; --ci --foo: FEHLER 'unbekanntes Argument' (C6-07)
+#   P-32 Remote setzt en-kurz auf Modus 100755 bei gleichem Blob: UEBERHOLT rc=0, kein Push (S7-01, r8b)
+#   P-33 Remote ersetzt en-kurz durch Symlink: UEBERHOLT 'blob/120000' rc=0, kein Push (S7-01, r8b)
+#   P-34 Remote loescht en-kurz: UEBERHOLT 'geloescht' rc=0 (kein FEHLER), kein Push (S7-02, r8b)
+#   P-35 fremde getrackte README unter DIR lokal geaendert: FEHLER rc=1, nichts committet (S7-03 a, r8b)
+#   P-36 Remote: gleiche PDF-Bytes + README unter DIR: UNVERAENDERT (remote), kein Merge/Push (S7-03 b, r8b)
+#   P-37 CI_PROJECT_PATH fremd / mit Query bei ID 288: FEHLER vor jedem Transport, Wert nie im Log (S7-04, r8b)
+#   P-38 URL mit userinfo+Kennwort / http / fremder Host: FEHLER ohne URL-Wert im Log (S7-05, r8b)
+#   P-39 EXPORT/DIR/SRC/FASSUNGEN explizit leer: FEHLER, kein stiller Default (S7-06, r8b)
+#   P-40 unlesbare PDF-Quelle: FEHLER nennt den head-Fehler, pipelinefrei (S7-08, r8b)
+#   P-41 SIGTERM waehrend des Laufs: rc=143 und Hilfsverzeichnis geraeumt (S7-08 trap, r8b)
 #
 # SELBSTBISS (--selbstbiss): 51 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -1373,6 +1383,171 @@ fall_P31() { # C6-07 (r7): --ci verweigert den Testhaken bedingungslos; fremdes 
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
 
+# --------------------------------------------------------------------------- r8b (Codex-Lens r7 B: S7-01..S7-08)
+vorlauf_v1() { # $1 = Fallverzeichnis, $2 = Script: Erstexport v1 aus workA; danach S = Tip; rc 2 bei Fehlschlag
+    baue_seed "$1" || { rot "Wegwerf-Remote nicht baubar"; return 2; }
+    klone "$1/workA" "$BASE" || { rot "Klon A nicht baubar"; return 2; }; lege_pdfs "$1/workA" v1
+    lauf "$1/workA" "$2" "$1/outA" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" \
+        || { rot "Vorlauf-Export (v1) fehlgeschlagen"; zeige "$1/outA"; return 2; }
+    S=$(tip)
+}
+fremd_eintrag() { # $1 = Klonpfad, $2 = modus|symlink|loeschen: en-kurz am Remote als fremder Tree-Eintrag, gepusht
+    git clone -q "$BARE" "$1" || return 2
+    _f=docs/diplomarbeit/diplomarbeit-en-kurz.pdf
+    case "$2" in
+        modus) git -C "$1" update-index --chmod=+x "$_f" || return 2 ;;
+        symlink) rm -f "$1/$_f" && ln -s diplomarbeit-en-lang.pdf "$1/$_f" && git -C "$1" add -- "$_f" || return 2 ;;
+        loeschen) git -C "$1" rm -q -- "$_f" || return 2 ;;
+        *) return 2 ;;
+    esac
+    git -C "$1" commit -q -m "fremd $2 en-kurz" || return 2
+    git -C "$1" push -q "$BARE" development || return 2
+}
+readme_unter_dir() { # $1 = Klonpfad, $2 = Text: getrackte Fremddatei docs/diplomarbeit/README.md am Remote, gepusht
+    git clone -q "$BARE" "$1" || return 2
+    mkdir -p "$1/docs/diplomarbeit" && echo "$2" >> "$1/docs/diplomarbeit/README.md" || return 2
+    git -C "$1" add -- docs/diplomarbeit/README.md && git -C "$1" commit -q -m "readme unter DIR: $2" || return 2
+    git -C "$1" push -q "$BARE" development || return 2
+}
+netzsperre() { # $1 = Datei: git-Konfiguration, die JEDE http(s)-URL auf einen toten lokalen Pfad umbiegt (kein Netz)
+    printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = https://\n' > "$1"
+    printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = http://\n' >> "$1"
+}
+fall_P32() { # S7-01 (r8b): Remote setzt en-kurz auf Modus 100755 bei gleichem Blob -> UEBERHOLT, kein Push
+    s="$1"; d="$T/P32"; vorlauf_v1 "$d" "$s" || return
+    klone "$d/workB" "$S" || { rot "Klon B nicht baubar"; return; }
+    lege_pdfs "$d/workB" v1; lege_pdfs "$d/workB" v2 de-lang
+    fremd_eintrag "$d/h" modus || { rot "Fremd-Eintrag (Modus) fehlgeschlagen"; return; }; H=$(tip)
+    m=$(git -C "$BARE" ls-tree "$H" -- docs/diplomarbeit/diplomarbeit-en-kurz.pdf | cut -d' ' -f1)
+    erw_gleich "$m" 100755 "Vorbedingung: Modus am Remote"
+    lauf "$d/workB" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 0; erw_text "$d/out" "am Remote als blob/100755 statt blob/100644"; erw_text "$d/out" "S7-01"
+    erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$H" "Bare-Tip = Fremd-Commit (kein Mischstand gepusht)"
+}
+fall_P33() { # S7-01 (r8b): Remote ersetzt en-kurz durch einen Symlink -> UEBERHOLT als Typwechsel, kein Push
+    s="$1"; d="$T/P33"; vorlauf_v1 "$d" "$s" || return
+    klone "$d/workB" "$S" || { rot "Klon B nicht baubar"; return; }
+    lege_pdfs "$d/workB" v1; lege_pdfs "$d/workB" v2 de-lang
+    fremd_eintrag "$d/h" symlink || { rot "Fremd-Eintrag (Symlink) fehlgeschlagen"; return; }; H=$(tip)
+    m=$(git -C "$BARE" ls-tree "$H" -- docs/diplomarbeit/diplomarbeit-en-kurz.pdf | cut -d' ' -f1)
+    erw_gleich "$m" 120000 "Vorbedingung: Modus am Remote"
+    lauf "$d/workB" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 0; erw_text "$d/out" "am Remote als blob/120000 statt blob/100644"; erw_text "$d/out" "S7-01"
+    erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$H" "Bare-Tip = Fremd-Commit (kein Mischstand gepusht)"
+}
+fall_P34() { # S7-02 (r8b): Remote loescht en-kurz, lokal unveraendert -> UEBERHOLT rc=0 mit Pfad + FERN, kein FEHLER
+    s="$1"; d="$T/P34"; vorlauf_v1 "$d" "$s" || return
+    klone "$d/workB" "$S" || { rot "Klon B nicht baubar"; return; }
+    lege_pdfs "$d/workB" v1; lege_pdfs "$d/workB" v2 de-lang
+    fremd_eintrag "$d/h" loeschen || { rot "Fremd-Eintrag (Loeschung) fehlgeschlagen"; return; }; H=$(tip)
+    m=$(git -C "$BARE" ls-tree "$H" -- docs/diplomarbeit/diplomarbeit-en-kurz.pdf | wc -l)
+    erw_gleich "$m" 0 "Vorbedingung: en-kurz am Remote geloescht"
+    lauf "$d/workB" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 0
+    erw_text "$d/out" "UEBERHOLT: Fassung docs/diplomarbeit/diplomarbeit-en-kurz.pdf am Remote geloescht"
+    erw_text "$d/out" "S7-02"; erw_kein_text "$d/out" "FEHLER"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$H" "Bare-Tip = Fremd-Commit"
+}
+fall_P35() { # S7-03 (r8b) (a): fremde getrackte Datei unter DIR lokal geaendert -> FEHLER, nichts committet/gepusht
+    s="$1"; d="$T/P35"; vorlauf_v1 "$d" "$s" || return
+    readme_unter_dir "$d/h" notiz || { rot "README unter DIR nicht anlegbar"; return; }; S2=$(tip)
+    klone "$d/workB" "$S2" || { rot "Klon B nicht baubar"; return; }
+    lege_pdfs "$d/workB" v1; lege_pdfs "$d/workB" v2 de-lang
+    echo "lokal geaendert" >> "$d/workB/docs/diplomarbeit/README.md"
+    lauf "$d/workB" "$s" "$d/out" "$S2" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "ausserhalb der Fassungs-Liste"; erw_text "$d/out" "S7-03"
+    erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$S2" "Bare-Tip unveraendert"
+    v=$(git -C "$BARE" show "$t:docs/diplomarbeit/README.md" | grep -c 'lokal geaendert')
+    erw_gleich "$v" 0 "README am Remote ohne die lokale Aenderung"
+}
+fall_P36() { # S7-03 (r8b) (b): Remote traegt dieselben PDF-Bytes + README unter DIR -> UNVERAENDERT (remote), kein Push
+    s="$1"; d="$T/P36"; vorlauf_v1 "$d" "$s" || return
+    readme_unter_dir "$d/h" notiz || { rot "README unter DIR nicht anlegbar"; return; }; S2=$(tip)
+    klone "$d/workB" "$BASE" || { rot "Klon B nicht baubar"; return; }; lege_pdfs "$d/workB" v1
+    lauf "$d/workB" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 0; erw_text "$d/out" "UNVERAENDERT (remote)"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$S2" "Bare-Tip unveraendert (kein Merge-Commit)"
+}
+fall_P37() { # S7-04 (r8b): CI_PROJECT_PATH fremd bzw. mit Query bei ID 288 -> FEHLER vor jedem Transport, ohne Wert
+    s="$1"; d="$T/P37"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    netzsperre "$d/sperre"   # Gurt: kaeme das Script bis zum Push, traefe es einen toten lokalen Pfad, nie das Netz
+    _i=0
+    for v in gruppe/projekt 'gruppe/projekt?x=1'; do
+        _i=$((_i+1))
+        lauf "$d/work" "$s" "$d/out$_i" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" GIT_TRACE=1 \
+            CI_SERVER_URL=https://gitlab.comdare.local CI_SERVER_HOST=gitlab.comdare.local CI_PROJECT_ID=288 \
+            CI_PROJECT_PATH="$v" COMDARE_WRITEBACK_USER=ciuser COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?
+        zeige "$d/out$_i"; erw_rc "$rc" 1; erw_text "$d/out$_i" "kanonischer Projektpfad (S7-04)"
+        erw_kein_text "$d/out$_i" "gruppe/projekt"; erw_kein_text "$d/out$_i" "$KOEDER"
+        erw_kein_text "$d/out$_i" "PUSH OK"
+    done
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P38() { # S7-05 (r8b): drei Verweigerungspfade drucken den URL-Wert nicht (userinfo+Kennwort, http, fremder Host)
+    s="$1"; d="$T/P38"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    netzsperre "$d/sperre"; KW=geheim-kw-4711
+    lauf "$d/work" "$s" "$d/out1" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" CI_SERVER_URL="https://ciuser:$KW@127.0.0.1:9" \
+        CI_SERVER_HOST=127.0.0.1 CI_PROJECT_ID=288 CI_PROJECT_PATH=gruppe/projekt COMDARE_WRITEBACK_USER=ciuser \
+        COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?; zeige "$d/out1"
+    erw_rc "$rc" 1; erw_text "$d/out1" "traegt userinfo, Query oder Fragment"
+    erw_kein_text "$d/out1" "$KW"; erw_kein_text "$d/out1" "ciuser:"; erw_kein_text "$d/out1" "$KOEDER"
+    lauf "$d/work" "$s" "$d/out2" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" CI_SERVER_URL=http://127.0.0.1:9 \
+        CI_SERVER_HOST=127.0.0.1 CI_PROJECT_ID=288 CI_PROJECT_PATH=gruppe/projekt COMDARE_WRITEBACK_USER=ciuser \
+        COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?; zeige "$d/out2"
+    erw_rc "$rc" 1; erw_text "$d/out2" "ist nicht https://"; erw_kein_text "$d/out2" "127.0.0.1:9"
+    lauf "$d/work" "$s" "$d/out3" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" CI_SERVER_URL=https://127.0.0.1:9 \
+        CI_SERVER_HOST=gitlab.comdare.local CI_PROJECT_ID=288 CI_PROJECT_PATH=gruppe/projekt \
+        COMDARE_WRITEBACK_USER=ciuser COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?; zeige "$d/out3"
+    erw_rc "$rc" 1; erw_text "$d/out3" "zeigt nicht auf die Instanz"; erw_kein_text "$d/out3" "127.0.0.1:9"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P39() { # S7-06 (r8b): expliziter Leerwert der Schalter/Pfade ist kein Default -> FEHLER, nichts gepusht
+    s="$1"; d="$T/P39"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out1" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_EXPORT=; rc=$?
+    zeige "$d/out1"; erw_rc "$rc" 1; erw_text "$d/out1" "erlaubt: true|false"; erw_kein_text "$d/out1" "PUSH OK"
+    for v in DIR SRC FASSUNGEN; do
+        lauf "$d/work" "$s" "$d/out_$v" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "COMDARE_THESIS_PDF_$v="; rc=$?
+        zeige "$d/out_$v"; erw_rc "$rc" 1; erw_text "$d/out_$v" "COMDARE_THESIS_PDF_$v ist gesetzt, aber leer"
+        erw_kein_text "$d/out_$v" "PUSH OK"
+    done
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P40() { # S7-08 (r8b): Header-Test pipelinefrei -- unlesbare Quelle nennt den head-Fehler, nicht 'kein PDF'
+    s="$1"; d="$T/P40"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    f="$d/work/thesis/diplomarbeit/diplomarbeit-en-kurz.pdf"; chmod 000 "$f"
+    if [ -r "$f" ]; then rot "Vorbedingung: Quelle trotz chmod 000 lesbar (root?)"; chmod 644 "$f"; return; fi
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; chmod 644 "$f"; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "head -c 5"; erw_text "$d/out" "S7-08"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P41() { # S7-08 (r8b): SIGTERM im Lauf -> rc=143 + Hilfsverzeichnis geraeumt (trap TERM -> exit -> EXIT-Trap)
+    s="$1"; d="$T/P41"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    mkdir -p "$d/fake" "$d/tmpw"; echt=$(command -v git)
+    { echo '#!/bin/sh'; echo "case \" \$* \" in *\" add \"*) : > '$d/marke'; sleep 3 ;; esac"
+      echo "exec '$echt' \"\$@\""; } > "$d/fake/git"; chmod 755 "$d/fake/git"
+    k=$(git -C "$d/work" rev-parse --short "$BASE")
+    ( cd "$d/work" && exec env -i PATH="$d/fake:$PATH" HOME="$HOME" TMPDIR="$d/tmpw" GIT_CONFIG_GLOBAL=/dev/null \
+        GIT_CONFIG_NOSYSTEM=1 CI_COMMIT_BRANCH=development CI_COMMIT_SHA="$BASE" CI_COMMIT_SHORT_SHA="$k" \
+        CI_PIPELINE_ID=4711 COMDARE_THESIS_PDF_REMOTE="$BARE" sh "$s" ) > "$d/out" 2>&1 &
+    pid=$!; i=0
+    while [ ! -e "$d/marke" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+    if [ ! -e "$d/marke" ]; then
+        rot "Vorbedingung: Fake-git wurde nicht erreicht"; kill "$pid" 2>/dev/null; wait "$pid"; return
+    fi
+    kill -TERM "$pid"; wait "$pid"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 143
+    rest=$(ls -A "$d/tmpw" | wc -l); erw_gleich "$rest" 0 "Hilfsverzeichnisse unter TMPDIR nach SIGTERM"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -1419,6 +1594,16 @@ fall P-28 fall_P28 "$SKRIPT"
 fall P-29 fall_P29 "$SKRIPT"
 fall P-30 fall_P30 "$SKRIPT"
 fall P-31 fall_P31 "$SKRIPT"
+fall P-32 fall_P32 "$SKRIPT"
+fall P-33 fall_P33 "$SKRIPT"
+fall P-34 fall_P34 "$SKRIPT"
+fall P-35 fall_P35 "$SKRIPT"
+fall P-36 fall_P36 "$SKRIPT"
+fall P-37 fall_P37 "$SKRIPT"
+fall P-38 fall_P38 "$SKRIPT"
+fall P-39 fall_P39 "$SKRIPT"
+fall P-40 fall_P40 "$SKRIPT"
+fall P-41 fall_P41 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -1456,8 +1641,33 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed '/(Quelle) liegt ausserhalb des Arbeitsbaums/d' "$SKRIPT" > "$MUT/m40.sh"
     # M43 (r7): jeder Fremdwert wieder INERT -> P-30 muss reissen (C6-13)
     sed 's/\*) fehler "COMDARE_THESIS_PDF_EXPORT=.*/*) echo "INERT: $SW"; exit 0 ;;/' "$SKRIPT" > "$MUT/m43.sh"
-    MUT_N=15; ENTF_N=0; NB_N=0
-    for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43; do
+    # M52 (r8b): Rueckbau auf den Blob-Vergleich (Modus/Typ unbeachtet) -> P-32 muss reissen (S7-01)
+    sed -e 's/^    \[ "\$ma" = "100644" \] && \[ "\$ta" = "blob" \] \\$/    true \\/' \
+        -e 's/^    \[ "\$a" = "\$b" \] || {/    [ "${a##* }" = "${b##* }" ] || {/' \
+        "$SKRIPT" > "$MUT/m52.sh"
+    # M53 (r8b): geloeschte Fassung wieder FEHLER statt UEBERHOLT -> P-34 muss reissen (S7-02)
+    sed 's/then echo "UEBERHOLT: Fassung \$dst am Remote geloescht/then fehler "m53 geloescht/' \
+        "$SKRIPT" > "$MUT/m53.sh"
+    # M54 (r8b): Wache gegen ungestagte Fremdaenderungen unter DIR entfernt -> P-35 muss reissen (S7-03 a)
+    sed '/ausserhalb der Fassungs-Liste (ungestagt, S7-03)/d' "$SKRIPT" > "$MUT/m54.sh"
+    # M55 (r8b): beide Projektpfad-Gleichheitspruefungen entfernt -> P-37 muss reissen (S7-04)
+    sed '/kanonischer Projektpfad (S7-04)/d' "$SKRIPT" > "$MUT/m55.sh"
+    # M56 (r8b): Remote-Idempotenz wieder auf dem Verzeichnis -> P-36 muss reissen (S7-03 b)
+    sed 's/if diff_gleich HEAD FETCH_HEAD -- "\$@"; then/if diff_gleich HEAD FETCH_HEAD -- "$DIR"; then/' \
+        "$SKRIPT" > "$MUT/m56.sh"
+    # M57 (r8b): URL-Wert wieder in der userinfo-Meldung -> P-38 muss reissen (S7-05)
+    sed 's/CI_SERVER_URL traegt userinfo/CI_SERVER_URL '"'"'$CI_SERVER_URL'"'"' traegt userinfo/' \
+        "$SKRIPT" > "$MUT/m57.sh"
+    # M58 (r8b): Leerwert des Schalters wieder Default true -> P-39 muss reissen (S7-06)
+    sed 's/^SW="\${COMDARE_THESIS_PDF_EXPORT-true}"/SW="${COMDARE_THESIS_PDF_EXPORT:-true}"/' "$SKRIPT" > "$MUT/m58.sh"
+    # M59 (r8b): Leerwert-Wache fuer DIR entfernt -> P-39 muss reissen (S7-06)
+    sed '/COMDARE_THESIS_PDF_DIR ist gesetzt, aber leer/d' "$SKRIPT" > "$MUT/m59.sh"
+    # M60 (r8b): Header-Vergleich entfernt -> P-12 muss reissen (S7-08)
+    sed 's/^  \[ "\$hdr" = "%PDF-" \] || /  : || /' "$SKRIPT" > "$MUT/m60.sh"
+    # M61 (r8b): TERM-Trap entfernt -> P-41 muss reissen (S7-08)
+    sed 's/; trap .exit 143. TERM//' "$SKRIPT" > "$MUT/m61.sh"
+    MUT_N=25; ENTF_N=0; NB_N=0
+    for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -1493,6 +1703,16 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m39 fall_P31 P-31
     [ "$BISS_RC" -eq 0 ] && biss m40 fall_P29 P-29
     [ "$BISS_RC" -eq 0 ] && biss m43 fall_P30 P-30
+    [ "$BISS_RC" -eq 0 ] && biss m52 fall_P32 P-32
+    [ "$BISS_RC" -eq 0 ] && biss m53 fall_P34 P-34
+    [ "$BISS_RC" -eq 0 ] && biss m54 fall_P35 P-35
+    [ "$BISS_RC" -eq 0 ] && biss m55 fall_P37 P-37
+    [ "$BISS_RC" -eq 0 ] && biss m56 fall_P36 P-36
+    [ "$BISS_RC" -eq 0 ] && biss m57 fall_P38 P-38
+    [ "$BISS_RC" -eq 0 ] && biss m58 fall_P39 P-39
+    [ "$BISS_RC" -eq 0 ] && biss m59 fall_P39 P-39
+    [ "$BISS_RC" -eq 0 ] && biss m60 fall_P12 P-12
+    [ "$BISS_RC" -eq 0 ] && biss m61 fall_P41 P-41
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
