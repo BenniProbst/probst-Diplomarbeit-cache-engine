@@ -12,6 +12,9 @@
 # (Pfad im Index UND Blob == Arbeitskopie; git add uebergeht .git-Pfade und assume-unchanged-Eintraege still mit
 # rc=0) + Nachzaehlung; L1-02 Kanonik und Arbeitsbaum-Grenze VOR mkdir -p (readlink -m); L1-06 Pfad-Normalisierung
 # (fuehrendes './', Schraegstrich am Ende); L1-07 Vertragstext UEBERHOLT praezisiert.
+# REV r3 (Lens r2, 23.09.2026): L2-05 Normalisierung faltet auch '//', '/./' und '/.' (git add normalisiert, rev-parse
+# ':pfad' nicht = irrefuehrender Abbruch); L2-06 doppelte Fassung laut benannt; L2-08 CI_SERVER_URL nur https://
+# (ueberschreibbare vordefinierte Variable: ein http-Ziel truege den Token im Klartext).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -77,6 +80,12 @@ else
   : "${COMDARE_WRITEBACK_USER:?thesis_pdf_export: COMDARE_WRITEBACK_USER fehlt (CI-Variable 288, protected)}"
   : "${COMDARE_WRITEBACK_TOKEN:?thesis_pdf_export: COMDARE_WRITEBACK_TOKEN fehlt (CI-Variable 288, protected)}"
   : "${CI_SERVER_URL:?thesis_pdf_export: CI_SERVER_URL fehlt (Protokoll+Host+Port des Servers)}"
+  # L2-08 (r3): CI_SERVER_URL ist durch Pipeline-/Projekt-Variablen ueberschreibbar (docs.gitlab.com/ci/variables);
+  # der Askpass-Helfer liefert den Token an JEDES Ziel, also nur ueber TLS.
+  case "$CI_SERVER_URL" in
+    https://*) ;;
+    *) fehler "CI_SERVER_URL '$CI_SERVER_URL' ist nicht https:// (Token liefe im Klartext, L2-08)" ;;
+  esac
   : "${CI_PROJECT_PATH:?thesis_pdf_export: CI_PROJECT_PATH fehlt}"
   REMOTE="${CI_SERVER_URL%/}/${CI_PROJECT_PATH}.git"
   cat > "$WERK/askpass.sh" <<'ASK'
@@ -97,8 +106,18 @@ fi
 # kein Symlink.
 # L1-06 (r2): fuehrendes './' und Schraegstriche am Ende abstreifen, damit der Praefix-Vergleich mit der
 # git-normalisierten Index-Ausgabe (I-02) nicht an der Schreibweise reisst ('docs/diplomarbeit/' = 'docs/diplomarbeit').
+# L2-05 (r3): auch '//', '/./' und ein '/.' am Ende falten -- git add normalisiert sie, rev-parse ':pfad' nicht.
 norm_pfad() { _p="$1"
-  while :; do case "$_p" in ./*) _p="${_p#./}" ;; */) _p="${_p%/}" ;; *) break ;; esac; done
+  while :; do
+    case "$_p" in
+      ./*) _p="${_p#./}" ;;
+      */) _p="${_p%/}" ;;
+      */.) _p="${_p%/.}" ;;
+      *//*) _p="${_p%%//*}/${_p#*//}" ;;
+      */./*) _p="${_p%%/./*}/${_p#*/./}" ;;
+      *) break ;;
+    esac
+  done
   printf '%s\n' "$_p"; }
 DIR=$(norm_pfad "$DIR") || fehler "Normalisierung DIR"
 SRC=$(norm_pfad "$SRC") || fehler "Normalisierung SRC"
@@ -126,12 +145,15 @@ mkdir -p -- "$DIR" || fehler "mkdir -p $DIR"
 DIR_F=$(readlink -f -- "$DIR") || fehler "readlink -f $DIR"
 [ "$DIR_F" = "$DIR_K" ] || fehler "$DIR: Kanonik nach mkdir ($DIR_F) weicht von der Vorpruefung ($DIR_K) ab"
 
-n=0
+n=0; gesehen=' '
 for f in $FASSUNGEN; do
   case "$f" in
     de-lang|en-lang|de-kurz|en-kurz) ;;
     *) fehler "unbekannte Fassung '$f' (erlaubt: de-lang en-lang de-kurz en-kurz)" ;;
   esac
+  # L2-06 (r3): ein Duplikat endete als 'nur 1 von 2 Zieldateien im Index' -- laut beim Namen nennen.
+  case "$gesehen" in *" $f "*) fehler "Fassung '$f' doppelt in COMDARE_THESIS_PDF_FASSUNGEN" ;; esac
+  gesehen="$gesehen$f "
   src="$SRC/diplomarbeit-$f.pdf"; dst="$DIR/diplomarbeit-$f.pdf"
   [ ! -L "$src" ] || fehler "$src ist ein Symlink (Quelldatei verboten)"
   [ -s "$src" ] || fehler "Fassung $src fehlt oder ist leer (Artefakt des thesis:pdf-Jobs)"

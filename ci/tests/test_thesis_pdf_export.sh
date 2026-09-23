@@ -50,13 +50,25 @@
 #   P-20 DIR 'docs/diplomarbeit/' und './docs/diplomarbeit': normalisiert, PUSH OK (L1-06)
 #   P-21 Zielordner selbst als getrackter Symlink nach aussen: FEHLER rc=1, nichts ausserhalb (L1-11)
 #   P-22 Overrides der Probe (COMDARE_SKRIPT/COMDARE_CI_YML) unter CI=true: rc=2 verweigert (Klasse F-02)
+#   r3 (Lens r2, 23.09.2026):
+#   P-23 YAML-Block EPOCH-288 (thesis:pdf): SOURCE_DATE_EPOCH = Quellstand (Elter reiner Writebacks, auch
+#        hinter einem --no-ff-Merge), F-10 Gitlink == Modul-HEAD sonst FEHLER (L2-01, MUSS)
+#   P-24 YAML-Block DRIFT-WACHE-288-289 dreiwertig: byte-gleich / DRIFT rot / veraltet ohne Byte-Urteil /
+#        fehlt gezaehlt (L1-04 + L2-01)
+#   P-25 DIR 'docs//diplomarbeit', 'docs/./diplomarbeit', 'docs/diplomarbeit/.': normalisiert, PUSH OK (L2-05)
+#   P-26 FASSUNGEN='de-lang de-lang': FEHLER 'doppelt', Bare unveraendert (L2-06)
+#   P-27 CI_SERVER_URL=http://...: FEHLER 'nicht https://', kein Transport-Aufruf, Token in 0 Zeilen (L2-08)
+#   P-23/P-24 lesen die ECHTE .gitlab-ci.yml (wie P-17): ohne die r3-Marker-Bloecke sind sie rot -- gewollt.
 #
-# SELBSTBISS (--selbstbiss): sechs Wegwerf-Mutanten des Scripts (M1 Marker
+# SELBSTBISS (--selbstbiss): zwoelf Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
-# git add, M6 Arbeitsbaum-Grenze vor mkdir) MUESSEN P-03 / P-05 / P-02 /
-# P-16 / P-19 / P-18 rot machen -- sonst beweist die Probe nichts und endet
-# mit rc=2.
+# git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
+# Pruefung, M12 '//'-Faltung; YAML: M7 Eltern-Walk (Quellstand), M8 Epoch-
+# Weiche (dreiwertig), M9 Byte-Urteil. Sie MUESSEN P-03 / P-05 / P-02 / P-16 /
+# P-19 / P-18 / P-27 / P-26 / P-25 / P-23 / P-24 / P-24 rot machen -- sonst
+# beweist die Probe nichts und endet mit rc=2. Fehlen die YAML-Marker (Lead-
+# Patch noch nicht gelandet), entfallen M7-M9 LAUT; P-23/P-24 sind dann rot.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -66,6 +78,8 @@
 #   COMDARE_SKRIPT   Pfad zum zu pruefenden Script (Default: ../thesis_pdf_export.sh
 #                    relativ zu dieser Datei). Fuer die Rot-Messung am alten Stand.
 #   TMPDIR           Wurzel der Wegwerf-Repos (Default /tmp); Pfad ohne Leerzeichen.
+#   bash             Runner-Shell (docs.gitlab.com/runner/shells) fuer P-23/P-24: die YAML-Bloecke laufen
+#                    dort wie im Job (bash -e -o pipefail); fehlt bash, sind P-23/P-24 rot.
 #   COMDARE_CI_YML   .gitlab-ci.yml fuer P-17 (Default: ../../.gitlab-ci.yml relativ zu
 #                    dieser Datei). Fuer die Gruen-Messung an einer gepatchten Kopie.
 #   COMDARE_SKRIPT und COMDARE_CI_YML sind in CI (CI/GITLAB_CI gesetzt) VERWEIGERT
@@ -83,8 +97,9 @@
 #     das Client-Verhalten gegen ein git-Bare-Repo.
 #   - Netz-/TLS-/Rechte-Fehler des echten Remotes; P-09/P-11 zeigen nur, dass
 #     solche Fehler LAUT und ohne Credential im Log enden.
-#   - Byte-Gleichheit der PDFs zur Thesis-Seite (I-06/L1-04) -- Drift-Wache im
-#     Job thesis:pdf (YAML), hier nicht pruefbar (kein TeX, kein Submodul).
+#   - Byte-Gleichheit ECHTER PDFs zur Thesis-Seite (I-06/L1-04): P-23/P-24 fahren
+#     die YAML-Bloecke mit Fake-PDFs (CreationDate = Epoch) -- die Toolchain-
+#     Gleichheit 288/289 zeigt erst der scharfe Lauf am Kurz-Stand (O-6).
 #   - P-17 liest die ECHTE .gitlab-ci.yml: solange der Job test:thesis-pdf-export-
 #     probe dort fehlt (YAML = Lead-only), ist P-17 rot -- gewollt (T-7).
 #
@@ -454,6 +469,7 @@ fall_P18() { # L1-02: getrackter Zwischen-Symlink docs/ext -> ../../aussen; DIR=
     [ -L "$d/work/docs/ext" ] || { rot "Zwischen-Symlink im Klon fehlt (Nenner)"; return; }
     lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR="docs/ext/pdf"; rc=$?
     zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "ausserhalb des Arbeitsbaums"
+    [ -d "$d/aussen" ] || { rot "Nenner: aussen/ fehlt (L2-04)"; return; }
     anz=$(ls -A "$d/aussen" | wc -l); erw_gleich "$anz" 0 "Eintraege ausserhalb des Baums angelegt (aussen/)"
     t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert"
 }
@@ -492,6 +508,7 @@ fall_P21() { # L1-11: Zielordner selbst als getrackter Symlink nach aussen -> FE
     [ -L "$d/work/docs/diplomarbeit" ] || { rot "Symlink im Klon fehlt (Nenner)"; return; }
     lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
     erw_rc "$rc" 1; erw_text "$d/out" "Symlink (Zielordner verboten)"
+    [ -d "$d/aussen" ] || { rot "Nenner: aussen/ fehlt (L2-04)"; return; }
     anz=$(ls -A "$d/aussen" | wc -l); erw_gleich "$anz" 0 "Dateien ausserhalb des Baums (aussen/)"
     t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert"
 }
@@ -503,7 +520,158 @@ fall_P22() { # Override-Verweigerung der PROBE in CI (Klasse F-02): COMDARE_SKRI
     ( cd "$d" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GITLAB_CI=true COMDARE_CI_YML="$CI_YML" sh "$SELBST" ) \
         > "$d/out2" 2>&1; rc=$?
     erw_rc "$rc" 2; erw_text "$d/out2" "in CI verweigert"
-    n=$(ls -d "$T"/tpe_probe.* 2>/dev/null | wc -l); erw_gleich "$n" 0 "Wegwerf-Wurzeln einer verweigerten Probe"
+    # L2-03 (r3): der innere Lauf muss VOR mktemp enden (Kopfzeile "Wegwerf-Wurzel:" darf nicht stehen) -- ein
+    # durchgelaufener Harnisch raeumt seine Wurzel selbst, eine Null-Zaehlung unterschied das nicht.
+    erw_kein_text "$d/out1" "Wegwerf-Wurzel:"; erw_kein_text "$d/out2" "Wegwerf-Wurzel:"
+}
+
+# --------------------------------------------------------------------------- Faelle r3 (Lens r2)
+# P-23/P-24: die Bloecke EPOCH-288 und DRIFT-WACHE-288-289 des Jobs thesis:pdf werden zwischen ihren Markern aus der
+# YAML extrahiert (6 Leerzeichen Block-Skalar-Einzug abgestreift) und mit der Runner-Shell (bash -e -o pipefail)
+# gegen ein Wegwerf-Modul samt Wegwerf-super gefahren; ein "Bau" ist hier eine Fake-PDF mit CreationDate = Epoch,
+# genau wie pdfTeX unter FORCE_SOURCE_DATE=1 die Zeit aus SOURCE_DATE_EPOCH nimmt.
+extrahiere_block() { # $1 = YAML, $2 = Marker-Name, $3 = Zieldatei; Ausgabe: Zeilenzahl
+    awk -v a="# >>> $2" -v e="# <<< $2" '
+        index($0, a) == 7 { drin = 1 }
+        drin { print substr($0, 7) }
+        index($0, e) == 7 { drin = 0 }' "$1" > "$3"
+    awk 'END{print NR}' "$3"
+}
+epoch_zeit() { date -u -d "@$1" +%Y%m%d%H%M%S; }
+lege_pdf_epoch() { # $1 = Verzeichnis, $2 = Epoch, $3 = Marke
+    for f in de-lang en-lang de-kurz en-kurz; do
+        printf '%%PDF-1.4\n%% fassung %s %s\n/CreationDate (D:%sZ)\n%%%%EOF\n' "$f" "$3" "$(epoch_zeit "$2")" \
+            > "$1/diplomarbeit-$f.pdf"
+    done
+}
+modul_commit() { # $1 = Epoch, $2 = Botschaft
+    GIT_COMMITTER_DATE="$1 +0000" GIT_AUTHOR_DATE="$1 +0000" git -C "$MODUL" commit -q -m "$2"
+}
+# Wegwerf-Modul (Thesis) im Wegwerf-super: X1 (Quelle, T1) -> Y1 (reiner Writeback, PDFs mit CreationDate T1)
+#   -> Zweig b: B1 (Quelle, T3); M = --no-ff-Merge von b auf Y1 (T4; fuer Nicht-PDF-Pfade TREESAME zu B1)
+#   -> Y2 (reiner Writeback auf M, PDFs mit CreationDate T4) -> Z1 (Quelle nach dem Writeback, T6).
+# Die Thesis-CI baut am Commit X mit %ct(X); der Writeback ist Kind Y. Setzt MODUL, SUPERW, X1 Y1 Y2 Z1, T1 T4 T6.
+baue_modul() { # $1 = Wurzelverzeichnis
+    SUPERW="$1/super"; MODUL="$SUPERW/thesis/diplomarbeit"; T1=1758600100; T4=1758600400; T6=1758600600
+    mkdir -p "$MODUL" || return 2
+    git init -q "$MODUL" && git -C "$MODUL" symbolic-ref HEAD refs/heads/development || return 2
+    printf '%s\n' '\documentclass{article}' > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit "$T1" "X1 quelle" || return 2
+    X1=$(git -C "$MODUL" rev-parse HEAD) || return 2
+    lege_pdf_epoch "$MODUL" "$T1" writeback1; git -C "$MODUL" add -- diplomarbeit-*.pdf || return 2
+    modul_commit 1758600200 "Y1 writeback [skip ci]" || return 2; Y1=$(git -C "$MODUL" rev-parse HEAD) || return 2
+    git -C "$MODUL" checkout -q -b b "$X1" || return 2
+    printf 'b\n' >> "$MODUL/diplomarbeit.tex"; git -C "$MODUL" add diplomarbeit.tex || return 2
+    modul_commit 1758600300 "B1 quelle auf b" || return 2
+    git -C "$MODUL" checkout -q development || return 2
+    GIT_COMMITTER_DATE="$T4 +0000" GIT_AUTHOR_DATE="$T4 +0000" git -C "$MODUL" merge -q --no-ff --no-edit \
+        -m "M merge b" b || return 2
+    lege_pdf_epoch "$MODUL" "$T4" writeback2; git -C "$MODUL" add -- diplomarbeit-*.pdf || return 2
+    modul_commit 1758600500 "Y2 writeback [skip ci]" || return 2; Y2=$(git -C "$MODUL" rev-parse HEAD) || return 2
+    printf 'z\n' >> "$MODUL/diplomarbeit.tex"; git -C "$MODUL" add diplomarbeit.tex || return 2
+    modul_commit "$T6" "Z1 quelle nach writeback" || return 2; Z1=$(git -C "$MODUL" rev-parse HEAD) || return 2
+    git init -q "$SUPERW" && git -C "$SUPERW" symbolic-ref HEAD refs/heads/development || return 2
+    echo "super" > "$SUPERW/README.md"; git -C "$SUPERW" add README.md || return 2
+}
+super_gitlink() { # $1 = SHA: Gitlink thesis/diplomarbeit im Wegwerf-super auf $1 setzen und committen
+    git -C "$SUPERW" update-index --add --cacheinfo "160000,$1,thesis/diplomarbeit" || return 2
+    GIT_COMMITTER_DATE="1758600900 +0000" GIT_AUTHOR_DATE="1758600900 +0000" git -C "$SUPERW" commit -q \
+        --allow-empty -m "gitlink $1" || return 2
+}
+fahre_block() { # $1 = Scriptdatei, $2 = Logdatei, danach K=V-Paare; cwd = Modul, CI_PROJECT_DIR = Wegwerf-super
+    _bs="$1"; _bl="$2"; shift 2
+    ( cd "$MODUL" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
+        CI_PROJECT_DIR="$SUPERW" "$@" bash -e -o pipefail "$_bs" ) > "$_bl" 2>&1
+}
+stand() { # $1 = SHA: Modul detached auf $1 (Fake-Bau der Vorrunde zurueckgesetzt), Gitlink des Wegwerf-super auf $1
+    git -C "$MODUL" checkout -q -- . && git -C "$MODUL" clean -qf -- . \
+        && git -C "$MODUL" checkout -q --detach "$1" && super_gitlink "$1"
+}
+fall_P23() { # L2-01 (r3): SOURCE_DATE_EPOCH = Quellstand; F-10 Gitlink == HEAD -- YAML-Block EPOCH-288
+    d="$T/P23"; mkdir -p "$d"
+    z=$(extrahiere_block "$CI_YML" EPOCH-288 "$d/epoch.sh"); echo "      Block EPOCH-288 aus der YAML: $z Zeilen"
+    if [ "$z" -lt 5 ]; then
+        rot "Block EPOCH-288 fehlt in $CI_YML ($z Zeilen zwischen den Markern) -- keine Quellstand-Formel"; return
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
+    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    for f in "Y1:$Y1:$T1:reiner Writeback auf X1" "X1:$X1:$T1:Quelle ohne Writeback" \
+             "Y2:$Y2:$T4:Writeback auf --no-ff-Merge M (TREESAME-Ecke)" "Z1:$Z1:$T6:Quelle nach dem Writeback"; do
+        nm=${f%%:*}; r=${f#*:}; sha=${r%%:*}; r=${r#*:}; soll=${r%%:*}; text=${r#*:}
+        stand "$sha" || { rot "Stand $nm nicht herstellbar"; return; }
+        fahre_block "$d/epoch.sh" "$d/out_$nm"; rc=$?; zeige "$d/out_$nm"
+        erw_rc "$rc" 0
+        e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_$nm" | head -1 | cut -d= -f2)
+        erw_gleich "$e" "$soll" "Epoch am Stand $nm ($text)"
+    done
+    git -C "$MODUL" checkout -q --detach "$Y1" && super_gitlink "$X1" || { rot "Gitlink-Stand X1"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_gitlink"; rc=$?; zeige "$d/out_gitlink"
+    erw_rc "$rc" 1; erw_text "$d/out_gitlink" "weicht vom super-Gitlink"   # F-10: Modul Y1, Gitlink X1
+}
+fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
+    d="$T/P24"; mkdir -p "$d"
+    ze=$(extrahiere_block "$CI_YML" EPOCH-288 "$d/epoch.sh")
+    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$d/drift.sh")
+    echo "      Bloecke aus der YAML: EPOCH-288 $ze Zeilen, DRIFT-WACHE-288-289 $zd Zeilen"
+    if [ "$ze" -lt 5 ] || [ "$zd" -lt 5 ]; then
+        rot "Block EPOCH-288/DRIFT-WACHE-288-289 fehlt in $CI_YML ($ze/$zd Zeilen) -- keine dreiwertige Wache"; return
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
+    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    cat > "$d/bau.sh" <<'BAU'
+for f in de-lang en-lang de-kurz en-kurz; do
+  printf '%%PDF-1.4\n%% fassung %s %s\n/CreationDate (D:%sZ)\n%%%%EOF\n' "$f" "$BAU_MARKE" \
+    "$(date -u -d "@$SOURCE_DATE_EPOCH" +%Y%m%d%H%M%S)" > "diplomarbeit-$f.pdf"
+done
+[ -z "${BAU_DRIFT:-}" ] || printf '%% drift\n' >> "diplomarbeit-de-lang.pdf"
+BAU
+    cat "$d/epoch.sh" "$d/bau.sh" "$d/drift.sh" > "$d/lauf.sh"
+    stand "$Y1" || { rot "Stand Y1"; return; }                          # (a) gleicher Quellstand, gleiche Bytes
+    fahre_block "$d/lauf.sh" "$d/out_a" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_a"
+    erw_rc "$rc" 0; erw_text "$d/out_a" "4 byte-gleich geprueft"; erw_text "$d/out_a" "0 veraltet/abweichend"
+    erw_kein_text "$d/out_a" "FEHLER: DRIFT"
+    stand "$Y1" || { rot "Stand Y1"; return; }                          # (b) gleicher Epoch, andere Bytes = ROT
+    fahre_block "$d/lauf.sh" "$d/out_b" BAU_MARKE=writeback1 BAU_DRIFT=1; rc=$?; zeige "$d/out_b"
+    erw_rc "$rc" 1; erw_text "$d/out_b" "FEHLER: DRIFT 288/289 bei diplomarbeit-de-lang.pdf"
+    stand "$Z1" || { rot "Stand Z1"; return; }                          # (c) Quelle bewegt: veraltet, kein Urteil
+    fahre_block "$d/lauf.sh" "$d/out_c" BAU_MARKE=neu; rc=$?; zeige "$d/out_c"
+    erw_rc "$rc" 0; erw_text "$d/out_c" "4 veraltet/abweichend"; erw_text "$d/out_c" "kein Byte-Urteil"
+    erw_kein_text "$d/out_c" "FEHLER: DRIFT"; erw_text "$d/out_c" "0 byte-gleich geprueft"
+    stand "$X1" || { rot "Stand X1"; return; }                          # (d) keine 289-Kopie: gezaehlt
+    fahre_block "$d/lauf.sh" "$d/out_d" BAU_MARKE=neu; rc=$?; zeige "$d/out_d"
+    erw_rc "$rc" 0; erw_text "$d/out_d" "0 von 4 Fassungen am Gitlink vorhanden"; erw_text "$d/out_d" "4 fehlen"
+}
+fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
+    s="$1"; d="$T/P25"
+    for var in "docs//diplomarbeit" "docs/./diplomarbeit" "docs/diplomarbeit/."; do
+        sub="$d/$(printf '%s' "$var" | tr '/.' '__')"
+        baue_seed "$sub" || { rot "Wegwerf-Remote nicht baubar"; return; }
+        klone "$sub/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$sub/work" v1
+        lauf "$sub/work" "$s" "$sub/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR="$var"; rc=$?
+        zeige "$sub/out"; erw_rc "$rc" 0; erw_text "$sub/out" "PUSH OK (ci.skip)"
+        erw_kein_text "$sub/out" "kein Stage-0-Eintrag"
+        t=$(tip); n=$(git -C "$BARE" ls-tree --name-only "$t" docs/diplomarbeit/ | grep -c 'diplomarbeit-.*\.pdf$')
+        erw_gleich "$n" 4 "PDF-Dateien unter docs/diplomarbeit/ im Bare-Tip (DIR='$var')"
+    done
+}
+fall_P26() { # L2-06: doppelte Fassung wird beim Namen genannt, nichts gepusht
+    s="$1"; d="$T/P26"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" \
+        COMDARE_THESIS_PDF_FASSUNGEN='de-lang de-lang'
+    rc=$?; zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "Fassung 'de-lang' doppelt"
+    erw_kein_text "$d/out" "Zieldateien stehen im Index"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P27() { # L2-08: CI_SERVER_URL ohne https:// -> FEHLER vor jedem Transport, Token in 0 Zeilen
+    s="$1"; d="$T/P27"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out" "$BASE" CI_SERVER_URL=http://127.0.0.1:9 CI_PROJECT_PATH=gruppe/projekt \
+        COMDARE_WRITEBACK_USER=ciuser COMDARE_WRITEBACK_TOKEN="$KOEDER" GIT_TRACE=1; rc=$?
+    erw_rc "$rc" 1; erw_text "$d/out" "ist nicht https://"
+    erw_kein_text "$d/out" "remote-http"   # kein Transport-Aufruf (weder http noch https)
+    erw_kein_text "$d/out" "$KOEDER"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -540,10 +708,15 @@ fall P-19 fall_P19 "$SKRIPT"
 fall P-20 fall_P20 "$SKRIPT"
 fall P-21 fall_P21 "$SKRIPT"
 fall P-22 fall_P22 "$SKRIPT"
+fall P-23 fall_P23 "$SKRIPT"
+fall P-24 fall_P24 "$SKRIPT"
+fall P-25 fall_P25 "$SKRIPT"
+fall P-26 fall_P26 "$SKRIPT"
+fall P-27 fall_P27 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
-BISS_RC=0; MUT_N=0
+BISS_RC=0; MUT_N=0; ENTF_N=0
 if [ "$SELBSTBISS" -eq 1 ]; then
     echo ""; echo "== SELBSTBISS: Mutanten muessen ROT werden =="
     MUT="$T/mutanten"; mkdir -p "$MUT"
@@ -559,8 +732,14 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed '/nicht den Inhalt der Arbeitskopie/d' "$SKRIPT" > "$MUT/m5.sh"
     # M6: Arbeitsbaum-Grenze vor mkdir entfernt -> P-18 muss reissen (L1-02)
     sed '/liegt ausserhalb des Arbeitsbaums/d' "$SKRIPT" > "$MUT/m6.sh"
-    MUT_N=6
-    for m in m1 m2 m3 m4 m5 m6; do
+    # M10: https-Pflicht entfernt -> P-27 muss reissen (L2-08)
+    sed '/ist nicht https:\/\//d' "$SKRIPT" > "$MUT/m10.sh"
+    # M11: Duplikat-Pruefung entfernt -> P-26 muss reissen (L2-06)
+    sed '/doppelt in COMDARE_THESIS_PDF_FASSUNGEN/d' "$SKRIPT" > "$MUT/m11.sh"
+    # M12: '//'-Faltung entfernt -> P-25 muss reissen (L2-05)
+    sed '/_p%%\/\/\*/d' "$SKRIPT" > "$MUT/m12.sh"
+    MUT_N=9; ENTF_N=0
+    for m in m1 m2 m3 m4 m5 m6 m10 m11 m12; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -581,6 +760,42 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m4 fall_P16 P-16
     [ "$BISS_RC" -eq 0 ] && biss m5 fall_P19 P-19
     [ "$BISS_RC" -eq 0 ] && biss m6 fall_P18 P-18
+    [ "$BISS_RC" -eq 0 ] && biss m10 fall_P27 P-27
+    [ "$BISS_RC" -eq 0 ] && biss m11 fall_P26 P-26
+    [ "$BISS_RC" -eq 0 ] && biss m12 fall_P25 P-25
+    # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
+    zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
+    if [ "$zm" -lt 5 ]; then
+        ENTF_N=3; echo "  [ENTFAELLT] Mutanten m7/m8/m9 (YAML): Block EPOCH-288 fehlt in der YAML ($zm Zeilen)"
+    else
+        # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
+        sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
+        # M8: Epoch-Weiche entfernt (Byte-Vergleich auch bei veralteter Kopie) -> P-24 (c) muss reissen
+        sed 's/if \[ -n "\$e289" \] && \[ "\$e289" = "\$SOURCE_DATE_EPOCH" \]; then/if true; then/' \
+            "$CI_YML" > "$MUT/m8.yml"
+        # M9: Byte-Urteil entfernt -> P-24 (b) muss reissen (L1-04)
+        sed '/test -n "\$s288" && test "\$s288" = "\$s289"/,/andere Bytes (L1-04\/L2-01)"; exit 1; }/d' \
+            "$CI_YML" > "$MUT/m9.yml"
+        MUT_N=$((MUT_N+3))
+        for m in m7 m8 m9; do
+            if cmp -s "$CI_YML" "$MUT/$m.yml"; then
+                echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
+            fi
+        done
+        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung
+            T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
+            ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
+            T="$T_ALT"
+            if [ "$r" -gt 0 ]; then
+                echo "  [OK]  Mutante $1 (YAML) macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
+            else
+                echo "  [ABBRUCH] Mutante $1 (YAML) laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+            fi
+        }
+        [ "$BISS_RC" -eq 0 ] && biss_yml m7 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && biss_yml m8 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m9 fall_P24 P-24
+    fi
 fi
 
 echo ""
@@ -588,7 +803,7 @@ echo "==========================================================================
 echo "BILANZ: $GRUEN_N von $N_FAELLE Faellen gruen, $ROT_N rot${ROT_LISTE:+ (}$ROT_LISTE${ROT_LISTE:+ )}"
 if [ "$SELBSTBISS" -eq 1 ]; then
     if [ "$BISS_RC" -eq 0 ]; then
-        echo "        Selbstbiss: $MUT_N von $MUT_N Mutanten rot"
+        echo "        Selbstbiss: $MUT_N von $MUT_N Mutanten rot${ENTF_N:+, }$ENTF_N entfallen (YAML ohne Marker)"
     else
         echo "        Selbstbiss: NICHT bewiesen"
     fi
