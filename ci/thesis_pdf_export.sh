@@ -15,6 +15,11 @@
 # REV r3 (Lens r2, 23.09.2026): L2-05 Normalisierung faltet auch '//', '/./' und '/.' (git add normalisiert, rev-parse
 # ':pfad' nicht = irrefuehrender Abbruch); L2-06 doppelte Fassung laut benannt; L2-08 CI_SERVER_URL nur https://
 # (ueberschreibbare vordefinierte Variable: ein http-Ziel truege den Token im Klartext).
+# REV r7 (Codex-Lens r6 + Lead-Triage K294, 23.09.2026): C6-13 Schalter nur true|false (Tippfehler = FEHLER statt
+# INERT); C6-07 Modus --ci (Aufruf-Literal der YAML): Testhaken bedingungslos verweigert; C6-06 Push-Ziel nur die
+# Instanz (CI_SERVER_HOST + URL-Host == Konstante, CI_PROJECT_ID == 288, kein userinfo/Query/Fragment); C6-08
+# Quelle kanonisch unter dem Arbeitsbaum (Zwischen-Symlink); C6-05 F-06 auch bei bewegtem Export-Script; C6-04
+# nach dem Merge muss jede exportierte Fassung noch das eigene Artefakt sein, sonst UEBERHOLT (kein Mischstand).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -25,15 +30,28 @@
 # CI-Rezept seit CI_COMMIT_SHA bewegt = UEBERHOLT (rc=0, kein Push alter PDFs; exportiert wird beim naechsten Push,
 # der eine Pipeline erzeugt -- ein [skip ci]-Bot-Commit, der den Gitlink bewegt, erzeugt selbst keine);
 # bei Konflikt sauberer Abbruch (naechste Pipeline holt nach).
-# SCHALTER: COMDARE_THESIS_PDF_EXPORT=false = INERT; COMDARE_THESIS_PDF_FASSUNGEN (Teilmenge der vier IDs);
+# SCHALTER: COMDARE_THESIS_PDF_EXPORT=false = INERT (nur true|false, r7); COMDARE_THESIS_PDF_FASSUNGEN (Teilmenge);
 # COMDARE_THESIS_PDF_SRC (Default thesis/diplomarbeit); COMDARE_THESIS_PDF_REMOTE = TESTHAKEN der Bissprobe:
 # nur absoluter Pfad auf ein lokales Bare-Repo, in CI (CI/GITLAB_CI gesetzt) laut verweigert.
 # Push-Option ci.no_pipeline (19.1-Doku) statt ci.skip = Owner-Frage Q-2 der Bewertung r1, hier nicht gesetzt.
 set -eu
 set -f
 fehler() { echo "FEHLER: $*"; exit 1; }
+# C6-06 (r7): Instanz-Konstanten -- Host wie die origin-URL des Projekts, Projekt-ID 288 (kein Projektpfad-Literal).
+INSTANZ_HOST=gitlab.comdare.local
+INSTANZ_PROJEKT_ID=288
+# C6-07 (r7): Modus --ci = Produktionsaufruf aus der YAML (Literal im script:, nicht per Variable ueberschreibbar).
+MODUS=""
+for arg in "$@"; do
+  case "$arg" in --ci) MODUS=ci ;; *) fehler "unbekanntes Argument '$arg' (erlaubt: --ci)" ;; esac
+done
+# C6-13 (r7): nur true|false; jeder andere Wert (Tippfehler) endet laut statt als gruener INERT-Job.
 SW="${COMDARE_THESIS_PDF_EXPORT:-true}"
-if [ "$SW" != "true" ]; then echo "INERT: COMDARE_THESIS_PDF_EXPORT=$SW, kein Export"; exit 0; fi
+case "$SW" in
+  true) ;;
+  false) echo "INERT: COMDARE_THESIS_PDF_EXPORT=false, kein Export"; exit 0 ;;
+  *) fehler "COMDARE_THESIS_PDF_EXPORT='$SW' unbekannt (erlaubt: true|false; C6-13)" ;;
+esac
 DIR="${COMDARE_THESIS_PDF_DIR:-docs/diplomarbeit}"
 SRC="${COMDARE_THESIS_PDF_SRC:-thesis/diplomarbeit}"
 FASSUNGEN="${COMDARE_THESIS_PDF_FASSUNGEN:-de-lang en-lang de-kurz en-kurz}"
@@ -66,6 +84,8 @@ HEAD_SHA=$(git rev-parse --verify HEAD) || fehler "HEAD nicht bestimmbar"
 # fremdes Ziel umlenken = gruener Job ohne Projekt-Update) und ausserhalb CI nur ein lokales Bare-Repo.
 # F-01: das echte Ziel ist credential-frei; Nutzer/Token liefert ein 0700-Askpass-Helfer aus der Umgebung.
 if [ -n "${COMDARE_THESIS_PDF_REMOTE:-}" ]; then
+  [ "$MODUS" != ci ] \
+    || fehler "COMDARE_THESIS_PDF_REMOTE ist ein Testhaken und wird im Modus --ci verweigert (C6-07)"
   [ -z "${CI:-}" ] && [ -z "${GITLAB_CI:-}" ] \
     || fehler "COMDARE_THESIS_PDF_REMOTE ist ein Testhaken und wird in CI verweigert (CI/GITLAB_CI gesetzt)"
   case "$COMDARE_THESIS_PDF_REMOTE" in
@@ -83,9 +103,20 @@ else
   # L2-08 (r3): CI_SERVER_URL ist durch Pipeline-/Projekt-Variablen ueberschreibbar (docs.gitlab.com/ci/variables);
   # der Askpass-Helfer liefert den Token an JEDES Ziel, also nur ueber TLS.
   case "$CI_SERVER_URL" in
+    *[@?#]*) fehler "CI_SERVER_URL '$CI_SERVER_URL' traegt userinfo, Query oder Fragment (C6-06)" ;;
     https://*) ;;
     *) fehler "CI_SERVER_URL '$CI_SERVER_URL' ist nicht https:// (Token liefe im Klartext, L2-08)" ;;
   esac
+  # C6-06 (r7): Tiefenschutz -- der Askpass-Helfer liefert den Token an das Ziel; das Ziel muss die Instanz sein.
+  : "${CI_SERVER_HOST:?thesis_pdf_export: CI_SERVER_HOST fehlt}"
+  : "${CI_PROJECT_ID:?thesis_pdf_export: CI_PROJECT_ID fehlt}"
+  [ "$CI_PROJECT_ID" = "$INSTANZ_PROJEKT_ID" ] \
+    || fehler "CI_PROJECT_ID '$CI_PROJECT_ID' ist nicht das Projekt $INSTANZ_PROJEKT_ID (C6-06)"
+  [ "$CI_SERVER_HOST" = "$INSTANZ_HOST" ] \
+    || fehler "CI_SERVER_HOST '$CI_SERVER_HOST' ist nicht die Instanz $INSTANZ_HOST (C6-06)"
+  url_host="${CI_SERVER_URL#https://}"; url_host="${url_host%%/*}"; url_host="${url_host%%:*}"
+  [ "$url_host" = "$INSTANZ_HOST" ] \
+    || fehler "CI_SERVER_URL '$CI_SERVER_URL' zeigt nicht auf die Instanz $INSTANZ_HOST (C6-06)"
   : "${CI_PROJECT_PATH:?thesis_pdf_export: CI_PROJECT_PATH fehlt}"
   REMOTE="${CI_SERVER_URL%/}/${CI_PROJECT_PATH}.git"
   cat > "$WERK/askpass.sh" <<'ASK'
@@ -136,6 +167,11 @@ done
 # ausserhalb des Baums anlegen. readlink -f nach mkdir bleibt als zweite Schicht.
 DIR_K=$(readlink -m -- "$DIR") || fehler "readlink -m $DIR"
 SRC_K=$(readlink -f -- "$SRC") || fehler "readlink -f $SRC"
+# C6-08 (r7): Symmetrie zu DIR_K -- die Quelle darf nicht ueber einen Zwischen-Symlink aus dem Baum zeigen.
+case "$SRC_K/" in
+  "$WURZEL/"*) ;;
+  *) fehler "$SRC (Quelle) liegt ausserhalb des Arbeitsbaums ($SRC_K, C6-08)" ;;
+esac
 [ "$DIR_K" != "$SRC_K" ] || fehler "Ziel und Quelle identisch ($DIR)"
 case "$DIR_K/" in
   "$WURZEL/"*) ;;
@@ -194,6 +230,7 @@ $GITP -c user.name="super-pdf-bot" -c user.email="super-pdf-bot@ci.comdare.local
   -m "Quelle super $KURZ ($PIPE_SHA), Submodul thesis/diplomarbeit (Order 389/390, 22.09.2026) [skip ci]" \
   -- "$DIR" || fehler "git commit"
 NEU=$(git rev-parse --short HEAD) || fehler "git rev-parse HEAD"
+NEU_VOLL=$(git rev-parse --verify HEAD) || fehler "git rev-parse --verify HEAD"
 echo "Commit $NEU auf $BRANCH (Basis Pipeline-Commit $KURZ)"
 
 # F-05 Push-Schleife: jeder Fehler ist sichtbar; nur ein nachgewiesenes non-ff-Race (Remote-Tip bewegt) fuehrt
@@ -212,7 +249,7 @@ while [ "$versuch" -lt 5 ]; do
   fi
   ist_vorfahr "$PIPE_SHA" FETCH_HEAD \
     || fehler "$BRANCH ($FERN) enthaelt den Pipeline-Commit $KURZ nicht (Rewrite/Force-Push?)"
-  if ! diff_gleich "$PIPE_SHA" FETCH_HEAD -- thesis/diplomarbeit .gitlab-ci.yml; then
+  if ! diff_gleich "$PIPE_SHA" FETCH_HEAD -- thesis/diplomarbeit .gitlab-ci.yml ci/thesis_pdf_export.sh; then
     echo "UEBERHOLT: Thesis-Gitlink oder CI-Rezept seit $KURZ bewegt ($FERN); kein Push alter PDFs"
     exit 0
   fi
@@ -223,6 +260,13 @@ while [ "$versuch" -lt 5 ]; do
   $GITP -c user.name="super-pdf-bot" -c user.email="super-pdf-bot@ci.comdare.local" merge -q --no-edit \
     -m "Merge $BRANCH in thesis-pdf-export $PIPE_ID [skip ci]" FETCH_HEAD \
     || { git merge --abort 2>/dev/null || true; fehler "Merge mit $FERN kollidiert, naechste Pipeline holt nach"; }
+  # C6-04 (r7): nach dem Merge muss jede exportierte Fassung noch das eigene Artefakt tragen; sonst hat ein fremder
+  # Commit eine Fassung bewegt und der Push waere ein Mischstand -> UEBERHOLT (rc=0), naechste Pipeline exportiert.
+  while IFS= read -r dst; do
+    a=$(git rev-parse --verify "HEAD:$dst") || fehler "git rev-parse HEAD:$dst (nach Merge)"
+    b=$(git rev-parse --verify "$NEU_VOLL:$dst") || fehler "git rev-parse $NEU:$dst (eigener Export-Commit)"
+    [ "$a" = "$b" ] || { echo "UEBERHOLT: Fassung $dst am Remote fremd bewegt ($FERN), kein Push (C6-04)"; exit 0; }
+  done < "$WERK/dst.txt"
   echo "Merge mit $BRANCH-Tip $FERN [skip ci], erneuter Push"
   if [ "$versuch" -lt 5 ]; then sleep $((versuch * 2)); fi
 done
