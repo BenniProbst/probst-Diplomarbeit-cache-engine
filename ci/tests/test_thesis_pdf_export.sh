@@ -41,11 +41,22 @@
 #   P-13 DIR absolut / mit .. / kanonisch gleich SRC: FEHLER rc=1 (F-03)
 #   P-14 HEAD != CI_COMMIT_SHA: FEHLER rc=1 (Provenienz PDF = Pipeline-Commit)
 #   P-15 fremder Pfad im Index: FEHLER rc=1, nichts gepusht (I-02)
+#   r2 (Lens r1, 23.09.2026):
+#   P-09b Askpass-Helfer des Scripts liefert per git credential fill (netzfrei); ohne Helfer laut (L1-05)
+#   P-16 DIR mit .git-Komponente (.git/x, docs/.git/x, .git): FEHLER rc=1, 0 PDFs unter .git/ (L1-01, MUSS)
+#   P-17 eigene Registrierung in .gitlab-ci.yml + kein allow_failure im eigenen Job, Koeder zuerst (T-7, L1-14)
+#   P-18 getrackter Zwischen-Symlink docs/ext -> ../../aussen, DIR=docs/ext/pdf: FEHLER, aussen/ bleibt leer (L1-02)
+#   P-19 assume-unchanged-Eintrag: git add stagt still nichts -> FEHLER, kein veraltetes PDF gepusht (L1-01)
+#   P-20 DIR 'docs/diplomarbeit/' und './docs/diplomarbeit': normalisiert, PUSH OK (L1-06)
+#   P-21 Zielordner selbst als getrackter Symlink nach aussen: FEHLER rc=1, nichts ausserhalb (L1-11)
+#   P-22 Overrides der Probe (COMDARE_SKRIPT/COMDARE_CI_YML) unter CI=true: rc=2 verweigert (Klasse F-02)
 #
-# SELBSTBISS (--selbstbiss): drei Wegwerf-Mutanten des Scripts (M1 Marker
+# SELBSTBISS (--selbstbiss): sechs Wegwerf-Mutanten des Scripts (M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
-# M3 Remote-Idempotenz-Zweig) MUESSEN P-03 / P-05 / P-02 rot machen -- sonst
-# beweist die Probe nichts und endet mit rc=2.
+# M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
+# git add, M6 Arbeitsbaum-Grenze vor mkdir) MUESSEN P-03 / P-05 / P-02 /
+# P-16 / P-19 / P-18 rot machen -- sonst beweist die Probe nichts und endet
+# mit rc=2.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -55,6 +66,11 @@
 #   COMDARE_SKRIPT   Pfad zum zu pruefenden Script (Default: ../thesis_pdf_export.sh
 #                    relativ zu dieser Datei). Fuer die Rot-Messung am alten Stand.
 #   TMPDIR           Wurzel der Wegwerf-Repos (Default /tmp); Pfad ohne Leerzeichen.
+#   COMDARE_CI_YML   .gitlab-ci.yml fuer P-17 (Default: ../../.gitlab-ci.yml relativ zu
+#                    dieser Datei). Fuer die Gruen-Messung an einer gepatchten Kopie.
+#   COMDARE_SKRIPT und COMDARE_CI_YML sind in CI (CI/GITLAB_CI gesetzt) VERWEIGERT
+#   (rc=2): ein Variablen-Setzer koennte die Probe sonst still auf ein fremdes
+#   Script oder eine fremde YAML lenken -- dieselbe Klasse wie F-02 (P-22 misst es).
 #
 # EXIT: 0 = alle Faelle gruen (und, mit --selbstbiss, alle Mutanten rot)
 #       1 = mindestens ein Fall rot (literale Ausgabe im Protokoll)
@@ -67,7 +83,10 @@
 #     das Client-Verhalten gegen ein git-Bare-Repo.
 #   - Netz-/TLS-/Rechte-Fehler des echten Remotes; P-09/P-11 zeigen nur, dass
 #     solche Fehler LAUT und ohne Credential im Log enden.
-#   - Byte-Gleichheit der PDFs zur Thesis-Seite (I-06) -- eigene Wache.
+#   - Byte-Gleichheit der PDFs zur Thesis-Seite (I-06/L1-04) -- Drift-Wache im
+#     Job thesis:pdf (YAML), hier nicht pruefbar (kein TeX, kein Submodul).
+#   - P-17 liest die ECHTE .gitlab-ci.yml: solange der Job test:thesis-pdf-export-
+#     probe dort fehlt (YAML = Lead-only), ist P-17 rot -- gewollt (T-7).
 #
 # POSIX-sh (die CI ruft `sh`, das ist hier dash), ASCII-only, kein bash-ismus;
 # GNU-Werkzeuge wie im Script selbst (readlink -f, mktemp, head -c).
@@ -75,9 +94,17 @@
 set -u
 
 HIER=$(cd "$(dirname "$0")" && pwd -P) || { echo "ABBRUCH: eigener Pfad nicht bestimmbar"; exit 2; }
+if [ -n "${CI:-}${GITLAB_CI:-}" ] && [ -n "${COMDARE_SKRIPT:-}${COMDARE_CI_YML:-}" ]; then
+    echo "ABBRUCH: COMDARE_SKRIPT/COMDARE_CI_YML sind Overrides der Probe und werden in CI verweigert (CI/GITLAB_CI)"
+    exit 2
+fi
 SKRIPT="${COMDARE_SKRIPT:-$HIER/../thesis_pdf_export.sh}"
 SKRIPT=$(readlink -f "$SKRIPT") || { echo "ABBRUCH: readlink -f auf das Script fehlgeschlagen"; exit 2; }
 [ -f "$SKRIPT" ] || { echo "ABBRUCH: Script '$SKRIPT' fehlt"; exit 2; }
+CI_YML="${COMDARE_CI_YML:-$HIER/../../.gitlab-ci.yml}"
+CI_YML=$(readlink -f "$CI_YML") || { echo "ABBRUCH: readlink -f auf die .gitlab-ci.yml fehlgeschlagen"; exit 2; }
+[ -f "$CI_YML" ] || { echo "ABBRUCH: .gitlab-ci.yml '$CI_YML' fehlt"; exit 2; }
+SELBST="$HIER/$(basename "$0")"
 SELBSTBISS=0
 for a in "$@"; do
     case "$a" in
@@ -106,6 +133,7 @@ BARE=""; BASE=""
 echo "============================================================================="
 echo " BISSPROBE thesis_pdf_export -- Script: $SKRIPT"
 echo " Wegwerf-Wurzel: $T"
+echo " YAML (P-17):    $CI_YML"
 echo "============================================================================="
 
 ok()  { echo "    [OK]  $*"; }
@@ -353,6 +381,131 @@ fall_P15() {
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert (fremder Pfad nie gepusht)"
 }
 
+# --------------------------------------------------------------------------- Faelle r2 (Lens r1)
+fall_P09b() { # L1-05: der Askpass-Helfer des Scripts liefert per git credential fill (netzfrei, host=example.invalid)
+    s="$1"; d="$T/P09b"; mkdir -p "$d"
+    sed -n "/<<'ASK'\$/,/^ASK\$/p" "$s" | sed '1d;$d' > "$d/askpass.sh"
+    z=$(awk 'END{print NR}' "$d/askpass.sh"); echo "      Helfer-Zeilen aus dem Script: $z"
+    if [ "$z" -lt 5 ]; then
+        rot "Askpass-Helfer im Script nicht gefunden ($z Zeilen zwischen <<'ASK' und ASK)"; return
+    fi
+    chmod 0700 "$d/askpass.sh"
+    printf 'protocol=https\nhost=example.invalid\n\n' | env -i PATH="$PATH" HOME="$HOME" GIT_CONFIG_GLOBAL=/dev/null \
+        GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 COMDARE_WRITEBACK_USER=botuser COMDARE_WRITEBACK_TOKEN="$KOEDER" \
+        GIT_ASKPASS="$d/askpass.sh" git -c credential.helper= credential fill > "$d/out" 2>&1; rc=$?
+    erw_rc "$rc" 0; erw_text "$d/out" "username=botuser"; erw_text "$d/out" "password=$KOEDER"
+    printf 'protocol=https\nhost=example.invalid\n\n' | env -i PATH="$PATH" HOME="$HOME" GIT_CONFIG_GLOBAL=/dev/null \
+        GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 git -c credential.helper= credential fill > "$d/out2" 2>&1; rc=$?
+    erw_rc "$rc" 128; erw_text "$d/out2" "terminal prompts disabled"   # Gegenprobe: ohne Helfer laut, nie still
+}
+fall_P16() { # L1-01: .git-Komponente im Ziel -> FEHLER, nichts unter .git/ geschrieben, Bare unveraendert
+    s="$1"; d="$T/P16"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    [ -d "$d/work/.git" ] || { rot "Klon hat kein .git-Verzeichnis (Nenner)"; return; }
+    for ziel in .git/x docs/.git/x .git; do
+        lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR="$ziel"; rc=$?
+        zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "traegt eine .git-Komponente"
+    done
+    n=$(find "$d/work/.git" -name 'diplomarbeit-*.pdf' | wc -l); erw_gleich "$n" 0 "PDFs unter .git/ geschrieben"
+    if [ -e "$d/work/docs/.git" ]; then rot "docs/.git wurde angelegt"; else ok "docs/.git nicht angelegt"; fi
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+AUFRUF='sh ci/tests/test_thesis_pdf_export.sh'
+JOB='test:thesis-pdf-export-probe'
+zaehle_aufrufe() { grep -c -F -- "$AUFRUF" "$1" || true; }
+zaehle_jobkopf() { grep -c -- "^$JOB:" "$1" || true; }
+# Der Job-Block endet an der ersten nicht eingerueckten, nicht leeren Zeile (Vorlage K9: sonst zaehlt der
+# Kommentarblock des NAECHSTEN Jobs mit).
+zaehle_allow() {
+    awk -v job="$JOB:" 'substr($0, 1, length(job)) == job { in_job = 1; next }
+        in_job && /^[^ ]/ && NF > 0 { in_job = 0 }
+        in_job && /allow_failure/ { n++ }
+        END { print n + 0 }' "$1"
+}
+fall_P17() { # T-7 (L1-14, Vorlage K9): eigene Registrierung + kein allow_failure im eigenen Job-Block, Koeder zuerst
+    d="$T/P17"; mkdir -p "$d"
+    {
+        printf 'x:\n  script:\n    - echo x\n\n'
+        printf '%s:\n  stage: test\n  allow_failure: true\n  script:\n    - %s --selbstbiss\n\n' "$JOB" "$AUFRUF"
+        printf '# allow_failure in Prosa\ny:\n  script: [echo y]\n'
+    } > "$d/koeder.yml"
+    k_a=$(zaehle_aufrufe "$d/koeder.yml"); k_j=$(zaehle_jobkopf "$d/koeder.yml"); k_f=$(zaehle_allow "$d/koeder.yml")
+    if [ "$k_a" = 1 ] && [ "$k_j" = 1 ] && [ "$k_f" = 1 ]; then
+        ok "Koeder beisst: Aufruf $k_a, Job-Kopf $k_j, allow_failure im Block $k_f (je 1 erwartet)"
+    else
+        rot "Koeder beisst NICHT ($k_a/$k_j/$k_f statt 1/1/1) -- die Zaehlung taugt nicht, keine Null gilt"; return
+    fi
+    nz=$(awk 'END{print NR}' "$CI_YML"); echo "      Nenner: $nz Zeilen in $CI_YML"
+    a=$(zaehle_aufrufe "$CI_YML"); j=$(zaehle_jobkopf "$CI_YML"); f=$(zaehle_allow "$CI_YML")
+    if [ "$a" -ge 1 ]; then ok "Probe wird gerufen ($a Aufruf(e) '$AUFRUF')"
+    else rot "Probe wird nicht gerufen (0 Aufrufe '$AUFRUF') -- ein nie gelaufener Test ist keiner"; fi
+    if [ "$j" -eq 1 ]; then ok "Job-Block $JOB vorhanden (1 Kopfzeile)"
+    else rot "Job-Block $JOB: $j Kopfzeile(n), erwartet 1"; fi
+    if [ "$f" -eq 0 ]; then ok "kein allow_failure im Job $JOB"
+    else rot "Job $JOB traegt allow_failure ($f Zeile(n)) -- die naechste stille Null"; fi
+}
+fall_P18() { # L1-02: getrackter Zwischen-Symlink docs/ext -> ../../aussen; DIR=docs/ext/pdf -> FEHLER, aussen/ leer
+    s="$1"; d="$T/P18"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    git clone -q "$BARE" "$d/prep" || { rot "Klon prep nicht baubar"; return; }
+    mkdir -p "$d/prep/docs" "$d/aussen"; ln -s ../../aussen "$d/prep/docs/ext"
+    git -C "$d/prep" add docs/ext && git -C "$d/prep" commit -q -m "zwischen-symlink" \
+        && git -C "$d/prep" push -q "$BARE" development || { rot "Symlink-Commit fehlgeschlagen"; return; }
+    S=$(tip); klone "$d/work" "$S" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    [ -L "$d/work/docs/ext" ] || { rot "Zwischen-Symlink im Klon fehlt (Nenner)"; return; }
+    lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR="docs/ext/pdf"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "ausserhalb des Arbeitsbaums"
+    anz=$(ls -A "$d/aussen" | wc -l); erw_gleich "$anz" 0 "Eintraege ausserhalb des Baums angelegt (aussen/)"
+    t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert"
+}
+fall_P19() { # L1-01 (2. Schicht): assume-unchanged-Eintrag -> git add stagt still nichts -> FEHLER, kein Push
+    s="$1"; d="$T/P19"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/workA" "$BASE" || { rot "Klon A nicht baubar"; return; }; lege_pdfs "$d/workA" v1
+    lauf "$d/workA" "$s" "$d/outA" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" \
+        || { rot "Vorlauf-Export (v1) fehlgeschlagen"; zeige "$d/outA"; return; }
+    S=$(tip); klone "$d/workB" "$S" || { rot "Klon B nicht baubar"; return; }; lege_pdfs "$d/workB" v2
+    git -C "$d/workB" update-index --assume-unchanged docs/diplomarbeit/diplomarbeit-de-lang.pdf \
+        || { rot "assume-unchanged nicht setzbar"; return; }
+    lauf "$d/workB" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "nicht den Inhalt der Arbeitskopie"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert (kein Export mit veraltetem PDF)"
+}
+fall_P20() { # L1-06: DIR mit Schraegstrich am Ende / mit './' -> normalisiert, Export laeuft (statt 'fremde Pfade')
+    s="$1"; d="$T/P20"
+    for var in "docs/diplomarbeit/" "./docs/diplomarbeit"; do
+        sub="$d/$(printf '%s' "$var" | tr '/.' '__')"
+        baue_seed "$sub" || { rot "Wegwerf-Remote nicht baubar"; return; }
+        klone "$sub/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$sub/work" v1
+        lauf "$sub/work" "$s" "$sub/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR="$var"; rc=$?
+        zeige "$sub/out"; erw_rc "$rc" 0; erw_text "$sub/out" "PUSH OK (ci.skip)"
+        erw_kein_text "$sub/out" "fremde Pfad"
+        t=$(tip); n=$(git -C "$BARE" ls-tree --name-only "$t" docs/diplomarbeit/ | grep -c 'diplomarbeit-.*\.pdf$')
+        erw_gleich "$n" 4 "PDF-Dateien unter docs/diplomarbeit/ im Bare-Tip (DIR='$var')"
+    done
+}
+fall_P21() { # L1-11: Zielordner selbst als getrackter Symlink nach aussen -> FEHLER, nichts ausserhalb geschrieben
+    s="$1"; d="$T/P21"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    git clone -q "$BARE" "$d/prep" || { rot "Klon prep nicht baubar"; return; }
+    mkdir -p "$d/prep/docs" "$d/aussen"; ln -s ../../aussen "$d/prep/docs/diplomarbeit"
+    git -C "$d/prep" add docs/diplomarbeit && git -C "$d/prep" commit -q -m "zielordner als symlink" \
+        && git -C "$d/prep" push -q "$BARE" development || { rot "Symlink-Commit fehlgeschlagen"; return; }
+    S=$(tip); klone "$d/work" "$S" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    [ -L "$d/work/docs/diplomarbeit" ] || { rot "Symlink im Klon fehlt (Nenner)"; return; }
+    lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Symlink (Zielordner verboten)"
+    anz=$(ls -A "$d/aussen" | wc -l); erw_gleich "$anz" 0 "Dateien ausserhalb des Baums (aussen/)"
+    t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert"
+}
+fall_P22() { # Override-Verweigerung der PROBE in CI (Klasse F-02): COMDARE_SKRIPT / COMDARE_CI_YML unter CI -> rc=2
+    s="$1"; d="$T/P22"; mkdir -p "$d"
+    ( cd "$d" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" CI=true COMDARE_SKRIPT="$s" sh "$SELBST" ) \
+        > "$d/out1" 2>&1; rc=$?
+    zeige "$d/out1"; erw_rc "$rc" 2; erw_text "$d/out1" "in CI verweigert"
+    ( cd "$d" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GITLAB_CI=true COMDARE_CI_YML="$CI_YML" sh "$SELBST" ) \
+        > "$d/out2" 2>&1; rc=$?
+    erw_rc "$rc" 2; erw_text "$d/out2" "in CI verweigert"
+    n=$(ls -d "$T"/tpe_probe.* 2>/dev/null | wc -l); erw_gleich "$n" 0 "Wegwerf-Wurzeln einer verweigerten Probe"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -379,10 +532,18 @@ fall P-12 fall_P12 "$SKRIPT"
 fall P-13 fall_P13 "$SKRIPT"
 fall P-14 fall_P14 "$SKRIPT"
 fall P-15 fall_P15 "$SKRIPT"
+fall P-09b fall_P09b "$SKRIPT"
+fall P-16 fall_P16 "$SKRIPT"
+fall P-17 fall_P17 "$SKRIPT"
+fall P-18 fall_P18 "$SKRIPT"
+fall P-19 fall_P19 "$SKRIPT"
+fall P-20 fall_P20 "$SKRIPT"
+fall P-21 fall_P21 "$SKRIPT"
+fall P-22 fall_P22 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
-BISS_RC=0
+BISS_RC=0; MUT_N=0
 if [ "$SELBSTBISS" -eq 1 ]; then
     echo ""; echo "== SELBSTBISS: Mutanten muessen ROT werden =="
     MUT="$T/mutanten"; mkdir -p "$MUT"
@@ -392,7 +553,14 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed '/Symlink (Zieldatei verboten)/d' "$SKRIPT" > "$MUT/m2.sh"
     # M3: Remote-Idempotenz-Zweig entfernt -> P-02 muss reissen (F-07)
     sed '/# F-07 Remote-Idempotenz/,/^  fi$/d' "$SKRIPT" > "$MUT/m3.sh"
-    for m in m1 m2 m3; do
+    # M4: .git-Muster aus dem case entfernt -> P-16 muss reissen (L1-01, 1. Schicht)
+    sed '/traegt eine .git-Komponente/d' "$SKRIPT" > "$MUT/m4.sh"
+    # M5: Inhalts-Invariante nach git add entfernt -> P-19 muss reissen (L1-01, 2. Schicht)
+    sed '/nicht den Inhalt der Arbeitskopie/d' "$SKRIPT" > "$MUT/m5.sh"
+    # M6: Arbeitsbaum-Grenze vor mkdir entfernt -> P-18 muss reissen (L1-02)
+    sed '/liegt ausserhalb des Arbeitsbaums/d' "$SKRIPT" > "$MUT/m6.sh"
+    MUT_N=6
+    for m in m1 m2 m3 m4 m5 m6; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -410,6 +578,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m1 fall_P03 P-03
     [ "$BISS_RC" -eq 0 ] && biss m2 fall_P05 P-05
     [ "$BISS_RC" -eq 0 ] && biss m3 fall_P02 P-02
+    [ "$BISS_RC" -eq 0 ] && biss m4 fall_P16 P-16
+    [ "$BISS_RC" -eq 0 ] && biss m5 fall_P19 P-19
+    [ "$BISS_RC" -eq 0 ] && biss m6 fall_P18 P-18
 fi
 
 echo ""
@@ -417,7 +588,7 @@ echo "==========================================================================
 echo "BILANZ: $GRUEN_N von $N_FAELLE Faellen gruen, $ROT_N rot${ROT_LISTE:+ (}$ROT_LISTE${ROT_LISTE:+ )}"
 if [ "$SELBSTBISS" -eq 1 ]; then
     if [ "$BISS_RC" -eq 0 ]; then
-        echo "        Selbstbiss: 3 von 3 Mutanten rot"
+        echo "        Selbstbiss: $MUT_N von $MUT_N Mutanten rot"
     else
         echo "        Selbstbiss: NICHT bewiesen"
     fi

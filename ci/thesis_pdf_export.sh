@@ -8,6 +8,10 @@
 # F-05 auswertbare Push-Schleife (max 5, Race-Nachweis statt Fehlertext-Parsing), F-06 UEBERHOLT-Wache
 # (Gitlink/CI-Rezept seit CI_COMMIT_SHA bewegt), F-07 Remote-Idempotenz, I-02 Index-Invariante + Commit per
 # Pathspec, gepruefte Substitutionen und expliziter Diff-Status. Bissprobe: ci/tests/test_thesis_pdf_export.sh.
+# REV r2 (Lens r1, 23.09.2026): L1-01 .git-Komponente im Ziel verboten + Index-Invariante nach jedem git add
+# (Pfad im Index UND Blob == Arbeitskopie; git add uebergeht .git-Pfade und assume-unchanged-Eintraege still mit
+# rc=0) + Nachzaehlung; L1-02 Kanonik und Arbeitsbaum-Grenze VOR mkdir -p (readlink -m); L1-06 Pfad-Normalisierung
+# (fuehrendes './', Schraegstrich am Ende); L1-07 Vertragstext UEBERHOLT praezisiert.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -15,7 +19,8 @@
 # Merge-Commit tragen '[skip ci]', Push mit -o ci.skip auf HEAD:$CI_COMMIT_BRANCH (Order 340 A-01 (c): eigener
 # Branch); COMDARE_WRITEBACK_USER/TOKEN gehen NUR ueber GIT_ASKPASS (nie in URL, argv, .git/config oder Log);
 # bei Ablehnung fetch + Pruefung + merge (nie rebase), max 5 Versuche; hat sich der Thesis-Gitlink oder das
-# CI-Rezept seit CI_COMMIT_SHA bewegt = UEBERHOLT (rc=0, kein Push alter PDFs, naechste Pipeline exportiert);
+# CI-Rezept seit CI_COMMIT_SHA bewegt = UEBERHOLT (rc=0, kein Push alter PDFs; exportiert wird beim naechsten Push,
+# der eine Pipeline erzeugt -- ein [skip ci]-Bot-Commit, der den Gitlink bewegt, erzeugt selbst keine);
 # bei Konflikt sauberer Abbruch (naechste Pipeline holt nach).
 # SCHALTER: COMDARE_THESIS_PDF_EXPORT=false = INERT; COMDARE_THESIS_PDF_FASSUNGEN (Teilmenge der vier IDs);
 # COMDARE_THESIS_PDF_SRC (Default thesis/diplomarbeit); COMDARE_THESIS_PDF_REMOTE = TESTHAKEN der Bissprobe:
@@ -87,23 +92,39 @@ ASK
   export GIT_ASKPASS="$WERK/askpass.sh"
 fi
 
-# F-03: Eingabe-Haertung. Ziel und Quelle sind relative Unterbaeume ohne '..', das Ziel kein Symlink, beide
-# nach Aufloesung verschieden und das Ziel innerhalb des Arbeitsbaums; jede Zieldatei ist kein Symlink.
+# F-03: Eingabe-Haertung. Ziel und Quelle sind relative Unterbaeume ohne '..' und ohne .git-Komponente, das Ziel
+# kein Symlink, beide nach Aufloesung verschieden und das Ziel innerhalb des Arbeitsbaums; jede Zieldatei ist
+# kein Symlink.
+# L1-06 (r2): fuehrendes './' und Schraegstriche am Ende abstreifen, damit der Praefix-Vergleich mit der
+# git-normalisierten Index-Ausgabe (I-02) nicht an der Schreibweise reisst ('docs/diplomarbeit/' = 'docs/diplomarbeit').
+norm_pfad() { _p="$1"
+  while :; do case "$_p" in ./*) _p="${_p#./}" ;; */) _p="${_p%/}" ;; *) break ;; esac; done
+  printf '%s\n' "$_p"; }
+DIR=$(norm_pfad "$DIR") || fehler "Normalisierung DIR"
+SRC=$(norm_pfad "$SRC") || fehler "Normalisierung SRC"
 for p in "$DIR" "$SRC"; do
   case "$p" in
-    ''|/*|..|../*|*/../*|*/..) fehler "'$p' muss ein relativer Pfad ohne '..' sein" ;;
+    ''|.|/*|..|../*|*/../*|*/..) fehler "'$p' muss ein relativer Pfad ohne '..' sein" ;;
+    # L1-01 (r2): git add uebergeht Pfade mit einer .git-Komponente STILL (rc=0, nichts gestagt) -- ein solches
+    # Ziel endete als gruener Job ohne Export.
+    .git|.git/*|*/.git|*/.git/*) fehler "'$p' traegt eine .git-Komponente (git add uebergeht solche Pfade still)" ;;
   esac
 done
 [ ! -L "$DIR" ] || fehler "$DIR ist ein Symlink (Zielordner verboten)"
 [ -d "$SRC" ] || fehler "Quelle $SRC fehlt (Artefakt des thesis:pdf-Jobs)"
-mkdir -p "$DIR" || fehler "mkdir -p $DIR"
-DIR_K=$(readlink -f "$DIR") || fehler "readlink -f $DIR"
-SRC_K=$(readlink -f "$SRC") || fehler "readlink -f $SRC"
+# L1-02 (r2): Kanonik und Arbeitsbaum-Grenze VOR dem ersten Seiteneffekt. readlink -m loest auch noch fehlende
+# Glieder auf; ein getrackter Zwischen-Symlink (docs/ext -> ../../aussen) darf nicht einmal ein leeres Verzeichnis
+# ausserhalb des Baums anlegen. readlink -f nach mkdir bleibt als zweite Schicht.
+DIR_K=$(readlink -m -- "$DIR") || fehler "readlink -m $DIR"
+SRC_K=$(readlink -f -- "$SRC") || fehler "readlink -f $SRC"
 [ "$DIR_K" != "$SRC_K" ] || fehler "Ziel und Quelle identisch ($DIR)"
 case "$DIR_K/" in
   "$WURZEL/"*) ;;
   *) fehler "$DIR liegt ausserhalb des Arbeitsbaums ($DIR_K)" ;;
 esac
+mkdir -p -- "$DIR" || fehler "mkdir -p $DIR"
+DIR_F=$(readlink -f -- "$DIR") || fehler "readlink -f $DIR"
+[ "$DIR_F" = "$DIR_K" ] || fehler "$DIR: Kanonik nach mkdir ($DIR_F) weicht von der Vorpruefung ($DIR_K) ab"
 
 n=0
 for f in $FASSUNGEN; do
@@ -119,10 +140,23 @@ for f in $FASSUNGEN; do
   groesse=$(wc -c < "$src") || fehler "wc -c $src"
   cp -f "$src" "$dst" || fehler "cp $src $dst"
   git add -- "$dst" || fehler "git add $dst"
+  # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen. Der
+  # Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie tragen (git diff --quiet traut assume-unchanged).
+  git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
+    || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
+  blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
+  idx=$(git rev-parse --verify -q ":$dst") || fehler "git rev-parse :$dst (kein Stage-0-Eintrag)"
+  [ "$idx" = "$blob" ] || fehler "Index traegt fuer $dst nicht den Inhalt der Arbeitskopie ($idx != $blob)"
+  printf '%s\n' "$dst" >> "$WERK/dst.txt" || fehler "Zielliste $WERK/dst.txt"
   n=$((n+1))
   echo "Fassung $f: $groesse B nach $dst"
 done
 [ "$n" -gt 0 ] || fehler "keine Fassung in COMDARE_THESIS_PDF_FASSUNGEN"
+# L1-01 (r2): Nachzaehlung nach der Schleife -- alle n Zieldateien stehen im Index unter $DIR/ (nicht ueber
+# diff --cached: bei byte-gleichem Bestand ist der gestagte Diff leer, und UNVERAENDERT unten ist der richtige Ausgang).
+git ls-files -- "$DIR" > "$WERK/ls.txt" || fehler "git ls-files $DIR"
+gestagt=$(grep -cxF -f "$WERK/dst.txt" "$WERK/ls.txt" || true)
+[ "$gestagt" -eq "$n" ] || fehler "nur $gestagt von $n Zieldateien stehen im Index unter $DIR/"
 
 # I-02: nur Pfade unter $DIR/ duerfen im Index stehen; der Commit nimmt zusaetzlich nur den Pathspec $DIR.
 git diff --cached --name-only > "$WERK/index.txt" || fehler "git diff --cached --name-only"
