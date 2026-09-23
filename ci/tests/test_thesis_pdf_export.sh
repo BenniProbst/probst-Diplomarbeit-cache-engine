@@ -59,16 +59,24 @@
 #   P-26 FASSUNGEN='de-lang de-lang': FEHLER 'doppelt', Bare unveraendert (L2-06)
 #   P-27 CI_SERVER_URL=http://...: FEHLER 'nicht https://', kein Transport-Aufruf, Token in 0 Zeilen (L2-08)
 #   P-23/P-24 lesen die ECHTE .gitlab-ci.yml (wie P-17): ohne die r3-Marker-Bloecke sind sie rot -- gewollt.
+#   r4 (Lens r3, 23.09.2026):
+#   P-23 (e) shallow-Klon des Wegwerf-Moduls (--depth 1) am Stand Y1: FEHLER 'gekappt' rc=1 statt stillem Rueckfall
+#        auf %ct(HEAD) (L3-01, ADV-14, MUSS); (f) zwei reine Writebacks hintereinander: Epoch X1, 2 Stufen (ADV-10)
+#   P-24 (e) 289-Kopie mit fremdem PTEX.Fullbanner bei gleichem Epoch: 'Toolchain abweichend', rc=0, 0 byte-gleich
+#        (L3-02, MUSS); (f) fremde CreationDate-Form (kein D:<14 Ziffern>Z): veraltet/abweichend, rc=0 (I-4, ADV-12);
+#        (g) pdftex fehlt auf dem PATH: FEHLER 'pdftex fehlt' rc=1 (Toolchain-Nachweis fail-closed, L3-02)
 #
-# SELBSTBISS (--selbstbiss): zwoelf Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): vierzehn Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
 # Pruefung, M12 '//'-Faltung; YAML: M7 Eltern-Walk (Quellstand), M8 Epoch-
-# Weiche (dreiwertig), M9 Byte-Urteil. Sie MUESSEN P-03 / P-05 / P-02 / P-16 /
-# P-19 / P-18 / P-27 / P-26 / P-25 / P-23 / P-24 / P-24 rot machen -- sonst
-# beweist die Probe nichts und endet mit rc=2. Fehlen die YAML-Marker (Lead-
-# Patch noch nicht gelandet), entfallen M7-M9 LAUT; P-23/P-24 sind dann rot.
+# Weiche (dreiwertig), M9 Byte-Urteil, M13 shallow-Pruefung (r4), M14
+# Fullbanner-Vergleich (r4). Sie MUESSEN P-03 / P-05 / P-02 / P-16 / P-19 /
+# P-18 / P-27 / P-26 / P-25 / P-23 / P-24 / P-24 / P-23 / P-24 rot machen --
+# sonst beweist die Probe nichts und endet mit rc=2. Fehlen die YAML-Marker
+# (Lead-Patch noch nicht gelandet), entfallen M7-M9/M13/M14 LAUT; P-23/P-24
+# sind dann rot.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -100,6 +108,9 @@
 #   - Byte-Gleichheit ECHTER PDFs zur Thesis-Seite (I-06/L1-04): P-23/P-24 fahren
 #     die YAML-Bloecke mit Fake-PDFs (CreationDate = Epoch) -- die Toolchain-
 #     Gleichheit 288/289 zeigt erst der scharfe Lauf am Kurz-Stand (O-6).
+#     P-24 stellt dem Block einen Wegwerf-pdftex (Versionszeile) voran: die
+#     Nachweiszeile ist geprueft, die ECHTE pdftex-Installation des Runners
+#     ist Konfig-Posten (thesis:pdf prueft latexmk/pdflatex selbst).
 #   - P-17 liest die ECHTE .gitlab-ci.yml: solange der Job test:thesis-pdf-export-
 #     probe dort fehlt (YAML = Lead-only), ist P-17 rot -- gewollt (T-7).
 #
@@ -607,6 +618,29 @@ fall_P23() { # L2-01 (r3): SOURCE_DATE_EPOCH = Quellstand; F-10 Gitlink == HEAD 
     git -C "$MODUL" checkout -q --detach "$Y1" && super_gitlink "$X1" || { rot "Gitlink-Stand X1"; return; }
     fahre_block "$d/epoch.sh" "$d/out_gitlink"; rc=$?; zeige "$d/out_gitlink"
     erw_rc "$rc" 1; erw_text "$d/out_gitlink" "weicht vom super-Gitlink"   # F-10: Modul Y1, Gitlink X1
+    # (e) L3-01 (r4): shallow-Klon des Moduls am Stand Y1 (--depth 1 ueber file://, der Elter von Y1 fehlt) -- die
+    # Wache muss LAUT reissen ('gekappt', rc=1) statt still auf %ct(Y1)=1758600200 zurueckzufallen (ADV-14).
+    git -C "$MODUL" branch -f y1 "$Y1" || { rot "Zweig y1 nicht setzbar"; return; }
+    git clone -q --depth 1 -b y1 "file://$MODUL" "$d/shallow" 2>/dev/null \
+        || { rot "shallow-Klon nicht baubar"; return; }
+    sh_=$(git -C "$d/shallow" rev-parse --is-shallow-repository); erw_gleich "$sh_" true "Nenner: Klon ist shallow"
+    h_=$(git -C "$d/shallow" rev-parse HEAD); erw_gleich "$h_" "$Y1" "Nenner: shallow-HEAD == Y1"
+    stand "$Y1" || { rot "Stand Y1 (e)"; return; }
+    MODUL_VOLL="$MODUL"; MODUL="$d/shallow"
+    fahre_block "$d/epoch.sh" "$d/out_shallow"; rc=$?; MODUL="$MODUL_VOLL"; zeige "$d/out_shallow"
+    erw_rc "$rc" 1; erw_text "$d/out_shallow" "gekappt"; erw_kein_text "$d/out_shallow" "SOURCE_DATE_EPOCH="
+    # (f) ADV-10 (Lens r3 L3-10/L3-11): zwei reine Writebacks hintereinander (Y1b auf Y1) -- Quellstand X1, 2 Stufen
+    git -C "$MODUL" checkout -q -B w2 "$Y1" || { rot "Zweig w2 nicht setzbar"; return; }
+    lege_pdf_epoch "$MODUL" 1758600200 writeback1b
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600250 "Y1b writeback auf Y1 [skip ci]" \
+        || { rot "Commit Y1b"; return; }
+    Y1B=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1b"; return; }
+    stand "$Y1B" || { rot "Stand Y1b"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_Y1b"; rc=$?; zeige "$d/out_Y1b"
+    erw_rc "$rc" 0
+    e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_Y1b" | head -1 | cut -d= -f2)
+    erw_gleich "$e" "$T1" "Epoch am Stand Y1b (zweiter reiner Writeback auf Y1)"
+    erw_text "$d/out_Y1b" "2 Writeback-Stufe(n) uebersprungen"
 }
 fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
     d="$T/P24"; mkdir -p "$d"
@@ -618,28 +652,77 @@ fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + F
     fi
     command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
     baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    # r4 (L3-02): Wegwerf-pdftex fuer die Nachweiszeile des Blocks (die ECHTE Installation ist Konfig-Posten)
+    mkdir -p "$d/bin" || { rot "Wegwerf-bin nicht anlegbar"; return; }
+    printf '#!/bin/sh\necho "pdfTeX 3.141592653-2.6-1.40.29 (TeX Live 2026) [Wegwerf-pdftex der Probe]"\n' \
+        > "$d/bin/pdftex"; chmod 0755 "$d/bin/pdftex"
+    P24_PATH="$d/bin:$PATH"
     cat > "$d/bau.sh" <<'BAU'
 for f in de-lang en-lang de-kurz en-kurz; do
   printf '%%PDF-1.4\n%% fassung %s %s\n/CreationDate (D:%sZ)\n%%%%EOF\n' "$f" "$BAU_MARKE" \
     "$(date -u -d "@$SOURCE_DATE_EPOCH" +%Y%m%d%H%M%S)" > "diplomarbeit-$f.pdf"
+  [ -z "${BAU_BANNER:-}" ] || printf '/PTEX.Fullbanner (%s)\n' "$BAU_BANNER" >> "diplomarbeit-$f.pdf"
 done
 [ -z "${BAU_DRIFT:-}" ] || printf '%% drift\n' >> "diplomarbeit-de-lang.pdf"
 BAU
     cat "$d/epoch.sh" "$d/bau.sh" "$d/drift.sh" > "$d/lauf.sh"
     stand "$Y1" || { rot "Stand Y1"; return; }                          # (a) gleicher Quellstand, gleiche Bytes
-    fahre_block "$d/lauf.sh" "$d/out_a" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_a"
+    fahre_block "$d/lauf.sh" "$d/out_a" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_a"
     erw_rc "$rc" 0; erw_text "$d/out_a" "4 byte-gleich geprueft"; erw_text "$d/out_a" "0 veraltet/abweichend"
     erw_kein_text "$d/out_a" "FEHLER: DRIFT"
     stand "$Y1" || { rot "Stand Y1"; return; }                          # (b) gleicher Epoch, andere Bytes = ROT
-    fahre_block "$d/lauf.sh" "$d/out_b" BAU_MARKE=writeback1 BAU_DRIFT=1; rc=$?; zeige "$d/out_b"
+    fahre_block "$d/lauf.sh" "$d/out_b" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_DRIFT=1; rc=$?; zeige "$d/out_b"
     erw_rc "$rc" 1; erw_text "$d/out_b" "FEHLER: DRIFT 288/289 bei diplomarbeit-de-lang.pdf"
     stand "$Z1" || { rot "Stand Z1"; return; }                          # (c) Quelle bewegt: veraltet, kein Urteil
-    fahre_block "$d/lauf.sh" "$d/out_c" BAU_MARKE=neu; rc=$?; zeige "$d/out_c"
+    fahre_block "$d/lauf.sh" "$d/out_c" PATH="$P24_PATH" BAU_MARKE=neu; rc=$?; zeige "$d/out_c"
     erw_rc "$rc" 0; erw_text "$d/out_c" "4 veraltet/abweichend"; erw_text "$d/out_c" "kein Byte-Urteil"
     erw_kein_text "$d/out_c" "FEHLER: DRIFT"; erw_text "$d/out_c" "0 byte-gleich geprueft"
     stand "$X1" || { rot "Stand X1"; return; }                          # (d) keine 289-Kopie: gezaehlt
-    fahre_block "$d/lauf.sh" "$d/out_d" BAU_MARKE=neu; rc=$?; zeige "$d/out_d"
+    fahre_block "$d/lauf.sh" "$d/out_d" PATH="$P24_PATH" BAU_MARKE=neu; rc=$?; zeige "$d/out_d"
     erw_rc "$rc" 0; erw_text "$d/out_d" "0 von 4 Fassungen am Gitlink vorhanden"; erw_text "$d/out_d" "4 fehlen"
+    # (e) L3-02 (r4): 289-Kopie mit FREMDEM PTEX.Fullbanner bei gleichem Epoch (Stand Y1f = reiner Writeback auf X1,
+    # von einer anderen Toolchain gebaut) -- Zustand (3) 'Toolchain abweichend', rc=0, KEIN Byte-Urteil (am r3-Block
+    # war das 'FEHLER: DRIFT' rc=1 = Rot je nach Scheduling im Pool prod1 + prod2).
+    B289='This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) kpathsea version 6.4.0'
+    B288='This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) kpathsea version 6.4.1'
+    stand "$X1" && git -C "$MODUL" checkout -q -B f "$X1" || { rot "Zweig f nicht setzbar"; return; }
+    lege_pdf_epoch "$MODUL" "$T1" writeback1
+    for f in de-lang en-lang de-kurz en-kurz; do
+        printf '/PTEX.Fullbanner (%s)\n' "$B289" >> "$MODUL/diplomarbeit-$f.pdf"
+    done
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600250 "Y1f writeback fremde Toolchain [skip ci]" \
+        || { rot "Commit Y1f"; return; }
+    Y1F=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1f"; return; }
+    stand "$Y1F" || { rot "Stand Y1f"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_e" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_BANNER="$B288"; rc=$?
+    zeige "$d/out_e"
+    erw_rc "$rc" 0; erw_text "$d/out_e" "Toolchain abweichend"; erw_text "$d/out_e" "0 byte-gleich geprueft"
+    erw_text "$d/out_e" "4 veraltet/abweichend"; erw_kein_text "$d/out_e" "FEHLER: DRIFT"
+    erw_text "$d/out_e" "TeX Live 2025"; erw_text "$d/out_e" "TeX Live 2026"   # beide Kennungen stehen im Log
+    # (f) I-4 (Fix r3) / ADV-12 (Lens r3 L3-10): 289-Kopie mit fremder CreationDate-Form (kein D:<14 Ziffern>Z) --
+    # Zustand (3) 'veraltet/abweichend' mit Rohwert, rc=0, kein Byte-Urteil (Regressionswache, an r3 und r4 gruen).
+    cd_="D:20260101120000+01'00'"
+    stand "$X1" && git -C "$MODUL" checkout -q -B x "$X1" || { rot "Zweig x nicht setzbar"; return; }
+    for f in de-lang en-lang de-kurz en-kurz; do
+        printf '%%PDF-1.4\n%% fassung %s fremd\n/CreationDate (%s)\n%%%%EOF\n' "$f" "$cd_" \
+            > "$MODUL/diplomarbeit-$f.pdf"
+    done
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600260 "Y1x writeback fremde CreationDate [skip ci]" \
+        || { rot "Commit Y1x"; return; }
+    Y1X=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1x"; return; }
+    stand "$Y1X" || { rot "Stand Y1x"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_f" PATH="$P24_PATH" BAU_MARKE=neu; rc=$?; zeige "$d/out_f"
+    erw_rc "$rc" 0; erw_text "$d/out_f" "4 veraltet/abweichend"; erw_text "$d/out_f" "kein Byte-Urteil"
+    erw_kein_text "$d/out_f" "FEHLER"; erw_text "$d/out_f" "CreationDate '' = Epoch ''"
+    # (g) L3-02 (r4): pdftex fehlt auf dem PATH -- die Nachweiszeile ist fail-closed (FEHLER, rc=1); Wegwerf-PATH
+    # nur mit den Werkzeugen der Bloecke (bash git date grep sed sha256sum cut mktemp rm head), ohne pdftex.
+    mkdir -p "$d/nobin" || { rot "Wegwerf-nobin nicht anlegbar"; return; }
+    for w in bash git date grep sed sha256sum cut mktemp rm head; do
+        ln -s "$(command -v "$w")" "$d/nobin/$w" || { rot "Werkzeug $w nicht verlinkbar"; return; }
+    done
+    stand "$Y1" || { rot "Stand Y1 (g)"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_g" PATH="$d/nobin" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_g"
+    erw_rc "$rc" 1; erw_text "$d/out_g" "pdftex fehlt"; erw_kein_text "$d/out_g" "byte-gleich"
 }
 fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
     s="$1"; d="$T/P25"
@@ -766,7 +849,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
-        ENTF_N=3; echo "  [ENTFAELLT] Mutanten m7/m8/m9 (YAML): Block EPOCH-288 fehlt in der YAML ($zm Zeilen)"
+        ENTF_N=5; echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13/m14 (YAML): Block EPOCH-288 fehlt in der YAML ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -776,8 +859,12 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M9: Byte-Urteil entfernt -> P-24 (b) muss reissen (L1-04)
         sed '/test -n "\$s288" && test "\$s288" = "\$s289"/,/andere Bytes (L1-04\/L2-01)"; exit 1; }/d' \
             "$CI_YML" > "$MUT/m9.yml"
-        MUT_N=$((MUT_N+3))
-        for m in m7 m8 m9; do
+        # M13 (r4): shallow-Pruefung entfernt (gekappte Historie faellt still auf %ct HEAD) -> P-23 (e) muss reissen
+        sed 's/if \[ "\$shallow" = true \]; then/if false; then/' "$CI_YML" > "$MUT/m13.yml"
+        # M14 (r4): Fullbanner-Vergleich entfernt (Byte-Urteil trotz fremder Toolchain) -> P-24 (e) muss reissen
+        sed 's/if \[ "\$b288" != "\$b289" \]; then/if false; then/' "$CI_YML" > "$MUT/m14.yml"
+        MUT_N=$((MUT_N+5))
+        for m in m7 m8 m9 m13 m14; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -795,6 +882,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && biss_yml m7 fall_P23 P-23
         [ "$BISS_RC" -eq 0 ] && biss_yml m8 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m9 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m13 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && biss_yml m14 fall_P24 P-24
     fi
 fi
 
