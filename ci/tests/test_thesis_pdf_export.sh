@@ -65,18 +65,31 @@
 #   P-24 (e) 289-Kopie mit fremdem PTEX.Fullbanner bei gleichem Epoch: 'Toolchain abweichend', rc=0, 0 byte-gleich
 #        (L3-02, MUSS); (f) fremde CreationDate-Form (kein D:<14 Ziffern>Z): veraltet/abweichend, rc=0 (I-4, ADV-12);
 #        (g) pdftex fehlt auf dem PATH: FEHLER 'pdftex fehlt' rc=1 (Toolchain-Nachweis fail-closed, L3-02)
+#   r5 (Lens r4, 23.09.2026):
+#   P-23 (g) Merge MG mit p1 = Quelle S1, p2 = Writeback Y1 (Diff p1..MG nur die 4 PDFs): Epoch %ct(MG), 0 Stufen
+#        (Ein-Elter-Regel, L4-01, MUSS); Writeback-Kind YG von MG: Epoch %ct(MG), 1 Stufe; (g2) derselbe Merge
+#        MIT '[skip ci]' = nur die Ein-Elter-Regel haelt (m15); (h) Ein-Elter-PDF-Commit
+#        OHNE '[skip ci]' (von Hand): Epoch %ct(H), 0 Stufen (UND-Bedingung); (i) acht Writebacks: Epoch X1 +
+#        '8 Stufe(n)', neun Writebacks: FEHLER 'Eltern-Walk-Deckel' rc=1 (L4-04); (j) CI_PROJECT_DIR leer: FEHLER
+#        'CI_PROJECT_DIR leer' rc=1 (L4-08)
+#   P-24 (h) eingebettetes /PTEX.InfoDict einer Figur (fremdes CreationDate + Fullbanner) VOR dem Dokument-Dict:
+#        (h1) Bytes gleich = '4 byte-gleich geprueft' (LETZTER Treffer, L4-02, MUSS); (h2) Figur-Banner gleich,
+#        Dokument-Banner verschieden = 'Toolchain abweichend' rc=0; (i) sha256sum scheitert: FEHLER 'sha256sum' rc=1
+#        (L4-07)
 #
-# SELBSTBISS (--selbstbiss): vierzehn Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): zwanzig Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
 # Pruefung, M12 '//'-Faltung; YAML: M7 Eltern-Walk (Quellstand), M8 Epoch-
 # Weiche (dreiwertig), M9 Byte-Urteil, M13 shallow-Pruefung (r4), M14
-# Fullbanner-Vergleich (r4). Sie MUESSEN P-03 / P-05 / P-02 / P-16 / P-19 /
-# P-18 / P-27 / P-26 / P-25 / P-23 / P-24 / P-24 / P-23 / P-24 rot machen --
-# sonst beweist die Probe nichts und endet mit rc=2. Fehlen die YAML-Marker
-# (Lead-Patch noch nicht gelandet), entfallen M7-M9/M13/M14 LAUT; P-23/P-24
-# sind dann rot.
+# Fullbanner-Vergleich (r4), M15 Ein-Elter-Regel (r5), M16 letzter Treffer
+# (r5), M17 Walk-Deckel (r5), M18 sha256sum-FEHLER (r5), M19 CI_PROJECT_DIR-
+# Gate (r5), M20 '[skip ci]'-Bedingung (r5). Sie MUESSEN P-03 / P-05 / P-02 /
+# P-16 / P-19 / P-18 / P-27 / P-26 / P-25 / P-23 / P-24 / P-24 / P-23 / P-24 /
+# P-23 / P-24 / P-23 / P-24 / P-23 / P-23 rot machen -- sonst beweist die Probe
+# nichts und endet mit rc=2. Fehlen die YAML-Marker (Lead-Patch noch nicht
+# gelandet), entfallen M7-M9/M13-M20 LAUT; P-23/P-24 sind dann rot.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -641,6 +654,89 @@ fall_P23() { # L2-01 (r3): SOURCE_DATE_EPOCH = Quellstand; F-10 Gitlink == HEAD 
     e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_Y1b" | head -1 | cut -d= -f2)
     erw_gleich "$e" "$T1" "Epoch am Stand Y1b (zweiter reiner Writeback auf Y1)"
     erw_text "$d/out_Y1b" "2 Writeback-Stufe(n) uebersprungen"
+    # (g) L4-01 (r5, ADV-15): Merge MG mit erstem Elter = Quelle S1 (Zweig feat ab X1) und zweitem Elter = Writeback
+    # Y1; Diff S1..MG = nur die vier PDFs. Die Thesis-CI baut MG mit %ct(MG): Ein-Elter-Regel -> Quellstand = MG,
+    # 0 Stufen (am r4-Block: Quellstand S1 = falscher Epoch bei rc=0). Writeback-Kind YG von MG: Quellstand MG.
+    stand "$X1" && git -C "$MODUL" checkout -q -B feat "$X1" || { rot "Zweig feat nicht setzbar"; return; }
+    printf 'feat\n' >> "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600310 "S1 quelle auf feat" || { rot "Commit S1"; return; }
+    S1=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse S1"; return; }
+    GIT_COMMITTER_DATE="1758600410 +0000" GIT_AUTHOR_DATE="1758600410 +0000" git -C "$MODUL" merge -q --no-ff \
+        --no-edit -m "MG development (Writeback Y1) in feat" "$Y1" || { rot "Merge MG"; return; }
+    MG=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse MG"; return; }
+    p_=$(git -C "$MODUL" rev-list --parents -n 1 "$MG" | wc -w); erw_gleich "$p_" 3 "Nenner: MG hat 2 Eltern"
+    r_=$(git -C "$MODUL" diff --name-only "$S1" "$MG" | grep -vc 'diplomarbeit-.*\.pdf$')
+    erw_gleich "$r_" 0 "Nenner: Pfade im Diff S1..MG ausserhalb der 4 PDFs"
+    stand "$MG" || { rot "Stand MG"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_MG"; rc=$?; zeige "$d/out_MG"
+    erw_rc "$rc" 0
+    e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_MG" | head -1 | cut -d= -f2)
+    erw_gleich "$e" 1758600410 "Epoch am Stand MG (Merge p1 = Quelle S1, p2 = Writeback Y1)"
+    erw_text "$d/out_MG" "0 Writeback-Stufe(n) uebersprungen"
+    lege_pdf_epoch "$MODUL" 1758600410 writebackG
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600510 "YG writeback auf MG [skip ci]" \
+        || { rot "Commit YG"; return; }
+    YG=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse YG"; return; }
+    stand "$YG" || { rot "Stand YG"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_YG"; rc=$?; zeige "$d/out_YG"
+    erw_rc "$rc" 0
+    e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_YG" | head -1 | cut -d= -f2)
+    erw_gleich "$e" 1758600410 "Epoch am Stand YG (Writeback-Kind des Merges MG)"
+    erw_text "$d/out_YG" "1 Writeback-Stufe(n) uebersprungen"
+    # (g2) derselbe Merge MIT '[skip ci]' in der Botschaft: die Marker-Bedingung greift nicht mehr, NUR die
+    # Ein-Elter-Regel haelt den Merge als Quellstand (Mutante m15 muss genau hier reissen).
+    git -C "$MODUL" checkout -q -B feat2 "$S1" || { rot "Zweig feat2 nicht setzbar"; return; }
+    GIT_COMMITTER_DATE="1758600420 +0000" GIT_AUTHOR_DATE="1758600420 +0000" git -C "$MODUL" merge -q --no-ff \
+        --no-edit -m "MG2 development (Writeback Y1) in feat2 [skip ci]" "$Y1" || { rot "Merge MG2"; return; }
+    MG2=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse MG2"; return; }
+    stand "$MG2" || { rot "Stand MG2"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_MG2"; rc=$?; zeige "$d/out_MG2"
+    erw_rc "$rc" 0
+    e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_MG2" | head -1 | cut -d= -f2)
+    erw_gleich "$e" 1758600420 "Epoch am Stand MG2 (Merge mit skip-ci-Marker, zwei Eltern)"
+    erw_text "$d/out_MG2" "0 Writeback-Stufe(n) uebersprungen"
+    # (h) L4-01 (r5, Lead-Wahl UND-Bedingung): Ein-Elter-PDF-Commit OHNE '[skip ci]' (von Hand) = KEIN Writeback,
+    # die Thesis-CI baut ihn -> Quellstand = HP1 (am r4-Block: uebersprungen, Quellstand X1 = falscher Epoch).
+    stand "$X1" && git -C "$MODUL" checkout -q -B hpdf "$X1" || { rot "Zweig hpdf nicht setzbar"; return; }
+    lege_pdf_epoch "$MODUL" "$T1" vonhand
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600320 "HP1 PDFs von Hand, ohne Marker" \
+        || { rot "Commit HP1"; return; }
+    HP1=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse HP1"; return; }
+    stand "$HP1" || { rot "Stand HP1"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_HP1"; rc=$?; zeige "$d/out_HP1"
+    erw_rc "$rc" 0
+    e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_HP1" | head -1 | cut -d= -f2)
+    erw_gleich "$e" 1758600320 "Epoch am Stand HP1 (PDF-Commit von Hand ohne skip-ci-Marker)"
+    erw_text "$d/out_HP1" "0 Writeback-Stufe(n) uebersprungen"
+    # (i) L4-04 (r5, ADV-17): acht reine Writebacks W1..W8 auf X1 = Quellstand X1 mit '8 Stufe(n)' (Deckel exakt
+    # erreicht, erlaubt); der neunte W9 = Deckel ueberschritten -> FEHLER rc=1 (am r4-Block: still %ct(W1), rc=0).
+    stand "$X1" && git -C "$MODUL" checkout -q -B w9 "$X1" || { rot "Zweig w9 nicht setzbar"; return; }
+    i_=1
+    while [ "$i_" -le 9 ]; do
+        lege_pdf_epoch "$MODUL" $((1758600100 + i_ * 10)) "wb$i_"
+        git -C "$MODUL" add -- diplomarbeit-*.pdf \
+            && modul_commit $((1758600200 + i_ * 10)) "W$i_ writeback [skip ci]" || { rot "Commit W$i_"; return; }
+        if [ "$i_" -eq 8 ]; then
+            W8=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse W8"; return; }
+            stand "$W8" || { rot "Stand W8"; return; }
+            fahre_block "$d/epoch.sh" "$d/out_W8"; rc=$?; zeige "$d/out_W8"
+            erw_rc "$rc" 0
+            e=$(grep -o 'SOURCE_DATE_EPOCH=[0-9]*' "$d/out_W8" | head -1 | cut -d= -f2)
+            erw_gleich "$e" "$T1" "Epoch am Stand W8 (acht Writebacks = Deckel exakt erreicht)"
+            erw_text "$d/out_W8" "8 Writeback-Stufe(n) uebersprungen"
+            git -C "$MODUL" checkout -q w9 || { rot "zurueck auf w9"; return; }
+        fi
+        i_=$((i_ + 1))
+    done
+    W9=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse W9"; return; }
+    stand "$W9" || { rot "Stand W9"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_W9"; rc=$?; zeige "$d/out_W9"
+    erw_rc "$rc" 1; erw_text "$d/out_W9" "FEHLER: Eltern-Walk-Deckel"; erw_kein_text "$d/out_W9" "SOURCE_DATE_EPOCH="
+    # (j) L4-08 (r5, ADV-26): CI_PROJECT_DIR leer -> FEHLER vor dem Gitlink-Vergleich (am r4-Block: git -C '' = cwd,
+    # irrefuehrender Text 'weicht vom super-Gitlink').
+    stand "$Y1" || { rot "Stand Y1 (j)"; return; }
+    fahre_block "$d/epoch.sh" "$d/out_cpd" CI_PROJECT_DIR=; rc=$?; zeige "$d/out_cpd"
+    erw_rc "$rc" 1; erw_text "$d/out_cpd" "CI_PROJECT_DIR leer"
 }
 fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
     d="$T/P24"; mkdir -p "$d"
@@ -715,14 +811,59 @@ BAU
     erw_rc "$rc" 0; erw_text "$d/out_f" "4 veraltet/abweichend"; erw_text "$d/out_f" "kein Byte-Urteil"
     erw_kein_text "$d/out_f" "FEHLER"; erw_text "$d/out_f" "CreationDate '' = Epoch ''"
     # (g) L3-02 (r4): pdftex fehlt auf dem PATH -- die Nachweiszeile ist fail-closed (FEHLER, rc=1); Wegwerf-PATH
-    # nur mit den Werkzeugen der Bloecke (bash git date grep sed sha256sum cut mktemp rm head), ohne pdftex.
+    # nur mit den Werkzeugen der Bloecke (bash git date grep sed sha256sum cut mktemp rm head tr), ohne pdftex.
     mkdir -p "$d/nobin" || { rot "Wegwerf-nobin nicht anlegbar"; return; }
-    for w in bash git date grep sed sha256sum cut mktemp rm head; do
+    for w in bash git date grep sed sha256sum cut mktemp rm head tr; do
         ln -s "$(command -v "$w")" "$d/nobin/$w" || { rot "Werkzeug $w nicht verlinkbar"; return; }
     done
     stand "$Y1" || { rot "Stand Y1 (g)"; return; }
     fahre_block "$d/lauf.sh" "$d/out_g" PATH="$d/nobin" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_g"
     erw_rc "$rc" 1; erw_text "$d/out_g" "pdftex fehlt"; erw_kein_text "$d/out_g" "byte-gleich"
+    # (h) L4-02 (r5, ADV-28): eingebettetes /PTEX.InfoDict einer Figur (fremdes CreationDate + fremder Fullbanner)
+    # steht VOR dem Info-Dict des Dokuments; der LETZTE Treffer zaehlt. (h1) Bytes gleich -> byte-gleich (am r4-Block:
+    # -m1 nimmt das Figur-Datum, 4x 'veraltet', kein Byte-Urteil bei rc=0); (h2) Figur-Banner gleich, Dokument-Banner
+    # verschieden -> 'Toolchain abweichend' rc=0 (am r4-Block: erster Treffer gleich, Byte-Urteil 'FEHLER: DRIFT').
+    FIG='This is pdfTeX, Version 3.141592653-2.6-1.40.20 (TeX Live 2019) kpathsea version 6.3.1'
+    cat > "$d/bau_fig.sh" <<'BAU'
+for f in de-lang en-lang de-kurz en-kurz; do
+  printf '%%PDF-1.4\n/PTEX.InfoDict << /CreationDate (D:20200101000000Z) /PTEX.Fullbanner (%s) >>\n' "$BAU_FIG" \
+    > "diplomarbeit-$f.pdf"
+  printf '%% fassung %s %s\n/CreationDate (D:%sZ)\n/PTEX.Fullbanner (%s)\n%%%%EOF\n' "$f" "$BAU_MARKE" \
+    "$(date -u -d "@$SOURCE_DATE_EPOCH" +%Y%m%d%H%M%S)" "$BAU_BANNER" >> "diplomarbeit-$f.pdf"
+done
+BAU
+    cat "$d/epoch.sh" "$d/bau_fig.sh" "$d/drift.sh" > "$d/lauf_fig.sh"
+    stand "$X1" && git -C "$MODUL" checkout -q -B fig "$X1" || { rot "Zweig fig nicht setzbar"; return; }
+    for f in de-lang en-lang de-kurz en-kurz; do
+        printf '%%PDF-1.4\n/PTEX.InfoDict << /CreationDate (D:20200101000000Z) /PTEX.Fullbanner (%s) >>\n' "$FIG" \
+            > "$MODUL/diplomarbeit-$f.pdf"
+        printf '%% fassung %s writeback1\n/CreationDate (D:%sZ)\n/PTEX.Fullbanner (%s)\n%%%%EOF\n' "$f" \
+            "$(epoch_zeit "$T1")" "$B289" >> "$MODUL/diplomarbeit-$f.pdf"
+    done
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600270 "Y1g writeback mit Figur-Dict [skip ci]" \
+        || { rot "Commit Y1g"; return; }
+    Y1G=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1g"; return; }
+    n_=$(git -C "$MODUL" show "$Y1G:diplomarbeit-de-lang.pdf" | grep -a -c 'CreationDate (D:')
+    erw_gleich "$n_" 2 "Nenner: CreationDate-Eintraege in der 289-Kopie (Figur zuerst, Dokument zuletzt)"
+    stand "$Y1G" || { rot "Stand Y1g"; return; }
+    fahre_block "$d/lauf_fig.sh" "$d/out_h1" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_FIG="$FIG" BAU_BANNER="$B289"
+    rc=$?; zeige "$d/out_h1"
+    erw_rc "$rc" 0; erw_text "$d/out_h1" "4 byte-gleich geprueft"; erw_text "$d/out_h1" "0 veraltet/abweichend"
+    erw_kein_text "$d/out_h1" "FEHLER"
+    stand "$Y1G" || { rot "Stand Y1g (h2)"; return; }
+    fahre_block "$d/lauf_fig.sh" "$d/out_h2" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_FIG="$FIG" BAU_BANNER="$B288"
+    rc=$?; zeige "$d/out_h2"
+    erw_rc "$rc" 0; erw_text "$d/out_h2" "Toolchain abweichend"; erw_text "$d/out_h2" "0 byte-gleich geprueft"
+    erw_kein_text "$d/out_h2" "FEHLER: DRIFT"
+    erw_text "$d/out_h2" "TeX Live 2025"; erw_text "$d/out_h2" "TeX Live 2026"   # beide Dokument-Kennungen im Log
+    # (i) L4-07 (r5, ADV-24): sha256sum scheitert im Byte-Urteil -> FEHLER-Zeile + rc=1 (am r4-Block: set -e ohne
+    # FEHLER-Zeile). Wegwerf-sha256sum vor dem PATH.
+    mkdir -p "$d/badbin" || { rot "Wegwerf-badbin nicht anlegbar"; return; }
+    printf '#!/bin/sh\necho "sha256sum: Wegwerf-Stub scheitert" >&2; exit 1\n' > "$d/badbin/sha256sum"
+    chmod 0755 "$d/badbin/sha256sum"
+    stand "$Y1" || { rot "Stand Y1 (i)"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_i" PATH="$d/badbin:$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_i"
+    erw_rc "$rc" 1; erw_text "$d/out_i" "FEHLER: sha256sum"; erw_kein_text "$d/out_i" "byte-gleich"
 }
 fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
     s="$1"; d="$T/P25"
@@ -849,7 +990,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
-        ENTF_N=5; echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13/m14 (YAML): Block EPOCH-288 fehlt in der YAML ($zm Zeilen)"
+        ENTF_N=11; echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m20 (YAML): Block EPOCH-288 fehlt in der YAML ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -863,8 +1004,20 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/if \[ "\$shallow" = true \]; then/if false; then/' "$CI_YML" > "$MUT/m13.yml"
         # M14 (r4): Fullbanner-Vergleich entfernt (Byte-Urteil trotz fremder Toolchain) -> P-24 (e) muss reissen
         sed 's/if \[ "\$b288" != "\$b289" \]; then/if false; then/' "$CI_YML" > "$MUT/m14.yml"
-        MUT_N=$((MUT_N+5))
-        for m in m7 m8 m9 m13 m14; do
+        # M15 (r5): Ein-Elter-Regel entfernt (Merge mit PDF-nur-Diff gilt als Writeback) -> P-23 (g) muss reissen
+        sed 's/\&\& ! git rev-parse -q --verify "\$QUELLE^2" >\/dev\/null; then/; then/' "$CI_YML" > "$MUT/m15.yml"
+        # M16 (r5): letzter Treffer -> erster Treffer (eingebettetes Info-Dict gewinnt) -> P-24 (h) muss reissen
+        sed 's/| tail -n1/| head -n1/' "$CI_YML" > "$MUT/m16.yml"
+        # M17 (r5): Walk-Deckel-FEHLER entfernt (stiller Weiterlauf) -> P-23 (i) muss reissen (L4-04)
+        sed 's/if \[ "\$stufe" -ge 8 \]; then/if false; then/' "$CI_YML" > "$MUT/m17.yml"
+        # M18 (r5): sha256sum-FEHLER-Zweig entfernt (set -e ohne Marke) -> P-24 (i) muss reissen (L4-07)
+        sed 's/ || { echo "FEHLER: sha256sum [^}]*}//' "$CI_YML" > "$MUT/m18.yml"
+        # M19 (r5): CI_PROJECT_DIR-Gate entfernt -> P-23 (j) muss reissen (L4-08)
+        sed '/CI_PROJECT_DIR leer (L4-08)/d' "$CI_YML" > "$MUT/m19.yml"
+        # M20 (r5): '[skip ci]'-Bedingung entfernt (PDF-Commit von Hand gilt als Writeback) -> P-23 (h) muss reissen
+        sed 's/\[ "\$bot" = ja \]/true/' "$CI_YML" > "$MUT/m20.yml"
+        MUT_N=$((MUT_N+11))
+        for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -884,6 +1037,12 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && biss_yml m9 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m13 fall_P23 P-23
         [ "$BISS_RC" -eq 0 ] && biss_yml m14 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m15 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && biss_yml m16 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m17 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && biss_yml m18 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && biss_yml m19 fall_P23 P-23
+        [ "$BISS_RC" -eq 0 ] && biss_yml m20 fall_P23 P-23
     fi
 fi
 
