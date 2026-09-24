@@ -131,8 +131,22 @@
 #   P-47 Koeder als Schalter / Fassung / Argument: FEHLER ohne den Rohwert im Log (S8-05)
 #   P-48 EXIT-Trap-Zeile vor der mktemp-Zeile; fehler()-Pfad vor mktemp ohne 'unbound variable', 0 Reste (S8-06)
 #   P-49 F09-GATE-346: mehrzeilige Makrodefinition = FEHLER statt falschem Konsum-Gruen (C8-06, Koppelpatch)
+#   r10 (Codex-Lens r9 A/B + Fable-Lens r9, Lead K300/K301, 23.09.2026):
+#   P-50 DIR/SRC mit Umlaut / '"' / '\' / ':' / ':(glob)' / '?' / '[ab]': FEHLER 'unzulaessige Zeichen' VOR jeder
+#        git-Wache, kein Verzeichnis, kein Push (S9-03; deckt L9-02/L9-03)
+#   P-51 Koeder als CI_COMMIT_SHA / CI_COMMIT_SHORT_SHA / CI_COMMIT_BRANCH: FEHLER ohne den Rohwert im Log (S9-07)
+#   P-52 Textwache fehler() = printf, kein echo mit Variablen; DIR mit literalem '\n': genau 1 Meldungszeile (S9-09)
+#   P-53 .gitattributes '*.pdf text' + CRLF-Artefakt: FEHLER 'Filter-/EOL-Konversion' vor dem Commit (S9-01)
+#   P-54 core.fileMode=false + Remote-Eintrag 100755: Lauf gruen, Index/Remote 100644 (S9-02, L9-06)
+#   P-55 push.err mit 'https://u:pa@ss@host/x' + 'git@host:g/r.git': '<cred>@host/x' + '<cred>@<host>:' (S9-06, L9-04)
+#   P-56 git-Shim laesst 'ls-tree FETCH_HEAD' / 'cat-file -e FETCH_HEAD:' mit rc 128 scheitern: FEHLER statt
+#        UEBERHOLT (S9-05)
+#   P-57 Textwache Harnisch-Kopf: SELBSTBISS-Zahl == Script- + YAML-Mutanten (L9-01)
+#   P-58 F09-GATE-346 kommentar-bewusst/zeilenuebergreifend: 3 Codex-Gegenfaelle = FEHLER, legitime Formen gruen,
+#        Definition + Konsum = 'Konsum 1' (C9-01/C9-02, Koppelpatch; r8-Gegenfall = P-49)
+#   P-59 Textwache ':0:$dst' genau 1x im Script, alte Form 0x (S9-04)
 #
-# SELBSTBISS (--selbstbiss): 51 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 80 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -167,6 +181,11 @@
 # M48/M49/M50 F09 Praefix-Konsum / newcommand* / def-Leerraum (P-24 p4/p5/p6), M51
 # beide rev-parse-Substitutionen leer + Leer-Guard weg (P-23 Gitlink). biss(): ein
 # ohne Mutation roter Basisfall = [NICHT BEWERTBAR], nicht in MUT_N (L7-03).
+# r10 (Codex r9 S9-01..09, Fable r9 L9-01/L9-04, Codex r9 C9-01/02): M71 S9-03-Wache, M72 S9-07-Wache, M73
+# fehler() per echo, M74 --no-filters, M75 core.fileMode, M76 scp-Maske, M77 Maske '[^/@]' zurueck, M78 cat-file-
+# Form, M79 ':$dst' zurueck, M80 Kopfzahl 51 (Textwache am Harnisch); M62 = Doppelmutante (Export + S9-03-Klasse),
+# M53/M66/M68 auf die r10-Zeilen nachgezogen; YAML: M30 Kommentar-Strip, M35 Zeilen-Join, M70 '\{?' (F09 r10),
+# M49/M50 auf die r10-Definitions-ERE ('|let)\*?', beide Leerraum-Klassen) nachgezogen.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -244,6 +263,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
+MUT_N_SKRIPT=43; MUT_N_YAML=37   # r10 (L9-01): Kopfkommentar == Summe (P-57)
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -1268,7 +1288,7 @@ BAU
         F09K=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse F09k"; return; }
         stand "$F09K" || { rot "Stand F09k"; return; }
         fahre_block "$d/f09.sh" "$d/out_p1"; rc=$?; zeige "$d/out_p1"
-        erw_rc "$rc" 1; erw_text "$d/out_p1" "ausserhalb von Kommentaren"
+        erw_rc "$rc" 1; erw_text "$d/out_p1" "kein Konsum von"
         git -C "$MODUL" checkout -q -B f09e "$X1" || { rot "Zweig f09e nicht setzbar"; return; }
         printf '%s\n' '\documentclass{article}' '\providecommand{\thesislang}{de}' \
             '\providecommand{\thesisumfang}{lang}' '\ifx\thesislang\undefined\fi' '\ifx\thesisumfang\undefined\fi' \
@@ -1289,7 +1309,7 @@ BAU
         F09D=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse F09d"; return; }
         stand "$F09D" || { rot "Stand F09d"; return; }
         fahre_block "$d/f09.sh" "$d/out_p3"; rc=$?; zeige "$d/out_p3"
-        erw_rc "$rc" 1; erw_text "$d/out_p3" "ausserhalb von Kommentaren"
+        erw_rc "$rc" 1; erw_text "$d/out_p3" "kein Konsum von"
         # (p4)/(p5)/(p6) C7-05 (r8): Praefix-Konsum '\thesislangAlt' (Control-Word-Grenze), '\newcommand*{...}' und
         # '\def \thesislang' als reine Definitionen -> je FEHLER rc=1 (am r7-Gate gezaehlt = rc=0)
         for pv in "p4:\\thesislangAlt \\thesisumfangAlt" \
@@ -1303,7 +1323,7 @@ BAU
                 || { rot "Commit F09$nm"; return; }
             stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand F09$nm"; return; }
             fahre_block "$d/f09.sh" "$d/out_$nm"; rc=$?; zeige "$d/out_$nm"
-            erw_rc "$rc" 1; erw_text "$d/out_$nm" "ausserhalb von Kommentaren"
+            erw_rc "$rc" 1; erw_text "$d/out_$nm" "kein Konsum von"
         done
     fi
 }
@@ -1577,14 +1597,14 @@ fremd_pdf() { # $1 = Klonpfad, $2 = Pfad im Repo, $3 = Fassung, $4 = Marke: getr
     git -C "$1" add -- "$2" && git -C "$1" commit -q -m "fremd-pdf $2" || return 2
     git -C "$1" push -q "$BARE" development || return 2
 }
-fall_P42() { # S8-01 (a): DIR 'docs/*' (literaler Stern) + geloeschte getrackte Fremd-PDF darunter mit Blob der Ziel-PDF
+fall_P42() { # S8-01 (a): DIR 'docs/*' + geloeschte Fremd-PDF (Rename-Blob); r10: S9-03 verwirft '*' VOR jeder git-Wache
     s="$1"; d="$T/P42"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     fremd_pdf "$d/h" 'docs/*/alt/diplomarbeit-de-lang.pdf' de-lang v1 || { rot "Fremd-PDF nicht anlegbar"; return; }
     S=$(tip); klone "$d/work" "$S" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
     rm -f "$d/work/docs/*/alt/diplomarbeit-de-lang.pdf"
     lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE" 'COMDARE_THESIS_PDF_DIR=docs/*' \
         COMDARE_THESIS_PDF_FASSUNGEN=de-lang; rc=$?; zeige "$d/out"
-    erw_rc "$rc" 1; erw_text "$d/out" "ausserhalb der Fassungs-Liste (ungestagt, S7-03)"
+    erw_rc "$rc" 1; erw_text "$d/out" "unzulaessige Zeichen (S9-03)"
     erw_kein_text "$d/out" "PUSH OK"; t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert"
     v=$(git -C "$BARE" ls-tree -r --name-only "$t" | grep -c -F 'docs/*/alt/diplomarbeit-de-lang.pdf')
     erw_gleich "$v" 1 "Fremd-PDF am Remote erhalten (Loeschung nicht mitgepusht)"
@@ -1645,9 +1665,12 @@ fall_P46() { # S8-04 (ENTLASTET mit Messung): Push vom pre-receive-Hook abgelehn
     u=$(grep -c -E '//[^/ ]*@' "$d/out"); erw_gleich "$u" 0 "URL-Formen mit userinfo im Log"
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
     # Credential-Maske des Scripts (push.err/fetch.err) am Muster geprobt, ohne den Koeder auszugeben
-    m=$(grep -c "s#//\[^/@\]\*@#//<cred>@#g" "$s")
+    m=$(grep -c "s#//\[^/\]\*@#//<cred>@#g" "$s")
     erw_gleich "$m" 2 "Masken-Ausdruecke im Script (push.err + fetch.err)"
-    g=$(printf 'https://ciuser:%s@host/x\n' "$KOEDER" | sed 's#//[^/@]*@#//<cred>@#g')
+    ms=$(grep -c "s#\[^ /:@\]\*@\[^ /:@\]\*:#<cred>@<host>:#g" "$s")
+    erw_gleich "$ms" 2 "scp-Masken-Ausdruecke im Script (push.err + fetch.err, L9-04)"
+    g=$(printf 'https://ciuser:%s@host/x\n' "$KOEDER" | sed -e 's#//[^/]*@#//<cred>@#g' \
+        -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g')
     case "$g" in *"$KOEDER"*) rot "Maske laesst den Koeder durch" ;; *'//<cred>@host/x'*) ok "Maske ersetzt userinfo" ;;
         *) rot "Maske liefert unerwartete Form" ;; esac
 }
@@ -1667,9 +1690,11 @@ fall_P47() { # S8-05: Koeder als Schalter, als Fassung und als Argument -> FEHLE
 fall_P48() { # S8-06: (a) EXIT-Trap vor mktemp (Zeilennummern); (b) fehler() vor mktemp: rc 1, kein unbound, 0 Reste
     s="$1"; d="$T/P48"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     zt=$(grep -n "^trap 'if \[ -n" "$s" | head -1 | cut -d: -f1)
-    zm=$(grep -n '^WERK=$(mktemp' "$s" | head -1 | cut -d: -f1)
-    if [ -n "$zt" ] && [ -n "$zm" ] && [ "$zt" -lt "$zm" ]; then ok "EXIT-Trap Z.$zt vor mktemp Z.$zm"
-    else rot "EXIT-Trap-Zeile '$zt' nicht vor der mktemp-Zeile '$zm'"; fi
+    zm=$(grep -n '^mkdir -m 0700' "$s" | head -1 | cut -d: -f1)   # S9-08 (r10): mkdir statt mktemp
+    zw=$(grep -n '^WERK="${TMPDIR' "$s" | head -1 | cut -d: -f1)
+    if [ -n "$zt" ] && [ -n "$zm" ] && [ -n "$zw" ] && [ "$zt" -lt "$zm" ] && [ "$zw" -lt "$zm" ]; then
+        ok "EXIT-Trap Z.$zt und WERK-Zuweisung Z.$zw vor mkdir Z.$zm"
+    else rot "EXIT-Trap-Zeile '$zt' / WERK-Zuweisung '$zw' nicht vor der mkdir-Zeile '$zm'"; fi
     klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
     mkdir -p "$d/tmpw"; k=$(git -C "$d/work" rev-parse --short "$BASE")
     ( cd "$d/work" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$d/tmpw" GIT_CONFIG_GLOBAL=/dev/null \
@@ -1696,7 +1721,7 @@ fall_P49() { # C8-06: mehrzeilige Makrodefinition im F09-GATE-346 = FEHLER (r8: 
     F09M=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse F09m"; return; }
     stand "$F09M" || { rot "Stand F09m"; return; }
     fahre_block "$d/f09.sh" "$d/out_m"; rc=$?; zeige "$d/out_m"
-    erw_rc "$rc" 1; erw_text "$d/out_m" "mehrzeilige Makrodefinition unzulaessig"
+    erw_rc "$rc" 1; erw_text "$d/out_m" 'kein Konsum von \thesisumfang'   # r10: Konsum = gesamt - Definitionen
     git -C "$MODUL" checkout -q -B f09g "$X1" || { rot "Zweig f09g nicht setzbar"; return; }
     printf '%s\n' '\documentclass{article}' '\providecommand{\thesislang}{de}' \
         '\providecommand{\thesisumfang}{lang}' '\ifx\thesislang\undefined\fi' '\ifx\thesisumfang\undefined\fi' \
@@ -1707,6 +1732,147 @@ fall_P49() { # C8-06: mehrzeilige Makrodefinition im F09-GATE-346 = FEHLER (r8: 
     stand "$F09G" || { rot "Stand F09g"; return; }
     fahre_block "$d/f09.sh" "$d/out_g"; rc=$?; zeige "$d/out_g"
     erw_rc "$rc" 0; erw_kein_text "$d/out_g" "FEHLER"
+}
+
+# ------------------------------------------------ r10 (Codex-Lens r9 A/B, Fable-Lens r9, Lead K300/K301)
+fall_P50() { # S9-03 (deckt L9-02/L9-03/L9-08): DIR/SRC ausserhalb [A-Za-z0-9._/-] -> FEHLER VOR jeder git-Wache
+    s="$1"; d="$T/P50"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    uml=$(printf 'docs/dipl\303\266marbeit'); _i=0
+    for v in "$uml" 'docs/x"y' 'docs/x\y' 'docs/x:y' ':(glob)docs/x' ':docs/y' 'docs/?' 'docs/[ab]'; do
+        _i=$((_i+1)); klone "$d/work$_i" "$BASE" || { rot "Klon $_i nicht baubar"; return; }; lege_pdfs "$d/work$_i" v1
+        lauf "$d/work$_i" "$s" "$d/out$_i" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "COMDARE_THESIS_PDF_DIR=$v"; rc=$?
+        zeige "$d/out$_i"; erw_rc "$rc" 1; erw_text "$d/out$_i" "unzulaessige Zeichen (S9-03)"
+        erw_kein_text "$d/out$_i" "PUSH OK"; erw_kein_text "$d/out$_i" "Zieldateien stehen im Index"
+        fremd=$(ls -A "$d/work$_i" | grep -v -x -e .git -e README.md -e .gitlab-ci.yml -e thesis | wc -l)
+        erw_gleich "$fremd" 0 "angelegte Eintraege im Klon $_i ausserhalb des Seeds (kein Fehlziel)"
+    done
+    klone "$d/work9" "$BASE" || { rot "Klon 9 nicht baubar"; return; }; lege_pdfs "$d/work9" v1
+    lauf "$d/work9" "$s" "$d/out9" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" 'COMDARE_THESIS_PDF_SRC=thesis/x"y'; rc=$?
+    zeige "$d/out9"; erw_rc "$rc" 1; erw_text "$d/out9" "unzulaessige Zeichen (S9-03)"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P51() { # S9-07: Koeder als CI_COMMIT_SHA / CI_COMMIT_SHORT_SHA / CI_COMMIT_BRANCH -> FEHLER, Rohwert nie im Log
+    s="$1"; d="$T/P51"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    _i=0
+    for kv in "CI_COMMIT_SHA=$KOEDER" "CI_COMMIT_SHORT_SHA=$KOEDER" "CI_COMMIT_BRANCH=x:$KOEDER"; do
+        _i=$((_i+1)); klone "$d/work$_i" "$BASE" || { rot "Klon $_i nicht baubar"; return; }; lege_pdfs "$d/work$_i" v1
+        lauf "$d/work$_i" "$s" "$d/out$_i" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "$kv"; rc=$?; zeige "$d/out$_i"
+        erw_rc "$rc" 1; erw_text "$d/out$_i" "${kv%%=*}:"; erw_text "$d/out$_i" "(S9-07)"
+        erw_kein_text "$d/out$_i" "$KOEDER"; erw_kein_text "$d/out$_i" "PUSH OK"
+    done
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P52() { # S9-09: fehler() per printf, kein echo mit Variablen; DIR mit literalem Backslash-n -> genau 1 Zeile
+    s="$1"; d="$T/P52"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    n1=$(grep -c 'echo "FEHLER' "$s"); erw_gleich "$n1" 0 "Zeilen 'echo \"FEHLER' im Script"
+    n2=$(grep -c -E '^[^#]*echo "[^"]*\$' "$s"); erw_gleich "$n2" 0 "echo-Zeilen mit Variablen im Script"
+    n3=$(grep -c -F "fehler() { printf '%s\\n' \"FEHLER: \$*\"; exit 1; }" "$s")
+    erw_gleich "$n3" 1 "fehler() per printf"
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" 'COMDARE_THESIS_PDF_DIR=docs/x\ny'; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "unzulaessige Zeichen (S9-03)"
+    z=$(awk 'END{print NR}' "$d/out"); erw_gleich "$z" 1 "Ausgabezeilen (genau eine FEHLER-Zeile, kein Backslash-n)"
+}
+gitattr_pdf_text() { # $1 = Klonpfad: .gitattributes '*.pdf text' am Remote, gepusht (S9-01-Fall)
+    git clone -q "$BARE" "$1" || return 2
+    printf '*.pdf text\n' > "$1/.gitattributes"
+    git -C "$1" add -- .gitattributes && git -C "$1" commit -q -m "gitattributes pdf text" || return 2
+    git -C "$1" push -q "$BARE" development || return 2
+}
+fall_P53() { # S9-01: '*.pdf text' + CRLF-Artefakt -> FEHLER 'Filter-/EOL-Konversion' VOR dem Commit (r9: PUSH OK)
+    s="$1"; d="$T/P53"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    gitattr_pdf_text "$d/h" || { rot ".gitattributes nicht anlegbar"; return; }; S=$(tip)
+    klone "$d/work" "$S" || { rot "Klon nicht baubar"; return; }
+    for f in de-lang en-lang de-kurz en-kurz; do
+        printf '%%PDF-1.4\r\n%% fassung %s crlf\r\n%%%%EOF\r\n' "$f" > "$d/work/thesis/diplomarbeit/diplomarbeit-$f.pdf"
+    done
+    a=$(git -C "$d/work" check-attr text -- docs/diplomarbeit/diplomarbeit-de-lang.pdf | grep -c 'text: set')
+    erw_gleich "$a" 1 "Vorbedingung: Attribut text gesetzt fuer die Zieldatei"
+    lauf "$d/work" "$s" "$d/out" "$S" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Filter-/EOL-Konversion am Artefakt"; erw_text "$d/out" "S9-01"
+    erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$S" "Bare-Tip unveraendert (kein konvertiertes Artefakt)"
+}
+fall_P54() { # S9-02 (L9-06): core.fileMode=false + Remote-Eintrag 100755 -> r10 gruen mit 100644 (r9 Dauer-FEHLER)
+    s="$1"; d="$T/P54"; vorlauf_v1 "$d" "$s" || return
+    fremd_eintrag "$d/h" modus || { rot "Fremd-Eintrag (Modus) fehlgeschlagen"; return; }; H=$(tip)
+    klone "$d/workB" "$H" || { rot "Klon B nicht baubar"; return; }; lege_pdfs "$d/workB" v2
+    git -C "$d/workB" config core.fileMode false || { rot "core.fileMode nicht setzbar"; return; }
+    fm=$(git -C "$d/workB" config --get core.fileMode); erw_gleich "$fm" false "Vorbedingung: core.fileMode im Klon"
+    lauf "$d/workB" "$s" "$d/out" "$H" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 0; erw_text "$d/out" "PUSH OK"; erw_kein_text "$d/out" "statt 100644 im Index"
+    t=$(tip); m=$(git -C "$BARE" ls-tree "$t" -- docs/diplomarbeit/diplomarbeit-en-kurz.pdf | cut -d' ' -f1)
+    erw_gleich "$m" 100644 "Modus von en-kurz am Remote nach dem Export (core.fileMode=false)"
+}
+fall_P55() { # S9-06/L9-04: von der Gegenseite echote URL-Formen werden bis zum letzten '@' und in scp-Form maskiert
+    s="$1"; d="$T/P55"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    { echo '#!/bin/sh'; echo 'echo "reject https://u:pa@ss@host/x" >&2'; echo 'echo "reject git@host:g/r.git" >&2'
+      echo 'exit 1'; } > "$BARE/hooks/pre-receive"; chmod 0755 "$BARE/hooks/pre-receive"
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Push abgelehnt"; erw_text "$d/out" "//<cred>@host/x"
+    erw_text "$d/out" "<cred>@<host>:g/r.git"; erw_kein_text "$d/out" "pa@ss"; erw_kein_text "$d/out" "ss@"
+    erw_kein_text "$d/out" "git@"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P56() { # S9-05: git-Shim laesst ls-tree FETCH_HEAD / cat-file -e FETCH_HEAD: mit rc 128 scheitern -> FEHLER
+    s="$1"; d="$T/P56"; vorlauf_v1 "$d" "$s" || return
+    klone "$d/workB" "$S" || { rot "Klon B nicht baubar"; return; }; lege_pdfs "$d/workB" v2
+    mensch "$d/h" fremd || { rot "Mensch-Commit fehlgeschlagen"; return; }; H=$(tip)
+    mkdir -p "$d/shim"; echt=$(command -v git)
+    { echo '#!/bin/sh'
+      echo 'case "$1 $2" in "ls-tree FETCH_HEAD") echo "fatal: shim ls-tree FETCH_HEAD" >&2; exit 128 ;; esac'
+      echo 'case "$1 $2 $3" in "cat-file -e FETCH_HEAD:"*) echo "fatal: shim cat-file FETCH_HEAD" >&2; exit 128 ;; esac'
+      echo "exec '$echt' \"\$@\""; } > "$d/shim/git"; chmod 0755 "$d/shim/git"
+    lauf "$d/workB" "$s" "$d/out" "$S" PATH="$d/shim:$PATH" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "FEHLER: git ls-tree FETCH_HEAD"; erw_text "$d/out" "S9-05"
+    erw_kein_text "$d/out" "UEBERHOLT"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$H" "Bare-Tip = Mensch-Commit (kein Push)"
+}
+fall_P57() { # L9-01: Kopfkommentar 'SELBSTBISS (--selbstbiss): N Wegwerf-Mutanten' == Script- + YAML-Mutanten
+    h="$SELBST"; case "$1" in */m80.sh) h="$1" ;; esac
+    k=$(grep -o 'SELBSTBISS (--selbstbiss): [0-9]* Wegwerf-Mutanten' "$h" | head -1 | grep -o '[0-9]*')
+    soll=$((MUT_N_SKRIPT + MUT_N_YAML))
+    erw_gleich "$k" "$soll" "Kopfkommentar-Mutantenzahl (Script $MUT_N_SKRIPT + YAML $MUT_N_YAML)"
+}
+fall_P58() { # C9-01/C9-02: F09-GATE-346 kommentar-bewusst + zeilenuebergreifend (Koppelpatch, sonst LAUT entfallen)
+    d="$T/P58"; mkdir -p "$d"
+    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$d/f09.sh")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] Block F09-GATE-346 fehlt ($zf Zeilen) -- C9-01/C9-02 nur mit Koppelpatch pruefbar"
+        return
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
+    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    f58() { # $1 = Zweig, $2 = erwarteter rc, $3 = erwarteter Text, danach die Zeilen der diplomarbeit.tex
+        _zw="$1"; _rc="$2"; _tx="$3"; shift 3
+        git -C "$MODUL" checkout -q -B "$_zw" "$X1" || { rot "Zweig $_zw nicht setzbar"; return; }
+        printf '%s\n' "$@" > "$MODUL/diplomarbeit.tex"
+        git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F58 $_zw" || { rot "Commit $_zw"; return; }
+        stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand $_zw"; return; }
+        fahre_block "$d/f09.sh" "$d/out_$_zw"; rc=$?; zeige "$d/out_$_zw"
+        erw_rc "$rc" "$_rc"; erw_text "$d/out_$_zw" "$_tx"
+    }
+    DC='\documentclass{article}'; DL='\providecommand{\thesislang}{de}'; DU='\providecommand{\thesisumfang}{lang}'
+    KL='\ifx\thesislang\undefined\fi'; KU='\ifx\thesisumfang\undefined\fi'; KO='kein Konsum von \thesisumfang'
+    # (a) drei Codex-Gegenfaelle je OHNE Konsum von \thesisumfang -> FEHLER (thesislang definiert + konsumiert)
+    f58 a1 1 "$KO" "$DC" "$DL" "$KL" '\providecommand{%' '\thesisumfang}{lang}'
+    f58 a2 1 "$KO" "$DC" "$DL" "$KL" '\def % Kommentar' '\thesisumfang{lang}'
+    f58 a3 1 "$KO" "$DC" "$DL" "$KL" '\let % Kommentar' '\thesisumfang=\relax'
+    # (b) r8-Gegenfall '\providecommand' NEWLINE '{\thesisumfang}{lang}' = P-49 (a); (c) legitime Formen bleiben gruen
+    f58 c1 0 'Konsum 1' "$DC" "$DL" "$DU" "$KU" '\textbf' '{\thesislang}'
+    f58 c2 0 'Konsum 1' "$DC" "$DL" "$DU" '% Beispiel: \providecommand' "$KL" "$KU"
+    f58 c3 0 'Konsum 1' "$DC" "$DL" "$DU" '\newcommand' '{\foo}{bar}' "$KL" "$KU"
+    f58 c4 0 'Konsum 1' "$DC" "$DL" "$DU" '\newcommand*' '{\foo}{x}' '\textbf' '  {\thesislang}' "$KU"
+    # (d) Definition + echter Konsum in derselben Datei: Konsum = gesamt - 1, je Makro eine Nachweiszeile
+    f58 d1 0 'F09-GATE-346: \thesisumfang Definitionen 1, Vorkommen 2, Konsum 1' "$DC" "$DL" "$DU" "$KL" "$KU"
+    erw_text "$d/out_d1" 'F09-GATE-346: \thesislang Definitionen 1, Vorkommen 2, Konsum 1'
+    for z in a1 a2 a3 c1 c2 c3 c4; do erw_kein_text "$d/out_$z" 'kein Konsum von \thesislang'; done
+}
+fall_P59() { # S9-04: Index-Abfrage mit expliziter Stage ':0:' genau einmal im Script, alte Form nie (Textwache)
+    s="$1"; n=$(grep -c -F 'git rev-parse --verify -q ":0:$dst"' "$s")
+    erw_gleich "$n" 1 "Zeilen mit ':0:\$dst' im Script"
+    n0=$(grep -c -F 'git rev-parse --verify -q ":$dst"' "$s"); erw_gleich "$n0" 0 "Zeilen mit der alten Form ':\$dst'"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -1773,6 +1939,16 @@ fall P-46 fall_P46 "$SKRIPT"
 fall P-47 fall_P47 "$SKRIPT"
 fall P-48 fall_P48 "$SKRIPT"
 fall P-49 fall_P49 "$SKRIPT"
+fall P-50 fall_P50 "$SKRIPT"
+fall P-51 fall_P51 "$SKRIPT"
+fall P-52 fall_P52 "$SKRIPT"
+fall P-53 fall_P53 "$SKRIPT"
+fall P-54 fall_P54 "$SKRIPT"
+fall P-55 fall_P55 "$SKRIPT"
+fall P-56 fall_P56 "$SKRIPT"
+fall P-57 fall_P57 "$SKRIPT"
+fall P-58 fall_P58 "$SKRIPT"
+fall P-59 fall_P59 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -1813,11 +1989,11 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         "$SKRIPT" > "$MUT/m43.sh"
     # M52 (r8b): Rueckbau auf den Blob-Vergleich (Modus/Typ unbeachtet) -> P-32 muss reissen (S7-01)
     sed -e 's/^    \[ "\$ma" = "100644" \] && \[ "\$ta" = "blob" \] \\$/    true \\/' \
-        -e 's/^    \[ "\$a" = "\$b" \] || {/    [ "${a##* }" = "${b##* }" ] || {/' \
+        -e 's/^    \[ "\$a" = "\$b" \] || ueberholt/    [ "${a##* }" = "${b##* }" ] || ueberholt/' \
         "$SKRIPT" > "$MUT/m52.sh"
     # M53 (r8b): geloeschte Fassung wieder FEHLER statt UEBERHOLT -> P-34 muss reissen (S7-02)
     # M53 (r9, neu definiert): Loesch-Erkennung VOR dem Merge entfernt -> P-45 (a) muss reissen (S8-03)
-    sed '/# S8-03 (r9): Loesch-Erkennung VOR dem Merge$/,/done < "\$WERK\/dst.txt"   # S8-03$/d' \
+    sed '/# S8-03\/S9-05: Loesch-Erkennung VOR dem Merge$/,/done < "\$WERK\/dst.txt"   # S8-03$/d' \
         "$SKRIPT" > "$MUT/m53.sh"
     # M54 (r8b): Wache gegen ungestagte Fremdaenderungen unter DIR entfernt -> P-35 muss reissen (S7-03 a)
     sed '/ausserhalb der Fassungs-Liste (ungestagt, S7-03)/d' "$SKRIPT" > "$MUT/m54.sh"
@@ -1836,8 +2012,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed 's/^  \[ "\$hdr" = "%PDF-" \] || /  : || /' "$SKRIPT" > "$MUT/m60.sh"
     # M61 (r8b): TERM-Trap entfernt -> P-41 muss reissen (S7-08)
     sed 's/; trap .exit 143. TERM//' "$SKRIPT" > "$MUT/m61.sh"
-    # M62 (r9): GIT_LITERAL_PATHSPECS-Export entfernt (Glob-add) -> P-42 muss reissen (S8-01 a)
-    sed '/^export GIT_LITERAL_PATHSPECS=1/d' "$SKRIPT" > "$MUT/m62.sh"
+    # M62 (r9; r10 Doppelmutante): GIT_LITERAL_PATHSPECS-Export UND S9-03-Zeichenklasse entfernt (Glob-add) -> P-42
+    sed -e '/^export GIT_LITERAL_PATHSPECS=1/d' -e '/unzulaessige Zeichen (S9-03)/d' "$SKRIPT" > "$MUT/m62.sh"
     # M63 (r9): Rename-Erkennung toleriert (ohne --no-renames, Status R akzeptiert, nur Zielpfad) -> P-43 (S8-01 b)
     sed -e 's/ --no-renames --name-status / --name-status /' -e 's/A|M) ;;/A|M|R*) ;;/' \
         -e 's/pf="\${zeile#\*\$TAB}"/pf="${zeile##*$TAB}"/' "$SKRIPT" > "$MUT/m63.sh"
@@ -1847,21 +2023,43 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M65 (r9): Index-Modus-Wache + Tree-Pruefung des eigenen Commits entfernt -> P-44 (c) muss reissen (S8-02)
     sed -e '/statt 100644 im Index (S8-02)/d' -e '/blob der Quelle (S8-02)/d' "$SKRIPT" > "$MUT/m65.sh"
     # M66 (r9): Loesch-Erkennung vor dem Merge UND UEBERHOLT nach dem Merge entfernt -> P-34 muss reissen (S7-02)
-    sed -e '/# S8-03 (r9): Loesch-Erkennung VOR dem Merge$/,/done < "\$WERK\/dst.txt"   # S8-03$/d' \
-        -e 's/then echo "UEBERHOLT: Fassung \$dst am Remote geloescht/then fehler "m66 geloescht/' \
+    sed -e '/# S8-03\/S9-05: Loesch-Erkennung VOR dem Merge$/,/done < "\$WERK\/dst.txt"   # S8-03$/d' \
+        -e 's/\[ -n "\$a" \] || ueberholt "Fassung \$dst am Remote geloescht/[ -n "$a" ] || fehler "m66 geloescht/' \
         "$SKRIPT" > "$MUT/m66.sh"
     # M67 (r9): Rohwert des Schalters wieder in der Meldung -> P-47 muss reissen (S8-05)
     sed "s/EXPORT: Wert nicht in {true,false}/EXPORT='\$SW' nicht in {true,false}/" \
         "$SKRIPT" > "$MUT/m67.sh"
-    # M68 (r9): mktemp wieder VOR den Traps -> P-48 (a) muss reissen (S8-06)
-    sed -e '/^WERK=\$(mktemp -d/d' \
-        -e 's/^WERK=..$/WERK=$(mktemp -d "${TMPDIR:-\/tmp}\/thesis_pdf_export.XXXXXX") || fehler "mktemp"/' \
+    # M68 (r9, r10 nachgezogen): WERK-Zuweisung HINTER die Anlage (mkdir zuerst) -> P-48 (a) muss reissen (S9-08)
+    sed -e 's|^WERK="\(\${TMPDIR.*zufall\)"$|mkdir -m 0700 -- "\1" \|\| fehler "m68"|' \
+        -e 's|^mkdir -m 0700 -- "\$WERK" .*$|WERK="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"|' \
         "$SKRIPT" > "$MUT/m68.sh"
     # M69 (r9): Leerraum-/Steuerzeichen-Wache entfernt -> P-39 muss reissen (L8-01)
     sed '/enthaelt Leerraum oder Steuerzeichen (S7-06\/L8-01)/d' "$SKRIPT" > "$MUT/m69.sh"
-    MUT_N=33; ENTF_N=0; NB_N=0
+    # M71 (r10): S9-03-Zeichen-/Formwache entfernt -> P-50 muss reissen
+    sed '/(S9-03)/d' "$SKRIPT" > "$MUT/m71.sh"
+    # M72 (r10): S9-07-CI-Wertwache entfernt -> P-51 muss reissen
+    sed '/(S9-07)/d' "$SKRIPT" > "$MUT/m72.sh"
+    # M73 (r10): fehler() wieder per echo -> P-52 (Textwache) muss reissen (S9-09)
+    sed "s/^fehler() { printf '%s\\\\n' \"FEHLER: \$\*\"; exit 1; }/fehler() { echo \"FEHLER: \$*\"; exit 1; }/" \
+        "$SKRIPT" > "$MUT/m73.sh"
+    # M74 (r10): --no-filters entfernt (gefilterte Hashes) -> P-53 muss reissen (S9-01)
+    sed 's/ --no-filters//g' "$SKRIPT" > "$MUT/m74.sh"
+    # M75 (r10): core.fileMode=true entfernt -> P-54 muss reissen (S9-02)
+    sed 's/ -c core.fileMode=true//g' "$SKRIPT" > "$MUT/m75.sh"
+    # M76 (r10): scp-Maske entfernt -> P-55 muss reissen (L9-04)
+    sed "s/ -e 's#\[^ \/:@\]\*@\[^ \/:@\]\*:#<cred>@<host>:#g'//" "$SKRIPT" > "$MUT/m76.sh"
+    # M77 (r10): Maske zurueck auf r9 '[^/@]' (Kennwort-Rest hinter dem letzten '@' sichtbar) -> P-55 (S9-06)
+    sed "s|s#//\[^/\]\*@#//<cred>@#g|s#//[^/@]*@#//<cred>@#g|g" "$SKRIPT" > "$MUT/m77.sh"
+    # M78 (r10): Werkzeugfehler der Remote-Seite gilt wieder als 'geloescht' (r9-Semantik der cat-file-Form) -> P-56
+    sed 's/ || fehler "git ls-tree FETCH_HEAD -- \$dst (S9-05)"/ || r=/' "$SKRIPT" > "$MUT/m78.sh"
+    # M79 (r10): Index-Abfrage zurueck auf ':$dst' -> P-59 (Textwache) muss reissen (S9-04)
+    sed 's/rev-parse --verify -q ":0:\$dst"/rev-parse --verify -q ":$dst"/' "$SKRIPT" > "$MUT/m79.sh"
+    # M80 (r10, L9-01): Kopfkommentar-Mutantenzahl zurueck auf 51 -> P-57 (Textwache am Harnisch) muss reissen
+    sed 's/SELBSTBISS (--selbstbiss): [0-9]* Wegwerf-Mutanten/SELBSTBISS (--selbstbiss): 51 Wegwerf-Mutanten/' \
+        "$SELBST" > "$MUT/m80.sh"
+    MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
-             m62 m63 m64 m65 m66 m67 m68 m69; do
+             m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -1915,10 +2113,21 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m67 fall_P47 P-47
     [ "$BISS_RC" -eq 0 ] && biss m68 fall_P48 P-48
     [ "$BISS_RC" -eq 0 ] && biss m69 fall_P39 P-39
+    if cmp -s "$SELBST" "$MUT/m80.sh"; then echo "  [ABBRUCH] Mutante m80 ist byte-gleich zum Harnisch"; BISS_RC=2; fi
+    [ "$BISS_RC" -eq 0 ] && biss m71 fall_P50 P-50
+    [ "$BISS_RC" -eq 0 ] && biss m72 fall_P51 P-51
+    [ "$BISS_RC" -eq 0 ] && biss m73 fall_P52 P-52
+    [ "$BISS_RC" -eq 0 ] && biss m74 fall_P53 P-53
+    [ "$BISS_RC" -eq 0 ] && biss m75 fall_P54 P-54
+    [ "$BISS_RC" -eq 0 ] && biss m76 fall_P55 P-55
+    [ "$BISS_RC" -eq 0 ] && biss m77 fall_P55 P-55
+    [ "$BISS_RC" -eq 0 ] && biss m78 fall_P56 P-56
+    [ "$BISS_RC" -eq 0 ] && biss m79 fall_P59 P-59
+    [ "$BISS_RC" -eq 0 ] && biss m80 fall_P57 P-57
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
-        ENTF_N=37
+        ENTF_N=$MUT_N_YAML
         echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70 (YAML): Block EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
@@ -1964,7 +2173,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/^  tags: \[prod, baremetal, amd\]/  tags: [baremetal]/' "$CI_YML" > "$MUT/m29.yml"
         # M30 (r6): Kommentar-Filter des F09-GATE entfernt (sed p statt s/%.*$//) -> P-24 (p) muss reissen (C4-08 a);
         # entfaellt LAUT, solange der Koppelpatch (Block F09-GATE-346) nicht gelandet ist
-        sed 's/^\( *\)ohne_kommentar=.*/\1ohne_kommentar=p/' "$CI_YML" > "$MUT/m30.yml"
+        sed 's/^\( *\)f09_strip() { sed .*/\1f09_strip() { cat; }/' "$CI_YML" > "$MUT/m30.yml"   # r10: Strip = cat
         # M31 (r7): /ID-Zeile NICHT ausgeblendet (roher Hash wie r6) -> P-24 (s3a) muss reissen (L6-01)
         sed 's#grep -a -v .\^/ID \\\[. #cat #' "$CI_YML" > "$MUT/m31.yml"
         # M32 (r7, r8 C7-02a): kanonische Literal-Zeile des EN-Zustands entfernt -> P-24 (s3b) muss reissen (Koppel)
@@ -1976,7 +2185,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/test "\$e288" = "\$SOURCE_DATE_EPOCH" \\$/true \\/' "$CI_YML" > "$MUT/m34.yml"
         # M35 (r7): Definitions-Filter des F09-GATE entfernt (sed p) -> P-24 (p3) muss reissen (C6-02 a; nur
         # mit Koppelpatch)
-        sed 's/^\( *\)ohne_definition=.*/\1ohne_definition=p/' "$CI_YML" > "$MUT/m35.yml"
+        sed 's/^\( *\)f09_join() { tr .*/\1f09_join() { cat; }/' "$CI_YML" > "$MUT/m35.yml"   # r10: Join = cat
         # M41 (r7): needs statt Stufenbarriere am Export-Job -> P-17 (c) muss reissen (C6-09)
         sed 's/^  dependencies: \["thesis:pdf"\]/  needs: [{job: "thesis:pdf", artifacts: true}]/' \
             "$CI_YML" > "$MUT/m41.yml"
@@ -1996,16 +2205,17 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M48 (r8): Konsum ohne Control-Word-Grenze (\thesislangAlt zaehlt) -> P-24 (p4) muss reissen (C7-05; Koppel)
         sed 's/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"
         # M49 (r8): Definitionsfilter ohne '\*?' (\newcommand* zaehlt als Konsum) -> P-24 (p5) reissen (C7-05; Koppel)
-        sed 's/renewcommand)\\\*?/renewcommand)/' "$CI_YML" > "$MUT/m49.yml"
+        sed 's/let)\\\*?/let)/' "$CI_YML" > "$MUT/m49.yml"   # r10: Definitions-ERE endet auf '|let)'
         # M50 (r8): def/let-Filter ohne Leerraum (\def \thesislang zaehlt) -> P-24 (p6) muss reissen (C7-05; Koppel)
-        sed 's/(e?def|let)\[\[:space:\]\]\*/(e?def|let)/' "$CI_YML" > "$MUT/m50.yml"
+        sed '/^ *f09_def=/s/\[\[:space:\]\]\*//g' "$CI_YML" > "$MUT/m50.yml"   # r10: beide Leerraum-Klassen der ERE
         # M51 (r8): beide rev-parse-Substitutionen leer + Leer-Guard entfernt (test "" = "") -> P-23 (Gitlink) reisst
         sed -e 's/h_sub=$(git rev-parse HEAD)/h_sub=/' \
             -e 's/h_git=$(git -C "$CI_PROJECT_DIR" rev-parse HEAD:thesis\/diplomarbeit)/h_git=/' \
             -e '/test -n "$h_sub" && test -n "$h_git"/d' "$CI_YML" > "$MUT/m51.yml"
         # M70 (r9, C8-06): Mehrzeilen-Filter des F09-GATE-346 nimmt Treffer nicht mehr ernst -> P-49 muss reissen
-        sed '/^ *mz=\$(git grep -n -E -e "\$mz_def"/s/^\( *\).*/\1mz=""; mzr=1/' "$CI_YML" > "$MUT/m70.yml"
-        MUT_N=$((MUT_N+37)); M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
+        sed 's/\*\\{?\[\[/*[[/' "$CI_YML" > "$MUT/m70.yml"   # r10: '\{?' aus der Definitions-ERE entfernt
+        MUT_N=$((MUT_N+MUT_N_YAML))
+        M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
             MUT_N=$((MUT_N-6)); ENTF_N=$((ENTF_N+6)); M30=; M35=; M48=; M49=; M50=; M70=
             echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 (F09-GATE-346):" \
@@ -2052,12 +2262,12 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && biss_yml m27 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m28 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m29 fall_P17 P-17
-        [ "$BISS_RC" -eq 0 ] && [ -n "$M30" ] && biss_yml m30 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M30" ] && biss_yml m30 fall_P58 P-58
         [ "$BISS_RC" -eq 0 ] && biss_yml m31 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && [ -n "$M32" ] && biss_yml m32 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && [ -n "$M33" ] && biss_yml m33 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m34 fall_P24 P-24
-        [ "$BISS_RC" -eq 0 ] && [ -n "$M35" ] && biss_yml m35 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M35" ] && biss_yml m35 fall_P58 P-58
         [ "$BISS_RC" -eq 0 ] && biss_yml m41 fall_P17 P-17
         [ "$BISS_RC" -eq 0 ] && biss_yml m42 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m44 fall_P24 P-24
