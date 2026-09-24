@@ -52,6 +52,9 @@
 # nur vorgemerkt (sig), mkdir-rc dreiwertig (0 = WERK, 1 = FEHLER, Signal-rc = leeren Kandidaten entfernen + exit rc),
 # danach Signal-Traps zurueck auf exit und ein vorgemerktes Signal per exit abgearbeitet (0 Reste); S11-02 fuehrendes
 # '-' auch NACH der Normalisierung in der gemeinsamen Wache ('./-n' wurde zu '-n' und exportiert).
+# REV r13 (Codex-Lens r12 A + B, Fable-Lens r12, Lead K306, 24.09.2026): S12-01 kein rmdir/rm auf einen unbestaetigten
+# Kandidaten (nur rc 0 setzt WERK, jeder andere rc = FEHLER mit rc-Nennung, Kandidat unangetastet); das mkdir-Kind ist
+# gegen HUP/INT/TERM immun (Subshell trap '' + exec), die Elternshell merkt weiter vor.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -171,19 +174,22 @@ trap 'sig=129' HUP; trap 'sig=130' INT; trap 'sig=143' TERM
 # S9-08 (r10, Codex-Lens r9 B): mktemp liesse ein Signalfenster zwischen mkdir und Pfadausgabe (Ordner ohne WERK-
 # Zuweisung). Der Pfad wird selbst gebildet (od-Fehler = FEHLER), mkdir ohne -p (Existenz = FEHLER).
 # S10-03 (r11, Codex-Lens r10 B): mkdir VOR der WERK-Zuweisung -- WERK bezeichnet nur einen nachweislich EIGENEN
-# Ordner (bei Kollision mit einem fremden Pfad plus Signal raeumte der EXIT-Trap sonst Fremdes). S11-01 (r12): der
-# mkdir-rc wird dreiwertig ausgewertet -- 0 = eigener Ordner (WERK), 1 = Kollision/Fehler (FEHLER, nichts Fremdes
-# angefasst), Signal-rc = das mkdir-Kind wurde nach der Anlage getoetet: nur ein LEERES Verzeichnis wird entfernt
-# (rmdir), ein fremder nicht-leerer Pfad bleibt; danach exit mit dem Signal-rc.
+# Ordner (bei Kollision mit einem fremden Pfad plus Signal raeumte der EXIT-Trap sonst Fremdes). S11-01 (r12) /
+# S12-01 (r13, Codex-Lens r12 B): der mkdir-rc wird dreiwertig ausgewertet -- 0 = eigener Ordner (WERK), 1 =
+# Kollision/Fehler (FEHLER, nichts Fremdes angefasst), jeder andere rc (Signal-, Werkzeug-rc 2/126/127) = Anlage
+# UNBESTAETIGT: FEHLER mit rc-Nennung, der Kandidat bleibt unangetastet (kein rmdir/rm ohne Eigentumsnachweis --
+# ein fremdes leeres Verzeichnis unter dem Kandidatennamen wuerde sonst entfernt). Das mkdir-Kind ignoriert
+# HUP/INT/TERM (Subshell mit trap '' + exec; das Ignorieren vererbt sich ueber exec, die Elternshell merkt weiter
+# vor); nur SIGKILL (nicht behandelbar) kann ein leeres Rest-Verzeichnis hinterlassen.
 zufall=$(od -An -N8 -tx1 /dev/urandom) || fehler "od /dev/urandom (S9-08)"
 zufall=$(printf '%s' "$zufall" | tr -d ' \n') || fehler "tr (S9-08)"
 [ ${#zufall} -eq 16 ] || fehler "Zufallsname unvollstaendig (S9-08)"
 kand="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"
-rc=0; mkdir -m 0700 -- "$kand" || rc=$?
+rc=0; ( trap '' HUP INT TERM; exec mkdir -m 0700 -- "$kand" ) || rc=$?
 case $rc in
   0) WERK=$kand ;;
   1) fehler "Hilfsordner anlegen (S9-08)" ;;
-  *) rmdir -- "$kand" 2>/dev/null || :; exit "$rc" ;;
+  *) fehler "Hilfsordner anlegen: mkdir rc $rc, Anlage unbestaetigt, Kandidat unangetastet (S12-01)" ;;
 esac
 trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
 [ -z "$sig" ] || exit "$sig"
