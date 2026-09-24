@@ -2068,7 +2068,7 @@ fall_P71() { # C10-06 (L10-03): Werkordner f09.* nach FEHLER (und nach Erfolg) 0
     erw_text "$d/out_r1" "$F11_KO"; erw_kein_text "$d/out_r2" "FEHLER"
 }
 
-fahre_block_ohne_e() { # wie fahre_block, aber bash OHNE -e und OHNE pipefail (P-72: der Block muss den rc selbst fangen)
+fahre_block_ohne_e() { # wie fahre_block, aber bash OHNE -e und OHNE pipefail (P-72: der Block faengt den rc selbst)
     _bs="$1"; _bl="$2"; shift 2
     ( cd "$MODUL" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
         CI_PROJECT_DIR="$SUPERW" "$@" bash "$_bs" ) > "$_bl" 2>&1
@@ -2085,7 +2085,7 @@ fall_P72() { # C10-06b (r11b): F09-Skalar unter bash ohne -e/pipefail; FEHLER-Mo
         fahre_block_ohne_e "$d/f09b.sh" "$d/out_$_zw"; rc=$?; zeige "$d/out_$_zw"
     }
     f72 s1 "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" || return
-    if [ "$rc" -ne 0 ]; then ok "rc=$rc (erwartet != 0)"; else rot "rc=0 (erwartet != 0): Subshell-rc nicht gefangen"; fi
+    if [ "$rc" -ne 0 ]; then ok "rc=$rc (erwartet != 0)"; else rot "rc=0 (erwartet != 0): Subshell-rc ungefangen"; fi
     erw_text "$d/out_s1" "FEHLER: F09"; erw_kein_text "$d/out_s1" "NACH-F09"
     f72 s2 "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F11_KU" || return
     erw_rc "$rc" 0; erw_kein_text "$d/out_s2" "FEHLER"; erw_text "$d/out_s2" "NACH-F09"
