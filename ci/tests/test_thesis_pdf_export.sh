@@ -208,6 +208,9 @@
 #   P-98 Textwache r17: Script-Kommentare S16-01..S16-03 + REV-r17 + YAML-Kommentare C16-01/C16-02 (Koppel, F09)
 #        und C16-03 (Haupt, DRIFT); nur Kommentare, keine Zaehl-Logik, keine Mutante (Codex-Lens r16 A/B, Fable-
 #        Lens r16 L16-01/L16-02, Lead K313/K314)
+#   P-99 Textwache r18: Script-Kommentare F18-02/F18-04 + Meldungstext F18-05 + REV-r18 + YAML-Kommentare F18-01/
+#        F18-03 (Koppel, F09); nur Kommentare + ein Meldungstext, keine Zaehl-Logik, keine Mutante (Codex-Lens r17
+#        A/B, Fable-Lens r17 L17-01..L17-05, Lead K317)
 #
 # SELBSTBISS (--selbstbiss): 123 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -280,6 +283,8 @@
 # r16-Klasse '[A-Za-z@:_]*' nachgezogen; P-92 traegt nur noch den Script-Teil, die YAML-Textwachen liegen in P-97.
 # r17 (Codex r16 C16-01..03 + S16-01..03, Fable r16 L16-01/L16-02, Lead K313/K314): nur Textwache P-98 (6 Kommentar-
 # Fixes, 0 Code), 0 neue Mutanten -- die Kommentar-Literale sind keine Beiss-Gegenstaende.
+# r18 (Codex r17 C17-01/C17-02 + S17-01..S17-03, Fable r17 L17-01..L17-05, Lead K317): nur Textwache P-99 (4 Kommentar-
+# Fixes + 1 Meldungstext, kein neuer Kontrollfluss), 0 neue Mutanten.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2704,6 +2709,44 @@ fall_P98() { # S16-01..S16-03 + REV-r17 (Codex-Lens r16 B) + C16-01/C16-02 (Kopp
     fi
 }
 
+fall_P99() { # F18-01..F18-05 + REV-r18 (Codex-Lens r17 A C17-01/C17-02, B S17-01..S17-03, Fable-Lens r17 L17-01..
+    # L17-05, Lead K317): Textwache auf die r18-Kommentare + den Meldungstext (neue Literale genau 1x, alte 0x);
+    # YAML-Teile nur mit F09-Block, sonst LAUT entfallen; keine Zaehl-Logik, keine Mutante
+    s="$1"
+    n=$(grep -c -F 'r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste' "$s")
+    erw_gleich "$n" 1 "Kommentar 'r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege ...' (F18-02)"
+    n=$(grep -c -F 'Index-Wache auf dem GESAMTEN Index' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'Index-Wache auf dem GESAMTEN Index' (F18-02)"
+    n=$(grep -c -F 'assume-unchanged-/skip-worktree-Bits sind nicht erfasst' "$s")
+    erw_gleich "$n" 1 "Kommentar 'assume-unchanged-/skip-worktree-Bits sind nicht erfasst' (F18-04)"
+    n=$(grep -c -F 'gestagt oder ungestagt); S7-04' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'gestagt oder ungestagt); S7-04' (F18-04)"
+    n=$(grep -c -F 'erneuter Push, falls Versuche verbleiben ($versuch/5; S17-03)' "$s")
+    erw_gleich "$n" 1 "Meldung 'erneuter Push, falls Versuche verbleiben (\$versuch/5; S17-03)' (F18-05)"
+    n=$(grep -c -F '[skip ci], erneuter Push' "$s")
+    erw_gleich "$n" 0 "alte Meldung '[skip ci], erneuter Push' (F18-05)"
+    n=$(grep -c '^# REV r18 ' "$s"); erw_gleich "$n" 1 "REV-r18-Kopf"
+    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
+    else
+        n=$(grep -c -F 'die GETEILTE Form \verb|%| \def + Folgezeile (Definierer und Ziel auf verschiedenen' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'die GETEILTE Form ... (Definierer und Ziel auf versch.' (F18-01)"
+        n=$(grep -c -F 'ergibt 0/0/0 = FEHLER = fail-closed (L17-01/C17-01)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'ergibt 0/0/0 = FEHLER = fail-closed (L17-01/C17-01)' (F18-01)"
+        n=$(grep -c -F 'vor einem Definierer derselben Zeile' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'vor einem Definierer derselben Zeile' (F18-01)"
+        n=$(grep -c -F 'z1-z3: Einzelverwendung mit Ziffer, Umlaut-Byte oder Punkt zaehlt 0/1/1' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'z1-z3: Einzelverwendung ... zaehlt 0/1/1' (F18-03)"
+        n=$(grep -c -F 'TeX-korrektes Soll unter Catcode 11 ist 0/0/0 (fremdes Control-Word)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'TeX-korrektes Soll unter Catcode 11 ist 0/0/0 (fremdes ...)' (F18-03)"
+        n=$(grep -c -F 'unter Standard-Catcodes 0/1/1 = r15-Verhalten' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'unter Standard-Catcodes 0/1/1 = r15-Verhalten' (F18-03)"
+        n=$(grep -c -F 'r18 (Codex-Lens r17 C17-01/C17-02 + Fable-Lens r17 L17-01/L17-05' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Absatz 'r18 (Codex-Lens r17 C17-01/C17-02 + Fable-Lens r17 L17-01/L17-05' (F09)"
+    fi
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -2817,6 +2860,7 @@ fall P-95 fall_P95 "$SKRIPT"
 fall P-96 fall_P96 "$SKRIPT"
 fall P-97 fall_P97 "$SKRIPT"
 fall P-98 fall_P98 "$SKRIPT"
+fall P-99 fall_P99 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
