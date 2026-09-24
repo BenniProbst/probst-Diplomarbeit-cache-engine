@@ -64,8 +64,13 @@
 # r12-Historie als abgeloest gekennzeichnet, Duplikat-Meldung per Position); keine funktionale Aenderung.
 # REV r16 (Codex-Lens r15 A C15-01..05, B2 S15-01..S15-05, B1 S15-07 + Fable-Lens r15 L15-01, Lead K312, 24.09.2026):
 # nur Kommentare berichtigt (PDF-Praefixtest statt 'ein PDF', lokale und Remote-Gleichheit getrennt, Push-Refspec
-# refs/heads/$BRANCH, Fetch + Abstammungspruefung nach jedem abgelehnten Push, Diff-Leerheit auch bei Moduswechsel,
-# Zielverzeichnis statt 'erster Seiteneffekt'); keine funktionale Aenderung.
+# refs/heads/$BRANCH, Fetch + Abstammungspruefung nach jedem abgelehnten Push, Diff-Leerheit setzt gleichen Modus
+# voraus (ein Moduswechsel ergibt Diff und Commit; S16-02), Zielverzeichnis statt 'erster Seiteneffekt'); keine
+# funktionale Aenderung.
+# REV r17 (Codex-Lens r16 A C16-01..03, B S16-01..03 + Fable-Lens r16 L16-01/L16-02, Lead K313/K314, 24.09.2026):
+# nur Kommentare berichtigt (Push-Schleife in Code-Reihenfolge: Fetch -> Abstammung -> Vorwachen -> Merge ->
+# Tree-Wachen -> erneuter Push; Modus-Satz des REV-r16-Kopfs; gestagter Diff = nur A/M-Eintraege aus der
+# Fassungs-Liste); keine funktionale Aenderung.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -76,7 +81,8 @@
 # dann vor (S7-01/S8-02/S15-01); Commit und Merge-Commit tragen '[skip ci]',
 # Push mit -o ci.skip auf HEAD:refs/heads/$BRANCH (S10-01; Order 340 A-01 (c): eigener Branch);
 # COMDARE_WRITEBACK_USER/TOKEN gehen NUR ueber GIT_ASKPASS (nie in URL, argv, .git/config oder Log);
-# bei Ablehnung fetch + Pruefung + merge (nie rebase), max 5 Versuche; hat sich der Thesis-Gitlink oder das
+# bei Ablehnung fetch + Abstammungspruefung + Vorwachen + merge (nie rebase) + Tree-Wachen, dann erneuter Push;
+# max 5 Versuche (S16-01); hat sich der Thesis-Gitlink oder das
 # CI-Rezept seit CI_COMMIT_SHA bewegt = UEBERHOLT (rc=0, kein Push alter PDFs; exportiert wird beim naechsten Push,
 # der eine Pipeline erzeugt -- ein [skip ci]-Bot-Commit, der den Gitlink bewegt, erzeugt selbst keine);
 # bei Konflikt sauberer Abbruch (naechste Pipeline holt nach).
@@ -404,9 +410,11 @@ git ls-files -- "$DIR" > "$WERK/ls.txt" || fehler "git ls-files $DIR"
 gestagt=$(grep -cxF -f "$WERK/dst.txt" "$WERK/ls.txt" || true)
 [ "$gestagt" -eq "$n" ] || fehler "nur $gestagt von $n Zieldateien stehen im Index unter $DIR/"
 
-# I-02 / S7-03 (r8b) / S8-01 (r9): der GESAMTE Index darf GENAU die Fassungs-Liste tragen, je Status A oder M,
-# ohne Rename-Erkennung (eine als Rename erkannte Fremd-Loeschung verschwaende sonst aus --name-only); der Commit,
-# der lokale Byte-Vergleich und die Remote-Idempotenz arbeiten auf derselben exakten, literalen Pathspec-Liste.
+# I-02 / S7-03 (r8b) / S8-01 (r9): der gesamte gestagte Diff (diff --cached)
+# darf nur A/M-Eintraege aus der Fassungs-Liste enthalten; unveraenderte Fassungen erscheinen darin nicht (Praesenz
+# getrennt in L1-01 oben; Teilmenge und leerer Diff sind erlaubt; S16-03); ohne Rename-Erkennung (eine als Rename
+# erkannte Fremd-Loeschung verschwaende sonst aus --name-only); der Commit, der lokale Byte-Vergleich und die
+# Remote-Idempotenz arbeiten auf derselben exakten, literalen Pathspec-Liste.
 git diff --cached --no-renames --name-status > "$WERK/index.txt" || fehler "git diff --cached --name-status"
 fremd=0
 while IFS= read -r zeile; do
@@ -444,8 +452,9 @@ for f in $FASSUNGEN; do
 done
 
 # F-05 Push-Schleife: jeder Fehler ist sichtbar; jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung
-# (FETCH_HEAD Vorfahr von HEAD = kein Race = FEHLER); Merge und erneuter Push nur bei passender Abstammung und
-# bestandenen Folgewachen (F-06, F-07, S8-03/S9-05, S7-01/S7-02/C6-04; S15-04); F-04 Merge-Botschaft mit Marker.
+# (FETCH_HEAD Vorfahr von HEAD = kein Race = FEHLER) -> Vorwachen F-06/F-07/S8-03/S9-05 -> Merge (nie rebase,
+# F-04 Marker) -> Tree-Wachen S7-01/S7-02/C6-04 am Merge-Ergebnis -> erneuter Push nur bei Erfolg aller Wachen
+# und verbleibendem Versuch (S15-04/S16-01); F-04 Merge-Botschaft mit Marker.
 versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
