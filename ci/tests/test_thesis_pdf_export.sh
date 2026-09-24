@@ -145,8 +145,24 @@
 #   P-58 F09-GATE-346 kommentar-bewusst/zeilenuebergreifend: 3 Codex-Gegenfaelle = FEHLER, legitime Formen gruen,
 #        Definition + Konsum = 'Konsum 1' (C9-01/C9-02, Koppelpatch; r8-Gegenfall = P-49)
 #   P-59 Textwache ':0:$dst' genau 1x im Script, alte Form 0x (S9-04)
+#   r11 (Codex-Lens r10 A/B + Fable-Lens r10, Lead K303/K304, 24.09.2026):
+#   P-60 CI_COMMIT_BRANCH 'refs/heads/x' landet auf refs/heads/refs/heads/x (Branch x unbewegt); 'HEAD' / 'x.lock'
+#        / 'x/' = FEHLER 'kein gueltiger Branchname' (S10-01, L10-07)
+#   P-61 CI_COMMIT_SHORT_SHA / CI_PIPELINE_ID ungesetzt = 'NA' im Commit-Text; gesetzt leer oder 'NA' = FEHLER (S10-02)
+#   P-62 mkdir-Shim: Kollision mit fremdem Ordner (mit Inhalt) + SIGTERM -> fremder Ordner unveraendert (S10-03)
+#   P-63 TMPDIR mit Leerzeichen / ';' / relativ = FEHLER ohne Rohwert; chmod 0700 -- am Askpass-Helfer (S10-04)
+#   P-64 Textwache fehler() ohne $SRC_K/$WERK/$TOP/$WURZEL/$DIR_K/$DIR_F; Symlink-Quelle ausserhalb: aufgeloester
+#        Pfad nie im Log (S10-06)
+#   P-65 core.fileMode=false + fremde getrackte Datei unter DIR chmod +x = FEHLER 'ungestagt', kein Push (S10-07)
+#   P-66 DIR '-n' / SRC '-x' = FEHLER "fuehrendes '-'", kein Verzeichnis, kein Push (L10-05)
+#   P-67 push.err mit 'https:u:pw@host/y' (ohne '//'): '<scheme>:<cred>@host/y', Kennwort nie im Log (S10-05, L10-06)
+#   P-68 F09-GATE-346 Backslash-Paritaet: 'A\\% \thesisumfang' zaehlt NICHT, 'A\% ..' und 'A\\\% ..' zaehlen (C10-01)
+#   P-69 F09-GATE-346 \gdef/\xdef/\DeclareRobustCommand/\NewDocumentCommand/\newrobustcmd: nur Definition = FEHLER,
+#        Definition + Konsum = gruen (C10-02, L10-01)
+#   P-70 F09-GATE-346 '\newcommand{\thesisumfangX}{x}' + Konsum \thesisumfang: Definitionen 1, Konsum 1 (C10-04)
+#   P-71 F09-GATE-346 nach FEHLER 0 Reste f09.* unter TMPDIR, Gegenprobe gruen ebenso (C10-06, L10-03)
 #
-# SELBSTBISS (--selbstbiss): 80 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 93 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -186,6 +202,11 @@
 # Form, M79 ':$dst' zurueck, M80 Kopfzahl 51 (Textwache am Harnisch); M62 = Doppelmutante (Export + S9-03-Klasse),
 # M53/M66/M68 auf die r10-Zeilen nachgezogen; YAML: M30 Kommentar-Strip, M35 Zeilen-Join, M70 '\{?' (F09 r10),
 # M49/M50 auf die r10-Definitions-ERE ('|let)\*?', beide Leerraum-Klassen) nachgezogen.
+# r11 (Codex r10 S10-01..07, Fable r10 L10-05, Codex r10 C10-01/02/04/06): M81 Push-Form 'HEAD:$BRANCH', M82 ohne
+# check-ref-format, M83 ':-NA'-Semantik, M84 WERK-Zuweisung VOR mkdir, M85 ohne TMPDIR-Wache/'--', M86 $SRC_K in
+# fehler(), M87 ungestagt-Diff ohne core.fileMode, M88 ohne '-*'-Zweig, M89 ohne scheme-Maske; M68 neu = mkdir -p
+# (Kollision toleriert); YAML: M90 Strip ohne Paritaet, M91 alte ERE, M92 Definitionsziel ohne Grenze, M93 ohne
+# EXIT-Trap im F09-Block; M48/M49 auf die r11-Zeilen nachgezogen.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -263,7 +284,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=43; MUT_N_YAML=37   # r10 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=52; MUT_N_YAML=41   # r11 (L9-01): Kopfkommentar == Summe (P-57)
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -1687,14 +1708,14 @@ fall_P47() { # S8-05: Koeder als Schalter, als Fassung und als Argument -> FEHLE
     zeige "$d/out3"; erw_rc "$rc" 1; erw_text "$d/out3" "Argument 1 unbekannt"; erw_kein_text "$d/out3" "$KOEDER"
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
-fall_P48() { # S8-06: (a) EXIT-Trap vor mktemp (Zeilennummern); (b) fehler() vor mktemp: rc 1, kein unbound, 0 Reste
+fall_P48() { # S8-06/S10-03: (a) Trap VOR mkdir VOR WERK-Zuweisung (Zeilen); (b) fehler() vor mkdir: rc 1, 0 Reste
     s="$1"; d="$T/P48"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     zt=$(grep -n "^trap 'if \[ -n" "$s" | head -1 | cut -d: -f1)
-    zm=$(grep -n '^mkdir -m 0700' "$s" | head -1 | cut -d: -f1)   # S9-08 (r10): mkdir statt mktemp
-    zw=$(grep -n '^WERK="${TMPDIR' "$s" | head -1 | cut -d: -f1)
-    if [ -n "$zt" ] && [ -n "$zm" ] && [ -n "$zw" ] && [ "$zt" -lt "$zm" ] && [ "$zw" -lt "$zm" ]; then
-        ok "EXIT-Trap Z.$zt und WERK-Zuweisung Z.$zw vor mkdir Z.$zm"
-    else rot "EXIT-Trap-Zeile '$zt' / WERK-Zuweisung '$zw' nicht vor der mkdir-Zeile '$zm'"; fi
+    zm=$(grep -n '^mkdir -m 0700 -- "\$kand"' "$s" | head -1 | cut -d: -f1)   # S9-08 mkdir ohne -p; r11: kand
+    zw=$(grep -n '^WERK=\$kand$' "$s" | head -1 | cut -d: -f1)   # S10-03 (r11): Zuweisung NACH der Anlage
+    if [ -n "$zt" ] && [ -n "$zm" ] && [ -n "$zw" ] && [ "$zt" -lt "$zm" ] && [ "$zm" -lt "$zw" ]; then
+        ok "EXIT-Trap Z.$zt vor mkdir Z.$zm vor WERK-Zuweisung Z.$zw (S8-06/S10-03)"
+    else rot "Trap '$zt' / mkdir '$zm' / WERK-Zuweisung '$zw' nicht in der Reihenfolge Trap, mkdir, Zuweisung"; fi
     klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
     mkdir -p "$d/tmpw"; k=$(git -C "$d/work" rev-parse --short "$BASE")
     ( cd "$d/work" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$d/tmpw" GIT_CONFIG_GLOBAL=/dev/null \
@@ -1875,6 +1896,176 @@ fall_P59() { # S9-04: Index-Abfrage mit expliziter Stage ':0:' genau einmal im S
     n0=$(grep -c -F 'git rev-parse --verify -q ":$dst"' "$s"); erw_gleich "$n0" 0 "Zeilen mit der alten Form ':\$dst'"
 }
 
+# ------------------------------------------------ r11 (Codex-Lens r10 A/B, Fable-Lens r10, Lead K303/K304)
+fall_P60() { # S10-01 (L10-07): Branch 'refs/heads/x' = volle Ref refs/heads/refs/heads/x; 'HEAD'/'x.lock'/'x/' = FEHLER
+    s="$1"; d="$T/P60"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    git -C "$BARE" update-ref refs/heads/refs/heads/x "$BASE" && git -C "$BARE" update-ref refs/heads/x "$BASE" \
+        || { rot "Zweige refs/heads/x und x am Bare nicht setzbar"; return; }
+    klone "$d/work1" "$BASE" || { rot "Klon 1 nicht baubar"; return; }; lege_pdfs "$d/work1" v1
+    lauf "$d/work1" "$s" "$d/out1" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" CI_COMMIT_BRANCH=refs/heads/x; rc=$?
+    zeige "$d/out1"; erw_rc "$rc" 0; erw_text "$d/out1" "PUSH OK"
+    zx=$(git -C "$BARE" rev-parse refs/heads/refs/heads/x); n=$(git -C "$BARE" rev-list --count "$BASE..$zx")
+    erw_gleich "$n" 1 "neue Commits auf refs/heads/refs/heads/x (Push-Ziel = volle Ref)"
+    bx=$(git -C "$BARE" rev-parse refs/heads/x); erw_gleich "$bx" "$BASE" "Branch x unbewegt (kein Fehlziel)"
+    _i=1
+    for b in HEAD x.lock x/; do
+        _i=$((_i+1)); klone "$d/work$_i" "$BASE" || { rot "Klon $_i nicht baubar"; return; }; lege_pdfs "$d/work$_i" v1
+        lauf "$d/work$_i" "$s" "$d/out$_i" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "CI_COMMIT_BRANCH=$b"; rc=$?
+        zeige "$d/out$_i"; erw_rc "$rc" 1; erw_text "$d/out$_i" "kein gueltiger Branchname (S10-01)"
+        erw_kein_text "$d/out$_i" "PUSH OK"
+    done
+    t=$(tip); erw_gleich "$t" "$BASE" "development unbewegt"
+}
+fall_P61() { # S10-02: NA nur bei UNGESETZTER SHORT_SHA/PIPELINE_ID; gesetzt leer oder 'NA' = FEHLER (S9-07-Wache)
+    s="$1"; d="$T/P61"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work1" "$BASE" || { rot "Klon 1 nicht baubar"; return; }; lege_pdfs "$d/work1" v1
+    ( cd "$d/work1" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
+        CI_COMMIT_BRANCH=development CI_COMMIT_SHA="$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" sh "$s" ) > "$d/out1" 2>&1
+    rc=$?; zeige "$d/out1"; erw_rc "$rc" 0; erw_text "$d/out1" "PUSH OK"
+    t=$(tip); m=$(git -C "$BARE" log -1 --format=%B "$t" | grep -c 'aus Pipeline NA')
+    erw_gleich "$m" 1 "'Pipeline NA' im Commit-Text (ungesetzt)"
+    m=$(git -C "$BARE" log -1 --format=%B "$t" | grep -c 'Quelle super NA (')
+    erw_gleich "$m" 1 "'super NA' im Commit-Text (ungesetzt)"
+    _i=1
+    for kv in CI_COMMIT_SHORT_SHA= CI_COMMIT_SHORT_SHA=NA CI_PIPELINE_ID= CI_PIPELINE_ID=NA; do
+        _i=$((_i+1)); klone "$d/work$_i" "$BASE" || { rot "Klon $_i nicht baubar"; return; }; lege_pdfs "$d/work$_i" v1
+        lauf "$d/work$_i" "$s" "$d/out$_i" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "$kv"; rc=$?; zeige "$d/out$_i"
+        erw_rc "$rc" 1; erw_text "$d/out$_i" "${kv%%=*}:"; erw_text "$d/out$_i" "(S9-07)"
+        erw_kein_text "$d/out$_i" "PUSH OK"
+    done
+    t2=$(tip); erw_gleich "$t2" "$t" "Bare-Tip unveraendert seit dem Lauf ohne SHORT_SHA/PIPELINE_ID"
+}
+fall_P62() { # S10-03: Kollision (Pfad existiert fremd, mit Inhalt) + SIGTERM bei der Anlage: nichts Fremdes geraeumt
+    s="$1"; d="$T/P62"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    mkdir -p "$d/shim" "$d/tmpw"; echt=$(command -v mkdir)
+    { echo '#!/bin/sh'
+      echo 'case "$1 $2 $3" in "-m 0700 --") ;; *) exec '"'$echt'"' "$@" ;; esac'
+      echo "'$echt' -p -- \"\$4\" && printf 'fremd\\n' > \"\$4/fremd.txt\" && printf '%s\\n' \"\$4\" > '$d/kand.txt'"
+      echo 'kill -TERM $PPID; exit 1'; } > "$d/shim/mkdir"; chmod 0755 "$d/shim/mkdir"
+    lauf "$d/work" "$s" "$d/out" "$BASE" PATH="$d/shim:$PATH" TMPDIR="$d/tmpw" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 143
+    [ -s "$d/kand.txt" ] || { rot "Vorbedingung: mkdir-Shim nicht erreicht"; return; }
+    kand=$(cat "$d/kand.txt")
+    if [ -d "$kand" ]; then ok "fremder Ordner besteht nach dem Signal"; else rot "fremder Ordner wurde geraeumt"; fi
+    inh=$(cat "$kand/fremd.txt" 2>/dev/null); erw_gleich "$inh" fremd "Inhalt des fremden Ordners unveraendert"
+    erw_kein_text "$d/out" "PUSH OK"; t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P63() { # S10-04: TMPDIR mit Leerzeichen / ';' / relativ = FEHLER ohne Rohwert VOR der Anlage; chmod 0700 --
+    s="$1"; d="$T/P63"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    n=$(grep -c -F 'chmod 0700 -- "$WERK/askpass.sh"' "$s"); erw_gleich "$n" 1 "chmod 0700 -- am Askpass-Helfer"
+    mkdir -p "$d/a b" "$d/x;y" || { rot "Sonder-TMPDIRs nicht anlegbar"; return; }
+    f63() { # $1 = Nr, $2 = TMPDIR-Wert, $3 = erwarteter Text, $4 = Fragment des Rohwerts (darf nicht im Log stehen)
+        klone "$d/work$1" "$BASE" || { rot "Klon $1 nicht baubar"; return; }; lege_pdfs "$d/work$1" v1
+        lauf "$d/work$1" "$s" "$d/out$1" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "TMPDIR=$2"; rc=$?; zeige "$d/out$1"
+        erw_rc "$rc" 1; erw_text "$d/out$1" "$3"; erw_kein_text "$d/out$1" "$4"; erw_kein_text "$d/out$1" "PUSH OK"
+    }
+    f63 1 "$d/a b" "TMPDIR: unzulaessige Zeichen (S10-04)" "a b"
+    f63 2 "$d/x;y" "TMPDIR: unzulaessige Zeichen (S10-04)" "x;y"
+    f63 3 "rel/x" "TMPDIR: kein absoluter Pfad (S10-04)" "rel/x"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P64() { # S10-06: fehler() ohne abgeleitete Werte (Textwache); Symlink-Quelle ausserhalb: Zielpfad nie im Log
+    s="$1"; d="$T/P64"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    n=$(grep -c -E 'fehler .*\$(SRC_K|WERK|TOP|WURZEL|DIR_K|DIR_F)' "$s")
+    erw_gleich "$n" 0 "fehler()-Zeilen mit \$SRC_K/\$WERK/\$TOP/\$WURZEL/\$DIR_K/\$DIR_F im Script"
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    mkdir -p "$d/AUSSEN-S10-06-MARKE" && ln -s "$d/AUSSEN-S10-06-MARKE" "$d/work/thesis/aussen" \
+        || { rot "Symlink-Quelle nicht anlegbar"; return; }
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_SRC=thesis/aussen; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 1; erw_text "$d/out" "liegt ausserhalb des Arbeitsbaums (SRC_K, C6-08)"
+    erw_kein_text "$d/out" "AUSSEN-S10-06-MARKE"; t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P65() { # S10-07: core.fileMode=false + fremde getrackte Datei unter DIR chmod +x (ungestagt) = FEHLER, kein Push
+    s="$1"; d="$T/P65"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    readme_unter_dir "$d/h" fremd || { rot "Fremddatei am Remote nicht anlegbar"; return; }; H=$(tip)
+    klone "$d/work" "$H" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    git -C "$d/work" config core.fileMode false || { rot "core.fileMode nicht setzbar"; return; }
+    chmod +x "$d/work/docs/diplomarbeit/README.md" || { rot "chmod +x fehlgeschlagen"; return; }
+    lauf "$d/work" "$s" "$d/out" "$H" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "(ungestagt, S7-03)"; erw_kein_text "$d/out" "PUSH OK"
+    t=$(tip); erw_gleich "$t" "$H" "Bare-Tip unveraendert"
+}
+fall_P66() { # L10-05: DIR '-n' / SRC '-x' = FEHLER "fuehrendes '-'" VOR jeder git-Wache, kein Verzeichnis, kein Push
+    s="$1"; d="$T/P66"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work1" "$BASE" || { rot "Klon 1 nicht baubar"; return; }; lege_pdfs "$d/work1" v1
+    lauf "$d/work1" "$s" "$d/out1" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_DIR=-n; rc=$?
+    zeige "$d/out1"; erw_rc "$rc" 1; erw_text "$d/out1" "COMDARE_THESIS_PDF_DIR: fuehrendes '-' (L10-05)"
+    erw_kein_text "$d/out1" "PUSH OK"
+    if [ -e "$d/work1/-n" ]; then rot "Verzeichnis '-n' im Klon angelegt"; else ok "kein Verzeichnis '-n' angelegt"; fi
+    klone "$d/work2" "$BASE" || { rot "Klon 2 nicht baubar"; return; }; lege_pdfs "$d/work2" v1
+    lauf "$d/work2" "$s" "$d/out2" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" COMDARE_THESIS_PDF_SRC=-x; rc=$?
+    zeige "$d/out2"; erw_rc "$rc" 1; erw_text "$d/out2" "COMDARE_THESIS_PDF_SRC: fuehrendes '-' (L10-05)"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P67() { # S10-05 (L10-06): Diagnoseform ohne '//' (scheme:user:kennwort@host/pfad) maskiert, Kennwort nie im Log
+    s="$1"; d="$T/P67"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    m=$(grep -c -F "s#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g" "$s")
+    erw_gleich "$m" 2 "scheme-Masken-Ausdruecke im Script (push.err + fetch.err)"
+    { echo '#!/bin/sh'; echo 'echo "reject https:u:pw0ohne2slash@host/y" >&2'; echo 'exit 1'; } \
+        > "$BARE/hooks/pre-receive"
+    chmod 0755 "$BARE/hooks/pre-receive"
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Push abgelehnt"; erw_text "$d/out" "<scheme>:<cred>@host/y"
+    erw_kein_text "$d/out" "pw0ohne2slash"; t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+f09_vorbereitung() { # $1 = Fallverzeichnis: Block F09-GATE-346 extrahieren + Wegwerf-Modul; rc 1 = entfallen/rot
+    mkdir -p "$1"; zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$1/f09.sh")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] Block F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch pruefbar"; return 1
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return 1; }
+    baue_modul "$1" || { rot "Wegwerf-Modul nicht baubar"; return 1; }
+}
+f09_fall() { # $1 = Fallverzeichnis, $2 = Zweig, $3 = erwarteter rc, $4 = erwarteter Text, danach die tex-Zeilen
+    _fd="$1"; _zw="$2"; _rc="$3"; _tx="$4"; shift 4
+    git -C "$MODUL" checkout -q -B "$_zw" "$X1" || { rot "Zweig $_zw nicht setzbar"; return; }
+    printf '%s\n' "$@" > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F11 $_zw" || { rot "Commit $_zw"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand $_zw"; return; }
+    fahre_block "$_fd/f09.sh" "$_fd/out_$_zw"; rc=$?; zeige "$_fd/out_$_zw"
+    erw_rc "$rc" "$_rc"; erw_text "$_fd/out_$_zw" "$_tx"
+}
+F11_DC='\documentclass{article}'; F11_DL='\providecommand{\thesislang}{de}'; F11_KL='\ifx\thesislang\undefined\fi'
+F11_DU='\providecommand{\thesisumfang}{lang}'; F11_KU='\ifx\thesisumfang\undefined\fi'
+F11_KO='kein Konsum von \thesisumfang'; F11_K1='F09-GATE-346: \thesisumfang Definitionen 1, Vorkommen 2, Konsum 1'
+fall_P68() { # C10-01 (L10-02): Backslash-Paritaet: '\\%' = Kommentar (zaehlt NICHT), '\%' und '\\\%' = escaptes Prozent
+    d="$T/P68"; f09_vorbereitung "$d" || return
+    f09_fall "$d" p1 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" 'A\\% \thesisumfang'
+    erw_text "$d/out_p1" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" p2 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" 'A\% \thesisumfang'
+    f09_fall "$d" p3 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" 'A\\\% \thesisumfang'
+}
+fall_P69() { # C10-02 (L10-01): weitere Definitionsformen: nur Definition = FEHLER, Definition + Konsum = gruen
+    d="$T/P69"; f09_vorbereitung "$d" || return; _i=0
+    for df in '\gdef\thesisumfang{lang}' '\xdef\thesisumfang{lang}' '\DeclareRobustCommand{\thesisumfang}{lang}' \
+              '\NewDocumentCommand{\thesisumfang}{}{lang}' '\newrobustcmd{\thesisumfang}{lang}'; do
+        _i=$((_i+1))
+        f09_fall "$d" "n$_i" 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$df"
+        f09_fall "$d" "k$_i" 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$df" "$F11_KU"
+    done
+}
+fall_P70() { # C10-04: Control-Word-Grenze am Definitionsziel: \thesisumfangX ist KEINE Definition von \thesisumfang
+    d="$T/P70"; f09_vorbereitung "$d" || return
+    f09_fall "$d" x1 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" '\newcommand{\thesisumfangX}{x}' "$F11_KU"
+    erw_kein_text "$d/out_x1" "FEHLER"
+}
+fall_P71() { # C10-06 (L10-03): Werkordner f09.* nach FEHLER (und nach Erfolg) 0 Reste unter TMPDIR
+    d="$T/P71"; f09_vorbereitung "$d" || return; mkdir -p "$d/tmpf"
+    for z in r1:1 r2:0; do
+        _zw="${z%%:*}"; _rc="${z#*:}"
+        git -C "$MODUL" checkout -q -B "$_zw" "$X1" || { rot "Zweig $_zw nicht setzbar"; return; }
+        if [ "$_rc" -eq 1 ]; then printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" > "$MODUL/diplomarbeit.tex"
+        else printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F11_KU" > "$MODUL/diplomarbeit.tex"; fi
+        git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F11 $_zw" || { rot "Commit $_zw"; return; }
+        stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand $_zw"; return; }
+        fahre_block "$d/f09.sh" "$d/out_$_zw" TMPDIR="$d/tmpf"; rc=$?; zeige "$d/out_$_zw"; erw_rc "$rc" "$_rc"
+        rest=$(ls -A "$d/tmpf" | wc -l); erw_gleich "$rest" 0 "Reste unter TMPDIR nach dem Lauf $_zw (rc $_rc)"
+    done
+    erw_text "$d/out_r1" "$F11_KO"; erw_kein_text "$d/out_r2" "FEHLER"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -1949,6 +2140,18 @@ fall P-56 fall_P56 "$SKRIPT"
 fall P-57 fall_P57 "$SKRIPT"
 fall P-58 fall_P58 "$SKRIPT"
 fall P-59 fall_P59 "$SKRIPT"
+fall P-60 fall_P60 "$SKRIPT"
+fall P-61 fall_P61 "$SKRIPT"
+fall P-62 fall_P62 "$SKRIPT"
+fall P-63 fall_P63 "$SKRIPT"
+fall P-64 fall_P64 "$SKRIPT"
+fall P-65 fall_P65 "$SKRIPT"
+fall P-66 fall_P66 "$SKRIPT"
+fall P-67 fall_P67 "$SKRIPT"
+fall P-68 fall_P68 "$SKRIPT"
+fall P-69 fall_P69 "$SKRIPT"
+fall P-70 fall_P70 "$SKRIPT"
+fall P-71 fall_P71 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2029,10 +2232,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M67 (r9): Rohwert des Schalters wieder in der Meldung -> P-47 muss reissen (S8-05)
     sed "s/EXPORT: Wert nicht in {true,false}/EXPORT='\$SW' nicht in {true,false}/" \
         "$SKRIPT" > "$MUT/m67.sh"
-    # M68 (r9, r10 nachgezogen): WERK-Zuweisung HINTER die Anlage (mkdir zuerst) -> P-48 (a) muss reissen (S9-08)
-    sed -e 's|^WERK="\(\${TMPDIR.*zufall\)"$|mkdir -m 0700 -- "\1" \|\| fehler "m68"|' \
-        -e 's|^mkdir -m 0700 -- "\$WERK" .*$|WERK="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"|' \
-        "$SKRIPT" > "$MUT/m68.sh"
+    # M68 (r9; r11 neu definiert): mkdir -p (Kollision mit bestehendem Pfad toleriert) -> P-48 (a) muss reissen (S9-08)
+    sed 's/^mkdir -m 0700 -- "\$kand" || fehler/mkdir -p -m 0700 -- "$kand" || fehler/' "$SKRIPT" > "$MUT/m68.sh"
     # M69 (r9): Leerraum-/Steuerzeichen-Wache entfernt -> P-39 muss reissen (L8-01)
     sed '/enthaelt Leerraum oder Steuerzeichen (S7-06\/L8-01)/d' "$SKRIPT" > "$MUT/m69.sh"
     # M71 (r10): S9-03-Zeichen-/Formwache entfernt -> P-50 muss reissen
@@ -2057,9 +2258,33 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M80 (r10, L9-01): Kopfkommentar-Mutantenzahl zurueck auf 51 -> P-57 (Textwache am Harnisch) muss reissen
     sed 's/SELBSTBISS (--selbstbiss): [0-9]* Wegwerf-Mutanten/SELBSTBISS (--selbstbiss): 51 Wegwerf-Mutanten/' \
         "$SELBST" > "$MUT/m80.sh"
+    # M81 (r11): Push-Ziel zurueck auf 'HEAD:$BRANCH' (Kurzname statt voller Ref) -> P-60 muss reissen (S10-01)
+    sed 's/"HEAD:refs\/heads\/\$BRANCH"/"HEAD:$BRANCH"/' "$SKRIPT" > "$MUT/m81.sh"
+    # M82 (r11): Branchnamen-Pruefung (check-ref-format) entfernt -> P-60 muss reissen (S10-01)
+    sed '/^git check-ref-format --branch "\$BRANCH"/,/kein gueltiger Branchname (S10-01)/d' "$SKRIPT" > "$MUT/m82.sh"
+    # M83 (r11): ':-NA'-Semantik zurueck (leer und 'NA' = ungesetzt) -> P-61 muss reissen (S10-02)
+    sed -e 's/^if \[ "\${CI_COMMIT_SHORT_SHA+x}" = x \]; then$/if [ "${CI_COMMIT_SHORT_SHA:-NA}" != NA ]; then/' \
+        -e 's/^if \[ "\${CI_PIPELINE_ID+x}" = x \]; then$/if [ "${CI_PIPELINE_ID:-NA}" != NA ]; then/' \
+        "$SKRIPT" > "$MUT/m83.sh"
+    # M84 (r11): WERK-Zuweisung VOR mkdir (der Trap kennt den fremden Pfad) -> P-62 muss reissen (S10-03)
+    sed 's/^mkdir -m 0700 -- "\$kand" || fehler/WERK=$kand; mkdir -m 0700 -- "$kand" || fehler/' \
+        "$SKRIPT" > "$MUT/m84.sh"
+    # M85 (r11): TMPDIR-Wache entfernt und chmod ohne '--' -> P-63 muss reissen (S10-04)
+    sed -e '/(S10-04)/d' -e 's/^  chmod 0700 -- "\$WERK\/askpass.sh".*/  chmod 0700 "$WERK\/askpass.sh"/' \
+        "$SKRIPT" > "$MUT/m85.sh"
+    # M86 (r11): aufgeloester Quellpfad wieder in der C6-08-Meldung -> P-64 muss reissen (S10-06)
+    sed 's/liegt ausserhalb des Arbeitsbaums (SRC_K, C6-08)/liegt ausserhalb des Arbeitsbaums ($SRC_K, C6-08)/' \
+        "$SKRIPT" > "$MUT/m86.sh"
+    # M87 (r11): ungestagt-Diff ohne core.fileMode=true -> P-65 muss reissen (S10-07)
+    sed 's/^ungestagt=\$(git -c core.fileMode=true diff/ungestagt=$(git diff/' "$SKRIPT" > "$MUT/m87.sh"
+    # M88 (r11): '-*'-Zweig fuer DIR/SRC entfernt -> P-66 muss reissen (L10-05)
+    sed '/(L10-05)/d' "$SKRIPT" > "$MUT/m88.sh"
+    # M89 (r11): scheme-Maske (Formen ohne '//') entfernt -> P-67 muss reissen (S10-05)
+    sed "s/ -e 's#\[A-Za-z\]\[A-Za-z0-9+.-\]\*:\[^\/ @\]\*@#<scheme>:<cred>@#g'//" "$SKRIPT" > "$MUT/m89.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
-             m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79; do
+             m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
+             m81 m82 m83 m84 m85 m86 m87 m88 m89; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -2124,11 +2349,20 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m78 fall_P56 P-56
     [ "$BISS_RC" -eq 0 ] && biss m79 fall_P59 P-59
     [ "$BISS_RC" -eq 0 ] && biss m80 fall_P57 P-57
+    [ "$BISS_RC" -eq 0 ] && biss m81 fall_P60 P-60
+    [ "$BISS_RC" -eq 0 ] && biss m82 fall_P60 P-60
+    [ "$BISS_RC" -eq 0 ] && biss m83 fall_P61 P-61
+    [ "$BISS_RC" -eq 0 ] && biss m84 fall_P62 P-62
+    [ "$BISS_RC" -eq 0 ] && biss m85 fall_P63 P-63
+    [ "$BISS_RC" -eq 0 ] && biss m86 fall_P64 P-64
+    [ "$BISS_RC" -eq 0 ] && biss m87 fall_P65 P-65
+    [ "$BISS_RC" -eq 0 ] && biss m88 fall_P66 P-66
+    [ "$BISS_RC" -eq 0 ] && biss m89 fall_P67 P-67
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
         ENTF_N=$MUT_N_YAML
-        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70 (YAML): Block EPOCH-288 fehlt ($zm Zeilen)"
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m93 (YAML): EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -2203,9 +2437,10 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/^\( *\)\*) echo "FEHLER: unerwarteter Wert --is-shallow-repository.*/\1*) : ;;/' \
             "$CI_YML" > "$MUT/m47.yml"
         # M48 (r8): Konsum ohne Control-Word-Grenze (\thesislangAlt zaehlt) -> P-24 (p4) muss reissen (C7-05; Koppel)
-        sed 's/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"
+        sed '/f09w\/ges"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"   # r11: nur die Vorkommen-Zeile
         # M49 (r8): Definitionsfilter ohne '\*?' (\newcommand* zaehlt als Konsum) -> P-24 (p5) reissen (C7-05; Koppel)
-        sed 's/let)\\\*?/let)/' "$CI_YML" > "$MUT/m49.yml"   # r10: Definitions-ERE endet auf '|let)'
+        # r11: '\*?' steht am Anfang der 3. f09_def-Zeile
+        sed 's/^\( *\)f09_def="\$f09_def"'"'"'\\\*?\[\[/\1f09_def="$f09_def"'"'"'[[/' "$CI_YML" > "$MUT/m49.yml"
         # M50 (r8): def/let-Filter ohne Leerraum (\def \thesislang zaehlt) -> P-24 (p6) muss reissen (C7-05; Koppel)
         sed '/^ *f09_def=/s/\[\[:space:\]\]\*//g' "$CI_YML" > "$MUT/m50.yml"   # r10: beide Leerraum-Klassen der ERE
         # M51 (r8): beide rev-parse-Substitutionen leer + Leer-Guard entfernt (test "" = "") -> P-23 (Gitlink) reisst
@@ -2214,11 +2449,23 @@ if [ "$SELBSTBISS" -eq 1 ]; then
             -e '/test -n "$h_sub" && test -n "$h_git"/d' "$CI_YML" > "$MUT/m51.yml"
         # M70 (r9, C8-06): Mehrzeilen-Filter des F09-GATE-346 nimmt Treffer nicht mehr ernst -> P-49 muss reissen
         sed 's/\*\\{?\[\[/*[[/' "$CI_YML" > "$MUT/m70.yml"   # r10: '\{?' aus der Definitions-ERE entfernt
+        # M90 (r11, C10-01): Kommentar-Strip zurueck auf die r10-Form ohne Backslash-Paritaet -> P-68 muss reissen
+        sed 's|^\( *\)f09_strip() { sed -E .*|\1f09_strip() { sed -e '"'"'s/\\(^\\\|[^\\\\]\\)%.*$/\\1/'"'"'; }|' \
+            "$CI_YML" > "$MUT/m90.yml"
+        # M91 (r11, C10-02): Definitions-ERE zurueck auf die r10-Formenliste -> P-69 muss reissen
+        sed -e '/^ *f09_def=.\\\\(providecommand/s/|\[gx\]def|let|DeclareRobustCommand/|let/' \
+            -e 's/|(New|Renew|Provide|Declare)(Expandable)?DocumentCommand|(new|renew|provide)robustcmd)/)/' \
+            "$CI_YML" > "$MUT/m91.yml"
+        # M92 (r11, C10-04): Definitionsziel ohne Control-Word-Grenze -> P-70 muss reissen
+        sed '/f09w\/def"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m92.yml"
+        # M93 (r11, C10-06): EXIT-Trap des F09-Blocks entfernt (Werkordner bleibt bei FEHLER) -> P-71 muss reissen
+        sed '/^ *trap '"'"'rm -rf -- "\$f09w"'"'"' EXIT$/d' "$CI_YML" > "$MUT/m93.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
+        M90=m90; M91=m91; M92=m92; M93=m93
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-6)); ENTF_N=$((ENTF_N+6)); M30=; M35=; M48=; M49=; M50=; M70=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 (F09-GATE-346):" \
+            MUT_N=$((MUT_N-10)); ENTF_N=$((ENTF_N+10)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m93 (F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
         fi
         if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
@@ -2226,7 +2473,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
             echo "  [ENTFAELLT] Mutanten m32 + m33 + m45 + m46 (UMFANG-346): Koppelpatch r8 nicht in der YAML ($CI_YML)"
         fi
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
-                 m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70; do
+                 m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -2279,6 +2526,10 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M50" ] && biss_yml m50 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && biss_yml m51 fall_P23 P-23
         [ "$BISS_RC" -eq 0 ] && [ -n "$M70" ] && biss_yml m70 fall_P49 P-49
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M90" ] && biss_yml m90 fall_P68 P-68
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M91" ] && biss_yml m91 fall_P69 P-69
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M92" ] && biss_yml m92 fall_P70 P-70
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M93" ] && biss_yml m93 fall_P71 P-71
     fi
 fi
 
