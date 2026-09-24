@@ -163,8 +163,17 @@
 #   P-71 F09-GATE-346 nach FEHLER 0 Reste f09.* unter TMPDIR, Gegenprobe gruen ebenso (C10-06, L10-03)
 #   P-72 F09-GATE-346-Skalar unter bash OHNE -e/pipefail: FEHLER-Modul rc != 0 + 'FEHLER: F09', kein Weiterlauf
 #        hinter der Klammer; gruenes Modul rc 0 (C10-06b, r11b)
+#   r12 (Codex-Lens r11 A/B + Fable-Lens r11, Lead K305, 24.09.2026):
+#   P-73 DIR './-n' / './-' und SRC './-n' = FEHLER "fuehrendes '-'" NACH der Normalisierung, kein Verzeichnis (S11-02)
+#   P-74 mkdir-Shim: (a) echtes mkdir + SIGTERM an die Shell, (b) mkdir-Kind endet 143 nach der Anlage: je rc 143
+#        und 0 Reste unter TMPDIR (S11-01; r11 liess den eigenen leeren Ordner liegen)
+#   P-75 F09-GATE-346 Leerraum / Tab / Kommentar+Zeilenwechsel VOR dem Stern: nur Definition = FEHLER, Definition +
+#        Konsum = gruen (C11-01)
+#   P-76 Textwache F09-Blockkommentar: 'Vorkommen ausserhalb erkannter Definitionsziele' 1x, altes Literal 0x (C11-02)
+#   P-77 SIGTERM an die F09-Subshell (git-Shim 'ls-tree'): rc 143, 0 Reste f09.*, Fang-Zeile im Log, Subshell lebt
+#        bis zum Ende des Vordergrund-Kindes (Trap vorgemerkt, Marker 'lebt'), kein 'Terminated' (C11-04)
 #
-# SELBSTBISS (--selbstbiss): 94 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 100 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -209,6 +218,10 @@
 # fehler(), M87 ungestagt-Diff ohne core.fileMode, M88 ohne '-*'-Zweig, M89 ohne scheme-Maske; M68 neu = mkdir -p
 # (Kollision toleriert); YAML: M90 Strip ohne Paritaet, M91 alte ERE, M92 Definitionsziel ohne Grenze, M93 ohne
 # EXIT-Trap im F09-Block; M48/M49 auf die r11-Zeilen nachgezogen; r11b: M94 Subshell-rc-Fang hinter der Klammer.
+# r12 (Codex r11 S11-01/S11-02, C11-01/C11-02, Lead-Hebung C11-04): M95 '-*' nach der Normalisierung entfernt, M96
+# alte Signal-Traps (exit statt vormerken) waehrend der Anlage, M97 rmdir-Zweig entfernt; YAML: M98 ERE-Suffix ohne
+# fuehrenden Leerraum, M99 alter Blockkommentar, M100 ohne HUP/INT/TERM-Traps in der Subshell; M68/M84 auf die
+# r12-Anlagezeile und M49 auf die r12-ERE-Zeile nachgezogen, P-48/P-62 nachgezogen.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -286,7 +299,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=52; MUT_N_YAML=42   # r11b (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=55; MUT_N_YAML=45   # r12 (L9-01): Kopfkommentar == Summe (P-57)
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -1713,8 +1726,8 @@ fall_P47() { # S8-05: Koeder als Schalter, als Fassung und als Argument -> FEHLE
 fall_P48() { # S8-06/S10-03: (a) Trap VOR mkdir VOR WERK-Zuweisung (Zeilen); (b) fehler() vor mkdir: rc 1, 0 Reste
     s="$1"; d="$T/P48"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     zt=$(grep -n "^trap 'if \[ -n" "$s" | head -1 | cut -d: -f1)
-    zm=$(grep -n '^mkdir -m 0700 -- "\$kand"' "$s" | head -1 | cut -d: -f1)   # S9-08 mkdir ohne -p; r11: kand
-    zw=$(grep -n '^WERK=\$kand$' "$s" | head -1 | cut -d: -f1)   # S10-03 (r11): Zuweisung NACH der Anlage
+    zm=$(grep -n '^rc=0; mkdir -m 0700 -- "\$kand"' "$s" | head -1 | cut -d: -f1)   # S9-08 ohne -p; r12: rc-Form
+    zw=$(grep -n '^  0) WERK=\$kand ;;$' "$s" | head -1 | cut -d: -f1)   # S10-03/S11-01: Zuweisung NACH der Anlage
     if [ -n "$zt" ] && [ -n "$zm" ] && [ -n "$zw" ] && [ "$zt" -lt "$zm" ] && [ "$zm" -lt "$zw" ]; then
         ok "EXIT-Trap Z.$zt vor mkdir Z.$zm vor WERK-Zuweisung Z.$zw (S8-06/S10-03)"
     else rot "Trap '$zt' / mkdir '$zm' / WERK-Zuweisung '$zw' nicht in der Reihenfolge Trap, mkdir, Zuweisung"; fi
@@ -1946,7 +1959,7 @@ fall_P62() { # S10-03: Kollision (Pfad existiert fremd, mit Inhalt) + SIGTERM be
       echo "'$echt' -p -- \"\$4\" && printf 'fremd\\n' > \"\$4/fremd.txt\" && printf '%s\\n' \"\$4\" > '$d/kand.txt'"
       echo 'kill -TERM $PPID; exit 1'; } > "$d/shim/mkdir"; chmod 0755 "$d/shim/mkdir"
     lauf "$d/work" "$s" "$d/out" "$BASE" PATH="$d/shim:$PATH" TMPDIR="$d/tmpw" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
-    zeige "$d/out"; erw_rc "$rc" 143
+    zeige "$d/out"; erw_rc "$rc" 1   # r12 (S11-01): Signal nur vorgemerkt, die Kollision endet als FEHLER rc 1
     [ -s "$d/kand.txt" ] || { rot "Vorbedingung: mkdir-Shim nicht erreicht"; return; }
     kand=$(cat "$d/kand.txt")
     if [ -d "$kand" ]; then ok "fremder Ordner besteht nach dem Signal"; else rot "fremder Ordner wurde geraeumt"; fi
@@ -2091,6 +2104,79 @@ fall_P72() { # C10-06b (r11b): F09-Skalar unter bash ohne -e/pipefail; FEHLER-Mo
     erw_rc "$rc" 0; erw_kein_text "$d/out_s2" "FEHLER"; erw_text "$d/out_s2" "NACH-F09"
 }
 
+# ------------------------------------------------ r12 (Codex-Lens r11 A/B, Fable-Lens r11, Lead K305)
+fall_P73() { # S11-02: fuehrendes '-' NACH der Normalisierung: DIR './-n', './-' und SRC './-n' = FEHLER (L10-05)
+    s="$1"; d="$T/P73"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    _i=0
+    for kv in 'COMDARE_THESIS_PDF_DIR=./-n' 'COMDARE_THESIS_PDF_DIR=./-' 'COMDARE_THESIS_PDF_SRC=./-n'; do
+        _i=$((_i+1)); klone "$d/work$_i" "$BASE" || { rot "Klon $_i nicht baubar"; return; }; lege_pdfs "$d/work$_i" v1
+        lauf "$d/work$_i" "$s" "$d/out$_i" "$BASE" COMDARE_THESIS_PDF_REMOTE="$BARE" "$kv"; rc=$?; zeige "$d/out$_i"
+        erw_rc "$rc" 1; erw_text "$d/out$_i" "fuehrendes '-'"; erw_text "$d/out$_i" "L10-05"
+        erw_kein_text "$d/out$_i" "PUSH OK"
+        fremd=$(ls -A "$d/work$_i" | grep -v -x -e .git -e README.md -e .gitlab-ci.yml -e thesis | wc -l)
+        erw_gleich "$fremd" 0 "angelegte Eintraege im Klon $_i ausserhalb des Seeds"
+    done
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P74() { # S11-01: Signal waehrend der Anlage: (a) TERM an die Shell nach echtem mkdir, (b) mkdir-Kind endet 143
+    s="$1"; d="$T/P74"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }; echt=$(command -v mkdir)
+    f74() { # $1 = Variante a|b -> je rc 143 und 0 Reste unter TMPDIR (r11: eigener leerer Ordner blieb liegen)
+        mkdir -p "$d/shim$1" "$d/tmpw$1"; klone "$d/work$1" "$BASE" || { rot "Klon $1 nicht baubar"; return 1; }
+        lege_pdfs "$d/work$1" v1
+        { echo '#!/bin/sh'
+          echo 'case "$1 $2 $3" in "-m 0700 --") ;; *) exec '"'$echt'"' "$@" ;; esac'
+          echo "'$echt' -m 0700 -- \"\$4\" || exit \$?"
+          if [ "$1" = a ]; then echo 'kill -TERM $PPID; exit 0'; else echo 'exit 143'; fi; } > "$d/shim$1/mkdir"
+        chmod 0755 "$d/shim$1/mkdir"
+        lauf "$d/work$1" "$s" "$d/out$1" "$BASE" PATH="$d/shim$1:$PATH" TMPDIR="$d/tmpw$1" \
+            COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?; zeige "$d/out$1"; erw_rc "$rc" 143
+        rest=$(ls -A "$d/tmpw$1" | wc -l); erw_gleich "$rest" 0 "Reste unter TMPDIR nach dem Signal ($1)"
+        erw_kein_text "$d/out$1" "PUSH OK"
+    }
+    f74 a; f74 b; t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P75() { # C11-01: Leerraum / Tab / Kommentar+Zeilenwechsel VOR dem Stern: nur Definition = FEHLER, + Konsum gruen
+    d="$T/P75"; f09_vorbereitung "$d" || return; tb=$(printf '\t')
+    DS=' *{\thesisumfang}{lang}'; DT="${tb}*{\\thesisumfang}{lang}"
+    f09_fall "$d" a1 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "\\providecommand$DS"
+    f09_fall "$d" a2 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "\\providecommand$DT"
+    f09_fall "$d" a3 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\providecommand%' '*{\thesisumfang}{lang}'
+    f09_fall "$d" k1 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "\\providecommand$DS" "$F11_KU"
+    f09_fall "$d" k2 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "\\providecommand$DT" "$F11_KU"
+    f09_fall "$d" k3 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\providecommand%' '*{\thesisumfang}{lang}' "$F11_KU"
+    for z in a1 a2 a3; do erw_text "$d/out_$z" 'Definitionen 1, Vorkommen 1'; done
+}
+fall_P76() { # C11-02: Textwache F09-Blockkommentar: neues Literal 1x, altes Literal 0x, Konsum-Formel unveraendert
+    d="$T/P76"; mkdir -p "$d"; zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$d/f09.sh")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] Block F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch pruefbar"; return
+    fi
+    l76='Vorkommen ausserhalb erkannter Definitionsziele > 0 (Definition per -usepretex, kein Definitionsgebot)'
+    n=$(grep -c -F "$l76" "$d/f09.sh"); erw_gleich "$n" 1 "neues Kommentar-Literal (C11-02) im F09-Block"
+    n0=$(grep -c -F 'Makro definiert UND ausserhalb der Definition referenziert' "$d/f09.sh")
+    erw_gleich "$n0" 0 "altes Kommentar-Literal im F09-Block"
+    n1=$(grep -c -F 'n_kons=$((n_ges - n_def))' "$d/f09.sh"); erw_gleich "$n1" 1 "Konsum-Formel unveraendert"
+}
+fall_P77() { # C11-04: SIGTERM an die F09-Subshell (git-Shim 'ls-tree' sendet kill -TERM $PPID): rc 143, 0 Reste f09.*
+    # Subshell lebt bis zum Ende des Vordergrund-Kindes (Trap vorgemerkt: Marker 'lebt'), kein 'Terminated' der
+    # Runner-Shell (kein Signal-Tod). Ohne Traps (m100) raeumt bash 5.2 den Werkordner selbst (EXIT-Trap laeuft im
+    # Signal-Handler), stirbt aber sofort: Marker 'tot' (oder fehlt) + 'Terminated' -- so beisst die Mutante.
+    d="$T/P77"; f09_vorbereitung "$d" || return; mkdir -p "$d/shim" "$d/tmpf"; echt=$(command -v git)
+    { echo '#!/bin/sh'; echo 'case "$1" in ls-tree) kill -TERM $PPID; sleep 1'
+      echo '    if kill -0 $PPID 2>/dev/null; then echo lebt > "$P77_MARK"; else echo tot > "$P77_MARK"; fi ;; esac'
+      echo "exec '$echt' \"\$@\""; } > "$d/shim/git"; chmod 0755 "$d/shim/git"
+    git -C "$MODUL" checkout -q -B t1 "$X1" || { rot "Zweig t1 nicht setzbar"; return; }
+    printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F11_KU" > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F12 t1" || { rot "Commit t1"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand t1"; return; }
+    fahre_block "$d/f09.sh" "$d/out_t1" PATH="$d/shim:$PATH" TMPDIR="$d/tmpf" P77_MARK="$d/mark"; rc=$?
+    zeige "$d/out_t1"; erw_rc "$rc" 143; erw_text "$d/out_t1" "FEHLER: F09-GATE-346 abgebrochen"
+    erw_kein_text "$d/out_t1" "Terminated"
+    mk=$(cat "$d/mark" 2>/dev/null || echo fehlt)
+    erw_gleich "$mk" lebt "Subshell lebt bis zum Ende des Vordergrund-Kindes (Signal-Trap vorgemerkt, C11-04)"
+    rest=$(ls -A "$d/tmpf" | wc -l); erw_gleich "$rest" 0 "Reste f09.* unter TMPDIR nach SIGTERM an die Subshell"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -2178,6 +2264,11 @@ fall P-69 fall_P69 "$SKRIPT"
 fall P-70 fall_P70 "$SKRIPT"
 fall P-71 fall_P71 "$SKRIPT"
 fall P-72 fall_P72 "$SKRIPT"
+fall P-73 fall_P73 "$SKRIPT"
+fall P-74 fall_P74 "$SKRIPT"
+fall P-75 fall_P75 "$SKRIPT"
+fall P-76 fall_P76 "$SKRIPT"
+fall P-77 fall_P77 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2259,7 +2350,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed "s/EXPORT: Wert nicht in {true,false}/EXPORT='\$SW' nicht in {true,false}/" \
         "$SKRIPT" > "$MUT/m67.sh"
     # M68 (r9; r11 neu definiert): mkdir -p (Kollision mit bestehendem Pfad toleriert) -> P-48 (a) muss reissen (S9-08)
-    sed 's/^mkdir -m 0700 -- "\$kand" || fehler/mkdir -p -m 0700 -- "$kand" || fehler/' "$SKRIPT" > "$MUT/m68.sh"
+    sed 's/^rc=0; mkdir -m 0700 -- "\$kand"/rc=0; mkdir -p -m 0700 -- "$kand"/' "$SKRIPT" > "$MUT/m68.sh"
     # M69 (r9): Leerraum-/Steuerzeichen-Wache entfernt -> P-39 muss reissen (L8-01)
     sed '/enthaelt Leerraum oder Steuerzeichen (S7-06\/L8-01)/d' "$SKRIPT" > "$MUT/m69.sh"
     # M71 (r10): S9-03-Zeichen-/Formwache entfernt -> P-50 muss reissen
@@ -2293,7 +2384,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         -e 's/^if \[ "\${CI_PIPELINE_ID+x}" = x \]; then$/if [ "${CI_PIPELINE_ID:-NA}" != NA ]; then/' \
         "$SKRIPT" > "$MUT/m83.sh"
     # M84 (r11): WERK-Zuweisung VOR mkdir (der Trap kennt den fremden Pfad) -> P-62 muss reissen (S10-03)
-    sed 's/^mkdir -m 0700 -- "\$kand" || fehler/WERK=$kand; mkdir -m 0700 -- "$kand" || fehler/' \
+    sed 's/^rc=0; mkdir -m 0700 -- "\$kand" || rc=\$?$/WERK=$kand; rc=0; mkdir -m 0700 -- "$kand" || rc=$?/' \
         "$SKRIPT" > "$MUT/m84.sh"
     # M85 (r11): TMPDIR-Wache entfernt und chmod ohne '--' -> P-63 muss reissen (S10-04)
     sed -e '/(S10-04)/d' -e 's/^  chmod 0700 -- "\$WERK\/askpass.sh".*/  chmod 0700 "$WERK\/askpass.sh"/' \
@@ -2307,10 +2398,18 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     sed '/(L10-05)/d' "$SKRIPT" > "$MUT/m88.sh"
     # M89 (r11): scheme-Maske (Formen ohne '//') entfernt -> P-67 muss reissen (S10-05)
     sed "s/ -e 's#\[A-Za-z\]\[A-Za-z0-9+.-\]\*:\[^\/ @\]\*@#<scheme>:<cred>@#g'//" "$SKRIPT" > "$MUT/m89.sh"
+    # M95 (r12): '-*' aus der Wache nach der Normalisierung entfernt -> P-73 muss reissen (S11-02)
+    sed '/L10-05\/S11-02)/d' "$SKRIPT" > "$MUT/m95.sh"
+    # M96 (r12): alte Signal-Traps (exit statt vormerken) waehrend der Anlage -> P-74 (a) muss reissen (S11-01)
+    l96a="trap 'sig=129' HUP; trap 'sig=130' INT; trap 'sig=143' TERM"
+    l96b="trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM"
+    sed "s/^$l96a\$/$l96b/" "$SKRIPT" > "$MUT/m96.sh"
+    # M97 (r12): rmdir-Zweig fuer den Signal-rc entfernt -> P-74 (b) muss reissen (S11-01)
+    sed 's/^  \*) rmdir -- "\$kand" 2>\/dev\/null || :; exit "\$rc" ;;$/  *) exit "$rc" ;;/' "$SKRIPT" > "$MUT/m97.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
              m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
-             m81 m82 m83 m84 m85 m86 m87 m88 m89; do
+             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -2384,11 +2483,15 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m87 fall_P65 P-65
     [ "$BISS_RC" -eq 0 ] && biss m88 fall_P66 P-66
     [ "$BISS_RC" -eq 0 ] && biss m89 fall_P67 P-67
+    [ "$BISS_RC" -eq 0 ] && biss m95 fall_P73 P-73
+    [ "$BISS_RC" -eq 0 ] && biss m96 fall_P74 P-74
+    [ "$BISS_RC" -eq 0 ] && biss m97 fall_P74 P-74
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
         ENTF_N=$MUT_N_YAML
-        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94 (YAML): EPOCH-288 fehlt ($zm Zeilen)"
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94/m98-m100 (YAML):" \
+             "EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -2465,8 +2568,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M48 (r8): Konsum ohne Control-Word-Grenze (\thesislangAlt zaehlt) -> P-24 (p4) muss reissen (C7-05; Koppel)
         sed '/f09w\/ges"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"   # r11: nur die Vorkommen-Zeile
         # M49 (r8): Definitionsfilter ohne '\*?' (\newcommand* zaehlt als Konsum) -> P-24 (p5) reissen (C7-05; Koppel)
-        # r11: '\*?' steht am Anfang der 3. f09_def-Zeile
-        sed 's/^\( *\)f09_def="\$f09_def"'"'"'\\\*?\[\[/\1f09_def="$f09_def"'"'"'[[/' "$CI_YML" > "$MUT/m49.yml"
+        # r12: '\*?' steht hinter dem fuehrenden Leerraum der 3. f09_def-Zeile
+        sed '/^ *f09_def="\$f09_def"'"'"'\[\[:space:\]\]\*\\\*?/s/\\\*?//' "$CI_YML" > "$MUT/m49.yml"
         # M50 (r8): def/let-Filter ohne Leerraum (\def \thesislang zaehlt) -> P-24 (p6) muss reissen (C7-05; Koppel)
         sed '/^ *f09_def=/s/\[\[:space:\]\]\*//g' "$CI_YML" > "$MUT/m50.yml"   # r10: beide Leerraum-Klassen der ERE
         # M51 (r8): beide rev-parse-Substitutionen leer + Leer-Guard entfernt (test "" = "") -> P-23 (Gitlink) reisst
@@ -2487,14 +2590,24 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M93 (r11, C10-06): EXIT-Trap des F09-Blocks entfernt (Werkordner bleibt bei FEHLER) -> P-71 muss reissen
         sed '/^ *trap '"'"'rm -rf -- "\$f09w"'"'"' EXIT$/d' "$CI_YML" > "$MUT/m93.yml"
         # M94 (r11b, C10-06b): Subshell-rc-Fang hinter der Klammer entfernt (Job liefe ohne Messung weiter) -> P-72
-        sed 's/^\( *\)) || { printf .*F09-GATE-346 abgebrochen.*$/\1)/' "$CI_YML" > "$MUT/m94.yml"
+        sed 's/^\( *\)) || { .*F09-GATE-346 abgebrochen.*$/\1)/' "$CI_YML" > "$MUT/m94.yml"   # r12: Fang mit rc=$?
+        # M98 (r12, C11-01): ERE-Suffix ohne fuehrenden Leerraum vor dem Stern -> P-75 muss reissen
+        sed '/^ *f09_def="\$f09_def"'"'"'\[\[:space:\]\]\*\\\*?/s/'"'"'\[\[:space:\]\]\*\\\*?/'"'"'\\*?/' \
+            "$CI_YML" > "$MUT/m98.yml"
+        # M99 (r12, C11-02): alter Blockkommentar ('definiert UND ... referenziert') -> P-76 (Textwache) muss reissen
+        l99='Vorkommen ausserhalb erkannter Definitionsziele > 0 (Definition per -usepretex, kein Definitionsgebot)'
+        sed "s/$l99/Makro definiert UND ausserhalb der Definition referenziert/" "$CI_YML" > "$MUT/m99.yml"
+        # M100 (r12, C11-04): HUP/INT/TERM-Traps der F09-Subshell entfernt -> P-77 muss reissen (die Subshell
+        # stirbt sofort am Signal: Marker 'tot' + 'Terminated'; bash 5.2 raeumt per EXIT-Trap im Signal-Handler)
+        l100="trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM"
+        sed "/^ *$l100\$/d" "$CI_YML" > "$MUT/m100.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
-        M90=m90; M91=m91; M92=m92; M93=m93; M94=m94
+        M90=m90; M91=m91; M92=m92; M93=m93; M94=m94; M98=m98; M99=m99; M100=m100
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-11)); ENTF_N=$((ENTF_N+11)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
-            M94=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 (F09-GATE-346):" \
+            MUT_N=$((MUT_N-14)); ENTF_N=$((ENTF_N+14)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            M94=; M98=; M99=; M100=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 (F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
         fi
         if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
@@ -2503,7 +2616,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         fi
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
                  m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93 \
-                 $M94; do
+                 $M94 $M98 $M99 $M100; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -2561,6 +2674,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M92" ] && biss_yml m92 fall_P70 P-70
         [ "$BISS_RC" -eq 0 ] && [ -n "$M93" ] && biss_yml m93 fall_P71 P-71
         [ "$BISS_RC" -eq 0 ] && [ -n "$M94" ] && biss_yml m94 fall_P72 P-72
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M98" ] && biss_yml m98 fall_P75 P-75
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M99" ] && biss_yml m99 fall_P76 P-76
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M100" ] && biss_yml m100 fall_P77 P-77
     fi
 fi
 
