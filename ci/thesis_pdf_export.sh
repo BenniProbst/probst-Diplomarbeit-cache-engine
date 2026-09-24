@@ -23,16 +23,17 @@
 # REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
 # (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
 # rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
-# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.425) oder ungestagt (git diff, Z.435);
-# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.393-394), commit --only nimmt den Index
-# (S17-02/L17-04)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
+# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.432) oder ungestagt (git diff, Z.442);
+# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.398-401); commit --only -- <Fassungen>
+# (Z.452-455) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.408/411),
+# fremde Pfade bleiben auf HEAD-Stand (S17-02/L17-04, L18-01/S18-01)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
 # (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
 # nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
 # Variable; S7-08 pipelinefreier PDF-Header-Test, trap auch fuer INT TERM HUP.
 # REV r9 (Codex-Lens r8 B + Fable-Lens r8 + Lead K299, 23.09.2026): S8-01 Pathspecs literal (GIT_LITERAL_PATHSPECS=1),
 # Index-Wache ohne Rename-Erkennung (--no-renames --name-status; r9: ganzer Index = Fassungs-Liste je A/M; seit
 # r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste, Teilmenge/leer erlaubt,
-# s. Z.420-424), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
+# s. Z.427-431), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
 # Export-Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
@@ -78,6 +79,10 @@
 # Kommentare berichtigt (REV-r9-Historie als Historie + geltender S16-03-Satz, S17-01/L17-02; Kopf-Garantie der
 # Fremdaenderungen auf die beiden Diff-Wachen eingegrenzt, S17-02/L17-04) + Meldungstext der Merge-Runde an den
 # Versuchszaehler gebunden (S17-03/L17-03; einzige Nicht-Kommentar-Zeile, kein neuer Kontrollfluss).
+# REV r19 (Fable-Lens r18 L18-01 + Codex-Lens r18 B S18-01, Lead K320, 24.09.2026): nur Kommentare berichtigt
+# (commit --only = nur die genannten Fassungen mit Arbeitsbaum-Inhalt, andere Pfade unveraendert auf HEAD; Bit-Satz
+# an git add um skip-worktree ergaenzt, je Bit im Wegwerf-Repo gemessen: assume-unchanged rc 0 still, skip-worktree
+# rc 1 laut, beide ungestagt); Textwache P-99 erweitert; 0 Nicht-Kommentar-Zeilen, kein neuer Kontrollfluss.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -390,8 +395,10 @@ for f in $FASSUNGEN; do
   # S9-02 (r10, Codex-Lens r9 B): core.fileMode=true erzwingen -- unter fileMode=false behielte git add den alten
   # Indexmodus (100755 vom Remote) und die Modus-Wache endete auf Dauer rot (L9-06).
   git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"
-  # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen. Der
-  # Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie tragen (git diff --quiet traut assume-unchanged).
+  # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen; ein
+  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.397, ebenfalls
+  # ohne zu stagen (gemessen git 2.43.0, r19). Der Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie
+  # tragen (git diff --quiet traut beiden Bits; die Wache Z.402-408 faengt beide Faelle, L18-01/S18-01).
   git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
     || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
   blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
