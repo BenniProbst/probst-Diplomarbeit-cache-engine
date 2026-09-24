@@ -205,6 +205,9 @@
 #        Normalfall 1/2/1 (C15-04 hochgestuft, fail-closed)
 #   P-97 Textwache Script-Kommentare S15-01..S15-05 + S15-07 + REV-r16 + YAML-Kommentare C15-03 + L15-01 (Koppel)
 #        und C15-05 (Haupt); die YAML-Textwache L14-03 wanderte aus P-92 hierher (C15-03-Wortlaut)
+#   P-98 Textwache r17: Script-Kommentare S16-01..S16-03 + REV-r17 + YAML-Kommentare C16-01/C16-02 (Koppel, F09)
+#        und C16-03 (Haupt, DRIFT); nur Kommentare, keine Zaehl-Logik, keine Mutante (Codex-Lens r16 A/B, Fable-
+#        Lens r16 L16-01/L16-02, Lead K313/K314)
 #
 # SELBSTBISS (--selbstbiss): 123 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -275,6 +278,8 @@
 # + Byte-Urteil mit Dateiname (r15-Form; GNU sha256sum escapt '\' im TMPDIR-Pfad), M122 Font-Stand des 288-Baus VOR
 # dem Fullbanner-Vergleich (r15-Reihenfolge), M123 Token-Klasse ohne ':_' (r15-Form); M105/M106/M108/M114 auf die
 # r16-Klasse '[A-Za-z@:_]*' nachgezogen; P-92 traegt nur noch den Script-Teil, die YAML-Textwachen liegen in P-97.
+# r17 (Codex r16 C16-01..03 + S16-01..03, Fable r16 L16-01/L16-02, Lead K313/K314): nur Textwache P-98 (6 Kommentar-
+# Fixes, 0 Code), 0 neue Mutanten -- die Kommentar-Literale sind keine Beiss-Gegenstaende.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2640,6 +2645,64 @@ fall_P97() { # S15-01..S15-05 + S15-07 + REV-r16 (Codex-Lens r15 B2/B1, Lead K31
         erw_gleich "$n" 0 "alte Fassung 'anderer Font-Stand (Fontpaket-Version) = andere' (C15-05)"
     fi
 }
+fall_P98() { # S16-01..S16-03 + REV-r17 (Codex-Lens r16 B) + C16-01/C16-02 (Koppel F09) + C16-03 (Haupt DRIFT), Lead
+    # K313/K314: Textwache auf die r17-Kommentare (neue Literale genau 1x, alte 0x); YAML-Teile nur mit Block, sonst
+    # LAUT entfallen; keine Zaehl-Logik, keine Mutante (Kommentar-Fixes sind keine Beiss-Gegenstaende)
+    s="$1"
+    n=$(grep -c -F 'Vorwachen F-06/F-07/S8-03/S9-05 -> Merge (nie rebase' "$s")
+    erw_gleich "$n" 1 "Kommentar 'Vorwachen F-06/F-07/S8-03/S9-05 -> Merge (nie rebase' (S16-01)"
+    n=$(grep -c -F 'Tree-Wachen S7-01/S7-02/C6-04 am Merge-Ergebnis' "$s")
+    erw_gleich "$n" 1 "Kommentar 'Tree-Wachen S7-01/S7-02/C6-04 am Merge-Ergebnis' (S16-01)"
+    n=$(grep -c -F 'bestandenen Folgewachen (F-06, F-07, S8-03/S9-05, S7-01/S7-02/C6-04; S15-04)' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'bestandenen Folgewachen (... C6-04; S15-04)' (S16-01)"
+    n=$(grep -c -F 'fetch + Abstammungspruefung + Vorwachen + merge (nie rebase) + Tree-Wachen' "$s")
+    erw_gleich "$n" 1 "Kommentar 'fetch + Abstammungspruefung + Vorwachen + merge (nie rebase) + Tree-Wachen' (S16-01)"
+    n=$(grep -c -F 'fetch + Pruefung + merge (nie rebase), max 5 Versuche' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'fetch + Pruefung + merge (nie rebase), max 5 Versuche' (S16-01)"
+    n=$(grep -c -F 'Diff-Leerheit setzt gleichen Modus' "$s")
+    erw_gleich "$n" 1 "Kommentar 'Diff-Leerheit setzt gleichen Modus' (S16-02)"
+    n=$(grep -c -F 'Diff-Leerheit auch bei Moduswechsel' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'Diff-Leerheit auch bei Moduswechsel' (S16-02)"
+    n=$(grep -c -F 'darf nur A/M-Eintraege aus der Fassungs-Liste enthalten' "$s")
+    erw_gleich "$n" 1 "Kommentar 'darf nur A/M-Eintraege aus der Fassungs-Liste enthalten' (S16-03)"
+    n=$(grep -c -F 'unveraenderte Fassungen erscheinen darin nicht' "$s")
+    erw_gleich "$n" 1 "Kommentar 'unveraenderte Fassungen erscheinen darin nicht' (S16-03)"
+    n=$(grep -c -F 'der GESAMTE Index darf GENAU die Fassungs-Liste tragen' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'der GESAMTE Index darf GENAU die Fassungs-Liste tragen' (S16-03)"
+    n=$(grep -c '^# REV r17 ' "$s"); erw_gleich "$n" 1 "REV-r17-Kopf"
+    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P98.f09")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] YAML-Textwache C16-01/C16-02: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
+    else
+        n=$(grep -c -F 'deshalb bleibt F09 Text-Vorprobe und UMFANG-346 der semantische' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'deshalb bleibt F09 Text-Vorprobe und UMFANG-346 der semantische' (C16-01)"
+        n=$(grep -c -F 'zaehlt als Vorkommen (Scheinkonsum' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'zaehlt als Vorkommen (Scheinkonsum' (C16-01)"
+        n=$(grep -c -F 'sind NICHT modelliert = fail-closed (der Zeilenrest faellt weg' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'sind NICHT modelliert = fail-closed (der Zeilenrest faellt weg' (C16-01)"
+        n=$(grep -c -F '(iii, r17) beliebige Catcode-Aenderungen sind NICHT modelliert' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar '(iii, r17) beliebige Catcode-Aenderungen sind NICHT modelliert' (C16-02)"
+        n=$(grep -c -F 'ersetzt keinen TeX-Tokenizer' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'ersetzt keinen TeX-Tokenizer' (C16-02)"
+        n=$(grep -c -F 'RESTRISIKO dreigeteilt (C14-04 + C16-02)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'RESTRISIKO dreigeteilt (C14-04 + C16-02)' (C16-02)"
+        n=$(grep -c -F 'r17 (Codex-Lens r16 C16-01 SOLL + C16-02 hochgestuft' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Absatz 'r17 (Codex-Lens r16 C16-01 SOLL + C16-02 hochgestuft' (F09)"
+    fi
+    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$T/P98.drift")
+    if [ "$zd" -lt 5 ]; then
+        echo "      [ENTFAELLT] YAML-Textwache C16-03: DRIFT-WACHE-288-289 fehlt ($zd Zeilen) -- nur mit Hauptpatch"
+    else
+        n=$(grep -c -F 'FontFile3 (CFF/OpenType), Type3 und PK-Fonts tragen KEIN Length1/2/3' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'FontFile3 (CFF/OpenType), Type3 und PK-Fonts ... KEIN Length1/2/3' (C16-03)"
+        n=$(grep -c -F 'die fn-0-Zweige greifen vorher (L16-02)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'die fn-0-Zweige greifen vorher (L16-02)' (C16-03)"
+        n=$(grep -c -F 'Kennung aus der PDF selbst: eingebettete Font-Programme tragen' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'Kennung aus der PDF selbst: eingebettete Font-Programme tragen' (C16-03)"
+        n=$(grep -c -F 'r17 (Codex-Lens r16 C16-03 hochgestuft' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Absatz 'r17 (Codex-Lens r16 C16-03 hochgestuft' (DRIFT)"
+    fi
+}
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
@@ -2753,6 +2816,7 @@ fall P-94 fall_P94 "$SKRIPT"
 fall P-95 fall_P95 "$SKRIPT"
 fall P-96 fall_P96 "$SKRIPT"
 fall P-97 fall_P97 "$SKRIPT"
+fall P-98 fall_P98 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
