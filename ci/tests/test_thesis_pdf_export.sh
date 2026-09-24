@@ -196,8 +196,17 @@
 #   P-92 Textwache Script-Kommentare S14-01..S14-05 + REV-r15 + YAML-Kommentar L14-03 (Kernel-Allokatoren)
 #   P-93 F09-GATE-346 Umlaut direkt am Namen unter LC_ALL=en_US.UTF-8: Vorkommen 2, Konsum 1 (L14-01, LC_ALL=C)
 #   P-94 F09-GATE-346 Kernel-/fontspec-Definierer newfontfamily / protected@edef = Definition (L14-04)
+#   r16 (Codex-Lens r15 A C15-01..05 + B2 S15-01..05 + B1 S15-07, Fable-Lens r15 L15-01, Lead K312, 24.09.2026):
+#   P-24 (r) 289-Kopie mit fremdem Fullbanner UND 288-Bau ohne Length1: 'Toolchain abweichend' VOR dem 288-Font-
+#        FEHLER (O-15 (b): Zustand der Kopie -> Font-Stand 288 -> 289 -> Byte-Urteil; rc bleibt 1; C15-02)
+#   P-95 DRIFT-WACHE mit Backslash im TMPDIR-Pfad: byte-gleich bleibt gruen (kein falsches DRIFT), Font-Kennung
+#        16 Hex (Hash per stdin + Validierung, C15-01)
+#   P-96 F09-GATE-346 ':' und '_' als Namenszeichen: ExplSyntax-Form 0/0/0 FEHLER, '\thesisumfang_x' 1/1/0 FEHLER,
+#        Normalfall 1/2/1 (C15-04 hochgestuft, fail-closed)
+#   P-97 Textwache Script-Kommentare S15-01..S15-05 + S15-07 + REV-r16 + YAML-Kommentare C15-03 + L15-01 (Koppel)
+#        und C15-05 (Haupt); die YAML-Textwache L14-03 wanderte aus P-92 hierher (C15-03-Wortlaut)
 #
-# SELBSTBISS (--selbstbiss): 120 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 123 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -262,6 +271,10 @@
 # Vergleich entfernt, M118 fn-0-Wache am 288-Bau entfernt, M119 LC_ALL=C an beiden Stufe-1-Extraktionen entfernt,
 # M120 Kernel-/fontspec-Definierer aus der ERE; M92/M105/M106/M108 auf die r15-Zeilen nachgezogen; alle P-24-Fakes
 # tragen Length1/2/3 (Font-Stand, 3 Zeilen je Fassung); m119 entfaellt LAUT ohne Locale en_US.utf8.
+# r16 (Codex r15 C15-01/C15-02/C15-04, Lead K312): YAML: M121 Font-Stand-Hash mit Dateiname + ohne 16-Hex-Validierung
+# + Byte-Urteil mit Dateiname (r15-Form; GNU sha256sum escapt '\' im TMPDIR-Pfad), M122 Font-Stand des 288-Baus VOR
+# dem Fullbanner-Vergleich (r15-Reihenfolge), M123 Token-Klasse ohne ':_' (r15-Form); M105/M106/M108/M114 auf die
+# r16-Klasse '[A-Za-z@:_]*' nachgezogen; P-92 traegt nur noch den Script-Teil, die YAML-Textwachen liegen in P-97.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -339,7 +352,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=57; MUT_N_YAML=63   # r15 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=57; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
 LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
@@ -1038,18 +1051,10 @@ fall_P23() { # L2-01 (r3): SOURCE_DATE_EPOCH = Quellstand; F-10 Gitlink == HEAD 
     erw_rc "$rc" 1; erw_text "$d/out_c2" "unerwarteter Wert --is-shallow-repository"
     erw_kein_text "$d/out_c2" "SOURCE_DATE_EPOCH="
 }
-fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
-    d="$T/P24"; mkdir -p "$d"
-    ze=$(extrahiere_block "$CI_YML" EPOCH-288 "$d/epoch.sh")
-    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$d/drift.sh")
-    echo "      Bloecke aus der YAML: EPOCH-288 $ze Zeilen, DRIFT-WACHE-288-289 $zd Zeilen"
-    if [ "$ze" -lt 5 ] || [ "$zd" -lt 5 ]; then
-        rot "Block EPOCH-288/DRIFT-WACHE-288-289 fehlt in $CI_YML ($ze/$zd Zeilen) -- keine dreiwertige Wache"; return
-    fi
-    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
-    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+p24_werkzeuge() { # r16: Wegwerf-pdftex, Wegwerf-latexmk + bau.sh der DRIFT-Laeufe (P-24, P-95); $1 = Fallordner
+    d="$1"
     # r4 (L3-02): Wegwerf-pdftex fuer die Nachweiszeile des Blocks (die ECHTE Installation ist Konfig-Posten)
-    mkdir -p "$d/bin" || { rot "Wegwerf-bin nicht anlegbar"; return; }
+    mkdir -p "$d/bin" || { rot "Wegwerf-bin nicht anlegbar"; return 1; }
     printf '#!/bin/sh\necho "pdfTeX 3.141592653-2.6-1.40.29 (TeX Live 2026) [Wegwerf-pdftex der Probe]"\n' \
         > "$d/bin/pdftex"; chmod 0755 "$d/bin/pdftex"
     # r6 (C4-09): Wegwerf-latexmk fuer die Bau-Schleife der YAML (Fall (o)) -- ohne -g gilt eine vorhandene
@@ -1092,6 +1097,18 @@ for f in de-lang en-lang de-kurz en-kurz; do
   printf 'Output written on diplomarbeit-%s.pdf (%s %s, 4711 bytes).\n' "$f" "$n" "$pg" > "diplomarbeit-$f.log"
 done
 BAU
+}
+fall_P24() { # L1-04/L2-01 (r3): Drift-Wache dreiwertig -- Bloecke EPOCH-288 + Fake-Bau + DRIFT-WACHE-288-289
+    d="$T/P24"; mkdir -p "$d"
+    ze=$(extrahiere_block "$CI_YML" EPOCH-288 "$d/epoch.sh")
+    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$d/drift.sh")
+    echo "      Bloecke aus der YAML: EPOCH-288 $ze Zeilen, DRIFT-WACHE-288-289 $zd Zeilen"
+    if [ "$ze" -lt 5 ] || [ "$zd" -lt 5 ]; then
+        rot "Block EPOCH-288/DRIFT-WACHE-288-289 fehlt in $CI_YML ($ze/$zd Zeilen) -- keine dreiwertige Wache"; return
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
+    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    p24_werkzeuge "$d" || { rot "Wegwerf-Werkzeuge nicht anlegbar"; return; }
     cat "$d/epoch.sh" "$d/bau.sh" "$d/drift.sh" > "$d/lauf.sh"
     stand "$Y1" || { rot "Stand Y1"; return; }                          # (a) gleicher Quellstand, gleiche Bytes
     fahre_block "$d/lauf.sh" "$d/out_a" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_a"
@@ -1449,6 +1466,21 @@ BAU
     fahre_block "$d/lauf.sh" "$d/out_l" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_l"
     erw_rc "$rc" 0; erw_text "$d/out_l" "Font-Stand nicht lesbar"; erw_text "$d/out_l" "4 veraltet/abweichend"
     erw_text "$d/out_l" "0 byte-gleich geprueft"; erw_kein_text "$d/out_l" "FEHLER"
+    # (r) C15-02 (r16): 289-Kopie mit fremdem Fullbanner (Stand Y1f) UND 288-Bau ohne Length1 -> die Zustandszeile
+    # 'Toolchain abweichend' steht VOR dem 288-Font-FEHLER (O-15 (b): Fullbanner-Vergleich -> Font-Stand 288 -> 289);
+    # rc bleibt 1 (Selbstpruefung fail-closed, auch ohne vergleichbare Kopie). Am r15-Block: FEHLER zuerst, keine
+    # Zustandszeile (die 288-Messung stand vor dem Fullbanner-Vergleich).
+    stand "$Y1F" || { rot "Stand Y1f (r)"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_r" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_BANNER="$B288" BAU_FONT=; rc=$?
+    zeige "$d/out_r"; erw_rc "$rc" 1; erw_text "$d/out_r" "Toolchain abweichend"
+    erw_text "$d/out_r" "FEHLER: keine eingebetteten Font-Programme im 288-Bau"
+    zt=$(grep -n -m1 -F 'Toolchain abweichend' "$d/out_r" | cut -d: -f1)
+    zf=$(grep -n -m1 -F 'Font-Programme im 288-Bau' "$d/out_r" | cut -d: -f1)
+    if [ -n "$zt" ] && [ -n "$zf" ] && [ "$zt" -lt "$zf" ]; then
+        ok "Reihenfolge: Toolchain-Zeile $zt vor 288-Font-FEHLER $zf (C15-02)"
+    else
+        rot "Reihenfolge: Toolchain-Zeile '$zt' nicht vor 288-Font-FEHLER '$zf' (C15-02)"
+    fi
 }
 fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
     s="$1"; d="$T/P25"
@@ -2477,15 +2509,7 @@ fall_P92() { # S14-01..S14-05 + REV-r15 (Codex-Lens r14 B, Lead-Hebung): Textwac
     erw_gleich "$n" 1 "Kommentar 'Position des doppelten Eintrags nennen' (S14-05)"
     n=$(grep -c -F 'laut beim Namen nennen' "$s"); erw_gleich "$n" 0 "alte Fassung 'laut beim Namen nennen' (S14-05)"
     n=$(grep -c '^# REV r15 ' "$s"); erw_gleich "$n" 1 "REV-r15-Kopf"
-    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P92.f09")
-    if [ "$zf" -lt 3 ]; then
-        echo "      [ENTFAELLT] L14-03-Textwache: Block F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch pruefbar"
-    else
-        n=$(grep -c -F 'sind LaTeX-Kernel-Allokatoren, die uebrigen plain-TeX-Primitive (L14-03)' "$CI_YML")
-        erw_gleich "$n" 1 "YAML-Kommentar 'sind LaTeX-Kernel-Allokatoren, die uebrigen plain-TeX-Primitive (L14-03)'"
-        n=$(grep -c -F 'plain-Allokatoren newcount' "$CI_YML")
-        erw_gleich "$n" 0 "alte Fassung 'plain-Allokatoren newcount'"
-    fi
+    # r16: die YAML-Textwache L14-03 (Allokatoren) liegt jetzt in P-97 mit dem C15-03-Wortlaut
 }
 fall_P93() { # L14-01: Konsum NUR als '\thesisumfang' + a-Umlaut (UTF-8 C3 A4) direkt am Namen, Blocklauf unter
     # LC_ALL=en_US.UTF-8: GNU grep zaehlte a-Umlaut in [A-Za-z] (Vorkommen 1 = falsches Rot); r15 pinnt LC_ALL=C je
@@ -2511,6 +2535,110 @@ fall_P94() { # L14-04: Kernel-/fontspec-Definierer '\newfontfamily\thesisumfang{
     f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\protected@edef\thesisumfang{x}'
     erw_text "$d/out_b" "$F14_L11"
     f09_fall "$d" c 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\newfontfamily\thesisumfang{x}' '\thesisumfang'
+}
+
+fall_P95() { # C15-01 (r16): Backslash im TMPDIR-Pfad -- GNU sha256sum escapt Dateinamen mit '\' ('\' + Hash); r15
+    # hashte Werkdatei und 289-Kopie MIT Dateiname: Font-Kennung = Backslash + 15 Hex, Byte-Urteil s288 != s289 =
+    # falsches 'FEHLER: DRIFT'. r16 hasht per stdin und validiert 16 Hex. (a) byte-gleich unter TMPDIR 'tmp_a\b' =
+    # rc 0, 4 byte-gleich; (b) anderer Font-Stand = 'Font-Stand abweichend (<16 Hex> vs <16 Hex>, O-15b)' je Fassung.
+    d="$T/P95"; mkdir -p "$d"
+    ze=$(extrahiere_block "$CI_YML" EPOCH-288 "$d/epoch.sh")
+    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$d/drift.sh")
+    if [ "$ze" -lt 5 ] || [ "$zd" -lt 5 ]; then
+        echo "      [ENTFAELLT] Block EPOCH-288/DRIFT-WACHE-288-289 fehlt ($ze/$zd Zeilen) -- P-24 meldet das Fehlen"
+        return
+    fi
+    command -v bash >/dev/null 2>&1 || { rot "bash (Runner-Shell) fehlt -- Block nicht fahrbar"; return; }
+    baue_modul "$d" || { rot "Wegwerf-Modul nicht baubar"; return; }
+    p24_werkzeuge "$d" || { rot "Wegwerf-Werkzeuge nicht anlegbar"; return; }
+    cat "$d/epoch.sh" "$d/bau.sh" "$d/drift.sh" > "$d/lauf.sh"
+    bs="$d/tmp_a\\b"
+    if ! mkdir -p "$bs" 2>/dev/null; then
+        echo "      [GEMESSEN] Dateisystem traegt keinen Backslash im Namen -- P-95 ohne Urteil"; return
+    fi
+    echo "      Nenner: Backslash im TMPDIR-Pfad = $(printf '%s' "$bs" | grep -c '\\')"
+    stand "$Y1" || { rot "Stand Y1 (P-95)"; return; }                   # (a) byte-gleich, TMPDIR mit Backslash
+    fahre_block "$d/lauf.sh" "$d/out_a" PATH="$d/bin:$PATH" BAU_MARKE=writeback1 TMPDIR="$bs"; rc=$?; zeige "$d/out_a"
+    erw_rc "$rc" 0; erw_text "$d/out_a" "4 byte-gleich geprueft"; erw_kein_text "$d/out_a" "FEHLER: DRIFT"
+    erw_kein_text "$d/out_a" "Font-Stand-Kennung unlesbar"
+    # (b) anderer Font-Stand
+    git -C "$MODUL" checkout -q -B fnt95 "$X1" || { rot "Zweig fnt95 nicht setzbar"; return; }
+    LEGE_FONT="$FONT_ALT"; lege_pdf_epoch "$MODUL" "$T1" writeback1; unset LEGE_FONT
+    git -C "$MODUL" add -- diplomarbeit-*.pdf \
+        && modul_commit 1758600284 "Y1t95 writeback anderer Font-Stand [skip ci]" \
+        || { rot "Commit Y1t95"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand Y1t95"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_b" PATH="$d/bin:$PATH" BAU_MARKE=writeback1 TMPDIR="$bs"; rc=$?; zeige "$d/out_b"
+    erw_rc "$rc" 0; erw_text "$d/out_b" "Font-Stand abweichend"; erw_kein_text "$d/out_b" "FEHLER"
+    n=$(grep -c -E 'Font-Stand abweichend \([0-9a-f]{16} vs [0-9a-f]{16}, O-15b\)' "$d/out_b")
+    erw_gleich "$n" 4 "Kennungen je 16 Hex in 'Font-Stand abweichend (... vs ..., O-15b)' (C15-01)"
+    rm -rf "$bs"
+}
+F16_E='\ExplSyntaxOn\def\thesisumfang:foo{x}\thesisumfang:foo\ExplSyntaxOff'
+F16_U='\def\thesisumfang{x}\thesisumfang_x'
+fall_P96() { # C15-04 (r16, hochgestuft; Klasse C14-02): unter \ExplSyntaxOn sind ':' und '_' Buchstaben -- r15 zaehlte
+    # '\def\thesisumfang:foo{x}\thesisumfang:foo' als 1/2/1 (fremdes Control-Word = Definition + Konsum, fail-open);
+    # r16: Token-Klasse [A-Za-z@:_] -> (a) 0/0/0 FEHLER, (b) '\def\thesisumfang{x}\thesisumfang_x' 1/1/0 FEHLER,
+    # (c) Normalfall 1/2/1 gruen
+    d="$T/P96"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F16_E"; erw_text "$d/out_a" "$F13_L0"
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F16_U"; erw_text "$d/out_b" "$F14_L11"
+    f09_fall "$d" c 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_M3"
+}
+fall_P97() { # S15-01..S15-05 + S15-07 + REV-r16 (Codex-Lens r15 B2/B1, Lead K312): Textwache auf die berichtigten
+    # Script-Kommentare (neue Literale 1x, alte 0x) + YAML-Kommentare C15-03 + L15-01 (nur mit F09-Block, sonst LAUT
+    # entfallen) und C15-05 (nur mit DRIFT-Block, sonst LAUT entfallen)
+    s="$1"
+    n=$(grep -c -F 'mit PDF-Header-Praefix %PDF- sein' "$s")
+    erw_gleich "$n" 1 "Kommentar 'mit PDF-Header-Praefix %PDF- sein' (S15-07)"
+    n=$(grep -c -F 'nicht leer und ein PDF sein' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'nicht leer und ein PDF sein' (S15-07)"
+    n=$(grep -c -F 'diff_gleich --cached vor dem Commit) = kein Commit, kein Push' "$s")
+    erw_gleich "$n" 1 "Kommentar 'diff_gleich --cached vor dem Commit) = kein Commit, kein Push' (S15-01)"
+    n=$(grep -c -F 'kein weiterer Merge/Push' "$s"); erw_gleich "$n" 1 "Kommentar 'kein weiterer Merge/Push' (S15-01)"
+    n=$(grep -c -F 'Remote-Tip) = kein Commit / kein Push' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'Remote-Tip) = kein Commit / kein Push' (S15-01)"
+    n=$(grep -c -F 'Push mit -o ci.skip auf HEAD:refs/heads/$BRANCH (S10-01' "$s")
+    erw_gleich "$n" 1 "Kommentar 'Push mit -o ci.skip auf HEAD:refs/heads/\$BRANCH (S10-01' (S15-03)"
+    n=$(grep -c -F 'HEAD:$CI_COMMIT_BRANCH' "$s"); erw_gleich "$n" 0 "alte Fassung 'HEAD:\$CI_COMMIT_BRANCH' (S15-03)"
+    n=$(grep -c -F 'jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung' "$s")
+    erw_gleich "$n" 1 "Kommentar 'jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung' (S15-04)"
+    n=$(grep -c -F 'nur ein nachgewiesenes non-ff-Race' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'nur ein nachgewiesenes non-ff-Race' (S15-04)"
+    n=$(grep -c -F 'VOR dem Anlegen des Zielverzeichnisses' "$s")
+    erw_gleich "$n" 1 "Kommentar 'VOR dem Anlegen des Zielverzeichnisses' (S15-05)"
+    n=$(grep -c -F 'VOR dem ersten Seiteneffekt' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'VOR dem ersten Seiteneffekt' (S15-05)"
+    n=$(grep -c -F 'bei gleichem Inhalt, Modus 100644 und Typ blob ist der gestagte Diff leer' "$s")
+    erw_gleich "$n" 1 "Kommentar 'bei gleichem Inhalt, Modus 100644 und Typ blob ist der gestagte Diff leer' (S15-02)"
+    n=$(grep -c -F 'bei byte-gleichem Bestand ist der gestagte Diff leer' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'bei byte-gleichem Bestand ist der gestagte Diff leer' (S15-02)"
+    n=$(grep -c '^# REV r16 ' "$s"); erw_gleich "$n" 1 "REV-r16-Kopf"
+    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P97.f09")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] YAML-Textwache C15-03/L15-01: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
+    else
+        n=$(grep -c -F 'die uebrigen plain-TeX-Allokator-Makros' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'die uebrigen plain-TeX-Allokator-Makros' (C15-03)"
+        n=$(grep -c -F 'plain-TeX-Primitive (L14-03)' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'plain-TeX-Primitive (L14-03)' (C15-03)"
+        n=$(grep -c -F 'plain-Allokatoren newcount' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'plain-Allokatoren newcount' (L14-03)"
+        l15='bash-only (read -r -d): unter dash laeuft die Dateischleife leer = 0/0/0 = FEHLER, fail-closed (L15-01)'
+        n=$(grep -c -F "$l15" "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'bash-only (read -r -d): ... fail-closed (L15-01)'"
+    fi
+    zd=$(extrahiere_block "$CI_YML" DRIFT-WACHE-288-289 "$T/P97.drift")
+    if [ "$zd" -lt 5 ]; then
+        echo "      [ENTFAELLT] YAML-Textwache C15-05: DRIFT-WACHE-288-289 fehlt ($zd Zeilen) -- nur mit Hauptpatch"
+    else
+        n=$(grep -c -F 'andere Laengen = anderer Font-Stand; gleiche Laengen' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'andere Laengen = anderer Font-Stand; gleiche Laengen' (C15-05)"
+        n=$(grep -c -F 'gleiche Kennung zum Byte-Urteil, nie zu gleich (L15-03, C15-05)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'gleiche Kennung zum Byte-Urteil, nie zu gleich (L15-03, C15-05)'"
+        n=$(grep -c -F 'anderer Font-Stand (Fontpaket-Version) = andere' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'anderer Font-Stand (Fontpaket-Version) = andere' (C15-05)"
+    fi
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -2622,6 +2750,9 @@ fall P-91 fall_P91 "$SKRIPT"
 fall P-92 fall_P92 "$SKRIPT"
 fall P-93 fall_P93 "$SKRIPT"
 fall P-94 fall_P94 "$SKRIPT"
+fall P-95 fall_P95 "$SKRIPT"
+fall P-96 fall_P96 "$SKRIPT"
+fall P-97 fall_P97 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2964,18 +3095,18 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M104 (r13, C12-01): futurelet aus der let-Familie entfernt -> P-79 (futurelet) muss reissen
         ersetze_literal "$CI_YML" '|futurelet' '' > "$MUT/m104.yml"   # r14: Primitiv-Liste
         # M105 (r14, C13-01): Stufe 1 der Definitionen zurueck auf die verbrauchende Wortgrenze -> P-80 (a) muss reissen
-        ersetze_literal "$CI_YML" '${makro}[A-Za-z@]*" "$f09w/eins" > "$f09w/tokd"' \
-            '${makro}([^A-Za-z@]|\$)" "$f09w/eins" > "$f09w/tokd"' \
+        ersetze_literal "$CI_YML" '${makro}[A-Za-z@:_]*" "$f09w/eins" > "$f09w/tokd"' \
+            '${makro}([^A-Za-z@:_]|\$)" "$f09w/eins" > "$f09w/tokd"' \
             > "$MUT/m105.yml"
         # M106 (r14, C13-01): Stufe 1 der Vorkommen zurueck auf die verbrauchende Wortgrenze -> P-81 (g) muss reissen
-        ersetze_literal "$CI_YML" '\\\\${makro}[A-Za-z@]*" "$f09w/eins" > "$f09w/tokg"' \
-            '\\\\${makro}([^A-Za-z@]|\$)" "$f09w/eins" > "$f09w/tokg"' \
+        ersetze_literal "$CI_YML" '\\\\${makro}[A-Za-z@:_]*" "$f09w/eins" > "$f09w/tokg"' \
+            '\\\\${makro}([^A-Za-z@:_]|\$)" "$f09w/eins" > "$f09w/tokg"' \
             > "$MUT/m106.yml"
         # M107 (r14, C13-01): beide Stufe-2-Filter ohne Endanker (Fremdname zaehlt) -> P-82 (e) muss reissen
         ersetze_literal "$CI_YML" '${makro}\$" "$f09w/tok' '${makro}" "$f09w/tok' > "$MUT/m107.yml"
         # M108 (r14, C13-01): Pipe statt zwei Stufen (rc 2 der Stufe 1 verschluckt) -> P-83 muss reissen
-        ersetze_literal "$CI_YML" '[A-Za-z@]*" "$f09w/eins" > "$f09w/tokd"' \
-            '[A-Za-z@]*" "$f09w/eins" | LC_ALL=C grep -E "\\\\${makro}\$" > "$f09w/def"' > "$MUT/m108.tmp"
+        ersetze_literal "$CI_YML" '[A-Za-z@:_]*" "$f09w/eins" > "$f09w/tokd"' \
+            '[A-Za-z@:_]*" "$f09w/eins" | LC_ALL=C grep -E "\\\\${makro}\$" > "$f09w/def"' > "$MUT/m108.tmp"
         ersetze_literal "$MUT/m108.tmp" \
             'LC_ALL=C grep -E "\\\\${makro}\$" "$f09w/tokd" > "$f09w/def" && dr=0 || dr=$?' \
             'dr=0' \
@@ -2994,7 +3125,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M113 (r15, C14-01): Stufe-2-Filter der Definitionen ohne Backslash (r14-Form) -> P-88 (a) muss reissen
         ersetze_literal "$CI_YML" '"\\\\${makro}\$" "$f09w/tokd"' '"${makro}\$" "$f09w/tokd"' > "$MUT/m113.yml"
         # M114 (r15, C14-02): Token-Klasse ohne '@' (beide Stufe-1-Extraktionen) -> P-89 (a) muss reissen
-        ersetze_literal "$CI_YML" '[A-Za-z@]*' '[A-Za-z]*' > "$MUT/m114.yml"
+        ersetze_literal "$CI_YML" '[A-Za-z@:_]*' '[A-Za-z:_]*' > "$MUT/m114.yml"   # r16: Klasse mit ':_'
         # M115 (r15, C14-03): Truncation der Werkdateien vor den vier Stufen entfernt -> P-90 muss reissen
         sed '/^ *: > "\$f09w\/[a-z]*" || { echo "FEHLER: Werkdatei /d' "$CI_YML" > "$MUT/m115.yml"
         # M116 (r15, C14-04): 'font' aus der Primitiv-Liste -> P-91 (a) muss reissen
@@ -3009,16 +3140,28 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         ersetze_literal "$MUT/m119.tmp" 'LC_ALL=C grep -o -E "\\\\${makro}' 'grep -o -E "\\\\${makro}' > "$MUT/m119.yml"
         # M120 (r15, L14-04): Kernel-/fontspec-Definierer aus der ERE -> P-94 (a) muss reissen
         ersetze_literal "$CI_YML" '|newfontfamily|DeclareMathSymbol|protected@edef|protected@xdef' '' > "$MUT/m120.yml"
+        # M121 (r16, C15-01): Font-Stand-Hash mit Dateiname (r15-Form; sha256sum escapt '\' im TMPDIR-Pfad), 16-Hex-
+        # Validierung entfernt, Byte-Urteil mit Dateiname -> P-95 (a)/(b) muss reissen
+        ersetze_literal "$CI_YML" 'fs=$(sha256sum < "$k289.fs")' 'fs=$(sha256sum "$k289.fs")' > "$MUT/m121.tmp"
+        ersetze_literal "$MUT/m121.tmp" 'test "${#fs}" -eq 16 \' 'true \' > "$MUT/m121.tmp2"
+        ersetze_literal "$MUT/m121.tmp2" 's289=$(sha256sum < "$k289" | cut' 's289=$(sha256sum "$k289" | cut' \
+            > "$MUT/m121.yml"
+        # M122 (r16, C15-02): Font-Stand des 288-Baus wieder VOR dem Fullbanner-Vergleich (r15-Reihenfolge) -> P-24 (r)
+        ersetze_literal "$CI_YML" 'b288=$kw' 'b288=$kw; lies_fontstand "$pdf" 288-Bau; test "$fn" -gt 0 || exit 1' \
+            > "$MUT/m122.yml"
+        # M123 (r16, C15-04): Token-Klasse ohne ':_' (r15-Form, beide Stufe-1-Extraktionen) -> P-96 (a) muss reissen
+        ersetze_literal "$CI_YML" '[A-Za-z@:_]*' '[A-Za-z@]*' > "$MUT/m123.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
         M90=m90; M91=m91; M92=m92; M93=m93; M94=m94; M98=m98; M99=m99; M100=m100; M103=m103; M104=m104
         M105=m105; M106=m106; M107=m107; M108=m108; M109=m109; M110=m110; M111=m111; M112=m112
         M113=m113; M114=m114; M115=m115; M116=m116; M117=m117; M118=m118; M119=m119; M120=m120
+        M121=m121; M122=m122; M123=m123
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-30)); ENTF_N=$((ENTF_N+30)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            MUT_N=$((MUT_N-31)); ENTF_N=$((ENTF_N+31)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
             M94=; M98=; M99=; M100=; M103=; M104=; M105=; M106=; M107=; M108=; M109=; M110=; M111=; M112=
-            M113=; M114=; M115=; M116=; M119=; M120=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m116 + m119 + m120" \
+            M113=; M114=; M115=; M116=; M119=; M120=; M123=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m116 + m119/m120/m123" \
                  "(F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
         fi
@@ -3113,6 +3256,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M118" ] && biss_yml m118 fall_P24 P-24
         [ "$BISS_RC" -eq 0 ] && [ -n "$M119" ] && biss_yml m119 fall_P93 P-93
         [ "$BISS_RC" -eq 0 ] && [ -n "$M120" ] && biss_yml m120 fall_P94 P-94
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M121" ] && biss_yml m121 fall_P95 P-95
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M122" ] && biss_yml m122 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M123" ] && biss_yml m123 fall_P96 P-96
     fi
 fi
 
