@@ -210,7 +210,8 @@
 #        Lens r16 L16-01/L16-02, Lead K313/K314)
 #   P-99 Textwache r18: Script-Kommentare F18-02/F18-04 + Meldungstext F18-05 + REV-r18 + YAML-Kommentare F18-01/
 #        F18-03 (Koppel, F09); nur Kommentare + ein Meldungstext, keine Zaehl-Logik, keine Mutante (Codex-Lens r17
-#        A/B, Fable-Lens r17 L17-01..L17-05, Lead K317)
+#        A/B, Fable-Lens r17 L17-01..L17-05, Lead K317); r19: + F19-01 (commit --only nur genannte Pfade) + F19-02
+#        (skip-worktree an git add, gemessen) + REV-r19 (Fable r18 L18-01, Codex r18 B S18-01, Lead K320)
 #
 # SELBSTBISS (--selbstbiss): 123 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -285,6 +286,8 @@
 # Fixes, 0 Code), 0 neue Mutanten -- die Kommentar-Literale sind keine Beiss-Gegenstaende.
 # r18 (Codex r17 C17-01/C17-02 + S17-01..S17-03, Fable r17 L17-01..L17-05, Lead K317): nur Textwache P-99 (4 Kommentar-
 # Fixes + 1 Meldungstext, kein neuer Kontrollfluss), 0 neue Mutanten.
+# r19 (Fable r18 L18-01 + Codex r18 B S18-01, Lead K320): P-99 um 5 Erwartungen erweitert (F19-01 commit --only,
+# F19-02 skip-worktree-Bit gemessen, REV-r19); Faelle 103 unveraendert, 0 neue Mutanten, 0 Code.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2710,6 +2713,8 @@ fall_P98() { # S16-01..S16-03 + REV-r17 (Codex-Lens r16 B) + C16-01/C16-02 (Kopp
 }
 
 fall_P99() { # F18-01..F18-05 + REV-r18 (Codex-Lens r17 A C17-01/C17-02, B S17-01..S17-03, Fable-Lens r17 L17-01..
+    # L17-05, Lead K317) + r19: F19-01 commit --only + F19-02 skip-worktree-Bit + REV-r19 (Fable r18 L18-01, Codex r18
+    # B S18-01, Lead K320); nur Kommentar-Literale, keine Mutante.
     # L17-05, Lead K317): Textwache auf die r18-Kommentare + den Meldungstext (neue Literale genau 1x, alte 0x);
     # YAML-Teile nur mit F09-Block, sonst LAUT entfallen; keine Zaehl-Logik, keine Mutante
     s="$1"
@@ -2721,6 +2726,15 @@ fall_P99() { # F18-01..F18-05 + REV-r18 (Codex-Lens r17 A C17-01/C17-02, B S17-0
     erw_gleich "$n" 1 "Kommentar 'assume-unchanged-/skip-worktree-Bits sind nicht erfasst' (F18-04)"
     n=$(grep -c -F 'gestagt oder ungestagt); S7-04' "$s")
     erw_gleich "$n" 0 "alte Fassung 'gestagt oder ungestagt); S7-04' (F18-04)"
+    n=$(grep -c -F 'commit --only nimmt den Index' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'commit --only nimmt den Index' (F19-01)"
+    n=$(grep -c -F 'nimmt nur die genannten Pfade' "$s")
+    erw_gleich "$n" 1 "Kommentar 'nimmt nur die genannten Pfade' (F19-01)"
+    n=$(grep -c -F 'fremde Pfade bleiben auf HEAD-Stand' "$s")
+    erw_gleich "$n" 1 "Kommentar 'fremde Pfade bleiben auf HEAD-Stand' (F19-01)"
+    n=$(grep -c -F 'skip-worktree-Bit laesst git add mit rc=1 abbrechen' "$s")
+    erw_gleich "$n" 1 "Kommentar L1-01 'skip-worktree-Bit laesst git add mit rc=1 abbrechen' (F19-02, gemessen)"
+    n=$(grep -c '^# REV r19 ' "$s"); erw_gleich "$n" 1 "REV-r19-Kopf"
     n=$(grep -c -F 'erneuter Push, falls Versuche verbleiben ($versuch/5; S17-03)' "$s")
     erw_gleich "$n" 1 "Meldung 'erneuter Push, falls Versuche verbleiben (\$versuch/5; S17-03)' (F18-05)"
     n=$(grep -c -F '[skip ci], erneuter Push' "$s")
