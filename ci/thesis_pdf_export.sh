@@ -34,6 +34,13 @@
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
 # S8-06 Traps VOR mktemp; L8-01 Leerraum/Steuerzeichen in DIR/SRC und Fassungsnamen nur [A-Za-z0-9-].
+# REV r10 (Codex-Lens r9 A/B + Fable-Lens r9 + Lead K300/K301, 23.09.2026): S9-01 hash-object --no-filters und
+# Index-Blob == Rohhash (Filter-/EOL-Konversion = FEHLER); S9-02 core.fileMode=true fuer add und commit --only;
+# S9-03 DIR/SRC nur [A-Za-z0-9._/-], keine '..'-Komponente, kein fuehrendes '/' (git-Pfadquotierung und Glob-/
+# Magic-Fehlziele unerreichbar, L9-02/L9-03); S9-04 Index-Abfrage ':0:<pfad>' (Stage explizit); S9-05 Loesch-
+# Erkennung per ls-tree je Seite, Werkzeugfehler = FEHLER; S9-06/L9-04 Credential-Maske bis zum letzten '@' vor
+# dem Pfad plus scp-Form; S9-07 CI-Werte (SHAs, Branch, Pipeline-ID) VOR jeder Ausgabe geprueft; S9-08 WERK-Pfad
+# selbst gebildet und mkdir NACH den Traps (kein Signalfenster); S9-09 fehler() und variable Ausgaben per printf.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -53,7 +60,8 @@ set -f
 # S8-01 (r9): set -f stoppt nur das Shell-Globbing; git wertet Pathspecs (Glob-Zeichen, ':'-Magic) weiter aus.
 # Alle Pathspecs dieses Scripts sind literal (Verzeichnis-Praefix bleibt).
 export GIT_LITERAL_PATHSPECS=1
-fehler() { echo "FEHLER: $*"; exit 1; }
+fehler() { printf '%s\n' "FEHLER: $*"; exit 1; }
+ueberholt() { printf '%s\n' "UEBERHOLT: $*"; exit 0; }   # S9-09 (r10): variable Ausgaben nur per printf
 TAB=$(printf '\t')
 # C6-06 (r7): Instanz-Konstanten -- Host wie die origin-URL des Projekts, Projekt-ID 288 (kein Projektpfad-Literal).
 INSTANZ_HOST=gitlab.comdare.local
@@ -87,20 +95,45 @@ FASSUNGEN="${COMDARE_THESIS_PDF_FASSUNGEN-de-lang en-lang de-kurz en-kurz}"
 case "$DIR$SRC" in
   *[[:space:]]*|*[[:cntrl:]]*) fehler "COMDARE_THESIS_PDF_DIR/SRC enthaelt Leerraum oder Steuerzeichen (S7-06/L8-01)" ;;
 esac
+# S9-03 (r10, Codex-Lens r9 B; deckt L9-02/L9-03/L9-08): DIR/SRC nur [A-Za-z0-9._/-] -- '"', '\', Nicht-ASCII
+# erreichten sonst die git-Pfadquotierung (falsches Rot), Glob-/Magic-Zeichen ein literales Fehlziel; keine
+# '..'-Komponente, kein fuehrendes '/'; Meldungen ohne Rohwert, VOR jeder git-Wache und jeder Pfadausgabe.
+case "$DIR$SRC" in *[!A-Za-z0-9._/-]*) fehler "COMDARE_THESIS_PDF_DIR/SRC: unzulaessige Zeichen (S9-03)" ;; esac
+for p in "$DIR" "$SRC"; do
+  case "$p" in
+    /*|..|../*|*/..|*/../*) fehler "COMDARE_THESIS_PDF_DIR/SRC: relativer Pfad ohne '..' verlangt (S9-03)" ;;
+  esac
+done
 BRANCH="${CI_COMMIT_BRANCH:?thesis_pdf_export: nur in Branch-Pipelines (CI_COMMIT_BRANCH fehlt)}"
 PIPE_SHA="${CI_COMMIT_SHA:?thesis_pdf_export: CI_COMMIT_SHA fehlt (Pipeline-Stand fuer die Stale-Pruefung)}"
 KURZ="${CI_COMMIT_SHORT_SHA:-NA}"
 PIPE_ID="${CI_PIPELINE_ID:-NA}"
+# S9-07 (r10, Codex-Lens r9 B): CI-Werte VOR jeder Ausgabe pruefen -- ein Token in CI_COMMIT_SHA/SHORT_SHA/BRANCH
+# stuende sonst im Verweigerungspfad ('HEAD != CI_COMMIT_SHA') oder in Commit-/Push-Meldungen im Log; Meldung ohne
+# Rohwert. Die Defaults NA (SHORT_SHA/PIPELINE_ID nur bei ungesetzter Variable) bleiben (ADV-r9-10).
+hex40() { case "$1" in ''|*[!0-9a-f]*) return 1 ;; esac; [ ${#1} -eq 40 ]; }
+hex40 "$PIPE_SHA" || fehler "CI_COMMIT_SHA: keine 40-stellige Hex-SHA (S9-07)"
+case "$KURZ" in NA) ;; ''|*[!0-9a-f]*) fehler "CI_COMMIT_SHORT_SHA: unzulaessige Zeichen (S9-07)" ;;
+  *) [ ${#KURZ} -ge 7 ] && [ ${#KURZ} -le 40 ] || fehler "CI_COMMIT_SHORT_SHA: Laenge nicht 7..40 (S9-07)" ;; esac
+case "$BRANCH" in ''|-*|*..*|*[!A-Za-z0-9._/-]*) fehler "CI_COMMIT_BRANCH: unzulaessige Zeichen (S9-07)" ;; esac
+case "$PIPE_ID" in NA) ;; ''|*[!0-9]*) fehler "CI_PIPELINE_ID: keine Zahl (S9-07)" ;; esac
 export GIT_TERMINAL_PROMPT=0
 GITP="git -c credential.helper="
 # Hilfsdateien (Askpass-Helfer, Index-Liste, Push-Meldung) liegen in EINEM 0700-Wegwerfordner ausserhalb des
 # Arbeitsbaums und verschwinden mit dem Script.
-# S8-06 (r9): Traps VOR mktemp (kein Signalfenster zwischen Anlage und Cleanup-Installation); der EXIT-Trap raeumt
+# S8-06 (r9): Traps VOR der Anlage (kein Signalfenster zwischen Anlage und Cleanup-Installation); der EXIT-Trap raeumt
 # nur, wenn WERK bereits gesetzt ist. S7-08 (r8b): Signale muenden in exit, damit der EXIT-Trap laeuft.
 WERK=''
 trap 'if [ -n "${WERK:-}" ]; then rm -rf -- "$WERK"; fi' EXIT
 trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
-WERK=$(mktemp -d "${TMPDIR:-/tmp}/thesis_pdf_export.XXXXXX") || fehler "mktemp -d fuer Hilfsdateien"
+# S9-08 (r10, Codex-Lens r9 B): mktemp liesse ein Signalfenster zwischen mkdir und Pfadausgabe (Ordner ohne WERK-
+# Zuweisung). Der Pfad wird selbst gebildet (od-Fehler = FEHLER), WERK VOR der Anlage gesetzt (der Trap kennt den
+# Pfad), dann mkdir ohne -p (Existenz = FEHLER; bei Fehlschlag wird WERK geleert, der Trap raeumt nichts Fremdes).
+zufall=$(od -An -N8 -tx1 /dev/urandom) || fehler "od /dev/urandom (S9-08)"
+zufall=$(printf '%s' "$zufall" | tr -d ' \n') || fehler "tr (S9-08)"
+[ ${#zufall} -eq 16 ] || fehler "Zufallsname unvollstaendig (S9-08)"
+WERK="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"
+mkdir -m 0700 -- "$WERK" || { WERK=''; fehler "Hilfsordner anlegen (S9-08)"; }
 
 # Explizite Statusauswertung (0 = gleich / Vorfahr, 1 = verschieden / kein Vorfahr, sonst Abbruch): set -e
 # unterscheidet 1 nicht von einem Werkzeugfehler.
@@ -114,6 +147,7 @@ WURZEL=$(pwd -P) || fehler "pwd -P"
 TOP=$(git rev-parse --show-toplevel) || fehler "kein git-Arbeitsbaum"
 [ "$TOP" = "$WURZEL" ] || fehler "muss in der Repo-Wurzel laufen ($TOP != $WURZEL)"
 HEAD_SHA=$(git rev-parse --verify HEAD) || fehler "HEAD nicht bestimmbar"
+hex40 "$HEAD_SHA" || fehler "HEAD: keine 40-stellige Hex-SHA (S9-07)"
 [ "$HEAD_SHA" = "$PIPE_SHA" ] || fehler "HEAD $HEAD_SHA != CI_COMMIT_SHA $PIPE_SHA (Export nur vom Pipeline-Stand)"
 
 # Push-Ziel. F-02: der Testhaken ist in CI verweigert (ein Variablen-Setzer koennte den Job sonst still auf ein
@@ -258,19 +292,27 @@ for f in $FASSUNGEN; do
   rm -f -- "$dst" || fehler "rm -f $dst"
   cp -- "$src" "$dst" || fehler "cp $src $dst"
   chmod 0644 -- "$dst" || fehler "chmod 0644 $dst"
-  git add -- "$dst" || fehler "git add $dst"
+  # S9-02 (r10, Codex-Lens r9 B): core.fileMode=true erzwingen -- unter fileMode=false behielte git add den alten
+  # Indexmodus (100755 vom Remote) und die Modus-Wache endete auf Dauer rot (L9-06).
+  git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"
   # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen. Der
   # Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie tragen (git diff --quiet traut assume-unchanged).
   git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
     || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
   blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
-  idx=$(git rev-parse --verify -q ":$dst") || fehler "git rev-parse :$dst (kein Stage-0-Eintrag)"
+  # S9-04 (r10): Stage explizit (':0:'); ':<pfad>' waere bei einem Pfad mit ':' Stage-Syntax. Nach S9-03 ist ':'
+  # ausgeschlossen, die eindeutige Form bleibt Pflicht.
+  idx=$(git rev-parse --verify -q ":0:$dst") || fehler "git rev-parse :0:$dst (kein Stage-0-Eintrag)"
   [ "$idx" = "$blob" ] || fehler "Index traegt fuer $dst nicht den Inhalt der Arbeitskopie ($idx != $blob)"
+  # S9-01 (r10, Codex-Lens r9 B): der Index-Blob muss der ROHHASH der Datei sein (--no-filters); greift ein Clean-/
+  # EOL-Filter (z. B. '*.pdf text'), weichen die gespeicherten Bytes vom Artefakt ab = FEHLER (Objekt: *.pdf binary).
+  roh=$(git hash-object --no-filters -- "$dst") || fehler "git hash-object --no-filters $dst"
+  [ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion am Artefakt $dst (S9-01)"
   modus=$(git ls-files -s -- "$dst") || fehler "git ls-files -s $dst"; modus="${modus%% *}"
   [ "$modus" = "100644" ] || fehler "$dst steht mit Modus $modus statt 100644 im Index (S8-02)"
   printf '%s\n' "$dst" >> "$WERK/dst.txt" || fehler "Zielliste $WERK/dst.txt"
   n=$((n+1))
-  echo "Fassung $f: $groesse B nach $dst"
+  printf '%s\n' "Fassung $f: $groesse B nach $dst"
 done
 [ "$n" -gt 0 ] || fehler "keine Fassung in COMDARE_THESIS_PDF_FASSUNGEN"
 # L1-01 (r2): Nachzaehlung nach der Schleife -- alle n Zieldateien stehen im Index unter $DIR/ (nicht ueber
@@ -297,21 +339,22 @@ while IFS= read -r p; do set -- "$@" "$p"; done < "$WERK/dst.txt"
 [ "$#" -eq "$n" ] || fehler "Fassungs-Liste $# != $n"
 
 if diff_gleich --no-renames --cached -- "$@"; then
-  echo "UNVERAENDERT: $n Fassungen byte-gleich zum Bestand in $DIR, kein Commit"; exit 0
+  printf '%s\n' "UNVERAENDERT: $n Fassungen byte-gleich zum Bestand in $DIR, kein Commit"; exit 0
 fi
-$GITP -c user.name="super-pdf-bot" -c user.email="super-pdf-bot@ci.comdare.local" commit -q --only \
+$GITP -c core.fileMode=true -c user.name="super-pdf-bot" \
+  -c user.email="super-pdf-bot@ci.comdare.local" commit -q --only \
   -m "docs(diplomarbeit): $n Thesis-Fassungen aus Pipeline $PIPE_ID" \
   -m "Quelle super $KURZ ($PIPE_SHA), Submodul thesis/diplomarbeit (Order 389/390, 22.09.2026) [skip ci]" \
   -- "$@" || fehler "git commit"
 NEU=$(git rev-parse --short HEAD) || fehler "git rev-parse HEAD"
 NEU_VOLL=$(git rev-parse --verify HEAD) || fehler "git rev-parse --verify HEAD"
-echo "Commit $NEU auf $BRANCH (Basis Pipeline-Commit $KURZ)"
+printf '%s\n' "Commit $NEU auf $BRANCH (Basis Pipeline-Commit $KURZ)"
 # S8-02 (r9): der EIGENE Export-Commit wird VOR dem ersten Push geprueft (100644 blob, Inhalt = Quelle je Fassung);
 # eine Abweichung ist ein eigener Defekt = FEHLER, nie UEBERHOLT.
 for f in $FASSUNGEN; do
   src="$SRC/diplomarbeit-$f.pdf"; dst="$DIR/diplomarbeit-$f.pdf"
   e=$(git ls-tree "$NEU_VOLL" -- "$dst") || fehler "git ls-tree $NEU -- $dst"
-  q=$(git hash-object -- "$src") || fehler "git hash-object $src"
+  q=$(git hash-object --no-filters -- "$src") || fehler "git hash-object --no-filters $src"   # S9-01 (r10)
   [ "${e%%$TAB*}" = "100644 blob $q" ] || fehler "Export-Commit $NEU: $dst nicht 100644 blob der Quelle (S8-02)"
 done
 
@@ -321,13 +364,14 @@ versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
   if $GITP push -q -o ci.skip "$REMOTE" "HEAD:$BRANCH" 2>"$WERK/push.err"; then
-    echo "PUSH OK (ci.skip) auf $BRANCH (Versuch $versuch)"; exit 0
+    printf '%s\n' "PUSH OK (ci.skip) auf $BRANCH (Versuch $versuch)"; exit 0
   fi
   # S8-04 (r9, Haertung): git-Diagnostik nur mit Credential-Maske ausgeben (userinfo in URLs -> <cred>).
-  echo "Push abgelehnt (Versuch $versuch), git meldet:"
-  sed -e 's#//[^/@]*@#//<cred>@#g' -e 's/^/  | /' "$WERK/push.err"
+  printf '%s\n' "Push abgelehnt (Versuch $versuch), git meldet:"
+  # S9-06/L9-04 (r10): Maske bis zum letzten '@' vor dem Pfad (deckt '@' im Kennwort) plus scp-Form user@host:pfad.
+  sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e 's/^/  | /' "$WERK/push.err"
   $GITP fetch -q "$REMOTE" "$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"
-    sed -e 's#//[^/@]*@#//<cred>@#g' -e 's/^/  | /' "$WERK/fetch.err"
+    sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e 's/^/  | /' "$WERK/fetch.err"
     fehler "fetch $BRANCH fehlgeschlagen (Recht/Netz), kein Race"; }
   FERN=$(git rev-parse --short FETCH_HEAD) || fehler "git rev-parse FETCH_HEAD"
   if ist_vorfahr FETCH_HEAD HEAD; then
@@ -336,19 +380,23 @@ while [ "$versuch" -lt 5 ]; do
   ist_vorfahr "$PIPE_SHA" FETCH_HEAD \
     || fehler "$BRANCH ($FERN) enthaelt den Pipeline-Commit $KURZ nicht (Rewrite/Force-Push?)"
   if ! diff_gleich "$PIPE_SHA" FETCH_HEAD -- thesis/diplomarbeit .gitlab-ci.yml ci/thesis_pdf_export.sh; then
-    echo "UEBERHOLT: Thesis-Gitlink oder CI-Rezept seit $KURZ bewegt ($FERN); kein Push alter PDFs"
+    printf '%s\n' "UEBERHOLT: Thesis-Gitlink oder CI-Rezept seit $KURZ bewegt ($FERN); kein Push alter PDFs"
     exit 0
   fi
   if diff_gleich --no-renames HEAD FETCH_HEAD -- "$@"; then  # F-07 Remote-Idempotenz, Fassungs-Liste (S7-03/S8-01)
-    echo "UNVERAENDERT (remote): $BRANCH ($FERN) traegt die $n Fassungen bereits byte-gleich, kein Merge/Push"
+    printf '%s\n' "UNVERAENDERT (remote): $BRANCH ($FERN) traegt die $n Fassungen bereits byte-gleich, kein Merge/Push"
     exit 0
   fi
   # S8-03 (r9): eine Fassung, die im Pipeline-Tree lag und am Remote fehlt, wurde dort geloescht -> UEBERHOLT (rc 0)
   # VOR dem Merge (sonst endete ein modify/delete-Konflikt rot); eine erstmals exportierte Fassung (im Pipeline-
   # Tree nicht vorhanden) ist keine Loeschung, Merge + Push laufen normal; ein Konflikt danach bleibt FEHLER.
-  while IFS= read -r dst; do   # S8-03 (r9): Loesch-Erkennung VOR dem Merge
-    if git cat-file -e "$PIPE_SHA:$dst" 2>/dev/null && ! git cat-file -e "FETCH_HEAD:$dst" 2>/dev/null; then
-      echo "UEBERHOLT: Fassung $dst am Remote geloescht ($FERN), kein Merge/Push (S7-02/S8-03)"; exit 0
+  # S9-05 (r10, Codex-Lens r9 B): je Seite ls-tree mit eigenem Fehlerzweig -- ein Werkzeugfehler (cat-file rc != 0)
+  # galt in r9 als 'am Remote geloescht' (UEBERHOLT rc 0); leer = Pfad fehlt, jeder Werkzeugfehler = FEHLER.
+  while IFS= read -r dst; do   # S8-03/S9-05: Loesch-Erkennung VOR dem Merge
+    e=$(git ls-tree "$PIPE_SHA" -- "$dst") || fehler "git ls-tree PIPE_SHA -- $dst (S9-05)"
+    r=$(git ls-tree FETCH_HEAD -- "$dst") || fehler "git ls-tree FETCH_HEAD -- $dst (S9-05)"
+    if [ -n "$e" ] && [ -z "$r" ]; then
+      printf '%s\n' "UEBERHOLT: Fassung $dst am Remote geloescht ($FERN), kein Merge/Push (S7-02/S8-03)"; exit 0
     fi
   done < "$WERK/dst.txt"   # S8-03
   $GITP -c user.name="super-pdf-bot" -c user.email="super-pdf-bot@ci.comdare.local" merge -q --no-edit \
@@ -362,13 +410,13 @@ while [ "$versuch" -lt 5 ]; do
     a=$(git ls-tree HEAD -- "$dst") || fehler "git ls-tree HEAD -- $dst (nach Merge)"
     b=$(git ls-tree "$NEU_VOLL" -- "$dst") || fehler "git ls-tree $NEU -- $dst (eigener Export-Commit)"
     [ -n "$b" ] || fehler "Fassung $dst fehlt im eigenen Export-Commit $NEU"
-    if [ -z "$a" ]; then echo "UEBERHOLT: Fassung $dst am Remote geloescht ($FERN), kein Push (S7-02)"; exit 0; fi
+    [ -n "$a" ] || ueberholt "Fassung $dst am Remote geloescht ($FERN), kein Push (S7-02)"
     ma="${a%% *}"; ta="${a#* }"; ta="${ta%% *}"
     [ "$ma" = "100644" ] && [ "$ta" = "blob" ] \
-      || { echo "UEBERHOLT: Fassung $dst am Remote als $ta/$ma statt blob/100644 ($FERN), kein Push (S7-01)"; exit 0; }
-    [ "$a" = "$b" ] || { echo "UEBERHOLT: Fassung $dst am Remote fremd bewegt ($FERN), kein Push (C6-04)"; exit 0; }
+      || ueberholt "Fassung $dst am Remote als $ta/$ma statt blob/100644 ($FERN), kein Push (S7-01)"
+    [ "$a" = "$b" ] || ueberholt "Fassung $dst am Remote fremd bewegt ($FERN), kein Push (C6-04)"
   done < "$WERK/dst.txt"
-  echo "Merge mit $BRANCH-Tip $FERN [skip ci], erneuter Push"
+  printf '%s\n' "Merge mit $BRANCH-Tip $FERN [skip ci], erneuter Push"
   if [ "$versuch" -lt 5 ]; then sleep $((versuch * 2)); fi
 done
 fehler "Push nach 5 Versuchen abgelehnt ($BRANCH bewegt sich zu schnell?)"
