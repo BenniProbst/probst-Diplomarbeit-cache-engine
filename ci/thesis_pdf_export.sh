@@ -48,6 +48,10 @@
 # mit '--'; S10-05 Maske = Zusatzschutz, dritte Regel fuer Diagnoseformen ohne '//'; S10-06 fehler() ohne
 # abgeleitete Werte (SRC_K/WERK/TOP/WURZEL/DIR_K/DIR_F nur als Variablenname); S10-07 core.fileMode=true auch am
 # ungestagt-Diff; S10-08 hex40 = Vertrag Kleinhex (keine Normalisierung); L10-05 fuehrendes '-' in DIR/SRC = FEHLER.
+# REV r12 (Codex-Lens r11 B + Fable-Lens r11 + Lead K305, 24.09.2026): S11-01 Signale WAEHREND der Werkordner-Anlage
+# nur vorgemerkt (sig), mkdir-rc dreiwertig (0 = WERK, 1 = FEHLER, Signal-rc = leeren Kandidaten entfernen + exit rc),
+# danach Signal-Traps zurueck auf exit und ein vorgemerktes Signal per exit abgearbeitet (0 Reste); S11-02 fuehrendes
+# '-' auch NACH der Normalisierung in der gemeinsamen Wache ('./-n' wurde zu '-n' und exportiert).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -159,18 +163,30 @@ case "$T" in /*) ;; *) fehler "TMPDIR: kein absoluter Pfad (S10-04)" ;; esac
 case "$T" in *[!A-Za-z0-9._/-]*) fehler "TMPDIR: unzulaessige Zeichen (S10-04)" ;; esac
 WERK=''
 trap 'if [ -n "${WERK:-}" ]; then rm -rf -- "$WERK"; fi' EXIT
-trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
+# S11-01 (r12, Codex-Lens r11 B): Signale WAEHREND der Anlage nur VORMERKEN -- ein Signal zwischen mkdir und der
+# WERK-Zuweisung liess sonst den eigenen leeren 0700-Ordner liegen (der EXIT-Trap kannte ihn noch nicht). Nach der
+# Anlage werden die Traps auf exit zurueckgestellt und ein vorgemerktes Signal per exit abgearbeitet (EXIT raeumt WERK).
+sig=''
+trap 'sig=129' HUP; trap 'sig=130' INT; trap 'sig=143' TERM
 # S9-08 (r10, Codex-Lens r9 B): mktemp liesse ein Signalfenster zwischen mkdir und Pfadausgabe (Ordner ohne WERK-
 # Zuweisung). Der Pfad wird selbst gebildet (od-Fehler = FEHLER), mkdir ohne -p (Existenz = FEHLER).
 # S10-03 (r11, Codex-Lens r10 B): mkdir VOR der WERK-Zuweisung -- WERK bezeichnet nur einen nachweislich EIGENEN
-# Ordner (bei Kollision mit einem fremden Pfad plus Signal raeumte der EXIT-Trap sonst Fremdes). Restfenster zwischen
-# Anlage und Zuweisung: hoechstens ein leeres eigenes 0700-Verzeichnis bleibt liegen, nie eine Fremdloeschung.
+# Ordner (bei Kollision mit einem fremden Pfad plus Signal raeumte der EXIT-Trap sonst Fremdes). S11-01 (r12): der
+# mkdir-rc wird dreiwertig ausgewertet -- 0 = eigener Ordner (WERK), 1 = Kollision/Fehler (FEHLER, nichts Fremdes
+# angefasst), Signal-rc = das mkdir-Kind wurde nach der Anlage getoetet: nur ein LEERES Verzeichnis wird entfernt
+# (rmdir), ein fremder nicht-leerer Pfad bleibt; danach exit mit dem Signal-rc.
 zufall=$(od -An -N8 -tx1 /dev/urandom) || fehler "od /dev/urandom (S9-08)"
 zufall=$(printf '%s' "$zufall" | tr -d ' \n') || fehler "tr (S9-08)"
 [ ${#zufall} -eq 16 ] || fehler "Zufallsname unvollstaendig (S9-08)"
 kand="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"
-mkdir -m 0700 -- "$kand" || fehler "Hilfsordner anlegen (S9-08)"
-WERK=$kand
+rc=0; mkdir -m 0700 -- "$kand" || rc=$?
+case $rc in
+  0) WERK=$kand ;;
+  1) fehler "Hilfsordner anlegen (S9-08)" ;;
+  *) rmdir -- "$kand" 2>/dev/null || :; exit "$rc" ;;
+esac
+trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
+[ -z "$sig" ] || exit "$sig"
 
 # Explizite Statusauswertung (0 = gleich / Vorfahr, 1 = verschieden / kein Vorfahr, sonst Abbruch): set -e
 # unterscheidet 1 nicht von einem Werkzeugfehler.
@@ -277,6 +293,8 @@ DIR=$(norm_pfad "$DIR") || fehler "Normalisierung DIR"
 SRC=$(norm_pfad "$SRC") || fehler "Normalisierung SRC"
 for p in "$DIR" "$SRC"; do
   case "$p" in
+    # S11-02 (r12, Codex-Lens r11 B): fuehrendes '-' auch NACH der Normalisierung ('./-n' wurde zu '-n', L10-05).
+    -*) fehler "'$p' beginnt nach der Normalisierung mit '-' (fuehrendes '-', L10-05/S11-02)" ;;
     ''|.|/*|..|../*|*/../*|*/..) fehler "'$p' muss ein relativer Pfad ohne '..' sein" ;;
     # L1-01 (r2): git add uebergeht Pfade mit einer .git-Komponente STILL (rc=0, nichts gestagt) -- ein solches
     # Ziel endete als gruener Job ohne Export.
