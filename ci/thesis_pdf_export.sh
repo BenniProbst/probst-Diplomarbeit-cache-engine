@@ -41,6 +41,13 @@
 # Erkennung per ls-tree je Seite, Werkzeugfehler = FEHLER; S9-06/L9-04 Credential-Maske bis zum letzten '@' vor
 # dem Pfad plus scp-Form; S9-07 CI-Werte (SHAs, Branch, Pipeline-ID) VOR jeder Ausgabe geprueft; S9-08 WERK-Pfad
 # selbst gebildet und mkdir NACH den Traps (kein Signalfenster); S9-09 fehler() und variable Ausgaben per printf.
+# REV r11 (Codex-Lens r10 B + Fable-Lens r10 + Lead K303/K304, 24.09.2026): S10-01 Branchname per git check-ref-
+# format, Push/Fetch immer auf die volle Ref refs/heads/<Branch>; S10-02 NA nur bei UNGESETZTER Variable (gesetzt =
+# streng geprueft, leer/'NA' = FEHLER); S10-03 mkdir VOR der WERK-Zuweisung (der Trap kennt nur eigene Ordner, nie
+# Fremdloeschung); S10-04 TMPDIR-Wache (absolut, nur [A-Za-z0-9._/-]; git ruft GIT_ASKPASS per Shell auf) + chmod
+# mit '--'; S10-05 Maske = Zusatzschutz, dritte Regel fuer Diagnoseformen ohne '//'; S10-06 fehler() ohne
+# abgeleitete Werte (SRC_K/WERK/TOP/WURZEL/DIR_K/DIR_F nur als Variablenname); S10-07 core.fileMode=true auch am
+# ungestagt-Diff; S10-08 hex40 = Vertrag Kleinhex (keine Normalisierung); L10-05 fuehrendes '-' in DIR/SRC = FEHLER.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -99,6 +106,10 @@ esac
 # erreichten sonst die git-Pfadquotierung (falsches Rot), Glob-/Magic-Zeichen ein literales Fehlziel; keine
 # '..'-Komponente, kein fuehrendes '/'; Meldungen ohne Rohwert, VOR jeder git-Wache und jeder Pfadausgabe.
 case "$DIR$SRC" in *[!A-Za-z0-9._/-]*) fehler "COMDARE_THESIS_PDF_DIR/SRC: unzulaessige Zeichen (S9-03)" ;; esac
+# L10-05 (r11, Fable-Lens r10): fuehrendes '-' = FEHLER (zweite Schicht neben dem '--' aller Aufrufe; ein Wert '-n'
+# wurde sonst als Verzeichnis '-n' exportiert).
+case "$DIR" in -*) fehler "COMDARE_THESIS_PDF_DIR: fuehrendes '-' (L10-05)" ;; esac
+case "$SRC" in -*) fehler "COMDARE_THESIS_PDF_SRC: fuehrendes '-' (L10-05)" ;; esac
 for p in "$DIR" "$SRC"; do
   case "$p" in
     /*|..|../*|*/..|*/../*) fehler "COMDARE_THESIS_PDF_DIR/SRC: relativer Pfad ohne '..' verlangt (S9-03)" ;;
@@ -106,34 +117,60 @@ for p in "$DIR" "$SRC"; do
 done
 BRANCH="${CI_COMMIT_BRANCH:?thesis_pdf_export: nur in Branch-Pipelines (CI_COMMIT_BRANCH fehlt)}"
 PIPE_SHA="${CI_COMMIT_SHA:?thesis_pdf_export: CI_COMMIT_SHA fehlt (Pipeline-Stand fuer die Stale-Pruefung)}"
-KURZ="${CI_COMMIT_SHORT_SHA:-NA}"
-PIPE_ID="${CI_PIPELINE_ID:-NA}"
 # S9-07 (r10, Codex-Lens r9 B): CI-Werte VOR jeder Ausgabe pruefen -- ein Token in CI_COMMIT_SHA/SHORT_SHA/BRANCH
 # stuende sonst im Verweigerungspfad ('HEAD != CI_COMMIT_SHA') oder in Commit-/Push-Meldungen im Log; Meldung ohne
-# Rohwert. Die Defaults NA (SHORT_SHA/PIPELINE_ID nur bei ungesetzter Variable) bleiben (ADV-r9-10).
+# Rohwert. Die Defaults NA (SHORT_SHA/PIPELINE_ID) gelten NUR bei ungesetzter Variable (ADV-r9-10).
+# S10-02 (r11, Codex-Lens r10 B): Setzstatus per ${VAR+x} -- ein GESETZTER Wert wird streng geprueft, leer oder 'NA'
+# = FEHLER (Variablen-Setzer-Klasse F-02; ':-NA' machte Leerwerte still zu NA und liess ein gesetztes 'NA' passieren).
+# S10-08 (r11): Vertrag = Kleinhex (git-Form); Grossschreibung = Fremdwert = FEHLER, keine Normalisierung (HEAD_SHA
+# und PIPE_SHA werden textuell verglichen).
 hex40() { case "$1" in ''|*[!0-9a-f]*) return 1 ;; esac; [ ${#1} -eq 40 ]; }
 hex40 "$PIPE_SHA" || fehler "CI_COMMIT_SHA: keine 40-stellige Hex-SHA (S9-07)"
-case "$KURZ" in NA) ;; ''|*[!0-9a-f]*) fehler "CI_COMMIT_SHORT_SHA: unzulaessige Zeichen (S9-07)" ;;
-  *) [ ${#KURZ} -ge 7 ] && [ ${#KURZ} -le 40 ] || fehler "CI_COMMIT_SHORT_SHA: Laenge nicht 7..40 (S9-07)" ;; esac
+if [ "${CI_COMMIT_SHORT_SHA+x}" = x ]; then
+  KURZ=$CI_COMMIT_SHORT_SHA
+  case "$KURZ" in ''|*[!0-9a-f]*) fehler "CI_COMMIT_SHORT_SHA: unzulaessige Zeichen (S9-07)" ;; esac
+  [ ${#KURZ} -ge 7 ] && [ ${#KURZ} -le 40 ] || fehler "CI_COMMIT_SHORT_SHA: Laenge nicht 7..40 (S9-07)"
+else
+  KURZ=NA
+fi
 case "$BRANCH" in ''|-*|*..*|*[!A-Za-z0-9._/-]*) fehler "CI_COMMIT_BRANCH: unzulaessige Zeichen (S9-07)" ;; esac
-case "$PIPE_ID" in NA) ;; ''|*[!0-9]*) fehler "CI_PIPELINE_ID: keine Zahl (S9-07)" ;; esac
+# S10-01 (r11, Codex-Lens r10 B; L10-07): vollstaendige Branchnamen-Pruefung (HEAD, x.lock, x/, '..', '@{' = FEHLER);
+# Push und Fetch adressieren unten IMMER die volle Ref refs/heads/$BRANCH -- ein Branch 'refs/heads/x' (legal, liegt
+# unter refs/heads/refs/heads/x) landete sonst auf Branch x.
+git check-ref-format --branch "$BRANCH" >/dev/null 2>&1 \
+  || fehler "CI_COMMIT_BRANCH: kein gueltiger Branchname (S10-01)"
+if [ "${CI_PIPELINE_ID+x}" = x ]; then
+  PIPE_ID=$CI_PIPELINE_ID
+  case "$PIPE_ID" in ''|*[!0-9]*) fehler "CI_PIPELINE_ID: keine Zahl (S9-07)" ;; esac
+else
+  PIPE_ID=NA
+fi
 export GIT_TERMINAL_PROMPT=0
 GITP="git -c credential.helper="
 # Hilfsdateien (Askpass-Helfer, Index-Liste, Push-Meldung) liegen in EINEM 0700-Wegwerfordner ausserhalb des
 # Arbeitsbaums und verschwinden mit dem Script.
 # S8-06 (r9): Traps VOR der Anlage (kein Signalfenster zwischen Anlage und Cleanup-Installation); der EXIT-Trap raeumt
 # nur, wenn WERK bereits gesetzt ist. S7-08 (r8b): Signale muenden in exit, damit der EXIT-Trap laeuft.
+# S10-04 (r11, Codex-Lens r10 B): TMPDIR-Wache VOR der Anlage -- git ruft GIT_ASKPASS per Shell auf; Leerraum oder
+# Metazeichen im Helfer-Pfad zerlegen den Aufruf (legitimer Export erst bei der Authentifizierung rot, Metazeichen =
+# Kommando-Injektion aus TMPDIR). Nur absolute Pfade aus [A-Za-z0-9._/-]; Meldung ohne Rohwert.
+T="${TMPDIR:-/tmp}"
+case "$T" in /*) ;; *) fehler "TMPDIR: kein absoluter Pfad (S10-04)" ;; esac
+case "$T" in *[!A-Za-z0-9._/-]*) fehler "TMPDIR: unzulaessige Zeichen (S10-04)" ;; esac
 WERK=''
 trap 'if [ -n "${WERK:-}" ]; then rm -rf -- "$WERK"; fi' EXIT
 trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
 # S9-08 (r10, Codex-Lens r9 B): mktemp liesse ein Signalfenster zwischen mkdir und Pfadausgabe (Ordner ohne WERK-
-# Zuweisung). Der Pfad wird selbst gebildet (od-Fehler = FEHLER), WERK VOR der Anlage gesetzt (der Trap kennt den
-# Pfad), dann mkdir ohne -p (Existenz = FEHLER; bei Fehlschlag wird WERK geleert, der Trap raeumt nichts Fremdes).
+# Zuweisung). Der Pfad wird selbst gebildet (od-Fehler = FEHLER), mkdir ohne -p (Existenz = FEHLER).
+# S10-03 (r11, Codex-Lens r10 B): mkdir VOR der WERK-Zuweisung -- WERK bezeichnet nur einen nachweislich EIGENEN
+# Ordner (bei Kollision mit einem fremden Pfad plus Signal raeumte der EXIT-Trap sonst Fremdes). Restfenster zwischen
+# Anlage und Zuweisung: hoechstens ein leeres eigenes 0700-Verzeichnis bleibt liegen, nie eine Fremdloeschung.
 zufall=$(od -An -N8 -tx1 /dev/urandom) || fehler "od /dev/urandom (S9-08)"
 zufall=$(printf '%s' "$zufall" | tr -d ' \n') || fehler "tr (S9-08)"
 [ ${#zufall} -eq 16 ] || fehler "Zufallsname unvollstaendig (S9-08)"
-WERK="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"
-mkdir -m 0700 -- "$WERK" || { WERK=''; fehler "Hilfsordner anlegen (S9-08)"; }
+kand="${TMPDIR:-/tmp}/thesis_pdf_export.$$.$zufall"
+mkdir -m 0700 -- "$kand" || fehler "Hilfsordner anlegen (S9-08)"
+WERK=$kand
 
 # Explizite Statusauswertung (0 = gleich / Vorfahr, 1 = verschieden / kein Vorfahr, sonst Abbruch): set -e
 # unterscheidet 1 nicht von einem Werkzeugfehler.
@@ -145,7 +182,7 @@ ist_vorfahr() { set +e; git merge-base --is-ancestor "$1" "$2"; _rc=$?; set -e
 # Ort und Stand: Repo-Wurzel, HEAD == Pipeline-Commit (Provenienz "PDF = CI_COMMIT_SHA").
 WURZEL=$(pwd -P) || fehler "pwd -P"
 TOP=$(git rev-parse --show-toplevel) || fehler "kein git-Arbeitsbaum"
-[ "$TOP" = "$WURZEL" ] || fehler "muss in der Repo-Wurzel laufen ($TOP != $WURZEL)"
+[ "$TOP" = "$WURZEL" ] || fehler "muss in der Repo-Wurzel laufen (TOP != WURZEL, S10-06)"
 HEAD_SHA=$(git rev-parse --verify HEAD) || fehler "HEAD nicht bestimmbar"
 hex40 "$HEAD_SHA" || fehler "HEAD: keine 40-stellige Hex-SHA (S9-07)"
 [ "$HEAD_SHA" = "$PIPE_SHA" ] || fehler "HEAD $HEAD_SHA != CI_COMMIT_SHA $PIPE_SHA (Export nur vom Pipeline-Stand)"
@@ -213,7 +250,7 @@ case "$1" in
   *) exit 1 ;;
 esac
 ASK
-  chmod 0700 "$WERK/askpass.sh"
+  chmod 0700 -- "$WERK/askpass.sh"   # S10-04 (r11): Trenner
   export COMDARE_WRITEBACK_USER COMDARE_WRITEBACK_TOKEN
   export GIT_ASKPASS="$WERK/askpass.sh"
 fi
@@ -256,16 +293,17 @@ SRC_K=$(readlink -f -- "$SRC") || fehler "readlink -f $SRC"
 # C6-08 (r7): Symmetrie zu DIR_K -- die Quelle darf nicht ueber einen Zwischen-Symlink aus dem Baum zeigen.
 case "$SRC_K/" in
   "$WURZEL/"*) ;;
-  *) fehler "$SRC (Quelle) liegt ausserhalb des Arbeitsbaums ($SRC_K, C6-08)" ;;
+  # S10-06 (r11): aufgeloeste Pfade (SRC_K/DIR_K/DIR_F), TOP/WURZEL und WERK nie in Meldungen (S8-05-Vertrag).
+  *) fehler "$SRC (Quelle) liegt ausserhalb des Arbeitsbaums (SRC_K, C6-08)" ;;
 esac
 [ "$DIR_K" != "$SRC_K" ] || fehler "Ziel und Quelle identisch ($DIR)"
 case "$DIR_K/" in
   "$WURZEL/"*) ;;
-  *) fehler "$DIR liegt ausserhalb des Arbeitsbaums ($DIR_K)" ;;
+  *) fehler "$DIR liegt ausserhalb des Arbeitsbaums (DIR_K, L1-02)" ;;
 esac
 mkdir -p -- "$DIR" || fehler "mkdir -p $DIR"
 DIR_F=$(readlink -f -- "$DIR") || fehler "readlink -f $DIR"
-[ "$DIR_F" = "$DIR_K" ] || fehler "$DIR: Kanonik nach mkdir ($DIR_F) weicht von der Vorpruefung ($DIR_K) ab"
+[ "$DIR_F" = "$DIR_K" ] || fehler "$DIR: Kanonik nach mkdir (DIR_F) weicht von der Vorpruefung (DIR_K) ab"
 
 n=0; gesehen=' '; pos=0
 for f in $FASSUNGEN; do
@@ -310,7 +348,7 @@ for f in $FASSUNGEN; do
   [ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion am Artefakt $dst (S9-01)"
   modus=$(git ls-files -s -- "$dst") || fehler "git ls-files -s $dst"; modus="${modus%% *}"
   [ "$modus" = "100644" ] || fehler "$dst steht mit Modus $modus statt 100644 im Index (S8-02)"
-  printf '%s\n' "$dst" >> "$WERK/dst.txt" || fehler "Zielliste $WERK/dst.txt"
+  printf '%s\n' "$dst" >> "$WERK/dst.txt" || fehler "Zielliste WERK/dst.txt"
   n=$((n+1))
   printf '%s\n' "Fassung $f: $groesse B nach $dst"
 done
@@ -332,7 +370,9 @@ while IFS= read -r zeile; do
   grep -q -x -F -- "$pf" "$WERK/dst.txt" || fremd=$((fremd+1))
 done < "$WERK/index.txt"
 [ "$fremd" -eq 0 ] || fehler "$fremd fremde Pfad(e) im Index (erlaubt ist nur die Fassungs-Liste, S7-03/S8-01)"
-ungestagt=$(git diff --name-only -- "$DIR") || fehler "git diff --name-only $DIR"
+# S10-07 (r11, Codex-Lens r10 B): core.fileMode=true auch hier -- unter fileMode=false bliebe ein reiner Modus-Wechsel
+# einer fremden getrackten Datei unter DIR unsichtbar (S7-03-Ausschluss unvollstaendig).
+ungestagt=$(git -c core.fileMode=true diff --name-only -- "$DIR") || fehler "git diff --name-only $DIR"
 [ -z "$ungestagt" ] || fehler "getrackte Aenderung(en) unter $DIR ausserhalb der Fassungs-Liste (ungestagt, S7-03)"
 set --
 while IFS= read -r p; do set -- "$@" "$p"; done < "$WERK/dst.txt"
@@ -363,15 +403,19 @@ done
 versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
-  if $GITP push -q -o ci.skip "$REMOTE" "HEAD:$BRANCH" 2>"$WERK/push.err"; then
+  if $GITP push -q -o ci.skip "$REMOTE" "HEAD:refs/heads/$BRANCH" 2>"$WERK/push.err"; then   # S10-01: volle Ref
     printf '%s\n' "PUSH OK (ci.skip) auf $BRANCH (Versuch $versuch)"; exit 0
   fi
   # S8-04 (r9, Haertung): git-Diagnostik nur mit Credential-Maske ausgeben (userinfo in URLs -> <cred>).
   printf '%s\n' "Push abgelehnt (Versuch $versuch), git meldet:"
   # S9-06/L9-04 (r10): Maske bis zum letzten '@' vor dem Pfad (deckt '@' im Kennwort) plus scp-Form user@host:pfad.
-  sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e 's/^/  | /' "$WERK/push.err"
-  $GITP fetch -q "$REMOTE" "$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"
-    sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e 's/^/  | /' "$WERK/fetch.err"
+  # S10-05 (r11, Codex-Lens r10 B; L10-06): Maske = Zusatzschutz (REMOTE ohne userinfo, F-01/S7-04), kein Vertrag
+  # ueber fremde Diagnoseformen; dritte Regel fuer Formen ohne '//' (scheme:user:kennwort@host/pfad).
+  sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
+    -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/push.err"
+  $GITP fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"   # S10-01
+    sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
+      -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/fetch.err"
     fehler "fetch $BRANCH fehlgeschlagen (Recht/Netz), kein Race"; }
   FERN=$(git rev-parse --short FETCH_HEAD) || fehler "git rev-parse FETCH_HEAD"
   if ist_vorfahr FETCH_HEAD HEAD; then
