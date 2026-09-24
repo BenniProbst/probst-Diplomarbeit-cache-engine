@@ -183,8 +183,21 @@
 #   P-83 F09-GATE-346 grep -o rc 2 = FEHLER 'grep Definitions-Token', kein Weiterlauf (C13-01 rc-Klassen)
 #   P-84 F09-GATE-346 chardef-Familie / P-85 plain-Allokatoren / P-86 LaTeX-Definierer = Definition (C13-02)
 #   P-87 Textwache Script-Kommentare rc-1-Zweig + Restfenster des mkdir-Kindes + REV-r14 (S13-01)
+#   r15 (Codex-Lens r14 A/B + Fable-Lens r14 + Owner-Order 455 O-15 (b), Lead K308/K310, 24.09.2026):
+#   P-24 (j) 289-Kopie mit anderem Font-Stand (Length1/2/3) bei gleichem Epoch + Fullbanner: 'Font-Stand abweichend
+#        (O-15b)' rc=0, kein Byte-Urteil; (k) 288-Bau ohne Length1: FEHLER 'keine eingebetteten Font-Programme' rc=1;
+#        (l) 289-Kopie ohne Length1: 'Font-Stand nicht lesbar' rc=0, kein Byte-Urteil (Order 455 / O-15 (b))
+#   P-88 F09-GATE-346 laengere Fremd-Definition \thesisumfangXthesisumfang: 0/1/1 gruen bzw. 0/0/0 FEHLER (C14-01)
+#   P-89 F09-GATE-346 '@' als Namenszeichen: makeatletter-Form 0/0/0, '\thesisumfang@foo' 1/1/0, Normalfall 1/2/1
+#        (C14-02, fail-closed)
+#   P-90 F09-GATE-346 Werkdatei 'ges' unschreibbar: FEHLER 'Werkdatei ges nicht schreibbar', kein altes Ergebnis
+#        zaehlt (C14-03)
+#   P-91 F09-GATE-346 '\font\thesisumfang=cmr10' = Definition + Textwache RESTRISIKO-Kommentar zweigeteilt (C14-04)
+#   P-92 Textwache Script-Kommentare S14-01..S14-05 + REV-r15 + YAML-Kommentar L14-03 (Kernel-Allokatoren)
+#   P-93 F09-GATE-346 Umlaut direkt am Namen unter LC_ALL=en_US.UTF-8: Vorkommen 2, Konsum 1 (L14-01, LC_ALL=C)
+#   P-94 F09-GATE-346 Kernel-/fontspec-Definierer newfontfamily / protected@edef = Definition (L14-04)
 #
-# SELBSTBISS (--selbstbiss): 112 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 120 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -243,6 +256,12 @@
 # Stufen (rc 2 verschluckt), M109 chardef-Familie weg, M110 plain-Allokatoren weg, M111 DeclareTextCommand/
 # DeclareMathOperator/CommandCopy weg, M112 DeclarePairedDelimiter weg; M48/M92 auf die Stufe-2-Zeilen, M104 auf
 # 'futurelet' der Primitiv-Liste, M91 auf die r14-Formenliste nachgezogen (literal per ersetze_literal).
+# r15 (Codex r14 C14-01..04, Fable r14 L14-01/L14-04, Order 455 O-15 (b), Lead K308/K310): YAML: M113 Stufe-2-Filter
+# der Definitionen ohne Backslash (r14-Form, Fremd-Definition verschluckt Konsum), M114 Token-Klasse ohne '@', M115
+# Truncation der Werkdateien entfernt (alter Inhalt bleibt), M116 'font' aus der Primitiv-Liste, M117 Font-Stand-
+# Vergleich entfernt, M118 fn-0-Wache am 288-Bau entfernt, M119 LC_ALL=C an beiden Stufe-1-Extraktionen entfernt,
+# M120 Kernel-/fontspec-Definierer aus der ERE; M92/M105/M106/M108 auf die r15-Zeilen nachgezogen; alle P-24-Fakes
+# tragen Length1/2/3 (Font-Stand, 3 Zeilen je Fassung); m119 entfaellt LAUT ohne Locale en_US.utf8.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -320,7 +339,8 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=57; MUT_N_YAML=55   # r14 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=57; MUT_N_YAML=63   # r15 (L9-01): Kopfkommentar == Summe (P-57)
+LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -812,12 +832,16 @@ epoch_zeit() { date -u -d "@$1" +%Y%m%d%H%M%S; }
 # r6: jede Fake-PDF traegt eine pdfTeX-Kennung (PTEX.Fullbanner) -- der r6-Block fordert sie am eigenen Bau GENAU
 # einmal (C4-03/C4-04); die Standard-Kennung entspricht der Form von pdfTeX 1.40.29 mit unescaped '(TeX Live 2026)'.
 BANNER_STD='This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) kpathsea version 6.4.1'
+FONT_STD=$(printf '/Length1 1830\n/Length2 11383\n/Length3 0')   # r15 (O-15b): Font-Stand-Zeilen der Fake-PDFs
+FONT_ALT=$(printf '/Length1 1831\n/Length2 11384\n/Length3 0')   # r15 (O-15b): anderer Font-Stand (P-24 (j))
 lege_pdf_epoch() { # $1 = Verzeichnis, $2 = Epoch, $3 = Marke, [$4 = Kennung; leer = keine Kennungszeile]
     if [ $# -ge 4 ]; then _kn="$4"; else _kn="$BANNER_STD"; fi
+    if [ -n "${LEGE_FONT+x}" ]; then _ft="$LEGE_FONT"; else _ft="$FONT_STD"; fi   # r15 (O-15b): leer = ohne Font-Stand
     for f in de-lang en-lang de-kurz en-kurz; do
         printf '%%PDF-1.4\n%% fassung %s %s\n/CreationDate (D:%sZ)\n%%%%EOF\n' "$f" "$3" "$(epoch_zeit "$2")" \
             > "$1/diplomarbeit-$f.pdf"
         [ -z "$_kn" ] || printf '/PTEX.Fullbanner (%s)\n' "$_kn" >> "$1/diplomarbeit-$f.pdf"
+        [ -z "$_ft" ] || printf '%s\n' "$_ft" >> "$1/diplomarbeit-$f.pdf"   # r15 (O-15b): Length1/2/3
         printf '/ID [<%s> <%s>]\n' "$f" "$f" >> "$1/diplomarbeit-$f.pdf"   # r7: Trailer-ID je jobname (L6-01)
     done
 }
@@ -1044,12 +1068,14 @@ LMK
     cat > "$d/bau.sh" <<'BAU'
 # BAU_BANNER: unset = Standard-Kennung (wie lege_pdf_epoch), gesetzt-leer = keine Kennung (Fall k4)
 BAU_BANNER="${BAU_BANNER-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) kpathsea version 6.4.1}"
+BAU_FONT="${BAU_FONT-$(printf '/Length1 1830\n/Length2 11383\n/Length3 0')}"   # r15 (O-15b): leer = ohne (Fall k)
 for f in de-lang en-lang de-kurz en-kurz; do
   printf '%%PDF-1.4\n%% fassung %s %s\n' "$f" "$BAU_MARKE" > "diplomarbeit-$f.pdf"
   [ -n "${BAU_NOCD:-}" ] || printf '/CreationDate (D:%sZ)\n' \
     "$(date -u -d "@${BAU_CD_EPOCH:-$SOURCE_DATE_EPOCH}" +%Y%m%d%H%M%S)" >> "diplomarbeit-$f.pdf"
   printf '%%%%EOF\n' >> "diplomarbeit-$f.pdf"
   [ -z "$BAU_BANNER" ] || printf '/PTEX.Fullbanner (%s)\n' "$BAU_BANNER" >> "diplomarbeit-$f.pdf"
+  [ -z "$BAU_FONT" ] || printf '%s\n' "$BAU_FONT" >> "diplomarbeit-$f.pdf"
 done
 [ -z "${BAU_DRIFT:-}" ] || printf '%% drift\n' >> "diplomarbeit-de-lang.pdf"
 [ -z "${BAU_GLEICH:-}" ] || cp diplomarbeit-de-lang.pdf diplomarbeit-de-kurz.pdf
@@ -1133,6 +1159,7 @@ for f in de-lang en-lang de-kurz en-kurz; do
     > "diplomarbeit-$f.pdf"
   printf '%% fassung %s %s\n/CreationDate (D:%sZ)\n/PTEX.Fullbanner (%s)\n%%%%EOF\n' "$f" "$BAU_MARKE" \
     "$(date -u -d "@$SOURCE_DATE_EPOCH" +%Y%m%d%H%M%S)" "$BAU_BANNER" >> "diplomarbeit-$f.pdf"
+  printf '/Length1 1830\n/Length2 11383\n/Length3 0\n' >> "diplomarbeit-$f.pdf"   # r15 (O-15b)
   printf '/ID [<%s> <%s>]\n' "$f" "$f" >> "diplomarbeit-$f.pdf"
 done
 BAU
@@ -1143,6 +1170,7 @@ BAU
             > "$MODUL/diplomarbeit-$f.pdf"
         printf '%% fassung %s writeback1\n/CreationDate (D:%sZ)\n/PTEX.Fullbanner (%s)\n%%%%EOF\n' "$f" \
             "$(epoch_zeit "$T1")" "$B289" >> "$MODUL/diplomarbeit-$f.pdf"
+        printf '/Length1 1830\n/Length2 11383\n/Length3 0\n' >> "$MODUL/diplomarbeit-$f.pdf"   # r15 (O-15b)
     done
     git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600270 "Y1g writeback mit Figur-Dict [skip ci]" \
         || { rot "Commit Y1g"; return; }
@@ -1389,6 +1417,38 @@ BAU
             erw_rc "$rc" 1; erw_text "$d/out_$nm" "kein Konsum von"
         done
     fi
+    # (j)/(k)/(l) O-15 (b) (Owner-Order 455, r15): Font-Stand-Kennung aus '/Length1 N' (+ Length2/3) der Fake-PDFs
+    # (Nenner: jede Fake-PDF traegt 3 Length-Zeilen, FONT_STD). (j) 289-Kopie mit anderem Font-Stand bei gleichem Epoch
+    # und gleicher Fullbanner-Kennung -> Zustand (3) 'Font-Stand abweichend (O-15b)' rc=0, kein Byte-Urteil (am r14-
+    # Block: Byte-Urteil -> FEHLER DRIFT rc=1); (k) eigener 288-Bau ohne Length1 -> FEHLER 'keine eingebetteten Font-
+    # Programme' rc=1; (l) 289-Kopie ohne Length1 -> Zustand (3) 'Font-Stand nicht lesbar' rc=0, kein Byte-Urteil.
+    stand "$X1" && git -C "$MODUL" checkout -q -B fnt "$X1" || { rot "Zweig fnt nicht setzbar"; return; }
+    LEGE_FONT="$FONT_ALT"; lege_pdf_epoch "$MODUL" "$T1" writeback1; unset LEGE_FONT
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600284 "Y1t writeback anderer Font-Stand [skip ci]" \
+        || { rot "Commit Y1t"; return; }
+    Y1T=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1t"; return; }
+    n_=$(git -C "$MODUL" show "$Y1T:diplomarbeit-de-lang.pdf" | grep -a -c '/Length[123] ')
+    erw_gleich "$n_" 3 "Nenner: Length-Zeilen in der 289-Kopie (j)"
+    stand "$Y1T" || { rot "Stand Y1t"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_j" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_j"
+    erw_rc "$rc" 0; erw_text "$d/out_j" "Font-Stand abweichend"; erw_text "$d/out_j" "O-15b"
+    erw_text "$d/out_j" "4 veraltet/abweichend"; erw_text "$d/out_j" "0 byte-gleich geprueft"
+    erw_kein_text "$d/out_j" "FEHLER"
+    stand "$Y1" || { rot "Stand Y1 (k)"; return; }                             # (k) 288-Bau ohne Length1
+    fahre_block "$d/lauf.sh" "$d/out_k" PATH="$P24_PATH" BAU_MARKE=writeback1 BAU_FONT=; rc=$?; zeige "$d/out_k"
+    erw_rc "$rc" 1; erw_text "$d/out_k" "FEHLER: keine eingebetteten Font-Programme im 288-Bau"
+    erw_kein_text "$d/out_k" "byte-gleich zur 289-Kopie"
+    stand "$X1" && git -C "$MODUL" checkout -q -B nofnt "$X1" || { rot "Zweig nofnt nicht setzbar"; return; }
+    LEGE_FONT=; lege_pdf_epoch "$MODUL" "$T1" writeback1; unset LEGE_FONT
+    git -C "$MODUL" add -- diplomarbeit-*.pdf && modul_commit 1758600286 "Y1u writeback ohne Font-Stand [skip ci]" \
+        || { rot "Commit Y1u"; return; }
+    Y1U=$(git -C "$MODUL" rev-parse HEAD) || { rot "rev-parse Y1u"; return; }
+    n_=$(git -C "$MODUL" show "$Y1U:diplomarbeit-de-lang.pdf" | grep -a -c '/Length[123] ')
+    erw_gleich "$n_" 0 "Nenner: Length-Zeilen in der 289-Kopie (l)"
+    stand "$Y1U" || { rot "Stand Y1u"; return; }
+    fahre_block "$d/lauf.sh" "$d/out_l" PATH="$P24_PATH" BAU_MARKE=writeback1; rc=$?; zeige "$d/out_l"
+    erw_rc "$rc" 0; erw_text "$d/out_l" "Font-Stand nicht lesbar"; erw_text "$d/out_l" "4 veraltet/abweichend"
+    erw_text "$d/out_l" "0 byte-gleich geprueft"; erw_kein_text "$d/out_l" "FEHLER"
 }
 fall_P25() { # L2-05: '//', '/./' und '/.' im Ziel werden gefaltet -> PUSH OK statt 'kein Stage-0-Eintrag'
     s="$1"; d="$T/P25"
@@ -2338,6 +2398,121 @@ fall_P87() { # S13-01: Textwache auf die berichtigten Script-Kommentare (rc-1-Zw
     n=$(grep -c '^# REV r14 ' "$s"); erw_gleich "$n" 1 "REV-r14-Kopf"
 }
 
+F14_X='\def\thesisumfangXthesisumfang{x}'; F14_M1='\makeatletter\def\thesisumfang@foo{x}\thesisumfang@foo\makeatother'
+F14_M2='\def\thesisumfang{x}\thesisumfang@foo'; F14_M3='\def\thesisumfang{x}\thesisumfang'
+F14_L11='F09-GATE-346: \thesisumfang Definitionen 1, Vorkommen 1, Konsum 0'
+F14_L011='F09-GATE-346: \thesisumfang Definitionen 0, Vorkommen 1, Konsum 1'
+fall_P88() { # C14-01: (a) laengere Fremd-Definition \thesisumfangXthesisumfang + Konsum = 0/1/1 gruen (r14: 1/1/0 =
+    # falsches Rot, Stufe 2 prueft nur das Namensende); (b) Fremd-Definition allein = 0/0/0 FEHLER (r14: 1/0/-1)
+    d="$T/P88"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 0 "$F14_L011" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_X" '\thesisumfang'
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_X"; erw_text "$d/out_b" "$F13_L0"
+}
+fall_P89() { # C14-02: '@' als Namenszeichen (fail-closed): (a) makeatletter-Form 0/0/0 FEHLER (r14: 1/2/1 fail-open);
+    # (b) '\def\thesisumfang{x}\thesisumfang@foo' 1/1/0 FEHLER (auch ausserhalb makeatletter); (c) Normalfall 1/2/1
+    d="$T/P89"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_M1"; erw_text "$d/out_a" "$F13_L0"
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_M2"; erw_text "$d/out_b" "$F14_L11"
+    f09_fall "$d" c 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F14_M3"
+}
+fall_P90() { # C14-03: Werkdatei 'ges' im Werkordner vorab unschreibbar (444) MIT altem Inhalt (3 Zeilen), per
+    # mktemp-Shim im PATH des Blocklaufs -> r15: FEHLER 'Werkdatei ges nicht schreibbar' rc=1 (r14 unter bash:
+    # Umleitung rc 1 = 'kein Treffer', der alte Inhalt zaehlte = gruen, fail-open); (k) Fixture ohne Shim = kein Konsum
+    d="$T/P90"; f09_vorbereitung "$d" || return; mkdir -p "$d/shim"; echt=$(command -v mktemp)
+    { printf '%s\n' '#!/bin/sh' "w=\$('$echt' \"\$@\") || exit \$?"; cat <<'SHIM'; } > "$d/shim/mktemp"
+case "$*" in *-d*) printf '%s\n' '\thesisumfang' '\thesisumfang' '\thesisumfang' > "$w/ges"; chmod 444 "$w/ges" ;; esac
+printf '%s\n' "$w"
+SHIM
+    chmod 0755 "$d/shim/mktemp"
+    git -C "$MODUL" checkout -q -B t90 "$X1" || { rot "Zweig t90 nicht setzbar"; return; }
+    printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F14 t90" || { rot "Commit t90"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand t90"; return; }
+    fahre_block "$d/f09.sh" "$d/out" PATH="$d/shim:$PATH"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "FEHLER: Werkdatei ges nicht schreibbar"
+    erw_text "$d/out" "FEHLER: F09-GATE-346 abgebrochen"; erw_kein_text "$d/out" "Vorkommen 3"
+    f09_fall "$d" k 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU"; erw_text "$d/out_k" "$F14_L11"
+}
+fall_P91() { # C14-04: '\font\thesisumfang=cmr10' = Definition (1/1/0 FEHLER; r14: 0/1/1 = Konsum, fail-open) + Konsum-
+    # Gegenprobe 1/2/1; Textwache RESTRISIKO-Kommentar zweigeteilt + 'font' + Optionalitaetszeichen (neu 1x, alt 0x)
+    d="$T/P91"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\font\thesisumfang=cmr10'; erw_text "$d/out_a" "$F14_L11"
+    f09_fall "$d" k 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\font\thesisumfang=cmr10' "$F11_KU"
+    n=$(grep -c -F 'enthalten kein literales \thesisumfang = 0/0/0 = FEHLER = fail-closed' "$CI_YML")
+    erw_gleich "$n" 1 "YAML 'enthalten kein literales \thesisumfang = 0/0/0 = FEHLER = fail-closed' (C14-04 i)"
+    n=$(grep -c -F '(\newcommandx, \DeclareTextSymbol) = 0/1/1 =' "$CI_YML")
+    erw_gleich "$n" 1 "YAML-Kommentar '(\newcommandx, \DeclareTextSymbol) = 0/1/1 =' (C14-04 ii)"
+    n=$(grep -c -F 'zaehlen als KONSUM = fail-open' "$CI_YML")
+    erw_gleich "$n" 0 "alte Fassung 'zaehlen als KONSUM = fail-open'"
+    n=$(grep -c -F 'toksdef, font;' "$CI_YML"); erw_gleich "$n" 1 "YAML-Kommentar 'toksdef, font;' (C14-04 iii)"
+    n=$(grep -c -F 'DeclareTextCommand(Default)?,' "$CI_YML")
+    erw_gleich "$n" 1 "YAML-Kommentar 'DeclareTextCommand(Default)?,'"
+    n=$(grep -c -F '(Expandable)?DocumentCommand, (New|Renew|Declare)CommandCopy' "$CI_YML")
+    erw_gleich "$n" 1 "YAML-Kommentar '(Expandable)?DocumentCommand, (New|Renew|Declare)CommandCopy'"
+    n=$(grep -c -F 'DeclarePairedDelimiter(X|XPP)?;' "$CI_YML")
+    erw_gleich "$n" 1 "YAML-Kommentar 'DeclarePairedDelimiter(X|XPP)?;'"
+}
+fall_P92() { # S14-01..S14-05 + REV-r15 (Codex-Lens r14 B, Lead-Hebung): Textwache auf die berichtigten Script-
+    # Kommentare (neue Literale 1x, alte 0x) + L14-03 (YAML-Kommentar Kernel-Allokatoren; nur mit F09-Block, sonst LAUT
+    # entfallen)
+    s="$1"
+    n=$(grep -c -F 'seit r13 abgeloest (S12-01)' "$s")
+    erw_gleich "$n" 1 "Kommentar 'seit r13 abgeloest (S12-01)' (S14-01)"
+    n=$(grep -c -F "'0 Reste' = r12-Messung" "$s"); erw_gleich "$n" 1 "Kommentar ''0 Reste' = r12-Messung' (S14-01)"
+    n=$(grep -c -F 'abgearbeitet (0 Reste)' "$s"); erw_gleich "$n" 0 "alte Fassung 'abgearbeitet (0 Reste)' (S14-01)"
+    n=$(grep -c -F 'unter TMPDIR bzw. /tmp' "$s"); erw_gleich "$n" 1 "Kommentar 'unter TMPDIR bzw. /tmp' (S14-02)"
+    n=$(grep -c -F 'bestaetigten Werkordner, nicht bei SIGKILL (S14-02)' "$s")
+    erw_gleich "$n" 1 "Kommentar 'bestaetigten Werkordner, nicht bei SIGKILL (S14-02)'"
+    n=$(grep -c -F 'Arbeitsbaums und verschwinden mit dem Script' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'Arbeitsbaums und verschwinden mit dem Script' (S14-02)"
+    n=$(grep -c -F 'gleicher Inhalt UND Modus 100644 UND Typ blob der Zielfassungen' "$s")
+    erw_gleich "$n" 1 "Kommentar 'gleicher Inhalt UND Modus 100644 UND Typ blob der Zielfassungen' (S14-03)"
+    n=$(grep -c -F 'byte-gleich zum lokalen Bestand ODER zum Remote-Tip' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'byte-gleich zum lokalen Bestand ODER zum Remote-Tip' (S14-03)"
+    n=$(grep -c -F 'im Modus --ci oder bei nicht leerer CI/GITLAB_CI-Variable laut' "$s")
+    erw_gleich "$n" 1 "Kommentar 'im Modus --ci oder bei nicht leerer CI/GITLAB_CI-Variable laut' (S14-04)"
+    n=$(grep -c -F 'in CI (CI/GITLAB_CI gesetzt) laut verweigert' "$s")
+    erw_gleich "$n" 0 "alte Fassung 'in CI (CI/GITLAB_CI gesetzt) laut verweigert' (S14-04)"
+    n=$(grep -c -F 'Position des doppelten Eintrags nennen' "$s")
+    erw_gleich "$n" 1 "Kommentar 'Position des doppelten Eintrags nennen' (S14-05)"
+    n=$(grep -c -F 'laut beim Namen nennen' "$s"); erw_gleich "$n" 0 "alte Fassung 'laut beim Namen nennen' (S14-05)"
+    n=$(grep -c '^# REV r15 ' "$s"); erw_gleich "$n" 1 "REV-r15-Kopf"
+    zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P92.f09")
+    if [ "$zf" -lt 3 ]; then
+        echo "      [ENTFAELLT] L14-03-Textwache: Block F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch pruefbar"
+    else
+        n=$(grep -c -F 'sind LaTeX-Kernel-Allokatoren, die uebrigen plain-TeX-Primitive (L14-03)' "$CI_YML")
+        erw_gleich "$n" 1 "YAML-Kommentar 'sind LaTeX-Kernel-Allokatoren, die uebrigen plain-TeX-Primitive (L14-03)'"
+        n=$(grep -c -F 'plain-Allokatoren newcount' "$CI_YML")
+        erw_gleich "$n" 0 "alte Fassung 'plain-Allokatoren newcount'"
+    fi
+}
+fall_P93() { # L14-01: Konsum NUR als '\thesisumfang' + a-Umlaut (UTF-8 C3 A4) direkt am Namen, Blocklauf unter
+    # LC_ALL=en_US.UTF-8: GNU grep zaehlte a-Umlaut in [A-Za-z] (Vorkommen 1 = falsches Rot); r15 pinnt LC_ALL=C je
+    # Stufe -> Vorkommen 2, Konsum 1, rc=0. Vorbedingung: Locale en_US.utf8 installiert (sonst GEMESSEN ohne Urteil).
+    d="$T/P93"; f09_vorbereitung "$d" || return
+    um=$(printf '\303\244'); git -C "$MODUL" checkout -q -B t93 "$X1" || { rot "Zweig t93 nicht setzbar"; return; }
+    printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "\\thesisumfang$um" > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F14 t93" || { rot "Commit t93"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand t93"; return; }
+    echo "      Nenner: locale -a | grep -c -i en_US.utf8 = $LOCALE_EN"
+    fahre_block "$d/f09.sh" "$d/out" LC_ALL=en_US.UTF-8; rc=$?; zeige "$d/out"
+    if [ "$LOCALE_EN" -lt 1 ]; then
+        echo "      [GEMESSEN] Locale en_US.utf8 fehlt -- rc=$rc ohne Urteil (L14-01)"; return
+    fi
+    erw_rc "$rc" 0; erw_text "$d/out" "$F11_K1"
+    fahre_block "$d/f09.sh" "$d/out_c" LC_ALL=C; rc=$?; zeige "$d/out_c"; erw_rc "$rc" 0; erw_text "$d/out_c" "$F11_K1"
+}
+fall_P94() { # L14-04: Kernel-/fontspec-Definierer '\newfontfamily\thesisumfang{Latin Modern Roman}' und
+    # '\protected@edef\thesisumfang{x}' = Definition (je 1/1/0 FEHLER; r14: 0/1/1 fail-open); Konsum-Gegenprobe 1/2/1
+    d="$T/P94"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\newfontfamily\thesisumfang{Latin Modern Roman}'
+    erw_text "$d/out_a" "$F14_L11"
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\protected@edef\thesisumfang{x}'
+    erw_text "$d/out_b" "$F14_L11"
+    f09_fall "$d" c 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\newfontfamily\thesisumfang{x}' '\thesisumfang'
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -2440,6 +2615,13 @@ fall P-84 fall_P84 "$SKRIPT"
 fall P-85 fall_P85 "$SKRIPT"
 fall P-86 fall_P86 "$SKRIPT"
 fall P-87 fall_P87 "$SKRIPT"
+fall P-88 fall_P88 "$SKRIPT"
+fall P-89 fall_P89 "$SKRIPT"
+fall P-90 fall_P90 "$SKRIPT"
+fall P-91 fall_P91 "$SKRIPT"
+fall P-92 fall_P92 "$SKRIPT"
+fall P-93 fall_P93 "$SKRIPT"
+fall P-94 fall_P94 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2669,7 +2851,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
         ENTF_N=$MUT_N_YAML
-        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94/m98-m100/m103-m112 (YAML):" \
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94/m98-m100/m103-m120 (YAML):" \
              "EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
@@ -2763,7 +2945,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M91 (r11, C10-02): Definitions-ERE zurueck auf die r10-Formenliste -> P-69 muss reissen
         ersetze_literal "$CI_YML" '|gdef|xdef' '' > "$MUT/m91.yml"   # r14: gdef/xdef aus der Primitiv-Liste
         # M92 (r11, C10-04): Definitionsziel ohne Control-Word-Grenze -> P-70 muss reissen
-        ersetze_literal "$CI_YML" '"${makro}\$" "$f09w/tokd"' '"${makro}" "$f09w/tokd"' > "$MUT/m92.yml"
+        ersetze_literal "$CI_YML" '"\\\\${makro}\$" "$f09w/tokd"' '"\\\\${makro}" "$f09w/tokd"' > "$MUT/m92.yml"   # r15
         # M93 (r11, C10-06): EXIT-Trap des F09-Blocks entfernt (Werkordner bleibt bei FEHLER) -> P-71 muss reissen
         sed '/^ *trap '"'"'rm -rf -- "\$f09w"'"'"' EXIT$/d' "$CI_YML" > "$MUT/m93.yml"
         # M94 (r11b, C10-06b): Subshell-rc-Fang hinter der Klammer entfernt (Job liefe ohne Messung weiter) -> P-72
@@ -2782,19 +2964,20 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M104 (r13, C12-01): futurelet aus der let-Familie entfernt -> P-79 (futurelet) muss reissen
         ersetze_literal "$CI_YML" '|futurelet' '' > "$MUT/m104.yml"   # r14: Primitiv-Liste
         # M105 (r14, C13-01): Stufe 1 der Definitionen zurueck auf die verbrauchende Wortgrenze -> P-80 (a) muss reissen
-        ersetze_literal "$CI_YML" '${makro}[A-Za-z]*" "$f09w/eins" > "$f09w/tokd"' \
-            '${makro}([^A-Za-z]|\$)" "$f09w/eins" > "$f09w/tokd"' \
+        ersetze_literal "$CI_YML" '${makro}[A-Za-z@]*" "$f09w/eins" > "$f09w/tokd"' \
+            '${makro}([^A-Za-z@]|\$)" "$f09w/eins" > "$f09w/tokd"' \
             > "$MUT/m105.yml"
         # M106 (r14, C13-01): Stufe 1 der Vorkommen zurueck auf die verbrauchende Wortgrenze -> P-81 (g) muss reissen
-        ersetze_literal "$CI_YML" '\\\\${makro}[A-Za-z]*" "$f09w/eins" > "$f09w/tokg"' \
-            '\\\\${makro}([^A-Za-z]|\$)" "$f09w/eins" > "$f09w/tokg"' \
+        ersetze_literal "$CI_YML" '\\\\${makro}[A-Za-z@]*" "$f09w/eins" > "$f09w/tokg"' \
+            '\\\\${makro}([^A-Za-z@]|\$)" "$f09w/eins" > "$f09w/tokg"' \
             > "$MUT/m106.yml"
         # M107 (r14, C13-01): beide Stufe-2-Filter ohne Endanker (Fremdname zaehlt) -> P-82 (e) muss reissen
         ersetze_literal "$CI_YML" '${makro}\$" "$f09w/tok' '${makro}" "$f09w/tok' > "$MUT/m107.yml"
         # M108 (r14, C13-01): Pipe statt zwei Stufen (rc 2 der Stufe 1 verschluckt) -> P-83 muss reissen
-        ersetze_literal "$CI_YML" '[A-Za-z]*" "$f09w/eins" > "$f09w/tokd"' \
-            '[A-Za-z]*" "$f09w/eins" | grep -E "${makro}\$" > "$f09w/def"' > "$MUT/m108.tmp"
-        ersetze_literal "$MUT/m108.tmp" 'grep -E "${makro}\$" "$f09w/tokd" > "$f09w/def" && dr=0 || dr=$?' \
+        ersetze_literal "$CI_YML" '[A-Za-z@]*" "$f09w/eins" > "$f09w/tokd"' \
+            '[A-Za-z@]*" "$f09w/eins" | LC_ALL=C grep -E "\\\\${makro}\$" > "$f09w/def"' > "$MUT/m108.tmp"
+        ersetze_literal "$MUT/m108.tmp" \
+            'LC_ALL=C grep -E "\\\\${makro}\$" "$f09w/tokd" > "$f09w/def" && dr=0 || dr=$?' \
             'dr=0' \
             > "$MUT/m108.yml"
         # M109 (r14, C13-02): chardef-Familie weg -> P-84 muss reissen
@@ -2808,15 +2991,40 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         ersetze_literal "$CI_YML" "$l111" '' > "$MUT/m111.yml"
         # M112 (r14, C13-02): DeclarePairedDelimiter weg -> P-86 (p) muss reissen
         ersetze_literal "$CI_YML" '|DeclarePairedDelimiter(X|XPP)?' '' > "$MUT/m112.yml"
+        # M113 (r15, C14-01): Stufe-2-Filter der Definitionen ohne Backslash (r14-Form) -> P-88 (a) muss reissen
+        ersetze_literal "$CI_YML" '"\\\\${makro}\$" "$f09w/tokd"' '"${makro}\$" "$f09w/tokd"' > "$MUT/m113.yml"
+        # M114 (r15, C14-02): Token-Klasse ohne '@' (beide Stufe-1-Extraktionen) -> P-89 (a) muss reissen
+        ersetze_literal "$CI_YML" '[A-Za-z@]*' '[A-Za-z]*' > "$MUT/m114.yml"
+        # M115 (r15, C14-03): Truncation der Werkdateien vor den vier Stufen entfernt -> P-90 muss reissen
+        sed '/^ *: > "\$f09w\/[a-z]*" || { echo "FEHLER: Werkdatei /d' "$CI_YML" > "$MUT/m115.yml"
+        # M116 (r15, C14-04): 'font' aus der Primitiv-Liste -> P-91 (a) muss reissen
+        ersetze_literal "$CI_YML" '|futurelet|font' '|futurelet' > "$MUT/m116.yml"
+        # M117 (r15, O-15b): Font-Stand-Vergleich entfernt -> P-24 (j) muss reissen
+        ersetze_literal "$CI_YML" 'elif [ "$f288" != "$f289" ]; then' 'elif false; then' > "$MUT/m117.yml"
+        # M118 (r15, O-15b): fn-0-Wache am eigenen 288-Bau entfernt -> P-24 (k) muss reissen
+        ersetze_literal "$CI_YML" 'lies_fontstand "$pdf" 288-Bau; test "$fn" -gt 0 \' \
+            'lies_fontstand "$pdf" 288-Bau; true \' > "$MUT/m118.yml"
+        # M119 (r15, L14-01): LC_ALL=C an beiden Stufe-1-Extraktionen entfernt -> P-93 muss reissen
+        ersetze_literal "$CI_YML" 'LC_ALL=C grep -o -E "${f09_def}' 'grep -o -E "${f09_def}' > "$MUT/m119.tmp"
+        ersetze_literal "$MUT/m119.tmp" 'LC_ALL=C grep -o -E "\\\\${makro}' 'grep -o -E "\\\\${makro}' > "$MUT/m119.yml"
+        # M120 (r15, L14-04): Kernel-/fontspec-Definierer aus der ERE -> P-94 (a) muss reissen
+        ersetze_literal "$CI_YML" '|newfontfamily|DeclareMathSymbol|protected@edef|protected@xdef' '' > "$MUT/m120.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
         M90=m90; M91=m91; M92=m92; M93=m93; M94=m94; M98=m98; M99=m99; M100=m100; M103=m103; M104=m104
         M105=m105; M106=m106; M107=m107; M108=m108; M109=m109; M110=m110; M111=m111; M112=m112
+        M113=m113; M114=m114; M115=m115; M116=m116; M117=m117; M118=m118; M119=m119; M120=m120
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-24)); ENTF_N=$((ENTF_N+24)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            MUT_N=$((MUT_N-30)); ENTF_N=$((ENTF_N+30)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
             M94=; M98=; M99=; M100=; M103=; M104=; M105=; M106=; M107=; M108=; M109=; M110=; M111=; M112=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m112 (F09-GATE-346):" \
+            M113=; M114=; M115=; M116=; M119=; M120=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m116 + m119 + m120" \
+                 "(F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
+        fi
+        if [ -n "$M119" ] && [ "$LOCALE_EN" -lt 1 ]; then
+            MUT_N=$((MUT_N-1)); ENTF_N=$((ENTF_N+1)); M119=
+            echo "  [ENTFAELLT] Mutante m119 (L14-01): Locale en_US.utf8 fehlt (locale -a: $LOCALE_EN)"
         fi
         if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
             MUT_N=$((MUT_N-4)); ENTF_N=$((ENTF_N+4)); M32=; M33=; M45=; M46=
@@ -2825,7 +3033,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
                  m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93 \
                  $M94 $M98 $M99 $M100 $M103 $M104 \
-                 $M105 $M106 $M107 $M108 $M109 $M110 $M111 $M112; do
+                 $M105 $M106 $M107 $M108 $M109 $M110 $M111 $M112 \
+                 $M113 $M114 $M115 $M116 $M117 $M118 $M119 $M120; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -2896,6 +3105,14 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M110" ] && biss_yml m110 fall_P85 P-85
         [ "$BISS_RC" -eq 0 ] && [ -n "$M111" ] && biss_yml m111 fall_P86 P-86
         [ "$BISS_RC" -eq 0 ] && [ -n "$M112" ] && biss_yml m112 fall_P86 P-86
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M113" ] && biss_yml m113 fall_P88 P-88
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M114" ] && biss_yml m114 fall_P89 P-89
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M115" ] && biss_yml m115 fall_P90 P-90
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M116" ] && biss_yml m116 fall_P91 P-91
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M117" ] && biss_yml m117 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M118" ] && biss_yml m118 fall_P24 P-24
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M119" ] && biss_yml m119 fall_P93 P-93
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M120" ] && biss_yml m120 fall_P94 P-94
     fi
 fi
 
