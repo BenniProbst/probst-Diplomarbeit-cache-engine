@@ -177,8 +177,14 @@
 #        rc-Nennung, Kandidat unangetastet (S12-01 i/iii)
 #   P-79 F09-GATE-346 Definitionsformen \expandafter (1x/2x), \futurelet, \global\expandafter\let\expandafter:
 #        nur Definition = FEHLER, Definition + Konsum = gruen (C12-01)
+#   P-80 F09-GATE-346 zwei adjazente Definitionen (\futurelet + \def; \def + \def) = 2/2/0 = FEHLER (C13-01)
+#   P-81 F09-GATE-346 adjazente Vorkommen zaehlen je einzeln: 0/2/2, 1/2/1, 1/2/1, 1/3/2 = gruen (C13-01)
+#   P-82 F09-GATE-346 Fremdname \thesisumfangX in beiden Stufen ausgeschlossen (0/0/0; 1/2/1) (C13-01)
+#   P-83 F09-GATE-346 grep -o rc 2 = FEHLER 'grep Definitions-Token', kein Weiterlauf (C13-01 rc-Klassen)
+#   P-84 F09-GATE-346 chardef-Familie / P-85 plain-Allokatoren / P-86 LaTeX-Definierer = Definition (C13-02)
+#   P-87 Textwache Script-Kommentare rc-1-Zweig + Restfenster des mkdir-Kindes + REV-r14 (S13-01)
 #
-# SELBSTBISS (--selbstbiss): 104 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 112 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -232,6 +238,11 @@
 # Definitions-ERE entfernt, M104 futurelet aus der let-Familie entfernt; M68/M84 auf die r13-Anlagezeile (Subshell)
 # und M49/M98 auf die r13-ERE-Zeile nachgezogen (literal per awk, ersetze_literal), P-48 nachgezogen; ok()/rot()
 # per printf (A-7).
+# r14 (Codex r13 C13-01/C13-02 + Lead K307): YAML: M105 Stufe 1 der Definitionen zurueck auf die verbrauchende
+# Wortgrenze, M106 dito Vorkommen, M107 Stufe-2-Filter ohne Endanker (Fremdname zaehlt), M108 Pipe statt zwei
+# Stufen (rc 2 verschluckt), M109 chardef-Familie weg, M110 plain-Allokatoren weg, M111 DeclareTextCommand/
+# DeclareMathOperator/CommandCopy weg, M112 DeclarePairedDelimiter weg; M48/M92 auf die Stufe-2-Zeilen, M104 auf
+# 'futurelet' der Primitiv-Liste, M91 auf die r14-Formenliste nachgezogen (literal per ersetze_literal).
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -309,7 +320,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=57; MUT_N_YAML=47   # r13 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=57; MUT_N_YAML=55   # r14 (L9-01): Kopfkommentar == Summe (P-57)
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -2241,6 +2252,92 @@ fall_P79() { # C12-01: Definitionsformen mit \expandafter zwischen Kommando und 
     f09_fall "$d" k4 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$GL" "$F11_KU"
 }
 
+F13_A='\futurelet\thesisumfang\def\thesisumfang{lang}'; F13_B='\def\thesisumfang{x}\def\thesisumfang{y}'
+F13_C='\let\thesisumfang\relax\thesisumfang'; F13_G='\thesisumfang\thesisumfang'
+F13_I='\futurelet\thesisumfang\thesisumfang'
+F13_J='\ifx\thesisumfang\undefined\def\thesisumfang{lang}\fi \thesisumfang'; F13_E='\newcommand*{\thesisumfangX}{x}'
+F13_L0='F09-GATE-346: \thesisumfang Definitionen 0, Vorkommen 0, Konsum 0'
+F13_L2='F09-GATE-346: \thesisumfang Definitionen 2, Vorkommen 2, Konsum 0'
+F13_L02='F09-GATE-346: \thesisumfang Definitionen 0, Vorkommen 2, Konsum 2'
+F13_L13='F09-GATE-346: \thesisumfang Definitionen 1, Vorkommen 3, Konsum 2'
+fall_P80() { # C13-01 (a)/(b): zwei adjazente Definitionen = 2/2/0 = FEHLER (r13: 1/2/1 = fail-open, die verbrauchende
+    # Wortgrenze schluckte den Backslash der Folge-Definition; r14 zaehlt zweistufig per Token-Extraktion)
+    d="$T/P80"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_A"; erw_text "$d/out_a" "$F13_L2"
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_B"; erw_text "$d/out_b" "$F13_L2"
+}
+fall_P81() { # C13-01 (g)/(i)/(c)/(j): adjazente Vorkommen zaehlen je einzeln (r13: (g) 0/1/1, (i) 1/1/0 = falsch)
+    d="$T/P81"; f09_vorbereitung "$d" || return
+    f09_fall "$d" g 0 "$F13_L02" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_G"
+    f09_fall "$d" i 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_I"
+    f09_fall "$d" c 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_C"
+    f09_fall "$d" j 0 "$F13_L13" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_J"
+}
+fall_P82() { # C13-01 (e): Fremdname \thesisumfangX bleibt in BEIDEN Stufen ausgeschlossen (0/0/0; mit echter Definition
+    # + Konsum 1/2/1 unveraendert)
+    d="$T/P82"; f09_vorbereitung "$d" || return
+    f09_fall "$d" e 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" "$F13_E"; erw_text "$d/out_e" "$F13_L0"
+    f09_fall "$d" e2 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F13_E" \
+        "$F11_KU"
+}
+fall_P83() { # C13-01 rc-Klassen der Stufen: grep -o endet mit rc 2 (Werkzeugfehler) = FEHLER 'grep Definitions-
+    # Token', kein Weiterlauf (eine Pipe statt zweier Stufen verschluckte den rc 2 hinter dem rc-1-Filter, pipefail)
+    d="$T/P83"; f09_vorbereitung "$d" || return; mkdir -p "$d/shim"; echt=$(command -v grep)
+    { printf '%s\n' '#!/bin/sh' 'case "$1" in -o) exit 2 ;; esac' "exec '$echt' \"\$@\""; } > "$d/shim/grep"
+    chmod 0755 "$d/shim/grep"
+    git -C "$MODUL" checkout -q -B t83 "$X1" || { rot "Zweig t83 nicht setzbar"; return; }
+    printf '%s\n' "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F11_KU" > "$MODUL/diplomarbeit.tex"
+    git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F13 t83" || { rot "Commit t83"; return; }
+    stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand t83"; return; }
+    fahre_block "$d/f09.sh" "$d/out" PATH="$d/shim:$PATH"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "FEHLER: grep Definitions-Token"
+    erw_text "$d/out" "FEHLER: F09-GATE-346 abgebrochen"
+    erw_kein_text "$d/out" 'F09-GATE-346: \thesislang Definitionen'
+}
+fall_P84() { # C13-02 TeX-Primitive (chardef-Familie): '\chardef\thesisumfang=0' / '\countdef' = Definition (1/1/0 =
+    # FEHLER; r13: 0/1/1 fail-open), mit Konsum 1/2/1
+    d="$T/P84"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\chardef\thesisumfang=0'
+    erw_text "$d/out_a" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\countdef\thesisumfang=10'
+    erw_text "$d/out_b" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" k 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\chardef\thesisumfang=0' "$F11_KU"
+}
+fall_P85() { # C13-02 plain-Allokatoren: '\newcount\thesisumfang' / '\newsavebox{\thesisumfang}' = Definition
+    d="$T/P85"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\newcount\thesisumfang'
+    erw_text "$d/out_a" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\newsavebox{\thesisumfang}'
+    erw_text "$d/out_b" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" k 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\newcount\thesisumfang' "$F11_KU"
+}
+fall_P86() { # C13-02 LaTeX-Definierer: DeclareTextCommand(Default), DeclareMathOperator*, NewCommandCopy,
+    # DeclarePairedDelimiter = Definition (je 1/1/0 = FEHLER; r13: 0/1/1 fail-open), mit Konsum 1/2/1
+    d="$T/P86"; f09_vorbereitung "$d" || return
+    f09_fall "$d" a 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\DeclareTextCommand{\thesisumfang}{T1}{x}'
+    erw_text "$d/out_a" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" b 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\DeclareMathOperator*{\thesisumfang}{lang}'
+    erw_text "$d/out_b" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" c 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\NewCommandCopy\thesisumfang\foo'
+    erw_text "$d/out_c" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" p 1 "$F11_KO" "$F11_DC" "$F11_DL" "$F11_KL" '\DeclarePairedDelimiter\thesisumfang{\lbrace}{\rbrace}'
+    erw_text "$d/out_p" 'Definitionen 1, Vorkommen 1'
+    f09_fall "$d" k 0 "$F11_K1" "$F11_DC" "$F11_DL" "$F11_KL" '\DeclareTextCommandDefault{\thesisumfang}{x}' "$F11_KU"
+}
+fall_P87() { # S13-01: Textwache auf die berichtigten Script-Kommentare (rc-1-Zweig ohne Nummer; Restfenster des
+    # mkdir-Kindes nicht nur SIGKILL) + REV-r14-Kopf; alte absolute SIGKILL-Aussage 0x
+    s="$1"
+    n=$(grep -c -F 'rc 1 = FEHLER (S9-08), jeder andere rc = FEHLER mit rc-Nennung' "$s")
+    erw_gleich "$n" 1 "Kommentar 'rc 1 = FEHLER (S9-08), jeder andere rc = FEHLER mit rc-Nennung' (S13-01)"
+    n=$(grep -c -F 'ein Abbruch ohne Erfolgsstatus (SIGKILL, andere Signale, Werkzeugfehler' "$s")
+    erw_gleich "$n" 1 "Kommentar 'ein Abbruch ohne Erfolgsstatus (SIGKILL, andere Signale, Werkzeugfehler' (S13-01)"
+    n=$(grep -c -F 'der Kandidat wird nie angefasst (S13-01)' "$s")
+    erw_gleich "$n" 1 "Kommentar 'der Kandidat wird nie angefasst (S13-01)'"
+    n=$(grep -c -F 'nur SIGKILL (nicht behandelbar) kann ein leeres Rest-Verzeichnis hinterlassen' "$s")
+    erw_gleich "$n" 0 "alte Zusage 'nur SIGKILL (nicht behandelbar) kann ein leeres Rest-Verzeichnis hinterlassen'"
+    n=$(grep -c '^# REV r14 ' "$s"); erw_gleich "$n" 1 "REV-r14-Kopf"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -2335,6 +2432,14 @@ fall P-76 fall_P76 "$SKRIPT"
 fall P-77 fall_P77 "$SKRIPT"
 fall P-78 fall_P78 "$SKRIPT"
 fall P-79 fall_P79 "$SKRIPT"
+fall P-80 fall_P80 "$SKRIPT"
+fall P-81 fall_P81 "$SKRIPT"
+fall P-82 fall_P82 "$SKRIPT"
+fall P-83 fall_P83 "$SKRIPT"
+fall P-84 fall_P84 "$SKRIPT"
+fall P-85 fall_P85 "$SKRIPT"
+fall P-86 fall_P86 "$SKRIPT"
+fall P-87 fall_P87 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2564,7 +2669,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
         ENTF_N=$MUT_N_YAML
-        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94/m98-m100/m103-m104 (YAML):" \
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94/m98-m100/m103-m112 (YAML):" \
              "EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
@@ -2640,7 +2745,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's/^\( *\)\*) echo "FEHLER: unerwarteter Wert --is-shallow-repository.*/\1*) : ;;/' \
             "$CI_YML" > "$MUT/m47.yml"
         # M48 (r8): Konsum ohne Control-Word-Grenze (\thesislangAlt zaehlt) -> P-24 (p4) muss reissen (C7-05; Koppel)
-        sed '/f09w\/ges"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m48.yml"   # r11: nur die Vorkommen-Zeile
+        ersetze_literal "$CI_YML" '"^\\\\${makro}\$" "$f09w/tokg"' '"^\\\\${makro}" "$f09w/tokg"' > "$MUT/m48.yml"
         # M49 (r8): Definitionsfilter ohne '\*?' (\newcommand* zaehlt als Konsum) -> P-24 (p5) reissen (C7-05; Koppel)
         # r12: '\*?' steht hinter dem fuehrenden Leerraum der 3. f09_def-Zeile
         ersetze_literal "$CI_YML" '\*?[[:space:]]*\{?' '[[:space:]]*\{?' > "$MUT/m49.yml"   # r13: literal (ERE-Zeile)
@@ -2656,11 +2761,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed 's|^\( *\)f09_strip() { sed -E .*|\1f09_strip() { sed -e '"'"'s/\\(^\\\|[^\\\\]\\)%.*$/\\1/'"'"'; }|' \
             "$CI_YML" > "$MUT/m90.yml"
         # M91 (r11, C10-02): Definitions-ERE zurueck auf die r10-Formenliste -> P-69 muss reissen
-        sed -e '/^ *f09_def=.\\\\(providecommand/s/|\[gx\]def|let|DeclareRobustCommand/|let/' \
-            -e 's/|(New|Renew|Provide|Declare)(Expandable)?DocumentCommand|(new|renew|provide)robustcmd)/)/' \
-            "$CI_YML" > "$MUT/m91.yml"
+        ersetze_literal "$CI_YML" '|gdef|xdef' '' > "$MUT/m91.yml"   # r14: gdef/xdef aus der Primitiv-Liste
         # M92 (r11, C10-04): Definitionsziel ohne Control-Word-Grenze -> P-70 muss reissen
-        sed '/f09w\/def"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m92.yml"
+        ersetze_literal "$CI_YML" '"${makro}\$" "$f09w/tokd"' '"${makro}" "$f09w/tokd"' > "$MUT/m92.yml"
         # M93 (r11, C10-06): EXIT-Trap des F09-Blocks entfernt (Werkordner bleibt bei FEHLER) -> P-71 muss reissen
         sed '/^ *trap '"'"'rm -rf -- "\$f09w"'"'"' EXIT$/d' "$CI_YML" > "$MUT/m93.yml"
         # M94 (r11b, C10-06b): Subshell-rc-Fang hinter der Klammer entfernt (Job liefe ohne Messung weiter) -> P-72
@@ -2677,14 +2780,42 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         # M103 (r13, C12-01): expandafter-Erweiterung der Definitions-ERE entfernt -> P-79 muss reissen
         ersetze_literal "$CI_YML" '([[:space:]]*\\expandafter)*' '' > "$MUT/m103.yml"
         # M104 (r13, C12-01): futurelet aus der let-Familie entfernt -> P-79 (futurelet) muss reissen
-        ersetze_literal "$CI_YML" '(future)?let' 'let' > "$MUT/m104.yml"
+        ersetze_literal "$CI_YML" '|futurelet' '' > "$MUT/m104.yml"   # r14: Primitiv-Liste
+        # M105 (r14, C13-01): Stufe 1 der Definitionen zurueck auf die verbrauchende Wortgrenze -> P-80 (a) muss reissen
+        ersetze_literal "$CI_YML" '${makro}[A-Za-z]*" "$f09w/eins" > "$f09w/tokd"' \
+            '${makro}([^A-Za-z]|\$)" "$f09w/eins" > "$f09w/tokd"' \
+            > "$MUT/m105.yml"
+        # M106 (r14, C13-01): Stufe 1 der Vorkommen zurueck auf die verbrauchende Wortgrenze -> P-81 (g) muss reissen
+        ersetze_literal "$CI_YML" '\\\\${makro}[A-Za-z]*" "$f09w/eins" > "$f09w/tokg"' \
+            '\\\\${makro}([^A-Za-z]|\$)" "$f09w/eins" > "$f09w/tokg"' \
+            > "$MUT/m106.yml"
+        # M107 (r14, C13-01): beide Stufe-2-Filter ohne Endanker (Fremdname zaehlt) -> P-82 (e) muss reissen
+        ersetze_literal "$CI_YML" '${makro}\$" "$f09w/tok' '${makro}" "$f09w/tok' > "$MUT/m107.yml"
+        # M108 (r14, C13-01): Pipe statt zwei Stufen (rc 2 der Stufe 1 verschluckt) -> P-83 muss reissen
+        ersetze_literal "$CI_YML" '[A-Za-z]*" "$f09w/eins" > "$f09w/tokd"' \
+            '[A-Za-z]*" "$f09w/eins" | grep -E "${makro}\$" > "$f09w/def"' > "$MUT/m108.tmp"
+        ersetze_literal "$MUT/m108.tmp" 'grep -E "${makro}\$" "$f09w/tokd" > "$f09w/def" && dr=0 || dr=$?' \
+            'dr=0' \
+            > "$MUT/m108.yml"
+        # M109 (r14, C13-02): chardef-Familie weg -> P-84 muss reissen
+        ersetze_literal "$CI_YML" '|chardef|mathchardef|countdef|dimendef|skipdef|muskipdef|toksdef' '' \
+            > "$MUT/m109.yml"
+        # M110 (r14, C13-02): plain-Allokatoren weg -> P-85 muss reissen
+        l110='|newcount|newdimen|newskip|newmuskip|newbox|newtoks|newread|newwrite|newlength|newsavebox'
+        ersetze_literal "$CI_YML" "$l110" '' > "$MUT/m110.yml"
+        # M111 (r14, C13-02): DeclareTextCommand / DeclareMathOperator / CommandCopy weg -> P-86 muss reissen
+        l111='|DeclareTextCommand(Default)?|DeclareMathOperator|(New|Renew|Declare)CommandCopy'
+        ersetze_literal "$CI_YML" "$l111" '' > "$MUT/m111.yml"
+        # M112 (r14, C13-02): DeclarePairedDelimiter weg -> P-86 (p) muss reissen
+        ersetze_literal "$CI_YML" '|DeclarePairedDelimiter(X|XPP)?' '' > "$MUT/m112.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
         M90=m90; M91=m91; M92=m92; M93=m93; M94=m94; M98=m98; M99=m99; M100=m100; M103=m103; M104=m104
+        M105=m105; M106=m106; M107=m107; M108=m108; M109=m109; M110=m110; M111=m111; M112=m112
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-16)); ENTF_N=$((ENTF_N+16)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
-            M94=; M98=; M99=; M100=; M103=; M104=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m104 (F09-GATE-346):" \
+            MUT_N=$((MUT_N-24)); ENTF_N=$((ENTF_N+24)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            M94=; M98=; M99=; M100=; M103=; M104=; M105=; M106=; M107=; M108=; M109=; M110=; M111=; M112=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 + m98-m100 + m103-m112 (F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
         fi
         if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
@@ -2693,7 +2824,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         fi
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
                  m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93 \
-                 $M94 $M98 $M99 $M100 $M103 $M104; do
+                 $M94 $M98 $M99 $M100 $M103 $M104 \
+                 $M105 $M106 $M107 $M108 $M109 $M110 $M111 $M112; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -2756,6 +2888,14 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M100" ] && biss_yml m100 fall_P77 P-77
         [ "$BISS_RC" -eq 0 ] && [ -n "$M103" ] && biss_yml m103 fall_P79 P-79
         [ "$BISS_RC" -eq 0 ] && [ -n "$M104" ] && biss_yml m104 fall_P79 P-79
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M105" ] && biss_yml m105 fall_P80 P-80
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M106" ] && biss_yml m106 fall_P81 P-81
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M107" ] && biss_yml m107 fall_P82 P-82
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M108" ] && biss_yml m108 fall_P83 P-83
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M109" ] && biss_yml m109 fall_P84 P-84
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M110" ] && biss_yml m110 fall_P85 P-85
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M111" ] && biss_yml m111 fall_P86 P-86
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M112" ] && biss_yml m112 fall_P86 P-86
     fi
 fi
 
