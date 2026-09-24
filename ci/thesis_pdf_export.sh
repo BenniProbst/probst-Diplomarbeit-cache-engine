@@ -53,8 +53,11 @@
 # danach Signal-Traps zurueck auf exit und ein vorgemerktes Signal per exit abgearbeitet (0 Reste); S11-02 fuehrendes
 # '-' auch NACH der Normalisierung in der gemeinsamen Wache ('./-n' wurde zu '-n' und exportiert).
 # REV r13 (Codex-Lens r12 A + B, Fable-Lens r12, Lead K306, 24.09.2026): S12-01 kein rmdir/rm auf einen unbestaetigten
-# Kandidaten (nur rc 0 setzt WERK, jeder andere rc = FEHLER mit rc-Nennung, Kandidat unangetastet); das mkdir-Kind ist
-# gegen HUP/INT/TERM immun (Subshell trap '' + exec), die Elternshell merkt weiter vor.
+# Kandidaten (nur rc 0 setzt WERK, rc 1 = FEHLER (S9-08), jeder andere rc = FEHLER mit rc-Nennung, Kandidat
+# unangetastet); das mkdir-Kind ist gegen HUP/INT/TERM immun (Subshell trap '' + exec), die Elternshell merkt
+# weiter vor.
+# REV r14 (Codex-Lens r13 B S13-01, Lead K307, 24.09.2026): nur Kommentare berichtigt (rc-1-Zweig nennt keine Nummer;
+# das Restfenster des mkdir-Kindes ist nicht nur SIGKILL), keine funktionale Aenderung (A-2 des Fix r13 bleibt).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
@@ -180,7 +183,8 @@ trap 'sig=129' HUP; trap 'sig=130' INT; trap 'sig=143' TERM
 # UNBESTAETIGT: FEHLER mit rc-Nennung, der Kandidat bleibt unangetastet (kein rmdir/rm ohne Eigentumsnachweis --
 # ein fremdes leeres Verzeichnis unter dem Kandidatennamen wuerde sonst entfernt). Das mkdir-Kind ignoriert
 # HUP/INT/TERM (Subshell mit trap '' + exec; das Ignorieren vererbt sich ueber exec, die Elternshell merkt weiter
-# vor); nur SIGKILL (nicht behandelbar) kann ein leeres Rest-Verzeichnis hinterlassen.
+# vor). HUP/INT/TERM werden im Kind ignoriert; ein Abbruch ohne Erfolgsstatus (SIGKILL, andere Signale, Werkzeugfehler
+# nach der Anlage) kann einen leeren EIGENEN Rest hinterlassen -- der Kandidat wird nie angefasst (S13-01).
 zufall=$(od -An -N8 -tx1 /dev/urandom) || fehler "od /dev/urandom (S9-08)"
 zufall=$(printf '%s' "$zufall" | tr -d ' \n') || fehler "tr (S9-08)"
 [ ${#zufall} -eq 16 ] || fehler "Zufallsname unvollstaendig (S9-08)"
