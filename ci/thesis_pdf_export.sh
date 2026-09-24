@@ -62,13 +62,20 @@
 # REV r15 (Codex-Lens r14 B S14-01..S14-05 + Fable-Lens r14, Lead K308/K310, 24.09.2026): nur Kommentare berichtigt
 # (Werkordner-Lage + Trap-Reichweite, Commit-Bedingung Inhalt + Modus + Typ, CI-Verweigerung per Leerheit der Variable,
 # r12-Historie als abgeloest gekennzeichnet, Duplikat-Meldung per Position); keine funktionale Aenderung.
+# REV r16 (Codex-Lens r15 A C15-01..05, B2 S15-01..S15-05, B1 S15-07 + Fable-Lens r15 L15-01, Lead K312, 24.09.2026):
+# nur Kommentare berichtigt (PDF-Praefixtest statt 'ein PDF', lokale und Remote-Gleichheit getrennt, Push-Refspec
+# refs/heads/$BRANCH, Fetch + Abstammungspruefung nach jedem abgelehnten Push, Diff-Leerheit auch bei Moduswechsel,
+# Zielverzeichnis statt 'erster Seiteneffekt'); keine funktionale Aenderung.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
-# jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
-# docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
-# ueberschreibend; gleicher Inhalt UND Modus 100644 UND Typ blob der Zielfassungen (zum lokalen Bestand ODER zum
-# Remote-Tip) = kein Commit / kein Push (S7-01/S8-02); Commit und
-# Merge-Commit tragen '[skip ci]', Push mit -o ci.skip auf HEAD:$CI_COMMIT_BRANCH (Order 340 A-01 (c): eigener
-# Branch); COMDARE_WRITEBACK_USER/TOKEN gehen NUR ueber GIT_ASKPASS (nie in URL, argv, .git/config oder Log);
+# jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
+# 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
+# Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf, ueberschreibend; lokal:
+# gleicher Inhalt UND Modus 100644 UND Typ blob der Zielfassungen, gemessen als leerer gestagter Diff
+# (diff_gleich --cached vor dem Commit) = kein Commit, kein Push; remote gleich nach Fetch (F-07, diff_gleich HEAD
+# FETCH_HEAD) = kein weiterer Merge/Push -- ein bereits erstellter Commit und ein abgelehnter Push-Versuch liegen
+# dann vor (S7-01/S8-02/S15-01); Commit und Merge-Commit tragen '[skip ci]',
+# Push mit -o ci.skip auf HEAD:refs/heads/$BRANCH (S10-01; Order 340 A-01 (c): eigener Branch);
+# COMDARE_WRITEBACK_USER/TOKEN gehen NUR ueber GIT_ASKPASS (nie in URL, argv, .git/config oder Log);
 # bei Ablehnung fetch + Pruefung + merge (nie rebase), max 5 Versuche; hat sich der Thesis-Gitlink oder das
 # CI-Rezept seit CI_COMMIT_SHA bewegt = UEBERHOLT (rc=0, kein Push alter PDFs; exportiert wird beim naechsten Push,
 # der eine Pipeline erzeugt -- ein [skip ci]-Bot-Commit, der den Gitlink bewegt, erzeugt selbst keine);
@@ -320,9 +327,10 @@ for p in "$DIR" "$SRC"; do
 done
 [ ! -L "$DIR" ] || fehler "$DIR ist ein Symlink (Zielordner verboten)"
 [ -d "$SRC" ] || fehler "Quelle $SRC fehlt (Artefakt des thesis:pdf-Jobs)"
-# L1-02 (r2): Kanonik und Arbeitsbaum-Grenze VOR dem ersten Seiteneffekt. readlink -m loest auch noch fehlende
-# Glieder auf; ein getrackter Zwischen-Symlink (docs/ext -> ../../aussen) darf nicht einmal ein leeres Verzeichnis
-# ausserhalb des Baums anlegen. readlink -f nach mkdir bleibt als zweite Schicht.
+# L1-02 (r2): Kanonik und Arbeitsbaum-Grenze VOR dem Anlegen des Zielverzeichnisses (Werkordner und Askpass-Datei
+# entstehen frueher; S15-05). readlink -m loest auch noch fehlende Glieder auf; ein getrackter Zwischen-Symlink
+# (docs/ext -> ../../aussen) darf nicht einmal ein leeres Verzeichnis ausserhalb des Baums anlegen. readlink -f nach
+# mkdir bleibt als zweite Schicht.
 DIR_K=$(readlink -m -- "$DIR") || fehler "readlink -m $DIR"
 SRC_K=$(readlink -f -- "$SRC") || fehler "readlink -f $SRC"
 # C6-08 (r7): Symmetrie zu DIR_K -- die Quelle darf nicht ueber einen Zwischen-Symlink aus dem Baum zeigen.
@@ -390,7 +398,8 @@ for f in $FASSUNGEN; do
 done
 [ "$n" -gt 0 ] || fehler "keine Fassung in COMDARE_THESIS_PDF_FASSUNGEN"
 # L1-01 (r2): Nachzaehlung nach der Schleife -- alle n Zieldateien stehen im Index unter $DIR/ (nicht ueber
-# diff --cached: bei byte-gleichem Bestand ist der gestagte Diff leer, und UNVERAENDERT unten ist der richtige Ausgang).
+# diff --cached: bei gleichem Inhalt, Modus 100644 und Typ blob ist der gestagte Diff leer, und UNVERAENDERT unten ist
+# der richtige Ausgang; ein Moduswechsel (HEAD 100755 -> chmod 0644 + add) ergibt einen Diff und einen Commit; S15-02).
 git ls-files -- "$DIR" > "$WERK/ls.txt" || fehler "git ls-files $DIR"
 gestagt=$(grep -cxF -f "$WERK/dst.txt" "$WERK/ls.txt" || true)
 [ "$gestagt" -eq "$n" ] || fehler "nur $gestagt von $n Zieldateien stehen im Index unter $DIR/"
@@ -434,8 +443,9 @@ for f in $FASSUNGEN; do
   [ "${e%%$TAB*}" = "100644 blob $q" ] || fehler "Export-Commit $NEU: $dst nicht 100644 blob der Quelle (S8-02)"
 done
 
-# F-05 Push-Schleife: jeder Fehler ist sichtbar; nur ein nachgewiesenes non-ff-Race (Remote-Tip bewegt) fuehrt
-# zu fetch + Pruefung + merge; F-06 UEBERHOLT-Wache; F-07 Remote-Idempotenz; F-04 Merge-Botschaft mit Marker.
+# F-05 Push-Schleife: jeder Fehler ist sichtbar; jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung
+# (FETCH_HEAD Vorfahr von HEAD = kein Race = FEHLER); Merge und erneuter Push nur bei passender Abstammung und
+# bestandenen Folgewachen (F-06, F-07, S8-03/S9-05, S7-01/S7-02/C6-04; S15-04); F-04 Merge-Botschaft mit Marker.
 versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
