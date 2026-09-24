@@ -161,8 +161,10 @@
 #        Definition + Konsum = gruen (C10-02, L10-01)
 #   P-70 F09-GATE-346 '\newcommand{\thesisumfangX}{x}' + Konsum \thesisumfang: Definitionen 1, Konsum 1 (C10-04)
 #   P-71 F09-GATE-346 nach FEHLER 0 Reste f09.* unter TMPDIR, Gegenprobe gruen ebenso (C10-06, L10-03)
+#   P-72 F09-GATE-346-Skalar unter bash OHNE -e/pipefail: FEHLER-Modul rc != 0 + 'FEHLER: F09', kein Weiterlauf
+#        hinter der Klammer; gruenes Modul rc 0 (C10-06b, r11b)
 #
-# SELBSTBISS (--selbstbiss): 93 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 94 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -206,7 +208,7 @@
 # check-ref-format, M83 ':-NA'-Semantik, M84 WERK-Zuweisung VOR mkdir, M85 ohne TMPDIR-Wache/'--', M86 $SRC_K in
 # fehler(), M87 ungestagt-Diff ohne core.fileMode, M88 ohne '-*'-Zweig, M89 ohne scheme-Maske; M68 neu = mkdir -p
 # (Kollision toleriert); YAML: M90 Strip ohne Paritaet, M91 alte ERE, M92 Definitionsziel ohne Grenze, M93 ohne
-# EXIT-Trap im F09-Block; M48/M49 auf die r11-Zeilen nachgezogen.
+# EXIT-Trap im F09-Block; M48/M49 auf die r11-Zeilen nachgezogen; r11b: M94 Subshell-rc-Fang hinter der Klammer.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -284,7 +286,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=52; MUT_N_YAML=41   # r11 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=52; MUT_N_YAML=42   # r11b (L9-01): Kopfkommentar == Summe (P-57)
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
 
@@ -2066,6 +2068,29 @@ fall_P71() { # C10-06 (L10-03): Werkordner f09.* nach FEHLER (und nach Erfolg) 0
     erw_text "$d/out_r1" "$F11_KO"; erw_kein_text "$d/out_r2" "FEHLER"
 }
 
+fahre_block_ohne_e() { # wie fahre_block, aber bash OHNE -e und OHNE pipefail (P-72: der Block muss den rc selbst fangen)
+    _bs="$1"; _bl="$2"; shift 2
+    ( cd "$MODUL" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
+        CI_PROJECT_DIR="$SUPERW" "$@" bash "$_bs" ) > "$_bl" 2>&1
+}
+fall_P72() { # C10-06b (r11b): F09-Skalar unter bash ohne -e/pipefail; FEHLER-Modul rc != 0, kein Weiterlauf; gruen rc 0
+    d="$T/P72"; f09_vorbereitung "$d" || return
+    { cat "$d/f09.sh"; echo 'echo "NACH-F09: Job laeuft hinter der Klammer weiter"'; } > "$d/f09b.sh"
+    f72() { # $1 = Zweig, danach die tex-Zeilen
+        _zw="$1"; shift
+        git -C "$MODUL" checkout -q -B "$_zw" "$X1" || { rot "Zweig $_zw nicht setzbar"; return 1; }
+        printf '%s\n' "$@" > "$MODUL/diplomarbeit.tex"
+        git -C "$MODUL" add diplomarbeit.tex && modul_commit 1758600298 "F11b $_zw" || { rot "Commit $_zw"; return 1; }
+        stand "$(git -C "$MODUL" rev-parse HEAD)" || { rot "Stand $_zw"; return 1; }
+        fahre_block_ohne_e "$d/f09b.sh" "$d/out_$_zw"; rc=$?; zeige "$d/out_$_zw"
+    }
+    f72 s1 "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" || return
+    if [ "$rc" -ne 0 ]; then ok "rc=$rc (erwartet != 0)"; else rot "rc=0 (erwartet != 0): Subshell-rc nicht gefangen"; fi
+    erw_text "$d/out_s1" "FEHLER: F09"; erw_kein_text "$d/out_s1" "NACH-F09"
+    f72 s2 "$F11_DC" "$F11_DL" "$F11_KL" "$F11_DU" "$F11_KU" || return
+    erw_rc "$rc" 0; erw_kein_text "$d/out_s2" "FEHLER"; erw_text "$d/out_s2" "NACH-F09"
+}
+
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
@@ -2152,6 +2177,7 @@ fall P-68 fall_P68 "$SKRIPT"
 fall P-69 fall_P69 "$SKRIPT"
 fall P-70 fall_P70 "$SKRIPT"
 fall P-71 fall_P71 "$SKRIPT"
+fall P-72 fall_P72 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -2362,7 +2388,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
         ENTF_N=$MUT_N_YAML
-        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m93 (YAML): EPOCH-288 fehlt ($zm Zeilen)"
+        echo "  [ENTFAELLT] Mutanten m7/m8/m9/m13-m35/m41/m42/m44-m51/m70/m90-m94 (YAML): EPOCH-288 fehlt ($zm Zeilen)"
     else
         # M7: Eltern-Walk stillgelegt (Epoch = %ct HEAD wie r2) -> P-23 muss reissen (L2-01)
         sed 's/QUELLE="\$QUELLE^"; stufe=\$((stufe+1))/break/' "$CI_YML" > "$MUT/m7.yml"
@@ -2460,12 +2486,15 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         sed '/f09w\/def"/s/(\[^A-Za-z\]|\\\$)"/"/' "$CI_YML" > "$MUT/m92.yml"
         # M93 (r11, C10-06): EXIT-Trap des F09-Blocks entfernt (Werkordner bleibt bei FEHLER) -> P-71 muss reissen
         sed '/^ *trap '"'"'rm -rf -- "\$f09w"'"'"' EXIT$/d' "$CI_YML" > "$MUT/m93.yml"
+        # M94 (r11b, C10-06b): Subshell-rc-Fang hinter der Klammer entfernt (Job liefe ohne Messung weiter) -> P-72
+        sed 's/^\( *\)) || { printf .*F09-GATE-346 abgebrochen.*$/\1)/' "$CI_YML" > "$MUT/m94.yml"
         MUT_N=$((MUT_N+MUT_N_YAML))
         M30=m30; M35=m35; M48=m48; M49=m49; M50=m50; M32=m32; M33=m33; M45=m45; M46=m46; M70=m70
-        M90=m90; M91=m91; M92=m92; M93=m93
+        M90=m90; M91=m91; M92=m92; M93=m93; M94=m94
         if grep -q '# >>> F09-GATE-346' "$CI_YML"; then :; else
-            MUT_N=$((MUT_N-10)); ENTF_N=$((ENTF_N+10)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
-            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m93 (F09-GATE-346):" \
+            MUT_N=$((MUT_N-11)); ENTF_N=$((ENTF_N+11)); M30=; M35=; M48=; M49=; M50=; M70=; M90=; M91=; M92=; M93=
+            M94=
+            echo "  [ENTFAELLT] Mutanten m30 + m35 + m48-m50 + m70 + m90-m94 (F09-GATE-346):" \
                  "Koppelpatch nicht in der YAML ($CI_YML)"
         fi
         if grep -q '# >>> UMFANG-346' "$CI_YML"; then :; else
@@ -2473,7 +2502,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
             echo "  [ENTFAELLT] Mutanten m32 + m33 + m45 + m46 (UMFANG-346): Koppelpatch r8 nicht in der YAML ($CI_YML)"
         fi
         for m in m7 m8 m9 m13 m14 m15 m16 m17 m18 m19 m20 m21 m22 m23 m24 m25 m26 m27 m28 m29 $M30 \
-                 m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93; do
+                 m31 $M32 $M33 m34 $M35 m41 m42 m44 $M45 $M46 m47 $M48 $M49 $M50 m51 $M70 $M90 $M91 $M92 $M93 \
+                 $M94; do
             if cmp -s "$CI_YML" "$MUT/$m.yml"; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
@@ -2530,6 +2560,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         [ "$BISS_RC" -eq 0 ] && [ -n "$M91" ] && biss_yml m91 fall_P69 P-69
         [ "$BISS_RC" -eq 0 ] && [ -n "$M92" ] && biss_yml m92 fall_P70 P-70
         [ "$BISS_RC" -eq 0 ] && [ -n "$M93" ] && biss_yml m93 fall_P71 P-71
+        [ "$BISS_RC" -eq 0 ] && [ -n "$M94" ] && biss_yml m94 fall_P72 P-72
     fi
 fi
 
