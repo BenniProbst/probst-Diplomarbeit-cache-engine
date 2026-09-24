@@ -49,8 +49,9 @@
 # abgeleitete Werte (SRC_K/WERK/TOP/WURZEL/DIR_K/DIR_F nur als Variablenname); S10-07 core.fileMode=true auch am
 # ungestagt-Diff; S10-08 hex40 = Vertrag Kleinhex (keine Normalisierung); L10-05 fuehrendes '-' in DIR/SRC = FEHLER.
 # REV r12 (Codex-Lens r11 B + Fable-Lens r11 + Lead K305, 24.09.2026): S11-01 Signale WAEHREND der Werkordner-Anlage
-# nur vorgemerkt (sig), mkdir-rc dreiwertig (0 = WERK, 1 = FEHLER, Signal-rc = leeren Kandidaten entfernen + exit rc),
-# danach Signal-Traps zurueck auf exit und ein vorgemerktes Signal per exit abgearbeitet (0 Reste); S11-02 fuehrendes
+# nur vorgemerkt (sig), mkdir-rc dreiwertig (0 = WERK, 1 = FEHLER, Signal-rc = leeren Kandidaten entfernen + exit rc
+# = r12-Verhalten, seit r13 abgeloest (S12-01): kein rmdir/rm auf einen unbestaetigten Kandidaten), danach Signal-
+# Traps zurueck auf exit und ein vorgemerktes Signal per exit abgearbeitet ('0 Reste' = r12-Messung); S11-02 fuehrendes
 # '-' auch NACH der Normalisierung in der gemeinsamen Wache ('./-n' wurde zu '-n' und exportiert).
 # REV r13 (Codex-Lens r12 A + B, Fable-Lens r12, Lead K306, 24.09.2026): S12-01 kein rmdir/rm auf einen unbestaetigten
 # Kandidaten (nur rc 0 setzt WERK, rc 1 = FEHLER (S9-08), jeder andere rc = FEHLER mit rc-Nennung, Kandidat
@@ -58,10 +59,14 @@
 # weiter vor.
 # REV r14 (Codex-Lens r13 B S13-01, Lead K307, 24.09.2026): nur Kommentare berichtigt (rc-1-Zweig nennt keine Nummer;
 # das Restfenster des mkdir-Kindes ist nicht nur SIGKILL), keine funktionale Aenderung (A-2 des Fix r13 bleibt).
+# REV r15 (Codex-Lens r14 B S14-01..S14-05 + Fable-Lens r14, Lead K308/K310, 24.09.2026): nur Kommentare berichtigt
+# (Werkordner-Lage + Trap-Reichweite, Commit-Bedingung Inhalt + Modus + Typ, CI-Verweigerung per Leerheit der Variable,
+# r12-Historie als abgeloest gekennzeichnet, Duplikat-Meldung per Position); keine funktionale Aenderung.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und ein PDF sein (sonst rot); Ziel COMDARE_THESIS_PDF_DIR (Default
 # docs/diplomarbeit, relativer Unterbaum, kein Symlink), stabile Namen diplomarbeit-<lang>-<umfang>.pdf,
-# ueberschreibend; byte-gleich zum lokalen Bestand ODER zum Remote-Tip = kein Commit / kein Push; Commit und
+# ueberschreibend; gleicher Inhalt UND Modus 100644 UND Typ blob der Zielfassungen (zum lokalen Bestand ODER zum
+# Remote-Tip) = kein Commit / kein Push (S7-01/S8-02); Commit und
 # Merge-Commit tragen '[skip ci]', Push mit -o ci.skip auf HEAD:$CI_COMMIT_BRANCH (Order 340 A-01 (c): eigener
 # Branch); COMDARE_WRITEBACK_USER/TOKEN gehen NUR ueber GIT_ASKPASS (nie in URL, argv, .git/config oder Log);
 # bei Ablehnung fetch + Pruefung + merge (nie rebase), max 5 Versuche; hat sich der Thesis-Gitlink oder das
@@ -70,7 +75,8 @@
 # bei Konflikt sauberer Abbruch (naechste Pipeline holt nach).
 # SCHALTER: COMDARE_THESIS_PDF_EXPORT=false = INERT (nur true|false, r7); COMDARE_THESIS_PDF_FASSUNGEN (Teilmenge);
 # COMDARE_THESIS_PDF_SRC (Default thesis/diplomarbeit); COMDARE_THESIS_PDF_REMOTE = TESTHAKEN der Bissprobe:
-# nur absoluter Pfad auf ein lokales Bare-Repo, in CI (CI/GITLAB_CI gesetzt) laut verweigert.
+# nur absoluter Pfad auf ein lokales Bare-Repo; im Modus --ci oder bei nicht leerer CI/GITLAB_CI-Variable laut
+# verweigert (C6-07).
 # Push-Option ci.no_pipeline (19.1-Doku) statt ci.skip = Owner-Frage Q-2 der Bewertung r1, hier nicht gesetzt.
 set -eu
 set -f
@@ -157,8 +163,9 @@ else
 fi
 export GIT_TERMINAL_PROMPT=0
 GITP="git -c credential.helper="
-# Hilfsdateien (Askpass-Helfer, Index-Liste, Push-Meldung) liegen in EINEM 0700-Wegwerfordner ausserhalb des
-# Arbeitsbaums und verschwinden mit dem Script.
+# Hilfsdateien (Askpass-Helfer, Index-Liste, Push-Meldung) liegen in EINEM 0700-Wegwerfordner unter TMPDIR bzw. /tmp
+# (absolut + Zeichenwache S10-04; ein TMPDIR im Arbeitsbaum wird nicht verhindert); der EXIT-Trap entfernt den
+# bestaetigten Werkordner, nicht bei SIGKILL (S14-02).
 # S8-06 (r9): Traps VOR der Anlage (kein Signalfenster zwischen Anlage und Cleanup-Installation); der EXIT-Trap raeumt
 # nur, wenn WERK bereits gesetzt ist. S7-08 (r8b): Signale muenden in exit, damit der EXIT-Trap laeuft.
 # S10-04 (r11, Codex-Lens r10 B): TMPDIR-Wache VOR der Anlage -- git ruft GIT_ASKPASS per Shell auf; Leerraum oder
@@ -344,7 +351,8 @@ for f in $FASSUNGEN; do
     de-lang|en-lang|de-kurz|en-kurz) ;;
     *) fehler "COMDARE_THESIS_PDF_FASSUNGEN: Eintrag $pos unbekannt (erlaubt: de-lang en-lang de-kurz en-kurz)" ;;
   esac
-  # L2-06 (r3): ein Duplikat endete als 'nur 1 von 2 Zieldateien im Index' -- laut beim Namen nennen.
+  # L2-06 (r3): ein Duplikat endete als 'nur 1 von 2 Zieldateien im Index' -- Position des doppelten Eintrags nennen
+  # (S14-05; die Meldung nennt 'Eintrag $pos', nie den Fassungswert, S8-05).
   case "$gesehen" in *" $f "*) fehler "Eintrag $pos doppelt in COMDARE_THESIS_PDF_FASSUNGEN (S8-05)" ;; esac
   gesehen="$gesehen$f "
   src="$SRC/diplomarbeit-$f.pdf"; dst="$DIR/diplomarbeit-$f.pdf"
