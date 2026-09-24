@@ -23,14 +23,17 @@
 # REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
 # (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
 # rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
-# getrackten Aenderungen unter DIR, gestagt oder ungestagt); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
+# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.425) oder ungestagt (git diff, Z.435);
+# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.393-394), commit --only nimmt den Index
+# (S17-02/L17-04)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
 # (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
 # nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
 # Variable; S7-08 pipelinefreier PDF-Header-Test, trap auch fuer INT TERM HUP.
 # REV r9 (Codex-Lens r8 B + Fable-Lens r8 + Lead K299, 23.09.2026): S8-01 Pathspecs literal (GIT_LITERAL_PATHSPECS=1),
-# Index-Wache auf dem GESAMTEN Index ohne Rename-Erkennung (--no-renames --name-status, genau die Fassungs-Liste je
-# A/M), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN Export-
-# Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
+# Index-Wache ohne Rename-Erkennung (--no-renames --name-status; r9: ganzer Index = Fassungs-Liste je A/M; seit
+# r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste, Teilmenge/leer erlaubt,
+# s. Z.420-424), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
+# Export-Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
 # S8-06 Traps VOR mktemp; L8-01 Leerraum/Steuerzeichen in DIR/SRC und Fassungsnamen nur [A-Za-z0-9-].
@@ -71,6 +74,10 @@
 # nur Kommentare berichtigt (Push-Schleife in Code-Reihenfolge: Fetch -> Abstammung -> Vorwachen -> Merge ->
 # Tree-Wachen -> erneuter Push; Modus-Satz des REV-r16-Kopfs; gestagter Diff = nur A/M-Eintraege aus der
 # Fassungs-Liste); keine funktionale Aenderung.
+# REV r18 (Codex-Lens r17 A C17-01/C17-02, B S17-01..S17-03 + Fable-Lens r17 L17-01..L17-05, Lead K317, 24.09.2026):
+# Kommentare berichtigt (REV-r9-Historie als Historie + geltender S16-03-Satz, S17-01/L17-02; Kopf-Garantie der
+# Fremdaenderungen auf die beiden Diff-Wachen eingegrenzt, S17-02/L17-04) + Meldungstext der Merge-Runde an den
+# Versuchszaehler gebunden (S17-03/L17-03; einzige Nicht-Kommentar-Zeile, kein neuer Kontrollfluss).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -515,7 +522,7 @@ while [ "$versuch" -lt 5 ]; do
       || ueberholt "Fassung $dst am Remote als $ta/$ma statt blob/100644 ($FERN), kein Push (S7-01)"
     [ "$a" = "$b" ] || ueberholt "Fassung $dst am Remote fremd bewegt ($FERN), kein Push (C6-04)"
   done < "$WERK/dst.txt"
-  printf '%s\n' "Merge mit $BRANCH-Tip $FERN [skip ci], erneuter Push"
+  printf '%s\n' "Merge mit $BRANCH-Tip $FERN [skip ci]; erneuter Push, falls Versuche verbleiben ($versuch/5; S17-03)"
   if [ "$versuch" -lt 5 ]; then sleep $((versuch * 2)); fi
 done
 fehler "Push nach 5 Versuchen abgelehnt ($BRANCH bewegt sich zu schnell?)"
