@@ -235,8 +235,10 @@
 #        erreicht den echten Bare-Tip (Selbstabbildung gewinnt); Mutante M134 (pushInsteadOf entfernt) reisst
 #   P-107 extraHeader-Listen-Reset F23-03 (c): Altwert in drei Formen (plain, kuerzerer Scope, gleicher Scope) ->
 #        get-urlmatch mit den GITP_REMOTE-Optionen leer, letzter get-all-Eintrag leer; Rot-zuerst ohne Reset
-#   P-108 Verweis-Wache F23-01: Zeilenverweise Script-Kopf Z.26-29/37 + L1-01-Kommentar Z.437/439 -> Zielzeile traegt
-#        das erwartete Literal (rot am Script r22, gruen am Script r23); keine Mutante (Textwache)
+#   P-108 Verweis-Wache F23-01: Zeilenverweise Script-Kopf Z.26-29/37 + L1-01-Kommentar Z.441/443 -> Zielzeile traegt
+#        das erwartete Literal (rot an alten Nummern, gruen am r24-Stand); keine Mutante (Textwache)
+#   P-109 --nur fail-closed F24-01 (r24, Codex B S23-01 / Fable L23-01): Harnisch-Kopie mit '--nur=P-999', '--nur=' und
+#        '--nur=P-104 --selbstbiss' je rc 2 mit ABBRUCH-Literal, nie 'PROBE ... GRUEN'; '--nur=P-104' rc 0 (1 von 1)
 #
 # SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -328,6 +330,10 @@
 # Mutante M133 per --nur=P-104 an der Harnisch-Kopie), Verhaltensnachweise Helper-Reset / pushInsteadOf-Gegenrichtung /
 # extraHeader-Listen-Reset (P-105..P-107, M134), Verweis-Wache P-108, M131 auf die Leak-Ursache gesetzt ('sed \' statt
 # 'sed \\': die r22-Form riss per sed-Werkzeugfehler); Script r23 nur Kommentare -> Faelle 112, Mutanten 134 = 68 + 66.
+# r24 (Codex r23 B S23-01..S23-04, Fable r23 L23-01/L23-06/L23-08, Lead K331/K332): --nur fail-closed (leer, unbekannt,
+# mit --selbstbiss je rc 2; 0 Faelle = KEIN URTEIL) + P-109; fall_P104m per env -u CI -u GITLAB_CI, Basislauf der
+# unveraenderten Kopie vor M133, fehlendes/widerspruechliches P-104-Urteil = KEIN URTEIL (BISS_RC=2); P-99 um die
+# F24-03-Literale (COUNT-Paare) + REV-r24 erweitert; P-108 um +4 (REV-r24-Block) -> Faelle 113, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -387,10 +393,16 @@ SELBSTBISS=0; NUR=""   # r23: --nur=<Kennung>
 for a in "$@"; do
     case "$a" in
         --selbstbiss) SELBSTBISS=1 ;;
-        --nur=*) NUR="${a#--nur=}" ;;   # r23: genau einen Fall fahren (Traeger des Harnisch-Mutanten M133)
+        --nur=*) NUR="${a#--nur=}"   # r23: genau einen Fall fahren (Traeger des Harnisch-Mutanten M133)
+            [ -n "$NUR" ] || { echo "ABBRUCH: --nur ohne Kennung"; exit 2; } ;;   # r24 (F24-01 (a)): fail-closed
         *) echo "ABBRUCH: unbekanntes Argument '$a'"; exit 2 ;;
     esac
 done
+# r24 (F24-01 (c)): --nur und --selbstbiss schliessen sich aus (M133 nutzt --nur OHNE --selbstbiss, biss() ungefiltert)
+if [ -n "$NUR" ] && [ "$SELBSTBISS" -eq 1 ]; then
+    echo "ABBRUCH: --nur und --selbstbiss schliessen sich aus: eine Bilanz ueber einen Fall ist kein Selbstbiss-Nenner"
+    exit 2
+fi
 command -v git >/dev/null 2>&1 || { echo "ABBRUCH: git fehlt"; exit 2; }
 
 T=$(mktemp -d "${TMPDIR:-/tmp}/tpe_probe.XXXXXX") || { echo "ABBRUCH: mktemp -d fehlgeschlagen"; exit 2; }
@@ -2788,6 +2800,23 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c -F '[skip ci], erneuter Push' "$s")
     erw_gleich "$n" 0 "alte Meldung '[skip ci], erneuter Push' (F18-05)"
     n=$(grep -c '^# REV r18 ' "$s"); erw_gleich "$n" 1 "REV-r18-Kopf"
+    # r24 (F24-03, Codex B S23-03 / Fable L23-06): COUNT-Paare unterliegen den Reset-/Praefix-Regeln; alte Aussagen 0x
+    n=$(grep -c -F 'aus GIT_CONFIG_COUNT/KEY_n/VALUE_n (gleiche Praefix-Regeln' "$s")
+    erw_gleich "$n" 0 \
+        "alte Fassung 'aus GIT_CONFIG_COUNT/KEY_n/VALUE_n (gleiche Praefix-Regeln' (F24-03)"
+    n=$(grep -c -F 'GIT_CONFIG_COUNT bleiben wirksam' "$s")
+    erw_gleich "$n" 0 "alte REV-r23-Fassung 'GIT_CONFIG_COUNT bleiben wirksam' (F24-03)"
+    n=$(grep -c -F 'werden ebenfalls vor -c eingelesen und unterliegen denselben Reset-/Praefix-Regeln' "$s")
+    erw_gleich "$n" 1 \
+        "Kommentar 'werden ebenfalls vor -c eingelesen und unterliegen denselben Reset-/Praefix-Regeln' (F24-03)"
+    n=$(grep -c -F 'weiter wirksam bleiben nur unbehandelte Schluessel' "$s")
+    erw_gleich "$n" 1 "Kommentar 'weiter wirksam bleiben nur unbehandelte Schluessel' (F24-03)"
+    n=$(grep -c -F 'lange URL-Umbiegungen (Gleichstand)' "$s")
+    erw_gleich "$n" 1 "Kommentar 'lange URL-Umbiegungen (Gleichstand)' (F24-03)"
+    n=$(grep -c -F 'nur unbehandelte Schluessel wie credential.username bleiben wirksam' "$s")
+    erw_gleich "$n" 1 \
+        "REV-r23-Zeile 'nur unbehandelte Schluessel wie credential.username bleiben wirksam' (F24-03)"
+    n=$(grep -c '^# REV r24 ' "$s"); erw_gleich "$n" 1 "REV-r24-Kopf"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -2950,16 +2979,30 @@ fall_P104() { # F23-02 (r23, Codex B S22-02): HARNISCH-NETZSPERRE per GIT_ALLOW_
     else ok "Ausgabe frei vom Projektpfad (S7-05)"; fi
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
-fall_P104m() { # r23: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script und
-    # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); Muster wie P-57/m80 (Kopie des Harnischs)
-    h="$1"; d="$T/P104m"; mkdir -p "$d"
-    pfad=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
-    COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$d" sh "$h" --nur=P-104 > "$d/out" 2>&1; rc=$?
-    sed "s#$pfad#<super-pfad>#g" "$d/out" > "$d/out.m"
-    grep -E '^  P-104: |^BILANZ|^    \[ROT\]' "$d/out.m" | sed 's/^/      > /'
-    n=$(grep -o '^  P-104: ROT ([0-9]*' "$d/out.m" | grep -o '[0-9]*$'); [ -n "$n" ] || n=0
-    [ "$n" -eq 0 ] || FEHL=$((FEHL+n))
-    grep -q '^  P-104: ' "$d/out.m" || rot "Harnisch-Kopie lieferte kein P-104-Urteil (rc=$rc)"
+p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Original oder Mutante) im Ordner $2, setzt
+    # P104M_URTEIL (GRUEN/ROT/KEIN), P104M_RC, P104M_N; env -u CI -u GITLAB_CI (F24-02 (a)): die oeffentliche Override-
+    # Sperre des Kopfes (P-22) bleibt, der interne Kopienaufruf traegt die CI-Marker nicht weiter
+    mkdir -p "$2"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
+    env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$2" sh "$1" --nur=P-104 \
+        > "$2/out" 2>&1; P104M_RC=$?
+    sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"
+    P104M_N=$(grep -o '^  P-104: ROT ([0-9]*' "$2/out.m" | grep -o '[0-9]*$'); [ -n "$P104M_N" ] || P104M_N=0
+    if grep -q '^  P-104: GRUEN' "$2/out.m"; then P104M_URTEIL=GRUEN
+    elif grep -q '^  P-104: ROT' "$2/out.m"; then P104M_URTEIL=ROT
+    else P104M_URTEIL=KEIN; fi
+    grep -E '^  P-104: |^BILANZ|^    \[ROT\]|^ABBRUCH' "$2/out.m" | sed 's/^/      > /'
+}
+fall_P104m() { # r23/r24: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script,
+    # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); F24-02 (b): fehlendes Urteil oder ein rc, der dem
+    # Urteil widerspricht (GRUEN bei rc != 0, ROT bei rc 0), ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss())
+    p104m_lauf "$1" "$T/P104m"
+    case "$P104M_URTEIL/$P104M_RC" in
+        GRUEN/0) : ;;
+        ROT/0|GRUEN/*|KEIN/*)
+            printf '%s\n' "Harnisch-Kopie ohne belastbares P-104-Urteil (Urteil $P104M_URTEIL, rc $P104M_RC)" \
+                > "$T/kein-urteil.txt" ;;
+        ROT/*) FEHL=$((FEHL+P104M_N)) ;;
+    esac
 }
 fall_P105() { # F23-03 (a) (r23, Codex B S22-04 / N-02): HELPER-RESET als Verhalten -- Wegwerf-GIT_CONFIG_GLOBAL mit
     # credential.helper bzw. credential.<REMOTE>.helper = Marker-Helfer (schreibt je Aufruf eine Datei); git mit GENAU
@@ -3028,26 +3071,48 @@ fall_P107() { # F23-03 (c) (r23, Codex B S22-04 / N-01): extraHeader-LISTEN-RESE
 }
 fall_P108() { # F23-01 (r23, Codex B S22-01): VERWEIS-WACHE -- jeder Zeilenverweis im Script-Kopf und im L1-01-Kommentar
     # zeigt auf die benannte Zielzeile (Tafel: Kopf-Zeile, Verweis-Literal, Zielzeile, Literal der Zielzeile); am
-    # Script r22 (Verweise auf den r21-Stand) reisst der Fall, am Script r23 ist er gruen; keine Mutante (Textwache).
+    # Script r22/r23 (alte Nummern) reisst der Fall, am Script r24 (+4 durch REV r24) ist er gruen; keine Mutante.
     s="$1"
     v108() { # $1 = Kopf-Zeile, $2 = Verweis-Literal, $3 = Zielzeile, $4 = Literal der Zielzeile
         k=$(sed -n "${1}p" "$s"); z=$(sed -n "${3}p" "$s")
         case "$k" in *"$2"*) ok "Z.$1 traegt '$2'" ;; *) rot "Z.$1 traegt NICHT '$2'" ;; esac
         case "$z" in *"$4"*) ok "Z.$3 traegt '$4'" ;; *) rot "Z.$3 traegt NICHT '$4'" ;; esac
     }
-    v108 26 'Z.472)' 472 'git diff --cached --no-renames --name-status --ignore-submodules=none'
-    v108 26 'Z.486;' 486 'diff --name-only --ignore-submodules=none -- "$DIR"'
-    v108 27 'Z.257/472/486' 257 'diff_gleich() { set +e; git diff --quiet --ignore-submodules=none'
-    v108 28 'Z.436-439' 436 '# L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege'
-    v108 29 'Z.497-500' 497 'commit -q --only'
-    v108 29 'Z.497-500' 500 '-- "$@" || fehler "git commit"'
-    v108 29 'Z.446/449-450' 446 '[ "$idx" = "$blob" ] || fehler'
-    v108 29 'Z.446/449-450' 449 'roh=$(git hash-object --no-filters -- "$dst")'
-    v108 29 'Z.446/449-450' 450 '[ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion'
-    v108 37 'Z.465-471' 465 '# I-02 / S7-03 (r8b) / S8-01 (r9): der gesamte gestagte Diff (diff --cached)'
-    v108 437 'FEHLER in Z.435' 435 'git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"'
-    v108 439 'Z.440-446' 440 'git ls-files --error-unmatch -- "$dst"'
-    v108 439 'Z.440-446' 446 '[ "$idx" = "$blob" ] || fehler'
+    v108 26 'Z.476)' 476 'git diff --cached --no-renames --name-status --ignore-submodules=none'
+    v108 26 'Z.490;' 490 'diff --name-only --ignore-submodules=none -- "$DIR"'
+    v108 27 'Z.261/476/490' 261 'diff_gleich() { set +e; git diff --quiet --ignore-submodules=none'
+    v108 28 'Z.440-443' 440 '# L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege'
+    v108 29 'Z.501-504' 501 'commit -q --only'
+    v108 29 'Z.501-504' 504 '-- "$@" || fehler "git commit"'
+    v108 29 'Z.450/453-454' 450 '[ "$idx" = "$blob" ] || fehler'
+    v108 29 'Z.450/453-454' 453 'roh=$(git hash-object --no-filters -- "$dst")'
+    v108 29 'Z.450/453-454' 454 '[ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion'
+    v108 37 'Z.469-475' 469 '# I-02 / S7-03 (r8b) / S8-01 (r9): der gesamte gestagte Diff (diff --cached)'
+    v108 441 'FEHLER in Z.439' 439 'git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"'
+    v108 443 'Z.444-450' 444 'git ls-files --error-unmatch -- "$dst"'
+    v108 443 'Z.444-450' 450 '[ "$idx" = "$blob" ] || fehler'
+}
+fall_P109() { # F24-01 (r24, Codex B S23-01 / Fable L23-01): --nur ist fail-closed -- die Harnisch-Kopie (env -u CI
+    # -u GITLAB_CI wie fall_P104m) liefert mit '--nur=P-999' (unbekannt), '--nur=' (leer) und '--nur=P-104 --selbstbiss'
+    # je rc 2 mit ABBRUCH-Literal und druckt nie 'PROBE thesis_pdf_export: GRUEN'; Gruen-Probe '--nur=P-104' rc 0 mit
+    # 'BILANZ: 1 von 1 Faellen gruen'. Am r23-Harnisch: rc 0 + GRUEN bei 0 Faellen bzw. Vollauf (Rot-zuerst, Lauf R-1b).
+    d="$T/P109"; mkdir -p "$d"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
+    p109() { # $1 = Marke, $2.. = Argumente der Kopie -> $d/$1.out (maskiert), rc in P109_RC
+        _m="$1"; shift; mkdir -p "$d/$_m"
+        env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$d/$_m" sh "$SELBST" "$@" \
+            > "$d/$_m.raw" 2>&1; P109_RC=$?
+        sed "s#$_pf#<super-pfad>#g" "$d/$_m.raw" > "$d/$_m.out"
+        grep -E '^ABBRUCH|^BILANZ|^PROBE ' "$d/$_m.out" | sed 's/^/      > /'
+    }
+    p109 unbekannt --nur=P-999; erw_rc "$P109_RC" 2
+    erw_text "$d/unbekannt.out" "ABBRUCH: --nur=P-999: Kennung unbekannt oder nicht gefahren (0 Faelle)"
+    erw_kein_text "$d/unbekannt.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 leer --nur=; erw_rc "$P109_RC" 2; erw_text "$d/leer.out" "ABBRUCH: --nur ohne Kennung"
+    erw_kein_text "$d/leer.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 kombi --nur=P-104 --selbstbiss; erw_rc "$P109_RC" 2
+    erw_text "$d/kombi.out" "ABBRUCH: --nur und --selbstbiss schliessen sich aus"
+    erw_kein_text "$d/kombi.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 gruen --nur=P-104; erw_rc "$P109_RC" 0; erw_text "$d/gruen.out" "BILANZ: 1 von 1 Faellen gruen, 0 rot"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -3174,7 +3239,12 @@ fall P-105 fall_P105 "$SKRIPT"
 fall P-106 fall_P106 "$SKRIPT"
 fall P-107 fall_P107 "$SKRIPT"
 fall P-108 fall_P108 "$SKRIPT"
+fall P-109 fall_P109 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
+if [ -n "$NUR" ] && [ "$N_FAELLE" -ne 1 ]; then   # r24 (F24-01 (b)): fail-closed, unbekannte Kennung faehrt 0 Faelle
+    echo "ABBRUCH: --nur=$NUR: Kennung unbekannt oder nicht gefahren ($N_FAELLE Faelle)"; exit 2
+fi
+if [ "$N_FAELLE" -eq 0 ]; then echo "ABBRUCH: 0 Faelle gefahren -- KEIN URTEIL"; exit 2; fi   # r24 (F24-01 (d))
 
 # --------------------------------------------------------------------------- Selbstbiss
 BISS_RC=0; MUT_N=0; ENTF_N=0
@@ -3344,8 +3414,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M132 (r22, F22-01): Zeichenwache laesst '=' durch -> P-103 muss reissen (git 'invalid key' statt Vertragstext)
     ersetze_literal "$SKRIPT" '*[!A-Za-z0-9_./:-]*) fehler' '*[!A-Za-z0-9_./:=-]*) fehler' > "$MUT/m132.sh"
     # M133 (r23, F23-02): Harnisch OHNE GIT_ALLOW_PROTOCOL=file (Kopie des Harnischs, alle drei Setzungen entfernt) ->
-    # P-104 muss reissen (Traeger fall_P104m faehrt die Kopie mit --nur=P-104: 'Failed to connect' statt 'not allowed')
-    ersetze_literal "$SELBST" ' GIT_ALLOW_PROTOCOL=file' '' > "$MUT/m133.sh"
+    # P-104 muss reissen; r24 (F24-02 (c)): die Kopie wird erst NACH dem gruenen Basislauf der unveraenderten Kopie
+    # erzeugt (Selbstbiss-Block vor 'biss m133', Traeger fall_P104m per --nur=P-104)
     # M134 (r23, F23-03 (b)): pushInsteadOf-Selbstabbildung aus GITP_REMOTE entfernt -> P-106 muss reissen (der Push
     # folgt dem kuerzeren globalen pushInsteadOf-Praefix auf den toten Pfad, der Fetch bleibt per insteadOf intakt)
     ersetze_literal "$SKRIPT" ' -c url.$REMOTE.pushInsteadOf=$REMOTE"' '"' > "$MUT/m134.sh"
@@ -3368,6 +3438,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
         ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
         T="$T_ALT"
+        if [ -f "$T/biss_$1/kein-urteil.txt" ]; then   # r24 (F24-02 (b)): der Traeger konnte die Mutante nicht bewerten
+            echo "  [ABBRUCH] Mutante $1: $(cat "$T/biss_$1/kein-urteil.txt") -- KEIN URTEIL"; BISS_RC=2; return 0
+        fi
         if [ "$r" -gt "$basis" ]; then
             echo "  [OK]  Mutante $1 macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
         else
@@ -3408,7 +3481,6 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m68 fall_P48 P-48
     [ "$BISS_RC" -eq 0 ] && biss m69 fall_P39 P-39
     if cmp -s "$SELBST" "$MUT/m80.sh"; then echo "  [ABBRUCH] Mutante m80 ist byte-gleich zum Harnisch"; BISS_RC=2; fi
-    if cmp -s "$SELBST" "$MUT/m133.sh"; then echo "  [ABBRUCH] Mutante m133 ist byte-gleich zum Harnisch"; BISS_RC=2; fi
     [ "$BISS_RC" -eq 0 ] && biss m71 fall_P50 P-50
     [ "$BISS_RC" -eq 0 ] && biss m72 fall_P51 P-51
     [ "$BISS_RC" -eq 0 ] && biss m73 fall_P52 P-52
@@ -3442,6 +3514,23 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m130 fall_P102 P-102
     [ "$BISS_RC" -eq 0 ] && biss m131 fall_P102 P-102
     [ "$BISS_RC" -eq 0 ] && biss m132 fall_P103 P-103
+    # M133-Basislauf (r24, F24-02 (c)): die UNVERAENDERTE Harnisch-Kopie muss P-104 unter derselben Aufrufumgebung
+    # bestehen (env -u CI -u GITLAB_CI, --nur=P-104); erst dann wird die Kopie ohne die drei GIT_ALLOW_PROTOCOL-
+    # Setzungen erzeugt (M133, r23 F23-02) und gebissen; ohne gruenen Basislauf = KEIN URTEIL (BISS_RC=2)
+    if [ "$BISS_RC" -eq 0 ]; then
+        p104m_lauf "$SELBST" "$T/basis_m133"
+        case "$P104M_URTEIL/$P104M_RC" in
+            GRUEN/0) echo "  [OK]  Basislauf der unveraenderten Harnisch-Kopie: P-104 GRUEN (rc 0)" ;;
+            *) echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: P-104 $P104M_URTEIL (rc $P104M_RC)" \
+                    "-- KEIN URTEIL"; BISS_RC=2 ;;
+        esac
+    fi
+    if [ "$BISS_RC" -eq 0 ]; then
+        ersetze_literal "$SELBST" ' GIT_ALLOW_PROTOCOL=file' '' > "$MUT/m133.sh"
+        if cmp -s "$SELBST" "$MUT/m133.sh"; then
+            echo "  [ABBRUCH] Mutante m133 ist byte-gleich zum Harnisch"; BISS_RC=2
+        fi
+    fi
     [ "$BISS_RC" -eq 0 ] && biss m133 fall_P104m P-104
     [ "$BISS_RC" -eq 0 ] && biss m134 fall_P106 P-106
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
