@@ -23,9 +23,10 @@
 # REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
 # (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
 # rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
-# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.442) oder ungestagt (git diff, Z.453);
-# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.406-409); commit --only -- <Fassungen>
-# (Z.463-466) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.416/419-420),
+# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.448) oder ungestagt (git diff, Z.462; alle drei
+# Gitlink-relevanten Wachen Z.249/448/462 mit --ignore-submodules=none (r20/r21));
+# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.412-415); commit --only -- <Fassungen>
+# (Z.473-476) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.422/425-426),
 # fremde Pfade bleiben auf HEAD-Stand (S17-02/L17-04, L18-01/S18-01)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
 # (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
 # nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
@@ -33,7 +34,7 @@
 # REV r9 (Codex-Lens r8 B + Fable-Lens r8 + Lead K299, 23.09.2026): S8-01 Pathspecs literal (GIT_LITERAL_PATHSPECS=1),
 # Index-Wache ohne Rename-Erkennung (--no-renames --name-status; r9: ganzer Index = Fassungs-Liste je A/M; seit
 # r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste, Teilmenge/leer erlaubt,
-# s. Z.435-441), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
+# s. Z.441-447), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
 # Export-Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
@@ -86,7 +87,12 @@
 # REV r20 (Codex-Lens r19 B S19-01 + Fable-Lens r19 L19-01/L19-02, Lead K322, 25.09.2026): --ignore-submodules=none
 # an diff_gleich (F-06, F-07, --cached-Vergleich) und an der Gesamtindex-Wache: diff.ignoreSubmodules=all im Runner-
 # Klon verbarg Gitlink-Wechsel und fremde gestagte Gitlinks (gemessen git 2.43.0: rc 0 / LEER ohne Flag, rc 1 / 'M sub'
-# mit Flag; das Flag gilt vor jeder Konfigurationsebene); 2 Nicht-Kommentar-Zeilen, kein neuer Kontrollfluss.
+# mit Flag; das Flag gilt vor jeder Konfigurationsebene);
+# 2 Nicht-Kommentar-Kommandos (3 Zeilen, Gesamtindex-Wache per Backslash zweizeilig), kein neuer Kontrollfluss.
+# REV r21 (Codex-Lens r20 B S20-01/S20-02 + Fable-Lens r20 L20-01, Lead K323, 25.09.2026): --ignore-submodules=none
+# auch an der Arbeitsbaum-Wache (ein Gitlink-Eintrag unterhalb von DIR ist committbar; DIR selbst kann nicht unter
+# einem Gitlink liegen, git add rc 128); Zaehlangabe REV r20 berichtigt; 1 Nicht-Kommentar-Kommando (2 Zeilen,
+# Arbeitsbaum-Wache per Backslash zweizeilig), kein neuer Kontrollfluss.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -404,9 +410,9 @@ for f in $FASSUNGEN; do
   # Indexmodus (100755 vom Remote) und die Modus-Wache endete auf Dauer rot (L9-06).
   git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"
   # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen; ein
-  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.405, ebenfalls
+  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.411, ebenfalls
   # ohne zu stagen (gemessen git 2.43.0, r19). Der Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie
-  # tragen (git diff --quiet traut beiden Bits; die Wache Z.410-416 faengt beide Faelle, L18-01/S18-01).
+  # tragen (git diff --quiet traut beiden Bits; die Wache Z.416-422 faengt beide Faelle, L18-01/S18-01).
   git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
     || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
   blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
@@ -450,7 +456,11 @@ done < "$WERK/index.txt"
 [ "$fremd" -eq 0 ] || fehler "$fremd fremde Pfad(e) im Index (erlaubt ist nur die Fassungs-Liste, S7-03/S8-01)"
 # S10-07 (r11, Codex-Lens r10 B): core.fileMode=true auch hier -- unter fileMode=false bliebe ein reiner Modus-Wechsel
 # einer fremden getrackten Datei unter DIR unsichtbar (S7-03-Ausschluss unvollstaendig).
-ungestagt=$(git -c core.fileMode=true diff --name-only -- "$DIR") || fehler "git diff --name-only $DIR"
+# r21 (Codex r20 B S20-01, Lead K323): --ignore-submodules=none auch hier -- ein Gitlink-Eintrag UNTERHALB von DIR ist
+# committbar, sein ungestagter Wechsel waere unter diff.ignoreSubmodules=all ohne Flag unsichtbar (gemessen git 2.43.0:
+# LEER ohne, Pfad mit Flag).
+ungestagt=$(git -c core.fileMode=true diff --name-only --ignore-submodules=none -- "$DIR") \
+  || fehler "git diff --name-only $DIR"
 [ -z "$ungestagt" ] || fehler "getrackte Aenderung(en) unter $DIR ausserhalb der Fassungs-Liste (ungestagt, S7-03)"
 set --
 while IFS= read -r p; do set -- "$@" "$p"; done < "$WERK/dst.txt"
