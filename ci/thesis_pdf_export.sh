@@ -93,6 +93,10 @@
 # auch an der Arbeitsbaum-Wache (ein Gitlink-Eintrag unterhalb von DIR ist committbar; DIR selbst kann nicht unter
 # einem Gitlink liegen, git add rc 128); Zaehlangabe REV r20 berichtigt; 1 Nicht-Kommentar-Kommando (2 Zeilen,
 # Arbeitsbaum-Wache per Backslash zweizeilig), kein neuer Kontrollfluss.
+# REV r22 (Lead K327, CI 288/16809 Job thesis:pdf-export: Push 403 'not allowed to push' trotz Token, der von prod1
+# ausserhalb des Runners angenommen wird, 25.09.2026): der Runner injiziert Job-Token-Auth als Git-Konfiguration
+# (credential.helper / http.<url>.extraHeader / url.<praefix>.insteadOf); Push + Fetch laufen ueber GITP_REMOTE
+# (F22-01: leerer Helper, leere Header-Liste, Selbstabbildung der URL, Zeichenwache), Diagnose der Schluessel (F22-02).
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -327,6 +331,17 @@ ASK
   export GIT_ASKPASS="$WERK/askpass.sh"
 fi
 
+# F22-01 (r22, Lead K327): der Runner injiziert Job-Token-Auth als Git-Konfiguration (credential.helper,
+# http.<url>.extraHeader, url.<praefix>.insteadOf/pushInsteadOf); Push und Fetch (F-05-Schleife) neutralisieren sie
+# GENAU fuer REMOTE: leerer credential.helper, leere extraHeader-Liste der URL, Selbstabbildung der URL als laengster
+# insteadOf-/pushInsteadOf-Praefix (schlaegt jeden kuerzeren Runner-Praefix; ein GLEICH langer globaler pushInsteadOf
+# gewinnt weiterhin = Restrisiko, sichtbar in der Diagnose F22-02); lokale Aufrufe behalten GITP. Zeichenwache: '='
+# oder Leerraum im REMOTE machte den -c-Schluessel unlesbar ('invalid key', rc 128; git 2.43.0) -> FEHLER vor jedem
+# Transport, Wert nicht ausgegeben (CI-Zweig: S7-04/S7-05 engen bereits auf https://host[:port]/[A-Za-z0-9._/-] ein).
+case "$REMOTE" in *[!A-Za-z0-9_./:-]*) fehler "REMOTE traegt Zeichen ausserhalb [A-Za-z0-9_./:-] (F22-01)" ;; esac
+GITP_REMOTE="git -c credential.helper= \
+-c http.$REMOTE.extraheader= -c url.$REMOTE.insteadOf=$REMOTE -c url.$REMOTE.pushInsteadOf=$REMOTE"
+
 # F-03: Eingabe-Haertung. Ziel und Quelle sind relative Unterbaeume ohne '..' und ohne .git-Komponente, das Ziel
 # kein Symlink, beide nach Aufloesung verschieden und das Ziel innerhalb des Arbeitsbaums; jede Zieldatei ist
 # kein Symlink.
@@ -486,6 +501,20 @@ for f in $FASSUNGEN; do
   [ "${e%%$TAB*}" = "100644 blob $q" ] || fehler "Export-Commit $NEU: $dst nicht 100644 blob der Quelle (S8-02)"
 done
 
+# F22-02 (r22): Diagnose VOR dem ersten Push: welche Konfiguration der Klassen extraHeader/insteadOf/pushInsteadOf/
+# credential.* wirkt (Herkunft + Schluessel, NIE Werte: --name-only); ohne die -c-Optionen von GITP, sonst erschiene
+# die eigene Neutralisierung als Eintrag; rc 1 = kein Treffer (0 Eintraege), rc >= 2 = Werkzeugfehler = FEHLER; die
+# S8-04-Maske (drei Regeln wie push.err/fetch.err, Reihenfolge 3-1-2, Ergebnis gleich) deckt userinfo im SCHLUESSEL
+# (Runner-Form url.https://gitlab-ci-token:TOKEN@host/.insteadof).
+if git config --show-origin --name-only \
+    --get-regexp '^(http\..*extraheader|url\..*insteadof|url\..*pushinsteadof|credential\.)' > "$WERK/gitconfig.txt"
+then gc_rc=0; else gc_rc=$?; fi
+[ "$gc_rc" -le 1 ] || fehler "git config --get-regexp (Diagnose F22-02) rc $gc_rc"
+gc_n=$(wc -l < "$WERK/gitconfig.txt" | tr -d ' ')
+printf '%s\n' "RUNNER-GITCONFIG: $gc_n Eintraege (Herkunft Schluessel, Werte nie ausgegeben; F22-02)"
+sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \
+  -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e "s/$TAB/ /" -e 's/^/  | /' "$WERK/gitconfig.txt"
+
 # F-05 Push-Schleife: jeder Fehler ist sichtbar; jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung
 # (FETCH_HEAD Vorfahr von HEAD = kein Race = FEHLER) -> Vorwachen F-06/F-07/S8-03/S9-05 -> Merge (nie rebase,
 # F-04 Marker) -> Tree-Wachen S7-01/S7-02/C6-04 am Merge-Ergebnis -> erneuter Push nur bei Erfolg aller Wachen
@@ -493,7 +522,7 @@ done
 versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
-  if $GITP push -q -o ci.skip "$REMOTE" "HEAD:refs/heads/$BRANCH" 2>"$WERK/push.err"; then   # S10-01: volle Ref
+  if $GITP_REMOTE push -q -o ci.skip "$REMOTE" "HEAD:refs/heads/$BRANCH" 2>"$WERK/push.err"; then   # S10-01: volle Ref
     printf '%s\n' "PUSH OK (ci.skip) auf $BRANCH (Versuch $versuch)"; exit 0
   fi
   # S8-04 (r9, Haertung): git-Diagnostik nur mit Credential-Maske ausgeben (userinfo in URLs -> <cred>).
@@ -503,7 +532,7 @@ while [ "$versuch" -lt 5 ]; do
   # ueber fremde Diagnoseformen; dritte Regel fuer Formen ohne '//' (scheme:user:kennwort@host/pfad).
   sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
     -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/push.err"
-  $GITP fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"   # S10-01
+  $GITP_REMOTE fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"   # S10-01
     sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
       -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/fetch.err"
     fehler "fetch $BRANCH fehlgeschlagen (Recht/Netz), kein Race"; }
