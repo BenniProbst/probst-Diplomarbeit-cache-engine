@@ -189,3 +189,17 @@ Korrekturen dieser Analyse nach der Tiefenanalyse 353 (Beweisort 20260920-order-
 Klicks auf den Folien 5/6/8/9 statt zwoelf auf 4-8 (Abschn. 2, Z-3); V-8-03 zwoelf Pruefer-Fragen statt elf (Abschn. 1
 und 8; die Liste in Abschn. 8 zaehlte bereits zwoelf Eintraege); V-8-04 384 gepaarte Kontexte der Folie 14 ergaenzt
 (Abschn. 7). Stand der Zeilenanker: Momentaufnahme dieses Nachtrags.
+
+## NACHTRAG 25.09.2026 -- P-11 LANDUNG r4 (Orders 353 (2) / 479 OP-10 / 482)
+- Deck (.pptx), Speaker Guide, Summary und Review-and-QA in diesem Ordner sind seit diesem Commit die Endfassung P-11
+  r4 (md5 Deck 72ae119c, Guide c81c0797, Summary 5ea678ee, Review 99ae3313; Route B 2709 Woerter = 1177 s = 19:37 im
+  Korridor 19:20-19:40). Owner-Gegenpruefung der NAS-Abgabe v3 am 25.09.2026 06:14Z: 'Vortrag-p11r4 ist jetzt
+  perfekt'.
+- Herkunft: P-11 Schreiber r1 (150 Protokoll-Eintraege) + Fix r2/r3/r4 (Eintraege 151-209) + Lens r1/r2/r3 (r3 TRAEGT
+  0 MUSS / 0 SOLL / 5 INFO). Protokolle und Lens-Berichte: Beweisort
+  backups-workflow/20260923-p10-vortrag-ce/p11-folien/ und NAS Vertragsordner 'Abgabe v3/review/vortrag-p11/'.
+- KORREKTUR der Bilanzzeile aus der Tiefenanalyse (Order 353, Beweisort
+  20260920-order-289-praesentation/ANALYSE-VORTRAG-DATEIEN-353.md Abschnitt 5 Z.2239 und Z.2990): 'CSV 21 = 17 DECKT /
+  4 TEIL' war um eins falsch; nachgezaehlt (P11-FOLIEN-BERICHT.md Z.118, P11-SCHREIBER-BERICHT.md Z.64, Lens r1
+  Pflichtpruefung (g)): 18 DECKT / 3 TEIL bei Nenner 21, die drei TEIL-Faelle sind Rundungen des Sprechtexts, 0
+  WIDERSPRICHT. Die Originalzeilen bleiben stehen (additiv).
