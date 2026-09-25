@@ -226,8 +226,19 @@
 #   P-103 Zeichenwache F22-01: Testhaken-Pfad mit '=' (machte -c url.<pfad>.insteadOf zum 'invalid key') -> FEHLER vor
 #        jedem Transport, Wert nicht ausgegeben, Bare-Tip unveraendert; Mutanten M127..M132 (Neutralisierung entfernt,
 #        Push bzw. Fetch ohne GITP_REMOTE, Diagnose mit Werten, Diagnose ohne Maske, Zeichenwache laesst '=' durch)
+#   P-104 Harnisch-Netzsperre F23-02 (r23, Codex B S22-02): GIT_ALLOW_PROTOCOL=file fuer jeden Script-/git-Aufruf des
+#        Harnischs; https-REMOTE des CI-Zweigs -> git verweigert den Transport VOR jeder Verbindung ('not allowed'),
+#        kein 'Failed to connect' auf 127.0.0.1:9; Harnisch-Mutante M133 (Setzung entfernt) muss den Fall reissen
+#   P-105 Helper-Reset F23-03 (a): Marker-Helfer ungescopt + URL-gescopt, 'credential fill' mit den GITP_REMOTE-
+#        Optionen des Scripts (Literal gelesen) -> kein Marker; Rot-zuerst ohne die leere Setzung (Marker entsteht)
+#   P-106 pushInsteadOf-Gegenrichtung F23-03 (b): kuerzerer globaler pushInsteadOf-Praefix auf toten Pfad -> Push
+#        erreicht den echten Bare-Tip (Selbstabbildung gewinnt); Mutante M134 (pushInsteadOf entfernt) reisst
+#   P-107 extraHeader-Listen-Reset F23-03 (c): Altwert in drei Formen (plain, kuerzerer Scope, gleicher Scope) ->
+#        get-urlmatch mit den GITP_REMOTE-Optionen leer, letzter get-all-Eintrag leer; Rot-zuerst ohne Reset
+#   P-108 Verweis-Wache F23-01: Zeilenverweise Script-Kopf Z.26-29/37 + L1-01-Kommentar Z.437/439 -> Zielzeile traegt
+#        das erwartete Literal (rot am Script r22, gruen am Script r23); keine Mutante (Textwache)
 #
-# SELBSTBISS (--selbstbiss): 132 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -313,6 +324,10 @@
 # Script-Fix F22-01 GITP_REMOTE (credential.helper= + http.<url>.extraheader= + url.<url>.insteadOf/pushInsteadOf =
 # Selbstabbildung) an Push + Fetch, Zeichenwache fuer REMOTE, Diagnose F22-02 (Herkunft + Schluessel, nie Werte) vor
 # dem ersten Push; neue Faelle P-101/P-102/P-103 + M127..M132 -> Faelle 107, Mutanten 132 = 66 + 66.
+# r23 (Codex r22 B S22-01..S22-04, Lead-Triage K329): Harnisch-Netzsperre GIT_ALLOW_PROTOCOL=file (P-104, Harnisch-
+# Mutante M133 per --nur=P-104 an der Harnisch-Kopie), Verhaltensnachweise Helper-Reset / pushInsteadOf-Gegenrichtung /
+# extraHeader-Listen-Reset (P-105..P-107, M134), Verweis-Wache P-108, M131 auf die Leak-Ursache gesetzt ('sed \' statt
+# 'sed \\': die r22-Form riss per sed-Werkzeugfehler); Script r23 nur Kommentare -> Faelle 112, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -368,10 +383,11 @@ CI_YML="${COMDARE_CI_YML:-$HIER/../../.gitlab-ci.yml}"
 CI_YML=$(readlink -f "$CI_YML") || { echo "ABBRUCH: readlink -f auf die .gitlab-ci.yml fehlgeschlagen"; exit 2; }
 [ -f "$CI_YML" ] || { echo "ABBRUCH: .gitlab-ci.yml '$CI_YML' fehlt"; exit 2; }
 SELBST="$HIER/$(basename "$0")"
-SELBSTBISS=0
+SELBSTBISS=0; NUR=""   # r23: --nur=<Kennung>
 for a in "$@"; do
     case "$a" in
         --selbstbiss) SELBSTBISS=1 ;;
+        --nur=*) NUR="${a#--nur=}" ;;   # r23: genau einen Fall fahren (Traeger des Harnisch-Mutanten M133)
         *) echo "ABBRUCH: unbekanntes Argument '$a'"; exit 2 ;;
     esac
 done
@@ -383,14 +399,14 @@ case "$T" in *' '*) echo "ABBRUCH: TMPDIR '$T' enthaelt Leerzeichen"; exit 2 ;; 
 
 # Hermetische git-Umgebung fuer die EIGENEN Aufrufe der Probe (das Script bekommt
 # seine Umgebung explizit per env -i in lauf()).
-export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_ALLOW_PROTOCOL=file   # r23 (F23-02): kein Netz
 export GIT_AUTHOR_NAME=probe GIT_AUTHOR_EMAIL=probe@ci.comdare.local
 export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=66; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=68; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
 LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
@@ -489,7 +505,7 @@ lauf() {
     _kurz=$(git -C "$_k" rev-parse --short "$_p") || return 2
     LAUF_N=$((LAUF_N+1)); _datum="$((1758600000 + LAUF_N)) +0000"
     ( cd "$_k" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null \
-        GIT_CONFIG_NOSYSTEM=1 GIT_COMMITTER_DATE="$_datum" GIT_AUTHOR_DATE="$_datum" \
+        GIT_CONFIG_NOSYSTEM=1 GIT_ALLOW_PROTOCOL=file GIT_COMMITTER_DATE="$_datum" GIT_AUTHOR_DATE="$_datum" \
         CI_COMMIT_BRANCH=development CI_COMMIT_SHA="$_p" CI_COMMIT_SHORT_SHA="$_kurz" \
         CI_PIPELINE_ID=4711 "$@" sh "$_s" $LAUF_ARGS ) > "$_l" 2>&1
 }
@@ -1633,6 +1649,7 @@ readme_unter_dir() { # $1 = Klonpfad, $2 = Text: getrackte Fremddatei docs/diplo
 netzsperre() { # $1 = Datei: git-Konfiguration, die JEDE http(s)-URL auf einen toten lokalen Pfad umbiegt (kein Netz)
     printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = https://\n' > "$1"
     printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = http://\n' >> "$1"
+    export GIT_ALLOW_PROTOCOL=file   # r23 (F23-02): git verweigert http(s) VOR jeder Verbindung (zweiter Gurt)
 }
 fall_P32() { # S7-01 (r8b): Remote setzt en-kurz auf Modus 100755 bei gleichem Blob -> UEBERHOLT, kein Push
     s="$1"; d="$T/P32"; vorlauf_v1 "$d" "$s" || return
@@ -2912,8 +2929,129 @@ fall_P103() { # F22-01 Zeichenwache (r22): ein Testhaken-Pfad mit '=' machte '-c
     erw_gleich "$t" "$BASE" "Bare-Tip (x=y) unveraendert"
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
+fall_P104() { # F23-02 (r23, Codex B S22-02): HARNISCH-NETZSPERRE per GIT_ALLOW_PROTOCOL=file -- eine https-REMOTE des
+    # CI-Zweigs (Instanz-Host, ID 288, kanonischer Pfad aus dem Script gelesen, nie ausgegeben) erreicht den Push; git
+    # verweigert den Transport VOR jedem Verbindungsversuch ('transport 'https' not allowed'); die insteadOf-Sperre der
+    # netzsperre() allein wird von der Selbstabbildung F22-01 (laengerer Praefix) verdraengt; dritter Gurt http.proxy
+    # 127.0.0.1:9 (geschlossener Port): ein Harnisch ohne die Setzung (M133) endet dort mit 'Failed to connect'.
+    s="$1"; d="$T/P104"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    netzsperre "$d/sperre"; printf '[http]\n\tproxy = http://127.0.0.1:9\n' >> "$d/sperre"
+    pfad=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$s" | head -n 1)
+    [ -n "$pfad" ] || { rot "INSTANZ_PROJEKT_PFAD im Script nicht lesbar"; return; }
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" \
+        CI_SERVER_URL=https://gitlab.comdare.local CI_SERVER_HOST=gitlab.comdare.local CI_PROJECT_ID=288 \
+        CI_PROJECT_PATH="$pfad" COMDARE_WRITEBACK_USER=ciuser COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?
+    sed "s#$pfad#<super-pfad>#g" "$d/out" > "$d/out.m"; zeige "$d/out.m"
+    erw_rc "$rc" 1; erw_text "$d/out.m" "not allowed"; erw_text "$d/out.m" "Push abgelehnt (Versuch 1)"
+    erw_kein_text "$d/out.m" "Failed to connect"; erw_kein_text "$d/out.m" "127.0.0.1"
+    erw_kein_text "$d/out.m" "$KOEDER"; erw_kein_text "$d/out.m" "PUSH OK"
+    if grep -qF -- "$pfad" "$d/out"; then rot "Ausgabe traegt den Projektpfad (S7-05)"
+    else ok "Ausgabe frei vom Projektpfad (S7-05)"; fi
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P104m() { # r23: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script und
+    # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); Muster wie P-57/m80 (Kopie des Harnischs)
+    h="$1"; d="$T/P104m"; mkdir -p "$d"
+    pfad=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
+    COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$d" sh "$h" --nur=P-104 > "$d/out" 2>&1; rc=$?
+    sed "s#$pfad#<super-pfad>#g" "$d/out" > "$d/out.m"
+    grep -E '^  P-104: |^BILANZ|^    \[ROT\]' "$d/out.m" | sed 's/^/      > /'
+    n=$(grep -o '^  P-104: ROT ([0-9]*' "$d/out.m" | grep -o '[0-9]*$'); [ -n "$n" ] || n=0
+    [ "$n" -eq 0 ] || FEHL=$((FEHL+n))
+    grep -q '^  P-104: ' "$d/out.m" || rot "Harnisch-Kopie lieferte kein P-104-Urteil (rc=$rc)"
+}
+fall_P105() { # F23-03 (a) (r23, Codex B S22-04 / N-02): HELPER-RESET als Verhalten -- Wegwerf-GIT_CONFIG_GLOBAL mit
+    # credential.helper bzw. credential.<REMOTE>.helper = Marker-Helfer (schreibt je Aufruf eine Datei); git mit GENAU
+    # den GITP_REMOTE-Optionen des Scripts (Literal aus dem Script gelesen, REMOTE eingesetzt) 'credential fill' nicht
+    # interaktiv -> KEIN Marker (Reset wirkt ungescopt UND URL-gescopt); Rot-zuerst: ohne die Optionen entsteht der
+    # Marker in beiden Formen (Instrument beisst). credential.<url>.helper= im Script ist nicht noetig (gemessen).
+    s="$1"; d="$T/P105"; mkdir -p "$d"
+    REMOTE=https://gitlab.example.invalid/gruppe/projekt.git
+    opt=$(sed -n '/^GITP_REMOTE="/,/"$/p' "$s" | sed -e 's/^GITP_REMOTE="//' -e 's/ \\$//' -e 's/"$//' | tr '\n' ' ')
+    case "$opt" in "git -c credential.helper= "*) ok "GITP_REMOTE-Literal aus dem Script gelesen" ;;
+        *) rot "GITP_REMOTE-Literal nicht lesbar"; return ;; esac
+    eval "gr=\"$opt\""   # setzt REMOTE ein wie im Script
+    printf '#!/bin/sh\ntouch "%s/marker-$1"\n' "$d" > "$d/marker.sh"; chmod 0700 "$d/marker.sh"
+    git init -q "$d/repo" || { rot "Wegwerf-Repo nicht baubar"; return; }
+    printf '[credential]\n\thelper = !%s\n' "$d/marker.sh" > "$d/cfg-plain"
+    printf '[credential "%s"]\n\thelper = !%s\n' "$REMOTE" "$d/marker.sh" > "$d/cfg-url"
+    fill105() { # $1 = Konfigurationsdatei, $2 = git-Aufruf (mit oder ohne die GITP_REMOTE-Optionen) -> Markerzahl
+        rm -f "$d"/marker-*
+        printf 'protocol=https\nhost=gitlab.example.invalid\npath=gruppe/projekt.git\n\n' \
+            | GIT_CONFIG_GLOBAL="$1" GIT_TERMINAL_PROMPT=0 GIT_ASKPASS= $2 -C "$d/repo" credential fill >/dev/null 2>&1
+        ls "$d"/marker-* 2>/dev/null | wc -l
+    }
+    n=$(fill105 "$d/cfg-plain" git); erw_gleich "$n" 1 "Rot-zuerst: Marker ohne Reset (ungescopt)"
+    n=$(fill105 "$d/cfg-url" git); erw_gleich "$n" 1 "Rot-zuerst: Marker ohne Reset (URL-gescopt)"
+    n=$(fill105 "$d/cfg-plain" "$gr"); erw_gleich "$n" 0 "kein Marker mit den GITP_REMOTE-Optionen (ungescopt)"
+    n=$(fill105 "$d/cfg-url" "$gr"); erw_gleich "$n" 0 "kein Marker mit den GITP_REMOTE-Optionen (URL-gescopt)"
+}
+fall_P106() { # F23-03 (b) (r23, Codex B S22-04): pushInsteadOf-GEGENRICHTUNG -- ein kuerzerer globaler pushInsteadOf-
+    # Praefix biegt den Push (nicht den Fetch) auf einen toten Pfad; die Selbstabbildung F22-01 (laengster Praefix)
+    # gewinnt, der Push erreicht den echten Bare-Tip; ohne die pushInsteadOf-Setzung (M134) reisst der Fall.
+    s="$1"; d="$T/P106"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    printf '[url "%s/nirgends/"]\n\tpushInsteadOf = %s/\n' "$d" "$d" > "$d/umbiegung"
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/umbiegung" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "PUSH OK (ci.skip)"; erw_kein_text "$d/out" "Push abgelehnt"
+    erw_text "$d/out" "RUNNER-GITCONFIG: 1 Eintraege"
+    erw_text "$d/out" "file:$d/umbiegung url.$d/nirgends/.pushinsteadof"
+    erw_kein_text "$d/out" "does not appear to be a git repository"
+    t=$(tip); n=$(git -C "$BARE" rev-list --count "$t"); erw_gleich "$n" 2 "Bare-Tip = Seed + Export-Commit"
+}
+fall_P107() { # F23-03 (c) (r23, Codex B S22-04 / N-01): extraHeader-LISTEN-RESET als Verhalten -- vorbelegter Header
+    # in DREI Formen (plain http.extraheader, kuerzerer URL-Scope, gleicher URL-Scope) -> git mit den GITP_REMOTE-
+    # Optionen 'config --get-urlmatch http.extraheader REMOTE' (dieselbe urlmatch-Aufloesung wie der http-Transport)
+    # liefert KEINEN Altwert; zusaetzlich get-all am REMOTE-Schluessel: Formen 1/2 nur der leere Eintrag, Form 3
+    # listet den Altwert VOR dem leeren Eintrag (Listung; der letzte Eintrag leert die Liste); Rot-zuerst: ohne die
+    # Optionen erscheint der Altwert in allen drei Formen; Werte werden nie ausgegeben (Koeder maskiert).
+    s="$1"; d="$T/P107"; mkdir -p "$d"
+    REMOTE=https://gitlab.example.invalid/gruppe/projekt.git
+    opt=$(sed -n '/^GITP_REMOTE="/,/"$/p' "$s" | sed -e 's/^GITP_REMOTE="//' -e 's/ \\$//' -e 's/"$//' | tr '\n' ' ')
+    eval "gr=\"$opt\""
+    git init -q "$d/repo" || { rot "Wegwerf-Repo nicht baubar"; return; }
+    printf '[http]\n\textraheader = Authorization: Bearer %s-1\n' "$KOEDER" > "$d/cfg1"
+    printf '[http "https://gitlab.example.invalid/"]\n\textraheader = Authorization: Bearer %s-2\n' "$KOEDER" \
+        > "$d/cfg2"
+    printf '[http "%s"]\n\textraheader = Authorization: Bearer %s-3\n' "$REMOTE" "$KOEDER" > "$d/cfg3"
+    for i in 1 2 3; do
+        GIT_CONFIG_GLOBAL="$d/cfg$i" git -C "$d/repo" config --get-urlmatch http.extraheader "$REMOTE" > "$d/alt$i" 2>&1
+        if grep -qF -- "Bearer $KOEDER-$i" "$d/alt$i"; then ok "Rot-zuerst Form $i: Altwert ohne Reset sichtbar"
+        else rot "Rot-zuerst Form $i: Altwert ohne Reset NICHT sichtbar"; fi
+        GIT_CONFIG_GLOBAL="$d/cfg$i" $gr -C "$d/repo" config --get-urlmatch http.extraheader "$REMOTE" > "$d/neu$i" 2>&1
+        erw_kein_text "$d/neu$i" "Bearer"; erw_kein_text "$d/neu$i" "$KOEDER"
+        GIT_CONFIG_GLOBAL="$d/cfg$i" $gr -C "$d/repo" config --get-all "http.$REMOTE.extraheader" > "$d/all$i" 2>&1
+        l=$(tail -n 1 "$d/all$i"); erw_gleich "$l" "" "Form $i: letzter get-all-Eintrag leer"
+    done
+    erw_kein_text "$d/all1" "Bearer"; erw_kein_text "$d/all2" "Bearer"; erw_text "$d/all3" "Bearer"
+}
+fall_P108() { # F23-01 (r23, Codex B S22-01): VERWEIS-WACHE -- jeder Zeilenverweis im Script-Kopf und im L1-01-Kommentar
+    # zeigt auf die benannte Zielzeile (Tafel: Kopf-Zeile, Verweis-Literal, Zielzeile, Literal der Zielzeile); am
+    # Script r22 (Verweise auf den r21-Stand) reisst der Fall, am Script r23 ist er gruen; keine Mutante (Textwache).
+    s="$1"
+    v108() { # $1 = Kopf-Zeile, $2 = Verweis-Literal, $3 = Zielzeile, $4 = Literal der Zielzeile
+        k=$(sed -n "${1}p" "$s"); z=$(sed -n "${3}p" "$s")
+        case "$k" in *"$2"*) ok "Z.$1 traegt '$2'" ;; *) rot "Z.$1 traegt NICHT '$2'" ;; esac
+        case "$z" in *"$4"*) ok "Z.$3 traegt '$4'" ;; *) rot "Z.$3 traegt NICHT '$4'" ;; esac
+    }
+    v108 26 'Z.472)' 472 'git diff --cached --no-renames --name-status --ignore-submodules=none'
+    v108 26 'Z.486;' 486 'diff --name-only --ignore-submodules=none -- "$DIR"'
+    v108 27 'Z.257/472/486' 257 'diff_gleich() { set +e; git diff --quiet --ignore-submodules=none'
+    v108 28 'Z.436-439' 436 '# L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege'
+    v108 29 'Z.497-500' 497 'commit -q --only'
+    v108 29 'Z.497-500' 500 '-- "$@" || fehler "git commit"'
+    v108 29 'Z.446/449-450' 446 '[ "$idx" = "$blob" ] || fehler'
+    v108 29 'Z.446/449-450' 449 'roh=$(git hash-object --no-filters -- "$dst")'
+    v108 29 'Z.446/449-450' 450 '[ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion'
+    v108 37 'Z.465-471' 465 '# I-02 / S7-03 (r8b) / S8-01 (r9): der gesamte gestagte Diff (diff --cached)'
+    v108 437 'FEHLER in Z.435' 435 'git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"'
+    v108 439 'Z.440-446' 440 'git ls-files --error-unmatch -- "$dst"'
+    v108 439 'Z.440-446' 446 '[ "$idx" = "$blob" ] || fehler'
+}
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
+    case "$NUR" in '') ;; "$1") ;; *) return 0 ;; esac   # r23: --nur=<Kennung> faehrt genau einen Fall (M133-Traeger)
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
     eval "BASIS_$(printf '%s' "$1" | tr -d -)=\$FEHL" # r8 (L7-03): Basis-FEHL je Fall fuer biss()
@@ -3031,6 +3169,11 @@ fall P-100 fall_P100 "$SKRIPT"
 fall P-101 fall_P101 "$SKRIPT"
 fall P-102 fall_P102 "$SKRIPT"
 fall P-103 fall_P103 "$SKRIPT"
+fall P-104 fall_P104 "$SKRIPT"
+fall P-105 fall_P105 "$SKRIPT"
+fall P-106 fall_P106 "$SKRIPT"
+fall P-107 fall_P107 "$SKRIPT"
+fall P-108 fall_P108 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -3193,18 +3336,24 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     ersetze_literal "$SKRIPT" '$GITP_REMOTE fetch -q "$REMOTE"' '$GITP fetch -q "$REMOTE"' > "$MUT/m129.sh"
     # M130 (r22, F22-02): Diagnose ohne --name-only (Werte im Log) -> P-102 muss reissen (Koeder im Wert sichtbar)
     ersetze_literal "$SKRIPT" 'git config --show-origin --name-only' 'git config --show-origin' > "$MUT/m130.sh"
-    # M131 (r22, F22-02): Maskenregeln 3+1 der Diagnose entfernt (Regel 2 deckt die https-Form nicht) -> P-102 muss
-    # reissen (Token im Schluessel sichtbar); Literal nur in der Diagnose (push.err/fetch.err: Reihenfolge 1-2-3)
+    # M131 (r22, F22-02): Zeile 1 der Diagnose-Maske entfernt (Zeile 2 deckt die https-Form nicht) -> P-102 muss
+    # reissen (Koeder im Schluessel sichtbar, r23: Fortsetzung 'sed \' bleibt, kein Werkzeugfehler; Literal nur hier)
     ersetze_literal "$SKRIPT" \
-        "sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \\" 'sed \\' \
+        "sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \\" 'sed \' \
         > "$MUT/m131.sh"
     # M132 (r22, F22-01): Zeichenwache laesst '=' durch -> P-103 muss reissen (git 'invalid key' statt Vertragstext)
     ersetze_literal "$SKRIPT" '*[!A-Za-z0-9_./:-]*) fehler' '*[!A-Za-z0-9_./:=-]*) fehler' > "$MUT/m132.sh"
+    # M133 (r23, F23-02): Harnisch OHNE GIT_ALLOW_PROTOCOL=file (Kopie des Harnischs, alle drei Setzungen entfernt) ->
+    # P-104 muss reissen (Traeger fall_P104m faehrt die Kopie mit --nur=P-104: 'Failed to connect' statt 'not allowed')
+    ersetze_literal "$SELBST" ' GIT_ALLOW_PROTOCOL=file' '' > "$MUT/m133.sh"
+    # M134 (r23, F23-03 (b)): pushInsteadOf-Selbstabbildung aus GITP_REMOTE entfernt -> P-106 muss reissen (der Push
+    # folgt dem kuerzeren globalen pushInsteadOf-Praefix auf den toten Pfad, der Fetch bleibt per insteadOf intakt)
+    ersetze_literal "$SKRIPT" ' -c url.$REMOTE.pushInsteadOf=$REMOTE"' '"' > "$MUT/m134.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
              m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
              m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126 \
-             m127 m128 m129 m130 m131 m132; do
+             m127 m128 m129 m130 m131 m132 m134; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -3259,6 +3408,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m68 fall_P48 P-48
     [ "$BISS_RC" -eq 0 ] && biss m69 fall_P39 P-39
     if cmp -s "$SELBST" "$MUT/m80.sh"; then echo "  [ABBRUCH] Mutante m80 ist byte-gleich zum Harnisch"; BISS_RC=2; fi
+    if cmp -s "$SELBST" "$MUT/m133.sh"; then echo "  [ABBRUCH] Mutante m133 ist byte-gleich zum Harnisch"; BISS_RC=2; fi
     [ "$BISS_RC" -eq 0 ] && biss m71 fall_P50 P-50
     [ "$BISS_RC" -eq 0 ] && biss m72 fall_P51 P-51
     [ "$BISS_RC" -eq 0 ] && biss m73 fall_P52 P-52
@@ -3292,6 +3442,8 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m130 fall_P102 P-102
     [ "$BISS_RC" -eq 0 ] && biss m131 fall_P102 P-102
     [ "$BISS_RC" -eq 0 ] && biss m132 fall_P103 P-103
+    [ "$BISS_RC" -eq 0 ] && biss m133 fall_P104m P-104
+    [ "$BISS_RC" -eq 0 ] && biss m134 fall_P106 P-106
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
