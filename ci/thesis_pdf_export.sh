@@ -23,10 +23,10 @@
 # REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
 # (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
 # rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
-# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.448) oder ungestagt (git diff, Z.462; alle drei
-# Gitlink-relevanten Wachen Z.249/448/462 mit --ignore-submodules=none (r20/r21));
-# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.412-415); commit --only -- <Fassungen>
-# (Z.473-476) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.422/425-426),
+# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.472) oder ungestagt (git diff, Z.486; alle drei
+# Gitlink-relevanten Wachen Z.257/472/486 mit --ignore-submodules=none (r20/r21));
+# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.436-439); commit --only -- <Fassungen>
+# (Z.497-500) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.446/449-450),
 # fremde Pfade bleiben auf HEAD-Stand (S17-02/L17-04, L18-01/S18-01)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
 # (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
 # nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
@@ -34,7 +34,7 @@
 # REV r9 (Codex-Lens r8 B + Fable-Lens r8 + Lead K299, 23.09.2026): S8-01 Pathspecs literal (GIT_LITERAL_PATHSPECS=1),
 # Index-Wache ohne Rename-Erkennung (--no-renames --name-status; r9: ganzer Index = Fassungs-Liste je A/M; seit
 # r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste, Teilmenge/leer erlaubt,
-# s. Z.441-447), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
+# s. Z.465-471), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
 # Export-Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
@@ -97,6 +97,10 @@
 # ausserhalb des Runners angenommen wird, 25.09.2026): der Runner injiziert Job-Token-Auth als Git-Konfiguration
 # (credential.helper / http.<url>.extraHeader / url.<praefix>.insteadOf); Push + Fetch laufen ueber GITP_REMOTE
 # (F22-01: leerer Helper, leere Header-Liste, Selbstabbildung der URL, Zeichenwache), Diagnose der Schluessel (F22-02).
+# REV r23 (Codex-Lens r22 B S22-01..S22-04, Lead-Triage K329, 25.09.2026): Zeilenverweise Z.26-29/37 und im L1-01-
+# Kommentar (Z.437/439) auf den r23-Stand nachgezogen (Verweis-Wache P-108); Reichweite der Gleichstands-Grenze
+# (Z.345-349: auch insteadOf/Fetch; credential.username, http.proxy, GIT_CONFIG_COUNT bleiben wirksam); Helper-Reset
+# ungescopt + URL-gescopt gemessen (P-105, credential.<url>.helper= nicht noetig); 0 Nicht-Kommentar-Aenderungen.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -338,6 +342,11 @@ fi
 # gewinnt weiterhin = Restrisiko, sichtbar in der Diagnose F22-02); lokale Aufrufe behalten GITP. Zeichenwache: '='
 # oder Leerraum im REMOTE machte den -c-Schluessel unlesbar ('invalid key', rc 128; git 2.43.0) -> FEHLER vor jedem
 # Transport, Wert nicht ausgegeben (CI-Zweig: S7-04/S7-05 engen bereits auf https://host[:port]/[A-Za-z0-9._/-] ein).
+# Reichweite der Gleichstands-Grenze (r23, Codex B S22-03): sie gilt fuer pushInsteadOf (Push) UND insteadOf (Fetch)
+# gleichermassen -- ein GLEICH langer globaler Praefix beider Arten gewinnt weiterhin. NICHT Teil der drei neutrali-
+# sierten Klassen und daher weiter wirksam: credential.username, http.proxy bzw. die Proxy-Umgebung und Eintraege
+# aus GIT_CONFIG_COUNT/KEY_n/VALUE_n (gleiche Praefix-Regeln, die -c-Setzungen kommen danach, ein Gleichstand bleibt).
+# Die Diagnose F22-02 zeigt Herkunft und Schluessel, hebt aber keine Gleichstands-Regel auf.
 case "$REMOTE" in *[!A-Za-z0-9_./:-]*) fehler "REMOTE traegt Zeichen ausserhalb [A-Za-z0-9_./:-] (F22-01)" ;; esac
 GITP_REMOTE="git -c credential.helper= \
 -c http.$REMOTE.extraheader= -c url.$REMOTE.insteadOf=$REMOTE -c url.$REMOTE.pushInsteadOf=$REMOTE"
@@ -425,9 +434,9 @@ for f in $FASSUNGEN; do
   # Indexmodus (100755 vom Remote) und die Modus-Wache endete auf Dauer rot (L9-06).
   git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"
   # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen; ein
-  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.411, ebenfalls
+  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.435, ebenfalls
   # ohne zu stagen (gemessen git 2.43.0, r19). Der Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie
-  # tragen (git diff --quiet traut beiden Bits; die Wache Z.416-422 faengt beide Faelle, L18-01/S18-01).
+  # tragen (git diff --quiet traut beiden Bits; die Wache Z.440-446 faengt beide Faelle, L18-01/S18-01).
   git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
     || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
   blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
