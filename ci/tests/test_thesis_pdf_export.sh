@@ -238,7 +238,11 @@
 #   P-108 Verweis-Wache F23-01: Zeilenverweise Script-Kopf Z.26-29/37 + L1-01-Kommentar Z.441/443 -> Zielzeile traegt
 #        das erwartete Literal (rot an alten Nummern, gruen am r24-Stand); keine Mutante (Textwache)
 #   P-109 --nur fail-closed F24-01 (r24, Codex B S23-01 / Fable L23-01): Harnisch-Kopie mit '--nur=P-999', '--nur=' und
-#        '--nur=P-104 --selbstbiss' je rc 2 mit ABBRUCH-Literal, nie 'PROBE ... GRUEN'; '--nur=P-104' rc 0 (1 von 1)
+#        '--nur=P-104 --selbstbiss' je rc 2 mit ABBRUCH-Literal, nie 'PROBE ... GRUEN'; '--nur=P-104' rc 0 (1 von 1;
+#        r25 (F25-02, Fable L24-05): nacktes '--nur' rc 2 'unbekanntes Argument' (Regressionswache, kein Zweig)
+#   P-110 M133-Urteilstafel F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): Stand-in-Kopien (nur
+#        echo + exit) mit ROT/rc 2, ROT/rc 143, GRUEN/rc 1, ohne Urteilszeile, Doppelzeile, ROT (0) -> KEIN-URTEIL-
+#        Marker + FEHL 0; ROT (4)/rc 1 -> FEHL 4 ohne Marker; GRUEN/rc 0 -> weder Marker noch FEHL; keine Mutante
 #
 # SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -334,6 +338,10 @@
 # mit --selbstbiss je rc 2; 0 Faelle = KEIN URTEIL) + P-109; fall_P104m per env -u CI -u GITLAB_CI, Basislauf der
 # unveraenderten Kopie vor M133, fehlendes/widerspruechliches P-104-Urteil = KEIN URTEIL (BISS_RC=2); P-99 um die
 # F24-03-Literale (COUNT-Paare) + REV-r24 erweitert; P-108 um +4 (REV-r24-Block) -> Faelle 113, Mutanten 134 = 68 + 66.
+# r25 (Codex r24 B S24-01 Haertung + N-02, Fable r24 L24-02/L24-03/L24-05, Lead K334/K335): M133-Urteilstafel
+# fail-closed (belastbar nur GRUEN/rc 0 und ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile, P104M_Z; sonst KEIN
+# URTEIL) + P-110; P-109 (5) nacktes --nur; Kommentar hermetische git-Umgebung (F25-03); Script r24 unveraendert
+# -> Faelle 114, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -409,8 +417,9 @@ T=$(mktemp -d "${TMPDIR:-/tmp}/tpe_probe.XXXXXX") || { echo "ABBRUCH: mktemp -d 
 trap 'rm -rf "$T"' EXIT INT TERM
 case "$T" in *' '*) echo "ABBRUCH: TMPDIR '$T' enthaelt Leerzeichen"; exit 2 ;; esac
 
-# Hermetische git-Umgebung fuer die EIGENEN Aufrufe der Probe (das Script bekommt
-# seine Umgebung explizit per env -i in lauf()).
+# Hermetische git-Umgebung fuer die EIGENEN git-Aufrufe der Probe; das Script bekommt seine Umgebung explizit per
+# env -i in lauf(); Harnisch-KOPIEN (p104m_lauf, P-109) laufen per env -u CI -u GITLAB_CI und ERBEN diese Exporte
+# samt PATH/HOME (kein env -i) -- r25 (F25-03, Codex B r24 N-02).
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_ALLOW_PROTOCOL=file   # r23 (F23-02): kein Netz
 export GIT_AUTHOR_NAME=probe GIT_AUTHOR_EMAIL=probe@ci.comdare.local
 export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
@@ -2817,6 +2826,12 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     erw_gleich "$n" 1 \
         "REV-r23-Zeile 'nur unbehandelte Schluessel wie credential.username bleiben wirksam' (F24-03)"
     n=$(grep -c '^# REV r24 ' "$s"); erw_gleich "$n" 1 "REV-r24-Kopf"
+    # r25 (F25-03, Codex B r24 N-02 / Fable L24-06): Kommentar 'Hermetische git-Umgebung' am HARNISCH selbst
+    # ($SELBST); Literale zerlegt, damit diese Wache ihre eigene Quellzeile nicht mitzaehlt
+    alt='fuer die EIGENEN Aufrufe der Probe'" (das Script bekommt"; neu='ERBEN diese'" Exporte"
+    n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Harnisch-Fassung 'fuer die EIGENEN Aufrufe ...' (F25-03)"
+    n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Harnisch-Kommentar ERBEN-Exporte (F25-03)"
+    n=$(grep -c '^# r25 (Codex r24 B S24-01' "$SELBST"); erw_gleich "$n" 1 "r25-Kopfabsatz des Harnischs (F25-04)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -2980,13 +2995,17 @@ fall_P104() { # F23-02 (r23, Codex B S22-02): HARNISCH-NETZSPERRE per GIT_ALLOW_
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
 }
 p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Original oder Mutante) im Ordner $2, setzt
-    # P104M_URTEIL (GRUEN/ROT/KEIN), P104M_RC, P104M_N; env -u CI -u GITLAB_CI (F24-02 (a)): die oeffentliche Override-
+    # P104M_URTEIL (GRUEN/ROT/KEIN), P104M_RC, P104M_N, P104M_Z r25; env -u CI -u GITLAB_CI (F24-02 (a)): die Override-
     # Sperre des Kopfes (P-22) bleibt, der interne Kopienaufruf traegt die CI-Marker nicht weiter
     mkdir -p "$2"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
     env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$2" sh "$1" --nur=P-104 \
         > "$2/out" 2>&1; P104M_RC=$?
     sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"
-    P104M_N=$(grep -o '^  P-104: ROT ([0-9]*' "$2/out.m" | grep -o '[0-9]*$'); [ -n "$P104M_N" ] || P104M_N=0
+    P104M_Z=$(grep -c '^  P-104: ' "$2/out.m")   # r25 (F25-01 (a)): Zahl der Urteilszeilen, belastbar nur genau 1
+    if [ "$P104M_Z" -eq 1 ]; then
+        P104M_N=$(grep -o '^  P-104: ROT ([0-9]*' "$2/out.m" | head -n 1 | grep -o '[0-9]*$')
+    else P104M_N=''; fi
+    [ -n "$P104M_N" ] || P104M_N=0
     if grep -q '^  P-104: GRUEN' "$2/out.m"; then P104M_URTEIL=GRUEN
     elif grep -q '^  P-104: ROT' "$2/out.m"; then P104M_URTEIL=ROT
     else P104M_URTEIL=KEIN; fi
@@ -2994,14 +3013,23 @@ p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Orig
 }
 fall_P104m() { # r23/r24: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script,
     # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); F24-02 (b): fehlendes Urteil oder ein rc, der dem
-    # Urteil widerspricht (GRUEN bei rc != 0, ROT bei rc 0), ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss())
+    # Urteil widerspricht, ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss()); r25 (F25-01): Tafel gehaertet
     p104m_lauf "$1" "$T/P104m"
-    case "$P104M_URTEIL/$P104M_RC" in
-        GRUEN/0) : ;;
-        ROT/0|GRUEN/*|KEIN/*)
-            printf '%s\n' "Harnisch-Kopie ohne belastbares P-104-Urteil (Urteil $P104M_URTEIL, rc $P104M_RC)" \
-                > "$T/kein-urteil.txt" ;;
-        ROT/*) FEHL=$((FEHL+P104M_N)) ;;
+    # r25 (F25-01 (b), Codex B S24-01 Haertung / Fable L24-02/L24-03): belastbar sind NUR GRUEN/rc 0 (kein Biss) und
+    # ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss); ROT mit rc != 1, ROT (0), GRUEN mit rc != 0, KEIN und
+    # fehlende oder doppelte Urteilszeile = KEIN URTEIL (Marker fuer biss())
+    _tafel=KEIN
+    if [ "$P104M_Z" -eq 1 ]; then
+        case "$P104M_URTEIL/$P104M_RC" in
+            GRUEN/0) _tafel=OK ;;
+            ROT/1) if [ "$P104M_N" -gt 0 ]; then _tafel=BISS; fi ;;
+        esac
+    fi
+    case "$_tafel" in
+        OK) : ;;
+        BISS) FEHL=$((FEHL+P104M_N)) ;;
+        *) _txt="Harnisch-Kopie ohne belastbares P-104-Urteil (Urteil $P104M_URTEIL, rc $P104M_RC,"
+           _txt="$_txt Urteilszeilen $P104M_Z, gerissen $P104M_N)"; printf '%s\n' "$_txt" > "$T/kein-urteil.txt" ;;
     esac
 }
 fall_P105() { # F23-03 (a) (r23, Codex B S22-04 / N-02): HELPER-RESET als Verhalten -- Wegwerf-GIT_CONFIG_GLOBAL mit
@@ -3096,6 +3124,8 @@ fall_P109() { # F24-01 (r24, Codex B S23-01 / Fable L23-01): --nur ist fail-clos
     # -u GITLAB_CI wie fall_P104m) liefert mit '--nur=P-999' (unbekannt), '--nur=' (leer) und '--nur=P-104 --selbstbiss'
     # je rc 2 mit ABBRUCH-Literal und druckt nie 'PROBE thesis_pdf_export: GRUEN'; Gruen-Probe '--nur=P-104' rc 0 mit
     # 'BILANZ: 1 von 1 Faellen gruen'. Am r23-Harnisch: rc 0 + GRUEN bei 0 Faellen bzw. Vollauf (Rot-zuerst, Lauf R-1b).
+    # r25 (F25-02, Fable L24-05): nacktes '--nur' trifft den Vorbestand-Zweig 'unbekanntes Argument' rc 2
+    # (Regressionswache, kein neuer case-Arm; Lead-Triage r24 Teil 2).
     d="$T/P109"; mkdir -p "$d"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
     p109() { # $1 = Marke, $2.. = Argumente der Kopie -> $d/$1.out (maskiert), rc in P109_RC
         _m="$1"; shift; mkdir -p "$d/$_m"
@@ -3112,7 +3142,53 @@ fall_P109() { # F24-01 (r24, Codex B S23-01 / Fable L23-01): --nur ist fail-clos
     p109 kombi --nur=P-104 --selbstbiss; erw_rc "$P109_RC" 2
     erw_text "$d/kombi.out" "ABBRUCH: --nur und --selbstbiss schliessen sich aus"
     erw_kein_text "$d/kombi.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 nackt --nur; erw_rc "$P109_RC" 2   # r25 (F25-02): nacktes --nur
+    erw_text "$d/nackt.out" "ABBRUCH: unbekanntes Argument '--nur'"
+    erw_kein_text "$d/nackt.out" "PROBE thesis_pdf_export: GRUEN"
     p109 gruen --nur=P-104; erw_rc "$P109_RC" 0; erw_text "$d/gruen.out" "BILANZ: 1 von 1 Faellen gruen, 0 rot"
+}
+
+fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M133-URTEILSTAFEL, Stand-in-Kopien
+    # (nur echo + exit, keine Rekursion) drucken die gewuenschten P-104-Urteilszeilen und enden mit dem Soll-rc;
+    # fall_P104m laeuft je Variante in einer Subshell mit eigenem T und FEHL=0. Belastbar sind NUR GRUEN/rc 0 (kein
+    # Biss) und ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss: FEHL += N); alles andere schreibt den KEIN-
+    # URTEIL-Marker und laesst FEHL bei 0. Am r24-Harnisch sind (a) (b) (e) (f) rot (ROT/rc != 1 und ROT (0) zaehlten
+    # als Biss, die Doppelzeile riss die Arithmetik der Subshell); keine Mutante (Textwache-Klasse).
+    d="$T/P110"; mkdir -p "$d"
+    p110() { # $1 = Marke, $2 = rc der Kopie, $3.. = Urteilszeilen (ohne die zwei fuehrenden Leerzeichen)
+        _m="$1"; _rc="$2"; shift 2; _k="$d/kopie-$_m.sh"; mkdir -p "$d/$_m"
+        printf '#!/bin/sh\n' > "$_k"
+        for _z in "$@"; do printf 'echo "  %s"\n' "$_z" >> "$_k"; done
+        printf 'exit %s\n' "$_rc" >> "$_k"
+        ( T="$d/$_m"; FEHL=0; fall_P104m "$_k" > "$d/$_m.out" 2>&1; echo "$FEHL" > "$d/$_m/fehl" )
+        if [ -f "$d/$_m/fehl" ]; then P110_FEHL=$(cat "$d/$_m/fehl"); else P110_FEHL=ABBRUCH; fi
+        if [ -f "$d/$_m/kein-urteil.txt" ]; then P110_MARKER=JA; else P110_MARKER=NEIN; fi
+        echo "      > ($_m) Marker $P110_MARKER, FEHL $P110_FEHL"
+    }
+    p110 a 2 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(a) ROT/rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(a) ROT/rc 2 -> FEHL 0"
+    p110 b 143 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(b) ROT/rc 143 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(b) ROT/rc 143 -> FEHL 0"
+    p110 c 1 'P-104: GRUEN'
+    erw_gleich "$P110_MARKER" JA "(c) GRUEN/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(c) GRUEN/rc 1 -> FEHL 0"
+    p110 d 0
+    erw_gleich "$P110_MARKER" JA "(d) keine Urteilszeile/rc 0 -> Marker"
+    erw_gleich "$P110_FEHL" 0 "(d) -> FEHL 0"
+    p110 e 1 'P-104: ROT (4 Erwartung(en) gerissen)' 'P-104: ROT (2 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(e) zwei ROT-Zeilen/rc 1 -> Marker"
+    erw_gleich "$P110_FEHL" 0 "(e) Doppelzeile -> FEHL 0"
+    p110 f 1 'P-104: ROT (0 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(f) ROT (0)/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(f) ROT (0) -> FEHL 0"
+    p110 g 1 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" NEIN "(g) ROT (4)/rc 1 -> kein Marker"
+    erw_gleich "$P110_FEHL" 4 "(g) ROT (4)/rc 1 -> FEHL 4"
+    p110 h 0 'P-104: GRUEN'
+    erw_gleich "$P110_MARKER" NEIN "(h) GRUEN/rc 0 -> kein Marker"
+    erw_gleich "$P110_FEHL" 0 "(h) GRUEN/rc 0 -> FEHL 0"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -3240,6 +3316,7 @@ fall P-106 fall_P106 "$SKRIPT"
 fall P-107 fall_P107 "$SKRIPT"
 fall P-108 fall_P108 "$SKRIPT"
 fall P-109 fall_P109 "$SKRIPT"
+fall P-110 fall_P110 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 if [ -n "$NUR" ] && [ "$N_FAELLE" -ne 1 ]; then   # r24 (F24-01 (b)): fail-closed, unbekannte Kennung faehrt 0 Faelle
     echo "ABBRUCH: --nur=$NUR: Kennung unbekannt oder nicht gefahren ($N_FAELLE Faelle)"; exit 2
