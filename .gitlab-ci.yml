@@ -755,6 +755,33 @@ test:persist-sammler-probe:
   script:
     - sh ci/tests/persist_sammler_probe.sh --selbstbiss
 
+# -- Order 371 / Board #279 (2026-09-23, r7): BISSPROBE des THESIS-PDF-EXPORTS (ci/thesis_pdf_export.sh) ----------
+# 104 Faelle gegen ein Wegwerf-Bare-Repo (kein Netz; einziges Nicht-Datei-Ziel 127.0.0.1:9, geschlossener Port) plus
+# 126 Mutanten (--selbstbiss; 60 am Script, 66 an dieser YAML). Der Testhaken COMDARE_THESIS_PDF_REMOTE ist im
+# Script in CI verweigert; die Probe faehrt das Script deshalb in einer leeren Umgebung (env -i) und misst die
+# Verweigerung selbst (Fall P-10); ihre eigenen Overrides (COMDARE_SKRIPT/COMDARE_CI_YML) verweigert sie in CI
+# ebenso (P-22). Fall P-17 prueft diesen Job-Block (Aufruf vorhanden, kein allow_failure) -- T-7 wie
+# plan_zahlen_probe K9 (Lens r1 L1-14). P-23/P-24 fahren die Marker-Bloecke EPOCH-288 und DRIFT-WACHE-288-289 des
+# Jobs thesis:pdf mit der Runner-Shell gegen ein Wegwerf-Modul (Lens r2 L2-01; r4: shallow + Toolchain, Lens r3;
+# r5: Ein-Elter-Regel + [skip ci], letzter Treffer, Walk-Deckel, sha256sum, CI_PROJECT_DIR, Lens r4; r6: Kennungs-
+# Kardinalitaet, Fullbanner-ERE, ls-tree-Existenz, Elternliste, pdftex-Nachweis, rm -f/latexmk -g, SCHALTER-346,
+# F09-GATE, Host-Pinnung, Codex-Lens r4 C4-03..C4-12; r7: L6-01 Doppelnachweis SCHALTER-346, C6-01 Epoch-
+# Selbstnachweis, C6-09 Stufenbarriere, C6-07 --ci, C6-12, F09-Konsumregel, Codex-Lens r6). P-17 prueft die tags-
+# Zeilen beider Thesis-Jobs, das Aufruf-Literal '--ci' und die Stufenbarriere (keine needs) des Export-Jobs.
+# KEIN allow_failure (advisory Probe = stille Null), KEIN .code-rules (Export-Job und Probe gehoeren zur YAML).
+test:thesis-pdf-export-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # die Probe baut sich ihr Bare-Repo selbst, sie klont nichts
+  script:
+    - sh ci/tests/test_thesis_pdf_export.sh --selbstbiss
+
 # ── LAG-P1 (2026-08-09): BISSPROBE der BESTANDSLOG-WACHE + der Scharfschaltung ──
 # DER BEFUND, der diesen Job erzwingt (selbst gezaehlt): COMDARE_BESTANDSLOG stand in NULL von zwei
 # aktiven .gitlab-ci.yml -- die gesamte Lager-Koordination war in Produktion AUS. Ohne sie gibt es
@@ -1726,35 +1753,317 @@ prebackup:measurements:
 # ── Stage thesis-pdf: Diplomarbeit-PDF (TeXLive = Infra-Voraussetzung, User-Wahl P1c) ──
 thesis:pdf:
   stage: thesis-pdf
-  tags: [baremetal]
+  tags: [prod, baremetal, amd]   # C4-11 (r6, Lead-Wahl): Host-Pinnung wie :1969/:2222 -- das Byte-Urteil 288/289
+                                 # setzt EINE Toolchain voraus (Pakete/Fonts stehen nicht im Banner); der
+                                 # Fullbanner-Vergleich im Block DRIFT-WACHE bleibt zweite Sicherung; 289-Seite = O-5b
   needs: [{job: "analyse:thesis-data", optional: true}]  # #53: docs-only-DAG-sicher (analyse ist code-gegated, thesis:pdf laeuft auch ohne)
   cache:
     paths: []               # #53: latexmk-PDF-Bau, kein C++-Compile -> kein ccache-Zip (docs-Konsument, NICHT code-gaten)
+  variables:
+    GIT_SUBMODULE_DEPTH: "0"        # L3-01 (r4): Vollhistorie des Moduls -- der Eltern-Walk (Block EPOCH-288) braucht
+                                    # HEAD^ bis max 8 Stufen; ohne die Variable erbt das Submodul die Projekt-Tiefe
+                                    # (Default 20, docs ci/runners/configure_runners); Kappung faellt im Block LAUT
+                                    # auf. C4-02 (r6): ein aelterer shallow-Klon auf einem wiederverwendeten Runner-
+                                    # Worktree traegt HEAD+19 >= Walk-Deckel 8 (+1 Quellstand); der Block ist fail-
+                                    # closed (shallow ODER Elternliste unlesbar = FEHLER, nie falsches Gruen); kein
+                                    # 'fetch --unshallow' im Job (Netz + Runner-Credentials im Script, die netzfreie
+                                    # Bissprobe P-23 bliebe unfahrbar) -- hostabhaengig hoechstens ROT.
   # TeXLive/latexmk = Runner-Voraussetzung (Infra installiert texlive vor). Bis dahin gegatet
   # (sonst sicherer Fail an "latexmk fehlt"). Reaktivieren: CI-Variable COMDARE_TEXLIVE_AVAILABLE="true".
   rules:
     - if: '$COMDARE_TEXLIVE_AVAILABLE == "true"'
   script:
-    - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (P1c)"; exit 1; }'
+    - 'command -v latexmk >/dev/null 2>&1 || { echo "FEHLER: latexmk fehlt (Infra P1c, C6-11)"; exit 1; }'
     - cd thesis/diplomarbeit
-    - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head'
+    - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head || true'
     # REV (Order 389/390, 22.09.2026): vier Fassungen de/en x lang/kurz wie in der Thesis-CI (REV 4) und reproduzierbare
-    # PDF-Bytes (SOURCE_DATE_EPOCH = Submodul-Commit-Zeit) -- Eingang fuer thesis:pdf-export (docs/diplomarbeit/).
+    # PDF-Bytes (SOURCE_DATE_EPOCH = Commit-Zeit des Quellstands, r3) -- Eingang fuer thesis:pdf-export.
     - |
-      export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct 2>/dev/null || echo 0) FORCE_SOURCE_DATE=1
-      echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-      main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"
+      # >>> EPOCH-288 (r3, Lens r2 L2-01; die Bissprobe P-23 extrahiert diesen Block zwischen den Markern und faehrt
+      # ihn gegen ein Wegwerf-Modul -- Marker nicht verschieben). SOURCE_DATE_EPOCH = Commit-Zeit des QUELLSTANDS,
+      # den die Thesis-CI (289: 'git log -1 --format=%ct' am gebauten Commit X) benutzt hat: pdf:writeback committet
+      # die vier PDFs als Kind Y von X; am Gitlink Y ist %ct(Y) der falsche Epoch (0 von 20 Fassungen gleich =
+      # Byte-Drift by design). Quellstand = HEAD, solange HEAD kein REINER Writeback ist (Diff zum ersten Elter
+      # beruehrt nur die vier Fassungen, mindestens eine); sonst der Elter, max 8 Stufen. Der Eltern-Walk trifft
+      # auch --no-ff-Merges, die fuer Nicht-PDF-Pfade TREESAME zu einem Elter sind (Kurz-Zweig a4c3753: ein Pathspec-
+      # 'git log -1 -- . :!pdf' spraenge auf 3e1f406, die Thesis-CI baute dort mit %ct(a4c3753)).
+      # r4 (Lens r3 L3-01, ADV-14): fehlt der Elter, weil die Submodul-Historie GEKAPPT ist (shallow -- die Projekt-
+      # Tiefe, Default 20, gilt laut docs.gitlab.com/ci/runners/configure_runners auch fuer Submodule), bricht der Job
+      # LAUT ab statt still auf %ct(HEAD) zurueckzufallen (falscher Epoch bei rc=0); ein echter Wurzel-Commit ohne
+      # Elter bleibt erlaubt. GIT_SUBMODULE_DEPTH "0" am Job holt die Vollhistorie des Moduls (variables oben).
+      # r5 (Lens r4 L4-01, ADV-15): reiner Writeback = EIN-Elter-Commit des pdf_writeback.sh MIT '[skip ci]' in der
+      # Botschaft (beide echten Bot-Commits 79d7199/d35ab55 tragen ihn; Lead-Wahl UND-Bedingung). Ein Merge hat zwei
+      # Eltern und bringt Fremdaenderungen mit, auch wenn sein Diff zum ersten Elter nur die vier PDFs beruehrt
+      # (development mit Bot-Writeback IN einen Arbeitszweig gemergt): dann ist der Merge selbst der Quellstand. Ein
+      # Ein-Elter-PDF-Commit OHNE Marker (von Hand) wird von der Thesis-CI gebaut und ist ebenfalls Quellstand.
+      # r5 (Lens r4 L4-04, ADV-17): der Walk-Deckel (8 Stufen) bricht LAUT ab statt still mit %ct(Y) weiterzulaufen.
+      # r5 (Lens r4 L4-08, ADV-26): CI_PROJECT_DIR leer = FEHLER vor dem Gitlink-Vergleich (git -C '' waere cwd).
+      # r6 (Codex-Lens r4 C4-12): Wurzel nur, wenn 'git rev-list --parents -n 1' KEINEN Elter listet (eine shallow-
+      # Grenze listet ebenfalls keinen: dann FEHLER 'gekappt'); Elternliste nicht lesbar (fehlendes/defektes Elter-
+      # Objekt) oder gelisteter Elter nicht als Commit aufloesbar = FEHLER exit 1 -- nie stiller Wurzel-Rueckfall.
+      # r8 (Codex-Lens r7 C7-04, ENTLASTET; Messung fix-r8/probe-c7-04-rev-list-parents-r8.txt): 'rev-list --parents'
+      # steht VOR der '^2'-Probe und stirbt mit rc 128 ('Failed to traverse parents') fuer JEDEN fehlenden oder
+      # defekten Elter -- die '^2'-Probe unten sieht nur validierte Eltern ('rev-parse -q --verify X^2' allein wuerde
+      # einen fehlenden zweiten Elter mit rc 0 durchreichen, gemessen). Eine shallow-Grenze listet KEINEN Elter.
+      QUELLE=HEAD; stufe=0
+      while :; do
+        eltern=$(git rev-list --parents -n 1 "$QUELLE") \
+          || { echo "FEHLER: git rev-list --parents -n 1 $QUELLE (Elternliste nicht lesbar, C4-12/r6)"; exit 1; }
+        case "$eltern" in
+          *" "*) git rev-parse -q --verify "$QUELLE^^{commit}" >/dev/null \
+                   || { echo "FEHLER: Elter von $QUELLE gelistet, aber nicht aufloesbar (C4-12/r6)"; exit 1; } ;;
+          *) shallow=$(git rev-parse --is-shallow-repository) \
+               || { echo "FEHLER: git rev-parse --is-shallow-repository (Quellstand, F-10/r4)"; exit 1; }
+             case "$shallow" in # r8 (Codex-Lens r7 C7-03): nur true|false, jeder andere Wert = FEHLER
+               true) echo "FEHLER: Submodul-Historie gekappt vor dem Quellstand (shallow, F-10/r3)"; exit 1 ;;
+               false) ;;
+               *) echo "FEHLER: unerwarteter Wert --is-shallow-repository: '$shallow' (C7-03/r8)"; exit 1 ;;
+             esac
+             break ;;
+        esac
+        rest=$(git diff --name-only "$QUELLE^" "$QUELLE" -- . ':!diplomarbeit-de-lang.pdf' \
+          ':!diplomarbeit-en-lang.pdf' ':!diplomarbeit-de-kurz.pdf' ':!diplomarbeit-en-kurz.pdf') \
+          || { echo "FEHLER: git diff $QUELLE^ $QUELLE (Quellstand, F-10/r3)"; exit 1; }
+        pdfs=$(git diff --name-only "$QUELLE^" "$QUELLE" -- diplomarbeit-de-lang.pdf diplomarbeit-en-lang.pdf \
+          diplomarbeit-de-kurz.pdf diplomarbeit-en-kurz.pdf) \
+          || { echo "FEHLER: git diff $QUELLE^ $QUELLE (PDF-Pfade, F-10/r3)"; exit 1; }
+        botschaft=$(git log -1 --format=%B "$QUELLE" | tr 'A-Z' 'a-z') \
+          || { echo "FEHLER: git log -1 --format=%B $QUELLE (Botschaft, L4-01/r5)"; exit 1; }
+        case "$botschaft" in *"[skip ci]"*|*"[ci skip]"*) bot=ja ;; *) bot=nein ;; esac
+        if [ -z "$rest" ] && [ -n "$pdfs" ] && [ "$bot" = ja ] \
+           && ! git rev-parse -q --verify "$QUELLE^2" >/dev/null; then
+          if [ "$stufe" -ge 8 ]; then
+            echo "FEHLER: Eltern-Walk-Deckel (8 Stufen) erreicht, Quellstand nicht bestimmt (L4-04)"; exit 1
+          fi
+          QUELLE="$QUELLE^"; stufe=$((stufe+1))
+        else break; fi
+      done
+      SOURCE_DATE_EPOCH=$(git log -1 --format=%ct "$QUELLE") \
+        || { echo "FEHLER: Commit-Zeit des Quellstands $QUELLE nicht lesbar (git log im Submodul, F-10)"; exit 1; }
+      case "$SOURCE_DATE_EPOCH" in ''|*[!0-9]*)
+        echo "FEHLER: SOURCE_DATE_EPOCH='$SOURCE_DATE_EPOCH' ist keine Zahl (F-10)"; exit 1 ;; esac
+      : "${CI_PROJECT_DIR:?FEHLER: CI_PROJECT_DIR leer (L4-08)}"
+      h_sub=$(git rev-parse HEAD) || { echo "FEHLER: rev-parse Submodul-HEAD (C7-06/r8)"; exit 1; }
+      h_git=$(git -C "$CI_PROJECT_DIR" rev-parse HEAD:thesis/diplomarbeit) \
+        || { echo "FEHLER: Gitlink-Lesung HEAD:thesis/diplomarbeit im super (C7-06/r8)"; exit 1; }
+      test -n "$h_sub" && test -n "$h_git" || { echo "FEHLER: Submodul-HEAD oder Gitlink leer (C7-06/r8)"; exit 1; }
+      test "$h_sub" = "$h_git" \
+        || { echo "FEHLER: Submodul-HEAD weicht vom super-Gitlink thesis/diplomarbeit ab (F-10)"; exit 1; }
+      export SOURCE_DATE_EPOCH FORCE_SOURCE_DATE=1
+      kurzq=$(git rev-parse --short "$QUELLE") || { echo "FEHLER: git rev-parse --short $QUELLE"; exit 1; }
+      echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH (Quellstand $kurzq, $stufe Writeback-Stufe(n) uebersprungen)"
+      # <<< EPOCH-288
+      main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1) || main=; echo "main-tex=$main"
       test -n "$main" || { echo "FEHLER: kein documentclass in thesis/diplomarbeit/*.tex"; exit 1; }
       for L in de en; do for U in lang kurz; do
         echo "== Fassung $L-$U =="
-        latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=diplomarbeit-$L-$U \
+        rm -f "diplomarbeit-$L-$U.pdf"   # C4-09 (r6): die ausgecheckte 289-Kopie ist nie der Neubau; -g erzwingt ihn
+        latexmk -g -pdf -interaction=nonstopmode -halt-on-error -jobname=diplomarbeit-$L-$U \
           -usepretex="\def\thesislang{$L}\def\thesisumfang{$U}" "$main" || exit 1
         test -s diplomarbeit-$L-$U.pdf || { echo "FEHLER: diplomarbeit-$L-$U.pdf fehlt"; exit 1; }
       done; done
+      # >>> SCHALTER-346 (r6 C4-08 b; r7 L6-01/C6-02 K294; r8 Lens r7 L7-01 + Codex r7 C7-01/C7-07; die Bissprobe P-24
+      # (s) extrahiert diesen Block -- Marker nicht verschieben). pdfTeX leitet die Trailer-/ID aus dem jobname ab, die
+      # vier Fassungen sind deshalb IMMER byte-verschieden: der r6-Vergleich roher sha256 bewies keinen Schalter. Je
+      # Fassung: (1) ID-freier Hash = sha256 ueber das PDF OHNE die '/ID ['-Zeile (Klartext auch bei ObjStm); r8 C7-01:
+      # die Zeile muss GENAU 1x stehen (0 = Filter greift nicht, 2+ = mehrdeutig), sonst FEHLER -- nie ein ungefiltertes
+      # PDF hashen; (2) Seitenzahl aus dem pdfTeX-Log ('Output written on <pdf> (N pages?,' -- eine Seite schreibt
+      # 'page', r8 C7-07). HIER nur der SPRACH-Schalter: 4 Paare de/en ID-frei verschieden (am Objekt-Gitlink d32cc492
+      # wirksam, \thesislang 13x konsumiert). Die UMFANG-Regeln (de lang/kurz, EN-Dreiwert) stehen im Block UMFANG-346
+      # des Koppelpatches (r8 L7-01: am Gitlink d32cc492 ist \thesisumfang 0x konsumiert, de-kurz == de-lang ID-frei;
+      # der Hauptpatch allein bleibt dort gruen, die Umfang-Pruefung kommt NUR mit dem Gitlink-Bump auf einen
+      # Kurz-Stand).
+      for f in de-lang de-kurz en-lang en-kurz; do
+      v=$(echo "$f" | tr '-' '_'); pdf="diplomarbeit-$f.pdf"
+      n_id=$(LC_ALL=C grep -a -c '^/ID \[' "$pdf") && ir=0 || ir=$?
+      case "$ir" in 0|1) ;; *) echo "FEHLER: grep rc=$ir beim Zaehlen der /ID-Zeilen in $pdf (C7-01)"; exit 1 ;; esac
+      test "$n_id" -eq 1 || { echo "FEHLER: /ID-Zeilen $n_id != 1 in $pdf (SCHALTER-346, C7-01)"; exit 1; }
+      h=$(LC_ALL=C grep -a -v '^/ID \[' "$pdf" | sha256sum | cut -d' ' -f1) \
+        || { echo "FEHLER: ID-freier sha256 $pdf (SCHALTER-346)"; exit 1; }
+      test -n "$h" || { echo "FEHLER: ID-freier Hash $pdf leer (SCHALTER-346)"; exit 1; }
+      eval "h_$v=\$h"
+      lg="diplomarbeit-$f.log"
+      s=$(grep -a -o -E "Output written on diplomarbeit-$f\.pdf \([0-9]+ pages?," "$lg") && sr=0 || sr=$?
+      case "$sr" in 0) sn=$(printf '%s\n' "$s" | wc -l) ;; 1) sn=0 ;;
+      *) echo "FEHLER: grep rc=$sr im Log $lg (Seitenzahl, SCHALTER-346)"; exit 1 ;; esac
+      test "$sn" -eq 1 \
+        || { echo "FEHLER: 'Output written on' in $lg $sn-mal statt 1x (Seitenzahl, SCHALTER-346)"; exit 1; }
+      n=$(printf '%s\n' "$s" | sed -E 's/^.*\(([0-9]+) pages?,$/\1/')
+      case "$n" in ''|*[!0-9]*) echo "FEHLER: Seitenzahl '$n' aus $lg keine Zahl (SCHALTER-346)"; exit 1 ;; esac
+      eval "n_$v=\$n"; hk=$(printf '%.12s' "$h")
+      echo "SCHALTER-346: $pdf /ID-Zeilen $n_id, ID-freier Hash $hk.. Seiten $n"
+      done
+      for paar in de_lang:en_lang de_kurz:en_kurz de_lang:en_kurz de_kurz:en_lang; do
+      a=$(eval "echo \"\$h_${paar%%:*}\""); b=$(eval "echo \"\$h_${paar#*:}\"")
+      test -n "$a" && test -n "$b" && test "$a" != "$b" \
+        || { echo "FEHLER: Sprach-Schalter wirkungslos: $paar ID-frei byte-gleich (Order 346, L6-01)"; exit 1; }
+      done
+      echo "SCHALTER-346: Sprach-Schalter nachgewiesen (4 Paare de/en ID-frei verschieden); Umfang = Block UMFANG-346"
+      # <<< SCHALTER-346
+      # >>> DRIFT-WACHE-288-289 (r3, Lens r1 L1-04 + Lens r2 L2-01; die Bissprobe P-24 extrahiert diesen Block --
+      # Marker nicht verschieben). Dreiwertig je Fassung: (1) Kopie fehlt am Gitlink = gezaehlt; (2) Kopie da und
+      # ihr CreationDate-Epoch == SOURCE_DATE_EPOCH = Byte-Vergleich, Abweichung ROT (gleiche Quelle, gleicher Epoch,
+      # gleiche Toolchain muessen byte-gleich sein, Order 371 'ohne Drift'); (3) Kopie da, Epoch verschieden oder
+      # nicht lesbar = '289-Kopie veraltet/abweichend', laut gezaehlt, KEIN Byte-Urteil (die Thesis-CI hat diesen
+      # Quellstand noch nicht zurueckgeschrieben; am Kurz-Zweig 12 von 20 Fassungen). ROT auch fuer (3) = Lead-Wahl:
+      # dann hinter 'veraltet=$((veraltet+1))' ein 'exit 1' setzen.
+      # r4 (Lens r3 L3-02): 'tags: [baremetal]' ist der Pool prod1 + prod2, das Byte-Urteil setzt EINE Toolchain
+      # voraus. Deshalb VOR dem Byte-Urteil die pdfTeX-Kennung beider Dateien vergleichen (PTEX.Fullbanner, in der
+      # PDF unkomprimiert lesbar): weicht sie ab, Zustand (3) 'Toolchain abweichend', laut gezaehlt, KEIN Byte-Urteil
+      # (kein Rot je nach Scheduling). Nachweiszeile pdftex --version einmal je Job, fail-closed ohne pdftex.
+      # r6: Host-Pinnung beider Jobs thesis:pdf + thesis:pdf-export auf [prod, baremetal, amd] GESETZT (C4-11, Muster
+      # :1969/:2222). Inventar-Annahme (C6-10/C6-15, r7): GENAU EIN Runner traegt 'amd' -- Lead-Messung 23.09. per
+      # Runner-Inventar (prod+baremetal+amd = 1 Runner, prod1); Pruefweg bei Runner-Zugang = Runner-Inventar, Lead-
+      # Posten; die 289-Seite (pdf-Job des Thesis-Repos) bleibt zu pinnen (O-5b, Landebedingung).
+      # r4 (Lens r3 L3-09): trap raeumt die 289-Kopie auch bei exit 1.
+      # r5 (Lens r4 L4-02, ADV-28): CreationDate und Fullbanner = LETZTER Treffer in der Datei (pdfTeX schreibt das
+      # eigene Info-Dict am Ende); ein eingebettetes /PTEX.InfoDict einer Figur davor traegt fremde Werte und wuerde
+      # mit dem ersten Treffer das Byte-Urteil still neutralisieren. r5 (Lens r4 L4-07, ADV-24): sha256sum-Fehler
+      # tragen eine FEHLER-Zeile statt des stillen set-e-Abbruchs.
+      # r6 (Codex-Lens r4 C4-10): Toolchain-Nachweis erfasst die ganze Ausgabe, prueft rc UND Nichtleere, zeigt Zeile 1.
+      # r6 (C4-03/C4-04/C4-05): Kennungs-Lesung als Funktion lies_kennung -- grep -a -o -E ohne -m1/tail, Trefferzahl
+      # gemessen (kn), grep rc 2 = FEHLER exit 1. Am eigenen 288-Bau muss jede Kennung GENAU einmal stehen, sonst
+      # FEHLER (eigener Bau unlesbar); an der 289-Kopie ist kn != 1 Zustand (3) 'Kennung nicht lesbar/eindeutig' --
+      # laut gezaehlt, kein Byte-Urteil (die r5-Regel 'letzter Treffer' geht darin auf). Das Fullbanner-Muster erlaubt
+      # EINE Ebene balancierter Klammern (pdfTeX schreibt '(TeX Live 2026)' unescaped in den String) sowie escaped
+      # Zeichen und endet erst an der schliessenden ')' des Strings: der kpathsea-Teil liegt im Vergleich (Probe prod1).
+      # r6 (C4-06): Existenz der 289-Kopie per 'git ls-tree --name-only HEAD -- <pdf>' mit rc-Pruefung (leer = fehlt,
+      # gezaehlt); gelisteter Pfad = Blob MUSS lesbar sein (cat-file -e + show), sonst FEHLER; kein '|| continue'.
+      # r15 (Owner-Order 455, 24.09.2026 07:08:29Z: O-15 = (b); L4-03; Lead K308/K310; Bissprobe P-24 (j)(k)(l)):
+      # volle Toolchain-Kennung = PTEX.Fullbanner inkl. kpathsea (seit r6) + FONT-STAND je Fassung. pdffonts
+      # fehlt auf prod1 (command -v leer), deshalb Kennung aus der PDF selbst: Type1-/TrueType-Font-Programme
+      # (FontFile/FontFile2) tragen unkomprimierte Stream-Dicts mit '/Length1 N' (Type1 zusaetzlich '/Length2 N'
+      # '/Length3 N'); FontFile3 (CFF/OpenType), Type3 und PK-Fonts tragen KEIN Length1/2/3 -> fn kann 0 sein: am
+      # 288-Bau FEHLER (fail-closed; dann Verfahren pruefen), an der 289-Kopie Zustand (3); bei fn 0 wird keine
+      # Kennung verglichen, die fn-0-Zweige greifen vorher (L16-02); die Kennung zaehlt rohe Length-Treffer, keine
+      # geparsten Fontobjekte (C16-03). Font-Stand =
+      # LC_ALL=C grep -a -o -E '/Length[123] [0-9]+' (grep rc 0/1 ok, >= 2 = FEHLER), Treffer in eine Werkdatei, wc -l =
+      # Trefferzahl fn, sort + sha256sum je mit eigenem Fehlerzweig (keine Pipe im Statuspfad), 16 Hex = fs. Gleiche
+      # Quelle + gleicher Font-Stand = gleiche Subsets/Laengen; andere Laengen = anderer Font-Stand; gleiche Laengen
+      # sind KEIN Beweis fuer Gleichheit (andere Fontprogramme oder Subsets koennen gleiche Laengen tragen), daher
+      # fuehrt eine gleiche Kennung zum Byte-Urteil, nie zu gleich (L15-03, C15-05). Am eigenen 288-Bau ist fn 0 =
+      # FEHLER (fail-closed); an der 289-Kopie ist fn 0 Zustand (3) 'Font-Stand nicht lesbar' und f288 != f289 (bei
+      # gleicher Fullbanner-Kennung, gleichem Epoch) Zustand (3) 'Font-Stand abweichend' mit beiden Kurz-Kennungen --
+      # laut gezaehlt, KEIN Byte-Urteil; gleich = Byte-Urteil wie r14 (Modul 79d7199: je Fassung 63-69 Length-Treffer,
+      # 21-23 Font-Programme).
+      # r16 (Codex-Lens r15 C15-01/C15-02/C15-05, Lead K312; Bissprobe P-24 (r) + P-95): (1) der Font-Stand-Hash liest
+      # die Werkdatei per stdin (sha256sum < Datei): mit einem Dateinamen escapt GNU sha256sum einen Backslash im
+      # TMPDIR-Pfad und die Ausgabe beginnt mit '\' (Kennung = Backslash + 15 Hex, Byte-Urteil falsch DRIFT); die
+      # 16-Hex-Kennung wird validiert, sonst FEHLER 'Font-Stand-Kennung unlesbar (O-15b, C15-01)' = fail-closed; das
+      # Byte-Urteil hasht ebenso per stdin (C15-01). (2) Reihenfolge O-15 (b): Zustand der 289-Kopie (fehlt / Kennung
+      # / Epoch / Fullbanner-Vergleich) ZUERST, danach Font-Stand 288-Bau (Selbstpruefung, immer, auch ohne Kopie),
+      # dann Font-Stand 289-Kopie -> fn-0-Zweig -> Vergleich -> Byte-Urteil (C15-02).
+      # r17 (Codex-Lens r16 C16-03 hochgestuft + Fable-Lens r16 L16-02, Lead K313/K314; Textwache P-98): Font-Programm-
+      # Aussage auf FontFile/FontFile2 eingegrenzt (FontFile3/Type3/PK ohne Length1/2/3 -> fn 0 moeglich), fn-0-Zweige
+      # vor dem Kennungsvergleich benannt; nur Kommentar, kein Code.
+      command -v pdftex >/dev/null 2>&1 \
+        || { echo "FEHLER: pdftex fehlt auf dem Runner (Toolchain-Nachweis DRIFT-WACHE, L3-02)"; exit 1; }
+      pdftex_v=$(pdftex --version 2>&1) || { echo "FEHLER: pdftex --version rc!=0 (Nachweis, C4-10/r6)"; exit 1; }
+      test -n "$pdftex_v" || { echo "FEHLER: pdftex --version ohne Ausgabe (Toolchain-Nachweis, C4-10/r6)"; exit 1; }
+      printf '%s\n' "$pdftex_v" | head -n1
+      cd_ere='CreationDate \(D:[0-9]{14}Z\)'
+      fb_ere='PTEX\.Fullbanner \(([^()\\]|\\.|\(([^()\\]|\\.)*\))*\)'
+      lies_kennung() { # $1 = Datei, $2 = ERE; setzt kn (Trefferzahl) + kw (Treffer); grep rc 2 = FEHLER (C4-04/r6)
+        kw=$(grep -a -o -E "$2" "$1") && kr=0 || kr=$?
+        case "$kr" in 0) kn=$(printf '%s\n' "$kw" | wc -l) ;; 1) kn=0 ;;
+          *) echo "FEHLER: grep rc=$kr beim Lesen der Kennung '$2' aus $1 (C4-04/r6)"; exit 1 ;; esac
+      }
+      lies_fontstand() { # $1 = Datei, $2 = Rolle; setzt fn (Treffer) + fs (16 Hex der sortierten Treffer) (O-15b/r15)
+        : > "$k289.fl" || { echo "FEHLER: Werkdatei Font-Stand nicht schreibbar ($2, O-15b)"; exit 1; }
+        LC_ALL=C grep -a -o -E '/Length[123] [0-9]+' "$1" > "$k289.fl" && fr=0 || fr=$?
+        case "$fr" in 0|1) ;; *) echo "FEHLER: grep rc=$fr beim Font-Stand aus $1 ($2, O-15b)"; exit 1 ;; esac
+        fn=$(wc -l < "$k289.fl") || { echo "FEHLER: wc Font-Stand ($2, O-15b)"; exit 1; }
+        sort "$k289.fl" > "$k289.fs" || { echo "FEHLER: sort Font-Stand ($2, O-15b)"; exit 1; }
+        fs=$(sha256sum < "$k289.fs") || { echo "FEHLER: sha256sum Font-Stand $1 ($2, O-15b)"; exit 1; }
+        fs=$(printf '%.16s' "$fs")
+        case "$fs" in *[!0-9a-f]*) fs= ;; esac   # r16 (C15-01): nur [0-9a-f], sonst leer = FEHLER unten
+        test "${#fs}" -eq 16 \
+          || { echo "FEHLER: Font-Stand-Kennung unlesbar (O-15b, C15-01): keine 16 Hex aus $1 ($2)"; exit 1; }
+      }
+      vorh=0; gleich=0; veraltet=0; k289=$(mktemp) || { echo "FEHLER: mktemp fuer die 289-Kopie"; exit 1; }
+      trap 'rm -f "$k289" "$k289.fl" "$k289.fs"' EXIT
+      for L in de en; do for U in lang kurz; do
+        pdf="diplomarbeit-$L-$U.pdf"
+        lies_kennung "$pdf" "$cd_ere"; test "$kn" -eq 1 \
+          || { echo "FEHLER: CreationDate im 288-Bau $pdf $kn-mal statt 1x (Bau unlesbar, C4-04/r6)"; exit 1; }
+        # r7 (Codex-Lens r6 C6-01): Selbstnachweis -- pdfTeX TL 2026 schreibt die Z-Form auch ohne Epoch, die ERE
+        # beweist den Epoch nicht; der eigene Bau muss GENAU SOURCE_DATE_EPOCH tragen (sonst Dauer-Writeback).
+        z288=$(printf '%s\n' "$kw" | sed 's/^.*D://; s/Z)$//')
+        d288=$(echo "$z288" | sed 's/^\(....\)\(..\)\(..\)\(..\)\(..\)\(..\)$/\1-\2-\3 \4:\5:\6/')
+        e288=$(date -u -d "$d288" +%s) || { echo "FEHLER: date -u -d fuer 288-CreationDate '$z288' ($pdf)"; exit 1; }
+        test "$e288" = "$SOURCE_DATE_EPOCH" \
+          || { echo "FEHLER: 288-Bau $pdf CreationDate $e288 != SOURCE_DATE_EPOCH $SOURCE_DATE_EPOCH (C6-01)"; exit 1; }
+        lies_kennung "$pdf" "$fb_ere"; test "$kn" -eq 1 \
+          || { echo "FEHLER: PTEX.Fullbanner im 288-Bau $pdf $kn-mal statt 1x (Bau unlesbar, C4-03/r6)"; exit 1; }
+        b288=$kw
+        # r16 (C15-02): Zustand der 289-Kopie ZUERST (fehlt / Kennung / Epoch / Fullbanner), DANN der Font-Stand:
+        # 288-Bau immer (Selbstpruefung, fn 0 = FEHLER fail-closed, auch ohne Kopie), 289-Kopie nur bei gleichem
+        # Epoch und gleicher Fullbanner-Kennung (vergleich=ja); danach fn-0-Zweig -> Vergleich -> Byte-Urteil.
+        vergleich=nein
+        eintrag=$(git ls-tree --name-only HEAD -- "$pdf") \
+          || { echo "FEHLER: git ls-tree HEAD -- $pdf (Existenz der 289-Kopie unbestimmbar, C4-06/r6)"; exit 1; }
+        if [ -z "$eintrag" ]; then echo "DRIFT-WACHE 288/289: 289-Kopie $pdf fehlt am Gitlink (gezaehlt)"; else
+          git cat-file -e "HEAD:$pdf" \
+            || { echo "FEHLER: git cat-file -e HEAD:$pdf (289-Kopie gelistet, Blob nicht lesbar, C4-06/r6)"; exit 1; }
+          vorh=$((vorh+1))
+          git show "HEAD:$pdf" > "$k289" || { echo "FEHLER: git show HEAD:$pdf (289-Kopie nicht lesbar)"; exit 1; }
+          lies_kennung "$k289" "$cd_ere"; n289c=$kn; z289=$(printf '%s\n' "$kw" | sed 's/^.*D://; s/Z)$//')
+          lies_kennung "$k289" "$fb_ere"; n289b=$kn; b289=$kw
+          if [ "$n289c" -ne 1 ] || [ "$n289b" -ne 1 ]; then
+            veraltet=$((veraltet+1))
+            echo "DRIFT-WACHE 288/289: 289-Kopie $pdf Kennung nicht lesbar/eindeutig (CreationDate $n289c-mal," \
+                 "PTEX.Fullbanner $n289b-mal), kein Byte-Urteil (C4-03/C4-04)"
+          else
+            d289=$(echo "$z289" | sed 's/^\(....\)\(..\)\(..\)\(..\)\(..\)\(..\)$/\1-\2-\3 \4:\5:\6/')
+            e289=$(date -u -d "$d289" +%s) || { echo "FEHLER: date -u -d fuer CreationDate '$z289' ($pdf)"; exit 1; }
+            if [ "$e289" = "$SOURCE_DATE_EPOCH" ]; then
+              if [ "$b288" != "$b289" ]; then
+                veraltet=$((veraltet+1))
+                echo "DRIFT-WACHE 288/289: 289-Kopie $pdf Toolchain abweichend ('$b289' vs '$b288')," \
+                     "kein Byte-Urteil (L3-02)"
+              else
+                vergleich=ja
+              fi
+            else
+              veraltet=$((veraltet+1))
+              echo "DRIFT-WACHE 288/289: 289-Kopie $pdf veraltet/abweichend (CreationDate '$z289' = Epoch '$e289' !=" \
+                   "Quellstand $SOURCE_DATE_EPOCH), kein Byte-Urteil"
+            fi
+          fi
+        fi
+        lies_fontstand "$pdf" 288-Bau; test "$fn" -gt 0 \
+          || { echo "FEHLER: keine eingebetteten Font-Programme im 288-Bau $pdf (O-15b)"; exit 1; }
+        f288=$fs
+        [ "$vergleich" = ja ] || continue
+        lies_fontstand "$k289" 289-Kopie; f289=$fs
+        if [ "$fn" -eq 0 ]; then
+          veraltet=$((veraltet+1))
+          echo "DRIFT-WACHE 288/289: 289-Kopie $pdf Font-Stand nicht lesbar (fn 0, O-15b), kein Byte-Urteil"
+        elif [ "$f288" != "$f289" ]; then
+          veraltet=$((veraltet+1))
+          echo "DRIFT-WACHE 288/289: 289-Kopie $pdf Font-Stand abweichend ($f289 vs $f288, O-15b), kein Byte-Urteil"
+        else
+          s288=$(sha256sum < "$pdf" | cut -d' ' -f1) \
+            || { echo "FEHLER: sha256sum $pdf (Byte-Urteil, L4-07)"; exit 1; }
+          s289=$(sha256sum < "$k289" | cut -d' ' -f1) || { echo "FEHLER: sha256sum 289-Kopie $pdf (L4-07)"; exit 1; }
+          test -n "$s288" && test "$s288" = "$s289" \
+            || { echo "FEHLER: DRIFT 288/289 bei $pdf ($s288 != $s289) -- gleicher Quellstand, Epoch" \
+                      "$SOURCE_DATE_EPOCH, andere Bytes (L1-04/L2-01)"; exit 1; }
+          gleich=$((gleich+1))
+          echo "DRIFT-WACHE 288/289: $pdf byte-gleich zur 289-Kopie (Epoch $SOURCE_DATE_EPOCH)"
+        fi
+      done; done
+      rm -f "$k289"
+      echo "DRIFT-WACHE 288/289: $vorh von 4 Fassungen am Gitlink vorhanden, $gleich byte-gleich geprueft," \
+           "$veraltet veraltet/abweichend, $((4-vorh)) fehlen (r6)"
+      # <<< DRIFT-WACHE-288-289
       ls -la diplomarbeit-*-*.pdf
   artifacts:
     paths:
-      - thesis/diplomarbeit/*.pdf
+      - thesis/diplomarbeit/diplomarbeit-de-lang.pdf   # I-04: nur die vier Fassungen, keine fremden PDFs
+      - thesis/diplomarbeit/diplomarbeit-en-lang.pdf
+      - thesis/diplomarbeit/diplomarbeit-de-kurz.pdf
+      - thesis/diplomarbeit/diplomarbeit-en-kurz.pdf
     when: always
     expire_in: 4 weeks
 
@@ -3000,12 +3309,18 @@ ergebnis:holen:
 # thesis:pdf-export (Owner-Orders 389 + 390, 22.09.2026): die vier Thesis-Fassungen des super-eigenen Baus (thesis:pdf)
 # werden als Folge-Commit nach docs/diplomarbeit/ geschrieben (Order 390: docs/diplomarbeit statt docs/thesis, weil das
 # Thesis-Submodul unter thesis/ liegt). Nur auf development (Order 340 A-01 (c): eigener Branch, main folgt per FF);
-# Bot-Pushes loesen nie eine Pipeline aus ([skip ci] + -o ci.skip + Login-Wache). Uebersteuerung per Env-Vertrag
+# Bot-Pushes erzeugen keine Job-Pipeline ([skip ci] + -o ci.skip = skipped-Datensatz, F-12-Kanon 16252/16257;
+# -o ci.no_pipeline = Owner-Frage Q-2 der Bewertung 371 r1; Login-Wache). Uebersteuerung per Env-Vertrag
 # (Order 340 A-04 (a)): COMDARE_THESIS_PDF_EXPORT=false (inert), COMDARE_THESIS_PDF_DIR, COMDARE_THESIS_PDF_FASSUNGEN,
-# COMDARE_THESIS_PDF_SRC. Skript ci/thesis_pdf_export.sh (Biss-Test lokal gegen ein Bare-Repo, K270).
+# COMDARE_THESIS_PDF_SRC. Skript ci/thesis_pdf_export.sh, Bissprobe ci/tests/test_thesis_pdf_export.sh (Job
+# test:thesis-pdf-export-probe, 104 Faelle + 126 Mutanten gegen ein Wegwerf-Bare-Repo; Order 371 / Board #279, r21).
 thesis:pdf-export:
   stage: persist
-  tags: [baremetal]
+  tags: [prod, baremetal, amd]      # C4-11 (r6, Lead-Wahl): derselbe Host-Pool wie thesis:pdf (Muster :1969/:2222)
+  resource_group: thesis-pdf-export   # I-01: Mutex, parallele dev-Pipelines exportieren nacheinander, nie gleichzeitig.
+                                      # C4-07 (r6): der Mutex ORDNET nicht; die Ordnung haelt ci/thesis_pdf_export.sh
+                                      # (F-06 UEBERHOLT-Wache: Gitlink/Rezept seit CI_COMMIT_SHA bewegt = kein Push
+                                      # alter PDFs; F-07 Remote-Idempotenz; Push nur von HEAD == CI_COMMIT_SHA).
   before_script: []                 # wie anhang:forward: kein manueller Cross-Projekt-Klon
   cache:
     paths: []                       # reines Kopieren + Commit, kein Compile
@@ -3013,9 +3328,11 @@ thesis:pdf-export:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "0"                  # voller Klon: Folge-Commit haengt an HEAD, Merge bei Ablehnung braucht die Basis
     GIT_SUBMODULE_STRATEGY: none    # die PDFs kommen als Artefakt von thesis:pdf
-  needs:
-    - job: "thesis:pdf"
-      artifacts: true
+  # C6-09 (r7, Lead-Wahl b = STUFENBARRIERE): der Export ist ein externer Seiteneffekt und laeuft erst nach ALLEN
+  # Pflicht-Jobs der vorherigen Stufen (persist = letzte Stufe der stages-Liste, PyYAML-Beleg im Bericht); der
+  # Probe-Job test:thesis-pdf-export-probe (stage test) ist damit Pflicht-Vorlaeufer. KEIN needs (das startete
+  # den Export, sobald thesis:pdf fertig war); das Artefakt kommt per dependencies.
+  dependencies: ["thesis:pdf"]
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
@@ -3023,4 +3340,4 @@ thesis:pdf-export:
       when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
   script:
-    - 'sh ci/thesis_pdf_export.sh'
+    - 'sh ci/thesis_pdf_export.sh --ci'   # C6-07 (r7): Produktionsmodus als Literal, Testhaken verweigert
