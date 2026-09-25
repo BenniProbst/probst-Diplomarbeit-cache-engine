@@ -213,11 +213,12 @@
 #        A/B, Fable-Lens r17 L17-01..L17-05, Lead K317); r19: + F19-01 (commit --only nur genannte Pfade) + F19-02
 #        (skip-worktree an git add, gemessen) + REV-r19 (Fable r18 L18-01, Codex r18 B S18-01, Lead K320)
 #   P-100 Gitlink-Wachen unabhaengig von diff.ignoreSubmodules (Codex-Lens r19 B S19-01, Lead K322): Flag
-#        --ignore-submodules=none genau 2x im Script (diff_gleich + Gesamtindex-Wache), alte Formen 0x, plus
-#        Verhaltensprobe im Wegwerf-Repo unter config all (diff_gleich rc 1, --cached-Wache 'M thesis/diplomarbeit');
-#        Mutanten M124/M125 = je ein Flag entfernt (F20-01/F20-02)
+#        --ignore-submodules=none genau 3x im Script (diff_gleich + Gesamtindex-Wache + Arbeitsbaum-Wache, r21), alte
+#        Formen 0x, plus Verhaltensprobe im Wegwerf-Repo unter config all (diff_gleich rc 1, --cached-Wache
+#        'M thesis/diplomarbeit'; r21 (c): echtes Sub-Repo unter DIR, Arbeitsbaum-Wache 'docs/diplomarbeit/sub');
+#        Mutanten M124/M125/M126 = je ein Flag entfernt (F20-01/F20-02, F21-01/F21-03)
 #
-# SELBSTBISS (--selbstbiss): 125 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 126 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -293,9 +294,12 @@
 # r19 (Fable r18 L18-01 + Codex r18 B S18-01, Lead K320): P-99 um 5 Erwartungen erweitert (F19-01 commit --only,
 # F19-02 skip-worktree-Bit gemessen, REV-r19); Faelle 103 unveraendert, 0 neue Mutanten, 0 Code.
 # r20 (Codex r19 B S19-01 + Fable r19 L19-01/L19-02, Lead K322): Script-Fix --ignore-submodules=none an diff_gleich und
-# an der Gesamtindex-Wache (2 Code-Zeilen, 0 Kontrollfluss); neuer Fall P-100 (Literal-Wache + Verhaltensprobe im
-# Wegwerf-Repo unter diff.ignoreSubmodules=all) + M124/M125 (je Flag entfernt) -> Faelle 104, Mutanten 125 = 59 + 66;
-# fall_P99-Kopfkommentar geordnet (Fable r19 L19-01).
+# an der Gesamtindex-Wache (2 Kommandos = 3 Code-Zeilen, 0 Kontrollfluss); neuer Fall P-100 (Literal-Wache +
+# Verhaltensprobe im Wegwerf-Repo unter diff.ignoreSubmodules=all) + M124/M125 (je Flag entfernt) -> Faelle 104,
+# Mutanten 125 = 59 + 66; fall_P99-Kopfkommentar geordnet (Fable r19 L19-01).
+# r21 (Codex r20 B S20-01/S20-02 + Fable r20 L20-01, Lead K323): Flag an der Arbeitsbaum-Wache (Script r20 Z.453, r21
+# Z.462; 1 Kommando = 2 Code-Zeilen per Backslash-Umbruch, 0 Kontrollfluss); P-100 um Literal 3x, Verhaltensprobe (c)
+# Gitlink unter DIR und M126 erweitert -> Faelle 104, Mutanten 126 = 60 + 66; Zaehlangaben r20 berichtigt (L20-01).
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -373,7 +377,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=59; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=60; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
 LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
@@ -2724,7 +2728,8 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     # L17-01..L17-05, Lead K317): die neuen Kommentar-Literale und der Meldungstext genau 1x, die alten Fassungen 0x;
     # die YAML-Teile nur mit F09-Block, sonst LAUT entfallen. r19 erweiterte den Fall um F19-01 (commit --only), F19-02
     # (skip-worktree-Bit, gemessen) und REV-r19 (Fable r18 L18-01, Codex r18 B S18-01, Lead K320); r20 ordnete diesen
-    # Kommentar (Fable r19 L19-01). Keine Zaehl-Logik, keine Mutante.
+    # Kommentar (Fable r19 L19-01); r21 (Codex r20 B S20-02, Fable r20 L20-01, Lead K323) prueft REV-r21 und die
+    # berichtigte r20-Zaehlangabe (alte Form 0x, neue Form 1x). Keine Zaehl-Logik, keine Mutante.
     s="$1"
     n=$(grep -c -F 'r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste' "$s")
     erw_gleich "$n" 1 "Kommentar 'r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege ...' (F18-02)"
@@ -2743,6 +2748,11 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c -F 'skip-worktree-Bit laesst git add mit rc=1 abbrechen' "$s")
     erw_gleich "$n" 1 "Kommentar L1-01 'skip-worktree-Bit laesst git add mit rc=1 abbrechen' (F19-02, gemessen)"
     n=$(grep -c '^# REV r19 ' "$s"); erw_gleich "$n" 1 "REV-r19-Kopf"
+    n=$(grep -c '^# REV r21 ' "$s"); erw_gleich "$n" 1 "REV-r21-Kopf"
+    n=$(grep -c -F '; 2 Nicht-Kommentar-Zeilen, kein neuer Kontrollfluss.' "$s")
+    erw_gleich "$n" 0 "alte r20-Zaehlform '; 2 Nicht-Kommentar-Zeilen, kein neuer Kontrollfluss.' (F21-02)"
+    n=$(grep -c -F '2 Nicht-Kommentar-Kommandos (3 Zeilen, Gesamtindex-Wache per Backslash zweizeilig)' "$s")
+    erw_gleich "$n" 1 "neue r20-Zaehlform '2 Nicht-Kommentar-Kommandos (3 Zeilen, ...)' (F21-02)"
     n=$(grep -c -F 'erneuter Push, falls Versuche verbleiben ($versuch/5; S17-03)' "$s")
     erw_gleich "$n" 1 "Meldung 'erneuter Push, falls Versuche verbleiben (\$versuch/5; S17-03)' (F18-05)"
     n=$(grep -c -F '[skip ci], erneuter Push' "$s")
@@ -2769,21 +2779,29 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     fi
 }
 
-fall_P100() { # F20-01/F20-02 (Codex-Lens r19 B S19-01, Lead K322): Gitlink-Wachen unabhaengig von diff.ignoreSubmodules
-    # (a) Literal-Wache: --ignore-submodules=none genau 2x (diff_gleich-Zeile + Gesamtindex-Wache), alte Formen ohne
-    #     Flag 0x; (b) Verhaltensprobe im Wegwerf-Repo unter TMPDIR (Gitlink-Eintraege per update-index --cacheinfo
-    #     160000, kein echtes Submodul, Repo-Config diff.ignoreSubmodules=all): diff_gleich (2 Funktionszeilen aus dem
-    #     Pruefling extrahiert) A B -- thesis/diplomarbeit = rc 1; die Gesamtindex-Wachenzeile des Prueflings zeigt
-    #     einen fremden gestagten Gitlink als 'M thesis/diplomarbeit'; Vorbedingung je Probe roh ohne Flag = rc 0 bzw.
-    #     LEER (Lead-Messung 25.09.2026, git 2.43.0). Mutanten M124/M125 entfernen je ein Flag -> beide Proben reissen.
+fall_P100() { # F20-01/F20-02 (Codex-Lens r19 B S19-01, Lead K322) + F21-01/F21-03 (Codex-Lens r20 B S20-01, Lead K323):
+    # Gitlink-Wachen unabhaengig von diff.ignoreSubmodules. (a) Literal-Wache: --ignore-submodules=none genau 3x in
+    #     Code-Zeilen (diff_gleich + Gesamtindex-Wache + Arbeitsbaum-Wache), alte Formen ohne Flag 0x; (b) Verhaltens-
+    #     probe im Wegwerf-Repo unter TMPDIR (Gitlink-Eintraege per update-index --cacheinfo 160000, kein echtes
+    #     Submodul, Repo-Config diff.ignoreSubmodules=all): diff_gleich (2 Funktionszeilen aus dem Pruefling extrahiert)
+    #     A B -- thesis/diplomarbeit = rc 1; die Gesamtindex-Wachenzeile des Prueflings zeigt einen fremden gestagten
+    #     Gitlink als 'M thesis/diplomarbeit'; (c, r21) zweites Wegwerf-Repo mit ECHTEM Sub-Repo unter docs/diplomarbeit
+    #     (Gitlink unterhalb von DIR, ungestagter Wechsel s1 -> s2, config all): die Arbeitsbaum-Wachenzeile des
+    #     Prueflings (Kommando zwischen '$(' und ')', DIR=docs/diplomarbeit) zeigt genau 'docs/diplomarbeit/sub';
+    #     Vorbedingung je Probe roh ohne Flag = rc 0 bzw. LEER (Lead-Messungen 25.09.2026 + 55.48ro, git 2.43.0).
+    #     Mutanten M124/M125/M126 entfernen je ein Flag -> die zugehoerige Probe reisst.
     s="$1"; d="$T/P100"; r="$d/repo"; rm -rf "$d"; mkdir -p "$r"
     n=$(grep -v -E '^[[:space:]]*#' "$s" | grep -c -F -- '--ignore-submodules=none')
-    erw_gleich "$n" 2 "Flag --ignore-submodules=none in Code-Zeilen des Scripts (F20-01; Kommentare nicht gezaehlt)"
+    erw_gleich "$n" 3 "Flag --ignore-submodules=none in Code-Zeilen des Scripts (F20-01/F21-01; Kommentare ungezaehlt)"
     n=$(grep -c -F 'git diff --quiet --ignore-submodules=none "$@"' "$s"); erw_gleich "$n" 1 "diff_gleich mit Flag"
     n=$(grep -c -F 'git diff --quiet "$@"' "$s"); erw_gleich "$n" 0 "alte Form diff_gleich ohne Flag"
     n=$(grep -c -F 'git diff --cached --no-renames --name-status --ignore-submodules=none >' "$s")
     erw_gleich "$n" 1 "Gesamtindex-Wache mit Flag"
     n=$(grep -c -F 'git diff --cached --no-renames --name-status >' "$s"); erw_gleich "$n" 0 "alte Form ohne Flag"
+    n=$(grep -c -F 'ungestagt=$(git -c core.fileMode=true diff --name-only --ignore-submodules=none -- "$DIR")' "$s")
+    erw_gleich "$n" 1 "Arbeitsbaum-Wache mit Flag (F21-01)"
+    n=$(grep -c -F 'ungestagt=$(git -c core.fileMode=true diff --name-only -- "$DIR")' "$s")
+    erw_gleich "$n" 0 "alte Form Arbeitsbaum-Wache ohne Flag"
     git init -q "$r" 2>/dev/null || { rot "Wegwerf-Repo P-100 nicht anlegbar"; return; }
     git -C "$r" update-index --add --cacheinfo "160000,$GITLINK_A,thesis/diplomarbeit" || { rot "Gitlink A"; return; }
     git -C "$r" commit -q -m A || { rot "Commit A"; return; }
@@ -2808,6 +2826,31 @@ fall_P100() { # F20-01/F20-02 (Codex-Lens r19 B S19-01, Lead K322): Gitlink-Wach
     ( GIT_DIR="$r/.git" GIT_WORK_TREE="$r"; export GIT_DIR GIT_WORK_TREE; $kdo ) > "$d/cached.out" 2>&1
     n=$(grep -c -E "^M[[:space:]]thesis/diplomarbeit\$" "$d/cached.out")
     erw_gleich "$n" 1 "Gesamtindex-Wache des Prueflings zeigt 'M thesis/diplomarbeit' unter config all (S7-03/S8-01)"
+    # (c, r21) echtes Sub-Repo unterhalb von DIR (F21-01/F21-03; Codex r20 B S20-01, Lead-Messung 55.48ro)
+    r2="$d/repo2"; sub="$r2/docs/diplomarbeit/sub"
+    { git init -q "$r2" && mkdir -p "$r2/docs/diplomarbeit" && git init -q "$sub"; } 2>/dev/null \
+        || { rot "Wegwerf-Sub-Repo P-100 nicht anlegbar"; return; }
+    git -C "$sub" commit -q --allow-empty -m s1 || { rot "Sub-Repo Commit s1"; return; }
+    s1=$(git -C "$sub" rev-parse HEAD)
+    git -C "$sub" commit -q --allow-empty -m s2 || { rot "Sub-Repo Commit s2"; return; }
+    s2=$(git -C "$sub" rev-parse HEAD)
+    git -C "$sub" checkout -q "$s1" || { rot "Sub-Repo checkout s1"; return; }
+    printf '%%PDF-1.4\n' > "$r2/docs/diplomarbeit/a.pdf"
+    git -C "$r2" add docs/diplomarbeit/a.pdf || { rot "git add a.pdf (repo2)"; return; }
+    git -C "$r2" update-index --add --cacheinfo "160000,$s1,docs/diplomarbeit/sub" \
+        || { rot "Gitlink unter DIR (repo2)"; return; }
+    git -C "$r2" commit -q -m A || { rot "Commit A (repo2)"; return; }
+    git -C "$sub" checkout -q "$s2" || { rot "Sub-Repo checkout s2 (ungestagter Gitlink-Wechsel)"; return; }
+    git -C "$r2" config diff.ignoreSubmodules all || { rot "config diff.ignoreSubmodules=all (repo2)"; return; }
+    git -C "$r2" -c core.fileMode=true diff --name-only -- docs/diplomarbeit > "$d/roh2.out" 2>&1
+    n=$(grep -c . "$d/roh2.out")
+    erw_gleich "$n" 0 "Vorbedingung: roh ohne Flag ist der ungestagte Gitlink-Wechsel unter DIR unsichtbar (LEER)"
+    zl=$(grep -m1 -F 'ungestagt=$(git -c core.fileMode=true diff --name-only' "$s"); kdo="${zl#*\$(}"; kdo="${kdo%%)*}"
+    [ -n "$kdo" ] || { rot "Arbeitsbaum-Wachenzeile im Pruefling nicht gefunden (F21-01)"; return; }
+    ( GIT_DIR="$r2/.git" GIT_WORK_TREE="$r2"; export GIT_DIR GIT_WORK_TREE; DIR=docs/diplomarbeit
+      eval "$kdo" ) > "$d/wt.out" 2>&1
+    erw_gleich "$(cat "$d/wt.out")" "docs/diplomarbeit/sub" \
+        "Arbeitsbaum-Wache des Prueflings zeigt den ungestagten Gitlink-Wechsel unter DIR (F21-01)"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -3074,10 +3117,13 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M125 (r20, S19-01): Flag --ignore-submodules=none an der Gesamtindex-Wache entfernt -> P-100 muss reissen (S8-01)
     ersetze_literal "$SKRIPT" 'git diff --cached --no-renames --name-status --ignore-submodules=none >' \
         'git diff --cached --no-renames --name-status >' > "$MUT/m125.sh"
+    # M126 (r21, S20-01): Flag --ignore-submodules=none an der Arbeitsbaum-Wache entfernt -> P-100 muss reissen (S7-03)
+    ersetze_literal "$SKRIPT" 'git -c core.fileMode=true diff --name-only --ignore-submodules=none -- "$DIR"' \
+        'git -c core.fileMode=true diff --name-only -- "$DIR"' > "$MUT/m126.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
              m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
-             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125; do
+             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -3158,6 +3204,7 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m102 fall_P74 P-74
     [ "$BISS_RC" -eq 0 ] && biss m124 fall_P100 P-100
     [ "$BISS_RC" -eq 0 ] && biss m125 fall_P100 P-100
+    [ "$BISS_RC" -eq 0 ] && biss m126 fall_P100 P-100
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
