@@ -217,8 +217,17 @@
 #        Formen 0x, plus Verhaltensprobe im Wegwerf-Repo unter config all (diff_gleich rc 1, --cached-Wache
 #        'M thesis/diplomarbeit'; r21 (c): echtes Sub-Repo unter DIR, Arbeitsbaum-Wache 'docs/diplomarbeit/sub');
 #        Mutanten M124/M125/M126 = je ein Flag entfernt (F20-01/F20-02, F21-01/F21-03)
+#   P-101 Runner-Konfigurations-Neutralisierung F22-01 (Lead K327, CI 288/16809 Push 403): Wegwerf-GIT_CONFIG_GLOBAL
+#        biegt den Praefix des Wegwerf-Remotes per url.<praefix>.insteadOf auf einen toten Pfad um; Race wie P-03 ->
+#        Push abgelehnt, Fetch, Merge, PUSH OK: Push UND Fetch laufen ueber GITP_REMOTE (Selbstabbildung der URL)
+#   P-102 Diagnose F22-02 ohne Werte: Koeder im extraHeader-Wert, im credential.username-Wert und im SCHLUESSEL einer
+#        url.*-Sektion (Runner-Form https://gitlab-ci-token:TOKEN@host/) -> 'RUNNER-GITCONFIG: 3 Eintraege',
+#        Schluessel + Herkunft gelistet, Koeder 0x im Log (S8-04-Maske auch auf Schluessel)
+#   P-103 Zeichenwache F22-01: Testhaken-Pfad mit '=' (machte -c url.<pfad>.insteadOf zum 'invalid key') -> FEHLER vor
+#        jedem Transport, Wert nicht ausgegeben, Bare-Tip unveraendert; Mutanten M127..M132 (Neutralisierung entfernt,
+#        Push bzw. Fetch ohne GITP_REMOTE, Diagnose mit Werten, Diagnose ohne Maske, Zeichenwache laesst '=' durch)
 #
-# SELBSTBISS (--selbstbiss): 126 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 132 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -300,6 +309,10 @@
 # r21 (Codex r20 B S20-01/S20-02 + Fable r20 L20-01, Lead K323): Flag an der Arbeitsbaum-Wache (Script r20 Z.453, r21
 # Z.462; 1 Kommando = 2 Code-Zeilen per Backslash-Umbruch, 0 Kontrollfluss); P-100 um Literal 3x, Verhaltensprobe (c)
 # Gitlink unter DIR und M126 erweitert -> Faelle 104, Mutanten 126 = 60 + 66; Zaehlangaben r20 berichtigt (L20-01).
+# r22 (Lead K327; CI 288/16809 Job thesis:pdf-export Push 403 trotz Token, der ausserhalb des Runners angenommen wird):
+# Script-Fix F22-01 GITP_REMOTE (credential.helper= + http.<url>.extraheader= + url.<url>.insteadOf/pushInsteadOf =
+# Selbstabbildung) an Push + Fetch, Zeichenwache fuer REMOTE, Diagnose F22-02 (Herkunft + Schluessel, nie Werte) vor
+# dem ersten Push; neue Faelle P-101/P-102/P-103 + M127..M132 -> Faelle 107, Mutanten 132 = 66 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -377,7 +390,7 @@ export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=60; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=66; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
 LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
@@ -1846,9 +1859,9 @@ fall_P46() { # S8-04 (ENTLASTET mit Messung): Push vom pre-receive-Hook abgelehn
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
     # Credential-Maske des Scripts (push.err/fetch.err) am Muster geprobt, ohne den Koeder auszugeben
     m=$(grep -c "s#//\[^/\]\*@#//<cred>@#g" "$s")
-    erw_gleich "$m" 2 "Masken-Ausdruecke im Script (push.err + fetch.err)"
+    erw_gleich "$m" 3 "Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, r22)"
     ms=$(grep -c "s#\[^ /:@\]\*@\[^ /:@\]\*:#<cred>@<host>:#g" "$s")
-    erw_gleich "$ms" 2 "scp-Masken-Ausdruecke im Script (push.err + fetch.err, L9-04)"
+    erw_gleich "$ms" 3 "scp-Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, L9-04/r22)"
     g=$(printf 'https://ciuser:%s@host/x\n' "$KOEDER" | sed -e 's#//[^/]*@#//<cred>@#g' \
         -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g')
     case "$g" in *"$KOEDER"*) rot "Maske laesst den Koeder durch" ;; *'//<cred>@host/x'*) ok "Maske ersetzt userinfo" ;;
@@ -2161,7 +2174,7 @@ fall_P66() { # L10-05: DIR '-n' / SRC '-x' = FEHLER "fuehrendes '-'" VOR jeder g
 fall_P67() { # S10-05 (L10-06): Diagnoseform ohne '//' (scheme:user:kennwort@host/pfad) maskiert, Kennwort nie im Log
     s="$1"; d="$T/P67"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     m=$(grep -c -F "s#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g" "$s")
-    erw_gleich "$m" 2 "scheme-Masken-Ausdruecke im Script (push.err + fetch.err)"
+    erw_gleich "$m" 3 "scheme-Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, r22)"
     { echo '#!/bin/sh'; echo 'echo "reject https:u:pw0ohne2slash@host/y" >&2'; echo 'exit 1'; } \
         > "$BARE/hooks/pre-receive"
     chmod 0755 "$BARE/hooks/pre-receive"
@@ -2852,6 +2865,53 @@ fall_P100() { # F20-01/F20-02 (Codex-Lens r19 B S19-01, Lead K322) + F21-01/F21-
     erw_gleich "$(cat "$d/wt.out")" "docs/diplomarbeit/sub" \
         "Arbeitsbaum-Wache des Prueflings zeigt den ungestagten Gitlink-Wechsel unter DIR (F21-01)"
 }
+fall_P101() { # F22-01 (r22, Lead K327; CI 288/16809 Push 403): Runner-injizierte insteadOf-Umbiegung des Remote-
+    # Praefixes per Wegwerf-GIT_CONFIG_GLOBAL; Race wie P-03 -> Push abgelehnt, Fetch, Merge, PUSH OK: beide Transport-
+    # aufrufe laufen ueber GITP_REMOTE (Selbstabbildung der URL = laengster Praefix); ohne F22-01 (r21, M127/M128)
+    # reisst der Push ('does not appear to be a git repository'), ohne F22-01 am Fetch (M129) der Fetch.
+    s="$1"; d="$T/P101"; vorlauf_bewegt "$s" "$d" || { rot "Vorlauf (Export v1 + Mensch h1) fehlgeschlagen"; return; }
+    mensch "$d/h2" "h2" || { rot "Mensch-Commit h2 fehlgeschlagen"; return; }
+    printf '[url "%s/nirgends/"]\n\tinsteadOf = %s/\n' "$d" "$d" > "$d/umbiegung"
+    lauf "$d/workB" "$s" "$d/out" "$H1" GIT_CONFIG_GLOBAL="$d/umbiegung" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "Push abgelehnt (Versuch 1)"
+    erw_text "$d/out" "PUSH OK (ci.skip)"; erw_text "$d/out" "RUNNER-GITCONFIG: 1 Eintraege"
+    erw_text "$d/out" "file:$d/umbiegung url.$d/nirgends/.insteadof"
+    erw_kein_text "$d/out" "does not appear to be a git repository"
+    t=$(tip); p=$(git -C "$BARE" rev-list --parents -n 1 "$t" | wc -w)
+    erw_gleich "$p" 3 "Tip ist Merge-Commit (2 Eltern)"
+}
+fall_P102() { # F22-02 (r22): die Diagnose VOR dem ersten Push listet Herkunft + Schluessel, NIE Werte: Koeder im
+    # extraHeader-Wert, im credential.username-Wert und im SCHLUESSEL einer url.*-Sektion (Runner-Form
+    # https://gitlab-ci-token:TOKEN@host/) -> 3 Eintraege, Schluessel gelistet (userinfo per S8-04-Maske), Koeder 0x;
+    # der lokale Push bleibt unberuehrt (PUSH OK). Ohne --name-only (M130) bzw. ohne Maske (M131) reisst der Fall.
+    s="$1"; d="$T/P102"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    hs=gitlab.example.invalid
+    { printf '[http "%s"]\n\textraheader = Authorization: Bearer %s\n' "$BARE" "$KOEDER"
+      printf '[url "https://gitlab-ci-token:%s@%s/"]\n\tinsteadOf = https://%s/\n' "$KOEDER" "$hs" "$hs"
+      printf '[credential]\n\tusername = %s\n' "$KOEDER"; } > "$d/injektion"
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/injektion" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "PUSH OK (ci.skip)"
+    erw_text "$d/out" "RUNNER-GITCONFIG: 3 Eintraege"; erw_text "$d/out" "file:$d/injektion http.$BARE.extraheader"
+    erw_text "$d/out" "file:$d/injektion url.https://<cred>@$hs/.insteadof"
+    erw_text "$d/out" "file:$d/injektion credential.username"
+    erw_kein_text "$d/out" "$KOEDER"; erw_kein_text "$d/out" "gitlab-ci-token:"; erw_kein_text "$d/out" "Bearer"
+    t=$(tip); n=$(git -C "$BARE" rev-list --count "$t"); erw_gleich "$n" 2 "Bare-Tip = Seed + Export-Commit"
+}
+fall_P103() { # F22-01 Zeichenwache (r22): ein Testhaken-Pfad mit '=' machte '-c url.<pfad>.insteadOf=<pfad>' zum
+    # 'invalid key' (git 2.43.0, rc 128, gemessen) -> das Script verweigert laut VOR jedem Transport, ohne den Wert;
+    # ohne die Wache (Script r21: Push rc 0; M132: git-Fehler + 'Push abgelehnt' statt Vertragstext) reisst der Fall.
+    s="$1"; d="$T/P103"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    mkdir -p "$d/x=y" && cp -r "$d/bare.git" "$d/x=y/bare.git" || { rot "Bare-Kopie unter 'x=y' nicht baubar"; return; }
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$d/x=y/bare.git"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Zeichen ausserhalb [A-Za-z0-9_./:-] (F22-01)"
+    erw_text "$d/out" "TESTHAKEN AKTIV"; erw_kein_text "$d/out" "PUSH OK"; erw_kein_text "$d/out" "Push abgelehnt"
+    erw_kein_text "$d/out" "x=y"
+    t=$(git -C "$d/x=y/bare.git" rev-parse refs/heads/development)
+    erw_gleich "$t" "$BASE" "Bare-Tip (x=y) unveraendert"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
     FEHL=0; echo ""; echo "== $1 =="
@@ -2968,6 +3028,9 @@ fall P-97 fall_P97 "$SKRIPT"
 fall P-98 fall_P98 "$SKRIPT"
 fall P-99 fall_P99 "$SKRIPT"
 fall P-100 fall_P100 "$SKRIPT"
+fall P-101 fall_P101 "$SKRIPT"
+fall P-102 fall_P102 "$SKRIPT"
+fall P-103 fall_P103 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
 
 # --------------------------------------------------------------------------- Selbstbiss
@@ -3120,10 +3183,28 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M126 (r21, S20-01): Flag --ignore-submodules=none an der Arbeitsbaum-Wache entfernt -> P-100 muss reissen (S7-03)
     ersetze_literal "$SKRIPT" 'git -c core.fileMode=true diff --name-only --ignore-submodules=none -- "$DIR"' \
         'git -c core.fileMode=true diff --name-only -- "$DIR"' > "$MUT/m126.sh"
+    # M127 (r22, F22-01): Neutralisierung entfernt (GITP_REMOTE == GITP) -> P-101 muss reissen (Push/Fetch umgebogen)
+    ersetze_literal "$SKRIPT" \
+        '-c http.$REMOTE.extraheader= -c url.$REMOTE.insteadOf=$REMOTE -c url.$REMOTE.pushInsteadOf=$REMOTE"' '"' \
+        > "$MUT/m127.sh"
+    # M128 (r22, F22-01): Push ohne GITP_REMOTE -> P-101 muss reissen (erster Push umgebogen)
+    ersetze_literal "$SKRIPT" 'if $GITP_REMOTE push -q -o ci.skip' 'if $GITP push -q -o ci.skip' > "$MUT/m128.sh"
+    # M129 (r22, F22-01): Fetch ohne GITP_REMOTE -> P-101 muss reissen (das Race-Szenario erreicht den Fetch)
+    ersetze_literal "$SKRIPT" '$GITP_REMOTE fetch -q "$REMOTE"' '$GITP fetch -q "$REMOTE"' > "$MUT/m129.sh"
+    # M130 (r22, F22-02): Diagnose ohne --name-only (Werte im Log) -> P-102 muss reissen (Koeder im Wert sichtbar)
+    ersetze_literal "$SKRIPT" 'git config --show-origin --name-only' 'git config --show-origin' > "$MUT/m130.sh"
+    # M131 (r22, F22-02): Maskenregeln 3+1 der Diagnose entfernt (Regel 2 deckt die https-Form nicht) -> P-102 muss
+    # reissen (Token im Schluessel sichtbar); Literal nur in der Diagnose (push.err/fetch.err: Reihenfolge 1-2-3)
+    ersetze_literal "$SKRIPT" \
+        "sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \\" 'sed \\' \
+        > "$MUT/m131.sh"
+    # M132 (r22, F22-01): Zeichenwache laesst '=' durch -> P-103 muss reissen (git 'invalid key' statt Vertragstext)
+    ersetze_literal "$SKRIPT" '*[!A-Za-z0-9_./:-]*) fehler' '*[!A-Za-z0-9_./:=-]*) fehler' > "$MUT/m132.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
              m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
-             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126; do
+             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126 \
+             m127 m128 m129 m130 m131 m132; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
@@ -3205,6 +3286,12 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m124 fall_P100 P-100
     [ "$BISS_RC" -eq 0 ] && biss m125 fall_P100 P-100
     [ "$BISS_RC" -eq 0 ] && biss m126 fall_P100 P-100
+    [ "$BISS_RC" -eq 0 ] && biss m127 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m128 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m129 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m130 fall_P102 P-102
+    [ "$BISS_RC" -eq 0 ] && biss m131 fall_P102 P-102
+    [ "$BISS_RC" -eq 0 ] && biss m132 fall_P103 P-103
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
