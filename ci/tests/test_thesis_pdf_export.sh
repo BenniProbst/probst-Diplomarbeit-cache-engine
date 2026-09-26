@@ -246,6 +246,8 @@
 #        r26 (F26-01 (e), Codex B r25 S25-01): Praefix-Treffer '4x', abgeschnittenes 'ROT (4', 'GRUENmuell',
 #        fuehrende Null '08'/'010', Bereich '1234567', Muell vor dem Anker (Z 0), Rest nach dem Schlussliteral ->
 #        je KEIN-URTEIL-Marker + FEHL 0 (Zeile nur EXAKT in einer der zwei Formen belastbar)
+#        r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell (korrekte Teilausgabe + rc 2):
+#        (q) Zahlen-sed, (r) grep -c, (s) Maskierungs-sed -> je Marker + FEHL 0 + Abbruchtext mit Stufe, nie OK/BISS
 #
 # SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -350,6 +352,14 @@
 # fuehrende Null, hoechstens 6 Ziffern; sonst KEIN URTEIL, Arithmetik erst nach der Validierung), gemeinsame Tafel
 # p104m_tafel fuer fall_P104m + M133-Basislauf, biss()-Hook Marker-Pflicht (Fehlerstatus ohne Urteil = KEIN URTEIL),
 # P-110 (i)-(p), Kopf P-109 Klammer (F26-02); Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r27 (Codex r26 B S26-01/S26-02/S26-04 + S26-03, Lead-Triage r26 K337): Werkzeugstatus gebunden (Ruhezustand
+# ungueltig, je Stufe pfad/maske/zaehlung/extraktion/zahl eigener rc, sonst P104M_ZG=werkzeugfehler = KEIN URTEIL,
+# nie OK/BISS; Z-Vergleich als Stringgleichheit), Ergebniskanal des Bisspfads ('ENDE FEHL=<n>' in $T/ergebnis,
+# Exitstatus nur 0/1/>=2, kein FEHL mod 256), Biss-Beleg nur mit verankerter Fallmeldung, P-110 (q)-(s) per
+# Werkzeug-Wrapper; Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# F27-05 (Nachtrag A, Lead K337 / L27-01 am Objekt entlastet): Kommentar-Vertrag in fall_P104m (Marker VOR der
+# FEHL-Auswertung) + P-99-Literal; 0 Kontrollfluss, P-110-Erwartungen bleiben Marker JA + FEHL 0.
+# F27-06 (Fable r26 L26-01): Subshell-Tod nach ROT-Zeile = KEIN URTEIL ueber den Ergebniskanal, Probe (6) + V13
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2846,6 +2856,9 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Kopfform P-109 ohne Klammer vor dem Semikolon (F26-02)"
     n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Kopfform P-109 mit geschlossener Klammer (F26-02)"
     n=$(grep -c '^# r26 (Codex r25 B S25-01' "$SELBST"); erw_gleich "$n" 1 "r26-Kopfabsatz des Harnischs (F26-04)"
+    n=$(grep -c '^# r27 (Codex r26 B S26-01' "$SELBST"); erw_gleich "$n" 1 "r27-Kopfabsatz des Harnischs (F27-04)"
+    n=$(grep -c 'VERTRAG (r27, Lead K337 / L27''-01)' "$SELBST"); erw_gleich "$n" 1 "Vertrag fall_P104m (F27-05)"
+    n=$(grep -c '^# F27-06 (Fable r26 L26-01)' "$SELBST"); erw_gleich "$n" 1 "F27-06-Kopfzeile (Fable r26 L26-01)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -3011,20 +3024,31 @@ fall_P104() { # F23-02 (r23, Codex B S22-02): HARNISCH-NETZSPERRE per GIT_ALLOW_
 p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Original oder Mutante) im Ordner $2, setzt
     # P104M_URTEIL (GRUEN/ROT/KEIN), P104M_RC, P104M_N, P104M_Z r25; env -u CI -u GITLAB_CI (F24-02 (a)): die Override-
     # Sperre des Kopfes (P-22) bleibt, der interne Kopienaufruf traegt die CI-Marker nicht weiter
-    mkdir -p "$2"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
+    # r27 (F27-01 (a)-(c), Codex B r26 S26-01): Ruhezustand = ungueltig; jede Werkzeugstufe (pfad-sed, Maskierungs-
+    # sed, grep -c [rc 0/1 gueltig], Extraktion, Zahlen-sed) bindet ihren Status: rc ausserhalb der gueltigen Menge =
+    # P104M_ZG=werkzeugfehler + P104M_WZ=<stufe>:<rc> und sofortiger Ausstieg (keine Tafel); Z als Stringgleichheit
+    P104M_URTEIL=KEIN; P104M_N=KEIN; P104M_Z=0; P104M_ZG=ungueltig; P104M_BEREICH=NEIN; P104M_WZ=''; P104M_RC=''
+    mkdir -p "$2"
+    _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT"); _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="pfad:$_rc"; return 0; fi
+    _pf=$(printf '%s\n' "$_pf" | head -n 1)
     env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$2" sh "$1" --nur=P-104 \
         > "$2/out" 2>&1; P104M_RC=$?
-    sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"
-    P104M_Z=$(grep -c '^  P-104: ' "$2/out.m")   # r25 (F25-01 (a)): Zahl der Urteilszeilen, belastbar nur genau 1
+    sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"; _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="maske:$_rc"; return 0; fi
+    P104M_Z=$(grep -c '^  P-104: ' "$2/out.m"); _rc=$?   # r25 (F25-01 (a)): Urteilszeilen, belastbar nur genau 1
+    if [ "$_rc" -ge 2 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="zaehlung:$_rc"; return 0; fi
     # r26 (F26-01 (a), Codex B r25 S25-01): die einzige Urteilszeile muss EXAKT einer der beiden Formen entsprechen
     # (Zeilenende!); N nur aus der validierten ROT-Zeile (POSIX BRE, kanonische Dezimalzahl ohne fuehrende Null),
-    # hoechstens 6 Ziffern (sonst P104M_BEREICH=JA = KEIN URTEIL); alles andere = KEIN, N 0, P104M_ZG=ungueltig
-    P104M_URTEIL=KEIN; P104M_N=0; P104M_ZG=ungueltig; P104M_BEREICH=NEIN
-    if [ "$P104M_Z" -eq 1 ]; then
-        _uz=$(grep '^  P-104: ' "$2/out.m")
+    # hoechstens 6 Ziffern (sonst P104M_BEREICH=JA = KEIN URTEIL); alles andere = KEIN, N KEIN, P104M_ZG=ungueltig
+    if [ "$P104M_Z" = 1 ]; then
+        _uz=$(grep '^  P-104: ' "$2/out.m"); _rc=$?
+        if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="extraktion:$_rc"; return 0; fi
         if [ "$_uz" = '  P-104: GRUEN' ]; then P104M_URTEIL=GRUEN; P104M_ZG=gueltig
         else
             _un=$(printf '%s\n' "$_uz" | sed -n 's/^  P-104: ROT (\([1-9][0-9]*\) Erwartung(en) gerissen)$/\1/p')
+            _rc=$?
+            if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="zahl:$_rc"; return 0; fi
             if [ -n "$_un" ] && [ "${#_un}" -le 6 ]; then P104M_URTEIL=ROT; P104M_N=$_un; P104M_ZG=gueltig
             elif [ -n "$_un" ]; then P104M_BEREICH=JA; fi
         fi
@@ -3036,7 +3060,7 @@ p104m_tafel() { # r26 (F26-01 (b)/(c), Codex B r25 S25-01 + N-03): gemeinsame Ur
     # N > 0 (N ist dann eine kanonische Dezimalzahl <= 6 Ziffern; Arithmetik erst danach); alles andere KEIN + Marker-
     # Text (r25-Form + ', Zeile <gueltig|ungueltig>' + bei Bereichsverletzung ', Zahl ausserhalb des Bereichs')
     _tafel=KEIN
-    if [ "$P104M_Z" -eq 1 ] && [ "$P104M_ZG" = gueltig ]; then
+    if [ "$P104M_Z" = 1 ] && [ "$P104M_ZG" = gueltig ]; then   # r27 (F27-01 (c)): Z als Stringgleichheit
         case "$P104M_URTEIL/$P104M_RC" in
             GRUEN/0) _tafel=OK ;;
             ROT/1) if [ "$P104M_N" -gt 0 ]; then _tafel=BISS; fi ;;
@@ -3050,7 +3074,14 @@ p104m_tafel() { # r26 (F26-01 (b)/(c), Codex B r25 S25-01 + N-03): gemeinsame Ur
 fall_P104m() { # r23/r24: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script,
     # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); F24-02 (b): fehlendes Urteil oder ein rc, der dem
     # Urteil widerspricht, ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss()); r25 (F25-01): Tafel gehaertet
+    # VERTRAG (r27, Lead K337 / L27-01): Aufrufer muessen $T/kein-urteil.txt VOR der FEHL-Auswertung pruefen (biss()
+    # und die P-110-Subshell tun das); ein Aufrufer ohne Marker-Pruefung erhielte bei KEIN URTEIL FEHL 0 = stilles
+    # GRUEN; kein solcher Aufrufer registriert (Literal 'P-104m' 0x, fall_P104m nur via biss m133 und p110)
     p104m_lauf "$1" "$T/P104m"
+    if [ "$P104M_ZG" = werkzeugfehler ]; then   # r27 (F27-01 (d)): Werkzeugfehler = KEIN URTEIL, nie OK, nie BISS
+        _txt="Harnisch-Kopie: Werkzeugfehler (${P104M_WZ%%:*} rc ${P104M_WZ#*:})"
+        echo "  [ABBRUCH] $_txt -- KEIN URTEIL"; printf '%s\n' "$_txt" > "$T/kein-urteil.txt"; return 0
+    fi
     # r25 (F25-01 (b), Codex B S24-01 Haertung / Fable L24-02/L24-03): belastbar sind NUR GRUEN/rc 0 (kein Biss) und
     # ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss); ROT mit rc != 1, ROT (0), GRUEN mit rc != 0, KEIN und
     # fehlende oder doppelte Urteilszeile = KEIN URTEIL (Marker fuer biss())
@@ -3185,13 +3216,14 @@ fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M13
     # Biss) und ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss: FEHL += N); alles andere schreibt den KEIN-
     # URTEIL-Marker und laesst FEHL bei 0. Am r24-Harnisch sind (a) (b) (e) (f) rot (ROT/rc != 1 und ROT (0) zaehlten
     # als Biss, die Doppelzeile riss die Arithmetik der Subshell); keine Mutante (Textwache-Klasse).
-    d="$T/P110"; mkdir -p "$d"; P110_EINZUG='  '   # r26 (F26-01 (e)): Einzug der Urteilszeilen, (o) ohne
+    d="$T/P110"; mkdir -p "$d"; P110_EINZUG='  '; P110_WRAP=''   # r26 (e): Einzug, (o) ohne; r27: Wrapper-PATH
     p110() { # $1 = Marke, $2 = rc der Kopie, $3.. = Urteilszeilen (ohne die zwei fuehrenden Leerzeichen)
         _m="$1"; _rc="$2"; shift 2; _k="$d/kopie-$_m.sh"; mkdir -p "$d/$_m"
         printf '#!/bin/sh\n' > "$_k"
         for _z in "$@"; do printf 'echo "%s%s"\n' "$P110_EINZUG" "$_z" >> "$_k"; done
         printf 'exit %s\n' "$_rc" >> "$_k"
-        ( T="$d/$_m"; FEHL=0; fall_P104m "$_k" > "$d/$_m.out" 2>&1; echo "$FEHL" > "$d/$_m/fehl" )
+        ( PATH="${P110_WRAP:+$P110_WRAP:}$PATH"; T="$d/$_m"; FEHL=0   # r27 (F27-01 (e)): Wrapper vor PATH
+          fall_P104m "$_k" > "$d/$_m.out" 2>&1; echo "$FEHL" > "$d/$_m/fehl" )
         if [ -f "$d/$_m/fehl" ]; then P110_FEHL=$(cat "$d/$_m/fehl"); else P110_FEHL=ABBRUCH; fi
         if [ -f "$d/$_m/kein-urteil.txt" ]; then P110_MARKER=JA; else P110_MARKER=NEIN; fi
         echo "      > ($_m) Marker $P110_MARKER, FEHL $P110_FEHL"
@@ -3249,6 +3281,28 @@ fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M13
     p110 p 1 'P-104: ROT (4 Erwartung(en) gerissen) x'
     erw_gleich "$P110_MARKER" JA "(p) Rest nach dem Schlussliteral/rc 1 -> KEIN-URTEIL-Marker"
     erw_gleich "$P110_FEHL" 0 "(p) Rest nach dem Schlussliteral -> FEHL 0"
+    # r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell rufen das echte Werkzeug (korrekte
+    # Teilausgabe) und enden mit rc 2 -- (q) nur das Zahlen-sed, (r) nur grep -c, (s) nur das Maskierungs-sed; am
+    # r26-Harnisch liefern alle drei BISS (FEHL 4, kein Marker) = Riss; am r27 ABBRUCH mit Stufe, Marker JA, FEHL 0
+    _sed=$(command -v sed); _grep=$(command -v grep); mkdir -p "$d/wrap-q" "$d/wrap-r" "$d/wrap-s"
+    printf '#!/bin/sh\ncase "$*" in *"Erwartung(en) gerissen)$/\\1/p"*) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' \
+        "$_sed" "$_sed" > "$d/wrap-q/sed"
+    printf '#!/bin/sh\ncase "$1" in -c) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_grep" "$_grep" > "$d/wrap-r/grep"
+    printf '#!/bin/sh\ncase "$1" in "s#"*"#<super-pfad>#g") %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' \
+        "$_sed" "$_sed" > "$d/wrap-s/sed"
+    chmod +x "$d/wrap-q/sed" "$d/wrap-r/grep" "$d/wrap-s/sed"
+    P110_WRAP="$d/wrap-q"; p110 q 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(q) Zahlen-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(q) Zahlen-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (zahl rc 2)' "$d/q.out"); erw_gleich "$_bn" 1 "(q) Abbruchtext Stufe zahl rc 2"
+    P110_WRAP="$d/wrap-r"; p110 r 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(r) grep -c Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(r) grep -c rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (zaehlung rc 2)' "$d/r.out"); erw_gleich "$_bn" 1 "(r) Abbruchtext Stufe zaehlung"
+    P110_WRAP="$d/wrap-s"; p110 s 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(s) Maskierungs-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(s) Maskierungs-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (maske rc 2)' "$d/s.out"); erw_gleich "$_bn" 1 "(s) Abbruchtext Stufe maske"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -3570,22 +3624,33 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1 nicht bewertbar"
         MUT_N=$((MUT_N-1)); NB_N=$((NB_N+1))
     }
-    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei r > Basis-FEHL
+    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei N > Basis-FEHL
         basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
         T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
-        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
+        # r27 (F27-02 (b), Codex B r26 S26-04): eigener Ergebniskanal -- der Fall schreibt 'ENDE FEHL=<n>' nach
+        # $T/ergebnis; der Exitstatus traegt nur 0 = regulaer ohne Risse, 1 = regulaer mit Rissen, >= 2 = Abbruch
+        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis"
+          if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
         T="$T_ALT"
         if [ -f "$T/biss_$1/kein-urteil.txt" ]; then   # r24 (F24-02 (b)): der Traeger konnte die Mutante nicht bewerten
             echo "  [ABBRUCH] Mutante $1: $(cat "$T/biss_$1/kein-urteil.txt") -- KEIN URTEIL"; BISS_RC=2; return 0
         fi
-        # r26 (F26-01 (d), Codex B r25 S25-01): Marker-Pflicht -- ein Fehlerstatus der Subshell OHNE Urteilsmarker und
-        # OHNE regulaere Fallmeldung ('[ROT]' der Erwartungen bzw. die ROT-Zeile der Harnisch-Kopie) ist kein Biss
-        if [ "$r" -ne 0 ] && ! grep -q -e '\[ROT\]' -e '>   P-104: ROT (' "$T/biss_$1/protokoll.txt"; then
-            echo "  [ABBRUCH] Mutante $1: Fehlerstatus $r ohne Urteil (weder Marker noch ROT-Zeile) -- KEIN URTEIL"
+        # r27 (F27-02 (a)/(b)): Fallabschluss NUR ueber die Ergebnisdatei; Exitstatus >= 2 oder fehlende/unlesbare
+        # Ergebnisdatei = KEIN URTEIL; die Risszahl N kommt aus der Datei, nie aus dem Exitstatus (kein mod 256)
+        _n=$(sed -n 's/^ENDE FEHL=\([0-9][0-9]*\)$/\1/p' "$T/biss_$1/ergebnis" 2>/dev/null)
+        if [ "$r" -ge 2 ] || [ -z "$_n" ]; then
+            echo "  [ABBRUCH] Mutante $1: Exitstatus $r ohne regulaeren Fallabschluss (Ergebniskanal) -- KEIN URTEIL"
             BISS_RC=2; return 0
         fi
-        if [ "$r" -gt "$basis" ]; then
-            echo "  [OK]  Mutante $1 macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
+        # r27 (F27-02 (a), Codex B r26 S26-02): Biss-Beleg NUR mit verankerter Fallmeldung -- '    [ROT] ' der
+        # Erwartungen oder die exakte ROT-Zeile der Harnisch-Kopie; unverankerte Textfragmente beglaubigen keinen Biss
+        if [ "$_n" -gt "$basis" ]; then
+            if grep -q -E '^    \[ROT\] |^      >   P-104: ROT \([1-9][0-9]* Erwartung\(en\) gerissen\)$' \
+                    "$T/biss_$1/protokoll.txt"; then
+                echo "  [OK]  Mutante $1 macht $3 ROT ($_n gerissene Erwartung(en)) -- die Probe beisst"
+            else
+                echo "  [ABBRUCH] Mutante $1: $_n Risse ohne verankerte Fallmeldung -- KEIN URTEIL"; BISS_RC=2
+            fi
         else
             echo "  [ABBRUCH] Mutante $1 laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
         fi
@@ -3662,11 +3727,17 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # Setzungen erzeugt (M133, r23 F23-02) und gebissen; ohne gruenen Basislauf = KEIN URTEIL (BISS_RC=2)
     if [ "$BISS_RC" -eq 0 ]; then
         p104m_lauf "$SELBST" "$T/basis_m133"
-        p104m_tafel   # r26 (F26-01 (c), Codex N-03): dieselbe Klassifikation wie fall_P104m, OK nur GRUEN/0 validiert
-        case "$_tafel" in
-            OK) echo "  [OK]  Basislauf der unveraenderten Harnisch-Kopie: P-104 GRUEN (rc 0)" ;;
-            *) echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: $_txt -- KEIN URTEIL"; BISS_RC=2 ;;
-        esac
+        if [ "$P104M_ZG" = werkzeugfehler ]; then   # r27 (F27-01 (d)): Werkzeugfehler = KEIN URTEIL (BISS_RC=2)
+            _wz="${P104M_WZ%%:*} rc ${P104M_WZ#*:}"
+            echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: Werkzeugfehler ($_wz) -- KEIN URTEIL"
+            BISS_RC=2
+        else
+            p104m_tafel   # r26 (F26-01 (c), Codex N-03): dieselbe Klassifikation wie fall_P104m, OK nur GRUEN/0
+            case "$_tafel" in
+                OK) echo "  [OK]  Basislauf der unveraenderten Harnisch-Kopie: P-104 GRUEN (rc 0)" ;;
+                *) echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: $_txt -- KEIN URTEIL"; BISS_RC=2 ;;
+            esac
+        fi
     fi
     if [ "$BISS_RC" -eq 0 ]; then
         ersetze_literal "$SELBST" ' GIT_ALLOW_PROTOCOL=file' '' > "$MUT/m133.sh"
