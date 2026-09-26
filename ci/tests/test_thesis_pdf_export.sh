@@ -363,13 +363,18 @@
 # FEHL-Auswertung) + P-99-Literal; 0 Kontrollfluss, P-110-Erwartungen bleiben Marker JA + FEHL 0.
 # F27-06 (Fable r26 L26-01): Subshell-Tod nach ROT-Zeile = KEIN URTEIL ueber den Ergebniskanal, Probe (6) + V13
 # r28 (Codex r27 B S27-01..S27-04 + Fable r27 L27-02/L27-05, Lead-Triage r27 Teil 1+2 K339): Werkzeugstatus
-# vollstaendig (pfad-Stufe per Parameter-Expansion ohne Werkzeug, Weiterleitung in zwei gebundenen Stufen
+# vollstaendig (Erstzeilenauswahl der pfad-Stufe per Parameter-Expansion statt head = keine eigene Werkzeugstufe;
+# der pfad-sed bleibt als Stufe pfad:<rc> gebunden; Weiterleitung in zwei gebundenen Stufen
 # filter/weiterleitung ueber out.f), Ergebniskanal gehaertet (FEHL kanonisch vor dem Schreiben, Schreibstatus gebunden,
 # genau EIN Datensatz per Builtin, r/N-Abgleich), Vertrag fall_P104m sachlich neu, EREs in POSIX-Form [[]ROT[]],
 # Bereinigung der Ergebnisreste je Mutante (N-04), P-110 (t)(u); F28-08 (L27-02): biss_yml auf denselben Ergebniskanal
 # wie biss() ueber die gemeinsame Auswertung biss_urteil -- genau 2 Subshell-Urteilsstellen (biss, biss_yml), beide
 # ueber den Ergebniskanal, kein Kind-Exitstatus als Urteil; F28-09 (L27-05): Wrapper-Originale nur als Absolutpfad;
 # Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r29 (Codex B r28 S28-01/S28-02, Fable r28 0/0/6, Lead-Triage r28 K341): Kommentar der pfad-Stufe berichtigt
+# (F29-01: Erstzeilenauswahl per Parameter-Expansion statt head, der pfad-sed bleibt gebundene Stufe), Etikett
+# '(YAML)' auch in [NICHT BEWERTBAR] (F29-02: vierter Parameter von nicht_bewertbar); 0 Kontrollfluss ausser dem
+# Etikett-Parameter; Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2879,6 +2884,14 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     # (exit mit FEHL als Status) darf nirgends mehr stehen, die gemeinsame Auswertung biss_urteil ist genau 1x definiert
     alt='exit "$FE''HL"'; n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "Kind-Exitstatus als Urteil (F28-08)"
     n=$(grep -c '^    biss_urteil() {' "$SELBST"); erw_gleich "$n" 1 "gemeinsame Auswertung biss_urteil (F28-08)"
+    # r29 (F29-01, Codex B r28 S28-01): die alte Kommentar-Behauptung zur pfad-Stufe ist berichtigt -- alte Form 0x,
+    # neue Form im Kopfabsatz r28 und in p104m_lauf je 1x; r29-Kopfabsatz 1x; F29-02: Etikett-Meldung 1x
+    # (Wachen-Literale zerlegt, kein Selbsttreffer)
+    n=$(grep -c -F 'ohne Werk''zeug' "$SELBST"); erw_gleich "$n" 0 "pfad-Stufe alte Form (F29-01)"
+    n=$(grep -c -F 'als Stufe pfad:<r''c> gebunden' "$SELBST"); erw_gleich "$n" 1 "Kopf r28 pfad-sed (F29-01)"
+    n=$(grep -c -F 'bleibt gebunden (pfad:<r''c>)' "$SELBST"); erw_gleich "$n" 1 "p104m_lauf pfad-sed (F29-01)"
+    n=$(grep -c '^# r29 (Codex B r28 S28-01' "$SELBST"); erw_gleich "$n" 1 "r29-Kopfabsatz des Harnischs (F29-03)"
+    n=$(grep -c -F 'Mutante $1${4-} nicht bew''ertbar' "$SELBST"); erw_gleich "$n" 1 "Etikett-Meldung (F29-02)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -3047,8 +3060,9 @@ p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Orig
     # r27 (F27-01 (a)-(c), Codex B r26 S26-01): Ruhezustand = ungueltig; jede Werkzeugstufe (pfad-sed, Maskierungs-
     # sed, grep -c [rc 0/1 gueltig], Extraktion, Zahlen-sed) bindet ihren Status: rc ausserhalb der gueltigen Menge =
     # P104M_ZG=werkzeugfehler + P104M_WZ=<stufe>:<rc> und sofortiger Ausstieg (keine Tafel); Z als Stringgleichheit
-    # r28 (F28-01 (a)/(b), Codex B r27 S27-01): pfad-Stufe ohne Werkzeug; Weiterleitung in zwei gebundenen Stufen
-    # filter (grep -E, rc 0/1 gueltig) und weiterleitung (sed) ueber $2/out.f; Fehler = werkzeugfehler VOR der Tafel
+    # r28 (F28-01 (a)/(b), Codex B r27 S27-01): Erstzeile der pfad-Stufe per Parameter-Expansion statt head, der
+    # pfad-sed bleibt gebunden (pfad:<rc>); Weiterleitung in zwei gebundenen Stufen filter (grep -E, rc 0/1
+    # gueltig) und weiterleitung (sed) ueber $2/out.f; Fehler = werkzeugfehler VOR der Tafel
     P104M_URTEIL=KEIN; P104M_N=KEIN; P104M_Z=0; P104M_ZG=ungueltig; P104M_BEREICH=NEIN; P104M_WZ=''; P104M_RC=''
     mkdir -p "$2"
     _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT"); _rc=$?
@@ -3672,8 +3686,9 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         fi
     done
     basis_von() { eval "printf '%s' \"\${BASIS_$(printf '%s' "$1" | tr -d -):-0}\""; } # r8 (L7-03)
-    nicht_bewertbar() { # $1 = Mutante, $2 = Kennung, $3 = Basis-FEHL: roter Basisfall, Mutante nicht gezaehlt
-        echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1 nicht bewertbar"
+    nicht_bewertbar() { # $1 = Mutante, $2 = Kennung, $3 = Basis-FEHL, $4 = Etikett (leer oder " (YAML)"; r29 F29-02):
+        # roter Basisfall, Mutante nicht gezaehlt; $4 optional (biss uebergibt 3 Argumente; ${4-} wegen set -u)
+        echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1${4-} nicht bewertbar"
         MUT_N=$((MUT_N-1)); NB_N=$((NB_N+1))
     }
     # r28 (F28-08, Fable r27 L27-02, Harmonisierung A2.1b): EINE gemeinsame Auswertung fuer beide Biss-Pfade (biss =
@@ -4043,9 +4058,11 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         done
         biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss(); r28 (F28-08,
             # Fable r27 L27-02): derselbe Ergebniskanal wie biss() -- Bereinigung (F28-05), FEHL-Kanon + gebundener
-            # Schreibstatus (F28-02 (a)/(b)), Exitstatus nur 0/1/>=2, Urteil per biss_urteil mit Etikett '(YAML)';
+            # Schreibstatus (F28-02 (a)/(b)), Exitstatus nur 0/1/>=2, Urteil per biss_urteil mit Etikett '(YAML)',
+            # r29 (F29-02, Codex B r28 S28-02): auch [NICHT BEWERTBAR] traegt das Etikett (vierter Parameter);
             # der Kind-Exitstatus (exit mit FEHL als Status, FEHL mod 256) ist kein Urteil mehr
-            basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
+            basis=$(basis_von "$3")
+            if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis" " (YAML)"; return 0; fi
             T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
             rm -f "$T/ergebnis" "$T/kein-urteil.txt"; _rc=$?
             if [ "$_rc" -ne 0 ]; then
