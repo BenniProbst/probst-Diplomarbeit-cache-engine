@@ -248,6 +248,8 @@
 #        je KEIN-URTEIL-Marker + FEHL 0 (Zeile nur EXAKT in einer der zwei Formen belastbar)
 #        r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell (korrekte Teilausgabe + rc 2):
 #        (q) Zahlen-sed, (r) grep -c, (s) Maskierungs-sed -> je Marker + FEHL 0 + Abbruchtext mit Stufe, nie OK/BISS
+#        r28 (F28-01 (c), Codex B r27 S27-01): (t) Weiterleitungs-sed, (u) Filter-grep -> je Marker + FEHL 0 + Text;
+#        r28 (F28-09, Fable r27 L27-05): Wrapper-Originale per command -v -p, Absolutpfad-Pruefung (sonst ROT)
 #
 # SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
@@ -360,6 +362,14 @@
 # F27-05 (Nachtrag A, Lead K337 / L27-01 am Objekt entlastet): Kommentar-Vertrag in fall_P104m (Marker VOR der
 # FEHL-Auswertung) + P-99-Literal; 0 Kontrollfluss, P-110-Erwartungen bleiben Marker JA + FEHL 0.
 # F27-06 (Fable r26 L26-01): Subshell-Tod nach ROT-Zeile = KEIN URTEIL ueber den Ergebniskanal, Probe (6) + V13
+# r28 (Codex r27 B S27-01..S27-04 + Fable r27 L27-02/L27-05, Lead-Triage r27 Teil 1+2 K339): Werkzeugstatus
+# vollstaendig (pfad-Stufe per Parameter-Expansion ohne Werkzeug, Weiterleitung in zwei gebundenen Stufen
+# filter/weiterleitung ueber out.f), Ergebniskanal gehaertet (FEHL kanonisch vor dem Schreiben, Schreibstatus gebunden,
+# genau EIN Datensatz per Builtin, r/N-Abgleich), Vertrag fall_P104m sachlich neu, EREs in POSIX-Form [[]ROT[]],
+# Bereinigung der Ergebnisreste je Mutante (N-04), P-110 (t)(u); F28-08 (L27-02): biss_yml auf denselben Ergebniskanal
+# wie biss() ueber die gemeinsame Auswertung biss_urteil -- genau 2 Subshell-Urteilsstellen (biss, biss_yml), beide
+# ueber den Ergebniskanal, kein Kind-Exitstatus als Urteil; F28-09 (L27-05): Wrapper-Originale nur als Absolutpfad;
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2859,6 +2869,16 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c '^# r27 (Codex r26 B S26-01' "$SELBST"); erw_gleich "$n" 1 "r27-Kopfabsatz des Harnischs (F27-04)"
     n=$(grep -c 'VERTRAG (r27, Lead K337 / L27''-01)' "$SELBST"); erw_gleich "$n" 1 "Vertrag fall_P104m (F27-05)"
     n=$(grep -c '^# F27-06 (Fable r26 L26-01)' "$SELBST"); erw_gleich "$n" 1 "F27-06-Kopfzeile (Fable r26 L26-01)"
+    n=$(grep -c '^# r28 (Codex r27 B S27-01' "$SELBST"); erw_gleich "$n" 1 "r28-Kopfabsatz des Harnischs (F28-07)"
+    # r28 (F28-03/F28-07, Codex B r27 S27-03): neuer Vertragswortlaut fall_P104m vorhanden, die alte Behauptung der
+    # Literalzaehlung verschwunden; Literale zerlegt, damit diese Wache ihre eigene Quellzeile nicht mitzaehlt
+    alt="Literal 'P-10""4m' 0x"; neu='kein direkt registrierter'" Fall (Registrierung nur fall P-101..P-110)"
+    n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Vertragsbehauptung Literalzaehlung (F28-03)"
+    n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Vertragswortlaut fall_P104m nicht registriert (F28-03)"
+    # r28 (F28-08, Fable r27 L27-02): beide Biss-Pfade urteilen ueber den Ergebniskanal -- die alte Exitstatus-Form
+    # (exit mit FEHL als Status) darf nirgends mehr stehen, die gemeinsame Auswertung biss_urteil ist genau 1x definiert
+    alt='exit "$FE''HL"'; n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "Kind-Exitstatus als Urteil (F28-08)"
+    n=$(grep -c '^    biss_urteil() {' "$SELBST"); erw_gleich "$n" 1 "gemeinsame Auswertung biss_urteil (F28-08)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -3027,11 +3047,14 @@ p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Orig
     # r27 (F27-01 (a)-(c), Codex B r26 S26-01): Ruhezustand = ungueltig; jede Werkzeugstufe (pfad-sed, Maskierungs-
     # sed, grep -c [rc 0/1 gueltig], Extraktion, Zahlen-sed) bindet ihren Status: rc ausserhalb der gueltigen Menge =
     # P104M_ZG=werkzeugfehler + P104M_WZ=<stufe>:<rc> und sofortiger Ausstieg (keine Tafel); Z als Stringgleichheit
+    # r28 (F28-01 (a)/(b), Codex B r27 S27-01): pfad-Stufe ohne Werkzeug; Weiterleitung in zwei gebundenen Stufen
+    # filter (grep -E, rc 0/1 gueltig) und weiterleitung (sed) ueber $2/out.f; Fehler = werkzeugfehler VOR der Tafel
     P104M_URTEIL=KEIN; P104M_N=KEIN; P104M_Z=0; P104M_ZG=ungueltig; P104M_BEREICH=NEIN; P104M_WZ=''; P104M_RC=''
     mkdir -p "$2"
     _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT"); _rc=$?
     if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="pfad:$_rc"; return 0; fi
-    _pf=$(printf '%s\n' "$_pf" | head -n 1)
+    _nl=$(printf '\nx'); _nl=${_nl%x}; _pf=${_pf%%"$_nl"*}   # r28 (F28-01 (a), Codex B r27 S27-01): Erstzeile per
+    # Parameter-Expansion statt head (keine Werkzeugstufe = kein Status zu binden)
     env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$2" sh "$1" --nur=P-104 \
         > "$2/out" 2>&1; P104M_RC=$?
     sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"; _rc=$?
@@ -3053,7 +3076,11 @@ p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Orig
             elif [ -n "$_un" ]; then P104M_BEREICH=JA; fi
         fi
     fi
-    grep -E '^  P-104: |^BILANZ|^    \[ROT\]|^ABBRUCH' "$2/out.m" | sed 's/^/      > /'
+    grep -E '^  P-104: |^BILANZ|^    [[]ROT[]]|^ABBRUCH' "$2/out.m" > "$2/out.f"; _rc=$?   # F28-04: POSIX-ERE
+    if [ "$_rc" -ge 2 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="filter:$_rc"; return 0; fi
+    sed 's/^/      > /' "$2/out.f"; _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="weiterleitung:$_rc"; return 0; fi
+    return 0
 }
 p104m_tafel() { # r26 (F26-01 (b)/(c), Codex B r25 S25-01 + N-03): gemeinsame Urteilstafel fuer fall_P104m und den
     # M133-Basislauf; OK nur GRUEN/rc 0 mit genau EINER validierten Zeile, BISS nur ROT/rc 1 mit validierter Zeile und
@@ -3074,9 +3101,11 @@ p104m_tafel() { # r26 (F26-01 (b)/(c), Codex B r25 S25-01 + N-03): gemeinsame Ur
 fall_P104m() { # r23/r24: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script,
     # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); F24-02 (b): fehlendes Urteil oder ein rc, der dem
     # Urteil widerspricht, ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss()); r25 (F25-01): Tafel gehaertet
-    # VERTRAG (r27, Lead K337 / L27-01): Aufrufer muessen $T/kein-urteil.txt VOR der FEHL-Auswertung pruefen (biss()
-    # und die P-110-Subshell tun das); ein Aufrufer ohne Marker-Pruefung erhielte bei KEIN URTEIL FEHL 0 = stilles
-    # GRUEN; kein solcher Aufrufer registriert (Literal 'P-104m' 0x, fall_P104m nur via biss m133 und p110)
+    # VERTRAG (r27, Lead K337 / L27-01) -- r28 (F28-03, Codex B r27 S27-03) sachlich neu: biss() prueft den Marker
+    # VOR der Klassifikation; die P-110-Subshell schreibt FEHL ohne Marker-Pruefung, der Elternkontext sammelt FEHL
+    # und Marker und prueft je Unterprobe zuerst die Marker-Erwartung, dann die FEHL-Erwartung; ein Aufrufer ohne
+    # Marker-Pruefung erhielte bei KEIN URTEIL FEHL 0 = stilles GRUEN.
+    # fall_P104m ist kein direkt registrierter Fall (Registrierung nur fall P-101..P-110); Aufrufer: biss m133 + p110
     p104m_lauf "$1" "$T/P104m"
     if [ "$P104M_ZG" = werkzeugfehler ]; then   # r27 (F27-01 (d)): Werkzeugfehler = KEIN URTEIL, nie OK, nie BISS
         _txt="Harnisch-Kopie: Werkzeugfehler (${P104M_WZ%%:*} rc ${P104M_WZ#*:})"
@@ -3284,7 +3313,13 @@ fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M13
     # r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell rufen das echte Werkzeug (korrekte
     # Teilausgabe) und enden mit rc 2 -- (q) nur das Zahlen-sed, (r) nur grep -c, (s) nur das Maskierungs-sed; am
     # r26-Harnisch liefern alle drei BISS (FEHL 4, kein Marker) = Riss; am r27 ABBRUCH mit Stufe, Marker JA, FEHL 0
-    _sed=$(command -v sed); _grep=$(command -v grep); mkdir -p "$d/wrap-q" "$d/wrap-r" "$d/wrap-s"
+    # r28 (F28-09, Fable r27 L27-05): Originale ueber den Standard-PATH (command -v -p) und nur als Absolutpfad --
+    # ein Wrapper darf nie 'exec <name>' auf sich selbst aufloesen (Endlosschleife statt ROT); Pfad ohne '/' = ROT +
+    # Rueckkehr aus fall_P110 (die Wrapper-Proben (q)-(u) entfallen, statt mit einem Namens-Wrapper zu haengen)
+    _sed=$(command -v -p sed); _grep=$(command -v -p grep)
+    case "$_sed" in /*) ;; *) rot "Werkzeugpfad sed nicht absolut: '$_sed'"; return 0 ;; esac
+    case "$_grep" in /*) ;; *) rot "Werkzeugpfad grep nicht absolut: '$_grep'"; return 0 ;; esac
+    mkdir -p "$d/wrap-q" "$d/wrap-r" "$d/wrap-s"
     printf '#!/bin/sh\ncase "$*" in *"Erwartung(en) gerissen)$/\\1/p"*) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' \
         "$_sed" "$_sed" > "$d/wrap-q/sed"
     printf '#!/bin/sh\ncase "$1" in -c) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_grep" "$_grep" > "$d/wrap-r/grep"
@@ -3303,6 +3338,23 @@ fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M13
     erw_gleich "$P110_MARKER" JA "(s) Maskierungs-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
     erw_gleich "$P110_FEHL" 0 "(s) Maskierungs-sed rc 2 -> FEHL 0"
     _bn=$(grep -c -F 'Werkzeugfehler (maske rc 2)' "$d/s.out"); erw_gleich "$_bn" 1 "(s) Abbruchtext Stufe maske"
+    # r28 (F28-01 (c), Codex B r27 S27-01): (t) nur das Weiterleitungs-sed ("$1" = 's/^/      > /'), (u) nur das
+    # Filter-grep ("$1" = -E) -- korrekte Teilausgabe + rc 2; am r27-Harnisch je BISS (FEHL 4, kein Marker, Status der
+    # Weiterleitungs-Pipeline ungelesen) = Riss; am r28 ABBRUCH mit Stufe weiterleitung/filter, Marker JA, FEHL 0
+    mkdir -p "$d/wrap-t" "$d/wrap-u"
+    printf '#!/bin/sh\ncase "$1" in "s/^/      > /") %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_sed" "$_sed" \
+        > "$d/wrap-t/sed"
+    printf '#!/bin/sh\ncase "$1" in -E) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_grep" "$_grep" > "$d/wrap-u/grep"
+    chmod +x "$d/wrap-t/sed" "$d/wrap-u/grep"
+    P110_WRAP="$d/wrap-t"; p110 t 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(t) Weiterleitungs-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(t) Weiterleitungs-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (weiterleitung rc 2)' "$d/t.out")
+    erw_gleich "$_bn" 1 "(t) Abbruchtext Stufe weiterleitung"
+    P110_WRAP="$d/wrap-u"; p110 u 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(u) Filter-grep Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(u) Filter-grep rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (filter rc 2)' "$d/u.out"); erw_gleich "$_bn" 1 "(u) Abbruchtext Stufe filter"
 }
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
@@ -3624,36 +3676,74 @@ if [ "$SELBSTBISS" -eq 1 ]; then
         echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1 nicht bewertbar"
         MUT_N=$((MUT_N-1)); NB_N=$((NB_N+1))
     }
-    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei N > Basis-FEHL
-        basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
-        T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
-        # r27 (F27-02 (b), Codex B r26 S26-04): eigener Ergebniskanal -- der Fall schreibt 'ENDE FEHL=<n>' nach
-        # $T/ergebnis; der Exitstatus traegt nur 0 = regulaer ohne Risse, 1 = regulaer mit Rissen, >= 2 = Abbruch
-        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis"
-          if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
-        T="$T_ALT"
+    # r28 (F28-08, Fable r27 L27-02, Harmonisierung A2.1b): EINE gemeinsame Auswertung fuer beide Biss-Pfade (biss =
+    # Script-Mutanten, biss_yml = YAML-Mutanten); beide Pfade schreiben denselben Ergebniskanal und tragen damit
+    # byte-gleiche Urteilslogik -- die Divergenz beider Pfade (r26/r27 heilten nur biss()) war die Ursache von L27-02
+    biss_urteil() { # $1 = Mutante, $2 = Kennung, $3 = r (Exitstatus der Subshell), $4 = Basis-FEHL, $5 = Etikett
         if [ -f "$T/biss_$1/kein-urteil.txt" ]; then   # r24 (F24-02 (b)): der Traeger konnte die Mutante nicht bewerten
-            echo "  [ABBRUCH] Mutante $1: $(cat "$T/biss_$1/kein-urteil.txt") -- KEIN URTEIL"; BISS_RC=2; return 0
+            echo "  [ABBRUCH] Mutante $1$5: $(cat "$T/biss_$1/kein-urteil.txt") -- KEIN URTEIL"; BISS_RC=2; return 0
         fi
-        # r27 (F27-02 (a)/(b)): Fallabschluss NUR ueber die Ergebnisdatei; Exitstatus >= 2 oder fehlende/unlesbare
-        # Ergebnisdatei = KEIN URTEIL; die Risszahl N kommt aus der Datei, nie aus dem Exitstatus (kein mod 256)
-        _n=$(sed -n 's/^ENDE FEHL=\([0-9][0-9]*\)$/\1/p' "$T/biss_$1/ergebnis" 2>/dev/null)
-        if [ "$r" -ge 2 ] || [ -z "$_n" ]; then
-            echo "  [ABBRUCH] Mutante $1: Exitstatus $r ohne regulaeren Fallabschluss (Ergebniskanal) -- KEIN URTEIL"
+        # r27 (F27-02 (a)/(b)): Fallabschluss NUR ueber die Ergebnisdatei; Exitstatus >= 2 = KEIN URTEIL; die Risszahl
+        # N kommt aus der Datei, nie aus dem Exitstatus (kein mod 256)
+        if [ "$3" -ge 2 ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Exitstatus $3 ohne regulaeren Fallabschluss (Ergebniskanal) -- KEIN URTEIL"
             BISS_RC=2; return 0
+        fi
+        # r28 (F28-02 (c)/(d), Codex B r27 S27-02): genau EIN Datensatz per Shell-Builtin (kein ungebundenes
+        # Werkzeug): Zeilen zaehlen, die einzige Zeile muss 'ENDE FEHL=' + 0 oder kanonische Dezimalzahl sein;
+        # fehlende, leere, mehrzeilige oder unpassende Datei = KEIN URTEIL; danach r/N-Abgleich VOR dem
+        # Bissvergleich (r=0 nur mit N=0, r=1 nur mit N>0; r>=2 wurde oben abgewiesen)
+        _k=0; _z=''; _l=''; _n=''; _g=''
+        if [ ! -f "$T/biss_$1/ergebnis" ]; then _g='Datei fehlt'
+        else
+            while IFS= read -r _z || [ -n "$_z" ]; do _k=$((_k+1)); _l=$_z; done < "$T/biss_$1/ergebnis"
+            case "$_k" in 0) _g='Datei leer' ;; 1) ;; *) _g="mehrzeilig ($_k Datensaetze)" ;; esac
+            if [ -z "$_g" ]; then
+                case "$_l" in 'ENDE FEHL=0') _n=0 ;; 'ENDE FEHL='[1-9]*) _n=${_l#ENDE FEHL=} ;; esac
+                case "$_n" in *[!0-9]*) _n='' ;; esac
+                [ -n "$_n" ] || _g='Datensatz unpassend'
+            fi
+        fi
+        if [ -n "$_g" ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Ergebniskanal ($_g) -- KEIN URTEIL"; BISS_RC=2; return 0
+        fi
+        case "$3/$_n" in 0/0|1/[1-9]*) ;; *) _g=JA ;; esac
+        if [ "$_g" = JA ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Ergebniskanal widerspruechlich (r=$3 N=$_n) -- KEIN URTEIL"; BISS_RC=2
+            return 0
         fi
         # r27 (F27-02 (a), Codex B r26 S26-02): Biss-Beleg NUR mit verankerter Fallmeldung -- '    [ROT] ' der
         # Erwartungen oder die exakte ROT-Zeile der Harnisch-Kopie; unverankerte Textfragmente beglaubigen keinen Biss
-        if [ "$_n" -gt "$basis" ]; then
-            if grep -q -E '^    \[ROT\] |^      >   P-104: ROT \([1-9][0-9]* Erwartung\(en\) gerissen\)$' \
+        # r28 (F28-04, Codex B r27 S27-04): ERE in POSIX-Form [[]ROT[]] (kein '\[' ausserhalb eines Bracket-Ausdrucks)
+        if [ "$_n" -gt "$4" ]; then
+            if grep -q -E '^    [[]ROT[]] |^      >   P-104: ROT \([1-9][0-9]* Erwartung\(en\) gerissen\)$' \
                     "$T/biss_$1/protokoll.txt"; then
-                echo "  [OK]  Mutante $1 macht $3 ROT ($_n gerissene Erwartung(en)) -- die Probe beisst"
+                echo "  [OK]  Mutante $1$5 macht $2 ROT ($_n gerissene Erwartung(en)) -- die Probe beisst"
             else
-                echo "  [ABBRUCH] Mutante $1: $_n Risse ohne verankerte Fallmeldung -- KEIN URTEIL"; BISS_RC=2
+                echo "  [ABBRUCH] Mutante $1$5: $_n Risse ohne verankerte Fallmeldung -- KEIN URTEIL"; BISS_RC=2
             fi
         else
-            echo "  [ABBRUCH] Mutante $1 laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+            echo "  [ABBRUCH] Mutante $1$5 laesst $2 GRUEN -- die Probe beweist nichts"; BISS_RC=2
         fi
+    }
+    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei N > Basis-FEHL
+        basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
+        T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
+        rm -f "$T/ergebnis" "$T/kein-urteil.txt"; _rc=$?   # r28 (F28-05, Codex B r27 N-04): Reste einer Wiederholung
+        if [ "$_rc" -ne 0 ]; then   # derselben Mutantenkennung im selben T wirken nie; Bereinigung gebunden
+            T="$T_ALT"; echo "  [ABBRUCH] Mutante $1: Ergebniskanal (Bereinigung rc $_rc) -- KEIN URTEIL"; BISS_RC=2
+            return 0
+        fi
+        # r27 (F27-02 (b), Codex B r26 S26-04): eigener Ergebniskanal -- der Fall schreibt 'ENDE FEHL=<n>' nach
+        # $T/ergebnis; der Exitstatus traegt nur 0 = regulaer ohne Risse, 1 = regulaer mit Rissen, >= 2 = Abbruch
+        # r28 (F28-02 (a)/(b), Codex B r27 S27-02): FEHL vor dem Schreiben kanonisch (0 oder Dezimalzahl ohne
+        # fuehrende Null, sonst Exitstatus 2 = Abbruch) und Schreibstatus gebunden (Schreibfehler = Exitstatus 2)
+        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1
+          case "$FEHL" in ''|*[!0-9]*|0[0-9]*) exit 2 ;; esac
+          printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis" || exit 2
+          if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
+        T="$T_ALT"
+        biss_urteil "$1" "$3" "$r" "$basis" ""   # r28 (F28-08): Urteil ueber die gemeinsame Auswertung
     }
     [ "$BISS_RC" -eq 0 ] && biss m1 fall_P03 P-03
     [ "$BISS_RC" -eq 0 ] && biss m2 fall_P05 P-05
@@ -3951,16 +4041,23 @@ if [ "$SELBSTBISS" -eq 1 ]; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
         done
-        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss()
+        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss(); r28 (F28-08,
+            # Fable r27 L27-02): derselbe Ergebniskanal wie biss() -- Bereinigung (F28-05), FEHL-Kanon + gebundener
+            # Schreibstatus (F28-02 (a)/(b)), Exitstatus nur 0/1/>=2, Urteil per biss_urteil mit Etikett '(YAML)';
+            # der Kind-Exitstatus (exit mit FEHL als Status, FEHL mod 256) ist kein Urteil mehr
             basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
             T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
-            ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
-            T="$T_ALT"
-            if [ "$r" -gt "$basis" ]; then
-                echo "  [OK]  Mutante $1 (YAML) macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
-            else
-                echo "  [ABBRUCH] Mutante $1 (YAML) laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+            rm -f "$T/ergebnis" "$T/kein-urteil.txt"; _rc=$?
+            if [ "$_rc" -ne 0 ]; then
+                T="$T_ALT"; echo "  [ABBRUCH] Mutante $1 (YAML): Ergebniskanal (Bereinigung rc $_rc) -- KEIN URTEIL"
+                BISS_RC=2; return 0
             fi
+            ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1
+              case "$FEHL" in ''|*[!0-9]*|0[0-9]*) exit 2 ;; esac
+              printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis" || exit 2
+              if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
+            T="$T_ALT"
+            biss_urteil "$1" "$3" "$r" "$basis" " (YAML)"
         }
         [ "$BISS_RC" -eq 0 ] && biss_yml m7 fall_P23 P-23
         [ "$BISS_RC" -eq 0 ] && biss_yml m8 fall_P24 P-24
