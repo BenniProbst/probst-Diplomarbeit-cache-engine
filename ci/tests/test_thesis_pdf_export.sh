@@ -217,8 +217,41 @@
 #        Formen 0x, plus Verhaltensprobe im Wegwerf-Repo unter config all (diff_gleich rc 1, --cached-Wache
 #        'M thesis/diplomarbeit'; r21 (c): echtes Sub-Repo unter DIR, Arbeitsbaum-Wache 'docs/diplomarbeit/sub');
 #        Mutanten M124/M125/M126 = je ein Flag entfernt (F20-01/F20-02, F21-01/F21-03)
+#   P-101 Runner-Konfigurations-Neutralisierung F22-01 (Lead K327, CI 288/16809 Push 403): Wegwerf-GIT_CONFIG_GLOBAL
+#        biegt den Praefix des Wegwerf-Remotes per url.<praefix>.insteadOf auf einen toten Pfad um; Race wie P-03 ->
+#        Push abgelehnt, Fetch, Merge, PUSH OK: Push UND Fetch laufen ueber GITP_REMOTE (Selbstabbildung der URL)
+#   P-102 Diagnose F22-02 ohne Werte: Koeder im extraHeader-Wert, im credential.username-Wert und im SCHLUESSEL einer
+#        url.*-Sektion (Runner-Form https://gitlab-ci-token:TOKEN@host/) -> 'RUNNER-GITCONFIG: 3 Eintraege',
+#        Schluessel + Herkunft gelistet, Koeder 0x im Log (S8-04-Maske auch auf Schluessel)
+#   P-103 Zeichenwache F22-01: Testhaken-Pfad mit '=' (machte -c url.<pfad>.insteadOf zum 'invalid key') -> FEHLER vor
+#        jedem Transport, Wert nicht ausgegeben, Bare-Tip unveraendert; Mutanten M127..M132 (Neutralisierung entfernt,
+#        Push bzw. Fetch ohne GITP_REMOTE, Diagnose mit Werten, Diagnose ohne Maske, Zeichenwache laesst '=' durch)
+#   P-104 Harnisch-Netzsperre F23-02 (r23, Codex B S22-02): GIT_ALLOW_PROTOCOL=file fuer jeden Script-/git-Aufruf des
+#        Harnischs; https-REMOTE des CI-Zweigs -> git verweigert den Transport VOR jeder Verbindung ('not allowed'),
+#        kein 'Failed to connect' auf 127.0.0.1:9; Harnisch-Mutante M133 (Setzung entfernt) muss den Fall reissen
+#   P-105 Helper-Reset F23-03 (a): Marker-Helfer ungescopt + URL-gescopt, 'credential fill' mit den GITP_REMOTE-
+#        Optionen des Scripts (Literal gelesen) -> kein Marker; Rot-zuerst ohne die leere Setzung (Marker entsteht)
+#   P-106 pushInsteadOf-Gegenrichtung F23-03 (b): kuerzerer globaler pushInsteadOf-Praefix auf toten Pfad -> Push
+#        erreicht den echten Bare-Tip (Selbstabbildung gewinnt); Mutante M134 (pushInsteadOf entfernt) reisst
+#   P-107 extraHeader-Listen-Reset F23-03 (c): Altwert in drei Formen (plain, kuerzerer Scope, gleicher Scope) ->
+#        get-urlmatch mit den GITP_REMOTE-Optionen leer, letzter get-all-Eintrag leer; Rot-zuerst ohne Reset
+#   P-108 Verweis-Wache F23-01: Zeilenverweise Script-Kopf Z.26-29/37 + L1-01-Kommentar Z.441/443 -> Zielzeile traegt
+#        das erwartete Literal (rot an alten Nummern, gruen am r24-Stand); keine Mutante (Textwache)
+#   P-109 --nur fail-closed F24-01 (r24, Codex B S23-01 / Fable L23-01): Harnisch-Kopie mit '--nur=P-999', '--nur=' und
+#        '--nur=P-104 --selbstbiss' je rc 2 mit ABBRUCH-Literal, nie 'PROBE ... GRUEN'; '--nur=P-104' rc 0 (1 von 1);
+#        r25 (F25-02, Fable L24-05): nacktes '--nur' rc 2 'unbekanntes Argument' (Regressionswache, kein Zweig)
+#   P-110 M133-Urteilstafel F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): Stand-in-Kopien (nur
+#        echo + exit) mit ROT/rc 2, ROT/rc 143, GRUEN/rc 1, ohne Urteilszeile, Doppelzeile, ROT (0) -> KEIN-URTEIL-
+#        Marker + FEHL 0; ROT (4)/rc 1 -> FEHL 4 ohne Marker; GRUEN/rc 0 -> weder Marker noch FEHL; keine Mutante
+#        r26 (F26-01 (e), Codex B r25 S25-01): Praefix-Treffer '4x', abgeschnittenes 'ROT (4', 'GRUENmuell',
+#        fuehrende Null '08'/'010', Bereich '1234567', Muell vor dem Anker (Z 0), Rest nach dem Schlussliteral ->
+#        je KEIN-URTEIL-Marker + FEHL 0 (Zeile nur EXAKT in einer der zwei Formen belastbar)
+#        r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell (korrekte Teilausgabe + rc 2):
+#        (q) Zahlen-sed, (r) grep -c, (s) Maskierungs-sed -> je Marker + FEHL 0 + Abbruchtext mit Stufe, nie OK/BISS
+#        r28 (F28-01 (c), Codex B r27 S27-01): (t) Weiterleitungs-sed, (u) Filter-grep -> je Marker + FEHL 0 + Text;
+#        r28 (F28-09, Fable r27 L27-05): Wrapper-Originale per command -v -p, Absolutpfad-Pruefung (sonst ROT)
 #
-# SELBSTBISS (--selbstbiss): 126 Wegwerf-Mutanten -- Script: M1 Marker
+# SELBSTBISS (--selbstbiss): 134 Wegwerf-Mutanten -- Script: M1 Marker
 # [skip ci] aus der Merge-Botschaft, M2 Symlink-Pruefung der Zieldatei,
 # M3 Remote-Idempotenz-Zweig, M4 .git-Muster, M5 Inhalts-Invariante nach
 # git add, M6 Arbeitsbaum-Grenze vor mkdir, M10 https-Pflicht, M11 Duplikat-
@@ -300,6 +333,52 @@
 # r21 (Codex r20 B S20-01/S20-02 + Fable r20 L20-01, Lead K323): Flag an der Arbeitsbaum-Wache (Script r20 Z.453, r21
 # Z.462; 1 Kommando = 2 Code-Zeilen per Backslash-Umbruch, 0 Kontrollfluss); P-100 um Literal 3x, Verhaltensprobe (c)
 # Gitlink unter DIR und M126 erweitert -> Faelle 104, Mutanten 126 = 60 + 66; Zaehlangaben r20 berichtigt (L20-01).
+# r22 (Lead K327; CI 288/16809 Job thesis:pdf-export Push 403 trotz Token, der ausserhalb des Runners angenommen wird):
+# Script-Fix F22-01 GITP_REMOTE (credential.helper= + http.<url>.extraheader= + url.<url>.insteadOf/pushInsteadOf =
+# Selbstabbildung) an Push + Fetch, Zeichenwache fuer REMOTE, Diagnose F22-02 (Herkunft + Schluessel, nie Werte) vor
+# dem ersten Push; neue Faelle P-101/P-102/P-103 + M127..M132 -> Faelle 107, Mutanten 132 = 66 + 66.
+# r23 (Codex r22 B S22-01..S22-04, Lead-Triage K329): Harnisch-Netzsperre GIT_ALLOW_PROTOCOL=file (P-104, Harnisch-
+# Mutante M133 per --nur=P-104 an der Harnisch-Kopie), Verhaltensnachweise Helper-Reset / pushInsteadOf-Gegenrichtung /
+# extraHeader-Listen-Reset (P-105..P-107, M134), Verweis-Wache P-108, M131 auf die Leak-Ursache gesetzt ('sed \' statt
+# 'sed \\': die r22-Form riss per sed-Werkzeugfehler); Script r23 nur Kommentare -> Faelle 112, Mutanten 134 = 68 + 66.
+# r24 (Codex r23 B S23-01..S23-04, Fable r23 L23-01/L23-06/L23-08, Lead K331/K332): --nur fail-closed (leer, unbekannt,
+# mit --selbstbiss je rc 2; 0 Faelle = KEIN URTEIL) + P-109; fall_P104m per env -u CI -u GITLAB_CI, Basislauf der
+# unveraenderten Kopie vor M133, fehlendes/widerspruechliches P-104-Urteil = KEIN URTEIL (BISS_RC=2); P-99 um die
+# F24-03-Literale (COUNT-Paare) + REV-r24 erweitert; P-108 um +4 (REV-r24-Block) -> Faelle 113, Mutanten 134 = 68 + 66.
+# r25 (Codex r24 B S24-01 Haertung + N-02, Fable r24 L24-02/L24-03/L24-05, Lead K334/K335): M133-Urteilstafel
+# fail-closed (belastbar nur GRUEN/rc 0 und ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile, P104M_Z; sonst KEIN
+# URTEIL) + P-110; P-109 (5) nacktes --nur; Kommentar hermetische git-Umgebung (F25-03); Script r24 unveraendert
+# -> Faelle 114, Mutanten 134 = 68 + 66.
+# r26 (Codex r25 B S25-01/S25-02, Fable r25 L25-01/L25-03, Lead-Triage r25 K336): Urteilsparser strikt (genau EINE
+# Urteilszeile, EXAKT 'P-104: GRUEN' oder 'P-104: ROT (<n> Erwartung(en) gerissen)' mit n kanonisch dezimal, keine
+# fuehrende Null, hoechstens 6 Ziffern; sonst KEIN URTEIL, Arithmetik erst nach der Validierung), gemeinsame Tafel
+# p104m_tafel fuer fall_P104m + M133-Basislauf, biss()-Hook Marker-Pflicht (Fehlerstatus ohne Urteil = KEIN URTEIL),
+# P-110 (i)-(p), Kopf P-109 Klammer (F26-02); Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r27 (Codex r26 B S26-01/S26-02/S26-04 + S26-03, Lead-Triage r26 K337): Werkzeugstatus gebunden (Ruhezustand
+# ungueltig, je Stufe pfad/maske/zaehlung/extraktion/zahl eigener rc, sonst P104M_ZG=werkzeugfehler = KEIN URTEIL,
+# nie OK/BISS; Z-Vergleich als Stringgleichheit), Ergebniskanal des Bisspfads ('ENDE FEHL=<n>' in $T/ergebnis,
+# Exitstatus nur 0/1/>=2, kein FEHL mod 256), Biss-Beleg nur mit verankerter Fallmeldung, P-110 (q)-(s) per
+# Werkzeug-Wrapper; Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# F27-05 (Nachtrag A, Lead K337 / L27-01 am Objekt entlastet): Kommentar-Vertrag in fall_P104m (Marker VOR der
+# FEHL-Auswertung) + P-99-Literal; 0 Kontrollfluss, P-110-Erwartungen bleiben Marker JA + FEHL 0.
+# F27-06 (Fable r26 L26-01): Subshell-Tod nach ROT-Zeile = KEIN URTEIL ueber den Ergebniskanal, Probe (6) + V13
+# r28 (Codex r27 B S27-01..S27-04 + Fable r27 L27-02/L27-05, Lead-Triage r27 Teil 1+2 K339): Werkzeugstatus
+# vollstaendig (Erstzeilenauswahl der pfad-Stufe per Parameter-Expansion statt head = keine eigene Werkzeugstufe;
+# der pfad-sed bleibt als Stufe pfad:<rc> gebunden; Weiterleitung in zwei gebundenen Stufen
+# filter/weiterleitung ueber out.f), Ergebniskanal gehaertet (FEHL kanonisch vor dem Schreiben, Schreibstatus gebunden,
+# genau EIN Datensatz per Builtin, r/N-Abgleich), Vertrag fall_P104m sachlich neu, EREs in POSIX-Form [[]ROT[]],
+# Bereinigung der Ergebnisreste je Mutante (N-04), P-110 (t)(u); F28-08 (L27-02): biss_yml auf denselben Ergebniskanal
+# wie biss() ueber die gemeinsame Auswertung biss_urteil -- genau 2 Subshell-Urteilsstellen (biss, biss_yml), beide
+# ueber den Ergebniskanal, kein Kind-Exitstatus als Urteil; F28-09 (L27-05): Wrapper-Originale nur als Absolutpfad;
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r29 (Codex B r28 S28-01/S28-02, Fable r28 0/0/6, Lead-Triage r28 K341): Kommentar der pfad-Stufe berichtigt
+# (F29-01: Erstzeilenauswahl per Parameter-Expansion statt head, der pfad-sed bleibt gebundene Stufe), Etikett
+# '(YAML)' auch in [NICHT BEWERTBAR] (F29-02: vierter Parameter von nicht_bewertbar); 0 Kontrollfluss (der vierte
+# Parameter von nicht_bewertbar ist ein Datenwert der Meldung, kein Zweig);
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r30 (Codex B r29 S29-01, Fable r29 0/0/7, Lead-Triage r29 K343): Teilformel des r29-Absatzes berichtigt (F30-01:
+# der vierte Parameter von nicht_bewertbar ist ein Datenwert (Text der Meldung), kein Kontrollfluss); 0 Kontrollfluss,
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -355,29 +434,37 @@ CI_YML="${COMDARE_CI_YML:-$HIER/../../.gitlab-ci.yml}"
 CI_YML=$(readlink -f "$CI_YML") || { echo "ABBRUCH: readlink -f auf die .gitlab-ci.yml fehlgeschlagen"; exit 2; }
 [ -f "$CI_YML" ] || { echo "ABBRUCH: .gitlab-ci.yml '$CI_YML' fehlt"; exit 2; }
 SELBST="$HIER/$(basename "$0")"
-SELBSTBISS=0
+SELBSTBISS=0; NUR=""   # r23: --nur=<Kennung>
 for a in "$@"; do
     case "$a" in
         --selbstbiss) SELBSTBISS=1 ;;
+        --nur=*) NUR="${a#--nur=}"   # r23: genau einen Fall fahren (Traeger des Harnisch-Mutanten M133)
+            [ -n "$NUR" ] || { echo "ABBRUCH: --nur ohne Kennung"; exit 2; } ;;   # r24 (F24-01 (a)): fail-closed
         *) echo "ABBRUCH: unbekanntes Argument '$a'"; exit 2 ;;
     esac
 done
+# r24 (F24-01 (c)): --nur und --selbstbiss schliessen sich aus (M133 nutzt --nur OHNE --selbstbiss, biss() ungefiltert)
+if [ -n "$NUR" ] && [ "$SELBSTBISS" -eq 1 ]; then
+    echo "ABBRUCH: --nur und --selbstbiss schliessen sich aus: eine Bilanz ueber einen Fall ist kein Selbstbiss-Nenner"
+    exit 2
+fi
 command -v git >/dev/null 2>&1 || { echo "ABBRUCH: git fehlt"; exit 2; }
 
 T=$(mktemp -d "${TMPDIR:-/tmp}/tpe_probe.XXXXXX") || { echo "ABBRUCH: mktemp -d fehlgeschlagen"; exit 2; }
 trap 'rm -rf "$T"' EXIT INT TERM
 case "$T" in *' '*) echo "ABBRUCH: TMPDIR '$T' enthaelt Leerzeichen"; exit 2 ;; esac
 
-# Hermetische git-Umgebung fuer die EIGENEN Aufrufe der Probe (das Script bekommt
-# seine Umgebung explizit per env -i in lauf()).
-export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+# Hermetische git-Umgebung fuer die EIGENEN git-Aufrufe der Probe; das Script bekommt seine Umgebung explizit per
+# env -i in lauf(); Harnisch-KOPIEN (p104m_lauf, P-109) laufen per env -u CI -u GITLAB_CI und ERBEN diese Exporte
+# samt PATH/HOME (kein env -i) -- r25 (F25-03, Codex B r24 N-02).
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_ALLOW_PROTOCOL=file   # r23 (F23-02): kein Netz
 export GIT_AUTHOR_NAME=probe GIT_AUTHOR_EMAIL=probe@ci.comdare.local
 export GIT_COMMITTER_NAME=probe GIT_COMMITTER_EMAIL=probe@ci.comdare.local
 
 GITLINK_A=1111111111111111111111111111111111111111
 GITLINK_B=2222222222222222222222222222222222222222
 KOEDER=PROBE-TOKEN-NIE-ECHT-0815
-MUT_N_SKRIPT=60; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
+MUT_N_SKRIPT=68; MUT_N_YAML=66   # r16 (L9-01): Kopfkommentar == Summe (P-57)
 LOCALE_EN=$(locale -a 2>/dev/null | grep -c -i 'en_US.utf8')   # r15 (L14-01): Vorbedingung P-93 / m119
 GRUEN_N=0; ROT_N=0; ROT_LISTE=""; FEHL=0; LAUF_N=0; LAUF_ARGS=""
 BARE=""; BASE=""
@@ -476,7 +563,7 @@ lauf() {
     _kurz=$(git -C "$_k" rev-parse --short "$_p") || return 2
     LAUF_N=$((LAUF_N+1)); _datum="$((1758600000 + LAUF_N)) +0000"
     ( cd "$_k" && env -i PATH="$PATH" HOME="$HOME" TMPDIR="$T" GIT_CONFIG_GLOBAL=/dev/null \
-        GIT_CONFIG_NOSYSTEM=1 GIT_COMMITTER_DATE="$_datum" GIT_AUTHOR_DATE="$_datum" \
+        GIT_CONFIG_NOSYSTEM=1 GIT_ALLOW_PROTOCOL=file GIT_COMMITTER_DATE="$_datum" GIT_AUTHOR_DATE="$_datum" \
         CI_COMMIT_BRANCH=development CI_COMMIT_SHA="$_p" CI_COMMIT_SHORT_SHA="$_kurz" \
         CI_PIPELINE_ID=4711 "$@" sh "$_s" $LAUF_ARGS ) > "$_l" 2>&1
 }
@@ -1620,6 +1707,7 @@ readme_unter_dir() { # $1 = Klonpfad, $2 = Text: getrackte Fremddatei docs/diplo
 netzsperre() { # $1 = Datei: git-Konfiguration, die JEDE http(s)-URL auf einen toten lokalen Pfad umbiegt (kein Netz)
     printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = https://\n' > "$1"
     printf '[url "/dev/null/netzsperre/"]\n\tinsteadOf = http://\n' >> "$1"
+    export GIT_ALLOW_PROTOCOL=file   # r23 (F23-02): git verweigert http(s) VOR jeder Verbindung (zweiter Gurt)
 }
 fall_P32() { # S7-01 (r8b): Remote setzt en-kurz auf Modus 100755 bei gleichem Blob -> UEBERHOLT, kein Push
     s="$1"; d="$T/P32"; vorlauf_v1 "$d" "$s" || return
@@ -1846,9 +1934,9 @@ fall_P46() { # S8-04 (ENTLASTET mit Messung): Push vom pre-receive-Hook abgelehn
     t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
     # Credential-Maske des Scripts (push.err/fetch.err) am Muster geprobt, ohne den Koeder auszugeben
     m=$(grep -c "s#//\[^/\]\*@#//<cred>@#g" "$s")
-    erw_gleich "$m" 2 "Masken-Ausdruecke im Script (push.err + fetch.err)"
+    erw_gleich "$m" 3 "Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, r22)"
     ms=$(grep -c "s#\[^ /:@\]\*@\[^ /:@\]\*:#<cred>@<host>:#g" "$s")
-    erw_gleich "$ms" 2 "scp-Masken-Ausdruecke im Script (push.err + fetch.err, L9-04)"
+    erw_gleich "$ms" 3 "scp-Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, L9-04/r22)"
     g=$(printf 'https://ciuser:%s@host/x\n' "$KOEDER" | sed -e 's#//[^/]*@#//<cred>@#g' \
         -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g')
     case "$g" in *"$KOEDER"*) rot "Maske laesst den Koeder durch" ;; *'//<cred>@host/x'*) ok "Maske ersetzt userinfo" ;;
@@ -2161,7 +2249,7 @@ fall_P66() { # L10-05: DIR '-n' / SRC '-x' = FEHLER "fuehrendes '-'" VOR jeder g
 fall_P67() { # S10-05 (L10-06): Diagnoseform ohne '//' (scheme:user:kennwort@host/pfad) maskiert, Kennwort nie im Log
     s="$1"; d="$T/P67"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
     m=$(grep -c -F "s#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g" "$s")
-    erw_gleich "$m" 2 "scheme-Masken-Ausdruecke im Script (push.err + fetch.err)"
+    erw_gleich "$m" 3 "scheme-Masken-Ausdruecke im Script (push.err + fetch.err + Diagnose F22-02, r22)"
     { echo '#!/bin/sh'; echo 'echo "reject https:u:pw0ohne2slash@host/y" >&2'; echo 'exit 1'; } \
         > "$BARE/hooks/pre-receive"
     chmod 0755 "$BARE/hooks/pre-receive"
@@ -2758,6 +2846,61 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c -F '[skip ci], erneuter Push' "$s")
     erw_gleich "$n" 0 "alte Meldung '[skip ci], erneuter Push' (F18-05)"
     n=$(grep -c '^# REV r18 ' "$s"); erw_gleich "$n" 1 "REV-r18-Kopf"
+    # r24 (F24-03, Codex B S23-03 / Fable L23-06): COUNT-Paare unterliegen den Reset-/Praefix-Regeln; alte Aussagen 0x
+    n=$(grep -c -F 'aus GIT_CONFIG_COUNT/KEY_n/VALUE_n (gleiche Praefix-Regeln' "$s")
+    erw_gleich "$n" 0 \
+        "alte Fassung 'aus GIT_CONFIG_COUNT/KEY_n/VALUE_n (gleiche Praefix-Regeln' (F24-03)"
+    n=$(grep -c -F 'GIT_CONFIG_COUNT bleiben wirksam' "$s")
+    erw_gleich "$n" 0 "alte REV-r23-Fassung 'GIT_CONFIG_COUNT bleiben wirksam' (F24-03)"
+    n=$(grep -c -F 'werden ebenfalls vor -c eingelesen und unterliegen denselben Reset-/Praefix-Regeln' "$s")
+    erw_gleich "$n" 1 \
+        "Kommentar 'werden ebenfalls vor -c eingelesen und unterliegen denselben Reset-/Praefix-Regeln' (F24-03)"
+    n=$(grep -c -F 'weiter wirksam bleiben nur unbehandelte Schluessel' "$s")
+    erw_gleich "$n" 1 "Kommentar 'weiter wirksam bleiben nur unbehandelte Schluessel' (F24-03)"
+    n=$(grep -c -F 'lange URL-Umbiegungen (Gleichstand)' "$s")
+    erw_gleich "$n" 1 "Kommentar 'lange URL-Umbiegungen (Gleichstand)' (F24-03)"
+    n=$(grep -c -F 'nur unbehandelte Schluessel wie credential.username bleiben wirksam' "$s")
+    erw_gleich "$n" 1 \
+        "REV-r23-Zeile 'nur unbehandelte Schluessel wie credential.username bleiben wirksam' (F24-03)"
+    n=$(grep -c '^# REV r24 ' "$s"); erw_gleich "$n" 1 "REV-r24-Kopf"
+    # r25 (F25-03, Codex B r24 N-02 / Fable L24-06): Kommentar 'Hermetische git-Umgebung' am HARNISCH selbst
+    # ($SELBST); Literale zerlegt, damit diese Wache ihre eigene Quellzeile nicht mitzaehlt
+    alt='fuer die EIGENEN Aufrufe der Probe'" (das Script bekommt"; neu='ERBEN diese'" Exporte"
+    n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Harnisch-Fassung 'fuer die EIGENEN Aufrufe ...' (F25-03)"
+    n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Harnisch-Kommentar ERBEN-Exporte (F25-03)"
+    n=$(grep -c '^# r25 (Codex r24 B S24-01' "$SELBST"); erw_gleich "$n" 1 "r25-Kopfabsatz des Harnischs (F25-04)"
+    # r26 (F26-02, Codex B r25 S25-02): Kopfkommentar P-109 (T241) schliesst die Klammer vor dem Semikolon (r25 ohne
+    # Klammer); Literale zerlegt, damit diese Wache ihre eigene Quellzeile nicht mitzaehlt (auch in den Texten)
+    alt='(1 von '"1;"; neu='(1 von '"1);"
+    n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Kopfform P-109 ohne Klammer vor dem Semikolon (F26-02)"
+    n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Kopfform P-109 mit geschlossener Klammer (F26-02)"
+    n=$(grep -c '^# r26 (Codex r25 B S25-01' "$SELBST"); erw_gleich "$n" 1 "r26-Kopfabsatz des Harnischs (F26-04)"
+    n=$(grep -c '^# r27 (Codex r26 B S26-01' "$SELBST"); erw_gleich "$n" 1 "r27-Kopfabsatz des Harnischs (F27-04)"
+    n=$(grep -c 'VERTRAG (r27, Lead K337 / L27''-01)' "$SELBST"); erw_gleich "$n" 1 "Vertrag fall_P104m (F27-05)"
+    n=$(grep -c '^# F27-06 (Fable r26 L26-01)' "$SELBST"); erw_gleich "$n" 1 "F27-06-Kopfzeile (Fable r26 L26-01)"
+    n=$(grep -c '^# r28 (Codex r27 B S27-01' "$SELBST"); erw_gleich "$n" 1 "r28-Kopfabsatz des Harnischs (F28-07)"
+    # r28 (F28-03/F28-07, Codex B r27 S27-03): neuer Vertragswortlaut fall_P104m vorhanden, die alte Behauptung der
+    # Literalzaehlung verschwunden; Literale zerlegt, damit diese Wache ihre eigene Quellzeile nicht mitzaehlt
+    alt="Literal 'P-10""4m' 0x"; neu='kein direkt registrierter'" Fall (Registrierung nur fall P-101..P-110)"
+    n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "alte Vertragsbehauptung Literalzaehlung (F28-03)"
+    n=$(grep -c -F "$neu" "$SELBST"); erw_gleich "$n" 1 "Vertragswortlaut fall_P104m nicht registriert (F28-03)"
+    # r28 (F28-08, Fable r27 L27-02): beide Biss-Pfade urteilen ueber den Ergebniskanal -- die alte Exitstatus-Form
+    # (exit mit FEHL als Status) darf nirgends mehr stehen, die gemeinsame Auswertung biss_urteil ist genau 1x definiert
+    alt='exit "$FE''HL"'; n=$(grep -c -F "$alt" "$SELBST"); erw_gleich "$n" 0 "Kind-Exitstatus als Urteil (F28-08)"
+    n=$(grep -c '^    biss_urteil() {' "$SELBST"); erw_gleich "$n" 1 "gemeinsame Auswertung biss_urteil (F28-08)"
+    # r29 (F29-01, Codex B r28 S28-01): die alte Kommentar-Behauptung zur pfad-Stufe ist berichtigt -- alte Form 0x,
+    # neue Form im Kopfabsatz r28 und in p104m_lauf je 1x; r29-Kopfabsatz 1x; F29-02: Etikett-Meldung 1x
+    # (Wachen-Literale zerlegt, kein Selbsttreffer)
+    n=$(grep -c -F 'ohne Werk''zeug' "$SELBST"); erw_gleich "$n" 0 "pfad-Stufe alte Form (F29-01)"
+    n=$(grep -c -F 'als Stufe pfad:<r''c> gebunden' "$SELBST"); erw_gleich "$n" 1 "Kopf r28 pfad-sed (F29-01)"
+    n=$(grep -c -F 'bleibt gebunden (pfad:<r''c>)' "$SELBST"); erw_gleich "$n" 1 "p104m_lauf pfad-sed (F29-01)"
+    n=$(grep -c '^# r29 (Codex B r28 S28-01' "$SELBST"); erw_gleich "$n" 1 "r29-Kopfabsatz des Harnischs (F29-03)"
+    n=$(grep -c -F 'Mutante $1${4-} nicht bew''ertbar' "$SELBST"); erw_gleich "$n" 1 "Etikett-Meldung (F29-02)"
+    # r30 (F30-01, Codex B r29 S29-01): die Teilformel des r29-Absatzes ist berichtigt -- alte Form 0x, neue Form 1x;
+    # r30-Kopfabsatz 1x (Wachen-Literale zerlegt, kein Selbsttreffer)
+    n=$(grep -c -F 'Kontrollfluss aus''ser dem' "$SELBST"); erw_gleich "$n" 0 "alte Teilformel r29 (F30-01)"
+    n=$(grep -c -F 'Datenwert der Mel''dung' "$SELBST"); erw_gleich "$n" 1 "neue Teilformel (F30-01)"
+    n=$(grep -c '^# r30 (Codex B r29 S29-01' "$SELBST"); erw_gleich "$n" 1 "r30-Kopfabsatz des Harnischs (F30-02)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
@@ -2852,8 +2995,393 @@ fall_P100() { # F20-01/F20-02 (Codex-Lens r19 B S19-01, Lead K322) + F21-01/F21-
     erw_gleich "$(cat "$d/wt.out")" "docs/diplomarbeit/sub" \
         "Arbeitsbaum-Wache des Prueflings zeigt den ungestagten Gitlink-Wechsel unter DIR (F21-01)"
 }
+fall_P101() { # F22-01 (r22, Lead K327; CI 288/16809 Push 403): Runner-injizierte insteadOf-Umbiegung des Remote-
+    # Praefixes per Wegwerf-GIT_CONFIG_GLOBAL; Race wie P-03 -> Push abgelehnt, Fetch, Merge, PUSH OK: beide Transport-
+    # aufrufe laufen ueber GITP_REMOTE (Selbstabbildung der URL = laengster Praefix); ohne F22-01 (r21, M127/M128)
+    # reisst der Push ('does not appear to be a git repository'), ohne F22-01 am Fetch (M129) der Fetch.
+    s="$1"; d="$T/P101"; vorlauf_bewegt "$s" "$d" || { rot "Vorlauf (Export v1 + Mensch h1) fehlgeschlagen"; return; }
+    mensch "$d/h2" "h2" || { rot "Mensch-Commit h2 fehlgeschlagen"; return; }
+    printf '[url "%s/nirgends/"]\n\tinsteadOf = %s/\n' "$d" "$d" > "$d/umbiegung"
+    lauf "$d/workB" "$s" "$d/out" "$H1" GIT_CONFIG_GLOBAL="$d/umbiegung" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "Push abgelehnt (Versuch 1)"
+    erw_text "$d/out" "PUSH OK (ci.skip)"; erw_text "$d/out" "RUNNER-GITCONFIG: 1 Eintraege"
+    erw_text "$d/out" "file:$d/umbiegung url.$d/nirgends/.insteadof"
+    erw_kein_text "$d/out" "does not appear to be a git repository"
+    t=$(tip); p=$(git -C "$BARE" rev-list --parents -n 1 "$t" | wc -w)
+    erw_gleich "$p" 3 "Tip ist Merge-Commit (2 Eltern)"
+}
+fall_P102() { # F22-02 (r22): die Diagnose VOR dem ersten Push listet Herkunft + Schluessel, NIE Werte: Koeder im
+    # extraHeader-Wert, im credential.username-Wert und im SCHLUESSEL einer url.*-Sektion (Runner-Form
+    # https://gitlab-ci-token:TOKEN@host/) -> 3 Eintraege, Schluessel gelistet (userinfo per S8-04-Maske), Koeder 0x;
+    # der lokale Push bleibt unberuehrt (PUSH OK). Ohne --name-only (M130) bzw. ohne Maske (M131) reisst der Fall.
+    s="$1"; d="$T/P102"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    hs=gitlab.example.invalid
+    { printf '[http "%s"]\n\textraheader = Authorization: Bearer %s\n' "$BARE" "$KOEDER"
+      printf '[url "https://gitlab-ci-token:%s@%s/"]\n\tinsteadOf = https://%s/\n' "$KOEDER" "$hs" "$hs"
+      printf '[credential]\n\tusername = %s\n' "$KOEDER"; } > "$d/injektion"
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/injektion" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "PUSH OK (ci.skip)"
+    erw_text "$d/out" "RUNNER-GITCONFIG: 3 Eintraege"; erw_text "$d/out" "file:$d/injektion http.$BARE.extraheader"
+    erw_text "$d/out" "file:$d/injektion url.https://<cred>@$hs/.insteadof"
+    erw_text "$d/out" "file:$d/injektion credential.username"
+    erw_kein_text "$d/out" "$KOEDER"; erw_kein_text "$d/out" "gitlab-ci-token:"; erw_kein_text "$d/out" "Bearer"
+    t=$(tip); n=$(git -C "$BARE" rev-list --count "$t"); erw_gleich "$n" 2 "Bare-Tip = Seed + Export-Commit"
+}
+fall_P103() { # F22-01 Zeichenwache (r22): ein Testhaken-Pfad mit '=' machte '-c url.<pfad>.insteadOf=<pfad>' zum
+    # 'invalid key' (git 2.43.0, rc 128, gemessen) -> das Script verweigert laut VOR jedem Transport, ohne den Wert;
+    # ohne die Wache (Script r21: Push rc 0; M132: git-Fehler + 'Push abgelehnt' statt Vertragstext) reisst der Fall.
+    s="$1"; d="$T/P103"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    mkdir -p "$d/x=y" && cp -r "$d/bare.git" "$d/x=y/bare.git" || { rot "Bare-Kopie unter 'x=y' nicht baubar"; return; }
+    lauf "$d/work" "$s" "$d/out" "$BASE" COMDARE_THESIS_PDF_REMOTE="$d/x=y/bare.git"; rc=$?; zeige "$d/out"
+    erw_rc "$rc" 1; erw_text "$d/out" "Zeichen ausserhalb [A-Za-z0-9_./:-] (F22-01)"
+    erw_text "$d/out" "TESTHAKEN AKTIV"; erw_kein_text "$d/out" "PUSH OK"; erw_kein_text "$d/out" "Push abgelehnt"
+    erw_kein_text "$d/out" "x=y"
+    t=$(git -C "$d/x=y/bare.git" rev-parse refs/heads/development)
+    erw_gleich "$t" "$BASE" "Bare-Tip (x=y) unveraendert"
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+fall_P104() { # F23-02 (r23, Codex B S22-02): HARNISCH-NETZSPERRE per GIT_ALLOW_PROTOCOL=file -- eine https-REMOTE des
+    # CI-Zweigs (Instanz-Host, ID 288, kanonischer Pfad aus dem Script gelesen, nie ausgegeben) erreicht den Push; git
+    # verweigert den Transport VOR jedem Verbindungsversuch ('transport 'https' not allowed'); die insteadOf-Sperre der
+    # netzsperre() allein wird von der Selbstabbildung F22-01 (laengerer Praefix) verdraengt; dritter Gurt http.proxy
+    # 127.0.0.1:9 (geschlossener Port): ein Harnisch ohne die Setzung (M133) endet dort mit 'Failed to connect'.
+    s="$1"; d="$T/P104"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    netzsperre "$d/sperre"; printf '[http]\n\tproxy = http://127.0.0.1:9\n' >> "$d/sperre"
+    pfad=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$s" | head -n 1)
+    [ -n "$pfad" ] || { rot "INSTANZ_PROJEKT_PFAD im Script nicht lesbar"; return; }
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/sperre" \
+        CI_SERVER_URL=https://gitlab.comdare.local CI_SERVER_HOST=gitlab.comdare.local CI_PROJECT_ID=288 \
+        CI_PROJECT_PATH="$pfad" COMDARE_WRITEBACK_USER=ciuser COMDARE_WRITEBACK_TOKEN="$KOEDER"; rc=$?
+    sed "s#$pfad#<super-pfad>#g" "$d/out" > "$d/out.m"; zeige "$d/out.m"
+    erw_rc "$rc" 1; erw_text "$d/out.m" "not allowed"; erw_text "$d/out.m" "Push abgelehnt (Versuch 1)"
+    erw_kein_text "$d/out.m" "Failed to connect"; erw_kein_text "$d/out.m" "127.0.0.1"
+    erw_kein_text "$d/out.m" "$KOEDER"; erw_kein_text "$d/out.m" "PUSH OK"
+    if grep -qF -- "$pfad" "$d/out"; then rot "Ausgabe traegt den Projektpfad (S7-05)"
+    else ok "Ausgabe frei vom Projektpfad (S7-05)"; fi
+    t=$(tip); erw_gleich "$t" "$BASE" "Bare-Tip unveraendert"
+}
+p104m_lauf() { # r24 (F24-02): faehrt genau P-104 in der Harnisch-Kopie $1 (Original oder Mutante) im Ordner $2, setzt
+    # P104M_URTEIL (GRUEN/ROT/KEIN), P104M_RC, P104M_N, P104M_Z r25; env -u CI -u GITLAB_CI (F24-02 (a)): die Override-
+    # Sperre des Kopfes (P-22) bleibt, der interne Kopienaufruf traegt die CI-Marker nicht weiter
+    # r27 (F27-01 (a)-(c), Codex B r26 S26-01): Ruhezustand = ungueltig; jede Werkzeugstufe (pfad-sed, Maskierungs-
+    # sed, grep -c [rc 0/1 gueltig], Extraktion, Zahlen-sed) bindet ihren Status: rc ausserhalb der gueltigen Menge =
+    # P104M_ZG=werkzeugfehler + P104M_WZ=<stufe>:<rc> und sofortiger Ausstieg (keine Tafel); Z als Stringgleichheit
+    # r28 (F28-01 (a)/(b), Codex B r27 S27-01): Erstzeile der pfad-Stufe per Parameter-Expansion statt head, der
+    # pfad-sed bleibt gebunden (pfad:<rc>); Weiterleitung in zwei gebundenen Stufen filter (grep -E, rc 0/1
+    # gueltig) und weiterleitung (sed) ueber $2/out.f; Fehler = werkzeugfehler VOR der Tafel
+    P104M_URTEIL=KEIN; P104M_N=KEIN; P104M_Z=0; P104M_ZG=ungueltig; P104M_BEREICH=NEIN; P104M_WZ=''; P104M_RC=''
+    mkdir -p "$2"
+    _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT"); _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="pfad:$_rc"; return 0; fi
+    _nl=$(printf '\nx'); _nl=${_nl%x}; _pf=${_pf%%"$_nl"*}   # r28 (F28-01 (a), Codex B r27 S27-01): Erstzeile per
+    # Parameter-Expansion statt head (keine Werkzeugstufe = kein Status zu binden)
+    env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$2" sh "$1" --nur=P-104 \
+        > "$2/out" 2>&1; P104M_RC=$?
+    sed "s#$_pf#<super-pfad>#g" "$2/out" > "$2/out.m"; _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="maske:$_rc"; return 0; fi
+    P104M_Z=$(grep -c '^  P-104: ' "$2/out.m"); _rc=$?   # r25 (F25-01 (a)): Urteilszeilen, belastbar nur genau 1
+    if [ "$_rc" -ge 2 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="zaehlung:$_rc"; return 0; fi
+    # r26 (F26-01 (a), Codex B r25 S25-01): die einzige Urteilszeile muss EXAKT einer der beiden Formen entsprechen
+    # (Zeilenende!); N nur aus der validierten ROT-Zeile (POSIX BRE, kanonische Dezimalzahl ohne fuehrende Null),
+    # hoechstens 6 Ziffern (sonst P104M_BEREICH=JA = KEIN URTEIL); alles andere = KEIN, N KEIN, P104M_ZG=ungueltig
+    if [ "$P104M_Z" = 1 ]; then
+        _uz=$(grep '^  P-104: ' "$2/out.m"); _rc=$?
+        if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="extraktion:$_rc"; return 0; fi
+        if [ "$_uz" = '  P-104: GRUEN' ]; then P104M_URTEIL=GRUEN; P104M_ZG=gueltig
+        else
+            _un=$(printf '%s\n' "$_uz" | sed -n 's/^  P-104: ROT (\([1-9][0-9]*\) Erwartung(en) gerissen)$/\1/p')
+            _rc=$?
+            if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="zahl:$_rc"; return 0; fi
+            if [ -n "$_un" ] && [ "${#_un}" -le 6 ]; then P104M_URTEIL=ROT; P104M_N=$_un; P104M_ZG=gueltig
+            elif [ -n "$_un" ]; then P104M_BEREICH=JA; fi
+        fi
+    fi
+    grep -E '^  P-104: |^BILANZ|^    [[]ROT[]]|^ABBRUCH' "$2/out.m" > "$2/out.f"; _rc=$?   # F28-04: POSIX-ERE
+    if [ "$_rc" -ge 2 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="filter:$_rc"; return 0; fi
+    sed 's/^/      > /' "$2/out.f"; _rc=$?
+    if [ "$_rc" -ne 0 ]; then P104M_ZG=werkzeugfehler; P104M_WZ="weiterleitung:$_rc"; return 0; fi
+    return 0
+}
+p104m_tafel() { # r26 (F26-01 (b)/(c), Codex B r25 S25-01 + N-03): gemeinsame Urteilstafel fuer fall_P104m und den
+    # M133-Basislauf; OK nur GRUEN/rc 0 mit genau EINER validierten Zeile, BISS nur ROT/rc 1 mit validierter Zeile und
+    # N > 0 (N ist dann eine kanonische Dezimalzahl <= 6 Ziffern; Arithmetik erst danach); alles andere KEIN + Marker-
+    # Text (r25-Form + ', Zeile <gueltig|ungueltig>' + bei Bereichsverletzung ', Zahl ausserhalb des Bereichs')
+    _tafel=KEIN
+    if [ "$P104M_Z" = 1 ] && [ "$P104M_ZG" = gueltig ]; then   # r27 (F27-01 (c)): Z als Stringgleichheit
+        case "$P104M_URTEIL/$P104M_RC" in
+            GRUEN/0) _tafel=OK ;;
+            ROT/1) if [ "$P104M_N" -gt 0 ]; then _tafel=BISS; fi ;;
+        esac
+    fi
+    _txt="Harnisch-Kopie ohne belastbares P-104-Urteil (Urteil $P104M_URTEIL, rc $P104M_RC,"
+    _txt="$_txt Urteilszeilen $P104M_Z, gerissen $P104M_N, Zeile $P104M_ZG"
+    if [ "$P104M_BEREICH" = JA ]; then _txt="$_txt, Zahl ausserhalb des Bereichs"; fi
+    _txt="$_txt)"
+}
+fall_P104m() { # r23/r24: Traeger des Harnisch-Mutanten M133 -- faehrt die Harnisch-Kopie $1 mit --nur=P-104 am Script,
+    # uebernimmt deren P-104-Urteil (ROT n = n gerissene Erwartungen); F24-02 (b): fehlendes Urteil oder ein rc, der dem
+    # Urteil widerspricht, ist KEIN Biss, sondern KEIN URTEIL (Marker fuer biss()); r25 (F25-01): Tafel gehaertet
+    # VERTRAG (r27, Lead K337 / L27-01) -- r28 (F28-03, Codex B r27 S27-03) sachlich neu: biss() prueft den Marker
+    # VOR der Klassifikation; die P-110-Subshell schreibt FEHL ohne Marker-Pruefung, der Elternkontext sammelt FEHL
+    # und Marker und prueft je Unterprobe zuerst die Marker-Erwartung, dann die FEHL-Erwartung; ein Aufrufer ohne
+    # Marker-Pruefung erhielte bei KEIN URTEIL FEHL 0 = stilles GRUEN.
+    # fall_P104m ist kein direkt registrierter Fall (Registrierung nur fall P-101..P-110); Aufrufer: biss m133 + p110
+    p104m_lauf "$1" "$T/P104m"
+    if [ "$P104M_ZG" = werkzeugfehler ]; then   # r27 (F27-01 (d)): Werkzeugfehler = KEIN URTEIL, nie OK, nie BISS
+        _txt="Harnisch-Kopie: Werkzeugfehler (${P104M_WZ%%:*} rc ${P104M_WZ#*:})"
+        echo "  [ABBRUCH] $_txt -- KEIN URTEIL"; printf '%s\n' "$_txt" > "$T/kein-urteil.txt"; return 0
+    fi
+    # r25 (F25-01 (b), Codex B S24-01 Haertung / Fable L24-02/L24-03): belastbar sind NUR GRUEN/rc 0 (kein Biss) und
+    # ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss); ROT mit rc != 1, ROT (0), GRUEN mit rc != 0, KEIN und
+    # fehlende oder doppelte Urteilszeile = KEIN URTEIL (Marker fuer biss())
+    # r26 (F26-01 (b)): Tafel ueber p104m_tafel -- belastbar nur mit VALIDIERTER Zeile (P104M_ZG), die Arithmetik
+    # FEHL += N steht erst NACH der Validierung (N kanonisch dezimal, <= 6 Ziffern)
+    p104m_tafel
+    case "$_tafel" in
+        OK) : ;;
+        BISS) FEHL=$((FEHL+P104M_N)) ;;
+        *) printf '%s\n' "$_txt" > "$T/kein-urteil.txt" ;;
+    esac
+}
+fall_P105() { # F23-03 (a) (r23, Codex B S22-04 / N-02): HELPER-RESET als Verhalten -- Wegwerf-GIT_CONFIG_GLOBAL mit
+    # credential.helper bzw. credential.<REMOTE>.helper = Marker-Helfer (schreibt je Aufruf eine Datei); git mit GENAU
+    # den GITP_REMOTE-Optionen des Scripts (Literal aus dem Script gelesen, REMOTE eingesetzt) 'credential fill' nicht
+    # interaktiv -> KEIN Marker (Reset wirkt ungescopt UND URL-gescopt); Rot-zuerst: ohne die Optionen entsteht der
+    # Marker in beiden Formen (Instrument beisst). credential.<url>.helper= im Script ist nicht noetig (gemessen).
+    s="$1"; d="$T/P105"; mkdir -p "$d"
+    REMOTE=https://gitlab.example.invalid/gruppe/projekt.git
+    opt=$(sed -n '/^GITP_REMOTE="/,/"$/p' "$s" | sed -e 's/^GITP_REMOTE="//' -e 's/ \\$//' -e 's/"$//' | tr '\n' ' ')
+    case "$opt" in "git -c credential.helper= "*) ok "GITP_REMOTE-Literal aus dem Script gelesen" ;;
+        *) rot "GITP_REMOTE-Literal nicht lesbar"; return ;; esac
+    eval "gr=\"$opt\""   # setzt REMOTE ein wie im Script
+    printf '#!/bin/sh\ntouch "%s/marker-$1"\n' "$d" > "$d/marker.sh"; chmod 0700 "$d/marker.sh"
+    git init -q "$d/repo" || { rot "Wegwerf-Repo nicht baubar"; return; }
+    printf '[credential]\n\thelper = !%s\n' "$d/marker.sh" > "$d/cfg-plain"
+    printf '[credential "%s"]\n\thelper = !%s\n' "$REMOTE" "$d/marker.sh" > "$d/cfg-url"
+    fill105() { # $1 = Konfigurationsdatei, $2 = git-Aufruf (mit oder ohne die GITP_REMOTE-Optionen) -> Markerzahl
+        rm -f "$d"/marker-*
+        printf 'protocol=https\nhost=gitlab.example.invalid\npath=gruppe/projekt.git\n\n' \
+            | GIT_CONFIG_GLOBAL="$1" GIT_TERMINAL_PROMPT=0 GIT_ASKPASS= $2 -C "$d/repo" credential fill >/dev/null 2>&1
+        ls "$d"/marker-* 2>/dev/null | wc -l
+    }
+    n=$(fill105 "$d/cfg-plain" git); erw_gleich "$n" 1 "Rot-zuerst: Marker ohne Reset (ungescopt)"
+    n=$(fill105 "$d/cfg-url" git); erw_gleich "$n" 1 "Rot-zuerst: Marker ohne Reset (URL-gescopt)"
+    n=$(fill105 "$d/cfg-plain" "$gr"); erw_gleich "$n" 0 "kein Marker mit den GITP_REMOTE-Optionen (ungescopt)"
+    n=$(fill105 "$d/cfg-url" "$gr"); erw_gleich "$n" 0 "kein Marker mit den GITP_REMOTE-Optionen (URL-gescopt)"
+}
+fall_P106() { # F23-03 (b) (r23, Codex B S22-04): pushInsteadOf-GEGENRICHTUNG -- ein kuerzerer globaler pushInsteadOf-
+    # Praefix biegt den Push (nicht den Fetch) auf einen toten Pfad; die Selbstabbildung F22-01 (laengster Praefix)
+    # gewinnt, der Push erreicht den echten Bare-Tip; ohne die pushInsteadOf-Setzung (M134) reisst der Fall.
+    s="$1"; d="$T/P106"; baue_seed "$d" || { rot "Wegwerf-Remote nicht baubar"; return; }
+    klone "$d/work" "$BASE" || { rot "Klon nicht baubar"; return; }; lege_pdfs "$d/work" v1
+    printf '[url "%s/nirgends/"]\n\tpushInsteadOf = %s/\n' "$d" "$d" > "$d/umbiegung"
+    lauf "$d/work" "$s" "$d/out" "$BASE" GIT_CONFIG_GLOBAL="$d/umbiegung" COMDARE_THESIS_PDF_REMOTE="$BARE"; rc=$?
+    zeige "$d/out"; erw_rc "$rc" 0; erw_text "$d/out" "PUSH OK (ci.skip)"; erw_kein_text "$d/out" "Push abgelehnt"
+    erw_text "$d/out" "RUNNER-GITCONFIG: 1 Eintraege"
+    erw_text "$d/out" "file:$d/umbiegung url.$d/nirgends/.pushinsteadof"
+    erw_kein_text "$d/out" "does not appear to be a git repository"
+    t=$(tip); n=$(git -C "$BARE" rev-list --count "$t"); erw_gleich "$n" 2 "Bare-Tip = Seed + Export-Commit"
+}
+fall_P107() { # F23-03 (c) (r23, Codex B S22-04 / N-01): extraHeader-LISTEN-RESET als Verhalten -- vorbelegter Header
+    # in DREI Formen (plain http.extraheader, kuerzerer URL-Scope, gleicher URL-Scope) -> git mit den GITP_REMOTE-
+    # Optionen 'config --get-urlmatch http.extraheader REMOTE' (dieselbe urlmatch-Aufloesung wie der http-Transport)
+    # liefert KEINEN Altwert; zusaetzlich get-all am REMOTE-Schluessel: Formen 1/2 nur der leere Eintrag, Form 3
+    # listet den Altwert VOR dem leeren Eintrag (Listung; der letzte Eintrag leert die Liste); Rot-zuerst: ohne die
+    # Optionen erscheint der Altwert in allen drei Formen; Werte werden nie ausgegeben (Koeder maskiert).
+    s="$1"; d="$T/P107"; mkdir -p "$d"
+    REMOTE=https://gitlab.example.invalid/gruppe/projekt.git
+    opt=$(sed -n '/^GITP_REMOTE="/,/"$/p' "$s" | sed -e 's/^GITP_REMOTE="//' -e 's/ \\$//' -e 's/"$//' | tr '\n' ' ')
+    eval "gr=\"$opt\""
+    git init -q "$d/repo" || { rot "Wegwerf-Repo nicht baubar"; return; }
+    printf '[http]\n\textraheader = Authorization: Bearer %s-1\n' "$KOEDER" > "$d/cfg1"
+    printf '[http "https://gitlab.example.invalid/"]\n\textraheader = Authorization: Bearer %s-2\n' "$KOEDER" \
+        > "$d/cfg2"
+    printf '[http "%s"]\n\textraheader = Authorization: Bearer %s-3\n' "$REMOTE" "$KOEDER" > "$d/cfg3"
+    for i in 1 2 3; do
+        GIT_CONFIG_GLOBAL="$d/cfg$i" git -C "$d/repo" config --get-urlmatch http.extraheader "$REMOTE" > "$d/alt$i" 2>&1
+        if grep -qF -- "Bearer $KOEDER-$i" "$d/alt$i"; then ok "Rot-zuerst Form $i: Altwert ohne Reset sichtbar"
+        else rot "Rot-zuerst Form $i: Altwert ohne Reset NICHT sichtbar"; fi
+        GIT_CONFIG_GLOBAL="$d/cfg$i" $gr -C "$d/repo" config --get-urlmatch http.extraheader "$REMOTE" > "$d/neu$i" 2>&1
+        erw_kein_text "$d/neu$i" "Bearer"; erw_kein_text "$d/neu$i" "$KOEDER"
+        GIT_CONFIG_GLOBAL="$d/cfg$i" $gr -C "$d/repo" config --get-all "http.$REMOTE.extraheader" > "$d/all$i" 2>&1
+        l=$(tail -n 1 "$d/all$i"); erw_gleich "$l" "" "Form $i: letzter get-all-Eintrag leer"
+    done
+    erw_kein_text "$d/all1" "Bearer"; erw_kein_text "$d/all2" "Bearer"; erw_text "$d/all3" "Bearer"
+}
+fall_P108() { # F23-01 (r23, Codex B S22-01): VERWEIS-WACHE -- jeder Zeilenverweis im Script-Kopf und im L1-01-Kommentar
+    # zeigt auf die benannte Zielzeile (Tafel: Kopf-Zeile, Verweis-Literal, Zielzeile, Literal der Zielzeile); am
+    # Script r22/r23 (alte Nummern) reisst der Fall, am Script r24 (+4 durch REV r24) ist er gruen; keine Mutante.
+    s="$1"
+    v108() { # $1 = Kopf-Zeile, $2 = Verweis-Literal, $3 = Zielzeile, $4 = Literal der Zielzeile
+        k=$(sed -n "${1}p" "$s"); z=$(sed -n "${3}p" "$s")
+        case "$k" in *"$2"*) ok "Z.$1 traegt '$2'" ;; *) rot "Z.$1 traegt NICHT '$2'" ;; esac
+        case "$z" in *"$4"*) ok "Z.$3 traegt '$4'" ;; *) rot "Z.$3 traegt NICHT '$4'" ;; esac
+    }
+    v108 26 'Z.476)' 476 'git diff --cached --no-renames --name-status --ignore-submodules=none'
+    v108 26 'Z.490;' 490 'diff --name-only --ignore-submodules=none -- "$DIR"'
+    v108 27 'Z.261/476/490' 261 'diff_gleich() { set +e; git diff --quiet --ignore-submodules=none'
+    v108 28 'Z.440-443' 440 '# L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege'
+    v108 29 'Z.501-504' 501 'commit -q --only'
+    v108 29 'Z.501-504' 504 '-- "$@" || fehler "git commit"'
+    v108 29 'Z.450/453-454' 450 '[ "$idx" = "$blob" ] || fehler'
+    v108 29 'Z.450/453-454' 453 'roh=$(git hash-object --no-filters -- "$dst")'
+    v108 29 'Z.450/453-454' 454 '[ "$idx" = "$roh" ] || fehler "Filter-/EOL-Konversion'
+    v108 37 'Z.469-475' 469 '# I-02 / S7-03 (r8b) / S8-01 (r9): der gesamte gestagte Diff (diff --cached)'
+    v108 441 'FEHLER in Z.439' 439 'git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"'
+    v108 443 'Z.444-450' 444 'git ls-files --error-unmatch -- "$dst"'
+    v108 443 'Z.444-450' 450 '[ "$idx" = "$blob" ] || fehler'
+}
+fall_P109() { # F24-01 (r24, Codex B S23-01 / Fable L23-01): --nur ist fail-closed -- die Harnisch-Kopie (env -u CI
+    # -u GITLAB_CI wie fall_P104m) liefert mit '--nur=P-999' (unbekannt), '--nur=' (leer) und '--nur=P-104 --selbstbiss'
+    # je rc 2 mit ABBRUCH-Literal und druckt nie 'PROBE thesis_pdf_export: GRUEN'; Gruen-Probe '--nur=P-104' rc 0 mit
+    # 'BILANZ: 1 von 1 Faellen gruen'. Am r23-Harnisch: rc 0 + GRUEN bei 0 Faellen bzw. Vollauf (Rot-zuerst, Lauf R-1b).
+    # r25 (F25-02, Fable L24-05): nacktes '--nur' trifft den Vorbestand-Zweig 'unbekanntes Argument' rc 2
+    # (Regressionswache, kein neuer case-Arm; Lead-Triage r24 Teil 2).
+    d="$T/P109"; mkdir -p "$d"; _pf=$(sed -n 's/^INSTANZ_PROJEKT_PFAD=//p' "$SKRIPT" | head -n 1)
+    p109() { # $1 = Marke, $2.. = Argumente der Kopie -> $d/$1.out (maskiert), rc in P109_RC
+        _m="$1"; shift; mkdir -p "$d/$_m"
+        env -u CI -u GITLAB_CI COMDARE_SKRIPT="$SKRIPT" COMDARE_CI_YML="$CI_YML" TMPDIR="$d/$_m" sh "$SELBST" "$@" \
+            > "$d/$_m.raw" 2>&1; P109_RC=$?
+        sed "s#$_pf#<super-pfad>#g" "$d/$_m.raw" > "$d/$_m.out"
+        grep -E '^ABBRUCH|^BILANZ|^PROBE ' "$d/$_m.out" | sed 's/^/      > /'
+    }
+    p109 unbekannt --nur=P-999; erw_rc "$P109_RC" 2
+    erw_text "$d/unbekannt.out" "ABBRUCH: --nur=P-999: Kennung unbekannt oder nicht gefahren (0 Faelle)"
+    erw_kein_text "$d/unbekannt.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 leer --nur=; erw_rc "$P109_RC" 2; erw_text "$d/leer.out" "ABBRUCH: --nur ohne Kennung"
+    erw_kein_text "$d/leer.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 kombi --nur=P-104 --selbstbiss; erw_rc "$P109_RC" 2
+    erw_text "$d/kombi.out" "ABBRUCH: --nur und --selbstbiss schliessen sich aus"
+    erw_kein_text "$d/kombi.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 nackt --nur; erw_rc "$P109_RC" 2   # r25 (F25-02): nacktes --nur
+    erw_text "$d/nackt.out" "ABBRUCH: unbekanntes Argument '--nur'"
+    erw_kein_text "$d/nackt.out" "PROBE thesis_pdf_export: GRUEN"
+    p109 gruen --nur=P-104; erw_rc "$P109_RC" 0; erw_text "$d/gruen.out" "BILANZ: 1 von 1 Faellen gruen, 0 rot"
+}
+
+fall_P110() { # F25-01 (r25, Codex B S24-01 Haertung / Fable L24-02/L24-03): M133-URTEILSTAFEL, Stand-in-Kopien
+    # (nur echo + exit, keine Rekursion) drucken die gewuenschten P-104-Urteilszeilen und enden mit dem Soll-rc;
+    # fall_P104m laeuft je Variante in einer Subshell mit eigenem T und FEHL=0. Belastbar sind NUR GRUEN/rc 0 (kein
+    # Biss) und ROT/rc 1 mit N > 0 bei genau EINER Urteilszeile (Biss: FEHL += N); alles andere schreibt den KEIN-
+    # URTEIL-Marker und laesst FEHL bei 0. Am r24-Harnisch sind (a) (b) (e) (f) rot (ROT/rc != 1 und ROT (0) zaehlten
+    # als Biss, die Doppelzeile riss die Arithmetik der Subshell); keine Mutante (Textwache-Klasse).
+    d="$T/P110"; mkdir -p "$d"; P110_EINZUG='  '; P110_WRAP=''   # r26 (e): Einzug, (o) ohne; r27: Wrapper-PATH
+    p110() { # $1 = Marke, $2 = rc der Kopie, $3.. = Urteilszeilen (ohne die zwei fuehrenden Leerzeichen)
+        _m="$1"; _rc="$2"; shift 2; _k="$d/kopie-$_m.sh"; mkdir -p "$d/$_m"
+        printf '#!/bin/sh\n' > "$_k"
+        for _z in "$@"; do printf 'echo "%s%s"\n' "$P110_EINZUG" "$_z" >> "$_k"; done
+        printf 'exit %s\n' "$_rc" >> "$_k"
+        ( PATH="${P110_WRAP:+$P110_WRAP:}$PATH"; T="$d/$_m"; FEHL=0   # r27 (F27-01 (e)): Wrapper vor PATH
+          fall_P104m "$_k" > "$d/$_m.out" 2>&1; echo "$FEHL" > "$d/$_m/fehl" )
+        if [ -f "$d/$_m/fehl" ]; then P110_FEHL=$(cat "$d/$_m/fehl"); else P110_FEHL=ABBRUCH; fi
+        if [ -f "$d/$_m/kein-urteil.txt" ]; then P110_MARKER=JA; else P110_MARKER=NEIN; fi
+        echo "      > ($_m) Marker $P110_MARKER, FEHL $P110_FEHL"
+    }
+    p110 a 2 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(a) ROT/rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(a) ROT/rc 2 -> FEHL 0"
+    p110 b 143 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(b) ROT/rc 143 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(b) ROT/rc 143 -> FEHL 0"
+    p110 c 1 'P-104: GRUEN'
+    erw_gleich "$P110_MARKER" JA "(c) GRUEN/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(c) GRUEN/rc 1 -> FEHL 0"
+    p110 d 0
+    erw_gleich "$P110_MARKER" JA "(d) keine Urteilszeile/rc 0 -> Marker"
+    erw_gleich "$P110_FEHL" 0 "(d) -> FEHL 0"
+    p110 e 1 'P-104: ROT (4 Erwartung(en) gerissen)' 'P-104: ROT (2 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(e) zwei ROT-Zeilen/rc 1 -> Marker"
+    erw_gleich "$P110_FEHL" 0 "(e) Doppelzeile -> FEHL 0"
+    p110 f 1 'P-104: ROT (0 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(f) ROT (0)/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(f) ROT (0) -> FEHL 0"
+    p110 g 1 'P-104: ROT (4 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" NEIN "(g) ROT (4)/rc 1 -> kein Marker"
+    erw_gleich "$P110_FEHL" 4 "(g) ROT (4)/rc 1 -> FEHL 4"
+    p110 h 0 'P-104: GRUEN'
+    erw_gleich "$P110_MARKER" NEIN "(h) GRUEN/rc 0 -> kein Marker"
+    erw_gleich "$P110_FEHL" 0 "(h) GRUEN/rc 0 -> FEHL 0"
+    # r26 (F26-01 (e), Codex B r25 S25-01): Praefix-Treffer, abgeschnitten, Muell, fuehrende Null, Bereich, Muell vor
+    # dem Anker, Rest nach dem Schlussliteral -> je KEIN-URTEIL-Marker + FEHL 0. Am r25-Harnisch (i)(j)(k)(l)(m)(n)(p)
+    # rot ((l) reisst die Arithmetik der Subshell, (m) zaehlt oktal, gemessen unter dash), (o) bereits gruen (Z 0)
+    p110 i 1 'P-104: ROT (4x Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(i) ROT (4x)/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(i) ROT (4x) -> FEHL 0"
+    p110 j 1 'P-104: ROT (4'
+    erw_gleich "$P110_MARKER" JA "(j) abgeschnittenes ROT (4/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(j) abgeschnittenes ROT (4 -> FEHL 0"
+    p110 k 0 'P-104: GRUENmuell'
+    erw_gleich "$P110_MARKER" JA "(k) GRUENmuell/rc 0 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(k) GRUENmuell -> FEHL 0"
+    p110 l 1 'P-104: ROT (08 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(l) ROT (08)/rc 1 fuehrende Null -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(l) ROT (08) -> FEHL 0"
+    p110 m 1 'P-104: ROT (010 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(m) ROT (010)/rc 1 fuehrende Null -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(m) ROT (010) -> FEHL 0"
+    p110 n 1 'P-104: ROT (1234567 Erwartung(en) gerissen)'
+    erw_gleich "$P110_MARKER" JA "(n) ROT (1234567)/rc 1 Bereich -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(n) ROT (1234567) -> FEHL 0"
+    _bn=$(grep -c -F 'Zahl ausserhalb des Bereichs' "$d/n/kein-urteil.txt" 2>/dev/null)
+    erw_gleich "$_bn" 1 "(n) Marker-Text 'Zahl ausserhalb des Bereichs'"
+    P110_EINZUG=''; p110 o 1 'xP-104: ROT (4 Erwartung(en) gerissen)'; P110_EINZUG='  '
+    erw_gleich "$P110_MARKER" JA "(o) Muell vor dem Anker (ohne Einzug)/rc 1 -> Marker (Z 0)"
+    erw_gleich "$P110_FEHL" 0 "(o) Muell vor dem Anker -> FEHL 0"
+    p110 p 1 'P-104: ROT (4 Erwartung(en) gerissen) x'
+    erw_gleich "$P110_MARKER" JA "(p) Rest nach dem Schlussliteral/rc 1 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(p) Rest nach dem Schlussliteral -> FEHL 0"
+    # r27 (F27-01 (e), Codex B r26 S26-01): Werkzeug-Wrapper im PATH der Subshell rufen das echte Werkzeug (korrekte
+    # Teilausgabe) und enden mit rc 2 -- (q) nur das Zahlen-sed, (r) nur grep -c, (s) nur das Maskierungs-sed; am
+    # r26-Harnisch liefern alle drei BISS (FEHL 4, kein Marker) = Riss; am r27 ABBRUCH mit Stufe, Marker JA, FEHL 0
+    # r28 (F28-09, Fable r27 L27-05): Originale ueber den Standard-PATH (command -v -p) und nur als Absolutpfad --
+    # ein Wrapper darf nie 'exec <name>' auf sich selbst aufloesen (Endlosschleife statt ROT); Pfad ohne '/' = ROT +
+    # Rueckkehr aus fall_P110 (die Wrapper-Proben (q)-(u) entfallen, statt mit einem Namens-Wrapper zu haengen)
+    _sed=$(command -v -p sed); _grep=$(command -v -p grep)
+    case "$_sed" in /*) ;; *) rot "Werkzeugpfad sed nicht absolut: '$_sed'"; return 0 ;; esac
+    case "$_grep" in /*) ;; *) rot "Werkzeugpfad grep nicht absolut: '$_grep'"; return 0 ;; esac
+    mkdir -p "$d/wrap-q" "$d/wrap-r" "$d/wrap-s"
+    printf '#!/bin/sh\ncase "$*" in *"Erwartung(en) gerissen)$/\\1/p"*) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' \
+        "$_sed" "$_sed" > "$d/wrap-q/sed"
+    printf '#!/bin/sh\ncase "$1" in -c) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_grep" "$_grep" > "$d/wrap-r/grep"
+    printf '#!/bin/sh\ncase "$1" in "s#"*"#<super-pfad>#g") %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' \
+        "$_sed" "$_sed" > "$d/wrap-s/sed"
+    chmod +x "$d/wrap-q/sed" "$d/wrap-r/grep" "$d/wrap-s/sed"
+    P110_WRAP="$d/wrap-q"; p110 q 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(q) Zahlen-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(q) Zahlen-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (zahl rc 2)' "$d/q.out"); erw_gleich "$_bn" 1 "(q) Abbruchtext Stufe zahl rc 2"
+    P110_WRAP="$d/wrap-r"; p110 r 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(r) grep -c Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(r) grep -c rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (zaehlung rc 2)' "$d/r.out"); erw_gleich "$_bn" 1 "(r) Abbruchtext Stufe zaehlung"
+    P110_WRAP="$d/wrap-s"; p110 s 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(s) Maskierungs-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(s) Maskierungs-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (maske rc 2)' "$d/s.out"); erw_gleich "$_bn" 1 "(s) Abbruchtext Stufe maske"
+    # r28 (F28-01 (c), Codex B r27 S27-01): (t) nur das Weiterleitungs-sed ("$1" = 's/^/      > /'), (u) nur das
+    # Filter-grep ("$1" = -E) -- korrekte Teilausgabe + rc 2; am r27-Harnisch je BISS (FEHL 4, kein Marker, Status der
+    # Weiterleitungs-Pipeline ungelesen) = Riss; am r28 ABBRUCH mit Stufe weiterleitung/filter, Marker JA, FEHL 0
+    mkdir -p "$d/wrap-t" "$d/wrap-u"
+    printf '#!/bin/sh\ncase "$1" in "s/^/      > /") %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_sed" "$_sed" \
+        > "$d/wrap-t/sed"
+    printf '#!/bin/sh\ncase "$1" in -E) %s "$@"; exit 2 ;; esac\nexec %s "$@"\n' "$_grep" "$_grep" > "$d/wrap-u/grep"
+    chmod +x "$d/wrap-t/sed" "$d/wrap-u/grep"
+    P110_WRAP="$d/wrap-t"; p110 t 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(t) Weiterleitungs-sed Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(t) Weiterleitungs-sed rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (weiterleitung rc 2)' "$d/t.out")
+    erw_gleich "$_bn" 1 "(t) Abbruchtext Stufe weiterleitung"
+    P110_WRAP="$d/wrap-u"; p110 u 1 'P-104: ROT (4 Erwartung(en) gerissen)'; P110_WRAP=''
+    erw_gleich "$P110_MARKER" JA "(u) Filter-grep Teilausgabe + rc 2 -> KEIN-URTEIL-Marker"
+    erw_gleich "$P110_FEHL" 0 "(u) Filter-grep rc 2 -> FEHL 0"
+    _bn=$(grep -c -F 'Werkzeugfehler (filter rc 2)' "$d/u.out"); erw_gleich "$_bn" 1 "(u) Abbruchtext Stufe filter"
+}
 
 fall() { # $1 = Kennung, $2 = Funktion, $3 = Script
+    case "$NUR" in '') ;; "$1") ;; *) return 0 ;; esac   # r23: --nur=<Kennung> faehrt genau einen Fall (M133-Traeger)
     FEHL=0; echo ""; echo "== $1 =="
     "$2" "$3"
     eval "BASIS_$(printf '%s' "$1" | tr -d -)=\$FEHL" # r8 (L7-03): Basis-FEHL je Fall fuer biss()
@@ -2968,7 +3496,21 @@ fall P-97 fall_P97 "$SKRIPT"
 fall P-98 fall_P98 "$SKRIPT"
 fall P-99 fall_P99 "$SKRIPT"
 fall P-100 fall_P100 "$SKRIPT"
+fall P-101 fall_P101 "$SKRIPT"
+fall P-102 fall_P102 "$SKRIPT"
+fall P-103 fall_P103 "$SKRIPT"
+fall P-104 fall_P104 "$SKRIPT"
+fall P-105 fall_P105 "$SKRIPT"
+fall P-106 fall_P106 "$SKRIPT"
+fall P-107 fall_P107 "$SKRIPT"
+fall P-108 fall_P108 "$SKRIPT"
+fall P-109 fall_P109 "$SKRIPT"
+fall P-110 fall_P110 "$SKRIPT"
 N_FAELLE=$((GRUEN_N + ROT_N))
+if [ -n "$NUR" ] && [ "$N_FAELLE" -ne 1 ]; then   # r24 (F24-01 (b)): fail-closed, unbekannte Kennung faehrt 0 Faelle
+    echo "ABBRUCH: --nur=$NUR: Kennung unbekannt oder nicht gefahren ($N_FAELLE Faelle)"; exit 2
+fi
+if [ "$N_FAELLE" -eq 0 ]; then echo "ABBRUCH: 0 Faelle gefahren -- KEIN URTEIL"; exit 2; fi   # r24 (F24-01 (d))
 
 # --------------------------------------------------------------------------- Selbstbiss
 BISS_RC=0; MUT_N=0; ENTF_N=0
@@ -3120,29 +3662,112 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     # M126 (r21, S20-01): Flag --ignore-submodules=none an der Arbeitsbaum-Wache entfernt -> P-100 muss reissen (S7-03)
     ersetze_literal "$SKRIPT" 'git -c core.fileMode=true diff --name-only --ignore-submodules=none -- "$DIR"' \
         'git -c core.fileMode=true diff --name-only -- "$DIR"' > "$MUT/m126.sh"
+    # M127 (r22, F22-01): Neutralisierung entfernt (GITP_REMOTE == GITP) -> P-101 muss reissen (Push/Fetch umgebogen)
+    ersetze_literal "$SKRIPT" \
+        '-c http.$REMOTE.extraheader= -c url.$REMOTE.insteadOf=$REMOTE -c url.$REMOTE.pushInsteadOf=$REMOTE"' '"' \
+        > "$MUT/m127.sh"
+    # M128 (r22, F22-01): Push ohne GITP_REMOTE -> P-101 muss reissen (erster Push umgebogen)
+    ersetze_literal "$SKRIPT" 'if $GITP_REMOTE push -q -o ci.skip' 'if $GITP push -q -o ci.skip' > "$MUT/m128.sh"
+    # M129 (r22, F22-01): Fetch ohne GITP_REMOTE -> P-101 muss reissen (das Race-Szenario erreicht den Fetch)
+    ersetze_literal "$SKRIPT" '$GITP_REMOTE fetch -q "$REMOTE"' '$GITP fetch -q "$REMOTE"' > "$MUT/m129.sh"
+    # M130 (r22, F22-02): Diagnose ohne --name-only (Werte im Log) -> P-102 muss reissen (Koeder im Wert sichtbar)
+    ersetze_literal "$SKRIPT" 'git config --show-origin --name-only' 'git config --show-origin' > "$MUT/m130.sh"
+    # M131 (r22, F22-02): Zeile 1 der Diagnose-Maske entfernt (Zeile 2 deckt die https-Form nicht) -> P-102 muss
+    # reissen (Koeder im Schluessel sichtbar, r23: Fortsetzung 'sed \' bleibt, kein Werkzeugfehler; Literal nur hier)
+    ersetze_literal "$SKRIPT" \
+        "sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \\" 'sed \' \
+        > "$MUT/m131.sh"
+    # M132 (r22, F22-01): Zeichenwache laesst '=' durch -> P-103 muss reissen (git 'invalid key' statt Vertragstext)
+    ersetze_literal "$SKRIPT" '*[!A-Za-z0-9_./:-]*) fehler' '*[!A-Za-z0-9_./:=-]*) fehler' > "$MUT/m132.sh"
+    # M133 (r23, F23-02): Harnisch OHNE GIT_ALLOW_PROTOCOL=file (Kopie des Harnischs, alle drei Setzungen entfernt) ->
+    # P-104 muss reissen; r24 (F24-02 (c)): die Kopie wird erst NACH dem gruenen Basislauf der unveraenderten Kopie
+    # erzeugt (Selbstbiss-Block vor 'biss m133', Traeger fall_P104m per --nur=P-104)
+    # M134 (r23, F23-03 (b)): pushInsteadOf-Selbstabbildung aus GITP_REMOTE entfernt -> P-106 muss reissen (der Push
+    # folgt dem kuerzeren globalen pushInsteadOf-Praefix auf den toten Pfad, der Fetch bleibt per insteadOf intakt)
+    ersetze_literal "$SKRIPT" ' -c url.$REMOTE.pushInsteadOf=$REMOTE"' '"' > "$MUT/m134.sh"
     MUT_N=$MUT_N_SKRIPT; ENTF_N=0; NB_N=0
     for m in m1 m2 m3 m4 m5 m6 m10 m11 m12 m36 m37 m38 m39 m40 m43 m52 m53 m54 m55 m56 m57 m58 m59 m60 m61 \
              m62 m63 m64 m65 m66 m67 m68 m69 m71 m72 m73 m74 m75 m76 m77 m78 m79 \
-             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126; do
+             m81 m82 m83 m84 m85 m86 m87 m88 m89 m95 m96 m97 m101 m102 m124 m125 m126 \
+             m127 m128 m129 m130 m131 m132 m134; do
         if cmp -s "$SKRIPT" "$MUT/$m.sh"; then
             echo "  [ABBRUCH] Mutante $m ist byte-gleich zum Script -- das Muster greift nicht"; BISS_RC=2
         fi
     done
     basis_von() { eval "printf '%s' \"\${BASIS_$(printf '%s' "$1" | tr -d -):-0}\""; } # r8 (L7-03)
-    nicht_bewertbar() { # $1 = Mutante, $2 = Kennung, $3 = Basis-FEHL: roter Basisfall, Mutante nicht gezaehlt
-        echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1 nicht bewertbar"
+    nicht_bewertbar() { # $1 = Mutante, $2 = Kennung, $3 = Basis-FEHL, $4 = Etikett (leer oder " (YAML)"; r29 F29-02):
+        # roter Basisfall, Mutante nicht gezaehlt; $4 optional (biss uebergibt 3 Argumente; ${4-} wegen set -u)
+        echo "  [NICHT BEWERTBAR] Fall $2 ohne Mutation rot ($3 Erwartung(en)) -- Mutante $1${4-} nicht bewertbar"
         MUT_N=$((MUT_N-1)); NB_N=$((NB_N+1))
     }
-    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei r > Basis-FEHL
+    # r28 (F28-08, Fable r27 L27-02, Harmonisierung A2.1b): EINE gemeinsame Auswertung fuer beide Biss-Pfade (biss =
+    # Script-Mutanten, biss_yml = YAML-Mutanten); beide Pfade schreiben denselben Ergebniskanal und tragen damit
+    # byte-gleiche Urteilslogik -- die Divergenz beider Pfade (r26/r27 heilten nur biss()) war die Ursache von L27-02
+    biss_urteil() { # $1 = Mutante, $2 = Kennung, $3 = r (Exitstatus der Subshell), $4 = Basis-FEHL, $5 = Etikett
+        if [ -f "$T/biss_$1/kein-urteil.txt" ]; then   # r24 (F24-02 (b)): der Traeger konnte die Mutante nicht bewerten
+            echo "  [ABBRUCH] Mutante $1$5: $(cat "$T/biss_$1/kein-urteil.txt") -- KEIN URTEIL"; BISS_RC=2; return 0
+        fi
+        # r27 (F27-02 (a)/(b)): Fallabschluss NUR ueber die Ergebnisdatei; Exitstatus >= 2 = KEIN URTEIL; die Risszahl
+        # N kommt aus der Datei, nie aus dem Exitstatus (kein mod 256)
+        if [ "$3" -ge 2 ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Exitstatus $3 ohne regulaeren Fallabschluss (Ergebniskanal) -- KEIN URTEIL"
+            BISS_RC=2; return 0
+        fi
+        # r28 (F28-02 (c)/(d), Codex B r27 S27-02): genau EIN Datensatz per Shell-Builtin (kein ungebundenes
+        # Werkzeug): Zeilen zaehlen, die einzige Zeile muss 'ENDE FEHL=' + 0 oder kanonische Dezimalzahl sein;
+        # fehlende, leere, mehrzeilige oder unpassende Datei = KEIN URTEIL; danach r/N-Abgleich VOR dem
+        # Bissvergleich (r=0 nur mit N=0, r=1 nur mit N>0; r>=2 wurde oben abgewiesen)
+        _k=0; _z=''; _l=''; _n=''; _g=''
+        if [ ! -f "$T/biss_$1/ergebnis" ]; then _g='Datei fehlt'
+        else
+            while IFS= read -r _z || [ -n "$_z" ]; do _k=$((_k+1)); _l=$_z; done < "$T/biss_$1/ergebnis"
+            case "$_k" in 0) _g='Datei leer' ;; 1) ;; *) _g="mehrzeilig ($_k Datensaetze)" ;; esac
+            if [ -z "$_g" ]; then
+                case "$_l" in 'ENDE FEHL=0') _n=0 ;; 'ENDE FEHL='[1-9]*) _n=${_l#ENDE FEHL=} ;; esac
+                case "$_n" in *[!0-9]*) _n='' ;; esac
+                [ -n "$_n" ] || _g='Datensatz unpassend'
+            fi
+        fi
+        if [ -n "$_g" ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Ergebniskanal ($_g) -- KEIN URTEIL"; BISS_RC=2; return 0
+        fi
+        case "$3/$_n" in 0/0|1/[1-9]*) ;; *) _g=JA ;; esac
+        if [ "$_g" = JA ]; then
+            echo "  [ABBRUCH] Mutante $1$5: Ergebniskanal widerspruechlich (r=$3 N=$_n) -- KEIN URTEIL"; BISS_RC=2
+            return 0
+        fi
+        # r27 (F27-02 (a), Codex B r26 S26-02): Biss-Beleg NUR mit verankerter Fallmeldung -- '    [ROT] ' der
+        # Erwartungen oder die exakte ROT-Zeile der Harnisch-Kopie; unverankerte Textfragmente beglaubigen keinen Biss
+        # r28 (F28-04, Codex B r27 S27-04): ERE in POSIX-Form [[]ROT[]] (kein '\[' ausserhalb eines Bracket-Ausdrucks)
+        if [ "$_n" -gt "$4" ]; then
+            if grep -q -E '^    [[]ROT[]] |^      >   P-104: ROT \([1-9][0-9]* Erwartung\(en\) gerissen\)$' \
+                    "$T/biss_$1/protokoll.txt"; then
+                echo "  [OK]  Mutante $1$5 macht $2 ROT ($_n gerissene Erwartung(en)) -- die Probe beisst"
+            else
+                echo "  [ABBRUCH] Mutante $1$5: $_n Risse ohne verankerte Fallmeldung -- KEIN URTEIL"; BISS_RC=2
+            fi
+        else
+            echo "  [ABBRUCH] Mutante $1$5 laesst $2 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+        fi
+    }
+    biss() { # $1 = Mutante, $2 = Fallfunktion, $3 = Kennung; r8 (L7-03): 'beisst' nur bei N > Basis-FEHL
         basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
         T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
-        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
-        T="$T_ALT"
-        if [ "$r" -gt "$basis" ]; then
-            echo "  [OK]  Mutante $1 macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
-        else
-            echo "  [ABBRUCH] Mutante $1 laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+        rm -f "$T/ergebnis" "$T/kein-urteil.txt"; _rc=$?   # r28 (F28-05, Codex B r27 N-04): Reste einer Wiederholung
+        if [ "$_rc" -ne 0 ]; then   # derselben Mutantenkennung im selben T wirken nie; Bereinigung gebunden
+            T="$T_ALT"; echo "  [ABBRUCH] Mutante $1: Ergebniskanal (Bereinigung rc $_rc) -- KEIN URTEIL"; BISS_RC=2
+            return 0
         fi
+        # r27 (F27-02 (b), Codex B r26 S26-04): eigener Ergebniskanal -- der Fall schreibt 'ENDE FEHL=<n>' nach
+        # $T/ergebnis; der Exitstatus traegt nur 0 = regulaer ohne Risse, 1 = regulaer mit Rissen, >= 2 = Abbruch
+        # r28 (F28-02 (a)/(b), Codex B r27 S27-02): FEHL vor dem Schreiben kanonisch (0 oder Dezimalzahl ohne
+        # fuehrende Null, sonst Exitstatus 2 = Abbruch) und Schreibstatus gebunden (Schreibfehler = Exitstatus 2)
+        ( FEHL=0; "$2" "$MUT/$1.sh" > "$T/protokoll.txt" 2>&1
+          case "$FEHL" in ''|*[!0-9]*|0[0-9]*) exit 2 ;; esac
+          printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis" || exit 2
+          if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
+        T="$T_ALT"
+        biss_urteil "$1" "$3" "$r" "$basis" ""   # r28 (F28-08): Urteil ueber die gemeinsame Auswertung
     }
     [ "$BISS_RC" -eq 0 ] && biss m1 fall_P03 P-03
     [ "$BISS_RC" -eq 0 ] && biss m2 fall_P05 P-05
@@ -3205,6 +3830,37 @@ if [ "$SELBSTBISS" -eq 1 ]; then
     [ "$BISS_RC" -eq 0 ] && biss m124 fall_P100 P-100
     [ "$BISS_RC" -eq 0 ] && biss m125 fall_P100 P-100
     [ "$BISS_RC" -eq 0 ] && biss m126 fall_P100 P-100
+    [ "$BISS_RC" -eq 0 ] && biss m127 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m128 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m129 fall_P101 P-101
+    [ "$BISS_RC" -eq 0 ] && biss m130 fall_P102 P-102
+    [ "$BISS_RC" -eq 0 ] && biss m131 fall_P102 P-102
+    [ "$BISS_RC" -eq 0 ] && biss m132 fall_P103 P-103
+    # M133-Basislauf (r24, F24-02 (c)): die UNVERAENDERTE Harnisch-Kopie muss P-104 unter derselben Aufrufumgebung
+    # bestehen (env -u CI -u GITLAB_CI, --nur=P-104); erst dann wird die Kopie ohne die drei GIT_ALLOW_PROTOCOL-
+    # Setzungen erzeugt (M133, r23 F23-02) und gebissen; ohne gruenen Basislauf = KEIN URTEIL (BISS_RC=2)
+    if [ "$BISS_RC" -eq 0 ]; then
+        p104m_lauf "$SELBST" "$T/basis_m133"
+        if [ "$P104M_ZG" = werkzeugfehler ]; then   # r27 (F27-01 (d)): Werkzeugfehler = KEIN URTEIL (BISS_RC=2)
+            _wz="${P104M_WZ%%:*} rc ${P104M_WZ#*:}"
+            echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: Werkzeugfehler ($_wz) -- KEIN URTEIL"
+            BISS_RC=2
+        else
+            p104m_tafel   # r26 (F26-01 (c), Codex N-03): dieselbe Klassifikation wie fall_P104m, OK nur GRUEN/0
+            case "$_tafel" in
+                OK) echo "  [OK]  Basislauf der unveraenderten Harnisch-Kopie: P-104 GRUEN (rc 0)" ;;
+                *) echo "  [ABBRUCH] Basislauf der unveraenderten Harnisch-Kopie: $_txt -- KEIN URTEIL"; BISS_RC=2 ;;
+            esac
+        fi
+    fi
+    if [ "$BISS_RC" -eq 0 ]; then
+        ersetze_literal "$SELBST" ' GIT_ALLOW_PROTOCOL=file' '' > "$MUT/m133.sh"
+        if cmp -s "$SELBST" "$MUT/m133.sh"; then
+            echo "  [ABBRUCH] Mutante m133 ist byte-gleich zum Harnisch"; BISS_RC=2
+        fi
+    fi
+    [ "$BISS_RC" -eq 0 ] && biss m133 fall_P104m P-104
+    [ "$BISS_RC" -eq 0 ] && biss m134 fall_P106 P-106
     # YAML-Mutanten (r3): nur wenn die Marker-Bloecke in der YAML stehen; sonst LAUT entfallen (P-23/P-24 rot)
     zm=$(extrahiere_block "$CI_YML" EPOCH-288 "$MUT/marker.txt")
     if [ "$zm" -lt 5 ]; then
@@ -3409,16 +4065,25 @@ if [ "$SELBSTBISS" -eq 1 ]; then
                 echo "  [ABBRUCH] Mutante $m ist byte-gleich zur YAML -- das Muster greift nicht"; BISS_RC=2
             fi
         done
-        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss()
-            basis=$(basis_von "$3"); if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis"; return 0; fi
+        biss_yml() { # $1 = Mutante (YAML), $2 = Fallfunktion, $3 = Kennung; r8 (L7-03) wie biss(); r28 (F28-08,
+            # Fable r27 L27-02): derselbe Ergebniskanal wie biss() -- Bereinigung (F28-05), FEHL-Kanon + gebundener
+            # Schreibstatus (F28-02 (a)/(b)), Exitstatus nur 0/1/>=2, Urteil per biss_urteil mit Etikett '(YAML)',
+            # r29 (F29-02, Codex B r28 S28-02): auch [NICHT BEWERTBAR] traegt das Etikett (vierter Parameter);
+            # der Kind-Exitstatus (exit mit FEHL als Status, FEHL mod 256) ist kein Urteil mehr
+            basis=$(basis_von "$3")
+            if [ "$basis" -gt 0 ]; then nicht_bewertbar "$1" "$3" "$basis" " (YAML)"; return 0; fi
             T_ALT="$T"; T="$T/biss_$1"; mkdir -p "$T"
-            ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1; exit "$FEHL" ); r=$?
-            T="$T_ALT"
-            if [ "$r" -gt "$basis" ]; then
-                echo "  [OK]  Mutante $1 (YAML) macht $3 ROT ($r gerissene Erwartung(en)) -- die Probe beisst"
-            else
-                echo "  [ABBRUCH] Mutante $1 (YAML) laesst $3 GRUEN -- die Probe beweist nichts"; BISS_RC=2
+            rm -f "$T/ergebnis" "$T/kein-urteil.txt"; _rc=$?
+            if [ "$_rc" -ne 0 ]; then
+                T="$T_ALT"; echo "  [ABBRUCH] Mutante $1 (YAML): Ergebniskanal (Bereinigung rc $_rc) -- KEIN URTEIL"
+                BISS_RC=2; return 0
             fi
+            ( FEHL=0; CI_YML="$MUT/$1.yml"; "$2" "$SKRIPT" > "$T/protokoll.txt" 2>&1
+              case "$FEHL" in ''|*[!0-9]*|0[0-9]*) exit 2 ;; esac
+              printf 'ENDE FEHL=%s\n' "$FEHL" > "$T/ergebnis" || exit 2
+              if [ "$FEHL" -gt 0 ]; then exit 1; fi; exit 0 ); r=$?
+            T="$T_ALT"
+            biss_urteil "$1" "$3" "$r" "$basis" " (YAML)"
         }
         [ "$BISS_RC" -eq 0 ] && biss_yml m7 fall_P23 P-23
         [ "$BISS_RC" -eq 0 ] && biss_yml m8 fall_P24 P-24

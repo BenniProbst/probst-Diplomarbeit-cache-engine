@@ -23,10 +23,10 @@
 # REV r8b (Codex-Lens r7 B + Lead K297, 23.09.2026): S7-01 nach dem Merge zaehlt der volle Tree-Eintrag je Fassung
 # (Modus 100644 + Typ blob + Blob); S7-02 vom Remote geloeschte Fassung = UEBERHOLT (rc 0), Werkzeugfehler bleiben
 # rot; S7-03 exakte Pathspec-Liste der Zielfassungen fuer Index-Wache, Commit und Remote-Idempotenz (keine fremden
-# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.448) oder ungestagt (git diff, Z.462; alle drei
-# Gitlink-relevanten Wachen Z.249/448/462 mit --ignore-submodules=none (r20/r21));
-# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.412-415); commit --only -- <Fassungen>
-# (Z.473-476) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.422/425-426),
+# getrackten Aenderungen unter DIR, gestagt (diff --cached, Z.476) oder ungestagt (git diff, Z.490; alle drei
+# Gitlink-relevanten Wachen Z.261/476/490 mit --ignore-submodules=none (r20/r21));
+# assume-unchanged-/skip-worktree-Bits sind nicht erfasst (Z.440-443); commit --only -- <Fassungen>
+# (Z.501-504) nimmt nur die genannten Pfade (Arbeitsbaum-Inhalt, Index == Arbeitskopie Z.450/453-454),
 # fremde Pfade bleiben auf HEAD-Stand (S17-02/L17-04, L18-01/S18-01)); S7-04 CI_PROJECT_PATH == kanonischer Projektpfad
 # (Konstante, nie ausgegeben) + strikte Form der Push-URL; S7-05 Fehlermeldungen nennen Variablennamen + Grund,
 # nie URL-Werte; S7-06 expliziter Leerwert der Schalter/Pfade = FEHLER (fail-closed), Default nur bei ungesetzter
@@ -34,7 +34,7 @@
 # REV r9 (Codex-Lens r8 B + Fable-Lens r8 + Lead K299, 23.09.2026): S8-01 Pathspecs literal (GIT_LITERAL_PATHSPECS=1),
 # Index-Wache ohne Rename-Erkennung (--no-renames --name-status; r9: ganzer Index = Fassungs-Liste je A/M; seit
 # r17/S16-03 gilt: der gestagte Diff traegt nur A/M-Eintraege aus der Fassungs-Liste, Teilmenge/leer erlaubt,
-# s. Z.441-447), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
+# s. Z.469-475), F-07 ohne Renames; S8-02 rm -f + cp + chmod 0644, Index-Modus-Wache, Tree-Pruefung des EIGENEN
 # Export-Commits vor dem ersten Push (eigener Defekt = FEHLER, nie UEBERHOLT); S8-03 Loesch-Erkennung VOR dem Merge
 # (Pipeline-Tree vorhanden + Remote fehlend = UEBERHOLT, Erst-Export zaehlt nicht); S8-04 push.err/fetch.err mit
 # Credential-Maske; S8-05 keine Rohwerte in fehler() ausser Pfadwerten DIR/SRC/dst nach der Zeichen-Wache;
@@ -93,6 +93,18 @@
 # auch an der Arbeitsbaum-Wache (ein Gitlink-Eintrag unterhalb von DIR ist committbar; DIR selbst kann nicht unter
 # einem Gitlink liegen, git add rc 128); Zaehlangabe REV r20 berichtigt; 1 Nicht-Kommentar-Kommando (2 Zeilen,
 # Arbeitsbaum-Wache per Backslash zweizeilig), kein neuer Kontrollfluss.
+# REV r22 (Lead K327, CI 288/16809 Job thesis:pdf-export: Push 403 'not allowed to push' trotz Token, der von prod1
+# ausserhalb des Runners angenommen wird, 25.09.2026): der Runner injiziert Job-Token-Auth als Git-Konfiguration
+# (credential.helper / http.<url>.extraHeader / url.<praefix>.insteadOf); Push + Fetch laufen ueber GITP_REMOTE
+# (F22-01: leerer Helper, leere Header-Liste, Selbstabbildung der URL, Zeichenwache), Diagnose der Schluessel (F22-02).
+# REV r23 (Codex-Lens r22 B S22-01..S22-04, Lead-Triage K329, 25.09.2026): Zeilenverweise Z.26-29/37 und im L1-01-
+# Kommentar (Z.441/443) auf den r23-Stand nachgezogen (Verweis-Wache P-108); Reichweite der Gleichstands-Grenze
+# (Z.349-353: auch insteadOf/Fetch; nur unbehandelte Schluessel wie credential.username bleiben wirksam); Helper-Reset
+# ungescopt + URL-gescopt gemessen (P-105, credential.<url>.helper= nicht noetig); 0 Nicht-Kommentar-Aenderungen.
+# REV r24 (Codex-Lens r23 B S23-01..S23-04 + Fable-Lens r23 L23-01/L23-06, Lead K331/K332, 25.09.2026): Kommentar
+# Z.349-353 berichtigt (COUNT-Paare unterliegen denselben Reset-/Praefix-Regeln, S23-03) und REV-r23-Zeile 102 dazu;
+# Zeilenverweise Z.26-29/37 + L1-01-Kommentar (Z.441/443) um +4 nachgezogen (dieser Block, Verweis-Wache P-108);
+# 0 Nicht-Kommentar-Aenderungen. Harnisch r24: --nur fail-closed (P-109), M133-Basislauf + KEIN-URTEIL-Wache.
 # VERTRAG: laeuft nur nach gruenem thesis:pdf (needs + artifacts) in der Repo-Wurzel mit HEAD == CI_COMMIT_SHA;
 # jede Fassung MUSS vorhanden, nicht leer und mit PDF-Header-Praefix %PDF- sein (S7-08-Praefixtest der ersten
 # 5 Byte, kein Vollparser; S15-07), sonst rot; Ziel COMDARE_THESIS_PDF_DIR (Default docs/diplomarbeit, relativer
@@ -327,6 +339,22 @@ ASK
   export GIT_ASKPASS="$WERK/askpass.sh"
 fi
 
+# F22-01 (r22, Lead K327): der Runner injiziert Job-Token-Auth als Git-Konfiguration (credential.helper,
+# http.<url>.extraHeader, url.<praefix>.insteadOf/pushInsteadOf); Push und Fetch (F-05-Schleife) neutralisieren sie
+# GENAU fuer REMOTE: leerer credential.helper, leere extraHeader-Liste der URL, Selbstabbildung der URL als laengster
+# insteadOf-/pushInsteadOf-Praefix (schlaegt jeden kuerzeren Runner-Praefix; ein GLEICH langer globaler pushInsteadOf
+# gewinnt weiterhin = Restrisiko, sichtbar in der Diagnose F22-02); lokale Aufrufe behalten GITP. Zeichenwache: '='
+# oder Leerraum im REMOTE machte den -c-Schluessel unlesbar ('invalid key', rc 128; git 2.43.0) -> FEHLER vor jedem
+# Transport, Wert nicht ausgegeben (CI-Zweig: S7-04/S7-05 engen bereits auf https://host[:port]/[A-Za-z0-9._/-] ein).
+# Reichweite der Gleichstands-Grenze (r23, Codex B S22-03): sie gilt fuer pushInsteadOf (Push) UND insteadOf (Fetch)
+# gleichermassen -- ein GLEICH langer globaler Praefix beider Arten gewinnt weiterhin. r24 (S23-03): COUNT-Paare
+# (GIT_CONFIG_COUNT/KEY_n/VALUE_n) werden ebenfalls vor -c eingelesen und unterliegen denselben Reset-/Praefix-Regeln;
+# weiter wirksam bleiben nur unbehandelte Schluessel (credential.username, http.proxy bzw. Proxy-Umgebung) und GLEICH
+# lange URL-Umbiegungen (Gleichstand). Die Diagnose F22-02 zeigt Herkunft und Schluessel, hebt aber keine Regel auf.
+case "$REMOTE" in *[!A-Za-z0-9_./:-]*) fehler "REMOTE traegt Zeichen ausserhalb [A-Za-z0-9_./:-] (F22-01)" ;; esac
+GITP_REMOTE="git -c credential.helper= \
+-c http.$REMOTE.extraheader= -c url.$REMOTE.insteadOf=$REMOTE -c url.$REMOTE.pushInsteadOf=$REMOTE"
+
 # F-03: Eingabe-Haertung. Ziel und Quelle sind relative Unterbaeume ohne '..' und ohne .git-Komponente, das Ziel
 # kein Symlink, beide nach Aufloesung verschieden und das Ziel innerhalb des Arbeitsbaums; jede Zieldatei ist
 # kein Symlink.
@@ -410,9 +438,9 @@ for f in $FASSUNGEN; do
   # Indexmodus (100755 vom Remote) und die Modus-Wache endete auf Dauer rot (L9-06).
   git -c core.fileMode=true add -- "$dst" || fehler "git add $dst"
   # L1-01 (r2): git add endet fuer .git-Pfade und assume-unchanged-Eintraege still mit rc=0, ohne zu stagen; ein
-  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.411, ebenfalls
+  # skip-worktree-Bit laesst git add mit rc=1 abbrechen (Sparse-Checkout-Hinweis) = FEHLER in Z.439, ebenfalls
   # ohne zu stagen (gemessen git 2.43.0, r19). Der Index muss danach den Pfad UND genau den Inhalt der Arbeitskopie
-  # tragen (git diff --quiet traut beiden Bits; die Wache Z.416-422 faengt beide Faelle, L18-01/S18-01).
+  # tragen (git diff --quiet traut beiden Bits; die Wache Z.444-450 faengt beide Faelle, L18-01/S18-01).
   git ls-files --error-unmatch -- "$dst" >/dev/null 2>&1 \
     || fehler "$dst steht nach git add nicht im Index (git add hat den Pfad still uebergangen)"
   blob=$(git hash-object -- "$dst") || fehler "git hash-object $dst"
@@ -486,6 +514,20 @@ for f in $FASSUNGEN; do
   [ "${e%%$TAB*}" = "100644 blob $q" ] || fehler "Export-Commit $NEU: $dst nicht 100644 blob der Quelle (S8-02)"
 done
 
+# F22-02 (r22): Diagnose VOR dem ersten Push: welche Konfiguration der Klassen extraHeader/insteadOf/pushInsteadOf/
+# credential.* wirkt (Herkunft + Schluessel, NIE Werte: --name-only); ohne die -c-Optionen von GITP, sonst erschiene
+# die eigene Neutralisierung als Eintrag; rc 1 = kein Treffer (0 Eintraege), rc >= 2 = Werkzeugfehler = FEHLER; die
+# S8-04-Maske (drei Regeln wie push.err/fetch.err, Reihenfolge 3-1-2, Ergebnis gleich) deckt userinfo im SCHLUESSEL
+# (Runner-Form url.https://gitlab-ci-token:TOKEN@host/.insteadof).
+if git config --show-origin --name-only \
+    --get-regexp '^(http\..*extraheader|url\..*insteadof|url\..*pushinsteadof|credential\.)' > "$WERK/gitconfig.txt"
+then gc_rc=0; else gc_rc=$?; fi
+[ "$gc_rc" -le 1 ] || fehler "git config --get-regexp (Diagnose F22-02) rc $gc_rc"
+gc_n=$(wc -l < "$WERK/gitconfig.txt" | tr -d ' ')
+printf '%s\n' "RUNNER-GITCONFIG: $gc_n Eintraege (Herkunft Schluessel, Werte nie ausgegeben; F22-02)"
+sed -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's#//[^/]*@#//<cred>@#g' \
+  -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' -e "s/$TAB/ /" -e 's/^/  | /' "$WERK/gitconfig.txt"
+
 # F-05 Push-Schleife: jeder Fehler ist sichtbar; jeder abgelehnte Push fuehrt zu Fetch + Abstammungspruefung
 # (FETCH_HEAD Vorfahr von HEAD = kein Race = FEHLER) -> Vorwachen F-06/F-07/S8-03/S9-05 -> Merge (nie rebase,
 # F-04 Marker) -> Tree-Wachen S7-01/S7-02/C6-04 am Merge-Ergebnis -> erneuter Push nur bei Erfolg aller Wachen
@@ -493,7 +535,7 @@ done
 versuch=0
 while [ "$versuch" -lt 5 ]; do
   versuch=$((versuch+1))
-  if $GITP push -q -o ci.skip "$REMOTE" "HEAD:refs/heads/$BRANCH" 2>"$WERK/push.err"; then   # S10-01: volle Ref
+  if $GITP_REMOTE push -q -o ci.skip "$REMOTE" "HEAD:refs/heads/$BRANCH" 2>"$WERK/push.err"; then   # S10-01: volle Ref
     printf '%s\n' "PUSH OK (ci.skip) auf $BRANCH (Versuch $versuch)"; exit 0
   fi
   # S8-04 (r9, Haertung): git-Diagnostik nur mit Credential-Maske ausgeben (userinfo in URLs -> <cred>).
@@ -503,7 +545,7 @@ while [ "$versuch" -lt 5 ]; do
   # ueber fremde Diagnoseformen; dritte Regel fuer Formen ohne '//' (scheme:user:kennwort@host/pfad).
   sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
     -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/push.err"
-  $GITP fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"   # S10-01
+  $GITP_REMOTE fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>"$WERK/fetch.err" || { echo "fetch meldet:"   # S10-01
     sed -e 's#//[^/]*@#//<cred>@#g' -e 's#[^ /:@]*@[^ /:@]*:#<cred>@<host>:#g' \
       -e 's#[A-Za-z][A-Za-z0-9+.-]*:[^/ @]*@#<scheme>:<cred>@#g' -e 's/^/  | /' "$WERK/fetch.err"
     fehler "fetch $BRANCH fehlgeschlagen (Recht/Netz), kein Race"; }
