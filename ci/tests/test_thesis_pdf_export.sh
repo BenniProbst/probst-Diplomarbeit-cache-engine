@@ -373,8 +373,12 @@
 # Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
 # r29 (Codex B r28 S28-01/S28-02, Fable r28 0/0/6, Lead-Triage r28 K341): Kommentar der pfad-Stufe berichtigt
 # (F29-01: Erstzeilenauswahl per Parameter-Expansion statt head, der pfad-sed bleibt gebundene Stufe), Etikett
-# '(YAML)' auch in [NICHT BEWERTBAR] (F29-02: vierter Parameter von nicht_bewertbar); 0 Kontrollfluss ausser dem
-# Etikett-Parameter; Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# '(YAML)' auch in [NICHT BEWERTBAR] (F29-02: vierter Parameter von nicht_bewertbar); 0 Kontrollfluss (der vierte
+# Parameter von nicht_bewertbar ist ein Datenwert der Meldung, kein Zweig);
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
+# r30 (Codex B r29 S29-01, Fable r29 0/0/7, Lead-Triage r29 K343): Teilformel des r29-Absatzes berichtigt (F30-01:
+# der vierte Parameter von nicht_bewertbar ist ein Datenwert (Text der Meldung), kein Kontrollfluss); 0 Kontrollfluss,
+# Script r25 unveraendert -> Faelle 114, Mutanten 134 = 68 + 66.
 #
 # AUFRUF:
 #   sh ci/tests/test_thesis_pdf_export.sh               # alle Faelle
@@ -2892,6 +2896,11 @@ fall_P99() { # Textwache r18 (F18-01..F18-05 + REV-r18; Codex-Lens r17 A C17-01/
     n=$(grep -c -F 'bleibt gebunden (pfad:<r''c>)' "$SELBST"); erw_gleich "$n" 1 "p104m_lauf pfad-sed (F29-01)"
     n=$(grep -c '^# r29 (Codex B r28 S28-01' "$SELBST"); erw_gleich "$n" 1 "r29-Kopfabsatz des Harnischs (F29-03)"
     n=$(grep -c -F 'Mutante $1${4-} nicht bew''ertbar' "$SELBST"); erw_gleich "$n" 1 "Etikett-Meldung (F29-02)"
+    # r30 (F30-01, Codex B r29 S29-01): die Teilformel des r29-Absatzes ist berichtigt -- alte Form 0x, neue Form 1x;
+    # r30-Kopfabsatz 1x (Wachen-Literale zerlegt, kein Selbsttreffer)
+    n=$(grep -c -F 'Kontrollfluss aus''ser dem' "$SELBST"); erw_gleich "$n" 0 "alte Teilformel r29 (F30-01)"
+    n=$(grep -c -F 'Datenwert der Mel''dung' "$SELBST"); erw_gleich "$n" 1 "neue Teilformel (F30-01)"
+    n=$(grep -c '^# r30 (Codex B r29 S29-01' "$SELBST"); erw_gleich "$n" 1 "r30-Kopfabsatz des Harnischs (F30-02)"
     zf=$(extrahiere_block "$CI_YML" F09-GATE-346 "$T/P99.f09")
     if [ "$zf" -lt 3 ]; then
         echo "      [ENTFAELLT] YAML-Textwache F18-01/F18-03: F09-GATE-346 fehlt ($zf Zeilen) -- nur mit Koppelpatch"
