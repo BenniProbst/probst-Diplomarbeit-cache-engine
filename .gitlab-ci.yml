@@ -756,8 +756,8 @@ test:persist-sammler-probe:
     - sh ci/tests/persist_sammler_probe.sh --selbstbiss
 
 # -- Order 371 / Board #279 (2026-09-23, r7): BISSPROBE des THESIS-PDF-EXPORTS (ci/thesis_pdf_export.sh) ----------
-# 104 Faelle gegen ein Wegwerf-Bare-Repo (kein Netz; einziges Nicht-Datei-Ziel 127.0.0.1:9, geschlossener Port) plus
-# 126 Mutanten (--selbstbiss; 60 am Script, 66 an dieser YAML). Der Testhaken COMDARE_THESIS_PDF_REMOTE ist im
+# 114 Faelle gegen ein Wegwerf-Bare-Repo (kein Netz; einziges Nicht-Datei-Ziel 127.0.0.1:9, geschlossener Port) plus
+# 134 Mutanten (--selbstbiss; 68 am Script, 66 an dieser YAML). Der Testhaken COMDARE_THESIS_PDF_REMOTE ist im
 # Script in CI verweigert; die Probe faehrt das Script deshalb in einer leeren Umgebung (env -i) und misst die
 # Verweigerung selbst (Fall P-10); ihre eigenen Overrides (COMDARE_SKRIPT/COMDARE_CI_YML) verweigert sie in CI
 # ebenso (P-22). Fall P-17 prueft diesen Job-Block (Aufruf vorhanden, kein allow_failure) -- T-7 wie
@@ -3313,7 +3313,10 @@ ergebnis:holen:
 # -o ci.no_pipeline = Owner-Frage Q-2 der Bewertung 371 r1; Login-Wache). Uebersteuerung per Env-Vertrag
 # (Order 340 A-04 (a)): COMDARE_THESIS_PDF_EXPORT=false (inert), COMDARE_THESIS_PDF_DIR, COMDARE_THESIS_PDF_FASSUNGEN,
 # COMDARE_THESIS_PDF_SRC. Skript ci/thesis_pdf_export.sh, Bissprobe ci/tests/test_thesis_pdf_export.sh (Job
-# test:thesis-pdf-export-probe, 104 Faelle + 126 Mutanten gegen ein Wegwerf-Bare-Repo; Order 371 / Board #279, r21).
+# test:thesis-pdf-export-probe, 114 Faelle + 134 Mutanten gegen ein Wegwerf-Bare-Repo; Order 371 / Board #279, r30).
+# r22 (Lead K327, CI 288/16809 Push 403): Runner-injizierte Job-Token-Auth (extraHeader/insteadOf) wird vor Push/Fetch
+# neutralisiert (GITP_REMOTE: http.<url>.extraheader= + url.<url>.insteadOf/pushInsteadOf = Selbstabbildung).
+# A-7 (r23): gleich langer globaler pushInsteadOf-/insteadOf-Praefix gewinnt weiter; F22-02 nennt Herkunft+Schluessel.
 thesis:pdf-export:
   stage: persist
   tags: [prod, baremetal, amd]      # C4-11 (r6, Lead-Wahl): derselbe Host-Pool wie thesis:pdf (Muster :1969/:2222)
