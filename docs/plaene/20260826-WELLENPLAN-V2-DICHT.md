@@ -25,6 +25,12 @@ b1_b10_scope_split_public.md, verbatim) + 3-Kontexte-Verbuchung 26.08. (Beweisor
 PAUSE-PROTOKOLL-6 / KON133-ENTWURF 01..10 (Lead 27.08. ~17:3xZ; ENTWURF, nicht im Ledger).
 Objekt-Anker (Schreiber-3-Messung 27.08. ~18:xxZ, ls-remote): super development c778ed7b (origin+github), main
 54b25e2f / ce dev==main==d3b5a393 / ce-Lande-Worktree wt-ce-lande3 lande/identitaet-2708 @ cc85bb91 (lokal).
+STAND-KOPF-BUMP 28.09.2026 23:1xZ (Lead 5a19728e K387; Anlass Orders 549-553, Verteidigung 28.09. bestanden 1,3,
+Wasserfall gilt, Prioritaet = Stack-Hoehe, Fix-Welle 2b VERBUCHT, Vier-DICHT-Volllesung nur extern): Nachtraege
+additiv AM ORT nach ABGLEICH-553-VIER-DICHT r3 (Beweisort ~/backups-workflow/20260928-order-553-vier-dicht-abgleich/,
+Volllesung aller 4 DICHT durch den externen Fable-5-max-Agenten 'abgleich-553', Lens r1..r3 bis 0 Objekt-Funde, md5-8
+a1cab55a); Objekt-Anker super 8b71a2b2 / ce ac5aa122 / Thesis 258c7e58; ARBEITSWEISE-Anteil (X-nn, A2.3, B.3, W-3) NUR
+ueber den v4.6-Zug #236.
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung (Datum + juengste KON + Quellen-Ereignis im STAND-KOPF nachziehen); das Original bleibt
 unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder Abschnitt traegt seine Quell-Anker
@@ -47,6 +53,15 @@ Quellen-Ereignisse seit 27.08.: #153-Lande-Zug bd55942a (CI 16263/16269; super-Z
 + Gitlink 9b6b4ae9 (16301/16303), E-1-Zombie-Fix ba6e532f (Lande-Run wf_6a56ad4d laeuft), T-Entscheid #158,
 SOLL=PFLICHT-Dauerregel 01.09., Fold-NEUER-LEDGER 18323 Z. (157-Gate). Details: NACHTRAG-Bloecke 01.09. an W-H.2 / W-H.4
 / W-6-RN-Zeilen / W-7.2 / W-S / W-12.
+NACHTRAG 28.09.2026 (Orders 549-553, additiv AM ORT, Beweisort 20260928-order-553-vier-dicht-abgleich): Abgabe 22.09.
+(Order 396); Verteidigung 28.09. bestanden 1,3 + Wasserfall gilt (Order 549); Stack-Wartung r10 = Dauerposten (Order
+550); Prioritaet = Stack-Hoehe + Antworten OF-01..OF-14 (Order 551); FIX-WELLE 2b VOR W3 (Order 552; H16b, FENSTER K
+(W2b) RN-93..RN-97, W-17..W-19); Volllesung der vier DICHT nur per externem Fable-5-max-Agenten (Order 553).
+Kalender-Etiketten '15.09.' in H20/S-011/S-083/S-092/S-094/RN-71..RN-74/W-9.1 = HISTORIE; 'Stack' (Order 441 verbatim
+'alle Einschub Bloecke bis zum Wellenplan zurueck strikt getrennt als Stack-Strecken gliedern'; #292) ist in dieser
+Fassung noch nicht getragen -> Einfaltung nach Order 502 (verbatim 'Auch der gesamte Lauf der anderen Stack Strecken
+muss erst vor der Weiterarbeit an den Wellen in diese gefaltet werden'; #306) erst nach den Alt-Runs (#263) und allen
+Stack-Strecken.
 LESE-ANWEISUNG (Einlese-Ritual): W-0 (dieser Kopf) + W-H (Hauptstrang) + W-6-Statusfeld ZUERST; Rest
 gezielt als Nachschlag. HINWEIS (W-15): par.26 EXISTIERT NICHT im Original (reserviert fuer den bedingten
 RN-70-Endstand-Nachtrag) -- kein Loch, eine Falsch-Null-Falle fuer Sucher.
@@ -205,6 +220,20 @@ H16 ##49 BAU-TRIGGER (POST /projects/288/pipeline ref=development) -- OFFEN, HAR
     NACHTRAG 27.08. ~17:3xZ (PAUSE-6): df / = 12G frei (96 %) WARNUNG; Riss 2 (Fable-5-Limit ~12:1xZ) toetete den
     Lande-Zug nach Merge 4/4 (Komplex-Fix/K17/Push offen), E-10 S4, Stempel-2, Fold; Trigger NICHT gefahren;
     Kipp-Punkt in < 13 h.
+    H16b FIX-WELLE 2b (NEU 28.09.2026, Order 552 OF-05/06/08 + C-4; Reihung W2 -> W2b -> W3; Traeger Board #324 + #325
+         + #326 + #318, Vorstufe #319): Architektur-Regression im Code. Owner 552 (verbatim-Kern): 'es gilt dass jede
+         Gattung ihre eigene Interface-Hauptflaeche und damit auch einen Teil-Kern definiert, der durch Genus in der
+         Funktions-Flaeche an Spezialfunktionen erweitert werden kann' / 'Es ist also Korrekt alles ueber
+         IDrivableTier ueber das Pruefdock zu fahren, aber je Gattungs-Kern und Genus-Unterkern ist eine andere
+         Meta-Programmierung und Flaeche fest einprogrammiert' / 'Map und Container haben dieselben Funktions-Namen
+         aber VERSCHIEDENE Kernfunktionen, also treffen sich die gleichnamigen Funktionen der beiden eben NICHT' /
+         'Die Trennung der Semantik ist ein TODO'. Glieder: FENSTER K (W2b) RN-93..RN-97 (W-6).
+         Objekt-Dateien + Gates: Abschnitt 2 Kopf des Beweisorts 20260928-order-553-vier-dicht-abgleich (ce dev
+         ac5aa122, V14 vor Bau neu messen). Testseite: DESIGNPLAN-DICHT T-14 + D11 (19)-(23). Richtschnur: Thesis Kap.
+         1-3 korrigiert (>= 258c7e58). STATUS 28.09.: VERBUCHT (Order 552 'sonst verbuche sie als Fix-Welle 2b vor die
+         Weiterfahrt von Welle 3'); BAU-START = OWNER-GATED (Order 551 OF-05 'Bitte genau erklaeren, keine Freigabe'
+         -> W-9.2). NAMENSKOLLISION: 'Flaeche' meint hier die Gattungs-Interface-Hauptflaeche, NICHT die
+         Mess-/Steuer-Naht-Flaechen 1/2/3 (S-15/S-22) und nicht die L4-Strategy-Flaechen (RN-41/RN-58).
 H17 W3-KAMPAGNE (Sa 29.08.-Do 03.09., F4) = DEBUG-GENERALPROBE, nicht die echte Messung -- ZUKUNFT.
 H18 W4 (07.-11.09.) -- ZUKUNFT (Baender par.24.3, RN-57..RN-70).
 H19 T-3-RESET + ECHTE MESSUNG (Sa 12.-Mo 14.09., nach MANUELLEM Reset) -- ZUKUNFT (RN-71).
@@ -237,6 +266,12 @@ T-ENTSCHEID #158 (Owner 28.08. verbatim 'Ich bleibe bei letzterem'): Reihenfolge
 69,8-h-Zombie (16275/16279/16280; Owner-Cancel 01.09. 09:50Z) -> Fix = rules-Skip (smoke|full -> on_success, sonst
 never) + Marken-Wache + Fail-fast, 9 Commits @ba6e532f; der S-086-Text 'Mess-Jobs manual/inert' wird mit der Landung
 UEBERHOLT (Doku-Nachzug #157(h)).
+    NACHTRAG 28.09.2026 (Orders 549-552): Reihung W2 -> W2b (H16b FIX-WELLE 2b, FENSTER K (W2b) RN-93..RN-97) -> W3;
+    die W3-Kampagne startet erst nach Landung von W2b. Kalender: Abgabe 22.09. (Order 396), Verteidigung 28.09.
+    bestanden 1,3 + '[...] vollstaendige normale Wasserfall-Abarbeitung [...]' (Order 549 Z.5-6), Projekt laeuft nach
+    der Verteidigung weiter (Order 544 O-6), Prioritaet = Stack-Hoehe (Order 551 verbatim 'hoehere Stack Ebenen auch
+    hoehere Prioritaet'), Stack-Wartung r10 = Dauerposten (Order 550 = Owner-Frage + Lead-Vollzug/Dauerregel);
+    H17-H20-Etiketten (29.08. bis 15.09.) = HISTORIE, Glieder LEBEND.
 
 ### W-H.3 ABZWEIGE A1-A12 (dienen der Kette nicht direkt; jeder mit benanntem Platz -- NIE-KUERZEN)
 
@@ -867,6 +902,8 @@ S-092 W3 = DEBUG-GENERALPROBE (KON37-04/KON41-01; Owner woertlich: "Beides, weil
       Messung W5 Sa 12.-Mo 14.09. nach MANUELLEM Reset (Builds + Messdaten, GO zum Zeitpunkt; Debug-
       Ergebnisse loeschen = KON29-01); Umschaltpunkt ~Sa 12.09. (nicht "T-3" nennen: TDD-Posten-Kollision,
       KON129-03); W4 entwickelt an Debug-Zahlen; traegt nur mit T-3-Ripple-Bau (RN-83).
+      NACHTRAG 28.09.2026: W3 startet erst nach W2b (H16b/FENSTER K (W2b)); 'bis 3 Tage vor Abgabe' ist als Kalender
+      HISTORIE (Abgabe 22.09., Verteidigung 28.09.), als Regel (Debug-Generalprobe VOR der echten Messung) LEBEND.
 S-093 KAMPAGNEN-BETRIEB W3 (par.3-W3, woertlich-kern): ##52 Vor-Gate + zwei GOs; ##53 320er zuerst, dann
       gedeckelte Teilmatrix, je Batch am Abend entschieden (S-021); HY-B Overhead-Kampagne (Stub-Heuristik
       am Hybrid-Pruefdock, Reroute-Overhead zu multiplen Tier-Zielen); ##54 Auswertung NUR in Batch-Pausen;
@@ -1392,6 +1429,29 @@ NACHTRAG 01.09.: K-4 GERISSEN (Fangnetz-Protokoll W-H.4-Nachtrag); Landewelle/E-
            -- je NEIN: sofort eskalieren, nicht rutschen. Traeger Lead-Gate.
            STATUS 26.08./27.08.: OFFEN (Frist-Kontrolle Sa-29-Klasse; je NEIN sofort eskalieren).
 
+### FENSTER K -- FIX-WELLE 2b (W2b; NEU 28.09.2026, Order 552; eingefuegt VOR FENSTER G)
+### (Buchstabe K = naechster freier nach J, V12; RN-93..RN-97 = naechste freie nach 24.6, V12 Gegenstand vor Nummer)
+        RN-93 GATTUNGS-KERN/GENUS-UNTERKERN-FLAECHEN (OF-05): je Gattung eigene Interface-Hauptflaeche + Teil-Kern;
+               Genus-Unterkern erweitert die Funktions-Flaeche um Spezialfunktionen; IDriveableTier ueber das
+               Pruefdock bleibt; je Kern eigene Meta-Programmierung fest einprogrammiert; Gattung = UND-Schnittmenge
+               der Genus-Interfaces als Template nach aussen (Order 506). Objekt anatomy_base.hpp:55-95,
+               idriveable_tier.hpp:28, container_framework.hpp:48, genus_kaskade.hpp. Traeger #324 (+#319
+               Entwurfs-Dossier). | Abh.: Thesis Kap. 1-3 (#327), Kern-Explore, Bau-Start owner-gated.
+        RN-94 SEMANTIK-TRENNUNG Map/Container (OF-05 'TODO'): gleichnamige Funktionen beider Gattungen treffen sich
+               NICHT; Koeder rot-zuerst (T-14 (2)). Traeger #324. | Abh.: RN-93.
+        RN-95 SET = GENUS DER GATTUNG CONTAINER, ALGEBRA = SEPARATER STUB wie Graph (OF-06): ISetAlgebraTier
+               (set_tier_algebra.hpp:40-44) vom Set-Genus (set_tier_v2.hpp:95-98) loesen; Historien-Explore 'wie kam
+               Algebra an Set' VOR dem Schnitt. Traeger #325. | Abh.: RN-93.
+        RN-96 VIEW-TIER = universelles Template, nur lesende Interfaces auf
+               Container_Gattung<Genus_Container_Spezialisierung> (OF-08): view_tier_v2.hpp:73 gegen Thesis. Traeger
+               #326. | Abh.: RN-93/RN-95.
+        RN-97 PRUEFDOCK-GATE JE GATTUNG (C-4 #318): pruef_only.hpp:29-40 hart auf SA, search_algorithm_dock.hpp:75-76
+               'kein Gattungs-Reject', Umfahrung cache_engine_builder_iterator.hpp:2394; Gate unbedingt VOR jeder
+               Messung; --debug-Standardsatz (Order 506 verbatim 'Standardsatz der dafuer validen Tests [...] nur
+               unter dem --debug Flag' + Order 519 E-2 verbatim 'nur die Debug Variante wird weiter ausgebaut und muss
+               die neuen Anforderungen erfuellen'). Traeger #318. | Abh.: RN-93.
+        STATUS 28.09.: alle fuenf VERBUCHT; Bau-Start OWNER-GATED (W-9.2); Landung als EIN Zug (Gates s. H16b).
+
 ### FENSTER G -- W3 Sa 29.08.-F4 Fr 04.09. (KAMPAGNE EXKLUSIV; Batch-Pausen [lok])
 
     RN-51  ##53 KAMPAGNE je Batch-Abend (Debug-GENERALPROBE-Charakter bis T-3;
@@ -1519,6 +1579,8 @@ NACHTRAG 01.09.: K-4 GERISSEN (Fangnetz-Protokoll W-H.4-Nachtrag); Landewelle/E-
            (je Scope-Antwort) + T19-Katalog-Folgefrage (NICHT jetzt erfinden, C.3).
            Traeger #38a3/#86-Folge.
            STATUS 26.08./27.08.: OWNER-GATED (W-3: 'W7-Anteil' ist Lead-Ableitung; Satz einholen).
+           NACHTRAG 28.09.2026: OF-06 rahmt L3-Container-Vier neu (Set = Genus der Gattung Container; Algebra = Stub);
+           "Vier" unaufgeschluesselt -> #325/#319; W-3 bleibt OWNER (unter Order 544 O-6 neu vorlegen).
     RN-76  V19 g2-Funde 2-4 (L2-Optionen A/B) * V20 XML-Rueckfrage-Kandidaten K1-K4
            (nach Abgabe buendeln) * V21 Posten-60/Klein-Hybride-Details * V22-
            Kontrolle (bewusst-nie-Liste bleibt deklariert; Wiederaufnahme nur per
@@ -1750,6 +1812,7 @@ NACHTRAG 01.09.: GELANDET als #147 (Stempel-2-Emitter-Haelfte inkl. hybrid_modul
     ~/backups-workflow/20260823-wellenplan-update/EINPLANUNGS-REGISTER.md.
     Naechste freie Nachtrags-Nummer: par.25 (reserviert fuer OV-16/17-Buchung,
     RN-27); par.26 = RN-70-Endstand-Nachtrag falls Differenzmengen nicht leer.
+    NACHTRAG 28.09.2026: RN-Plaetze 92 + 5 (FENSTER K (W2b) RN-93..RN-97, Order 552) = 97.
 
 ---
 
@@ -1770,6 +1833,9 @@ TERMIN gueltig, aendert aber NICHT den PFLICHT-Status. (2) Ein Posten OHNE jeden
 ERSTEN MAL getragen -- Traeger = diese par.27-Zeile, bis ein spezifischerer Traeger ihn uebernimmt. (3)
 NICHTS wird zurueckgestellt oder verschoben: jeder Posten behaelt seinen Platz bis er BEHOBEN, ENTLASTET
 (mit Messung) oder mit einem benannten, aktuellen Owner-Entscheid als "objektiv nach W2" markiert ist.
+    NACHTRAG 28.09.2026 (Order 552): die Gattungs-Kern-Regression (OF-05/06/08 + C-4) ist W2-ABSCHLUSS-PFLICHT im
+    Sinne der Saetze (1) und (3); Traeger = FENSTER K (W2b) (RN-93..RN-97); 'OHNE JEGLICHE [...] Regression an Welle
+    3' schliesst sie ein.
 W-7.1 27.1.A REGISTER-VERWEIS + DEKLARATION (woertlich-kern): die 74 R-Posten + 20 K-Status-Konflikte + 15
 Traegerlos + 22 Vertagt + 34 Gestrichen/Ueberholt des EINPLANUNGS-REGISTERs (~/backups-workflow/20260823-
 wellenplan-update/EINPLANUNGS-REGISTER.md) sind ALLE auf RN-01..RN-92 gemappt (Differenzmenge LEER). HIERMIT
@@ -2221,6 +2287,13 @@ W-9.2 OWNER-GATED OFFEN (Stand 27.08.; Vorlage nur nach 12W-Absicherung, X-17):
   T Split-Landung (nach Kampagne | vor Trigger): war owner-gated (Arbeitsannahme) -> OWNER-ENTSCHIEDEN RF-1
           26.08. ~19:0xZ "Ja, korrekt, GO." = NACH Kampagne (W-C); s. W-12 W-1.                  [S-131]
   Overleaf-Restkommentare 3/90 + F-16-Etiketten = Bringschuld, aber KEINE Startbedingung fuer #121 (RF-8b).
+  NACHTRAG 28.09.2026: (1) BAU-START FIX-WELLE 2b (Order 551 OF-05 'keine Freigabe'; Order 552 = VERBUCHUNG) =
+  Owner-Wort. (2) OF-14 MERGE 'Adapter' (Container-Genus: Thesis-Wortlaut + Lead-Lesart der Orders 498/551, s. W-17)
+  vs 'HeuristikAdapter' (4. Gattung): Owner 551 Z.12 verbatim 'Beide Konzepte brauchen einen merge durch mich, bitte
+  erklaere'; Eingang = 4-Monate-Explore #323 + W-17..W-19. (3) RN-75 'L3-Container-Vier' (W-3): durch OF-06 neu
+  gerahmt (Set = Genus der Gattung Container), 'Vier' unaufgeschluesselt -> #325/#319; die Zeile 'vor Abgabe einplanen
+  ja|nein' ist unter Order 544 O-6 neu zu stellen (Projekt laeuft weiter). (4) golden-GO (W-14) auch fuer 2b-Anteile
+  unter axes/topics/heuristik.
 W-9.3 ENTSCHIEDEN-KURZLISTE 25./26.08. (je EIN Satz + Quelle; Verbatims: Memory owner-kerne + KON129-04 +
   KON132; Testseiten-Wirkung T26-1..9: Designplan-DICHT D12; Kurztafel: GOAL-DICHT D-12)          [S-139]
   A1 F-13 = (a) ALLE 14 Lens-Klassen K01-K14 im Thesis-Scope -> main-FF entsperrt (vollzogen 26.08.).
@@ -2369,7 +2442,7 @@ S-150 OWNER-RUEGEN-KONTEXT B6-F1 (--simulate): Code GEBAUT + GELANDET (a1b348ae 
   (FINAL-b6 D0-D7: B1 sofort, B2 vor Einfrieren der Trigger-Linie oder nach Trigger, "W3" = spaeteste Frist);
   V1-/V3-Lehrfall: Sichtbarkeit erst durch Landung + Doku (ARBEITSWEISE-DICHT W-14).
 
-## W-12 WIDERSPRUECHE / UNAUFLOESBARES W-1..W-15 (deckt V-W01..V-W15; NIE selbst entscheiden; Volltext
+## W-12 WIDERSPRUECHE / UNAUFLOESBARES W-1..W-19 (deckt V-W01..V-W15; NIE selbst entscheiden; Volltext
 ## K3-wellenplan-drift.md Abschnitt 4; Owner-Antworten seit 26.08. ~19:0xZ als datierter Status)
 
 W-1  T SPLIT-LANDUNG (nach Kampagne | vor Trigger): in der 26.08.-13:00Z-Tranche NICHT beantwortet (S1-Scan
@@ -2436,6 +2509,23 @@ W-16 (NEU 27.08.) NUMMER "KON130": Spez-Schablone vs Ledger-Belegung seit c778ed
      kein Sach-Widerspruch, V12-Anwendung -> Lead vergibt die naechste freie Nummer bei Einspielung. Stand 27.08.
      17:3xZ: KON133 = Lead-ENTWURF (01..10, RF-Tranche/PAUSE 5+6/VO3-1/E-10/BL-1/Lead-Vollzug/D1) -> Konsolidierungs-
      KON = KON134 oder folgend (naechste freie); Gegenstand vor Nummer.
+    W-17 (NEU 28.09.) 'ADAPTER': der Thesis-Text (EN 04_concept_architecture Z.227 laut Order-498-Objektprobe: 'Set,
+         Sequence, Adapter, and View') und die Lead-Lesarten der Orders 498/551 (551 Z.28 'Adapter (Gattung unter
+         Container)') fuehren 'Adapter' als Container-Genus; die vier DICHT-Dokumente kennen nur 'HeuristikAdapter' =
+         4. Gattung (GOAL D-7.3, S-047b, S-075; Wortgrenze 'Adapter' 0/1/0/0). -> OWNER-MERGE (Order 551 Z.12 verbatim
+         'Beide Konzepte brauchen einen merge durch mich, bitte erklaere'), Eingang #323; NIE selbst entscheiden.
+    W-18 (NEU 28.09.) BEGRIFFS-KLAERUNG fuer #323 (Dock-Gattung vs Dock-Besitz): GOAL D-7.3 Z.240 'HeuristikAdapter=3
+         (4. Gattung, KEINE Dock-Gattung)' = Gattungs-Typ; S-047b Z.781 'genau 1 Standard-Dock' + S-093
+         'Hybrid-Pruefdock' + RN-67 V7 HY-Mehrfach-Dock + F-17 'nur bei der Hybrid-Tier-Binary ist das dynamisch' +
+         GOAL D-7.4 'DockSlot im Hybrid' = Dock-Besitz (genau 1 Standard-Dock; V7 Mehrfach-Dock RN-67). Kein
+         Widerspruch im Wortlaut; Klaerungs-Posten fuer #323, danach Doku-Praezisierung.
+    W-19 (NEU 28.09.) PRAEZISIERUNGS-POSTEN ORT-REIHUNG HYBRID/TIER: GOAL D-7.1 (a) Z.215-216, S-055 Z.616, S-056
+         Z.630 und Kipp-Regel (4) Z.956-957 tragen einheitlich PLANER -> CEB -> HYBRID -> TIER; GOAL Z.218 'erst Tier'
+         = Ausfuehrungsfolge auf derselben Stufe; einzige Abweichung = S-069 Z.693-694 Pfeilkette
+         PLANER->CEB->TIER->HYBRID, vom Wellenplan selbst als 'Ledger-Doktrin-Box, kein Owner-Zitat' ausgewiesen -> im
+         #323-Zug an die Owner-Kette angleichen. Order 500 A-3 = ZEIT-Aussage (Nach-Phase des fertigen Kompilats,
+         verbatim s. Beweisort ABGLEICH-553 Abschnitt 1 OF-14 W-B), keine ORT-Lesart. Keine Zwischenregel, Eingang
+         #323.
 
 ## W-13 HISTORIE-VERWEISTAFEL (nichts inhaltlich wiederholt; je Original-Abschnitt: HISTORIE, Grund, Ort)
 

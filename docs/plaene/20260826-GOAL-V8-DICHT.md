@@ -19,6 +19,12 @@ STAND-KOPF-BUMP 01.09.2026 ~19:4xZ (Lead; 14-Tage-Konsolidierung): + KON133-01..
 + KON135-01..11 (24df1135, lokal; Kopf = KON135). Objekt-Anker 01.09.: super dev==main==9b6b4ae9 (origin+github; LOKAL
 +10 docs-Commits) / ce dev==main==dd0f56d3 / thesis dev==main==cbefa617 (GitHub public seit 01.09. 13:30Z) / prt-art
 b539d6ee. Ereignis-Delta seit 27.08. kompakt im D-8-NACHTRAG 01.09.; D-13-Stand ebd.
+STAND-KOPF-BUMP 28.09.2026 23:1xZ (Lead 5a19728e K387; Anlass Orders 549-553, Verteidigung 28.09. bestanden 1,3,
+Wasserfall gilt, Prioritaet = Stack-Hoehe, Fix-Welle 2b VERBUCHT, Vier-DICHT-Volllesung nur extern): Nachtraege
+additiv AM ORT nach ABGLEICH-553-VIER-DICHT r3 (Beweisort ~/backups-workflow/20260928-order-553-vier-dicht-abgleich/,
+Volllesung aller 4 DICHT durch den externen Fable-5-max-Agenten 'abgleich-553', Lens r1..r3 bis 0 Objekt-Funde, md5-8
+a1cab55a); Objekt-Anker super 8b71a2b2 / ce ac5aa122 / Thesis 258c7e58; ARBEITSWEISE-Anteil (X-nn, A2.3, B.3, W-3) NUR
+ueber den v4.6-Zug #236.
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung (Datum + juengste KON + Quellen-Ereignis in den STAND-KOPF nachziehen); das Original bleibt
 unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder Abschnitt traegt seine Quell-Anker
@@ -46,6 +52,9 @@ es beschreibt, woran man erkennt, dass eine Aussage ueber den Bau STIMMT (08.08.
 3x war der Test selbst der Defekt, 13 von 40 Widerrufen fielen selbst). WARNUNG (W-09): die 241-Z.-
 Lesefassung (docs/sessions/20260808-GOAL-V8-KONSOLIDIERTE-LESEFASSUNG-verbatim.md) traegt die VI.4-csv-
 Korrektur NICHT -- nicht als Einstieg nutzen; Einlese-Ritual laeuft ueber DIESE Fassung.
+NACHTRAG 28.09.2026: 'gueltig bis 15.09.2026 (Abgabe)' = HISTORIE; Abgabe 22.09. (Order 396), Verteidigung 28.09.
+bestanden 1,3 (Order 549); v8 gilt fort, das Projekt laeuft nach der Verteidigung weiter (Order 544 O-6); D-2-Frist
+und D-15-Datum ebenso HISTORIE, Ziel-Satz LEBEND.
 
 ## D-1 REFERENZ-RAHMEN
 
@@ -119,6 +128,7 @@ Eine nicht aufloesbare Frage ist ZUERST eine eigene Gedaechtnisluecke: ZWOELF Wo
 (Owner 17.08.; die 4-6 bzw. 10 Wochen des Originals = Historie), 15 Wochen fuer A5-Matrix/Best-Practices
 (Owner 25.08.); Vorlage-Sperre A2.3a (v4.4); META-REGEL 26.08. Block F (woertlich): "Bitte sichere auch
 alle deine Fragen von eben durch explores gegen meine neuen Antworten ab, es war alles schon beantwortet."
+NACHTRAG 28.09.2026 (Order 551): Prioritaet = Stack-Hoehe -- hoehere Stack-Strecken zuerst (Order 544 O-6 bestaetigt).
 
 ## D-3 ARBEITSWEISE-KERN (Volltext: ARBEITSWEISE v4.4 Teil A/V + DICHT-Fassung)
 
@@ -255,6 +265,11 @@ werden (direkter Tier-Aufbau ODER Hybrid-Mehrfach-Aufbau); sie wirkt auf den BAU
 sie mitrechnen, sonst ist jede Groessenrechnung strukturell zu klein.
 HY-STAND 26.08.: HY-A GELANDET 18.08. (Board #80, Ancestor-Beweis); offen HY-B Stempel-Export (W3, #123),
 HY-C (W4), TSan-Vollausbau (#103), HY-Vollausbau.
+    NACHTRAG 28.09.2026 (Orders 551/552 OF-14): 'Adapter' als Container-Genus (Thesis-Wortlaut + Lead-Lesart der
+    Orders 498/551, s. WELLENPLAN-DICHT W-17) vs 'HeuristikAdapter' als 4. Gattung = OWNER-MERGE ausstehend (Order 551
+    Z.12 verbatim 'Beide Konzepte brauchen einen merge durch mich, bitte erklaere'); 4-Monate-Explore #323 = Pflicht
+    VOR jeder Verbuchung (Order 552); Eingang WELLENPLAN-DICHT W-17..W-19. 'KEINE Dock-Gattung' oben bleibt stehen =
+    Gattungs-Typ; S-047b/S-093 = Dock-Besitz, Begriffs-Klaerung fuer #323 (W-18), kein Widerspruch.
 
 ### D-7.4 Metaprogrammierung
 
@@ -317,6 +332,16 @@ nach Landung Intel-vs-AMD-pmc_befund NEU vergleichen (10.08.-Ausnahme evtl. dies
 ~12:1xZ: 20d6dd2c lokal gemergt (wt-ce-lande3 lande/identitaet-2708 Merge 2/4, cc85bb91), Push offen (D-8).
 MESSDATEN NIE LOESCHEN; zwei deklarierte Ausnahmen: Reset-Debug-Ausschuss (KON29-01) + Beweislauf-
 Klassenregel A (KON127-04: nach Beweis-Sicherung inkl. CSV-Kopie+sha256 raeumbar).
+### D-7.7 GATTUNG / GENUS / KONZEPT (NEU 28.09.2026, Orders 506/551/552; Ziel-Marker)
+Owner 552 OF-05 (verbatim-Kern): 'es gilt dass jede Gattung ihre eigene Interface-Hauptflaeche und damit auch einen
+Teil-Kern definiert, der durch Genus in der Funktions-Flaeche an Spezialfunktionen erweitert werden kann' + 'Map und
+Container haben dieselben Funktions-Namen aber VERSCHIEDENE Kernfunktionen'. OF-06: 'Ein Set ist ein Genus der
+Container Gattung [...] Algebra sind ein separater Stub wie Graph.' OF-08: View-Tier = universelles Template, nur
+lesende Interfaces auf Container_Gattung<Genus_Container_Spezialisierung>. OF-11: 'Rang' (Thesis) ist kein Begriff
+dieser Dokumente; 'Tier' = Kompilat (Order 551 OF-04). Order 506: Gattung = UND-Schnittmenge aller untergeordneten
+Genus-Interfaces, als Template nach aussen; KONZEPT vs KONKRETE IMPLEMENTIERUNG trennen. Richtschnur = Thesis Kap. 1-3
+korrigiert. Objekt-Anker anatomy_base.hpp:55-95 AnatomyGattung Map=0/Container=1/Graph=2/HeuristikAdapter=3 (HY-A1).
+Regression = FIX-WELLE 2b (D-8). Vorbestand D-7.3 ('4. Gattung', 'Interfaces einer Gattung+Genus') bleibt stehen.
 
 ## D-8 WELLEN UND TRIGGER
 
@@ -327,6 +352,12 @@ WELLEN HEUTE: W-1/W0a/W0b/W1/W2 = HISTORIE (gelandet). W3-MESS Sa 29.08.-Do 03.0
 (T-3-Reset + ECHTE Messung 12.-14.09. + Sicherung, PDF, Abgabe). NEU: Split-Wellen W-A (vor Trigger) /
 W-B (parallel Kampagne, Bau lokal) / W-C (Landefenster Fr 04.09.-Fr 11.09.) / W-D (Sicherung Sa 12.-Di
 15.09.) -- alles VOR 15.09. (KON129-03).
+    NACHTRAG 28.09.2026 (Order 552 OF-05): W2b = FIX-WELLE 2b (Gattungs-Kern/Genus-Unterkern-Flaechen,
+    Semantik-Trennung Map/Container, Set/Algebra, View-Tier, Pruefdock-Gate je Gattung) VOR W3 -- Ziel-Marker: die
+    Regression faellt unter D-15 ('jede Regel, die das sichert, in einem Werkzeug'), Gate = T-1-Koeder je Regression +
+    K17-Kombibau; Details WELLENPLAN-DICHT H16b / FENSTER K (W2b). Kalender: Abgabe 22.09. (Order 396), Verteidigung
+    28.09. bestanden 1,3 (Order 549), Projekt laeuft weiter (Order 544 O-6), Prioritaet = Stack-Hoehe (Order 551),
+    Stack-Wartung r10 Dauerposten (Order 550); W3-W5-Etiketten oben = HISTORIE.
 W7-REGEL (geltend): Owner C-2 17.08. (woertlich): "Wir lassen nichts weg und machen NICHTS nach der
 Abgabe, es gibt also nur vor der Abgabe, volles Programm bitte." Owner A5 25.08.: W7/#88-Monolith-Split
 MUSS VOR der Abgabe (+ Lizenz + public; supersediert "W7/#88 = Kategorie C nach Abgabe"). Owner A1
@@ -517,6 +548,10 @@ NACHTRAG 01.09.: #158 bestaetigt+praezisiert (Owner 28.08. 'Ich bleibe bei letzt
        W-11 Vorbehalt bleibt (Linie erst nach Komplex-Fix + K17 + #114-Re-Run eingefroren).
 NACHTRAG 01.09.: W-08-Nachzug KOMPLETT (alle Landewellen-Zweige gelandet, #153); W-11: Re-Run-2 GO @bd55942a, Linie
        danach bewegt (5e03c2cc / dd0f56d3 / E-1-Landung folgt) -> #114-Re-Run-Pflicht VOR ##49 bleibt LEBEND.
+    W-13 (NEU 28.09.) OF-14 Adapter-Merge = Owner-Wort (Order 551); #323 Explore VOR jeder Vorlage (Order 552).
+    W-14 (NEU 28.09.) Bau-Start FIX-WELLE 2b (Order 551 OF-05 'keine Freigabe'; Order 552 = Verbuchung).
+    W-15 (NEU 28.09.) RN-75 L3-Container-Vier (WELLENPLAN W-3, owner-gated seit 27.08.) unter Order 544 O-6 neu
+         vorlegen. (Namensraum D-13 W-nn ist GOAL-eigen; nicht mit WELLENPLAN W-13/ARBEITSWEISE W-13 verwechseln.)
 
 ## D-14 HISTORIE-VERWEISE
 

@@ -21,6 +21,12 @@ dev==main==9b6b4ae9 (LOKAL +10 docs-Commits) / Ledger-Kopf = KON135 (24df1135, l
 E-10 5e03c2cc + Stempel-2 dd0f56d3 GELANDET (CIs 16263..16294 SUCCESS); K17-Nenner-Reihe 549/545/543 -> 553/549/547 ->
 555/551/549 (Floor-Datei Z.999-1001); E-1-Zombie-Fix @ba6e532f (+2 Tests: Director 95, vl3 11; Lande-Run laeuft);
 Details an den D10-/D11-Zeilen (NACHTRAG 01.09.).
+STAND-KOPF-BUMP 28.09.2026 23:1xZ (Lead 5a19728e K387; Anlass Orders 549-553, Verteidigung 28.09. bestanden 1,3,
+Wasserfall gilt, Prioritaet = Stack-Hoehe, Fix-Welle 2b VERBUCHT, Vier-DICHT-Volllesung nur extern): Nachtraege
+additiv AM ORT nach ABGLEICH-553-VIER-DICHT r3 (Beweisort ~/backups-workflow/20260928-order-553-vier-dicht-abgleich/,
+Volllesung aller 4 DICHT durch den externen Fable-5-max-Agenten 'abgleich-553', Lens r1..r3 bis 0 Objekt-Funde, md5-8
+a1cab55a); Objekt-Anker super 8b71a2b2 / ce ac5aa122 / Thesis 258c7e58; ARBEITSWEISE-Anteil (X-nn, A2.3, B.3, W-3) NUR
+ueber den v4.6-Zug #236.
 PFLEGE-REGEL: Aenderungen additiv AM ORT mit Datum; hinten-Anfuegen verboten; Stand-Kopf-Bump je
 Konsolidierung; das Original bleibt unveraendert als Beleg-Archiv liegen (Doku nie loeschen); jeder
 Abschnitt traegt seine Quell-Anker (par./KON/Symbol).
@@ -42,6 +48,7 @@ XL=xlsx-Ausgabe, HY=Hybrid; je Posten [Band Welle h]; Band A = landet im Fenster
 C = Herkunftsklasse "W7" -- GELTEND seit par.21.3: Band C = W2/W4 fahrbar, W7 ist KEIN Endlager. `*` an der
 Welle (z.B. W1*) = die Welle weicht per Einfuege-Regel (D4) vom Wellen-Etikett des Materials ab (Original
 par.4 "`*` im Register"; I-01 `*`-Verschiebungsregel; Nachtrag 27.08. A2.5-Fix L-6).
+NACHTRAG 28.09.2026: W2b = Fix-Welle 2b (Order 552), Band A.
 META-REGEL 26.08. (T26-9): vor JEDER Testseiten-Rueckfrage an den Owner 12W-Absicherungs-Explore.
 
 ## D1 PRUEFNORM (par.1, woertlich-kern)
@@ -111,6 +118,9 @@ K7 produktionsweg-ungetestet (3): gebaut, aber unverdrahtet oder asymmetrisch.
    XL-CsvDtor-Leck [B W2 2]
 Einzelfaelle (2): PK-WinsorWert (absturzfreiheit-statt-aussage) [B W2 2] * XL-L4 n/a-Konkurrenz
    (kennzahl-ohne-nicht-bestimmbar) [A W1 3].
+NACHTRAG 28.09.2026 (SEPARAT gezaehlt, nicht im 117er; Stunden = Schaetzung des externen Agenten, nicht gemessen):
+   AG-GattungsFlaeche [A W2b 8] * AG-MapContainerSemantik [A W2b 4] * AG-SetOhneAlgebra [A W2b 3] * AG-ViewReadOnly [A
+   W2b 3] * AG-DockGateJeGattung [A W2b 4] (Klasse T-14; Bau-Start owner-gated).
 D-5-STAND (K7-Zeile "xlsx null Aufrufer"): 0 von 11 thesis_profiles xlsx-blind (R1 15.08., ce 04f76b65;
 Historie 8/9 -> Archiv par.2-Marker); OFFEN: T-3-Klasse-Posten mit Profil-Nenner (Wache-Luecke) + X2
 CSV-Factory-Semantik (XML-abhaengig; Design-Eingang B0-B10 -> #18, Fenster 04.-11.09.).
@@ -196,6 +206,19 @@ T-13 WORKAROUND-KONFORMITAET (24.08., Board #135; Owner-Dauerregel 23.08. 20:41Z
     Harmonisierung, TemplateWithUnknownRef, stringop-overflow-Duldung, NSDMI-Fixmuster; Wellenplan
     par.27.1.E) -- Stand 26.08.: 0/7 verdiktet, Frist "VOR main-FF" GERISSEN (W-2); Nachtrags-Kandidaten
     Gate-Default H-1 + Director-Fix (KON129-07) noch NICHT im Register.
+T-14 GATTUNGS-KERN-FLAECHEN-TESTS (NEU 28.09.2026, Order 552 OF-05/06/08 + C-4; Fix-Welle 2b, Wellenplan-DICHT
+    H16b/FENSTER K (W2b); ZUSAETZLICH zum 117er-Katalog, SEPARAT gezaehlt; ABGRENZUNG: DESIGNPLAN-Testklasse T-14,
+    NICHT die Wellenplan-Fehlerklassen 'T-13/T-14' der RN-44 C-12 (WP Z.1360/1364/1234)): (1) je Gattung ein
+    Flaechen-Vertragstest -- Gattungs-Tests generisch fuer ALLE Genera (Order 506: Gattung = UND-Schnittmenge der
+    Genus-Interfaces, Template nach aussen), Genus-Tests nur Spezialfunktionen (Koeder: Genus-Spezialfunktion ueber
+    die Gattungs-Flaeche erreichbar -> ROT); (2) Semantik-Trennung Map/Container: gleichnamige Kernfunktion beider
+    Gattungen mit verschiedenem, eingefrorenem Orakel (T-5; Koeder: Map-Orakel am Container gruen -> ROT); (3) Set =
+    Genus Container ohne Algebra-Symbole, Algebra-Stub separat (Koeder: ISetAlgebraTier-Symbol am Set-Genus sichtbar
+    -> ROT); (4) View-Tier nur lesend: schreibender Aufruf = compile-time-Fehler (T-4-Gegeneingang als
+    requires-/static_assert-Probe, T-11c Mutation); (5) Pruefdock-Gate je Gattung (C-4): Koeder 'Gattung !=
+    SearchAlgorithm passiert das Gate' -> ROT (pruef_only.hpp:29-40); T-3 Nenner FREMD = AnatomyGattung-Konstante
+    neben dem Enum (4) + Genera-Zaehler (6, S-075); T-1/T-7/T-8 wie ueblich; Bau-Modell Opus 5 max,
+    Stempel-/Preimage-Anteile Fable 5 max (KON38); Status: VERBUCHT, Bau-Start owner-gated (Order 551 OF-05).
 W2-ABSCHLUSS-GATE-BINDUNG (par.13.1 + Wellenplan par.27.3, 5 Punkte; Punkt 4 = die T-13-Verdikte als EIGENER Teil
     des Gates; Gate OFFEN 27.08., Erst-Pruefung an der W2-Freitagslieferung Fr 28.08.): Volltext WELLENPLAN-DICHT
     W-7.2; Testseite haelt fest: CI-gruener Endstand allein genuegt NICHT.
@@ -228,6 +251,9 @@ W7 = KEIN ENDLAGER (Owner 18.08. par.21.0: "Es wird NIE etwas ausgebucht oder ve
 PM-WinPCM -> W2/W4 (Windows-Runner 4/4 online), PM-AmdL3 1-2 -> Talos-Lane #87, MT-L8/PM-PAPI/
 AG-PunktFixes -> W4. Band B/W1 (22 Posten/62 h) wiederaufgenommen; Band-B-Rest 37/~104,5 h -> W3-[lok] +
 W4/W4-Fangnetz; Feinplatzierung = #96/RN-26 (Namensmengen-Divergenz W-11: #96 muss BEIDE Mengen nennen).
+NACHTRAG 28.09.2026: 'NICHTS nach der Abgabe' (C-2) ist im KALENDER ueberholt (Abgabe 22.09., Verteidigung 28.09.
+bestanden, Projekt laeuft weiter: Orders 396/549/544 O-6), in der SACHE (W7 = KEIN Endlager, NIE ausbuchen) LEBEND;
+W2b = Fix-Welle 2b VOR W3 (Wellenplan-DICHT H16b), Testposten T-14.
 
 ## D5 DIE SEQUENTIELLE KETTE (par.5 woertlich; Status 26.08. in Klammern)
 
@@ -298,7 +324,7 @@ NICHT GEDECKT (par.9.6, woertlich-kern): die vier ctest-Zustaende (Deckung = ce-
 Eigenschaft = innere Konsistenz) | die 157/117/40 (Aussage der Meta-Stufe, nicht nachgezaehlt).
 Historie: 22 Nachzuege 09.08.-25.08. + Berichtigungen B-1..B-4 am Objekt = Archiv par.9.1-9.5.
 
-## D10 DRIFT-REGISTER D-1..D-13 (geltende Fassung je Posten)
+## D10 DRIFT-REGISTER D-1..D-14 (geltende Fassung je Posten)
 
 D-1 Hybrid-Bestand nicht null: der HY-Vertrag PINNT kGenusCount (4 Header/943 Z.); HY-A gelandet 18.08.
 D-2 Stempel-Strecke ZUSAETZLICH, faellt NIE; "Band B/W1 gestrichen" = Historie (wiederaufgenommen 18.08.).
@@ -324,6 +350,8 @@ D-10 T-13 (s. D3). D-11 Floor-Gate-Zug (s. T-11b). D-12 #114-Beweislaeufe: Lauf 
     pmc-Koeder-Defekt, kein Produktivdefekt), Lauf 2 GO 10/10 + 23/23 + 0 Befunde; BLEIBENDE PFLICHT: EIN
     #114-E07-Q1-Re-Run <1 h nach JEDER Linienbewegung (final eingefrorene Trigger-Linie).
 D-13 K17-Testat-Standbindung (s. T-11b).
+D-14 (NEU 28.09.) GATTUNGS-KERN-REGRESSION (Order 552 OF-05 'massive Architektur-Regression im Code'): Testseite T-14
+     / D11 (19)-(23); Richtschnur Thesis Kap. 1-3; Objekt-Anker s. Wellenplan-DICHT H16b.
 
 ## D11 OFFENE TESTPFLICHTEN -- GEZAEHLTE LEBENDE WARTELISTE (Stand 26.08., 18 Posten)
 
@@ -371,6 +399,10 @@ NACHTRAG 01.09.: GELANDET (vo3-1 in bd55942a; XSD/PZW im super-Zug 8be694ef, PZW
 NACHTRAG 01.09.: VOLLZOGEN -- EIN K17 je Endstand mehrfach gefahren (zuletzt 4x'555/555' @ba6e532f), #114-Re-Run-2
      E07=GO @bd55942a, 833er-Manifest LIVE (sha 03987563); Linie seither bewegt -> Re-Run-Pflicht vor ##49 bleibt
      (D-12).
+(19) T-14 (1) Gattungs-Flaechen-Vertraege je Gattung [Fix-Welle 2b, #324] (20) T-14 (2) Semantik-Trennung
+     Map/Container [#324] (21) T-14 (3) Set/Algebra-Trennung [#325] (22) T-14 (4) View-Tier-Lesbarkeit [#326] (23)
+     T-14 (5) Pruefdock-Gate je Gattung [#318]; alle ROT-ZUERST + T-11c; Bau-Start owner-gated (Order 551 OF-05);
+     Nenner-Vermerk: 18 -> 23 Posten (Stand 28.09.).
 FUSSNOTE (Stand-Verbuchung 26.08.): E-10-FIX-1..7 und VO3-1-FIX-1..5 (3-Lenses-/2-Lenses-Verifies,
 TRAEGT_MIT_FIXES) leben als Bau-Auflagen in den gepatchten Workflow-Skripten (K1c F-04/F-05) und werden
 nach Bau-Ende als T-13-/Board-Nachtraege verbucht (Boards #133/#145 tragen noch die Kurzform).
