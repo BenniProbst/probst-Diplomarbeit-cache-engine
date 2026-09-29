@@ -26,6 +26,34 @@
 > ist BLAUPAUSE fuer Map-Reduce-Workflows, per Diff gegen diese Vollfassung konsolidiert (KON140); Z.22-23 '3a/3b'
 > UEBERHOLT.]
 
+## KON143 -- 28.09.2026: ORDERS 549-555 (VERTEIDIGUNG 1,3 / WASSERFALL / STACK-WARTUNG / FIX-WELLE 2b / RITUALE)
+
+**KON143-01 OWNER-ORDERS:** 549 (28.09. Verteidigung bestanden 1,3; Wasserfall-Abarbeitung gilt), 550 (Stack-Wartung
+  Dauerposten, Vier-Traeger-Regel je Order), 551 (Antworten OF-01..OF-14; Prioritaet = Stack-Hoehe), 552
+  (OF-05/06/08/11/12/14: Gattungs-Kern-Regression = Fix-Welle 2b vor Welle 3, 4-Monate-Explore OF-14 Pflicht, Lead-
+  Merge verworfen), 553 (Vier-DICHT-Volllesung nur extern, Lead = Triage + Landung AM ORT), 554 (Ritual B nach jedem
+  Compact), 555 (Volles GO Explore #323 auf dem naechsten freien WF-Platz, Q3 nach Q2). Order-Dateien im Owner-Order-
+  Beweisort, je Order 4 Traeger.
+**KON143-02 LANDUNG ABGLEICH 553 (B-27):** GOAL-/WELLENPLAN-/DESIGNPLAN-DICHT additiv AM ORT (H16b, FENSTER K (W2b)
+  RN-93..RN-97, W-17..W-19, T-14, D-14, D-7.7, D-8, Kopf-Bumps 28.09.; 159 Zeilen), super development f77af846 (Merge
+  --no-ff bau/abgleich-553 9d000b91; CI 288/16860 30/30), main-FF f77af846 (CI 288/16861 37/37), 4/4 Refs; Beweisort
+  20260928-order-553-vier-dicht-abgleich/ (r3 832 Z. a1cab55a, Lens r3 TRAEGT); ARBEITSWEISE-Anteil nur via #236 v4.6.
+**KON143-03 STACK-FASSUNG 2.5:** Strecke 'FIX-WELLE 2b' (Order 552) als eigene Strecke oberhalb der Wellen-Basis (W2
+  -> W2b -> W3), Phasen Gedaechtnis -> Review -> Explore -> Design (#319-Vorstufe) -> Bau -> Verify -> Fix -> Landung
+  -> Gitlink; Bau-Start OWNER-GATED (G-1); NACHTRAG-r13b-K388.md (Order 441).
+**KON143-04 OWNER-GATED (Post K388, Widerspruch genuegt):** G-1 Bau-Start 2b (Empfehlung erst nach GO), G-3 RN-75 in
+  FENSTER K, G-4 Dock-Gattung via #323, G-7 golden-GO je Landewelle; Kenntnisnahmen K-1..K-4 (OF-14 Explore zuerst,
+  ORT-Reihung, C-2 Kalender-Teil ueberholt, Regime-Zeile W-3 via #236).
+**KON143-05 THESIS-LESUNG KAP. 1-3 (OF-11):** 'Rang' = Zentralitaets-Rang der SOTA-Veroeffentlichungen, kein Tier-
+  Begriff; Glossar-Zeile DE/EN vorbereitet (20260928-order-552-of11-rang-glossar/); Begriffs-Mapping Orders
+  498/506/552 (Set = Gattung des Konzepts Container); 'Adapter' dreideutig (GoF/SOTA-Adapter, Container-Gattung,
+  HeuristikAdapter) = Eingang #323.
+**KON143-06 LEDGER-BACKLOG 22.-28.09. (Lead-Befund K389):** die Ereignisse zwischen KON142 (22.09.) und dieser KON
+  (Orders 396-548: Abgabe-Paket 22.09., Vortrag/Praesentation P-11, Thesis-Landungen bis 258c7e58 / super 903b20b5,
+  Pfad-Konsolidierung 432/441 mit Stack-Strecken ST-01..ST-13, Platten-Orders 525-544, Konten-Rotation) tragen noch
+  keine KON-Bloecke dieser Vollfassung; lebende Traeger sind je Order die Order-Datei, Memory, LQ und der Stack-
+  Nachtrag (Order 550), Board #328 = docs-Nachtrags-Zug KON144+ (Map ueber die Order-Dateien, Fable-Reduce, Lead-
+  Einspielung); Lens r9 dual Nachlauf-4 -> Fix r10 (K389) s. Board #231.
 ## KON142 -- 22.09.2026: NUTZUNGSRECHTE-VERTRAG SIGNIERT (Order 388) + ENDSTAND r3/r3b IN docs/recht + NAS-ABLAGE
 
 **KON142-01 SIGNATUR (Owner 22.09. 09:44:02Z Z.232278 verbatim: "Ich habe die SIGNIERT Fassung des Vertrages dort
